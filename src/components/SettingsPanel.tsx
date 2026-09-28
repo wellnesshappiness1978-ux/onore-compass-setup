@@ -52,7 +52,7 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
     <div className="space-y-5">
       <h2 className="font-serif text-2xl text-primary">{t.title}</h2>
 
-      <section className="glass-card rounded-2xl p-5">
+      <section className="rounded-2xl border border-primary/20 bg-card/40 shadow-2xl backdrop-blur-md p-5">
         <div className="flex items-center gap-4">
           <span className="grid size-16 place-items-center rounded-full border border-primary/40 bg-primary/10 text-primary">
             <UserRound className="size-8" strokeWidth={1.5} />
@@ -88,7 +88,7 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
         </div>
       </section>
 
-      <section className="glass-card rounded-2xl p-5">
+      <section className="rounded-2xl border border-primary/20 bg-card/40 shadow-2xl backdrop-blur-md p-5">
         <h3 className="font-serif text-lg text-primary">{t.membership}</h3>
         <div className="mt-3 overflow-hidden rounded-xl border border-primary/15 text-sm">
           <div className="grid grid-cols-[1fr_auto_auto] gap-x-4 bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
@@ -117,7 +117,7 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
         </Button>
       </section>
 
-      <section className="glass-card rounded-2xl p-5">
+      <section className="rounded-2xl border border-primary/20 bg-card/40 shadow-2xl backdrop-blur-md p-5">
         <h3 className="font-serif text-lg text-primary">{t.b2bTitle}</h3>
         <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-primary/15 p-3 text-sm">
           <span className={b2b ? "text-muted-foreground" : "text-primary"}>{t.personal}</span>
@@ -154,7 +154,7 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
                 ))}
                 {MATRIX.map((row, r) => (
                   <Fragment key={r}>
-                    <span className="truncate text-muted-foreground">{TEAM[r].split(" ")[1]}</span>
+                    <span className="truncate text-muted-foreground">{TEAM[r]?.split(" ")[1]}</span>
                     {row.map((v, c) => (
                       <span
                         key={`${r}-${c}`}
@@ -189,7 +189,7 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
               </h4>
               <div className="mt-2 grid grid-cols-7 gap-1 text-center text-[10px]">
                 {days.map((d, i) => {
-                  const level = [0, 1, 2, 0, 1, 1, 2][i];
+                  const level = [0, 1, 2, 0, 1, 1, 2][i] ?? 0;
                   return (
                     <div
                       key={i}
@@ -207,7 +207,7 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
         )}
       </section>
 
-      <section className="glass-card rounded-2xl p-5">
+      <section className="rounded-2xl border border-primary/20 bg-card/40 shadow-2xl backdrop-blur-md p-5">
         <h3 className="font-serif text-lg text-primary">{t.account}</h3>
         <Button
           variant="outline"
