@@ -74,7 +74,7 @@ export default function SettingsPanel({
 
   return (
     <div className="space-y-5">
-      <h2 className="font-serif text-2xl text-gold-gradient">{t.title}</h2>
+      <h2 className="font-serif text-2xl text-gradient-gold">{t.title}</h2>
 
       <section className={card}>
         <div className="flex items-center gap-4">
@@ -178,7 +178,7 @@ export default function SettingsPanel({
                 {SAMPLE_MATRIX.map((row, r) => (
                   <Fragment key={r}>
                     <span className="truncate text-left text-muted-foreground">
-                      {SAMPLE_TEAM[r].split(" ")[1]}
+                      {SAMPLE_TEAM[r]?.split(" ")[1]}
                     </span>
                     {row.map((v, c) => (
                       <span
