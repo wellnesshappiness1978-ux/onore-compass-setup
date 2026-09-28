@@ -9,3 +9,4 @@
 - [ ] Verify consultation responses, error states, and mobile/desktop layouts.
 - [x] Add the Step 5 natal nine-stars art preview with a VIP lock and wallpaper action reserved for verified paid members.
 - [x] Verify the locked art and CTA on mobile and desktop.
+- [x] Step 6: My Page, VIP comparison, B2B team mode preview, and app settings.
