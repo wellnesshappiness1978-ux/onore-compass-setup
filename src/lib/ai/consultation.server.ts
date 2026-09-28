@@ -29,7 +29,10 @@ export async function handleConsultation(request: Request) {
 
   const parsed = requestSchema.safeParse(await request.json());
   if (!parsed.success) {
-    return Response.json({ message: "Please check the consultation message and try again." }, { status: 400 });
+    return Response.json(
+      { message: "Please check the consultation message and try again." },
+      { status: 400 },
+    );
   }
 
   const { messages, profile, language } = parsed.data;
@@ -57,7 +60,10 @@ export async function handleConsultation(request: Request) {
   });
 
   return withLovableAiGatewayRunIdHeader(
-    result.toUIMessageStreamResponse({ originalMessages: messages as UIMessage[], sendReasoning: true }),
+    result.toUIMessageStreamResponse({
+      originalMessages: messages as UIMessage[],
+      sendReasoning: true,
+    }),
     runIdFetch,
   );
 }
