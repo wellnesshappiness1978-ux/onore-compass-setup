@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { Bell, CalendarDays, ChevronDown, ChevronRight, Compass, Crown, HeartHandshake, Home, LockKeyhole, Orbit, Palette, Settings2, Sparkles, UserRound, WandSparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -114,7 +114,7 @@ function TorisetsuPanel({ profile, language, onVip }: { profile: UserProfile; la
         <input id="partner-birth-date" type="date" min="1900-01-01" max={today} value={partnerDate} onChange={event => setPartnerDate(event.target.value)} className="field-luminous h-12 w-full rounded-md border border-primary/25 bg-background/60 px-4 text-foreground outline-none transition-colors focus:border-primary/60" />
       </div>
       {partnerDate ? <section className="py-8 text-center" aria-live="polite">
-        <div className="compatibility-meter relative mx-auto flex size-44 items-center justify-center rounded-full p-2 shadow-champagne" style={{ "--compatibility-score": `${score * 3.6}deg` } as React.CSSProperties}>
+        <div className="compatibility-meter relative mx-auto flex size-44 items-center justify-center rounded-full p-2 shadow-champagne" style={{ "--compatibility-score": `${score * 3.6}deg` } as CSSProperties}>
           <div className="flex size-full flex-col items-center justify-center rounded-full border border-primary/15 bg-background"><span className="text-xs text-muted-foreground">{t.score}</span><strong className="mt-1 font-serif text-4xl text-gradient-gold">{score}%</strong></div>
         </div>
         <p className="mx-auto mt-5 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
