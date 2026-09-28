@@ -14,6 +14,13 @@ import {
   ScrollText,
   Shield,
   Sparkles,
+  Target,
+  Moon,
+  SlidersHorizontal,
+  AlertTriangle,
+  Lightbulb,
+  Rocket,
+  Users,
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -65,7 +72,7 @@ function BiorhythmPreview({
   language: Language;
   onVip: () => void;
 }) {
-  const seed = Array.from(`${profile.birthDate}|${plan}`).reduce(
+  const seed = Array.from(profile.birthDate).reduce(
     (sum, character) => sum + character.charCodeAt(0),
     0,
   );
@@ -109,14 +116,32 @@ function BiorhythmPreview({
       />
     </svg>
   );
+  const dayType = (index: number): "push" | "calm" | "adjust" | "decision" => {
+    const score = value(index, 30);
+    return score > 76 ? "decision" : score > 52 ? "push" : score < 30 ? "calm" : "adjust";
+  };
 
   if (plan === "free") {
     return (
-      <div className="relative overflow-hidden rounded-xl border border-primary/15 bg-background/40 p-4">
-        <div className="select-none opacity-30 blur-md" aria-hidden="true">
-          {svg(30)}
+      <div className="overflow-hidden rounded-lg border border-primary/15 bg-background/40 p-4">
+        <div className="mb-3 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>{t.bioWeek}</span><span>{t.bioFuture}</span>
         </div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/40 px-4 text-center">
+        <div className="flex h-28 items-center gap-1" aria-label={t.bioWeek}>
+          {Array.from({ length: 7 }, (_, i) => (
+            <div key={i} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
+              <div className="w-full rounded-t-sm bg-primary/70" style={{ height: `${Math.max(15, value(i, 30))}%` }} />
+              <span className="text-[9px] text-muted-foreground">{i + 1}</span>
+            </div>
+          ))}
+          <div className="relative flex h-full flex-[3] items-center justify-center overflow-hidden rounded-md border border-primary/10 bg-card/50">
+            <div className="absolute inset-0 flex items-end gap-1 p-2 opacity-40 blur-md" aria-hidden="true">
+              {Array.from({ length: 9 }, (_, i) => <span key={i} className="flex-1 bg-primary/60" style={{ height: `${Math.max(15, value(i + 7, 30))}%` }} />)}
+            </div>
+            <LockKeyhole className="relative size-5 text-primary" aria-hidden="true" />
+          </div>
+        </div>
+        <div className="mt-4 flex flex-col items-center gap-2 text-center">
           <span className="flex size-10 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary shadow-[0_0_18px_var(--gold-glow)]">
             <LockKeyhole className="size-4" />
           </span>
@@ -131,33 +156,38 @@ function BiorhythmPreview({
 
   if (plan === "standard") {
     const count = 30;
-    const todayIndex = Math.min(new Date().getDate(), count) - 1;
-    const decisionDays = [...Array(count).keys()]
-      .sort((a, b) => value(b, count) - value(a, count))
-      .slice(0, 3)
-      .sort((a, b) => a - b);
-    const x = (index: number) => (index / (count - 1)) * 100;
+    const todayIndex = 0;
+    const labels = { push: t.push, calm: t.calm, adjust: t.bioAdjust, decision: t.bioLucky };
+    const decisionDays = Array.from({ length: count }, (_, i) => i).filter((i) => dayType(i) === "decision").slice(0, 4);
     return (
-      <div className="rounded-xl border border-primary/15 bg-background/40 p-4">
+      <div className="rounded-lg border border-primary/15 bg-background/40 p-4">
+        <p className="mb-2 text-xs font-medium text-primary">{t.bioMonthTitle}</p>
         <div className="relative">
           {svg(count)}
           <span
             className="absolute top-0 h-full w-px bg-primary/70"
-            style={{ left: `${x(todayIndex)}%` }}
+            style={{ left: `${(todayIndex / (count - 1)) * 100}%` }}
             aria-hidden="true"
           />
           <span
-            className="absolute top-0 -translate-x-1/2 rounded-full border border-primary/40 bg-background px-1.5 py-0.5 text-[9px] text-primary"
-            style={{ left: `${x(todayIndex)}%` }}
+            className="absolute left-0 top-0 rounded-full border border-primary/40 bg-background px-1.5 py-0.5 text-[9px] text-primary"
           >
             {t.bioToday}
           </span>
         </div>
-        <p className="mt-1 text-[10px] text-muted-foreground">{monthLabel(0)}</p>
+        <div className="mt-2 grid grid-cols-10 gap-1" aria-label={t.bioMonthTitle}>
+          {Array.from({ length: count }, (_, index) => {
+            const type = dayType(index);
+            return <div key={index} title={`${dayLabel(index)} · ${labels[type]}`} className={`flex min-w-0 flex-col items-center rounded-sm py-1 text-[9px] ${type === "decision" ? "bg-primary/25 text-primary" : type === "push" ? "bg-profile-wealth/20 text-profile-wealth" : type === "calm" ? "bg-profile-work/20 text-profile-work" : "bg-muted text-muted-foreground"}`}><span>{index + 1}</span><span aria-hidden="true">{type === "decision" ? "✦" : type === "push" ? "↑" : type === "calm" ? "↓" : "•"}</span></div>;
+          })}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
+          {(["push", "calm", "adjust", "decision"] as const).map((type) => <span key={type} className="flex items-center gap-1"><span className={`size-1.5 rounded-full ${type === "decision" ? "bg-primary" : type === "push" ? "bg-profile-wealth" : type === "calm" ? "bg-profile-work" : "bg-muted-foreground"}`} />{labels[type]}</span>)}
+        </div>
         <p className="mt-2 text-xs">
           <span className="text-muted-foreground">{t.bioDecision}: </span>
           <span className="font-medium text-primary">
-            {decisionDays.map((index) => index + 1).join("・")}
+            {decisionDays.map(dayLabel).join(" · ")}
           </span>
         </p>
       </div>
@@ -171,7 +201,8 @@ function BiorhythmPreview({
     const preps = indices.slice().sort((a, b) => value(a, count) - value(b, count)).slice(0, 2).sort((a, b) => a - b);
     const x = (index: number) => (index / (count - 1)) * 100;
     return (
-      <div className="rounded-xl border border-primary/15 bg-background/40 p-4">
+      <div className="rounded-lg border border-primary/15 bg-background/40 p-4">
+        <p className="mb-2 text-xs font-medium text-primary">{t.bioQuarterTitle}</p>
         <div className="relative">
           {svg(count)}
           {peaks.map((index) => (
@@ -208,14 +239,26 @@ function BiorhythmPreview({
             <span className="font-medium text-primary">{preps.map(dayLabel).join("・")}</span>
           </p>
         </div>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {[
+            { label: t.bioPeak, date: dayLabel(peaks[0] ?? 0), Icon: Target, color: "text-primary" },
+            { label: t.bioPrep, date: dayLabel(preps[0] ?? 0), Icon: SlidersHorizontal, color: "text-profile-work" },
+            { label: t.bioRefresh, date: dayLabel(preps[1] ?? 0), Icon: Moon, color: "text-profile-wealth" },
+            { label: t.bioAiDay, date: dayLabel(peaks[1] ?? 0), Icon: Sparkles, color: "text-profile-social" },
+          ].map(({ label, date, Icon, color }) => <div key={label} className="rounded-md border border-primary/15 bg-card/40 p-2"><Icon className={`mb-2 size-4 ${color}`} aria-hidden="true" /><p className="text-[10px] text-muted-foreground">{label}</p><p className="text-xs text-foreground">{date}</p></div>)}
+        </div>
       </div>
     );
   }
 
   const months = Array.from({ length: 12 }, (_, index) => value(index, 12));
   const indicatorMonths = t.bioIndicators.map((_, index) => (seed + index * 5) % 12);
+  const eventIcons = [Rocket, Moon, Target, Users, AlertTriangle, Lightbulb];
+  const eventColors = ["text-primary", "text-profile-wealth", "text-profile-love", "text-profile-work", "text-destructive", "text-profile-social"];
+  const eventBackgrounds = ["bg-primary", "bg-profile-wealth", "bg-profile-love", "bg-profile-work", "bg-destructive", "bg-profile-social"];
   return (
-    <div className="rounded-xl border border-primary/15 bg-background/40 p-4">
+    <div className="rounded-lg border border-primary/15 bg-background/40 p-4">
+      <p className="mb-3 text-xs font-medium text-primary">{t.bioAnnualTitle}</p>
       <div className="flex h-24 items-end gap-1" aria-hidden="true">
         {months.map((v, index) => (
           <div key={index} className="flex h-full flex-1 items-end">
@@ -236,13 +279,17 @@ function BiorhythmPreview({
           </span>
         ))}
       </div>
+      <div className="mt-2 flex gap-1" aria-label={t.bioAnnualTitle}>
+        {months.map((_, index) => <div key={index} className="flex min-w-0 flex-1 flex-wrap justify-center gap-0.5">{indicatorMonths.map((month, eventIndex) => month === index ? <span key={eventIndex} className={`size-1.5 rounded-full ${eventBackgrounds[eventIndex]}`} title={t.bioIndicators[eventIndex]} /> : null)}</div>)}
+      </div>
       <ul className="mt-4 space-y-1.5">
         {t.bioIndicators.map((indicator, index) => (
           <li
             key={indicator}
-            className="flex items-center justify-between gap-2 rounded-lg border border-primary/15 bg-background/40 px-3 py-2 text-xs"
+            className="flex items-center justify-between gap-2 rounded-md border border-primary/15 bg-background/40 px-3 py-2 text-xs"
           >
-            <span className="min-w-0 leading-5">{indicator}</span>
+            {(() => { const Icon = eventIcons[index] ?? Target; return <Icon className={`size-4 shrink-0 ${eventColors[index]}`} aria-hidden="true" />; })()}
+            <span className="min-w-0 flex-1 leading-5">{indicator}</span>
             <span className="shrink-0 rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
               {monthLabel(indicatorMonths[index] ?? 0)}
             </span>
@@ -262,6 +309,7 @@ export default function SettingsPanel({
 }: Props) {
   const t = settingsTranslations[language];
   const [plan, setPlan] = useState<Plan>("free");
+  const [bioPlan, setBioPlan] = useState<Plan>("free");
   const [yearly, setYearly] = useState(false);
   const [openTier, setOpenTier] = useState<string | null>("vip");
   const [b2b, setB2b] = useState(false);
@@ -347,9 +395,17 @@ export default function SettingsPanel({
         </div>
         <p className="mt-2 text-xs text-muted-foreground">{t.bioIntro}</p>
 
+        <div className="mt-4 grid grid-cols-2 gap-1 rounded-lg border border-primary/20 bg-background/60 p-1 sm:grid-cols-4" role="tablist" aria-label={t.bioTitle}>
+          {t.bioRanges.map((range) => (
+            <Button key={range.tier} id={`bio-tab-${range.tier}`} role="tab" aria-selected={bioPlan === range.tier} aria-controls="bio-preview" size="sm" variant="ghost" onClick={() => setBioPlan(range.tier)} className={`h-auto min-h-10 whitespace-normal rounded-md px-2 py-1 text-center text-[11px] leading-4 ${bioPlan === range.tier ? "bg-primary/20 text-primary shadow-[inset_0_0_0_1px_var(--primary)]" : "text-muted-foreground hover:text-primary"}`}>
+              {range.tier === "free" ? t.free : range.tier === "standard" ? t.standard : range.tier === "vip" ? "VIP" : t.corporate} ({range.range})
+            </Button>
+          ))}
+        </div>
+
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {t.bioRanges.map((range) => {
-            const active = range.tier === plan;
+            const active = range.tier === bioPlan;
             const tierName = t.tiers.find((tier) => tier.id === range.tier)?.name;
             return (
               <div
@@ -372,8 +428,8 @@ export default function SettingsPanel({
           })}
         </div>
 
-        <div className="mt-4">
-          <BiorhythmPreview plan={plan} profile={profile} t={t} language={language} onVip={onVip} />
+        <div id="bio-preview" role="tabpanel" aria-labelledby={`bio-tab-${bioPlan}`} className="mt-4">
+          <BiorhythmPreview plan={bioPlan} profile={profile} t={t} language={language} onVip={onVip} />
         </div>
         <p className="mt-3 text-[11px] text-muted-foreground">{t.bioSample}</p>
       </section>
