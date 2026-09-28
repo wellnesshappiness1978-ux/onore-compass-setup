@@ -1,0 +1,155 @@
+import type { Language } from "@/lib/translations";
+
+export type SettingsCopy = {
+  title: string;
+  guest: string;
+  planFree: string;
+  planVip: string;
+  planB2b: string;
+  testToggle: string;
+  testNote: string;
+  membership: string;
+  free: string;
+  vip: string;
+  benefits: [string, string, string];
+  freeValues: [string, string, string];
+  upgrade: string;
+  upgradeNote: string;
+  b2bTitle: string;
+  personal: string;
+  b2b: string;
+  sampleNote: string;
+  members: string;
+  roles: [string, string, string, string];
+  matrix: string;
+  roleMap: string;
+  roleAreas: [string, string, string, string];
+  calendar: string;
+  timing: [string, string, string];
+  account: string;
+  editProfile: string;
+  language: string;
+  notifications: string;
+  notifyDecision: string;
+  notifyBio: string;
+  notifyNote: string;
+  terms: string;
+  privacy: string;
+  help: string;
+  preparing: string;
+};
+
+export const settingsTranslations: Record<Language, SettingsCopy> = {
+  ja: {
+    title: "マイページ・設定", guest: "ゲストユーザー", planFree: "無料プラン", planVip: "VIP Member", planB2b: "B2B Enterprise Mode",
+    testToggle: "プラン表示テスト", testNote: "表示確認用の切替です。実際の会員状態・課金には反映されません。",
+    membership: "メンバーシップ", free: "無料", vip: "VIP",
+    benefits: ["AI相談", "高解像度曼陀羅ダウンロード", "生誕九星配置アート"], freeValues: ["1日2回", "—", "ロック"],
+    upgrade: "月額VIPプランに登録する (初回7日間無料)", upgradeNote: "VIPプランの登録受付は準備中です。",
+    b2bTitle: "BtoB 組織相性モード", personal: "個人モード", b2b: "B2B 組織コンサルティングモード",
+    sampleNote: "サンプルチームによるプレビューです。実際の占術計算ではありません。",
+    members: "チームメンバー", roles: ["経営者", "マネージャー", "メンバー", "メンバー"],
+    matrix: "チーム相性マトリクス", roleMap: "最適ロール配置マップ", roleAreas: ["ビジョン", "推進", "調整", "実務"],
+    calendar: "チーム決断タイミング", timing: ["攻め", "調整", "守り"],
+    account: "アカウント・アプリ設定", editProfile: "生年月日・プロフィールを編集", language: "言語",
+    notifications: "プッシュ通知", notifyDecision: "今日の決断タイミング通知", notifyBio: "バイオリズムアラート",
+    notifyNote: "通知の配信は準備中です。設定はこの画面でのみ保持されます。",
+    terms: "利用規約", privacy: "プライバシーポリシー", help: "ヘルプ・サポート", preparing: "このページは準備中です。",
+  },
+  en: {
+    title: "My Page & Settings", guest: "Guest user", planFree: "Free plan", planVip: "VIP Member", planB2b: "B2B Enterprise Mode",
+    testToggle: "Plan display test", testNote: "Display-only switch for testing. It does not change real membership or billing.",
+    membership: "Membership", free: "Free", vip: "VIP",
+    benefits: ["AI consultation", "High-res Mandala downloads", "Natal Nine Stars art"], freeValues: ["2 / day", "—", "Locked"],
+    upgrade: "Start monthly VIP (7-day free trial)", upgradeNote: "VIP sign-up is not available yet.",
+    b2bTitle: "B2B Organization Compatibility", personal: "Personal mode", b2b: "B2B organization consulting mode",
+    sampleNote: "Preview with a sample team. Not a real divination calculation.",
+    members: "Team members", roles: ["Executive", "Manager", "Member", "Member"],
+    matrix: "Team compatibility matrix", roleMap: "Optimal role map", roleAreas: ["Vision", "Drive", "Harmony", "Execution"],
+    calendar: "Team decision timing", timing: ["Push", "Adjust", "Hold"],
+    account: "Account & app settings", editProfile: "Edit birth data & profile", language: "Language",
+    notifications: "Push notifications", notifyDecision: "Today's decision timing", notifyBio: "Biorhythm alerts",
+    notifyNote: "Notifications are not delivered yet. Settings are kept on this screen only.",
+    terms: "Terms of Service", privacy: "Privacy Policy", help: "Help & Support", preparing: "This page is coming soon.",
+  },
+  "zh-CN": {
+    title: "我的页面·设置", guest: "访客用户", planFree: "免费方案", planVip: "VIP Member", planB2b: "B2B Enterprise Mode",
+    testToggle: "方案显示测试", testNote: "仅用于显示测试，不会改变实际会员状态或付费。",
+    membership: "会员", free: "免费", vip: "VIP",
+    benefits: ["AI咨询", "高清曼陀罗下载", "生辰九星配置艺术"], freeValues: ["每日2次", "—", "锁定"],
+    upgrade: "开通月度VIP（首7天免费）", upgradeNote: "VIP注册尚未开放。",
+    b2bTitle: "B2B 组织相性模式", personal: "个人模式", b2b: "B2B 组织咨询模式",
+    sampleNote: "示例团队预览，并非实际占术计算。",
+    members: "团队成员", roles: ["经营者", "经理", "成员", "成员"],
+    matrix: "团队相性矩阵", roleMap: "最佳角色分配图", roleAreas: ["愿景", "推进", "协调", "执行"],
+    calendar: "团队决策时机", timing: ["进攻", "调整", "守势"],
+    account: "账户与应用设置", editProfile: "编辑出生资料与个人资料", language: "语言",
+    notifications: "推送通知", notifyDecision: "今日决策时机通知", notifyBio: "生物节律提醒",
+    notifyNote: "通知尚未推送，设置仅保留在此页面。",
+    terms: "服务条款", privacy: "隐私政策", help: "帮助与支持", preparing: "此页面即将推出。",
+  },
+  "zh-TW": {
+    title: "我的頁面·設定", guest: "訪客用戶", planFree: "免費方案", planVip: "VIP Member", planB2b: "B2B Enterprise Mode",
+    testToggle: "方案顯示測試", testNote: "僅供顯示測試，不會改變實際會員狀態或付費。",
+    membership: "會員", free: "免費", vip: "VIP",
+    benefits: ["AI諮詢", "高解析曼陀羅下載", "生辰九星配置藝術"], freeValues: ["每日2次", "—", "鎖定"],
+    upgrade: "開通月費VIP（首7天免費）", upgradeNote: "VIP註冊尚未開放。",
+    b2bTitle: "B2B 組織相性模式", personal: "個人模式", b2b: "B2B 組織顧問模式",
+    sampleNote: "範例團隊預覽，並非實際占術計算。",
+    members: "團隊成員", roles: ["經營者", "經理", "成員", "成員"],
+    matrix: "團隊相性矩陣", roleMap: "最佳角色配置圖", roleAreas: ["願景", "推進", "協調", "執行"],
+    calendar: "團隊決策時機", timing: ["進攻", "調整", "守勢"],
+    account: "帳戶與應用設定", editProfile: "編輯出生資料與個人資料", language: "語言",
+    notifications: "推播通知", notifyDecision: "今日決策時機通知", notifyBio: "生物節律提醒",
+    notifyNote: "通知尚未推送，設定僅保留在此頁面。",
+    terms: "服務條款", privacy: "隱私權政策", help: "說明與支援", preparing: "此頁面即將推出。",
+  },
+  ko: {
+    title: "마이페이지·설정", guest: "게스트 사용자", planFree: "무료 플랜", planVip: "VIP Member", planB2b: "B2B Enterprise Mode",
+    testToggle: "플랜 표시 테스트", testNote: "표시 확인용 전환입니다. 실제 회원 상태나 결제에는 반영되지 않습니다.",
+    membership: "멤버십", free: "무료", vip: "VIP",
+    benefits: ["AI 상담", "고해상도 만다라 다운로드", "탄생 구궁성 아트"], freeValues: ["하루 2회", "—", "잠금"],
+    upgrade: "월간 VIP 가입 (첫 7일 무료)", upgradeNote: "VIP 가입은 아직 준비 중입니다.",
+    b2bTitle: "B2B 조직 궁합 모드", personal: "개인 모드", b2b: "B2B 조직 컨설팅 모드",
+    sampleNote: "샘플 팀 미리보기이며 실제 점술 계산이 아닙니다.",
+    members: "팀 멤버", roles: ["경영자", "매니저", "멤버", "멤버"],
+    matrix: "팀 궁합 매트릭스", roleMap: "최적 역할 배치 맵", roleAreas: ["비전", "추진", "조율", "실무"],
+    calendar: "팀 결정 타이밍", timing: ["공격", "조정", "수비"],
+    account: "계정·앱 설정", editProfile: "생년월일·프로필 편집", language: "언어",
+    notifications: "푸시 알림", notifyDecision: "오늘의 결정 타이밍 알림", notifyBio: "바이오리듬 알림",
+    notifyNote: "알림은 아직 발송되지 않으며 설정은 이 화면에서만 유지됩니다.",
+    terms: "이용약관", privacy: "개인정보 처리방침", help: "도움말·지원", preparing: "이 페이지는 준비 중입니다.",
+  },
+  es: {
+    title: "Mi página y ajustes", guest: "Usuario invitado", planFree: "Plan gratuito", planVip: "VIP Member", planB2b: "B2B Enterprise Mode",
+    testToggle: "Prueba de visualización", testNote: "Solo cambia la vista para pruebas. No modifica la membresía ni pagos reales.",
+    membership: "Membresía", free: "Gratis", vip: "VIP",
+    benefits: ["Consultas con IA", "Descargas de mandala en alta resolución", "Arte natal de nueve estrellas"], freeValues: ["2 / día", "—", "Bloqueado"],
+    upgrade: "Suscribirse a VIP mensual (7 días gratis)", upgradeNote: "La suscripción VIP aún no está disponible.",
+    b2bTitle: "Compatibilidad organizacional B2B", personal: "Modo personal", b2b: "Modo consultoría organizacional B2B",
+    sampleNote: "Vista previa con un equipo de ejemplo. No es un cálculo real.",
+    members: "Miembros del equipo", roles: ["Directivo", "Gerente", "Miembro", "Miembro"],
+    matrix: "Matriz de compatibilidad", roleMap: "Mapa de roles óptimos", roleAreas: ["Visión", "Impulso", "Armonía", "Ejecución"],
+    calendar: "Momentos de decisión del equipo", timing: ["Avanzar", "Ajustar", "Esperar"],
+    account: "Cuenta y ajustes", editProfile: "Editar datos de nacimiento y perfil", language: "Idioma",
+    notifications: "Notificaciones push", notifyDecision: "Momento de decisión de hoy", notifyBio: "Alertas de biorritmo",
+    notifyNote: "Las notificaciones aún no se envían. Los ajustes se mantienen solo en esta pantalla.",
+    terms: "Términos del servicio", privacy: "Política de privacidad", help: "Ayuda y soporte", preparing: "Esta página estará disponible pronto.",
+  },
+  fr: {
+    title: "Ma page et réglages", guest: "Utilisateur invité", planFree: "Offre gratuite", planVip: "VIP Member", planB2b: "B2B Enterprise Mode",
+    testToggle: "Test d'affichage de l'offre", testNote: "Bascule d'affichage pour test uniquement. Aucun effet sur l'abonnement ou la facturation.",
+    membership: "Abonnement", free: "Gratuit", vip: "VIP",
+    benefits: ["Consultation IA", "Mandalas haute résolution", "Art natal des neuf étoiles"], freeValues: ["2 / jour", "—", "Verrouillé"],
+    upgrade: "S'abonner au VIP mensuel (7 jours offerts)", upgradeNote: "L'inscription VIP n'est pas encore disponible.",
+    b2bTitle: "Compatibilité d'organisation B2B", personal: "Mode personnel", b2b: "Mode conseil organisationnel B2B",
+    sampleNote: "Aperçu avec une équipe exemple. Ce n'est pas un calcul réel.",
+    members: "Membres de l'équipe", roles: ["Dirigeant", "Manager", "Membre", "Membre"],
+    matrix: "Matrice de compatibilité", roleMap: "Carte des rôles optimaux", roleAreas: ["Vision", "Impulsion", "Harmonie", "Exécution"],
+    calendar: "Moments de décision d'équipe", timing: ["Agir", "Ajuster", "Attendre"],
+    account: "Compte et réglages", editProfile: "Modifier naissance et profil", language: "Langue",
+    notifications: "Notifications push", notifyDecision: "Moment de décision du jour", notifyBio: "Alertes biorythme",
+    notifyNote: "Les notifications ne sont pas encore envoyées. Réglages conservés sur cet écran uniquement.",
+    terms: "Conditions d'utilisation", privacy: "Politique de confidentialité", help: "Aide et support", preparing: "Cette page arrive bientôt.",
+  },
+};
