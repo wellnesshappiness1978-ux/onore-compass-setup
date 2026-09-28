@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Bell, ChevronRight, Compass, Crown, Home, Orbit, Settings2, Sparkles, UserRound, WandSparkles, X } from "lucide-react";
+import { Bell, ChevronRight, Compass, Crown, Home, Orbit, Settings2, Sparkles, UserRound, WandSparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { PREFECTURES, type UserProfile } from "./Onboarding";
