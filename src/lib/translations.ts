@@ -1,8 +1,8 @@
 export const languages = [
   { code: "ja", short: "JP", flag: "🇯🇵", label: "日本語" },
   { code: "en", short: "EN", flag: "🇺🇸", label: "English" },
-  { code: "zh-CN", short: "简", flag: "🇨🇳", label: "简体中文" },
-  { code: "zh-TW", short: "繁", flag: "🇹🇼", label: "繁體中文" },
+  { code: "zh-CN", short: "CN", flag: "🇨🇳", label: "简体中文" },
+  { code: "zh-TW", short: "TW", flag: "🇹🇼", label: "繁體中文" },
   { code: "ko", short: "KO", flag: "🇰🇷", label: "한국어" },
   { code: "es", short: "ES", flag: "🇪🇸", label: "Español" },
   { code: "fr", short: "FR", flag: "🇫🇷", label: "Français" },

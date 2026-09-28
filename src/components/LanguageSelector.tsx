@@ -20,7 +20,7 @@ export default function LanguageSelector({ language, onChange }: Props) {
             <ChevronDown className="size-3 text-muted-foreground" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" sideOffset={8} className="w-56 max-h-[min(26rem,calc(100dvh-5rem))] overflow-y-auto rounded-lg border border-primary/25 bg-popover/95 p-1.5 text-popover-foreground shadow-2xl backdrop-blur-xl">
+        <DropdownMenuContent align="end" sideOffset={8} className="w-56 max-h-[min(26rem,calc(100dvh-5rem))] overflow-y-auto rounded-lg border border-primary/30 bg-popover p-1.5 text-popover-foreground shadow-2xl backdrop-blur-xl">
           {languages.map((item) => (
             <DropdownMenuItem
               key={item.code}
