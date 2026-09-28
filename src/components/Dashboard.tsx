@@ -1,5 +1,5 @@
 import { useRef, useState, type CSSProperties } from "react";
-import { Bell, CalendarDays, ChevronDown, ChevronRight, Compass, Crown, HeartHandshake, Home, LockKeyhole, Orbit, Palette, Settings2, Sparkles, UserRound, WandSparkles } from "lucide-react";
+import { Bell, CalendarDays, ChevronRight, Compass, Crown, HeartHandshake, Home, LockKeyhole, Orbit, Palette, Settings2, Sparkles, UserRound, WandSparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { PREFECTURES, type UserProfile } from "./Onboarding";
@@ -91,17 +91,20 @@ function TorisetsuPanel({ profile, language, onVip }: { profile: UserProfile; la
     </div>
 
     {mode === "manual" ? <div className="mt-7">
-      <div className="text-center"><Sparkles className="mx-auto size-5 text-primary" strokeWidth={1.2} /><h3 className="mt-3 font-serif text-xl text-gradient-gold sm:text-2xl">{t.manualTitle}</h3><p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t.manualIntro}</p></div>
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        {base.arts.map((art, index) => <details key={art} className="group card-lux rounded-lg open:border-primary/45">
-          <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 [&::-webkit-details-marker]:hidden">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-primary/10 font-serif text-xs text-primary">{String(index + 1).padStart(2, "0")}</span>
-            <span className="min-w-0 flex-1"><span className="block font-serif text-sm text-foreground">{art}</span><span className="mt-1 block text-xs text-muted-foreground">{t.summaryThemes[index % t.summaryThemes.length]}</span></span>
-            <ChevronDown className="size-4 shrink-0 text-primary transition-transform group-open:rotate-180" aria-label={t.detailLabel} />
-          </summary>
-          <p className="border-t border-primary/10 px-4 py-4 text-sm leading-6 text-muted-foreground">{t.summaryThemes[(index + 2) % t.summaryThemes.length]} — {t.preview}</p>
-        </details>)}
-      </div>
+      <div className="text-center"><Sparkles className="mx-auto size-5 text-primary" strokeWidth={1.2} /><h3 className="mx-auto mt-3 max-w-xl font-serif text-xl leading-relaxed text-gradient-gold sm:text-2xl">{t.manualTitle}</h3><p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t.manualIntro}</p></div>
+      <section className="card-lux relative mt-7 overflow-hidden rounded-lg px-5 py-7 sm:px-9 sm:py-9" aria-label={t.manualTitle}>
+        <div className="pointer-events-none absolute right-5 top-3 font-serif text-7xl leading-none text-primary/10" aria-hidden="true">✧</div>
+        <div className="relative space-y-0">
+          {[
+            { title: t.coreTitle, body: t.coreBody, symbol: "✦" },
+            { title: t.decisionTitle, body: t.decisionBody, symbol: "◇" },
+            { title: t.timingTitle, body: t.timingBody, symbol: "☼" },
+          ].map((part, index) => <div key={part.title} className={`grid gap-3 py-6 first:pt-0 last:pb-0 sm:grid-cols-[4rem_1fr] sm:gap-5 ${index > 0 ? "border-t border-primary/20" : ""}`}>
+            <div className="flex size-11 items-center justify-center rounded-full border border-primary/40 bg-primary/10 font-serif text-2xl text-primary shadow-champagne" aria-hidden="true">{part.symbol}</div>
+            <div><p className="mb-1 text-[10px] text-primary/65">0{index + 1} / 03</p><h4 className="font-serif text-base text-gold-glow sm:text-lg">{part.title}</h4><p className="mt-3 text-sm leading-7 text-foreground/80">{part.body}</p></div>
+          </div>)}
+        </div>
+      </section>
       <section className="mt-6 border-y border-primary/15 py-6">
         <div className="flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-primary"><Palette className="size-5" strokeWidth={1.2} /></span><div><h3 className="font-serif text-lg text-foreground">{t.colorsTitle}</h3><p className="text-xs text-muted-foreground">{t.colorsIntro}</p></div></div>
         <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3">{t.colorLabels.map((label, index) => <div key={label} className="flex items-center gap-3"><span className={`size-9 shrink-0 rounded-full border-2 border-foreground/20 shadow-champagne ${swatchClasses[index]}`} /><span><span className="block text-xs text-muted-foreground">{label}</span><strong className="mt-0.5 block text-xs font-medium text-foreground">{t.colorNames[index]}</strong></span></div>)}</div>
