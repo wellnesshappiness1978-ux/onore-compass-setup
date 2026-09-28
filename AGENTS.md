@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep language selection in the index screen's React state and translate onboarding/dashboard through `src/lib/translations.ts`; this preserves the selected language across the in-page transition without persistence or a backend.
+- Keep dashboard tabs, compass interaction, and daily demo state local to `Dashboard.tsx`; there is no calculation service or persistent account yet, so avoid implying real readings or VIP entitlement.
