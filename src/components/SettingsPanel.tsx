@@ -2,6 +2,8 @@ import { Fragment, useState } from "react";
 import {
   Bell,
   Building2,
+  Check,
+  ChevronDown,
   Crown,
   Globe2,
   HelpCircle,
@@ -55,6 +57,8 @@ export default function SettingsPanel({
 }: Props) {
   const t = settingsTranslations[language];
   const [plan, setPlan] = useState<Plan>("free");
+  const [yearly, setYearly] = useState(false);
+  const [openTier, setOpenTier] = useState<string | null>("vip");
   const [b2b, setB2b] = useState(false);
   const [notifyTiming, setNotifyTiming] = useState(true);
   const [notifyBio, setNotifyBio] = useState(false);
@@ -114,29 +118,121 @@ export default function SettingsPanel({
       </section>
 
       <section className={card}>
-        <h3 className="mb-4 font-serif text-lg text-primary">{t.membership}</h3>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-xs text-muted-foreground">
-              <th className="pb-2 text-left font-normal" />
-              <th className="pb-2 font-normal">{t.free}</th>
-              <th className="pb-2 text-primary">{t.vip}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {t.benefits.map((b, i) => (
-              <tr key={b} className="border-t border-primary/10">
-                <td className="py-2.5 pr-2">{b}</td>
-                <td className="py-2.5 text-center text-muted-foreground">{t.freeValues[i]}</td>
-                <td className="py-2.5 text-center text-primary">{t.vipValues[i]}</td>
-              </tr>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="font-serif text-lg text-primary">{t.plansHeading}</h3>
+          <div
+            className="flex rounded-full border border-primary/25 bg-background/50 p-1 text-xs"
+            role="radiogroup"
+            aria-label={t.plansHeading}
+          >
+            {(
+              [
+                [false, t.billingMonthly],
+                [true, t.billingYearly],
+              ] as const
+            ).map(([value, label]) => (
+              <Button
+                key={label}
+                role="radio"
+                aria-checked={yearly === value}
+                size="sm"
+                variant="ghost"
+                onClick={() => setYearly(value)}
+                className={`h-7 rounded-full px-3 text-xs ${
+                  yearly === value ? "bg-primary/20 text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {label}
+              </Button>
             ))}
-          </tbody>
-        </table>
-        <Button onClick={onVip} className="mt-5 h-12 w-full">
-          <Crown className="size-4" /> {t.upgrade}
-        </Button>
-        <p className="mt-2 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {t.tiers.map((tier) => {
+            const isVip = tier.id === "vip";
+            const isB2b = tier.id === "b2b";
+            const open = openTier === tier.id;
+            const price = yearly ? tier.priceYearly : tier.priceMonthly;
+            const period = yearly ? t.perYear : t.perMonth;
+            return (
+              <div
+                key={tier.id}
+                className={`overflow-hidden rounded-2xl border transition-shadow ${
+                  isVip
+                    ? "border-primary/70 bg-primary/10 shadow-[0_0_28px_-6px_var(--gold-glow)]"
+                    : "border-primary/15 bg-background/40"
+                }`}
+              >
+                <button
+                  onClick={() => setOpenTier(open ? null : tier.id)}
+                  aria-expanded={open}
+                  className="flex w-full items-center gap-3 p-4 text-left"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className={`font-serif text-sm ${isVip ? "text-gradient-gold" : ""}`}>
+                        {tier.name}
+                      </p>
+                      {isVip && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-champagne-gradient px-2 py-0.5 text-[10px] font-semibold text-[#10131a] shadow-champagne">
+                          <Crown className="size-3" /> {t.popular}
+                        </span>
+                      )}
+                      {isB2b && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
+                          <Building2 className="size-3" /> {t.corporate}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 flex items-baseline gap-1">
+                      <span
+                        className={`text-xl font-semibold ${isVip ? "text-gradient-gold" : "text-foreground"}`}
+                      >
+                        {price}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">
+                        {tier.id === "b2b" ? tier.priceNote : period}
+                      </span>
+                      {tier.priceNote && tier.id !== "b2b" && (
+                        <span className="ml-1 text-[10px] text-primary">{tier.priceNote}</span>
+                      )}
+                    </p>
+                  </div>
+                  <ChevronDown
+                    className={`size-4 shrink-0 text-primary transition-transform ${open ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {open && (
+                  <div className="border-t border-primary/10 px-4 pb-4 pt-3">
+                    <ul className="space-y-1.5">
+                      {tier.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-xs">
+                          <Check
+                            className={`mt-0.5 size-3.5 shrink-0 ${isVip ? "text-primary" : "text-muted-foreground"}`}
+                          />
+                          <span className={isVip ? "text-foreground" : "text-muted-foreground"}>
+                            {f}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      onClick={() => (isVip ? onVip() : setNotice(`${tier.name}: ${t.soon}`))}
+                      disabled={tier.id === "free"}
+                      size="sm"
+                      className={`mt-3 h-9 w-full ${isVip ? "shadow-champagne-strong" : ""}`}
+                      variant={isVip ? "default" : "outline"}
+                    >
+                      {tier.cta}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
       </section>
 
       <section className={card}>

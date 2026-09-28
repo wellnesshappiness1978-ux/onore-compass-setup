@@ -10,3 +10,4 @@
 - [x] Add the Step 5 natal nine-stars art preview with a VIP lock and wallpaper action reserved for verified paid members.
 - [x] Verify the locked art and CTA on mobile and desktop.
 - [x] Step 6: My Page, VIP comparison, B2B team mode preview, and app settings.
+- [x] Replace the Free/VIP table with the 4-tier pricing (無料 / スタンダード ¥333・¥3,333 / VIP ¥777・¥7,777 人気No.1 / 法人 ¥9,800〜) using expandable cards and a monthly-yearly toggle in all 7 languages; verified mobile and desktop.
