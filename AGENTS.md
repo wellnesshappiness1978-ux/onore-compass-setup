@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep language selection in the index screen's React state and translate onboarding/dashboard through `src/lib/translations.ts`; this preserves the selected language across the in-page transition without persistence or a backend.

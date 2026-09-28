@@ -2,6 +2,8 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import Onboarding, { type UserProfile } from "@/components/Onboarding";
 import Dashboard from "@/components/Dashboard";
+import LanguageSelector from "@/components/LanguageSelector";
+import { type Language } from "@/lib/translations";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,10 +28,16 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [language, setLanguage] = useState<Language>("ja");
 
-  return profile ? (
-    <Dashboard profile={profile} onEdit={() => setProfile(null)} />
-  ) : (
-    <Onboarding onComplete={setProfile} />
+  return (
+    <>
+      <LanguageSelector language={language} onChange={setLanguage} />
+      {profile ? (
+        <Dashboard profile={profile} onEdit={() => setProfile(null)} language={language} />
+      ) : (
+        <Onboarding onComplete={setProfile} language={language} />
+      )}
+    </>
   );
 }
