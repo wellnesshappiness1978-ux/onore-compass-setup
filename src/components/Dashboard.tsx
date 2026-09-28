@@ -119,15 +119,47 @@ function TorisetsuPanel({ profile, language, onVip }: { profile: UserProfile; la
       <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
     </div> : <div className="mx-auto mt-7 max-w-2xl">
       <div className="text-center"><HeartHandshake className="mx-auto size-6 text-primary" strokeWidth={1.2} /><h3 className="mt-3 font-serif text-xl text-gradient-gold sm:text-2xl">{t.compatibility}</h3><p className="mt-2 text-sm text-muted-foreground">{t.partnerHint}</p></div>
-      <div className="mt-6 border-y border-primary/15 py-6">
-        <label htmlFor="partner-birth-date" className="mb-2 flex items-center gap-2 text-sm text-foreground"><CalendarDays className="size-4 text-primary" />{t.partnerBirthDate}</label>
-        <input id="partner-birth-date" type="date" min="1900-01-01" max={today} value={partnerDate} onChange={event => setPartnerDate(event.target.value)} className="field-luminous h-12 w-full rounded-md border border-primary/25 bg-background/60 px-4 text-foreground outline-none transition-colors focus:border-primary/60" />
-      </div>
-      {partnerDate ? <section className="py-8 text-center" aria-live="polite">
+      <section className="card-lux mt-6 rounded-lg p-5 sm:p-7" aria-label={t.compatibility}>
+        <div className="space-y-5">
+          <div>
+            <label htmlFor="partner-name" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary"><UserRound className="size-4 stroke-[1.4]" aria-hidden="true" />{t.partnerName} <span className="text-xs font-normal text-primary/70">{t.optional}</span></label>
+            <input id="partner-name" type="text" maxLength={40} placeholder={t.partnerNamePlaceholder} value={partnerName} onChange={event => setPartnerName(event.target.value)} className={inputClass} />
+          </div>
+          <div>
+            <label htmlFor="partner-birth-date" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary"><CalendarDays className="size-4 stroke-[1.4]" aria-hidden="true" />{t.partnerBirthDate} <span className="text-xs font-normal text-primary/70">{base.required}</span></label>
+            <input id="partner-birth-date" type="date" min="1900-01-01" max={today} value={partnerDate} onChange={event => { setPartnerDate(event.target.value); setAnalyzed(false); }} className={inputClass} />
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label htmlFor="partner-birth-time" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary"><Clock3 className="size-4 stroke-[1.4]" aria-hidden="true" />{t.partnerTime} <span className="text-xs font-normal text-primary/70">{t.optional}</span></label>
+              <input id="partner-birth-time" type="time" value={partnerTime} disabled={partnerTimeUnknown} onChange={event => setPartnerTime(event.target.value)} className={inputClass} />
+              <label className="mt-2 flex cursor-pointer items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={partnerTimeUnknown} onChange={event => { setPartnerTimeUnknown(event.target.checked); if (event.target.checked) setPartnerTime(""); }} className="size-4 rounded border-input accent-[var(--primary)]" />{base.timeUnknown}</label>
+            </div>
+            <div>
+              <label htmlFor="partner-birth-place" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary"><MapPin className="size-4 stroke-[1.4]" aria-hidden="true" />{t.partnerPlace} <span className="text-xs font-normal text-primary/70">{t.optional}</span></label>
+              <select id="partner-birth-place" value={partnerPlace} onChange={event => setPartnerPlace(event.target.value)} className={`${inputClass} appearance-none pr-10`}>
+                <option value="">{base.selectPlace}</option>
+                {PREFECTURES.map((pref, index) => <option key={pref} value={pref}>{["en", "es", "fr"].includes(language) ? prefecturesRomanized[index] : pref}</option>)}
+              </select>
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary"><Network className="size-4 stroke-[1.4]" aria-hidden="true" />{t.relationLabel} <span className="text-xs font-normal text-primary/70">{base.required}</span></p>
+            <div className="grid grid-cols-2 gap-2">{t.relations.map((rel, index) => <Button key={rel} type="button" variant="outline" onClick={() => { setRelation(index); setAnalyzed(false); }} aria-pressed={relation === index} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${relation === index ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}>{rel}</Button>)}</div>
+          </div>
+          <Button type="button" variant="champagne" disabled={!canAnalyze} onClick={() => setAnalyzed(true)} className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"><Sparkles className="size-4 shrink-0" aria-hidden="true" />{t.analyzeCta}</Button>
+        </div>
+      </section>
+      {analyzed && canAnalyze ? <section className="py-8 text-center" aria-live="polite">
+        {partnerName ? <p className="mb-4 text-sm text-muted-foreground">{partnerName}</p> : null}
         <div className="compatibility-meter relative mx-auto flex size-44 items-center justify-center rounded-full p-2 shadow-champagne" style={{ "--compatibility-score": `${score * 3.6}deg` } as CSSProperties}>
           <div className="flex size-full flex-col items-center justify-center rounded-full border border-primary/15 bg-background"><span className="text-xs text-muted-foreground">{t.score}</span><strong className="mt-1 font-serif text-4xl text-gradient-gold">{score}%</strong></div>
         </div>
-        <p className="mx-auto mt-5 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
+        <div className="mx-auto mt-6 max-w-lg rounded-lg border border-primary/20 bg-primary/5 px-5 py-4 text-left">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">{t.coreLabel}</p>
+          <p className="mt-2 text-sm leading-7 text-foreground">{t.coreDynamics[relation ?? 0]}</p>
+        </div>
+        <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
       </section> : null}
       <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
         <div className="select-none space-y-3 opacity-20 blur-[2px]" aria-hidden="true"><div className="mx-auto h-3 w-3/4 rounded-full bg-primary/40" /><div className="mx-auto h-3 w-full rounded-full bg-foreground/30" /><div className="mx-auto h-3 w-5/6 rounded-full bg-foreground/30" /><div className="grid grid-cols-2 gap-3 pt-5"><div className="h-16 rounded-md border border-primary/20" /><div className="h-16 rounded-md border border-primary/20" /></div></div>
