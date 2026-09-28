@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
-import { Bell, ChevronRight, Compass, Crown, Home, Orbit, Settings2, Sparkles, UserRound, WandSparkles } from "lucide-react";
+import { Bell, CalendarDays, ChevronDown, ChevronRight, Compass, Crown, HeartHandshake, Home, LockKeyhole, Orbit, Palette, Settings2, Sparkles, UserRound, WandSparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { PREFECTURES, type UserProfile } from "./Onboarding";
-import { dashboardTranslations, prefecturesRomanized, translations, type Language } from "@/lib/translations";
+import { dashboardTranslations, prefecturesRomanized, torisetsuTranslations, translations, type Language } from "@/lib/translations";
 
 type Props = { profile: UserProfile; onEdit: () => void; language: Language };
 type Tab = "home" | "arts" | "consult" | "mandala" | "settings";
@@ -71,6 +71,63 @@ function ProfileRows({ profile, language }: { profile: UserProfile; language: La
   return <div>{rows.map(([label, value]) => <div key={label} className="flex items-center justify-between gap-4 border-b border-primary/10 py-3 last:border-0"><span className="text-sm text-muted-foreground">{label}</span><span className="text-right text-sm text-foreground">{value}</span></div>)}</div>;
 }
 
+const swatchClasses = ["profile-swatch-overall", "profile-swatch-wealth", "profile-swatch-work", "profile-swatch-love", "profile-swatch-social", "profile-swatch-health"];
+
+function TorisetsuPanel({ profile, language, onVip }: { profile: UserProfile; language: Language; onVip: () => void }) {
+  const t = torisetsuTranslations[language];
+  const base = translations[language];
+  const [mode, setMode] = useState<"manual" | "compatibility">("manual");
+  const [partnerDate, setPartnerDate] = useState("");
+  const score = partnerDate
+    ? 56 + (Array.from(`${profile.birthDate}${partnerDate}`).reduce((total, character) => total + character.charCodeAt(0), 0) % 41)
+    : 0;
+  const advice = score >= 84 ? t.advice[2] : score >= 70 ? t.advice[1] : t.advice[0];
+  const today = new Date().toISOString().slice(0, 10);
+
+  return <div>
+    <div className="mx-auto grid max-w-xl grid-cols-2 rounded-lg border border-primary/20 bg-background/55 p-1 shadow-champagne" role="tablist" aria-label={base.artsTitle}>
+      <Button type="button" variant="ghost" role="tab" aria-selected={mode === "manual"} onClick={() => setMode("manual")} className={`min-h-11 whitespace-normal rounded-md px-2 text-xs sm:text-sm ${mode === "manual" ? "bg-champagne-gradient text-primary-foreground shadow-champagne hover:text-primary-foreground" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}>{t.manual}</Button>
+      <Button type="button" variant="ghost" role="tab" aria-selected={mode === "compatibility"} onClick={() => setMode("compatibility")} className={`min-h-11 whitespace-normal rounded-md px-2 text-xs sm:text-sm ${mode === "compatibility" ? "bg-champagne-gradient text-primary-foreground shadow-champagne hover:text-primary-foreground" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}>{t.compatibility}</Button>
+    </div>
+
+    {mode === "manual" ? <div className="mt-7">
+      <div className="text-center"><Sparkles className="mx-auto size-5 text-primary" strokeWidth={1.2} /><h3 className="mt-3 font-serif text-xl text-gradient-gold sm:text-2xl">{t.manualTitle}</h3><p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t.manualIntro}</p></div>
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        {base.arts.map((art, index) => <details key={art} className="group card-lux rounded-lg open:border-primary/45">
+          <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 [&::-webkit-details-marker]:hidden">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-primary/10 font-serif text-xs text-primary">{String(index + 1).padStart(2, "0")}</span>
+            <span className="min-w-0 flex-1"><span className="block font-serif text-sm text-foreground">{art}</span><span className="mt-1 block text-xs text-muted-foreground">{t.summaryThemes[index % t.summaryThemes.length]}</span></span>
+            <ChevronDown className="size-4 shrink-0 text-primary transition-transform group-open:rotate-180" aria-label={t.detailLabel} />
+          </summary>
+          <p className="border-t border-primary/10 px-4 py-4 text-sm leading-6 text-muted-foreground">{t.summaryThemes[(index + 2) % t.summaryThemes.length]} — {t.preview}</p>
+        </details>)}
+      </div>
+      <section className="mt-6 border-y border-primary/15 py-6">
+        <div className="flex items-center gap-3"><span className="flex size-10 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-primary"><Palette className="size-5" strokeWidth={1.2} /></span><div><h3 className="font-serif text-lg text-foreground">{t.colorsTitle}</h3><p className="text-xs text-muted-foreground">{t.colorsIntro}</p></div></div>
+        <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3">{t.colorLabels.map((label, index) => <div key={label} className="flex items-center gap-3"><span className={`size-9 shrink-0 rounded-full border-2 border-foreground/20 shadow-champagne ${swatchClasses[index]}`} /><span><span className="block text-xs text-muted-foreground">{label}</span><strong className="mt-0.5 block text-xs font-medium text-foreground">{t.colorNames[index]}</strong></span></div>)}</div>
+      </section>
+      <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
+    </div> : <div className="mx-auto mt-7 max-w-2xl">
+      <div className="text-center"><HeartHandshake className="mx-auto size-6 text-primary" strokeWidth={1.2} /><h3 className="mt-3 font-serif text-xl text-gradient-gold sm:text-2xl">{t.compatibility}</h3><p className="mt-2 text-sm text-muted-foreground">{t.partnerHint}</p></div>
+      <div className="mt-6 border-y border-primary/15 py-6">
+        <label htmlFor="partner-birth-date" className="mb-2 flex items-center gap-2 text-sm text-foreground"><CalendarDays className="size-4 text-primary" />{t.partnerBirthDate}</label>
+        <input id="partner-birth-date" type="date" min="1900-01-01" max={today} value={partnerDate} onChange={event => setPartnerDate(event.target.value)} className="field-luminous h-12 w-full rounded-md border border-primary/25 bg-background/60 px-4 text-foreground outline-none transition-colors focus:border-primary/60" />
+      </div>
+      {partnerDate ? <section className="py-8 text-center" aria-live="polite">
+        <div className="compatibility-meter relative mx-auto flex size-44 items-center justify-center rounded-full p-2 shadow-champagne" style={{ "--compatibility-score": `${score * 3.6}deg` } as React.CSSProperties}>
+          <div className="flex size-full flex-col items-center justify-center rounded-full border border-primary/15 bg-background"><span className="text-xs text-muted-foreground">{t.score}</span><strong className="mt-1 font-serif text-4xl text-gradient-gold">{score}%</strong></div>
+        </div>
+        <p className="mx-auto mt-5 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
+      </section> : null}
+      <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
+        <div className="select-none space-y-3 opacity-20 blur-[2px]" aria-hidden="true"><div className="mx-auto h-3 w-3/4 rounded-full bg-primary/40" /><div className="mx-auto h-3 w-full rounded-full bg-foreground/30" /><div className="mx-auto h-3 w-5/6 rounded-full bg-foreground/30" /><div className="grid grid-cols-2 gap-3 pt-5"><div className="h-16 rounded-md border border-primary/20" /><div className="h-16 rounded-md border border-primary/20" /></div></div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/55 px-6 backdrop-blur-sm"><span className="flex size-11 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary"><LockKeyhole className="size-5" /></span><h4 className="mt-3 font-serif text-lg text-foreground">{t.lockedTitle}</h4><p className="mt-2 max-w-md text-xs leading-5 text-muted-foreground">{t.lockedBody}</p><Button variant="champagne" onClick={onVip} className="mt-5 min-h-10 whitespace-normal px-5"><Crown className="size-4" />{t.unlock}</Button></div>
+      </section>
+      <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
+    </div>}
+  </div>;
+}
+
 export default function Dashboard({ profile, onEdit, language }: Props) {
   const t = dashboardTranslations[language];
   const base = translations[language];
@@ -121,7 +178,7 @@ export default function Dashboard({ profile, onEdit, language }: Props) {
         <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.demo}</p>
       </> : <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
         <div className="mb-8 text-center"><Sparkles className="mx-auto size-6 text-primary" strokeWidth={1} /><h2 className="mt-3 font-serif text-2xl text-gradient-gold">{navigation.find(n => n.id === tab)?.label}</h2></div>
-        {tab === "arts" ? <><p className="mb-6 text-center text-sm text-muted-foreground">{t.artsSubtitle}</p><div className="grid grid-cols-2 gap-3 sm:grid-cols-3">{base.arts.map((art, i) => <div key={art} className="card-lux flex min-h-24 flex-col justify-between rounded-lg p-4"><span className="text-xs text-primary/70">{String(i + 1).padStart(2, "0")}</span><span className="font-serif text-sm text-foreground">{art}</span></div>)}</div><p className="mt-6 text-center text-xs text-muted-foreground">{t.comingFeature}</p></> : tab === "settings" ? <section className="border-y border-primary/15 py-5"><h3 className="font-serif text-lg text-primary">{t.profile}</h3><ProfileRows profile={profile} language={language} /><Button variant="outline" onClick={onEdit} className="mt-5 w-full border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary">{base.edit}</Button></section> : <div className="border-y border-primary/15 py-12 text-center text-sm text-muted-foreground">{t.comingFeature}</div>}
+        {tab === "arts" ? <TorisetsuPanel profile={profile} language={language} onVip={() => setModal("vip")} /> : tab === "settings" ? <section className="border-y border-primary/15 py-5"><h3 className="font-serif text-lg text-primary">{t.profile}</h3><ProfileRows profile={profile} language={language} /><Button variant="outline" onClick={onEdit} className="mt-5 w-full border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary">{base.edit}</Button></section> : <div className="border-y border-primary/15 py-12 text-center text-sm text-muted-foreground">{t.comingFeature}</div>}
       </section>}
     </main>
 
