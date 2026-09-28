@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
 
 export type UserProfile = {
   birthDate: string;
@@ -20,8 +21,6 @@ const PREFECTURES = [
   "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
   "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県",
 ];
-
-const STEP_LABELS = ["生年月日・時間", "出生地", "血液型・兄弟構成"] as const;
 
 const BLOOD_TYPES = [
   { value: "A", label: "A型" },
@@ -46,9 +45,10 @@ const chipBase =
 const chipSelected = "border-primary/80 bg-primary/15 text-primary shadow-champagne";
 const chipIdle = "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5";
 
-type Props = { onComplete: (profile: UserProfile) => void };
+type Props = { onComplete: (profile: UserProfile) => void; language: Language };
 
-export default function Onboarding({ onComplete }: Props) {
+export default function Onboarding({ onComplete, language }: Props) {
+  const t = translations[language];
   const [step, setStep] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
@@ -69,7 +69,7 @@ export default function Onboarding({ onComplete }: Props) {
     profile.bloodType !== "" && profile.siblingOrder !== "",
   ][step];
 
-  const isLast = step === STEP_LABELS.length - 1;
+  const isLast = step === t.steps.length - 1;
 
   const handlePrimary = () => {
     if (!stepValid) return;
@@ -99,28 +99,27 @@ export default function Onboarding({ onComplete }: Props) {
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary/90">
             Onore Compass
           </p>
-          <h1 className="mt-2 font-serif text-4xl font-bold text-foreground">
-            オノレ<span className="text-gradient-gold">コンパス</span>
-          </h1>
+          <h1 className="mt-2 font-serif text-3xl font-bold text-gradient-gold sm:text-4xl">{t.brand}</h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            あなたの生まれた秘密を、15の占術で解き明かします
+            {t.subtitle}
           </p>
         </div>
 
         {/* Card */}
         <div className="card-lux rounded-2xl p-6 sm:p-8">
+          <h2 className="mb-5 font-serif text-base font-semibold text-gradient-gold">{t.profileEntry}</h2>
           {/* Progress */}
           <div className="mb-7">
             <div className="mb-2 flex items-center justify-between text-xs">
               <span className="font-semibold text-primary">
-                STEP {step + 1} / {STEP_LABELS.length}
+                {t.step} {step + 1} / {t.steps.length}
               </span>
-              <span className="font-serif text-gradient-gold font-semibold">{STEP_LABELS[step]}</span>
+              <span className="font-serif text-gradient-gold font-semibold text-right">{t.steps[step]}</span>
             </div>
             <div className="h-1 w-full overflow-hidden rounded-full bg-primary/10">
               <div
                 className="h-full rounded-full bg-champagne-gradient shadow-champagne transition-all duration-500 ease-out"
-                style={{ width: `${((step + 1) / STEP_LABELS.length) * 100}%` }}
+                 style={{ width: `${((step + 1) / t.steps.length) * 100}%` }}
               />
             </div>
           </div>
@@ -131,7 +130,7 @@ export default function Onboarding({ onComplete }: Props) {
               <div>
                 <label htmlFor="birth-date" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <CalendarDays className="size-4 stroke-[1.4]" aria-hidden="true" />
-                  生年月日 <span className="text-xs font-normal text-primary/70">必須</span>
+                  {t.birthDate} <span className="text-xs font-normal text-primary/70">{t.required}</span>
                 </label>
                 <input
                   id="birth-date"
@@ -145,7 +144,7 @@ export default function Onboarding({ onComplete }: Props) {
               <div>
                 <label htmlFor="birth-time" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <Clock3 className="size-4 stroke-[1.4]" aria-hidden="true" />
-                  出生時間
+                  {t.birthTime}
                 </label>
                 <input
                   id="birth-time"
@@ -165,7 +164,7 @@ export default function Onboarding({ onComplete }: Props) {
                     }}
                     className="size-4 rounded border-input accent-[var(--primary)]"
                   />
-                  出生時間が不明
+                  {t.timeUnknown}
                 </label>
               </div>
             </div>
@@ -176,7 +175,7 @@ export default function Onboarding({ onComplete }: Props) {
             <div>
               <label htmlFor="birth-place" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                 <MapPin className="size-4 stroke-[1.4]" aria-hidden="true" />
-                出生地（都道府県） <span className="text-xs font-normal text-primary/70">必須</span>
+                 {t.birthPlace} <span className="text-xs font-normal text-primary/70">{t.required}</span>
               </label>
               <select
                 id="birth-place"
@@ -185,16 +184,16 @@ export default function Onboarding({ onComplete }: Props) {
                 className={`${inputClass} appearance-none pr-10`}
               >
                 <option value="" disabled>
-                  都道府県を選択してください
+                   {t.selectPlace}
                 </option>
-                {PREFECTURES.map((pref) => (
+                 {PREFECTURES.map((pref, index) => (
                   <option key={pref} value={pref}>
-                    {pref}
+                     {["en", "es", "fr"].includes(language) ? prefecturesRomanized[index] : pref}
                   </option>
                 ))}
               </select>
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-                出生地は西洋占星術のハウス計算などに使用されます。
+                 {t.placeHint}
               </p>
             </div>
           )}
@@ -205,7 +204,7 @@ export default function Onboarding({ onComplete }: Props) {
               <div>
                 <p className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <Droplets className="size-4 stroke-[1.4]" aria-hidden="true" />
-                  血液型 <span className="text-xs font-normal text-primary/70">必須</span>
+                   {t.bloodType} <span className="text-xs font-normal text-primary/70">{t.required}</span>
                 </p>
                 <div className="grid grid-cols-4 gap-2">
                   {BLOOD_TYPES.map((bt) => (
@@ -219,7 +218,7 @@ export default function Onboarding({ onComplete }: Props) {
                         profile.bloodType === bt.value ? chipSelected : chipIdle
                       }`}
                     >
-                      {bt.label}
+                       {language === "ja" ? bt.label : bt.value}
                     </Button>
                   ))}
                 </div>
@@ -227,7 +226,7 @@ export default function Onboarding({ onComplete }: Props) {
               <div>
                 <p className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <Network className="size-4 stroke-[1.4]" aria-hidden="true" />
-                  兄弟構成 <span className="text-xs font-normal text-primary/70">必須</span>
+                   {t.siblingOrder} <span className="text-xs font-normal text-primary/70">{t.required}</span>
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {SIBLING_ORDERS.map((s) => (
@@ -235,13 +234,13 @@ export default function Onboarding({ onComplete }: Props) {
                       key={s.value}
                       type="button"
                       variant="outline"
-                      onClick={() => set("siblingOrder", s.label)}
-                      aria-pressed={profile.siblingOrder === s.label}
+                       onClick={() => set("siblingOrder", s.value)}
+                       aria-pressed={profile.siblingOrder === s.value}
                       className={`${chipBase} ${
-                        profile.siblingOrder === s.label ? chipSelected : chipIdle
+                         profile.siblingOrder === s.value ? chipSelected : chipIdle
                       }`}
                     >
-                      {s.label}
+                       {t.siblings[SIBLING_ORDERS.indexOf(s)]}
                     </Button>
                   ))}
                 </div>
@@ -259,7 +258,7 @@ export default function Onboarding({ onComplete }: Props) {
                 disabled={analyzing}
                 className="h-11 w-full rounded-lg border-primary/20 bg-transparent text-sm text-muted-foreground hover:border-primary/50 hover:bg-primary/5 hover:text-foreground"
               >
-                戻る
+                 {t.back}
               </Button>
             )}
             <Button
@@ -272,19 +271,19 @@ export default function Onboarding({ onComplete }: Props) {
               {analyzing ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="inline-block size-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground" />
-                  解析中…
+                   {t.analyzing}
                 </span>
               ) : isLast ? (
-                <><Sparkles className="size-4" aria-hidden="true" />15の占術で自分を解析する</>
+                 <><Sparkles className="size-4" aria-hidden="true" />{t.analyze}</>
               ) : (
-                "次へ"
+                 t.next
               )}
             </Button>
           </div>
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          入力された情報は、占術解析のためにのみ使用されます
+           {t.privacy}
         </p>
       </div>
     </div>
