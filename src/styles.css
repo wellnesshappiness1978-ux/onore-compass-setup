@@ -241,3 +241,24 @@
   .compass-center { animation: none; }
   .compass-rotor { transition: none; }
 }
+
+/* Six-category profile palette. Colors remain semantic and reusable. */
+:root {
+  --profile-overall: oklch(0.79 0.14 83);
+  --profile-wealth: oklch(0.72 0.14 145);
+  --profile-work: oklch(0.65 0.13 238);
+  --profile-love: oklch(0.7 0.15 20);
+  --profile-social: oklch(0.7 0.13 300);
+  --profile-health: oklch(0.76 0.13 62);
+}
+
+.profile-swatch-overall { background-color: var(--profile-overall); }
+.profile-swatch-wealth { background-color: var(--profile-wealth); }
+.profile-swatch-work { background-color: var(--profile-work); }
+.profile-swatch-love { background-color: var(--profile-love); }
+.profile-swatch-social { background-color: var(--profile-social); }
+.profile-swatch-health { background-color: var(--profile-health); }
+
+.compatibility-meter {
+  background: conic-gradient(var(--primary) var(--compatibility-score), color-mix(in oklab, var(--primary) 10%, transparent) 0);
+}

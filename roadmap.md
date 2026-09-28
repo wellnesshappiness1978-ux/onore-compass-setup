@@ -1,3 +1,6 @@
 - [x] Build the celestial home dashboard with an interactive compass and daily status.
 - [x] Add usable navigation, profile access, and notification feedback while preserving language selection.
 - [x] Verify the onboarding-to-dashboard flow and mobile layout.
+- [x] Build the bilingual-mode Torisetsu screen with 15 expandable summaries and six personal colors.
+- [x] Add the interactive compatibility preview and clearly separated VIP-locked detail.
+- [x] Verify Step 3 through the complete onboarding flow on desktop and mobile.
