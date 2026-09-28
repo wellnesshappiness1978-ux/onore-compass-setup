@@ -1,8 +1,8 @@
 import { useRef, useState, type CSSProperties } from "react";
-import { Bell, CalendarDays, ChevronRight, Compass, Crown, HeartHandshake, Home, LockKeyhole, Orbit, Palette, Settings2, Sparkles, UserRound, WandSparkles } from "lucide-react";
+import { Bell, CalendarDays, ChevronRight, Clock3, Compass, Crown, HeartHandshake, Home, LockKeyhole, MapPin, Network, Orbit, Palette, Settings2, Sparkles, UserRound, WandSparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { PREFECTURES, type UserProfile } from "./Onboarding";
+import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import { dashboardTranslations, prefecturesRomanized, torisetsuTranslations, translations, type Language } from "@/lib/translations";
 
 type Props = { profile: UserProfile; onEdit: () => void; language: Language };
@@ -77,9 +77,16 @@ function TorisetsuPanel({ profile, language, onVip }: { profile: UserProfile; la
   const t = torisetsuTranslations[language];
   const base = translations[language];
   const [mode, setMode] = useState<"manual" | "compatibility">("manual");
+  const [partnerName, setPartnerName] = useState("");
   const [partnerDate, setPartnerDate] = useState("");
-  const score = partnerDate
-    ? 56 + (Array.from(`${profile.birthDate}${partnerDate}`).reduce((total, character) => total + character.charCodeAt(0), 0) % 41)
+  const [partnerTime, setPartnerTime] = useState("");
+  const [partnerTimeUnknown, setPartnerTimeUnknown] = useState(false);
+  const [partnerPlace, setPartnerPlace] = useState("");
+  const [relation, setRelation] = useState<number | null>(null);
+  const [analyzed, setAnalyzed] = useState(false);
+  const canAnalyze = partnerDate !== "" && relation !== null;
+  const score = canAnalyze
+    ? 56 + (Array.from(`${profile.birthDate}${partnerDate}${relation}${partnerTimeUnknown ? "u" : partnerTime}${partnerPlace}`).reduce((total, character) => total + character.charCodeAt(0), 0) % 41)
     : 0;
   const advice = score >= 84 ? t.advice[2] : score >= 70 ? t.advice[1] : t.advice[0];
   const today = new Date().toISOString().slice(0, 10);
