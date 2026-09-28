@@ -36,7 +36,7 @@ const SIBLING_ORDERS = [
   { value: "only", label: "一人っ子" },
 ];
 
-const inputClass =
+export const inputClass =
   "field-luminous w-full rounded-lg border border-primary/15 bg-background/45 px-4 py-3 text-base text-foreground outline-none transition-all duration-300 placeholder:text-muted-foreground focus:border-primary/70 disabled:cursor-not-allowed disabled:opacity-40";
 
 const chipBase =

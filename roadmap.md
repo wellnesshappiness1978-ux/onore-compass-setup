@@ -4,3 +4,4 @@
 - [x] Replace the 15 expandable summaries with a single three-part integrated profile and retain six personal colors.
 - [x] Add the interactive compatibility preview and clearly separated VIP-locked detail.
 - [x] Verify Step 3 through the complete onboarding flow on desktop and mobile.
+- [x] Extend the compatibility form with name, birth time/place, and relationship category; verify score, core dynamic, and advice on CTA click.
