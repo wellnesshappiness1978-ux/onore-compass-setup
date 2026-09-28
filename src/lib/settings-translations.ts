@@ -84,12 +84,7 @@ const ja: SettingsTranslation = {
       name: "無料プラン",
       priceMonthly: "¥0",
       priceYearly: "¥0",
-      features: [
-        "単発基本診断",
-        "基本カラー2色",
-        "曼陀羅プレビュー（モザイク表示）",
-        "広告あり",
-      ],
+      features: ["単発基本診断", "基本カラー2色", "曼陀羅プレビュー（モザイク表示）", "広告あり"],
       cta: "現在のプラン",
     },
     {
@@ -186,12 +181,7 @@ const en: SettingsTranslation = {
       name: "Free Plan",
       priceMonthly: "¥0",
       priceYearly: "¥0",
-      features: [
-        "Single basic reading",
-        "2 basic colors",
-        "Mandala preview (mosaic)",
-        "With ads",
-      ],
+      features: ["Single basic reading", "2 basic colors", "Mandala preview (mosaic)", "With ads"],
       cta: "Current plan",
     },
     {
@@ -296,11 +286,7 @@ const zhCN: SettingsTranslation = {
       name: "标准会员",
       priceMonthly: "¥333",
       priceYearly: "¥3,333",
-      features: [
-        "相性诊断无限制",
-        "15占术×动物占卜 综合详细手册完全解锁",
-        "全部6类诞生颜色解锁",
-      ],
+      features: ["相性诊断无限制", "15占术×动物占卜 综合详细手册完全解锁", "全部6类诞生颜色解锁"],
       cta: "选择标准版",
     },
     {
@@ -389,11 +375,7 @@ const zhTW: SettingsTranslation = {
       name: "標準會員",
       priceMonthly: "¥333",
       priceYearly: "¥3,333",
-      features: [
-        "相性診斷無限制",
-        "15占術×動物占卜 綜合詳細手冊完全解鎖",
-        "全部6類誕生顏色解鎖",
-      ],
+      features: ["相性診斷無限制", "15占術×動物占卜 綜合詳細手冊完全解鎖", "全部6類誕生顏色解鎖"],
       cta: "選擇標準版",
     },
     {
