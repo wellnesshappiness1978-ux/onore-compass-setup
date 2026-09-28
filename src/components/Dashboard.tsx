@@ -46,8 +46,8 @@ function CompassWheel({ language }: { language: Language }) {
         <div className="absolute inset-0 rounded-full compass-ticks" />
         <div className="absolute left-1/2 top-[-1%] -translate-x-1/2 text-primary text-lg">✦</div>
         <div className="absolute left-1/2 bottom-[-1%] -translate-x-1/2 text-primary/70 text-sm">✧</div>
-        {zodiac.map((sign, i) => <span key={sign} className="absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center font-serif text-lg text-primary/80" style={{ left: `${zodiacPositions[i].x}%`, top: `${zodiacPositions[i].y}%`, transform: `translate(-50%, -50%) rotate(${-angle}deg)` }}>{sign}</span>)}
-        {trigrams.map((symbol, i) => <span key={symbol} className="absolute -translate-x-1/2 -translate-y-1/2 font-serif text-lg text-gold-glow/55" style={{ left: `${trigramPositions[i].x}%`, top: `${trigramPositions[i].y}%`, transform: `translate(-50%, -50%) rotate(${-angle}deg)` }}>{symbol}</span>)}
+        {zodiac.map((sign, i) => <span key={sign} className="absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center font-serif text-lg text-primary/80" style={{ left: `${zodiacPositions[i]?.x ?? 50}%`, top: `${zodiacPositions[i]?.y ?? 50}%`, transform: `translate(-50%, -50%) rotate(${-angle}deg)` }}>{sign}</span>)}
+        {trigrams.map((symbol, i) => <span key={symbol} className="absolute -translate-x-1/2 -translate-y-1/2 font-serif text-lg text-gold-glow/55" style={{ left: `${trigramPositions[i]?.x ?? 50}%`, top: `${trigramPositions[i]?.y ?? 50}%`, transform: `translate(-50%, -50%) rotate(${-angle}deg)` }}>{symbol}</span>)}
         <div className="absolute inset-[28%] compass-cross pointer-events-none" />
       </div>
       <div className="compass-center pointer-events-none absolute inset-[33%] flex flex-col items-center justify-center rounded-full border border-primary/40 text-center shadow-champagne">
