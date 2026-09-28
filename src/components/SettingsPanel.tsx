@@ -2,6 +2,8 @@ import { Fragment, useState } from "react";
 import {
   Bell,
   Building2,
+  Check,
+  ChevronDown,
   Crown,
   Globe2,
   HelpCircle,
@@ -55,6 +57,8 @@ export default function SettingsPanel({
 }: Props) {
   const t = settingsTranslations[language];
   const [plan, setPlan] = useState<Plan>("free");
+  const [yearly, setYearly] = useState(false);
+  const [openTier, setOpenTier] = useState<string | null>("vip");
   const [b2b, setB2b] = useState(false);
   const [notifyTiming, setNotifyTiming] = useState(true);
   const [notifyBio, setNotifyBio] = useState(false);
