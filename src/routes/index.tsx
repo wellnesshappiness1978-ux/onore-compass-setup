@@ -34,12 +34,7 @@ function Index() {
     <>
       <LanguageSelector language={language} onChange={setLanguage} />
       {profile ? (
-        <Dashboard
-          profile={profile}
-          onEdit={() => setProfile(null)}
-          language={language}
-          onLanguageChange={setLanguage}
-        />
+        <Dashboard profile={profile} onEdit={() => setProfile(null)} language={language} />
       ) : (
         <Onboarding onComplete={setProfile} language={language} />
       )}
