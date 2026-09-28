@@ -1,0 +1,3 @@
+- [x] Build the celestial home dashboard with an interactive compass and daily status.
+- [x] Add usable navigation, profile access, and notification feedback while preserving language selection.
+- [x] Verify the onboarding-to-dashboard flow and mobile layout.
