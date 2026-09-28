@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import ConsultationPanel from "@/components/ConsultationPanel";
+import NineStarsPanel from "@/components/NineStarsPanel";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -693,6 +694,8 @@ export default function Dashboard({ profile, onEdit, language }: Props) {
                 language={language}
                 onVip={() => setModal("vip")}
               />
+            ) : tab === "mandala" ? (
+              <NineStarsPanel language={language} onVip={() => setModal("vip")} />
             ) : tab === "settings" ? (
               <section className="border-y border-primary/15 py-5">
                 <h3 className="font-serif text-lg text-primary">{t.profile}</h3>
