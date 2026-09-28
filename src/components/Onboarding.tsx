@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export type UserProfile = {
   birthDate: string;
@@ -36,13 +38,13 @@ const SIBLING_ORDERS = [
 ];
 
 const inputClass =
-  "w-full rounded-xl border border-input bg-secondary/40 px-4 py-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/30";
+  "field-luminous w-full rounded-lg border border-primary/15 bg-background/45 px-4 py-3 text-base text-foreground outline-none transition-all duration-300 placeholder:text-muted-foreground focus:border-primary/70 disabled:cursor-not-allowed disabled:opacity-40";
 
 const chipBase =
-  "rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200";
+  "h-12 rounded-lg border px-2 text-sm font-medium transition-all duration-300";
 
-const chipSelected = "border-primary/70 bg-primary/15 text-primary shadow-gold";
-const chipIdle = "border-border bg-secondary/40 text-foreground hover:border-primary/40 hover:bg-secondary";
+const chipSelected = "border-primary/80 bg-primary/15 text-primary shadow-champagne";
+const chipIdle = "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5";
 
 type Props = { onComplete: (profile: UserProfile) => void };
 
@@ -80,14 +82,24 @@ export default function Onboarding({ onComplete }: Props) {
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background bg-lux-glow px-4 py-10">
-      <div className="w-full max-w-md">
+    <div className="celestial-scene relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-4 py-10 sm:py-14">
+      <div aria-hidden="true" className="celestial-stars" />
+      <div aria-hidden="true" className="celestial-orbit -left-64 -top-64 sm:-left-52 sm:-top-72" />
+      <div aria-hidden="true" className="celestial-orbit -bottom-80 -right-72 sm:-right-52" />
+      <svg aria-hidden="true" className="pointer-events-none absolute right-[8%] top-[12%] hidden h-36 w-40 text-primary/25 md:block" viewBox="0 0 160 144" fill="none">
+        <path d="M10 96 51 30 97 58 143 12M51 30l17 100 29-72 46 58" stroke="currentColor" strokeWidth=".7" />
+        {[ [10,96], [51,30], [97,58], [143,12], [68,130], [143,116] ].map(([cx, cy]) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="2" fill="currentColor" />)}
+      </svg>
+      <div className="relative z-10 w-full max-w-md">
         {/* Brand */}
         <div className="mb-8 text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.4em] text-primary/80">
+          <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full border border-primary/40 bg-primary/5 text-primary shadow-champagne">
+            <Compass className="size-6 stroke-[1.2]" aria-hidden="true" />
+          </div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary/90">
             Onore Compass
           </p>
-          <h1 className="mt-2 font-serif text-4xl font-bold tracking-wide text-foreground">
+          <h1 className="mt-2 font-serif text-4xl font-bold text-foreground">
             オノレ<span className="text-gradient-gold">コンパス</span>
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
@@ -96,18 +108,18 @@ export default function Onboarding({ onComplete }: Props) {
         </div>
 
         {/* Card */}
-        <div className="card-lux rounded-3xl p-6 sm:p-8">
+        <div className="card-lux rounded-2xl p-6 sm:p-8">
           {/* Progress */}
-          <div className="mb-6">
+          <div className="mb-7">
             <div className="mb-2 flex items-center justify-between text-xs">
-              <span className="font-semibold tracking-widest text-primary">
+              <span className="font-semibold text-primary">
                 STEP {step + 1} / {STEP_LABELS.length}
               </span>
-              <span className="text-muted-foreground">{STEP_LABELS[step]}</span>
+              <span className="font-serif text-gradient-gold font-semibold">{STEP_LABELS[step]}</span>
             </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+            <div className="h-1 w-full overflow-hidden rounded-full bg-primary/10">
               <div
-                className="h-full rounded-full bg-gold-gradient transition-all duration-500 ease-out"
+                className="h-full rounded-full bg-champagne-gradient shadow-champagne transition-all duration-500 ease-out"
                 style={{ width: `${((step + 1) / STEP_LABELS.length) * 100}%` }}
               />
             </div>
@@ -117,8 +129,9 @@ export default function Onboarding({ onComplete }: Props) {
           {step === 0 && (
             <div className="space-y-6">
               <div>
-                <label htmlFor="birth-date" className="mb-2 block text-sm font-medium text-foreground">
-                  生年月日 <span className="text-primary/70">必須</span>
+                <label htmlFor="birth-date" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
+                  <CalendarDays className="size-4 stroke-[1.4]" aria-hidden="true" />
+                  生年月日 <span className="text-xs font-normal text-primary/70">必須</span>
                 </label>
                 <input
                   id="birth-date"
@@ -130,7 +143,8 @@ export default function Onboarding({ onComplete }: Props) {
                 />
               </div>
               <div>
-                <label htmlFor="birth-time" className="mb-2 block text-sm font-medium text-foreground">
+                <label htmlFor="birth-time" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
+                  <Clock3 className="size-4 stroke-[1.4]" aria-hidden="true" />
                   出生時間
                 </label>
                 <input
@@ -139,7 +153,7 @@ export default function Onboarding({ onComplete }: Props) {
                   value={profile.birthTime}
                   disabled={profile.birthTimeUnknown}
                   onChange={(e) => set("birthTime", e.target.value)}
-                  className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-40`}
+                  className={inputClass}
                 />
                 <label className="mt-3 flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
                   <input
@@ -160,20 +174,15 @@ export default function Onboarding({ onComplete }: Props) {
           {/* Step 2: Birth place */}
           {step === 1 && (
             <div>
-              <label htmlFor="birth-place" className="mb-2 block text-sm font-medium text-foreground">
-                出生地（都道府県） <span className="text-primary/70">必須</span>
+              <label htmlFor="birth-place" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
+                <MapPin className="size-4 stroke-[1.4]" aria-hidden="true" />
+                出生地（都道府県） <span className="text-xs font-normal text-primary/70">必須</span>
               </label>
               <select
                 id="birth-place"
                 value={profile.birthPlace}
                 onChange={(e) => set("birthPlace", e.target.value)}
-                className={`${inputClass} appearance-none bg-[length:1rem] pr-10`}
-                style={{
-                  backgroundImage:
-                    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23F4D03F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E\")",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 1rem center",
-                }}
+                className={`${inputClass} appearance-none pr-10`}
               >
                 <option value="" disabled>
                   都道府県を選択してください
@@ -194,40 +203,46 @@ export default function Onboarding({ onComplete }: Props) {
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <p className="mb-2 text-sm font-medium text-foreground">
-                  血液型 <span className="text-primary/70">必須</span>
+                <p className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
+                  <Droplets className="size-4 stroke-[1.4]" aria-hidden="true" />
+                  血液型 <span className="text-xs font-normal text-primary/70">必須</span>
                 </p>
                 <div className="grid grid-cols-4 gap-2">
                   {BLOOD_TYPES.map((bt) => (
-                    <button
+                    <Button
                       key={bt.value}
                       type="button"
+                      variant="outline"
                       onClick={() => set("bloodType", bt.value)}
+                      aria-pressed={profile.bloodType === bt.value}
                       className={`${chipBase} ${
                         profile.bloodType === bt.value ? chipSelected : chipIdle
                       }`}
                     >
                       {bt.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
               <div>
-                <p className="mb-2 text-sm font-medium text-foreground">
-                  兄弟構成 <span className="text-primary/70">必須</span>
+                <p className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
+                  <Network className="size-4 stroke-[1.4]" aria-hidden="true" />
+                  兄弟構成 <span className="text-xs font-normal text-primary/70">必須</span>
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {SIBLING_ORDERS.map((s) => (
-                    <button
+                    <Button
                       key={s.value}
                       type="button"
+                      variant="outline"
                       onClick={() => set("siblingOrder", s.label)}
+                      aria-pressed={profile.siblingOrder === s.label}
                       className={`${chipBase} ${
                         profile.siblingOrder === s.label ? chipSelected : chipIdle
                       }`}
                     >
                       {s.label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -237,24 +252,22 @@ export default function Onboarding({ onComplete }: Props) {
           {/* Navigation */}
           <div className="mt-8 space-y-3">
             {step > 0 && (
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setStep((s) => s - 1)}
                 disabled={analyzing}
-                className="w-full rounded-xl border border-border bg-transparent px-4 py-2.5 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground disabled:opacity-40"
+                className="h-11 w-full rounded-lg border-primary/20 bg-transparent text-sm text-muted-foreground hover:border-primary/50 hover:bg-primary/5 hover:text-foreground"
               >
                 戻る
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               type="button"
+              variant="champagne"
               onClick={handlePrimary}
               disabled={!stepValid || analyzing}
-              className={`w-full rounded-xl px-4 py-4 text-base font-bold transition-all duration-300 ${
-                isLast
-                  ? "bg-gold-gradient text-primary-foreground shadow-gold hover:brightness-110 active:scale-[0.99]"
-                  : "bg-gold-gradient text-primary-foreground shadow-gold hover:brightness-110"
-              } disabled:cursor-not-allowed disabled:opacity-30 disabled:shadow-none`}
+              className="h-14 w-full rounded-lg px-3 text-sm font-bold transition-all duration-300 sm:text-base disabled:opacity-35 disabled:shadow-none"
             >
               {analyzing ? (
                 <span className="flex items-center justify-center gap-2">
@@ -262,11 +275,11 @@ export default function Onboarding({ onComplete }: Props) {
                   解析中…
                 </span>
               ) : isLast ? (
-                "15の占術で自分を解析する"
+                <><Sparkles className="size-4" aria-hidden="true" />15の占術で自分を解析する</>
               ) : (
                 "次へ"
               )}
-            </button>
+            </Button>
           </div>
         </div>
 
