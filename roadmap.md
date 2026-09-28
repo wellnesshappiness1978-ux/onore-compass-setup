@@ -7,5 +7,5 @@
 - [x] Extend the compatibility form with name, birth time/place, and relationship category; verify score, core dynamic, and advice on CTA click.
 - [ ] Build the AI Onore consultation screen with quick questions, live streaming chat, free-use counter, and VIP preview.
 - [ ] Verify consultation responses, error states, and mobile/desktop layouts.
-- [ ] Add the Step 5 natal nine-stars art preview with a VIP lock and wallpaper action reserved for verified paid members.
-- [ ] Verify the locked art and CTA on mobile and desktop.
+- [x] Add the Step 5 natal nine-stars art preview with a VIP lock and wallpaper action reserved for verified paid members.
+- [x] Verify the locked art and CTA on mobile and desktop.
