@@ -2,6 +2,7 @@ import { useRef, useState, type CSSProperties } from "react";
 import { Bell, CalendarDays, ChevronRight, Clock3, Compass, Crown, HeartHandshake, Home, LockKeyhole, MapPin, Network, Orbit, Palette, Settings2, Sparkles, UserRound, WandSparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import ConsultationPanel from "@/components/ConsultationPanel";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import { dashboardTranslations, prefecturesRomanized, torisetsuTranslations, translations, type Language } from "@/lib/translations";
 
@@ -220,7 +221,7 @@ export default function Dashboard({ profile, onEdit, language }: Props) {
         <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.demo}</p>
       </> : <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
         <div className="mb-8 text-center"><Sparkles className="mx-auto size-6 text-primary" strokeWidth={1} /><h2 className="mt-3 font-serif text-2xl text-gradient-gold">{navigation.find(n => n.id === tab)?.label}</h2></div>
-        {tab === "arts" ? <TorisetsuPanel profile={profile} language={language} onVip={() => setModal("vip")} /> : tab === "settings" ? <section className="border-y border-primary/15 py-5"><h3 className="font-serif text-lg text-primary">{t.profile}</h3><ProfileRows profile={profile} language={language} /><Button variant="outline" onClick={onEdit} className="mt-5 w-full border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary">{base.edit}</Button></section> : <div className="border-y border-primary/15 py-12 text-center text-sm text-muted-foreground">{t.comingFeature}</div>}
+        {tab === "arts" ? <TorisetsuPanel profile={profile} language={language} onVip={() => setModal("vip")} /> : tab === "consult" ? <ConsultationPanel profile={profile} language={language} onVip={() => setModal("vip")} /> : tab === "settings" ? <section className="border-y border-primary/15 py-5"><h3 className="font-serif text-lg text-primary">{t.profile}</h3><ProfileRows profile={profile} language={language} /><Button variant="outline" onClick={onEdit} className="mt-5 w-full border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary">{base.edit}</Button></section> : <div className="border-y border-primary/15 py-12 text-center text-sm text-muted-foreground">{t.comingFeature}</div>}
       </section>}
     </main>
 
