@@ -8,18 +8,21 @@ import {
   Globe2,
   HelpCircle,
   Lock,
+  LockKeyhole,
+  Orbit,
   PenLine,
   ScrollText,
   Shield,
+  Sparkles,
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
-import { settingsTranslations } from "@/lib/settings-translations";
+import { settingsTranslations, type SettingsTranslation } from "@/lib/settings-translations";
 import type { UserProfile } from "./Onboarding";
 
-type Plan = "free" | "vip" | "b2b";
+type Plan = "free" | "standard" | "vip" | "b2b";
 type Props = {
   profile: UserProfile;
   language: Language;
@@ -48,6 +51,208 @@ const SAMPLE_WEEK: ("push" | "hold" | "calm")[] = [
 
 const card = "rounded-2xl border border-primary/20 bg-card/60 p-5 shadow-2xl backdrop-blur-md";
 
+// Deterministic sample waveform for the plan display test — not a real reading.
+function BiorhythmPreview({
+  plan,
+  profile,
+  t,
+  language,
+  onVip,
+}: {
+  plan: Plan;
+  profile: UserProfile;
+  t: SettingsTranslation;
+  language: Language;
+  onVip: () => void;
+}) {
+  const seed = Array.from(`${profile.birthDate}|${plan}`).reduce(
+    (sum, character) => sum + character.charCodeAt(0),
+    0,
+  );
+  const value = (index: number, count: number) => {
+    const v =
+      Math.sin((index / count) * Math.PI * 4 + seed) * 0.6 +
+      Math.sin((index / count) * Math.PI * 9 + seed / 2) * 0.4;
+    return Math.round((v + 1) * 50);
+  };
+  const wavePath = (count: number) =>
+    Array.from(
+      { length: count },
+      (_, index) =>
+        `${index === 0 ? "M" : "L"}${((index / (count - 1)) * 100).toFixed(2)} ${(
+          100 - value(index, count)
+        ).toFixed(2)}`,
+    ).join(" ");
+  const monthLabel = (offset: number) =>
+    new Intl.DateTimeFormat(language, { month: "short" }).format(
+      new Date(new Date().getFullYear(), new Date().getMonth() + offset, 1),
+    );
+  const dayLabel = (offsetDays: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() + offsetDays);
+    return new Intl.DateTimeFormat(language, { month: "numeric", day: "numeric" }).format(date);
+  };
+  const svg = (count: number) => (
+    <svg
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      className="h-28 w-full text-primary sm:h-32"
+      aria-hidden="true"
+    >
+      <path
+        d={wavePath(count)}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        vectorEffect="non-scaling-stroke"
+        className="drop-shadow-[0_0_8px_var(--gold-glow)]"
+      />
+    </svg>
+  );
+
+  if (plan === "free") {
+    return (
+      <div className="relative overflow-hidden rounded-xl border border-primary/15 bg-background/40 p-4">
+        <div className="select-none opacity-30 blur-md" aria-hidden="true">
+          {svg(30)}
+        </div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/40 px-4 text-center">
+          <span className="flex size-10 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary shadow-[0_0_18px_var(--gold-glow)]">
+            <LockKeyhole className="size-4" />
+          </span>
+          <p className="text-xs font-medium text-primary">{t.bioLock}</p>
+          <Button variant="champagne" size="sm" onClick={onVip} className="min-h-9">
+            {t.bioUnlockCta}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (plan === "standard") {
+    const count = 30;
+    const todayIndex = Math.min(new Date().getDate(), count) - 1;
+    const decisionDays = [...Array(count).keys()]
+      .sort((a, b) => value(b, count) - value(a, count))
+      .slice(0, 3)
+      .sort((a, b) => a - b);
+    const x = (index: number) => (index / (count - 1)) * 100;
+    return (
+      <div className="rounded-xl border border-primary/15 bg-background/40 p-4">
+        <div className="relative">
+          {svg(count)}
+          <span
+            className="absolute top-0 h-full w-px bg-primary/70"
+            style={{ left: `${x(todayIndex)}%` }}
+            aria-hidden="true"
+          />
+          <span
+            className="absolute top-0 -translate-x-1/2 rounded-full border border-primary/40 bg-background px-1.5 py-0.5 text-[9px] text-primary"
+            style={{ left: `${x(todayIndex)}%` }}
+          >
+            {t.bioToday}
+          </span>
+        </div>
+        <p className="mt-1 text-[10px] text-muted-foreground">{monthLabel(0)}</p>
+        <p className="mt-2 text-xs">
+          <span className="text-muted-foreground">{t.bioDecision}: </span>
+          <span className="font-medium text-primary">
+            {decisionDays.map((index) => index + 1).join("・")}
+          </span>
+        </p>
+      </div>
+    );
+  }
+
+  if (plan === "vip") {
+    const count = 90;
+    const indices = [...Array(count).keys()];
+    const peaks = indices.slice().sort((a, b) => value(b, count) - value(a, count)).slice(0, 2).sort((a, b) => a - b);
+    const preps = indices.slice().sort((a, b) => value(a, count) - value(b, count)).slice(0, 2).sort((a, b) => a - b);
+    const x = (index: number) => (index / (count - 1)) * 100;
+    return (
+      <div className="rounded-xl border border-primary/15 bg-background/40 p-4">
+        <div className="relative">
+          {svg(count)}
+          {peaks.map((index) => (
+            <span
+              key={`peak-${index}`}
+              className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-champagne-gradient shadow-champagne"
+              style={{ left: `${x(index)}%`, top: `${100 - value(index, count)}%` }}
+              aria-hidden="true"
+            />
+          ))}
+          {preps.map((index) => (
+            <span
+              key={`prep-${index}`}
+              className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/50 bg-background"
+              style={{ left: `${x(index)}%`, top: `${100 - value(index, count)}%` }}
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+        <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+          {[0, 1, 2].map((offset) => (
+            <span key={offset}>{monthLabel(offset)}</span>
+          ))}
+        </div>
+        <div className="mt-3 space-y-1.5 text-xs">
+          <p className="flex items-center gap-2">
+            <span className="size-1.5 shrink-0 rounded-full bg-champagne-gradient" aria-hidden="true" />
+            <span className="text-muted-foreground">{t.bioPeak}: </span>
+            <span className="font-medium text-primary">{peaks.map(dayLabel).join("・")}</span>
+          </p>
+          <p className="flex items-center gap-2">
+            <span className="size-1.5 shrink-0 rounded-full border border-primary/50" aria-hidden="true" />
+            <span className="text-muted-foreground">{t.bioPrep}: </span>
+            <span className="font-medium text-primary">{preps.map(dayLabel).join("・")}</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const months = Array.from({ length: 12 }, (_, index) => value(index, 12));
+  const indicatorMonths = t.bioIndicators.map((_, index) => (seed + index * 5) % 12);
+  return (
+    <div className="rounded-xl border border-primary/15 bg-background/40 p-4">
+      <div className="flex h-24 items-end gap-1" aria-hidden="true">
+        {months.map((v, index) => (
+          <div key={index} className="flex h-full flex-1 items-end">
+            <div
+              className="w-full rounded-t-sm"
+              style={{
+                height: `${Math.max(v, 12)}%`,
+                backgroundColor: `color-mix(in oklab, var(--primary) ${Math.round(v * 0.9)}%, transparent)`,
+              }}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="mt-1 flex gap-1 text-center text-[9px] text-muted-foreground">
+        {months.map((_, index) => (
+          <span key={index} className="min-w-0 flex-1 truncate">
+            {monthLabel(index)}
+          </span>
+        ))}
+      </div>
+      <ul className="mt-4 space-y-1.5">
+        {t.bioIndicators.map((indicator, index) => (
+          <li
+            key={indicator}
+            className="flex items-center justify-between gap-2 rounded-lg border border-primary/15 bg-background/40 px-3 py-2 text-xs"
+          >
+            <span className="min-w-0 leading-5">{indicator}</span>
+            <span className="shrink-0 rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
+              {monthLabel(indicatorMonths[index] ?? 0)}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export default function SettingsPanel({
   profile,
   language,
@@ -64,7 +269,14 @@ export default function SettingsPanel({
   const [notifyBio, setNotifyBio] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const planLabel = plan === "vip" ? t.planVip : plan === "b2b" ? t.planB2b : t.planFree;
+  const planLabel =
+    plan === "vip"
+      ? t.planVip
+      : plan === "b2b"
+        ? t.planB2b
+        : plan === "standard"
+          ? t.planStandard
+          : t.planFree;
   const birth = [
     profile.birthDate || "—",
     profile.birthTimeUnknown ? "--:--" : profile.birthTime || "--:--",
@@ -91,15 +303,21 @@ export default function SettingsPanel({
             <span
               className={`mt-2 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs ${plan === "free" ? "border-border text-muted-foreground" : "border-primary/60 bg-primary/15 text-primary shadow-[0_0_16px_var(--gold-glow)]"}`}
             >
-              {plan === "b2b" ? <Building2 className="size-3" /> : <Crown className="size-3" />}
+              {plan === "b2b" ? (
+                <Building2 className="size-3" />
+              ) : plan === "standard" ? (
+                <Sparkles className="size-3" />
+              ) : (
+                <Crown className="size-3" />
+              )}
               {planLabel}
             </span>
           </div>
         </div>
         <div className="mt-4 border-t border-primary/10 pt-3">
           <p className="mb-2 text-xs text-muted-foreground">{t.planTest}</p>
-          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t.planTest}>
-            {(["free", "vip", "b2b"] as Plan[]).map((p) => (
+          <div className="grid grid-cols-4 gap-2" role="radiogroup" aria-label={t.planTest}>
+            {(["free", "standard", "vip", "b2b"] as Plan[]).map((p) => (
               <Button
                 key={p}
                 role="radio"
@@ -107,14 +325,57 @@ export default function SettingsPanel({
                 variant="outline"
                 size="sm"
                 onClick={() => setPlan(p)}
-                className={`text-[11px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
+                className={`text-[10px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
               >
-                {p === "free" ? t.planFree : p === "vip" ? "VIP" : "B2B"}
+                {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : "B2B"}
               </Button>
             ))}
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">{t.planTestNote}</p>
         </div>
+      </section>
+
+      <section className={card}>
+        <div className="flex items-center gap-3">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
+            <Orbit className="size-5" strokeWidth={1.4} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70">EARTH CALENDAR</p>
+            <h3 className="font-serif text-lg text-primary">{t.bioTitle}</h3>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">{t.bioIntro}</p>
+
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {t.bioRanges.map((range) => {
+            const active = range.tier === plan;
+            const tierName = t.tiers.find((tier) => tier.id === range.tier)?.name;
+            return (
+              <div
+                key={range.tier}
+                className={`rounded-xl border p-3 text-center ${
+                  active
+                    ? "border-primary/70 bg-primary/10 shadow-[0_0_22px_-6px_var(--gold-glow)]"
+                    : "border-primary/15 bg-background/40"
+                }`}
+              >
+                <p className={`font-serif text-sm ${active ? "text-gradient-gold" : "text-foreground"}`}>
+                  {range.range}
+                </p>
+                <p className="mt-0.5 truncate text-[10px] text-muted-foreground">{tierName}</p>
+                <p className="mt-1.5 text-left text-[10px] leading-4 text-muted-foreground">
+                  {range.scope}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-4">
+          <BiorhythmPreview plan={plan} profile={profile} t={t} language={language} onVip={onVip} />
+        </div>
+        <p className="mt-3 text-[11px] text-muted-foreground">{t.bioSample}</p>
       </section>
 
       <section className={card}>
