@@ -1,6 +1,6 @@
 import type { UserProfile } from "./Onboarding";
 import { Button } from "@/components/ui/button";
-import { translations, type Language } from "@/lib/translations";
+import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
 
 const ARTS = [
   "四柱推命", "数秘術", "西洋占星術", "タロット", "姓名判断",
@@ -34,7 +34,7 @@ export default function Dashboard({ profile, onEdit, language }: Props) {
     <div className="min-h-screen bg-background bg-lux-glow">
       {/* Header */}
       <header className="border-b border-border/60 bg-card/40 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
+         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-4 py-4 pr-32 sm:pr-36">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-primary/80">
               Onore Compass
@@ -68,7 +68,9 @@ export default function Dashboard({ profile, onEdit, language }: Props) {
            <h3 className="mb-2 font-serif text-lg font-semibold text-primary">{t.registeredProfile}</h3>
            {row(t.birthDate, birthDate)}
            {row(t.birthTime, profile.birthTimeUnknown ? t.unknown : profile.birthTime || "—")}
-           {row(t.birthPlace, profile.birthPlace || "—")}
+           {row(t.birthPlace, ["en", "es", "fr"].includes(language) && profile.birthPlace
+             ? prefecturesRomanized[["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"].indexOf(profile.birthPlace)] || profile.birthPlace
+             : profile.birthPlace || "—")}
            {row(t.bloodType, profile.bloodType ? `${profile.bloodType}${t.bloodSuffix}` : "—")}
            {row(t.siblingOrder, t.siblings[["first", "middle", "last", "only"].indexOf(profile.siblingOrder)] || "—")}
         </section>
