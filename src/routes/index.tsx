@@ -1,24 +1,35 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import Onboarding, { type UserProfile } from "@/components/Onboarding";
+import Dashboard from "@/components/Dashboard";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "オノレコンパス | 15の占術で自分を知る" },
+      {
+        name: "description",
+        content:
+          "生年月日・出生時間・血液型・兄弟構成から、15の占術であなたの本質を解析するパーソナル占術アプリ。",
+      },
+      { property: "og:title", content: "オノレコンパス | 15の占術で自分を知る" },
+      {
+        property: "og:description",
+        content: "生まれた瞬間の情報から、15の占術であなたの本質を解析します。",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  return profile ? (
+    <Dashboard profile={profile} onEdit={() => setProfile(null)} />
+  ) : (
+    <Onboarding onComplete={setProfile} />
   );
 }
