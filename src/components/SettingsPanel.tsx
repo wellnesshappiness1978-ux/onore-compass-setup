@@ -120,7 +120,7 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
       <section className="rounded-2xl border border-primary/20 bg-card/40 shadow-2xl backdrop-blur-md p-5">
         <h3 className="font-serif text-lg text-primary">{t.b2bTitle}</h3>
         <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-primary/15 p-3 text-sm">
-          <span className={b2b ? "text-muted-foreground" : "text-primary"}>{t.personal}</span>
+          <span className={`shrink-0 whitespace-nowrap ${b2b ? "text-muted-foreground" : "text-primary"}`}>{t.personal}</span>
           <Switch checked={b2b} onCheckedChange={setB2b} aria-label={t.b2b} />
           <span className={`text-right ${b2b ? "text-primary" : "text-muted-foreground"}`}>
             {t.b2b}
