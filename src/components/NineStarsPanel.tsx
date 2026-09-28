@@ -55,8 +55,8 @@ export default function NineStarsPanel({ language, onVip }: { language: Language
       <h3 id="nine-stars-heading" className="mt-3 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h3>
       <p className="mt-3 text-xs text-muted-foreground">{t.preview}</p>
       <div className="relative mx-auto mt-8 aspect-square w-full max-w-[560px] overflow-hidden rounded-full border border-primary/30 shadow-gold">
-        <div className="absolute inset-0 blur-[3px]" aria-hidden="true"><NineStarsArt /></div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/55 p-5 backdrop-blur-[5px] sm:p-8">
+        <div className="absolute inset-0 blur-[1px]" aria-hidden="true"><NineStarsArt /></div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/30 p-5 backdrop-blur-[2px] sm:p-8">
           <div className="flex size-12 items-center justify-center rounded-full border border-primary/40 bg-background/75 text-primary shadow-gold"><LockKeyhole className="size-5" /></div>
           <p className="mt-4 flex items-center gap-2 font-serif text-lg text-primary"><Sparkles className="size-4" />{t.lock}</p>
           <Button variant="champagne" onClick={onVip} className="mt-5 h-auto max-w-[330px] whitespace-normal px-5 py-3 text-center text-sm leading-6">
