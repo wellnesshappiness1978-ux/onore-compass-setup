@@ -1,5 +1,18 @@
-import { useState, type ReactNode } from "react";
-import { Bell, Building2, CalendarDays, Check, Crown, FileText, Globe, HelpCircle, LockKeyhole, Pencil, Shield, UserRound } from "lucide-react";
+import { Fragment, useState, type ReactNode } from "react";
+import {
+  Bell,
+  Building2,
+  CalendarDays,
+  Check,
+  Crown,
+  FileText,
+  Globe,
+  HelpCircle,
+  LockKeyhole,
+  Pencil,
+  Shield,
+  UserRound,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
@@ -84,7 +97,10 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
             <span className="w-14 text-center text-primary">{t.vip}</span>
           </div>
           {t.benefits.map((b, i) => (
-            <div key={b} className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 border-t border-primary/10 px-3 py-2.5">
+            <div
+              key={b}
+              className="grid grid-cols-[1fr_auto_auto] items-center gap-x-4 border-t border-primary/10 px-3 py-2.5"
+            >
               <span>{b}</span>
               <span className="w-14 text-center text-xs text-muted-foreground">
                 {i === 2 ? <LockKeyhole className="mx-auto size-4" /> : t.freeValues[i]}
@@ -93,7 +109,10 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
             </div>
           ))}
         </div>
-        <Button className="mt-4 h-auto w-full whitespace-normal py-3" onClick={() => setNotice(t.upgradeNote)}>
+        <Button
+          className="mt-4 h-auto w-full whitespace-normal py-3"
+          onClick={() => setNotice(t.upgradeNote)}
+        >
           <Crown className="size-4" /> {t.upgrade}
         </Button>
       </section>
@@ -103,7 +122,9 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
         <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-primary/15 p-3 text-sm">
           <span className={b2b ? "text-muted-foreground" : "text-primary"}>{t.personal}</span>
           <Switch checked={b2b} onCheckedChange={setB2b} aria-label={t.b2b} />
-          <span className={`text-right ${b2b ? "text-primary" : "text-muted-foreground"}`}>{t.b2b}</span>
+          <span className={`text-right ${b2b ? "text-primary" : "text-muted-foreground"}`}>
+            {t.b2b}
+          </span>
         </div>
         {b2b && (
           <div className="mt-4 space-y-5">
@@ -112,7 +133,10 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
               <h4 className="text-sm text-foreground">{t.members}</h4>
               <ul className="mt-2 grid grid-cols-2 gap-2">
                 {TEAM.map((name, i) => (
-                  <li key={name} className="rounded-lg border border-primary/15 bg-primary/5 px-3 py-2 text-sm">
+                  <li
+                    key={name}
+                    className="rounded-lg border border-primary/15 bg-primary/5 px-3 py-2 text-sm"
+                  >
                     {name}
                     <span className="block text-xs text-primary">{t.roles[i]}</span>
                   </li>
@@ -124,21 +148,27 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
               <div className="mt-2 grid grid-cols-5 gap-1 text-center text-[11px]">
                 <span />
                 {TEAM.map((n) => (
-                  <span key={n} className="truncate text-muted-foreground">{n.split(" ")[1]}</span>
+                  <span key={n} className="truncate text-muted-foreground">
+                    {n.split(" ")[1]}
+                  </span>
                 ))}
                 {MATRIX.map((row, r) => (
-                  <>
-                    <span key={`h${r}`} className="truncate text-muted-foreground">{TEAM[r].split(" ")[1]}</span>
+                  <Fragment key={r}>
+                    <span className="truncate text-muted-foreground">{TEAM[r].split(" ")[1]}</span>
                     {row.map((v, c) => (
                       <span
                         key={`${r}-${c}`}
                         className="rounded-md py-1.5 text-foreground"
-                        style={{ background: v ? `color-mix(in oklab, var(--primary) ${Math.round((v - 50) * 1.4)}%, transparent)` : "transparent" }}
+                        style={{
+                          background: v
+                            ? `color-mix(in oklab, var(--primary) ${Math.round((v - 50) * 1.4)}%, transparent)`
+                            : "transparent",
+                        }}
                       >
                         {v ? `${v}%` : "—"}
                       </span>
                     ))}
-                  </>
+                  </Fragment>
                 ))}
               </div>
             </div>
@@ -161,7 +191,10 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
                 {days.map((d, i) => {
                   const level = [0, 1, 2, 0, 1, 1, 2][i];
                   return (
-                    <div key={i} className={`rounded-lg border py-2 ${level === 0 ? "border-primary/50 bg-primary/15 text-primary" : "border-primary/10 text-muted-foreground"}`}>
+                    <div
+                      key={i}
+                      className={`rounded-lg border py-2 ${level === 0 ? "border-primary/50 bg-primary/15 text-primary" : "border-primary/10 text-muted-foreground"}`}
+                    >
                       <p>{new Intl.DateTimeFormat(language, { weekday: "short" }).format(d)}</p>
                       <p className="text-sm text-foreground">{d.getDate()}</p>
                       <p>{t.timing[level]}</p>
@@ -176,11 +209,17 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
 
       <section className="glass-card rounded-2xl p-5">
         <h3 className="font-serif text-lg text-primary">{t.account}</h3>
-        <Button variant="outline" onClick={onEdit} className="mt-3 w-full justify-start border-primary/25 bg-primary/5 text-foreground">
+        <Button
+          variant="outline"
+          onClick={onEdit}
+          className="mt-3 w-full justify-start border-primary/25 bg-primary/5 text-foreground"
+        >
           <Pencil className="size-4 text-primary" /> {t.editProfile}
         </Button>
         <div className="mt-4">
-          <p className="flex items-center gap-2 text-sm"><Globe className="size-4 text-primary" /> {t.language}</p>
+          <p className="flex items-center gap-2 text-sm">
+            <Globe className="size-4 text-primary" /> {t.language}
+          </p>
           <div className="mt-2 flex flex-wrap gap-2">
             {languages.map((l) => (
               <Button
@@ -189,7 +228,11 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
                 variant="outline"
                 aria-pressed={language === l.code}
                 onClick={() => onLanguageChange(l.code)}
-                className={language === l.code ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent text-muted-foreground"}
+                className={
+                  language === l.code
+                    ? "border-primary bg-primary/15 text-primary"
+                    : "border-primary/20 bg-transparent text-muted-foreground"
+                }
               >
                 {l.flag} {l.label}
               </Button>
@@ -197,18 +240,42 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
           </div>
         </div>
         <div className="mt-5 space-y-3">
-          <p className="flex items-center gap-2 text-sm"><Bell className="size-4 text-primary" /> {t.notifications}</p>
-          {([["decision", t.notifyDecision], ["bio", t.notifyBio]] as const).map(([key, label]) => (
-            <label key={key} className="flex items-center justify-between rounded-xl border border-primary/15 px-3 py-2.5 text-sm">
+          <p className="flex items-center gap-2 text-sm">
+            <Bell className="size-4 text-primary" /> {t.notifications}
+          </p>
+          {(
+            [
+              ["decision", t.notifyDecision],
+              ["bio", t.notifyBio],
+            ] as const
+          ).map(([key, label]) => (
+            <label
+              key={key}
+              className="flex items-center justify-between rounded-xl border border-primary/15 px-3 py-2.5 text-sm"
+            >
               {label}
-              <Switch checked={notify[key]} onCheckedChange={(v) => setNotify((n) => ({ ...n, [key]: v }))} />
+              <Switch
+                checked={notify[key]}
+                onCheckedChange={(v) => setNotify((n) => ({ ...n, [key]: v }))}
+              />
             </label>
           ))}
           <p className="text-[11px] text-muted-foreground">{t.notifyNote}</p>
         </div>
         <div className="mt-5 divide-y divide-primary/10 border-y border-primary/10">
-          {([[FileText, t.terms], [Shield, t.privacy], [HelpCircle, t.help]] as const).map(([Icon, label]) => (
-            <button key={label} type="button" onClick={() => setNotice(t.preparing)} className="flex w-full items-center gap-3 py-3 text-left text-sm hover:text-primary">
+          {(
+            [
+              [FileText, t.terms],
+              [Shield, t.privacy],
+              [HelpCircle, t.help],
+            ] as const
+          ).map(([Icon, label]) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => setNotice(t.preparing)}
+              className="flex w-full items-center gap-3 py-3 text-left text-sm hover:text-primary"
+            >
               <Icon className="size-4 text-primary" /> {label}
             </button>
           ))}
@@ -216,9 +283,19 @@ export default function SettingsPanel({ language, onLanguageChange, onEdit, prof
       </section>
 
       {notice && (
-        <p role="status" className="fixed bottom-24 left-1/2 z-40 w-[min(90vw,420px)] -translate-x-1/2 rounded-xl border border-primary/30 bg-card/95 px-4 py-3 text-center text-sm backdrop-blur" onAnimationEnd={() => undefined}>
+        <p
+          role="status"
+          className="fixed bottom-24 left-1/2 z-40 w-[min(90vw,420px)] -translate-x-1/2 rounded-xl border border-primary/30 bg-card/95 px-4 py-3 text-center text-sm backdrop-blur"
+        >
           {notice}
-          <button type="button" className="ml-3 text-primary" onClick={() => setNotice(null)} aria-label="close">×</button>
+          <button
+            type="button"
+            className="ml-3 text-primary"
+            onClick={() => setNotice(null)}
+            aria-label="close"
+          >
+            ×
+          </button>
         </p>
       )}
     </div>
