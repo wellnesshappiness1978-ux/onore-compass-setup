@@ -1,4 +1,4 @@
-import type { UserProfile } from "./Onboarding";
+import { PREFECTURES, type UserProfile } from "./Onboarding";
 import { Button } from "@/components/ui/button";
 import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
 
@@ -69,7 +69,7 @@ export default function Dashboard({ profile, onEdit, language }: Props) {
            {row(t.birthDate, birthDate)}
            {row(t.birthTime, profile.birthTimeUnknown ? t.unknown : profile.birthTime || "—")}
            {row(t.birthPlace, ["en", "es", "fr"].includes(language) && profile.birthPlace
-             ? prefecturesRomanized[["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"].indexOf(profile.birthPlace)] || profile.birthPlace
+             ? prefecturesRomanized[PREFECTURES.indexOf(profile.birthPlace)] || profile.birthPlace
              : profile.birthPlace || "—")}
            {row(t.bloodType, profile.bloodType ? `${profile.bloodType}${t.bloodSuffix}` : "—")}
            {row(t.siblingOrder, t.siblings[["first", "middle", "last", "only"].indexOf(profile.siblingOrder)] || "—")}
