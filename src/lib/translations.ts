@@ -142,6 +142,7 @@ export const dashboardTranslations: Record<Language, {
 
 type TorisetsuTranslation = {
   manual: string; compatibility: string; manualTitle: string; manualIntro: string;
+  coreTitle: string; coreBody: string; decisionTitle: string; decisionBody: string; timingTitle: string; timingBody: string;
   colorsTitle: string; colorsIntro: string; colorLabels: string[]; colorNames: string[];
   partnerBirthDate: string; partnerHint: string; calculate: string; score: string;
   advice: [string, string, string]; lockedTitle: string; lockedBody: string; unlock: string;
@@ -150,47 +151,68 @@ type TorisetsuTranslation = {
 
 export const torisetsuTranslations: Record<Language, TorisetsuTranslation> = {
   ja: {
-    manual: "自分のトリセツ", compatibility: "相性診断（相手）", manualTitle: "15占術から見る、あなたの輪郭", manualIntro: "異なる視点を重ねて、持ち味と行動傾向を読み解くプレビューです。",
+    manual: "自分のトリセツ", compatibility: "相性診断（相手）", manualTitle: "15占術×動物占い 総合クロス解析", manualIntro: "INTEGRATED AI PROFILE · 15占術と動物占いを横断する統合プロフィールのプレビュー",
+    coreTitle: "あなたの本質・コアアイデンティティ", coreBody: "西洋占星術の気質、四柱推命の巡り、数秘術の傾向、動物占いの個性、東洋の八卦の視点をひとつに。好奇心と慎重さの両方を持ち、確信を得ると一歩を踏み出す人物像です。",
+    decisionTitle: "思考と決断のバイアス", decisionBody: "選択肢を広く眺めてから核心をつかむタイプ。直感で方向を見つけ、最後は具体的な根拠を確かめると強みが生きます。考えすぎたときは、次の小さな一歩を決めて。",
+    timingTitle: "攻め時・守り時の行動指針", timingBody: "新しい提案や挑戦は、目的と準備が揃ったときに前へ。疲れを感じたり情報が足りないときは、急いで決めずに整える時間を。これは日付に基づく吉凶判定ではありません。",
     colorsTitle: "パーソナルカラー", colorsIntro: "6つのテーマを支える色", colorLabels: ["総合", "金運", "仕事", "恋愛", "対人", "健康"], colorNames: ["シャンパンゴールド", "翡翠", "瑠璃", "珊瑚", "藤", "琥珀"],
-    partnerBirthDate: "お相手の生年月日", partnerHint: "生年月日を入力すると、相性の傾向をプレビューします。", calculate: "相性を診る", score: "相性スコア",
+    partnerBirthDate: "お相手の生年月日", partnerHint: "15占術×動物占いの相性診断イメージ。生年月日からデモスコアを表示します。", calculate: "相性を診る", score: "相性スコア",
     advice: ["違いを急いで埋めず、互いのペースを言葉にすると関係が整います。", "共通点と違いのバランスが良好。小さな相談を重ねるほど信頼が深まります。", "自然に呼吸が合う組み合わせ。大切な決断ほど、二人の目的を確認しましょう。"],
     lockedTitle: "詳しい相性レポート", lockedBody: "価値観・会話・恋愛・長期関係の詳細アドバイスはVIP機能です。", unlock: "VIPで全機能解放", preview: "プレビュー表示 · 実際の占術計算ではありません", detailLabel: "読み解きを開く", summaryThemes: ["本質と人生のリズム", "決断と行動の傾向", "人との距離感", "才能が活きる場面", "心を整えるヒント"]
   },
   en: {
-    manual: "My Manual", compatibility: "Compatibility", manualTitle: "Your outline through 15 traditions", manualIntro: "A preview layering different perspectives on your strengths and patterns.",
+    manual: "My Manual", compatibility: "Compatibility", manualTitle: "15 Arts × Animal Horoscope · Integrated Profile", manualIntro: "INTEGRATED AI PROFILE · A sample cross-tradition portrait, not a calculated reading.",
+    coreTitle: "Your essence & core identity", coreBody: "Imagine Western astrology, Four Pillars, numerology, animal horoscope and Eastern trigrams as one lens. This sample portrait balances curiosity with care, stepping forward when conviction grows.",
+    decisionTitle: "Thinking & decision biases", decisionBody: "You may scan possibilities before finding the essential thread. Let intuition set direction, then check the evidence. When overthinking, choose one small next step.",
+    timingTitle: "When to advance, when to pause", timingBody: "Move on new ideas when purpose and preparation align. If you're tired or missing context, make room to regroup. This is not a date-based timing forecast.",
     colorsTitle: "Personal Colors", colorsIntro: "Colors supporting six parts of life", colorLabels: ["Overall", "Wealth", "Work", "Love", "Social", "Health"], colorNames: ["Champagne Gold", "Jade", "Lapis", "Coral", "Wisteria", "Amber"],
-    partnerBirthDate: "Partner's birth date", partnerHint: "Enter a date to preview your compatibility pattern.", calculate: "View compatibility", score: "Compatibility score",
+    partnerBirthDate: "Partner's birth date", partnerHint: "A 15-arts × animal-horoscope compatibility concept. Enter a date for a demo score.", calculate: "View compatibility", score: "Compatibility score",
     advice: ["Name your different rhythms instead of rushing to resolve them.", "You balance similarities and differences well. Small conversations deepen trust.", "Your rhythms align naturally. Revisit shared goals before major decisions."],
     lockedTitle: "Detailed compatibility report", lockedBody: "Values, communication, romance, and long-term guidance are available with VIP.", unlock: "Unlock all with VIP", preview: "Preview only · Not a real divination calculation", detailLabel: "Open insight", summaryThemes: ["Core nature and life rhythm", "Decision and action patterns", "Relationship boundaries", "Where talent shines", "A cue for inner balance"]
   },
   "zh-CN": {
-    manual: "我的使用说明", compatibility: "缘分诊断（对方）", manualTitle: "15种占术描绘的你", manualIntro: "从不同角度叠加解读你的优势与行动倾向。",
+    manual: "我的使用说明", compatibility: "缘分诊断（对方）", manualTitle: "15种占术×动物占卜 综合交叉解析", manualIntro: "INTEGRATED AI PROFILE · 跨传统综合画像预览，并非实际计算结果。",
+    coreTitle: "你的本质与核心身份", coreBody: "将西方占星、四柱推命、数字命理、动物占卜与东方八卦视为一个整体。这份示例画像描绘出兼具好奇与审慎、确认方向后愿意前进的性格。",
+    decisionTitle: "思考与决策倾向", decisionBody: "你可能先审视多种选择，再抓住关键。让直觉指引方向，再用事实核实；想得太多时，不妨先确定一个小步骤。",
+    timingTitle: "进取与休整的行动指引", timingBody: "目标与准备都明确时，适合推进新想法。疲惫或信息不足时，不妨暂缓决定、重新调整。这不是基于日期的吉凶预测。",
     colorsTitle: "个人色彩", colorsIntro: "支持六大生活主题的颜色", colorLabels: ["综合", "财运", "事业", "恋爱", "人际", "健康"], colorNames: ["香槟金", "翡翠", "琉璃", "珊瑚", "紫藤", "琥珀"],
-    partnerBirthDate: "对方的出生日期", partnerHint: "输入日期即可预览缘分倾向。", calculate: "查看缘分", score: "缘分分数", advice: ["不要急于消除差异，说出彼此的节奏会让关系更稳定。", "共同点与差异平衡良好，日常沟通会加深信任。", "你们的节奏自然契合，重要决定前请确认共同目标。"],
+    partnerBirthDate: "对方的出生日期", partnerHint: "15种占术×动物占卜的缘分诊断概念。输入日期可查看示例分数。", calculate: "查看缘分", score: "缘分分数", advice: ["不要急于消除差异，说出彼此的节奏会让关系更稳定。", "共同点与差异平衡良好，日常沟通会加深信任。", "你们的节奏自然契合，重要决定前请确认共同目标。"],
     lockedTitle: "详细缘分报告", lockedBody: "价值观、沟通、恋爱与长期关系建议为VIP功能。", unlock: "VIP解锁全部功能", preview: "预览展示 · 并非真实占术计算", detailLabel: "展开解读", summaryThemes: ["本质与人生节奏", "决策与行动倾向", "人际距离感", "才能发挥场景", "内心平衡提示"]
   },
   "zh-TW": {
-    manual: "我的使用說明", compatibility: "緣分診斷（對方）", manualTitle: "15種占術描繪的你", manualIntro: "從不同角度疊加解讀你的優勢與行動傾向。",
+    manual: "我的使用說明", compatibility: "緣分診斷（對方）", manualTitle: "15種占術×動物占卜 綜合交叉解析", manualIntro: "INTEGRATED AI PROFILE · 跨傳統綜合畫像預覽，並非實際計算結果。",
+    coreTitle: "你的本質與核心身份", coreBody: "將西洋占星、四柱推命、數字命理、動物占卜與東方八卦視為一體。這份示例畫像描繪出兼具好奇與審慎、確認方向後願意前進的性格。",
+    decisionTitle: "思考與決策傾向", decisionBody: "你可能先審視多種選擇，再抓住關鍵。讓直覺指引方向，再用事實核實；想得太多時，不妨先確定一個小步驟。",
+    timingTitle: "進取與休整的行動指引", timingBody: "目標與準備都明確時，適合推進新想法。疲憊或資訊不足時，不妨暫緩決定、重新調整。這不是基於日期的吉凶預測。",
     colorsTitle: "個人色彩", colorsIntro: "支持六大生活主題的顏色", colorLabels: ["綜合", "財運", "事業", "戀愛", "人際", "健康"], colorNames: ["香檳金", "翡翠", "琉璃", "珊瑚", "紫藤", "琥珀"],
-    partnerBirthDate: "對方的出生日期", partnerHint: "輸入日期即可預覽緣分傾向。", calculate: "查看緣分", score: "緣分分數", advice: ["不要急於消除差異，說出彼此的節奏會讓關係更穩定。", "共同點與差異平衡良好，日常溝通會加深信任。", "你們的節奏自然契合，重要決定前請確認共同目標。"],
+    partnerBirthDate: "對方的出生日期", partnerHint: "15種占術×動物占卜的緣分診斷概念。輸入日期可查看示例分數。", calculate: "查看緣分", score: "緣分分數", advice: ["不要急於消除差異，說出彼此的節奏會讓關係更穩定。", "共同點與差異平衡良好，日常溝通會加深信任。", "你們的節奏自然契合，重要決定前請確認共同目標。"],
     lockedTitle: "詳細緣分報告", lockedBody: "價值觀、溝通、戀愛與長期關係建議為VIP功能。", unlock: "VIP解鎖全部功能", preview: "預覽展示 · 並非真實占術計算", detailLabel: "展開解讀", summaryThemes: ["本質與人生節奏", "決策與行動傾向", "人際距離感", "才能發揮場景", "內心平衡提示"]
   },
   ko: {
-    manual: "나의 사용 설명서", compatibility: "궁합 진단 (상대)", manualTitle: "15가지 점술로 보는 나", manualIntro: "서로 다른 관점으로 강점과 행동 성향을 살펴보는 미리보기입니다.",
+    manual: "나의 사용 설명서", compatibility: "궁합 진단 (상대)", manualTitle: "15가지 점술 × 동물 점술 통합 분석", manualIntro: "INTEGRATED AI PROFILE · 여러 관점을 합친 예시이며 실제 계산 결과가 아닙니다.",
+    coreTitle: "본질과 핵심 정체성", coreBody: "서양 점성술, 사주, 수비학, 동물 점술, 동양의 팔괘를 하나의 시선으로 엮습니다. 이 예시 프로필은 호기심과 신중함을 함께 지니고, 확신이 생기면 앞으로 나아가는 모습을 그립니다.",
+    decisionTitle: "생각과 결정의 편향", decisionBody: "여러 가능성을 살핀 뒤 핵심을 찾아갑니다. 직감으로 방향을 잡고 근거를 확인해 보세요. 고민이 길어질 때는 작은 다음 행동 하나를 정해 보세요.",
+    timingTitle: "전진할 때와 멈출 때", timingBody: "목적과 준비가 맞으면 새로운 도전을 시작하세요. 지쳤거나 정보가 부족하면 잠시 정리할 시간을 가지세요. 날짜에 따른 길흉 예측은 아닙니다.",
     colorsTitle: "퍼스널 컬러", colorsIntro: "삶의 여섯 영역을 돕는 색", colorLabels: ["종합", "재물", "직업", "연애", "대인", "건강"], colorNames: ["샴페인 골드", "비취", "청금석", "산호", "등나무꽃", "호박"],
-    partnerBirthDate: "상대방 생년월일", partnerHint: "날짜를 입력하면 궁합 성향을 미리 볼 수 있습니다.", calculate: "궁합 보기", score: "궁합 점수", advice: ["차이를 서둘러 없애기보다 서로의 속도를 말로 나눠보세요.", "공통점과 차이의 균형이 좋습니다. 작은 대화가 신뢰를 키웁니다.", "자연스럽게 호흡이 맞습니다. 큰 결정 전 공동 목표를 확인하세요."],
+    partnerBirthDate: "상대방 생년월일", partnerHint: "15가지 점술 × 동물 점술 궁합의 예시입니다. 날짜를 입력하면 데모 점수가 표시됩니다.", calculate: "궁합 보기", score: "궁합 점수", advice: ["차이를 서둘러 없애기보다 서로의 속도를 말로 나눠보세요.", "공통점과 차이의 균형이 좋습니다. 작은 대화가 신뢰를 키웁니다.", "자연스럽게 호흡이 맞습니다. 큰 결정 전 공동 목표를 확인하세요."],
     lockedTitle: "상세 궁합 리포트", lockedBody: "가치관, 대화, 연애, 장기 관계 조언은 VIP 기능입니다.", unlock: "VIP로 모든 기능 열기", preview: "미리보기 · 실제 점술 계산이 아닙니다", detailLabel: "해석 열기", summaryThemes: ["본질과 삶의 리듬", "결정과 행동 패턴", "관계의 거리감", "재능이 빛나는 순간", "마음의 균형 힌트"]
   },
   es: {
-    manual: "Mi manual", compatibility: "Compatibilidad", manualTitle: "Tu perfil a través de 15 tradiciones", manualIntro: "Una vista previa de tus fortalezas y patrones desde distintas perspectivas.",
+    manual: "Mi manual", compatibility: "Compatibilidad", manualTitle: "15 artes × Horóscopo animal · Perfil integrado", manualIntro: "INTEGRATED AI PROFILE · Una síntesis ilustrativa, no una lectura calculada.",
+    coreTitle: "Tu esencia e identidad", coreBody: "Imagina la astrología occidental, los Cuatro Pilares, la numerología, el horóscopo animal y los trigramas como una sola lente. Este retrato de ejemplo combina curiosidad y prudencia, avanzando cuando llega la convicción.",
+    decisionTitle: "Sesgos al pensar y decidir", decisionBody: "Exploras posibilidades antes de llegar a lo esencial. Usa la intuición para orientarte y después comprueba los hechos. Si piensas demasiado, elige un pequeño paso.",
+    timingTitle: "Cuándo avanzar y cuándo pausar", timingBody: "Avanza con ideas nuevas cuando el propósito y la preparación coincidan. Si falta información o energía, date tiempo para reorganizarte. No es un pronóstico basado en fechas.",
     colorsTitle: "Colores personales", colorsIntro: "Colores para seis áreas de tu vida", colorLabels: ["General", "Dinero", "Trabajo", "Amor", "Social", "Salud"], colorNames: ["Oro champán", "Jade", "Lapislázuli", "Coral", "Glicinia", "Ámbar"],
-    partnerBirthDate: "Fecha de nacimiento de tu pareja", partnerHint: "Introduce una fecha para ver la tendencia de compatibilidad.", calculate: "Ver compatibilidad", score: "Puntuación", advice: ["Expresad vuestros ritmos sin apresurar las diferencias.", "Hay buen equilibrio. Las pequeñas conversaciones refuerzan la confianza.", "Vuestros ritmos encajan. Confirmad metas comunes antes de decisiones importantes."],
+    partnerBirthDate: "Fecha de nacimiento de tu pareja", partnerHint: "Concepto de compatibilidad de 15 artes y horóscopo animal. Introduce una fecha para ver una puntuación de ejemplo.", calculate: "Ver compatibilidad", score: "Puntuación", advice: ["Expresad vuestros ritmos sin apresurar las diferencias.", "Hay buen equilibrio. Las pequeñas conversaciones refuerzan la confianza.", "Vuestros ritmos encajan. Confirmad metas comunes antes de decisiones importantes."],
     lockedTitle: "Informe detallado", lockedBody: "Valores, comunicación, romance y orientación a largo plazo están disponibles con VIP.", unlock: "Desbloquear todo con VIP", preview: "Solo vista previa · No es un cálculo real", detailLabel: "Abrir lectura", summaryThemes: ["Esencia y ritmo vital", "Decisión y acción", "Límites en relaciones", "Dónde brilla el talento", "Clave para el equilibrio"]
   },
   fr: {
-    manual: "Mon mode d'emploi", compatibility: "Compatibilité", manualTitle: "Votre profil selon 15 traditions", manualIntro: "Un aperçu croisant plusieurs regards sur vos forces et vos tendances.",
+    manual: "Mon mode d'emploi", compatibility: "Compatibilité", manualTitle: "15 arts × Horoscope animal · Profil intégré", manualIntro: "INTEGRATED AI PROFILE · Une synthèse illustrative, pas une analyse calculée.",
+    coreTitle: "Votre essence et identité", coreBody: "Imaginez l'astrologie occidentale, les Quatre Piliers, la numérologie, l'horoscope animal et les trigrammes comme un seul regard. Ce portrait fictif associe curiosité et prudence, puis avance avec conviction.",
+    decisionTitle: "Biais de réflexion et de décision", decisionBody: "Vous explorez les possibilités avant de saisir l'essentiel. Laissez l'intuition vous orienter, puis vérifiez les faits. Si vous hésitez trop, choisissez une petite prochaine étape.",
+    timingTitle: "Quand avancer, quand ralentir", timingBody: "Avancez quand l'objectif et la préparation s'accordent. Si vous manquez d'énergie ou d'informations, prenez le temps de vous recentrer. Ce n'est pas une prévision liée aux dates.",
     colorsTitle: "Couleurs personnelles", colorsIntro: "Six couleurs pour vos domaines de vie", colorLabels: ["Global", "Finances", "Travail", "Amour", "Relations", "Santé"], colorNames: ["Or champagne", "Jade", "Lapis", "Corail", "Glycine", "Ambre"],
-    partnerBirthDate: "Date de naissance du partenaire", partnerHint: "Saisissez une date pour afficher la tendance de compatibilité.", calculate: "Voir la compatibilité", score: "Score de compatibilité", advice: ["N'effacez pas les différences trop vite : exprimez vos rythmes.", "L'équilibre est bon. De petits échanges renforcent la confiance.", "Vos rythmes s'accordent naturellement. Confirmez vos buts communs avant les grands choix."],
+    partnerBirthDate: "Date de naissance du partenaire", partnerHint: "Concept de compatibilité de 15 arts et horoscope animal. Saisissez une date pour un score de démonstration.", calculate: "Voir la compatibilité", score: "Score de compatibilité", advice: ["N'effacez pas les différences trop vite : exprimez vos rythmes.", "L'équilibre est bon. De petits échanges renforcent la confiance.", "Vos rythmes s'accordent naturellement. Confirmez vos buts communs avant les grands choix."],
     lockedTitle: "Rapport détaillé", lockedBody: "Valeurs, communication, amour et conseils à long terme sont disponibles avec VIP.", unlock: "Tout débloquer avec VIP", preview: "Aperçu uniquement · Aucun calcul réel", detailLabel: "Ouvrir l'analyse", summaryThemes: ["Nature et rythme de vie", "Décision et action", "Distance relationnelle", "Expression des talents", "Clé d'équilibre intérieur"]
   }
 };
