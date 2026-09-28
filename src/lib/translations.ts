@@ -139,3 +139,58 @@ export const dashboardTranslations: Record<Language, {
   es: { home: "Inicio", arts: "15 artes", consult: "Consulta IA", mandala: "Mandala", settings: "Ajustes", today: "Brújula de hoy", theme: "Tema de hoy", attack: "Avanzar", energy: "Alta energía", expansion: "Momento de expandirse", wheelHint: "Arrastra el anillo para girar", biorhythm: "Biorritmo del calendario terrestre", rhythmSubtitle: "Ritmo de hoy", actionFocus: "Enfoque de acción", momentum: "Impulso", clarity: "Claridad", intuition: "Intuición", decision: "Brújula de decisiones", decisionSubtitle: "Una pista para dar el siguiente paso", timing: "Explorar el momento de hoy", timingResult: "Avanza con intención hoy. Toma decisiones importantes cuando te sientas en calma.", demo: "Vista previa · Sin cálculo astrológico", notifications: "Avisos", noNotifications: "No hay avisos nuevos", vip: "VIP", artsSubtitle: "Quince tradiciones, una perspectiva", comingFeature: "Esta función estará disponible pronto", profile: "Perfil guardado", rotate: "Girar brújula" },
   fr: { home: "Accueil", arts: "15 arts", consult: "Conseil IA", mandala: "Mandala", settings: "Réglages", today: "Boussole du jour", theme: "Thème du jour", attack: "Avancer", energy: "Énergie élevée", expansion: "Le temps de s'ouvrir", wheelHint: "Faites glisser l'anneau pour tourner", biorhythm: "Biorythme du calendrier terrestre", rhythmSubtitle: "Rythme du jour", actionFocus: "Cap du jour", momentum: "Élan", clarity: "Clarté", intuition: "Intuition", decision: "Boussole de décision", decisionSubtitle: "Une piste pour votre prochain pas", timing: "Explorer le moment du jour", timingResult: "Avancez avec intention aujourd'hui. Prenez vos décisions importantes l'esprit apaisé.", demo: "Aperçu · Aucun calcul divinatoire connecté", notifications: "Notifications", noNotifications: "Aucune nouvelle notification", vip: "VIP", artsSubtitle: "Quinze traditions, un regard", comingFeature: "Cette fonctionnalité arrive bientôt", profile: "Profil enregistré", rotate: "Tourner la boussole" },
 };
+
+type TorisetsuTranslation = {
+  manual: string; compatibility: string; manualTitle: string; manualIntro: string;
+  colorsTitle: string; colorsIntro: string; colorLabels: string[]; colorNames: string[];
+  partnerBirthDate: string; partnerHint: string; calculate: string; score: string;
+  advice: [string, string, string]; lockedTitle: string; lockedBody: string; unlock: string;
+  preview: string; detailLabel: string; summaryThemes: string[];
+};
+
+export const torisetsuTranslations: Record<Language, TorisetsuTranslation> = {
+  ja: {
+    manual: "自分のトリセツ", compatibility: "相性診断（相手）", manualTitle: "15占術から見る、あなたの輪郭", manualIntro: "異なる視点を重ねて、持ち味と行動傾向を読み解くプレビューです。",
+    colorsTitle: "パーソナルカラー", colorsIntro: "6つのテーマを支える色", colorLabels: ["総合", "金運", "仕事", "恋愛", "対人", "健康"], colorNames: ["シャンパンゴールド", "翡翠", "瑠璃", "珊瑚", "藤", "琥珀"],
+    partnerBirthDate: "お相手の生年月日", partnerHint: "生年月日を入力すると、相性の傾向をプレビューします。", calculate: "相性を診る", score: "相性スコア",
+    advice: ["違いを急いで埋めず、互いのペースを言葉にすると関係が整います。", "共通点と違いのバランスが良好。小さな相談を重ねるほど信頼が深まります。", "自然に呼吸が合う組み合わせ。大切な決断ほど、二人の目的を確認しましょう。"],
+    lockedTitle: "詳しい相性レポート", lockedBody: "価値観・会話・恋愛・長期関係の詳細アドバイスはVIP機能です。", unlock: "VIPで全機能解放", preview: "プレビュー表示 · 実際の占術計算ではありません", detailLabel: "読み解きを開く", summaryThemes: ["本質と人生のリズム", "決断と行動の傾向", "人との距離感", "才能が活きる場面", "心を整えるヒント"]
+  },
+  en: {
+    manual: "My Manual", compatibility: "Compatibility", manualTitle: "Your outline through 15 traditions", manualIntro: "A preview layering different perspectives on your strengths and patterns.",
+    colorsTitle: "Personal Colors", colorsIntro: "Colors supporting six parts of life", colorLabels: ["Overall", "Wealth", "Work", "Love", "Social", "Health"], colorNames: ["Champagne Gold", "Jade", "Lapis", "Coral", "Wisteria", "Amber"],
+    partnerBirthDate: "Partner's birth date", partnerHint: "Enter a date to preview your compatibility pattern.", calculate: "View compatibility", score: "Compatibility score",
+    advice: ["Name your different rhythms instead of rushing to resolve them.", "You balance similarities and differences well. Small conversations deepen trust.", "Your rhythms align naturally. Revisit shared goals before major decisions."],
+    lockedTitle: "Detailed compatibility report", lockedBody: "Values, communication, romance, and long-term guidance are available with VIP.", unlock: "Unlock all with VIP", preview: "Preview only · Not a real divination calculation", detailLabel: "Open insight", summaryThemes: ["Core nature and life rhythm", "Decision and action patterns", "Relationship boundaries", "Where talent shines", "A cue for inner balance"]
+  },
+  "zh-CN": {
+    manual: "我的使用说明", compatibility: "缘分诊断（对方）", manualTitle: "15种占术描绘的你", manualIntro: "从不同角度叠加解读你的优势与行动倾向。",
+    colorsTitle: "个人色彩", colorsIntro: "支持六大生活主题的颜色", colorLabels: ["综合", "财运", "事业", "恋爱", "人际", "健康"], colorNames: ["香槟金", "翡翠", "琉璃", "珊瑚", "紫藤", "琥珀"],
+    partnerBirthDate: "对方的出生日期", partnerHint: "输入日期即可预览缘分倾向。", calculate: "查看缘分", score: "缘分分数", advice: ["不要急于消除差异，说出彼此的节奏会让关系更稳定。", "共同点与差异平衡良好，日常沟通会加深信任。", "你们的节奏自然契合，重要决定前请确认共同目标。"],
+    lockedTitle: "详细缘分报告", lockedBody: "价值观、沟通、恋爱与长期关系建议为VIP功能。", unlock: "VIP解锁全部功能", preview: "预览展示 · 并非真实占术计算", detailLabel: "展开解读", summaryThemes: ["本质与人生节奏", "决策与行动倾向", "人际距离感", "才能发挥场景", "内心平衡提示"]
+  },
+  "zh-TW": {
+    manual: "我的使用說明", compatibility: "緣分診斷（對方）", manualTitle: "15種占術描繪的你", manualIntro: "從不同角度疊加解讀你的優勢與行動傾向。",
+    colorsTitle: "個人色彩", colorsIntro: "支持六大生活主題的顏色", colorLabels: ["綜合", "財運", "事業", "戀愛", "人際", "健康"], colorNames: ["香檳金", "翡翠", "琉璃", "珊瑚", "紫藤", "琥珀"],
+    partnerBirthDate: "對方的出生日期", partnerHint: "輸入日期即可預覽緣分傾向。", calculate: "查看緣分", score: "緣分分數", advice: ["不要急於消除差異，說出彼此的節奏會讓關係更穩定。", "共同點與差異平衡良好，日常溝通會加深信任。", "你們的節奏自然契合，重要決定前請確認共同目標。"],
+    lockedTitle: "詳細緣分報告", lockedBody: "價值觀、溝通、戀愛與長期關係建議為VIP功能。", unlock: "VIP解鎖全部功能", preview: "預覽展示 · 並非真實占術計算", detailLabel: "展開解讀", summaryThemes: ["本質與人生節奏", "決策與行動傾向", "人際距離感", "才能發揮場景", "內心平衡提示"]
+  },
+  ko: {
+    manual: "나의 사용 설명서", compatibility: "궁합 진단 (상대)", manualTitle: "15가지 점술로 보는 나", manualIntro: "서로 다른 관점으로 강점과 행동 성향을 살펴보는 미리보기입니다.",
+    colorsTitle: "퍼스널 컬러", colorsIntro: "삶의 여섯 영역을 돕는 색", colorLabels: ["종합", "재물", "직업", "연애", "대인", "건강"], colorNames: ["샴페인 골드", "비취", "청금석", "산호", "등나무꽃", "호박"],
+    partnerBirthDate: "상대방 생년월일", partnerHint: "날짜를 입력하면 궁합 성향을 미리 볼 수 있습니다.", calculate: "궁합 보기", score: "궁합 점수", advice: ["차이를 서둘러 없애기보다 서로의 속도를 말로 나눠보세요.", "공통점과 차이의 균형이 좋습니다. 작은 대화가 신뢰를 키웁니다.", "자연스럽게 호흡이 맞습니다. 큰 결정 전 공동 목표를 확인하세요."],
+    lockedTitle: "상세 궁합 리포트", lockedBody: "가치관, 대화, 연애, 장기 관계 조언은 VIP 기능입니다.", unlock: "VIP로 모든 기능 열기", preview: "미리보기 · 실제 점술 계산이 아닙니다", detailLabel: "해석 열기", summaryThemes: ["본질과 삶의 리듬", "결정과 행동 패턴", "관계의 거리감", "재능이 빛나는 순간", "마음의 균형 힌트"]
+  },
+  es: {
+    manual: "Mi manual", compatibility: "Compatibilidad", manualTitle: "Tu perfil a través de 15 tradiciones", manualIntro: "Una vista previa de tus fortalezas y patrones desde distintas perspectivas.",
+    colorsTitle: "Colores personales", colorsIntro: "Colores para seis áreas de tu vida", colorLabels: ["General", "Dinero", "Trabajo", "Amor", "Social", "Salud"], colorNames: ["Oro champán", "Jade", "Lapislázuli", "Coral", "Glicinia", "Ámbar"],
+    partnerBirthDate: "Fecha de nacimiento de tu pareja", partnerHint: "Introduce una fecha para ver la tendencia de compatibilidad.", calculate: "Ver compatibilidad", score: "Puntuación", advice: ["Expresad vuestros ritmos sin apresurar las diferencias.", "Hay buen equilibrio. Las pequeñas conversaciones refuerzan la confianza.", "Vuestros ritmos encajan. Confirmad metas comunes antes de decisiones importantes."],
+    lockedTitle: "Informe detallado", lockedBody: "Valores, comunicación, romance y orientación a largo plazo están disponibles con VIP.", unlock: "Desbloquear todo con VIP", preview: "Solo vista previa · No es un cálculo real", detailLabel: "Abrir lectura", summaryThemes: ["Esencia y ritmo vital", "Decisión y acción", "Límites en relaciones", "Dónde brilla el talento", "Clave para el equilibrio"]
+  },
+  fr: {
+    manual: "Mon mode d'emploi", compatibility: "Compatibilité", manualTitle: "Votre profil selon 15 traditions", manualIntro: "Un aperçu croisant plusieurs regards sur vos forces et vos tendances.",
+    colorsTitle: "Couleurs personnelles", colorsIntro: "Six couleurs pour vos domaines de vie", colorLabels: ["Global", "Finances", "Travail", "Amour", "Relations", "Santé"], colorNames: ["Or champagne", "Jade", "Lapis", "Corail", "Glycine", "Ambre"],
+    partnerBirthDate: "Date de naissance du partenaire", partnerHint: "Saisissez une date pour afficher la tendance de compatibilité.", calculate: "Voir la compatibilité", score: "Score de compatibilité", advice: ["N'effacez pas les différences trop vite : exprimez vos rythmes.", "L'équilibre est bon. De petits échanges renforcent la confiance.", "Vos rythmes s'accordent naturellement. Confirmez vos buts communs avant les grands choix."],
+    lockedTitle: "Rapport détaillé", lockedBody: "Valeurs, communication, amour et conseils à long terme sont disponibles avec VIP.", unlock: "Tout débloquer avec VIP", preview: "Aperçu uniquement · Aucun calcul réel", detailLabel: "Ouvrir l'analyse", summaryThemes: ["Nature et rythme de vie", "Décision et action", "Distance relationnelle", "Expression des talents", "Clé d'équilibre intérieur"]
+  }
+};
