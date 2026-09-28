@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import ConsultationPanel from "@/components/ConsultationPanel";
 import NineStarsPanel from "@/components/NineStarsPanel";
+import SettingsPanel from "@/components/SettingsPanel";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -31,7 +32,12 @@ import {
   type Language,
 } from "@/lib/translations";
 
-type Props = { profile: UserProfile; onEdit: () => void; language: Language };
+type Props = {
+  profile: UserProfile;
+  onEdit: () => void;
+  language: Language;
+  onLanguageChange: (language: Language) => void;
+};
 type Tab = "home" | "arts" | "consult" | "mandala" | "settings";
 
 const zodiac = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"];
@@ -534,7 +540,7 @@ function TorisetsuPanel({
   );
 }
 
-export default function Dashboard({ profile, onEdit, language }: Props) {
+export default function Dashboard({ profile, onEdit, language, onLanguageChange }: Props) {
   const t = dashboardTranslations[language];
   const base = translations[language];
   const [tab, setTab] = useState<Tab>("home");
@@ -697,17 +703,13 @@ export default function Dashboard({ profile, onEdit, language }: Props) {
             ) : tab === "mandala" ? (
               <NineStarsPanel language={language} onVip={() => setModal("vip")} />
             ) : tab === "settings" ? (
-              <section className="border-y border-primary/15 py-5">
-                <h3 className="font-serif text-lg text-primary">{t.profile}</h3>
-                <ProfileRows profile={profile} language={language} />
-                <Button
-                  variant="outline"
-                  onClick={onEdit}
-                  className="mt-5 w-full border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
-                >
-                  {base.edit}
-                </Button>
-              </section>
+              <SettingsPanel
+                profile={profile}
+                language={language}
+                onLanguageChange={onLanguageChange}
+                onEdit={onEdit}
+                onVip={() => setModal("vip")}
+              />
             ) : (
               <div className="border-y border-primary/15 py-12 text-center text-sm text-muted-foreground">
                 {t.comingFeature}

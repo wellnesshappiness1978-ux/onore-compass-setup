@@ -1,5 +1,16 @@
-import { useState } from "react";
-import { Bell, Building2, Crown, Globe2, HelpCircle, Lock, PenLine, ScrollText, Shield, User } from "lucide-react";
+import { Fragment, useState } from "react";
+import {
+  Bell,
+  Building2,
+  Crown,
+  Globe2,
+  HelpCircle,
+  Lock,
+  PenLine,
+  ScrollText,
+  Shield,
+  User,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
@@ -23,11 +34,25 @@ const SAMPLE_MATRIX = [
   [72, 78, null, 69],
   [64, 81, 69, null],
 ];
-const SAMPLE_WEEK: ("push" | "hold" | "calm")[] = ["push", "hold", "push", "calm", "push", "hold", "calm"];
+const SAMPLE_WEEK: ("push" | "hold" | "calm")[] = [
+  "push",
+  "hold",
+  "push",
+  "calm",
+  "push",
+  "hold",
+  "calm",
+];
 
 const card = "rounded-2xl border border-primary/20 bg-card/60 p-5 shadow-2xl backdrop-blur-md";
 
-export default function SettingsPanel({ profile, language, onLanguageChange, onEdit, onVip }: Props) {
+export default function SettingsPanel({
+  profile,
+  language,
+  onLanguageChange,
+  onEdit,
+  onVip,
+}: Props) {
   const t = settingsTranslations[language];
   const [plan, setPlan] = useState<Plan>("free");
   const [b2b, setB2b] = useState(false);
@@ -119,7 +144,9 @@ export default function SettingsPanel({ profile, language, onLanguageChange, onE
         <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-background/40 p-3 text-sm">
           <span className={b2b ? "text-muted-foreground" : "text-primary"}>{t.personal}</span>
           <Switch checked={b2b} onCheckedChange={setB2b} aria-label={t.b2b} />
-          <span className={`text-right ${b2b ? "text-primary" : "text-muted-foreground"}`}>{t.b2b}</span>
+          <span className={`text-right ${b2b ? "text-primary" : "text-muted-foreground"}`}>
+            {t.b2b}
+          </span>
         </div>
 
         {b2b && (
@@ -129,7 +156,10 @@ export default function SettingsPanel({ profile, language, onLanguageChange, onE
               <h4 className="mb-2 text-sm text-primary">{t.team}</h4>
               <ul className="grid grid-cols-2 gap-2">
                 {SAMPLE_TEAM.map((name, i) => (
-                  <li key={name} className="rounded-lg border border-primary/15 bg-background/40 px-3 py-2">
+                  <li
+                    key={name}
+                    className="rounded-lg border border-primary/15 bg-background/40 px-3 py-2"
+                  >
                     <p className="text-sm">{name}</p>
                     <p className="text-[11px] text-muted-foreground">{t.roles[i]}</p>
                   </li>
@@ -141,21 +171,29 @@ export default function SettingsPanel({ profile, language, onLanguageChange, onE
               <div className="grid grid-cols-5 gap-1 text-center text-[11px]">
                 <span />
                 {SAMPLE_TEAM.map((n) => (
-                  <span key={n} className="truncate text-muted-foreground">{n.split(" ")[1]}</span>
+                  <span key={n} className="truncate text-muted-foreground">
+                    {n.split(" ")[1]}
+                  </span>
                 ))}
                 {SAMPLE_MATRIX.map((row, r) => (
-                  <>
-                    <span key={`h${r}`} className="truncate text-left text-muted-foreground">{SAMPLE_TEAM[r].split(" ")[1]}</span>
+                  <Fragment key={r}>
+                    <span className="truncate text-left text-muted-foreground">
+                      {SAMPLE_TEAM[r].split(" ")[1]}
+                    </span>
                     {row.map((v, c) => (
                       <span
                         key={`${r}-${c}`}
                         className="rounded-md border border-primary/10 py-2"
-                        style={{ backgroundColor: v ? `color-mix(in oklab, var(--primary) ${Math.round((v - 50) * 1.2)}%, transparent)` : undefined }}
+                        style={{
+                          backgroundColor: v
+                            ? `color-mix(in oklab, var(--primary) ${Math.round((v - 50) * 1.2)}%, transparent)`
+                            : undefined,
+                        }}
                       >
                         {v ?? "—"}
                       </span>
                     ))}
-                  </>
+                  </Fragment>
                 ))}
               </div>
             </div>
@@ -190,12 +228,18 @@ export default function SettingsPanel({ profile, language, onLanguageChange, onE
 
       <section className={card}>
         <h3 className="mb-3 font-serif text-lg text-primary">{t.account}</h3>
-        <Button variant="outline" onClick={onEdit} className="w-full justify-start border-primary/20 bg-transparent">
+        <Button
+          variant="outline"
+          onClick={onEdit}
+          className="w-full justify-start border-primary/20 bg-transparent"
+        >
           <PenLine className="size-4 text-primary" /> {t.editBirth}
         </Button>
 
         <div className="mt-5">
-          <p className="mb-2 flex items-center gap-2 text-sm"><Globe2 className="size-4 text-primary" /> {t.language}</p>
+          <p className="mb-2 flex items-center gap-2 text-sm">
+            <Globe2 className="size-4 text-primary" /> {t.language}
+          </p>
           <div className="flex flex-wrap gap-2">
             {languages.map((l) => (
               <Button
@@ -213,12 +257,17 @@ export default function SettingsPanel({ profile, language, onLanguageChange, onE
         </div>
 
         <div className="mt-5 space-y-3">
-          <p className="flex items-center gap-2 text-sm"><Bell className="size-4 text-primary" /> {t.notifications}</p>
+          <p className="flex items-center gap-2 text-sm">
+            <Bell className="size-4 text-primary" /> {t.notifications}
+          </p>
           {[
             [t.notifyTiming, notifyTiming, setNotifyTiming] as const,
             [t.notifyBio, notifyBio, setNotifyBio] as const,
           ].map(([label, value, set]) => (
-            <label key={label} className="flex items-center justify-between rounded-lg border border-primary/10 px-3 py-2.5 text-sm">
+            <label
+              key={label}
+              className="flex items-center justify-between rounded-lg border border-primary/10 px-3 py-2.5 text-sm"
+            >
               {label}
               <Switch checked={value} onCheckedChange={set} aria-label={label} />
             </label>
@@ -244,7 +293,11 @@ export default function SettingsPanel({ profile, language, onLanguageChange, onE
             );
           })}
         </div>
-        {notice && <p role="status" className="mt-2 text-xs text-muted-foreground">{notice}: {t.soon}</p>}
+        {notice && (
+          <p role="status" className="mt-2 text-xs text-muted-foreground">
+            {notice}: {t.soon}
+          </p>
+        )}
       </section>
     </div>
   );
