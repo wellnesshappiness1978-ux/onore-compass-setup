@@ -372,3 +372,198 @@
 .design-choice--business-night .design-choice-scene > span,
 .design-choice--business-day .design-choice-scene > span { border-radius: 2px; }
 @media (prefers-reduced-motion: reduce) { .design-canvas { transition: none; } }
+
+/* Seven crafted instrument surfaces. Appearance changes never imply membership. */
+.design-canvas {
+  --font-sans: "Karla", "Noto Sans JP", sans-serif;
+  --font-serif: "Cormorant Garamond", "Noto Serif JP", serif;
+  --design-surface: var(--card);
+  --design-line: color-mix(in oklab, var(--primary) 30%, transparent);
+  --design-stroke: 1px;
+  --design-corner: 7px;
+  --design-density: 1rem;
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  isolation: isolate;
+}
+.design-canvas .font-serif { font-family: var(--font-serif); }
+.design-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: var(--design-texture);
+  background-size: var(--design-texture-size, auto);
+  opacity: var(--design-texture-opacity, 1);
+}
+.design-canvas .design-wordmark { letter-spacing: .22em; font-family: "Cormorant Garamond", serif; font-size: 12px; }
+.design-canvas .design-title { font-family: "Cormorant Garamond", "Noto Serif JP", serif; font-size: clamp(30px, 3rem, 46px); font-weight: 600; line-height: 1.1; }
+.design-canvas .design-mode-caption { max-width: min(85vw, 32rem); margin-inline: auto; line-height: 1.5; }
+.design-canvas .design-header { border-bottom-color: var(--design-line); }
+.design-canvas .design-daily-panel,
+.design-canvas .card-lux,
+.design-canvas [class*="rounded-2xl"][class*="bg-card"] {
+  border-radius: var(--design-corner);
+  border-width: var(--design-stroke);
+  border-color: var(--design-line);
+}
+.design-canvas .design-daily-panel { background: var(--design-surface); padding: calc(1rem + var(--design-density) / 4); }
+.design-canvas .design-navigation { border-radius: var(--design-corner); border-color: var(--design-line); background: color-mix(in oklab, var(--card) 90%, transparent); }
+.design-canvas .compass-wheel { max-width: var(--design-wheel-size, 410px); }
+.design-canvas .compass-rotor { border: var(--design-stroke) solid var(--design-line); }
+.design-canvas .compass-center { background: var(--design-center, var(--background)); }
+.design-canvas .design-compass-section { position: relative; padding-block: var(--design-compass-spacing, 0); }
+.design-canvas .design-compass-section::before,
+.design-canvas .design-compass-section::after { content: ""; position: absolute; pointer-events: none; left: 50%; top: 52%; transform: translate(-50%, -50%); border-radius: 50%; width: min(94vw, var(--design-outer-size, 470px)); aspect-ratio: 1; border: var(--design-orbit-border, 0 solid transparent); }
+.design-canvas .design-compass-section::after { width: min(87vw, var(--design-inner-size, 450px)); transform: translate(-50%, -50%) rotate(25deg); border-style: dashed; opacity: var(--design-inner-opacity, 0); }
+
+/* Free · porcelain and ink: intentionally light, restrained, open. */
+.design-canvas[data-design="classic"] {
+  --background: oklch(.975 .008 94); --foreground: oklch(.22 .02 260);
+  --card: oklch(.992 .004 92); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --primary: oklch(.43 .07 258); --primary-foreground: oklch(.99 0 0);
+  --secondary: oklch(.93 .01 94); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.45 .02 260);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(.79 .02 260); --input: var(--border); --ring: var(--primary);
+  --gold-glow: oklch(.62 .05 95); --gold-deep: oklch(.36 .045 258);
+  --nebula: oklch(.85 .025 258); --celestial-ink: oklch(.85 .015 95);
+  --design-texture: repeating-linear-gradient(0deg, transparent 0 11px, color-mix(in oklab, var(--primary) 5%, transparent) 12px 13px);
+  --design-texture-opacity: .35; --design-surface: var(--card);
+  --design-line: color-mix(in oklab, var(--primary) 20%, transparent);
+  --design-corner: 3px; --design-density: .5rem; --design-wheel-size: 360px;
+  --design-center: var(--card);
+}
+.design-canvas[data-design="classic"] .celestial-stars { opacity: .06; }
+.design-canvas[data-design="classic"] .compass-halo { opacity: .12; }
+.design-canvas[data-design="classic"] .design-title { font-weight: 500; }
+.design-canvas[data-design="classic"] .design-navigation { box-shadow: 0 4px 25px color-mix(in oklab, var(--foreground) 8%, transparent); }
+
+/* Standard · carved obsidian and amethyst silk. */
+.design-canvas[data-design="masculine"] {
+  --background: #0c0c0c; --foreground: oklch(.94 .012 95);
+  --card: oklch(.16 .005 260); --card-foreground: var(--foreground);
+  --primary: #D4AF37; --primary-foreground: oklch(.1 .003 260);
+  --gold-glow: oklch(.88 .10 89); --gold-deep: oklch(.57 .1 85);
+  --nebula: oklch(.27 .015 260); --celestial-ink: oklch(.2 .01 260);
+  --design-texture: repeating-linear-gradient(45deg, transparent 0 7px, color-mix(in oklab, var(--primary) 5%, transparent) 8px 9px);
+  --design-texture-opacity: .6; --design-center: oklch(.1 .005 260);
+  --design-surface: linear-gradient(145deg, oklch(.2 .009 260), oklch(.13 .003 260));
+  --design-corner: 5px; --design-wheel-size: 390px;
+  --design-orbit-border: 1px solid color-mix(in oklab, var(--primary) 14%, transparent);
+}
+.design-canvas[data-design="feminine"] {
+  --background: oklch(.16 .055 310); --foreground: oklch(.96 .016 335);
+  --card: oklch(.23 .062 311); --card-foreground: var(--foreground);
+  --primary: oklch(.84 .09 322); --primary-foreground: oklch(.18 .05 310);
+  --gold-glow: oklch(.92 .04 335); --gold-deep: oklch(.65 .11 317);
+  --nebula: oklch(.37 .10 310); --celestial-ink: oklch(.28 .08 330);
+  --design-texture: repeating-linear-gradient(120deg, transparent 0 23px, color-mix(in oklab, var(--primary) 7%, transparent) 24px 25px), linear-gradient(145deg, transparent 15%, color-mix(in oklab, var(--primary) 11%, transparent) 50%, transparent 85%);
+  --design-center: oklch(.19 .06 311);
+  --design-surface: linear-gradient(140deg, oklch(.29 .075 310), oklch(.2 .04 322));
+  --design-corner: 8px; --design-wheel-size: 385px;
+  --design-orbit-border: 1px solid color-mix(in oklab, var(--primary) 25%, transparent);
+}
+.design-canvas[data-design="feminine"] .design-header { border-bottom-width: 2px; }
+.design-canvas[data-design="feminine"] .design-title { font-style: italic; }
+.design-canvas[data-design="feminine"] .design-daily-panel { border-top-width: 2px; }
+
+/* VIP · layered instrument dials, foil strokes and larger editorial typography. */
+.design-canvas[data-design="masculine-luxe"] {
+  --background: oklch(.13 .058 268); --foreground: oklch(.96 .01 260);
+  --card: oklch(.2 .062 265); --card-foreground: var(--foreground);
+  --primary: oklch(.79 .11 260); --primary-foreground: oklch(.13 .05 270);
+  --gold-glow: oklch(.9 .065 260); --gold-deep: oklch(.59 .115 260);
+  --nebula: oklch(.38 .105 272); --celestial-ink: oklch(.27 .085 260);
+  --design-texture: repeating-radial-gradient(circle at 50% 34%, transparent 0 42px, color-mix(in oklab, var(--primary) 11%, transparent) 43px 44px, transparent 45px 89px);
+  --design-center: oklch(.15 .06 268);
+  --design-surface: linear-gradient(145deg, oklch(.26 .08 266), oklch(.17 .05 266));
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-wheel-size: 430px; --design-outer-size: 500px; --design-inner-size: 476px;
+  --design-orbit-border: 1px solid color-mix(in oklab, var(--primary) 40%, transparent);
+  --design-inner-opacity: .55; --design-compass-spacing: 12px; --design-stroke: 2px;
+}
+.design-canvas[data-design="feminine-luxe"] {
+  --background: #0c0c0c; --foreground: oklch(.98 .012 88);
+  --card: oklch(.18 .013 90); --card-foreground: var(--foreground);
+  --primary: #D4AF37; --primary-foreground: oklch(.12 .013 90);
+  --gold-glow: oklch(.95 .08 91); --gold-deep: oklch(.59 .12 80);
+  --nebula: oklch(.39 .066 86); --celestial-ink: oklch(.27 .035 86);
+  --design-texture: repeating-radial-gradient(circle at 50% 33%, transparent 0 34px, color-mix(in oklab, var(--primary) 8%, transparent) 35px 36px, transparent 37px 69px), repeating-linear-gradient(45deg, transparent 0 6px, color-mix(in oklab, var(--primary) 3%, transparent) 7px 8px);
+  --design-center: oklch(.12 .015 85);
+  --design-surface: linear-gradient(145deg, oklch(.23 .026 87), oklch(.14 .008 87));
+  --design-line: color-mix(in oklab, var(--primary) 48%, transparent);
+  --design-wheel-size: 430px; --design-outer-size: 500px; --design-inner-size: 475px;
+  --design-orbit-border: 1px solid color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-inner-opacity: .7; --design-compass-spacing: 12px; --design-stroke: 2px;
+}
+.design-canvas[data-tier="vip"] .design-title,
+.design-canvas[data-tier="b2b"] .design-title { font-size: 46px; line-height: 1.05; }
+.design-canvas[data-design$="luxe"] .design-daily-panel { box-shadow: inset 0 1px 0 color-mix(in oklab, var(--gold-glow) 32%, transparent), 0 18px 42px color-mix(in oklab, var(--background) 70%, transparent); }
+.design-canvas[data-design$="luxe"] .design-header { border-bottom-width: 2px; }
+.design-canvas[data-design$="luxe"] .design-navigation { border-width: 2px; box-shadow: 0 0 25px color-mix(in oklab, var(--primary) 23%, transparent); }
+.design-canvas[data-design$="luxe"] .compass-rotor { box-shadow: inset 0 0 40px color-mix(in oklab, var(--primary) 15%, transparent), 0 0 35px color-mix(in oklab, var(--primary) 20%, transparent); }
+
+/* Business · jeweled geometry, ruled information surfaces, confident framing. */
+.design-canvas[data-design="business-night"] {
+  --background: oklch(.13 .052 350); --foreground: oklch(.97 .014 350);
+  --card: oklch(.21 .06 348); --card-foreground: var(--foreground);
+  --primary: oklch(.79 .17 353); --primary-foreground: oklch(.15 .046 350);
+  --gold-glow: oklch(.93 .075 352); --gold-deep: oklch(.63 .16 353);
+  --nebula: oklch(.38 .13 350); --celestial-ink: oklch(.29 .09 351);
+  --design-texture: repeating-linear-gradient(90deg, transparent 0 55px, color-mix(in oklab, var(--primary) 8%, transparent) 56px 57px), repeating-linear-gradient(0deg, transparent 0 55px, color-mix(in oklab, var(--primary) 6%, transparent) 56px 57px), linear-gradient(135deg, transparent 30%, color-mix(in oklab, var(--primary) 13%, transparent) 65%, transparent);
+  --design-center: oklch(.15 .055 350);
+  --design-surface: linear-gradient(135deg, oklch(.26 .075 350), oklch(.17 .046 350));
+  --design-line: color-mix(in oklab, var(--primary) 48%, transparent);
+  --design-corner: 3px; --design-stroke: 2px; --design-wheel-size: 440px;
+  --design-outer-size: 510px; --design-inner-size: 480px;
+  --design-orbit-border: 2px solid color-mix(in oklab, var(--primary) 40%, transparent);
+  --design-inner-opacity: .7; --design-compass-spacing: 17px;
+}
+.design-canvas[data-design="business-day"] {
+  --background: oklch(.12 .04 164); --foreground: oklch(.96 .017 160);
+  --card: oklch(.2 .053 164); --card-foreground: var(--foreground);
+  --primary: oklch(.8 .14 163); --primary-foreground: oklch(.13 .035 164);
+  --gold-glow: oklch(.93 .07 165); --gold-deep: oklch(.58 .12 164);
+  --nebula: oklch(.37 .1 166); --celestial-ink: oklch(.27 .07 165);
+  --design-texture: repeating-linear-gradient(135deg, transparent 0 39px, color-mix(in oklab, var(--primary) 10%, transparent) 40px 41px, transparent 42px 80px), repeating-linear-gradient(45deg, transparent 0 39px, color-mix(in oklab, var(--primary) 7%, transparent) 40px 41px, transparent 42px 80px);
+  --design-center: oklch(.14 .043 164);
+  --design-surface: linear-gradient(145deg, oklch(.26 .065 164), oklch(.16 .04 164));
+  --design-line: color-mix(in oklab, var(--primary) 45%, transparent);
+  --design-corner: 2px; --design-stroke: 2px; --design-wheel-size: 440px;
+  --design-outer-size: 510px; --design-inner-size: 480px;
+  --design-orbit-border: 2px solid color-mix(in oklab, var(--primary) 40%, transparent);
+  --design-inner-opacity: .75; --design-compass-spacing: 17px;
+}
+.design-canvas[data-design^="business-"] .design-header { border-bottom-width: 2px; background: color-mix(in oklab, var(--card) 84%, transparent); }
+.design-canvas[data-design^="business-"] .design-heading { border-inline: 1px solid var(--design-line); margin-inline: auto; max-width: 38rem; padding-inline: .5rem; }
+.design-canvas[data-design^="business-"] .design-daily-panel { border-left-width: 4px; box-shadow: 0 16px 38px color-mix(in oklab, var(--background) 70%, transparent); }
+.design-canvas[data-design^="business-"] .design-navigation { border-width: 2px; border-top-width: 4px; box-shadow: 0 0 24px color-mix(in oklab, var(--primary) 22%, transparent); }
+.design-canvas[data-design^="business-"] .compass-rotor { box-shadow: inset 0 0 32px color-mix(in oklab, var(--primary) 20%, transparent), 0 0 42px color-mix(in oklab, var(--primary) 23%, transparent); }
+
+/* Miniature appearance previews show the actual structure, not only a hue swatch. */
+.design-choice { --preview-base: oklch(.975 .008 94); --preview-accent: oklch(.43 .07 258); --preview-glint: oklch(.82 .02 94); }
+.design-choice--masculine { --preview-base: #0c0c0c; --preview-accent: #D4AF37; --preview-glint: oklch(.88 .10 89); }
+.design-choice--feminine { --preview-base: oklch(.16 .055 310); --preview-accent: oklch(.84 .09 322); --preview-glint: oklch(.92 .04 335); }
+.design-choice--masculine-luxe { --preview-base: oklch(.13 .058 268); --preview-accent: oklch(.79 .11 260); --preview-glint: oklch(.9 .065 260); }
+.design-choice--feminine-luxe { --preview-base: #0c0c0c; --preview-accent: #D4AF37; --preview-glint: oklch(.95 .08 91); }
+.design-choice--business-night { --preview-base: oklch(.13 .052 350); --preview-accent: oklch(.79 .17 353); --preview-glint: oklch(.93 .075 352); }
+.design-choice--business-day { --preview-base: oklch(.12 .04 164); --preview-accent: oklch(.8 .14 163); --preview-glint: oklch(.93 .07 165); }
+.design-choice-scene { background: var(--preview-base); }
+.design-choice-scene::before { content: ""; position: absolute; inset: 5px 11px; border: 1px solid color-mix(in oklab, var(--preview-accent) 45%, transparent); background: repeating-linear-gradient(90deg, transparent 0 20px, color-mix(in oklab, var(--preview-accent) 15%, transparent) 21px 22px); }
+.design-choice-scene > span { position: relative; width: 34px; height: 34px; background: var(--preview-base); }
+.design-choice--classic .design-choice-scene > span { box-shadow: none; border-width: 1px; }
+.design-choice--masculine-luxe .design-choice-scene::before,
+.design-choice--feminine-luxe .design-choice-scene::before { border-width: 2px; box-shadow: inset 0 0 15px color-mix(in oklab, var(--preview-accent) 25%, transparent); }
+.design-choice--business-night .design-choice-scene::before,
+.design-choice--business-day .design-choice-scene::before { border-width: 2px; border-radius: 0; }
+@media (max-width: 420px) {
+  .design-canvas .design-title { font-size: 34px; }
+  .design-canvas[data-tier="vip"] .design-title,
+  .design-canvas[data-tier="b2b"] .design-title { font-size: 38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .design-canvas *, .design-canvas *::before, .design-canvas *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
