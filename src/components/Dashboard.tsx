@@ -618,7 +618,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         {tab === "home" ? (
           <>
             <div className="mb-5"><SelfCoreCard profile={profile} language={language} onDiagnosis={() => setTab("arts")} /></div>
-            <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
             <section className="design-compass-section text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">
                 <span className="h-px w-8 bg-primary/30" />
