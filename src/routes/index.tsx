@@ -34,6 +34,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [editing, setEditing] = useState(false);
   const [language, setLanguage] = useState<Language>("ja");
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,13 +52,16 @@ function Index() {
       if (authError || !data.user) {
         setUserId(null);
         setProfile(null);
+        setEditing(false);
         setLoading(false);
         return;
       }
       setUserId(data.user.id);
+      setProfile(null);
+      setEditing(false);
       try {
         const saved = await read();
-        if (active) { setProfile(saved); setError(null); }
+        if (active) { setProfile(saved as UserProfile | null); setError(null); }
       } catch {
         if (active) setError("load");
       } finally { if (active) setLoading(false); }
@@ -65,7 +69,7 @@ function Index() {
     void load();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
-        if (event === "SIGNED_OUT") { setProfile(null); setUserId(null); setLoading(false); setError(null); }
+        if (event === "SIGNED_OUT") { setProfile(null); setEditing(false); setUserId(null); setLoading(false); setError(null); }
         else void load();
       }
     });
@@ -73,8 +77,9 @@ function Index() {
   }, [read]);
 
   const saveProfile = async (next: UserProfile) => {
-    if (userId) await save({ data: next });
+    if (userId) await save({ data: next as Parameters<typeof save>[0]["data"] });
     setProfile(next);
+    setEditing(false);
   };
 
   const signIn = async () => {
@@ -85,6 +90,7 @@ function Index() {
   const signOut = async () => {
     setProfile(null);
     setUserId(null);
+    setEditing(false);
     await supabase.auth.signOut();
   };
 
@@ -97,16 +103,16 @@ function Index() {
         </Button>
       </div>
       {error && <div role="alert" className="fixed left-4 right-4 top-20 z-50 mx-auto max-w-sm border border-destructive bg-background p-3 text-sm text-destructive">{error === "load" ? copy.loadError : copy.saveError}</div>}
-      {loading ? <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">{copy.loading}</div> : profile ? (
+      {loading ? <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">{copy.loading}</div> : profile && !editing ? (
         <Dashboard
           profile={profile}
-          onEdit={() => setProfile(null)}
+          onEdit={() => setEditing(true)}
           onProfileChange={saveProfile}
           language={language}
           onLanguageChange={setLanguage}
         />
       ) : (
-        <Onboarding onComplete={saveProfile} language={language} signedIn={Boolean(userId)} />
+        <Onboarding key={userId ?? "guest"} initialProfile={profile ?? undefined} onComplete={saveProfile} language={language} signedIn={Boolean(userId)} />
       )}
     </>
   );

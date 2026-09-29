@@ -5,15 +5,15 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const profileSchema = z.object({
   nameKanji: z.string().max(40),
   nameKana: z.string().max(60),
-  nameRomaji: z.string().regex(/^[A-Za-z][A-Za-z\s'-]*$/).max(60),
+  nameRomaji: z.string().regex(/^(?:[A-Za-z][A-Za-z\s'-]*)?$/).max(60),
   gender: z.enum(["female", "male", "other", "undisclosed"]),
   birthCity: z.string().max(80),
   birthDate: z.string().date(),
   birthTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).or(z.literal("")),
   birthTimeUnknown: z.boolean(),
   birthPlace: z.string().min(1).max(80),
-  bloodType: z.enum(["A", "B", "O", "AB"]),
-  siblingOrder: z.enum(["first", "middle", "last", "only"]),
+  bloodType: z.enum(["", "A", "B", "O", "AB"]),
+  siblingOrder: z.enum(["", "first", "middle", "last", "only"]),
 }).refine((p) => p.birthTimeUnknown || Boolean(p.birthTime), { message: "Birth time is required unless unknown" });
 
 export type StoredProfileInput = z.infer<typeof profileSchema>;
@@ -41,7 +41,7 @@ export const readMyProfile = createServerFn({ method: "GET" })
 
 export const saveMyProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => profileSchema.parse(input))
+  .validator((input: unknown) => profileSchema.parse(input))
   .handler(async ({ context, data }) => {
     const { error } = await context.supabase.from("profiles").upsert({
       user_id: context.userId,

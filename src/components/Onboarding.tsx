@@ -52,16 +52,16 @@ const chipBase =
 const chipSelected = "border-primary/80 bg-primary/15 text-primary shadow-champagne";
 const chipIdle = "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5";
 
-type Props = { onComplete: (profile: UserProfile) => Promise<void>; language: Language; signedIn: boolean };
+type Props = { onComplete: (profile: UserProfile) => Promise<void>; language: Language; signedIn: boolean; initialProfile?: UserProfile };
 
-export default function Onboarding({ onComplete, language, signedIn }: Props) {
+export default function Onboarding({ onComplete, language, signedIn, initialProfile }: Props) {
   const t = translations[language];
   const pt = profileTranslations[language];
   const storage = profileStorageCopy[language];
   const [step, setStep] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
   const [saveError, setSaveError] = useState(false);
-  const [profile, setProfile] = useState<UserProfile>({
+  const [profile, setProfile] = useState<UserProfile>(initialProfile ?? {
     nameKanji: "",
     nameKana: "",
     nameRomaji: "",
