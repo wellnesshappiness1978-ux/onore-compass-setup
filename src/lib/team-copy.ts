@@ -35,8 +35,8 @@ const ja: TeamCopy = {
   generate: "トリセツを生成", praise: "最もやる気が出る褒め方", ng: "やってはいけないNG指示", low: "モチベーション低下時の対処法",
   roles: { leader: "リーダー", coordinator: "調整役", mood: "ムードメーカー", checker: "チェック役", ideator: "アイデアマン", strategist: "参謀", executor: "実行部隊" },
   roleDesc: { leader: "方向を示し、決断で場を前に進める", coordinator: "人と人をつなぎ、合意をつくる", mood: "空気を明るくし、巻き込む", checker: "細部を確かめ、品質を守る", ideator: "新しい発想を次々に生む", strategist: "全体を読み、筋道を設計する", executor: "決まったことを着実に形にする" },
-  roleWords: { leader: "「あなたに任せたい」", coordinator: "「おかげでまとまった」", mood: "「一緒だと楽しい」", checker: "「丁寧さに助けられた」", ideator: "「その発想いいね」", strategist: "「読みが鋭いね」", executor: "「やり切ってくれてありがとう」" },
-  priority: "優先AI生成（表示のみ）", aiError: "AIの生成に失敗しました。時間をおいて再度お試しください。", generating: "生成中…",
+  roleWords: { leader: "「あなたの決断力を信頼しています」", coordinator: "「あなたのおかげで、みんなの心が一つになりました」", mood: "「あなたがいると、場が明るくなります」", checker: "「細やかな気づきに、いつも助けられています」", ideator: "「その発想は新しい可能性を開いてくれます」", strategist: "「先を見通す視点が、とても頼もしいです」", executor: "「最後まで形にする力に、心から感謝しています」" },
+  priority: "AI回答の優先生成（表示テスト）", aiError: "AIの生成に失敗しました。時間をおいて再度お試しください。", generating: "生成中…",
 };
 
 const en: TeamCopy = {
