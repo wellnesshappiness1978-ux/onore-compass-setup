@@ -24,7 +24,7 @@ export default function NineStarsPanel({ language, onVip, birthDate, bloodType =
     const svg = artRef.current?.querySelector("svg");
     if (!svg) throw new Error("Artwork unavailable");
     const clone = svg.cloneNode(true) as SVGSVGElement;
-    const tokens = ["background", "celestial-ink", "gold-glow", "primary", "birth-color-1", "birth-color-2", "birth-color-3", "birth-color-4", "birth-color-5", "birth-color-6", "birth-color-7", "birth-color-8", "birth-color-9", "birth-color-11", "birth-color-22", "birth-color-33"];
+    const tokens = ["art-void", "art-midnight", "gold-glow", "primary", "birth-color-1", "birth-color-2", "birth-color-3", "birth-color-4", "birth-color-5", "birth-color-6", "birth-color-7", "birth-color-8", "birth-color-9", "birth-color-11", "birth-color-22", "birth-color-33"];
     const css = getComputedStyle(svg);
     let serialized = new XMLSerializer().serializeToString(clone);
     for (const token of tokens) {
@@ -42,7 +42,7 @@ export default function NineStarsPanel({ language, onVip, birthDate, bloodType =
       canvas.height = 1920;
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas unavailable");
-      const bg = css.getPropertyValue("--background").trim();
+      const bg = css.getPropertyValue("--art-void").trim();
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, 1080, 1920);
       ctx.drawImage(image, 0, 350, 1080, 1080);

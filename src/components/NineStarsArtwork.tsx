@@ -42,7 +42,7 @@ export function NineStarsArtwork({ main, sub, bloodType, birthDate, language }: 
   return (
     <svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={isJapanese ? "九星の伝統的な固定配置例を描いた装飾アート。出生時の配置ではありません" : "Decorative traditional nine-star reference grid, not a natal chart"} className="block h-full w-full">
       <defs>
-        <radialGradient id="sky"><stop stopColor="var(--celestial-ink)"/><stop offset=".48" stopColor="var(--background)"/><stop offset="1" stopColor="var(--background)"/></radialGradient>
+        <radialGradient id="sky"><stop stopColor="var(--art-midnight)"/><stop offset=".48" stopColor="var(--art-void)"/><stop offset="1" stopColor="var(--art-void)"/></radialGradient>
         <radialGradient id="auraA"><stop stopColor={main} stopOpacity=".9"/><stop offset="1" stopColor={main} stopOpacity="0"/></radialGradient>
         <radialGradient id="auraB"><stop stopColor={sub} stopOpacity=".8"/><stop offset="1" stopColor={sub} stopOpacity="0"/></radialGradient>
         <linearGradient id="veins" x1="0" y1="0" x2="1" y2="1"><stop stopColor={main}/><stop offset=".35" stopColor="var(--gold-glow)"/><stop offset=".7" stopColor={sub}/><stop offset="1" stopColor="var(--primary)"/></linearGradient>
@@ -68,7 +68,7 @@ export function NineStarsArtwork({ main, sub, bloodType, birthDate, language }: 
       <path d={`M 106 ${352 - motif * 3} Q 260 ${295 + motif * 12} 400 355 T 694 ${355 + motif * 5} M 106 ${460 + motif * 3} Q 300 ${545 - motif * 11} 400 470 T 694 ${435 - motif * 3}`} fill="none" stroke={sub} strokeWidth="2" opacity=".42" filter="url(#light)"/>
       <g transform="translate(400 400) rotate(45)" fill="none" stroke="url(#veins)" opacity=".73"><rect x="-177" y="-177" width="354" height="354" strokeWidth="1.5"/><rect x="-186" y="-186" width="372" height="372" opacity=".3"/></g>
       <g transform="translate(220 220)">
-        <rect width="360" height="360" fill="var(--background)" fillOpacity=".76" stroke="url(#veins)" strokeWidth="2"/>
+        <rect width="360" height="360" fill="var(--art-void)" fillOpacity=".76" stroke="url(#veins)" strokeWidth="2"/>
         <path d="M120 0V360 M240 0V360 M0 120H360 M0 240H360" stroke="url(#veins)" opacity=".8"/>
         {palaceGrid.map((cell, i) => {
           const x = 60 + (i % 3) * 120;
