@@ -40,6 +40,10 @@
   --color-ring: var(--ring);
   --color-gold-glow: var(--gold-glow);
   --color-gold-deep: var(--gold-deep);
+  --color-profile-wealth: var(--profile-wealth);
+  --color-profile-work: var(--profile-work);
+  --color-profile-love: var(--profile-love);
+  --color-profile-social: var(--profile-social);
 }
 
 :root {
