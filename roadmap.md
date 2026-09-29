@@ -16,3 +16,4 @@
 - [x] Add seven session-only app design previews with plan-display-test selection limits and clear labeling; no paid access is claimed.
 - [x] Differentiate all seven designs by typography, background, compass, panel, and navigation treatments with increasing visual richness by plan tier.
 - [x] Confirm this project's Lovable Cloud connection; database and authentication are healthy, while profile persistence remains outside this request.
+- [ ] Save and restore private user profiles (including gender) with Google sign-in, and reserve a read-only 15-art results table for future verified calculations.
