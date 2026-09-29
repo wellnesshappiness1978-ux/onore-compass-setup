@@ -156,8 +156,8 @@ const ja: SettingsTranslation = {
     {
       id: "b2b",
       name: "ビジネス法人プラン",
-      priceMonthly: "¥9,800〜",
-      priceYearly: "¥9,800〜",
+      priceMonthly: "¥3,580",
+      priceYearly: "¥3,580",
       priceNote: "月額あたり（チーム単位）",
       features: [
         "法人向け「チーム・コンパス」組織管理ダッシュボード",
@@ -301,8 +301,8 @@ const en: SettingsTranslation = {
     {
       id: "b2b",
       name: "Business Enterprise Plan",
-      priceMonthly: "¥9,800〜",
-      priceYearly: "¥9,800〜",
+      priceMonthly: "¥3,580",
+      priceYearly: "¥3,580",
       priceNote: "Per month, per team",
       features: [
         "Team Compass organization dashboard",
@@ -447,8 +447,8 @@ const zhCN: SettingsTranslation = {
     {
       id: "b2b",
       name: "企业方案",
-      priceMonthly: "¥9,800〜",
-      priceYearly: "¥9,800〜",
+      priceMonthly: "¥3,580",
+      priceYearly: "¥3,580",
       priceNote: "按月·按团队计费",
       features: [
         "企业版「团队·罗盘」组织管理仪表板",
@@ -584,8 +584,8 @@ const zhTW: SettingsTranslation = {
     {
       id: "b2b",
       name: "企業方案",
-      priceMonthly: "¥9,800〜",
-      priceYearly: "¥9,800〜",
+      priceMonthly: "¥3,580",
+      priceYearly: "¥3,580",
       priceNote: "按月·按團隊計費",
       features: [
         "企業版「團隊·羅盤」組織管理儀表板",
@@ -725,8 +725,8 @@ const ko: SettingsTranslation = {
     {
       id: "b2b",
       name: "비즈니스 법인 플랜",
-      priceMonthly: "¥9,800〜",
-      priceYearly: "¥9,800〜",
+      priceMonthly: "¥3,580",
+      priceYearly: "¥3,580",
       priceNote: "월 단위·팀 단위 과금",
       features: [
         "기업용「팀·컴패스」조직 관리 대시보드",
@@ -871,8 +871,8 @@ const es: SettingsTranslation = {
     {
       id: "b2b",
       name: "Plan Empresarial",
-      priceMonthly: "¥9,800〜",
-      priceYearly: "¥9,800〜",
+      priceMonthly: "¥3,580",
+      priceYearly: "¥3,580",
       priceNote: "Por mes, por equipo",
       features: [
         "Panel de gestión organizativa Team Compass",
@@ -1018,8 +1018,8 @@ const fr: SettingsTranslation = {
     {
       id: "b2b",
       name: "Offre Entreprise",
-      priceMonthly: "¥9,800〜",
-      priceYearly: "¥9,800〜",
+      priceMonthly: "¥3,580",
+      priceYearly: "¥3,580",
       priceNote: "Par mois, par équipe",
       features: [
         "Tableau de bord organisationnel Team Compass",

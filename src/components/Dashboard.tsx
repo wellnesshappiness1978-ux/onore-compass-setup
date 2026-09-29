@@ -1,4 +1,5 @@
 import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
+import PersonPortrait from "./PersonPortrait";
 import { useRef, useState, type CSSProperties } from "react";
 import {
   Bell,
@@ -611,6 +612,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       <main className="relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <>
+            <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
             <section className="text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">
                 <span className="h-px w-8 bg-primary/30" />
@@ -696,6 +698,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             </div>
             {tab === "arts" ? (
               <>
+                <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
                 <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
                 <NameAnalysisPreview profile={profile} language={language} />
                 <TorisetsuPanel profile={profile} language={language} onVip={() => setModal("vip")} />
