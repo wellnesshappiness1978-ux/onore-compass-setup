@@ -769,7 +769,7 @@ export default function SettingsPanel({
         <DialogContent className="max-w-sm border-primary/30 bg-card text-foreground">
           <DialogTitle className="font-serif text-xl text-primary">{dc.title}</DialogTitle>
           <DialogDescription className="text-sm leading-6 text-muted-foreground">
-            {lockedMode && dc.locked(dc.groups[["free", "standard", "vip", "b2b"].indexOf(designModes.find((mode) => mode.id === lockedMode)?.tier ?? "free")] ?? dc.groups[0] ?? "")}
+            {lockedMode && dc.locked(dc.planNames[["standard", "vip", "b2b"].indexOf(designModes.find((mode) => mode.id === lockedMode)?.tier ?? "standard")] ?? dc.planNames[0] ?? "")}
           </DialogDescription>
           <p className="text-xs text-muted-foreground">{dc.note}</p>
           <div className="flex justify-end gap-2 pt-2">
