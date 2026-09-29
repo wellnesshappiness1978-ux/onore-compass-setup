@@ -1,5 +1,6 @@
 import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
 import PersonPortrait from "./PersonPortrait";
+import SelfCoreCard from "./SelfCoreCard";
 import { useRef, useState, type CSSProperties } from "react";
 import {
   Bell,
@@ -616,6 +617,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <>
+            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onDiagnosis={() => setTab("arts")} /></div>
             <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
             <section className="design-compass-section text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">

@@ -19,3 +19,4 @@
 - [x] Add private profile saving/loading (including gender), Google sign-in, and an empty read-only 15-art results table for future verified calculations.
 - [ ] Verify signed-in save/reload from the app; blocked until a person signs in with Google for the first time (no auth users yet).
 - [x] Add plan-tier background scenes and an upgrade dialog for locked design choices; keep all access as a clearly labeled local preview.
+- [x] Add profile-reactive self-core preview beside personal reading at the top of Home.
