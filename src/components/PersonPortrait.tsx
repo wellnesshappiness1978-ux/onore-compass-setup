@@ -35,7 +35,7 @@ export default function PersonPortrait({ profile, language }: { profile: UserPro
   const month = Number(match[2]);
   const day = Number(match[3]);
   if (month < 1 || month > 12 || day < 1 || day > 31) return null;
-  const index = month - (day < boundaries[month] ? 1 : 0);
+  const index = month - (day < (boundaries[month] ?? 1) ? 1 : 0);
   const dateNumber = Array.from(profile.birthDate.replaceAll("-", "")).reduce((sum, digit) => sum + Number(digit), 0);
   const lifePath = dateNumber > 0 ? (dateNumber - 1) % 9 + 1 : 0;
   const seed = year + month * 31 + day + (profile.bloodType.charCodeAt(0) || 0) + ["first", "middle", "last", "only"].indexOf(profile.siblingOrder);
