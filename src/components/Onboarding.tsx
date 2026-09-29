@@ -2,8 +2,13 @@ import { useState } from "react";
 import { CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
+import { profileTranslations } from "@/lib/profile-translations";
 
 export type UserProfile = {
+  nameKanji: string;
+  nameKana: string;
+  nameRomaji: string;
+  birthCity: string;
   birthDate: string;
   birthTime: string;
   birthTimeUnknown: boolean;
@@ -49,9 +54,14 @@ type Props = { onComplete: (profile: UserProfile) => void; language: Language };
 
 export default function Onboarding({ onComplete, language }: Props) {
   const t = translations[language];
+  const pt = profileTranslations[language];
   const [step, setStep] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
+    nameKanji: "",
+    nameKana: "",
+    nameRomaji: "",
+    birthCity: "",
     birthDate: "",
     birthTime: "",
     birthTimeUnknown: false,
@@ -64,7 +74,7 @@ export default function Onboarding({ onComplete, language }: Props) {
     setProfile((p) => ({ ...p, [key]: value }));
 
   const stepValid = [
-    profile.birthDate !== "" && (profile.birthTimeUnknown || profile.birthTime !== ""),
+    /^[A-Za-z][A-Za-z\s'-]*$/.test(profile.nameRomaji.trim()) && profile.birthDate !== "" && (profile.birthTimeUnknown || profile.birthTime !== ""),
     profile.birthPlace !== "",
     profile.bloodType !== "" && profile.siblingOrder !== "",
   ][step];
@@ -127,6 +137,21 @@ export default function Onboarding({ onComplete, language }: Props) {
           {/* Step 1: Birth date & time */}
           {step === 0 && (
             <div className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="name-kanji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKanji} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
+                  <input id="name-kanji" maxLength={40} placeholder="仁井田 大慈" value={profile.nameKanji} onChange={(e) => set("nameKanji", e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                  <label htmlFor="name-kana" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKana} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
+                  <input id="name-kana" maxLength={60} placeholder="にいだ だいじ" value={profile.nameKana} onChange={(e) => set("nameKana", e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                  <label htmlFor="name-romaji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameRomaji} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
+                  <input id="name-romaji" maxLength={60} placeholder="NIIDA DAIJI" value={profile.nameRomaji} onChange={(e) => set("nameRomaji", e.target.value.toUpperCase())} className={inputClass} />
+                  <p className="mt-1 text-xs text-muted-foreground">{pt.romajiHint}</p>
+                </div>
+              </div>
               <div>
                 <label htmlFor="birth-date" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <CalendarDays className="size-4 stroke-[1.4]" aria-hidden="true" />
@@ -192,6 +217,8 @@ export default function Onboarding({ onComplete, language }: Props) {
                   </option>
                 ))}
               </select>
+              <label htmlFor="birth-city" className="mb-2 mt-5 block font-serif text-sm font-semibold text-primary">{pt.city} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
+              <input id="birth-city" maxLength={80} placeholder="横浜市 保土ケ谷区 和田町" value={profile.birthCity} onChange={(e) => set("birthCity", e.target.value)} className={inputClass} />
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                  {t.placeHint}
               </p>
