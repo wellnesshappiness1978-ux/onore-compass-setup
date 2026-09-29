@@ -24,6 +24,7 @@ import {
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
 import { settingsTranslations, type SettingsTranslation } from "@/lib/settings-translations";
@@ -324,6 +325,7 @@ export default function SettingsPanel({
   const [notifyTiming, setNotifyTiming] = useState(true);
   const [notifyBio, setNotifyBio] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [lockedMode, setLockedMode] = useState<DesignMode | null>(null);
 
   const planLabel =
     plan === "vip"
@@ -413,10 +415,9 @@ export default function SettingsPanel({
                       type="button"
                       variant="outline"
                       aria-pressed={selected}
-                      disabled={!available}
-                      title={!available ? `${dc.requires}: ${dc.groups[index]}` : dc.names[mode.id]}
-                      onClick={() => onDesignModeChange(mode.id)}
-                      className={`design-choice design-choice--${mode.id} h-auto min-h-28 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left disabled:opacity-65 ${selected ? "ring-2 ring-primary" : ""}`}
+                       title={!available ? `${dc.requires}: ${dc.groups[index]}` : dc.names[mode.id]}
+                       onClick={() => available ? onDesignModeChange(mode.id) : setLockedMode(mode.id)}
+                       className={`design-choice design-choice--${mode.id} h-auto min-h-28 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left ${selected ? "ring-2 ring-primary" : ""}`}
                     >
                       <span className="design-choice-scene relative flex h-12 w-full items-center justify-center text-xl" aria-hidden="true">
                         <span>{mode.icon}</span>
