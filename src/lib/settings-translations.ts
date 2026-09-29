@@ -49,6 +49,7 @@ export type SettingsTranslation = {
   bioPrep: string;
   bioDecision: string;
   bioToday: string;
+  bioEnterpriseTab: string;
   bioWeek: string;
   bioFuture: string;
   bioMonthTitle: string;
@@ -186,6 +187,7 @@ const ja: SettingsTranslation = {
   bioPrep: "準備期",
   bioDecision: "決断タイミング",
   bioToday: "今日",
+  bioEnterpriseTab: "法人BtoB",
   bioWeek: "今週の流れ",
   bioFuture: "未来の流れ",
   bioMonthTitle: "30日間のデイリーフロー",
@@ -331,6 +333,7 @@ const en: SettingsTranslation = {
   bioPrep: "Prep period",
   bioDecision: "Decision timing",
   bioToday: "Today",
+  bioEnterpriseTab: "Enterprise B2B",
   bioWeek: "This week",
   bioFuture: "Future flow",
   bioMonthTitle: "30-day daily flow",
@@ -471,6 +474,7 @@ const zhCN: SettingsTranslation = {
   bioPrep: "准备期",
   bioDecision: "决策时机",
   bioToday: "今天",
+  bioEnterpriseTab: "企业B2B",
   bioWeek: "本周节律",
   bioFuture: "未来节律",
   bioMonthTitle: "30天日常节律",
@@ -607,6 +611,7 @@ const zhTW: SettingsTranslation = {
   bioPrep: "準備期",
   bioDecision: "決策時機",
   bioToday: "今天",
+  bioEnterpriseTab: "企業B2B",
   bioWeek: "本週節律",
   bioFuture: "未來節律",
   bioMonthTitle: "30天日常節律",
@@ -752,6 +757,7 @@ const ko: SettingsTranslation = {
   bioPrep: "준비기",
   bioDecision: "결정 타이밍",
   bioToday: "오늘",
+  bioEnterpriseTab: "법인B2B",
   bioWeek: "이번 주 흐름",
   bioFuture: "미래 흐름",
   bioMonthTitle: "30일 데일리 흐름",
@@ -897,6 +903,7 @@ const es: SettingsTranslation = {
   bioPrep: "Periodo de preparación",
   bioDecision: "Momento de decisión",
   bioToday: "Hoy",
+  bioEnterpriseTab: "Empresa B2B",
   bioWeek: "Esta semana",
   bioFuture: "Flujo futuro",
   bioMonthTitle: "Flujo diario de 30 días",
@@ -1043,6 +1050,7 @@ const fr: SettingsTranslation = {
   bioPrep: "Période de préparation",
   bioDecision: "Moment de décision",
   bioToday: "Aujourd'hui",
+  bioEnterpriseTab: "Entreprise B2B",
   bioWeek: "Cette semaine",
   bioFuture: "Flux futur",
   bioMonthTitle: "Flux quotidien sur 30 jours",

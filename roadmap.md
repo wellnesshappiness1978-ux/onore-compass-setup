@@ -11,3 +11,4 @@
 - [x] Verify the locked art and CTA on mobile and desktop.
 - [x] Step 6: My Page, VIP comparison, B2B team mode preview, and app settings.
 - [x] Replace the Free/VIP table with the 4-tier pricing (無料 / スタンダード ¥333・¥3,333 / VIP ¥777・¥7,777 人気No.1 / 法人 ¥9,800〜) using expandable cards and a monthly-yearly toggle in all 7 languages; verified mobile and desktop.
+- [x] Add independent interactive biorhythm tier tabs with free current-week lock, 30-day daily markers, 90-day focus zones, and 12-month color-coded enterprise events.

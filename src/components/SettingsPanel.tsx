@@ -131,7 +131,7 @@ function BiorhythmPreview({
           {Array.from({ length: 7 }, (_, i) => (
             <div key={i} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
               <div className="w-full rounded-t-sm bg-primary/70" style={{ height: `${Math.max(15, value(i, 30))}%` }} />
-              <span className="text-[9px] text-muted-foreground">{i + 1}</span>
+              <span className="text-[9px] text-muted-foreground">{new Date(Date.now() + i * 86400000).getDate()}</span>
             </div>
           ))}
           <div className="relative flex h-full flex-[3] items-center justify-center overflow-hidden rounded-md border border-primary/10 bg-card/50">
@@ -398,7 +398,7 @@ export default function SettingsPanel({
         <div className="mt-4 grid grid-cols-2 gap-1 rounded-lg border border-primary/20 bg-background/60 p-1 sm:grid-cols-4" role="tablist" aria-label={t.bioTitle}>
           {t.bioRanges.map((range) => (
             <Button key={range.tier} id={`bio-tab-${range.tier}`} role="tab" aria-selected={bioPlan === range.tier} aria-controls="bio-preview" size="sm" variant="ghost" onClick={() => setBioPlan(range.tier)} className={`h-auto min-h-10 whitespace-normal rounded-md px-2 py-1 text-center text-[11px] leading-4 ${bioPlan === range.tier ? "bg-primary/20 text-primary shadow-[inset_0_0_0_1px_var(--primary)]" : "text-muted-foreground hover:text-primary"}`}>
-              {range.tier === "free" ? t.free : range.tier === "standard" ? t.standard : range.tier === "vip" ? "VIP" : t.corporate} ({range.range})
+              {range.tier === "free" ? t.free : range.tier === "standard" ? t.standard : range.tier === "vip" ? "VIP" : t.bioEnterpriseTab} ({range.range})
             </Button>
           ))}
         </div>
