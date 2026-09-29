@@ -13,3 +13,4 @@
 - [x] Replace the Free/VIP table with the 4-tier pricing (無料 / スタンダード ¥333・¥3,333 / VIP ¥777・¥7,777 人気No.1 / 法人 ¥3,580) using expandable cards and a monthly-yearly toggle in all 7 languages; verified mobile and desktop.
 - [x] Add independent interactive biorhythm tier tabs with free current-week lock, 30-day daily markers, 90-day focus zones, and 12-month color-coded enterprise events.
 - [x] Update the corporate displayed price to ¥3,580 and show an illustrative person portrait from profile fields prominently on Home and 15占術.
+- [x] Add seven session-only app design previews with plan-display-test selection limits and clear labeling; no paid access is claimed.
