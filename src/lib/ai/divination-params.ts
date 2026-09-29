@@ -63,7 +63,7 @@ export function computeDivinationParams(p: Input, now = new Date()): string {
       `[数秘術] ライフパス数 ${lifePath} / バースデー数 ${reduce(d)} / 個人年数(${now.getUTCFullYear()}) ${personalYear} / 個人月数 ${personalMonth}`,
       `[バースカラー] ${COLORS[lifePath] ?? "—"}（ライフパス数対応）`,
       `[四柱推命・動物占い基礎] 日柱 ${STEMS[dayIdx % 10]}${BRANCHES[dayIdx % 12]}（六十干支 ${dayIdx + 1}番）/ 日干の五行 ${STEM_ELEMENT[dayIdx % 10]} / 年柱 ${STEMS[yearIdx % 10]}${BRANCHES[yearIdx % 12]}（立春前生まれは前年干支の可能性あり）。60分類アニマル名は日柱番号に基づく独自解釈として扱う`,
-      `[西洋占星術] 太陽星座 ${SIGNS[Math.floor(natalSun / 30 + 0) % 12 === 0 ? 0 : Math.floor(natalSun / 30)]}（太陽黄経 ${natalSun.toFixed(1)}°）/ 出生の二十四節気 ${TERMS[Math.floor(natalSun / 15)]}${p.birthTimeUnknown || !p.birthTime ? " / 出生時刻不明のためアセンダント・月星座は算出不可" : ""}`,
+      `[西洋占星術] 太陽星座 ${SIGNS[Math.floor(natalSun / 30) % 12]}（太陽黄経 ${natalSun.toFixed(1)}°）/ 出生の二十四節気 ${TERMS[Math.floor(natalSun / 15)]}${p.birthTimeUnknown || !p.birthTime ? " / 出生時刻不明のためアセンダント・月星座は算出不可" : ""}`,
       `[地球暦] 現在の太陽黄経 ${nowSun.toFixed(1)}°・二十四節気 ${TERMS[Math.floor(nowSun / 15)]} / 本人の太陽回帰からの位相 ${phase.toFixed(0)}°（${phase < 90 ? "始動期" : phase < 180 ? "成長期" : phase < 270 ? "収穫期" : "内省・準備期"}）`,
     );
   }
