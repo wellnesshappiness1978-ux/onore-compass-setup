@@ -14,3 +14,4 @@
 - [x] Add independent interactive biorhythm tier tabs with free current-week lock, 30-day daily markers, 90-day focus zones, and 12-month color-coded enterprise events.
 - [x] Update the corporate displayed price to ¥3,580 and show an illustrative person portrait from profile fields prominently on Home and 15占術.
 - [x] Add seven session-only app design previews with plan-display-test selection limits and clear labeling; no paid access is claimed.
+- [x] Differentiate all seven designs by typography, background, compass, panel, and navigation treatments with increasing visual richness by plan tier.

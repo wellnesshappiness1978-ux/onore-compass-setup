@@ -416,14 +416,14 @@ export default function SettingsPanel({
                       disabled={!available}
                       title={!available ? `${dc.requires}: ${dc.groups[index]}` : dc.names[mode.id]}
                       onClick={() => onDesignModeChange(mode.id)}
-                      className={`design-choice design-choice--${mode.id} h-auto min-h-24 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left disabled:opacity-65 ${selected ? "ring-2 ring-primary" : ""}`}
+                      className={`design-choice design-choice--${mode.id} h-auto min-h-28 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left disabled:opacity-65 ${selected ? "ring-2 ring-primary" : ""}`}
                     >
                       <span className="design-choice-scene relative flex h-12 w-full items-center justify-center text-xl" aria-hidden="true">
                         <span>{mode.icon}</span>
                         {!available && <LockKeyhole className="absolute right-3 top-3 size-3.5" />}
                       </span>
                       <span className="flex w-full items-center justify-between gap-2 px-3 py-2 text-xs text-foreground">
-                        <span className="min-w-0 whitespace-normal leading-4">{dc.names[mode.id]}</span>
+                        <span className="min-w-0 whitespace-normal leading-4">{dc.names[mode.id]}<span className="mt-0.5 block text-[10px] text-muted-foreground">{dc.groups[index]}</span></span>
                         {selected && <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} />}
                       </span>
                     </Button>

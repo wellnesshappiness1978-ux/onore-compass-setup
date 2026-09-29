@@ -25,7 +25,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import ConsultationPanel from "@/components/ConsultationPanel";
 import NineStarsPanel from "@/components/NineStarsPanel";
 import SettingsPanel from "@/components/SettingsPanel";
-import { canPreviewDesign, type DesignMode, type Plan } from "@/lib/design-modes";
+import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/design-modes";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -565,9 +565,9 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   ];
 
   return (
-    <div data-design={designMode} className="design-canvas celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
+    <div data-design={designMode} data-tier={previewPlan} className="design-canvas celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
-      <header className="relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
+      <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
           <div className="flex h-10 items-center justify-between pr-28 sm:pr-36">
             <Button
@@ -603,20 +603,21 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </Button>
             </div>
           </div>
-          <div className="mt-2 text-center">
-            <p className="text-[9px] uppercase tracking-[0.3em] text-primary/70">ONORE COMPASS</p>
-            <h1 className="font-serif text-2xl font-bold text-gradient-gold sm:text-3xl">
+          <div className="design-heading mt-2 text-center">
+            <p className="design-wordmark text-[9px] uppercase text-primary/70">ONORE COMPASS</p>
+            <h1 className="design-title font-serif text-2xl font-bold text-gradient-gold sm:text-3xl">
               Self Compass
             </h1>
+            <p className="design-mode-caption mt-1 text-[10px] text-muted-foreground">{designCopy[language].names[designMode]} · {designCopy[language].note}</p>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
+      <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <>
             <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
-            <section className="text-center" aria-label={t.today}>
+            <section className="design-compass-section text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">
                 <span className="h-px w-8 bg-primary/30" />
                 <Sparkles className="size-3" />
@@ -633,8 +634,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               <CompassWheel language={language} />
               <p className="-mt-2 text-xs text-muted-foreground">{t.wheelHint}</p>
             </section>
-            <div className="mx-auto mt-7 grid max-w-4xl gap-4 md:grid-cols-[1.2fr_1fr]">
-              <section className="card-lux rounded-lg p-5 sm:p-6">
+            <div className="design-daily-grid mx-auto mt-7 grid max-w-4xl gap-4 md:grid-cols-[1.2fr_1fr]">
+              <section className="design-daily-panel card-lux rounded-lg p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70">
@@ -668,7 +669,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                   </strong>
                 </div>
               </section>
-              <section className="card-lux flex flex-col justify-between rounded-lg p-5 sm:p-6">
+              <section className="design-daily-panel card-lux flex flex-col justify-between rounded-lg p-5 sm:p-6">
                 <div>
                   <div className="flex size-10 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
                     <Compass className="size-5" strokeWidth={1.2} />
@@ -742,7 +743,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       </main>
 
       <nav
-        className="fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"
+        className="design-navigation fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"
         aria-label="Main navigation"
       >
         <div className="grid grid-cols-5">
