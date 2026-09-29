@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import Onboarding, { type UserProfile } from "@/components/Onboarding";
 import Dashboard from "@/components/Dashboard";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -40,6 +41,7 @@ function Index() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const loadSequence = useRef(0);
+  const queryClient = useQueryClient();
   const read = useServerFn(readMyProfile);
   const save = useServerFn(saveMyProfile);
   const copy = profileStorageCopy[language];
@@ -90,6 +92,9 @@ function Index() {
     if (result.error) setError("auth");
   };
   const signOut = async () => {
+    ++loadSequence.current;
+    await queryClient.cancelQueries();
+    queryClient.clear();
     setProfile(null);
     setUserId(null);
     setEditing(false);

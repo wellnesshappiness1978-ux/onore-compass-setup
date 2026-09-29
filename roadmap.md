@@ -15,5 +15,6 @@
 - [x] Update the corporate displayed price to ¥3,580 and show an illustrative person portrait from profile fields prominently on Home and 15占術.
 - [x] Add seven session-only app design previews with plan-display-test selection limits and clear labeling; no paid access is claimed.
 - [x] Differentiate all seven designs by typography, background, compass, panel, and navigation treatments with increasing visual richness by plan tier.
-- [x] Confirm this project's Lovable Cloud connection; database and authentication are healthy, while profile persistence remains outside this request.
-- [ ] Save and restore private user profiles (including gender) with Google sign-in, and reserve a read-only 15-art results table for future verified calculations.
+- [x] Confirm this project's Lovable Cloud connection; database and authentication are healthy.
+- [x] Add private profile saving/loading (including gender), Google sign-in, and an empty read-only 15-art results table for future verified calculations.
+- [ ] Verify signed-in save/reload from the app; blocked until a person signs in with Google for the first time (no auth users yet).
