@@ -11,7 +11,7 @@
 
 <!-- LOVABLE:END -->
 
-- Keep language in index React state; persist only signed-in birth/name/gender profiles in private `profiles` rows through authenticated server functions. The 15-art results table is read-only to users and empty until validated calculations exist.
+- Profile persists in localStorage (key onore-profile) for auto-restore plus private `profiles` rows when signed in; sign-out clears local copy. Why: user requested no re-entry on reload.
 - Keep dashboard tabs, compass interaction, and daily demo state local to `Dashboard.tsx`; there is no calculation service or persistent account yet, so avoid implying real readings or VIP entitlement.
 - Keep the synthesized Torisetsu profile, color profiles, compatibility scoring, and VIP lock state as clearly labeled deterministic previews in `Dashboard.tsx` until a real analysis and entitlement service exists; this avoids presenting sample copy as actual readings.
 - Keep portrait and Home self-core illustrative: only approximate sun sign, calendar-year animal and digit-sum number derive from birth date; personality prompts are deterministic samples, never verified 15-art assessments.
