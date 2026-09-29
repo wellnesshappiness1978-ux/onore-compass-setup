@@ -14,6 +14,9 @@ const provider = (apiKey: string) => createOpenAI({
   headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
 });
 const RULES = "All inputs are illustrative reference values derived from birth dates (numerology life path, day-stem element, sine biorhythm). They are NOT verified divination nor evidence of ability. Do not claim certainty, guaranteed outcomes, or health effects. Be warm, practical, and avoid jargon. Never judge people as good or bad hires.";
+const outputLanguage = (language: z.infer<typeof lang>) => language === "ja"
+  ? "Write every user-visible sentence entirely in natural Japanese. Do not use English headings, labels, or explanatory phrases."
+  : `Write in language ${language}.`;
 
 const draftOut = z.object({
   recommendedSize: z.number().int().min(1).max(30),
@@ -33,7 +36,7 @@ export const draftProjectTeam = createServerFn({ method: "POST" })
     const { output } = await generateText({
       model: provider(apiKey).responses("openai/gpt-6-astra"),
       output: Output.object({ schema: draftOut }),
-      prompt: `${RULES}\nWrite in language ${data.language}. Project goal: ${data.goal}\n${fixed}\nCandidates (JSON): ${JSON.stringify(data.members)}\nReturn ids exactly as given. Scores reflect fit for this goal considering role balance, element synergy and today's biorhythm. features = team combination character, evaluation = overall assessment, cautions = points to watch.`,
+      prompt: `${RULES}\n${outputLanguage(data.language)} Project goal: ${data.goal}\n${fixed}\nCandidates (JSON): ${JSON.stringify(data.members)}\nReturn ids exactly as given. Scores reflect fit for this goal considering role balance, element synergy and today's biorhythm. features = team combination character, evaluation = overall assessment, cautions = points to watch.`,
       providerOptions: { openai: { store: false } },
     });
     const valid = new Set(data.members.map((m) => m.id));
@@ -50,7 +53,7 @@ export const generateOneOnOneGuide = createServerFn({ method: "POST" })
     const { output } = await generateText({
       model: provider(apiKey).responses("openai/gpt-6-astra"),
       output: Output.object({ schema: guideOut }),
-      prompt: `${RULES}\nWrite in language ${data.language} a short 1on1 management guide for a manager about this team member: ${JSON.stringify(data.member)}. praise = the kind of recognition most likely to motivate them (2-3 concrete phrasings). ngInstructions = instructions/approaches to avoid. lowMotivation = how to support them when motivation dips. Each 80-200 characters (or ~50 words), respectful, as gentle suggestions.`,
+      prompt: `${RULES}\n${outputLanguage(data.language)} Write a short 1on1 management guide for a manager about this team member: ${JSON.stringify(data.member)}. praise = the kind of recognition most likely to motivate them (2-3 concrete phrasings). ngInstructions = instructions/approaches to avoid. lowMotivation = how to support them when motivation dips. Each 80-200 characters (or ~50 words), respectful, as gentle suggestions.`,
       providerOptions: { openai: { store: false } },
     });
     return output;

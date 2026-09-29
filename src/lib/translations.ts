@@ -154,7 +154,7 @@ type TorisetsuTranslation = {
 
 export const torisetsuTranslations: Record<Language, TorisetsuTranslation> = {
   ja: {
-    manual: "自分のトリセツ", compatibility: "相性診断（相手）", manualTitle: "15占術×動物占い 総合クロス解析", manualIntro: "INTEGRATED AI PROFILE · 15占術と動物占いを横断する統合プロフィールのプレビュー",
+    manual: "自分のトリセツ", compatibility: "相性診断（相手）", manualTitle: "15占術×動物占い 総合クロス解析", manualIntro: "統合AIプロフィール · 15占術と動物占いを横断する統合プロフィールのプレビュー",
     coreTitle: "あなたの本質・コアアイデンティティ", coreBody: "西洋占星術の気質、四柱推命の巡り、数秘術の傾向、動物占いの個性、東洋の八卦の視点をひとつに。好奇心と慎重さの両方を持ち、確信を得ると一歩を踏み出す人物像です。",
     decisionTitle: "思考と決断のバイアス", decisionBody: "選択肢を広く眺めてから核心をつかむタイプ。直感で方向を見つけ、最後は具体的な根拠を確かめると強みが生きます。考えすぎたときは、次の小さな一歩を決めて。",
     timingTitle: "攻め時・守り時の行動指針", timingBody: "新しい提案や挑戦は、目的と準備が揃ったときに前へ。疲れを感じたり情報が足りないときは、急いで決めずに整える時間を。これは日付に基づく吉凶判定ではありません。",

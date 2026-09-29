@@ -79,7 +79,7 @@ export default function ConsultationPanel({ profile, language, onVip }: Props) {
           className="mx-auto size-20 drop-shadow-[0_0_22px_var(--primary)]"
         />
         <p className="mt-3 text-[10px] uppercase tracking-[0.24em] text-primary/70">
-          SELF AI CHAMBER
+          {language === "ja" ? "AIオノレ相談室" : "SELF AI CHAMBER"}
         </p>
         <h2 className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
@@ -98,7 +98,7 @@ export default function ConsultationPanel({ profile, language, onVip }: Props) {
           <Radio className="size-5 shrink-0 text-primary" />
           <div>
             <p className="text-sm font-semibold text-foreground">{t.remaining(remaining)}</p>
-            <p className="mt-0.5 text-[10px] text-muted-foreground">SESSION PREVIEW</p>
+            <p className="mt-0.5 text-[10px] text-muted-foreground">{language === "ja" ? "セッションプレビュー" : "SESSION PREVIEW"}</p>
           </div>
         </div>
         <Button
@@ -145,7 +145,7 @@ export default function ConsultationPanel({ profile, language, onVip }: Props) {
                       loading="lazy"
                       className="size-8 drop-shadow-[0_0_8px_var(--primary)]"
                     />
-                    AI ONORE
+                    {language === "ja" ? "AIオノレ" : "AI ONORE"}
                   </div>
                 ) : null}
                 <MessageContent

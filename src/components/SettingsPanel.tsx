@@ -335,7 +335,7 @@ export default function SettingsPanel({
   const premiumTier: PricingTier = {
     id: "b2b-premium", name: tc.planNames["b2b-premium"], priceMonthly: "¥8,888", priceYearly: "¥88,880",
     features: language === "ja"
-      ? ["関係者登録 最大100人", "100名フル機能の組織コンサル", "優先AI生成（表示のみ）", "ビジネスプランの全機能"]
+      ? ["最大100名のメンバー登録", "100名規模に対応した組織コンサルティング機能", "AI回答の優先生成（表示テスト）", "ビジネスプランの全機能"]
       : ["Up to 100 registered members", "Full organization consulting for 100", "Priority AI generation (label only)", "Everything in Business"],
     cta: tc.switchPlan,
   };
@@ -398,7 +398,7 @@ export default function SettingsPanel({
                  onClick={() => onPlanChange(p)}
                 className={`text-[10px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
               >
-                {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : p === "b2b" ? "B2B" : "B2B Premium"}
+                {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : p === "b2b" ? t.planB2b : tc.planNames["b2b-premium"]}
               </Button>
             ))}
           </div>
@@ -455,7 +455,7 @@ export default function SettingsPanel({
             <Orbit className="size-5" strokeWidth={1.4} />
           </span>
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70">EARTH CALENDAR</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70">{language === "ja" ? "地球暦" : "EARTH CALENDAR"}</p>
             <h3 className="font-serif text-lg text-primary">{t.bioTitle}</h3>
           </div>
         </div>

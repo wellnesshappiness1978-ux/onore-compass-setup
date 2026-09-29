@@ -89,7 +89,7 @@ export function NineStarsArtwork({ main, sub, bloodType, birthDate, language }: 
         <text x="400" y="656" fontSize="20" opacity=".9">{symbols ? animalNames[symbols.animal] : "✧"}</text>
         <text x="146" y="405" fontSize="15" opacity=".7">{bloodType || "✧"}</text>
         <text x="655" y="405" fontSize="15" opacity=".7">{birthDate ? String(lifeNumber).padStart(2, "0") : "✧"}</text>
-        <text x="400" y="72" fontSize="11" letterSpacing="4" opacity=".7">ONORE · CELESTIAL ATLAS</text>
+        <text x="400" y="72" fontSize="11" letterSpacing="4" opacity=".7">{isJapanese ? "ONORE · 天球図鑑" : "ONORE · CELESTIAL ATLAS"}</text>
         <text x="400" y="746" fontSize="11" letterSpacing="2" opacity=".8">{isJapanese ? "九星固定配置 · 参考図" : "NINE STAR REFERENCE · ILLUSTRATION"}</text>
       </g>
     </svg>
