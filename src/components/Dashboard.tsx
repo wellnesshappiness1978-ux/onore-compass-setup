@@ -736,6 +736,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 onLanguageChange={onLanguageChange}
                 onEdit={onEdit}
                 onVip={() => setModal("vip")}
+                signedIn={signedIn}
               />
             ) : (
               <div className="border-y border-primary/15 py-12 text-center text-sm text-muted-foreground">
