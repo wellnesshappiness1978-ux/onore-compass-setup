@@ -1,4 +1,5 @@
-import { Crown, Download, LockKeyhole, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Crown, Download, LockKeyhole, LockKeyholeOpen, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getBirthColorPair } from "@/lib/birth-colors";
 import { nineStarsTranslations } from "@/lib/nine-stars-translations";
@@ -51,25 +52,31 @@ function NineStarsArt({ main, sub }: { main: string; sub: string }) {
   );
 }
 
-export default function NineStarsPanel({ language, onVip, birthDate }: { language: Language; onVip: () => void; birthDate: string }) {
+export default function NineStarsPanel({ language, onVip, birthDate, testUnlocked = false }: { language: Language; onVip: () => void; birthDate: string; testUnlocked?: boolean }) {
   const t = nineStarsTranslations[language];
   const pair = getBirthColorPair(birthDate);
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => { if (!testUnlocked) setRevealed(false); }, [testUnlocked]);
+  const open = testUnlocked && revealed;
   return (
     <section className="mx-auto max-w-2xl text-center" aria-labelledby="nine-stars-heading">
       <p className="text-[10px] text-primary/75 tracking-[0.2em]">{t.subtitle}</p>
       <p className="mt-5 font-serif text-sm text-primary/90">{t.tagline}</p>
       <h3 id="nine-stars-heading" className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h3>
       <p className="mt-3 text-xs leading-6 text-muted-foreground">{pair ? t.preview : t.fallback}</p>
+      {testUnlocked && <p className="mx-auto mt-3 inline-block rounded-full border border-primary/40 px-3 py-1 text-[11px] text-primary">開発テスト：ビジネス会員として仮表示中（課金・権限は未実装）</p>}
       <div className="relative mx-auto mt-8 aspect-square w-full max-w-[560px] overflow-hidden rounded-full border border-primary/30 shadow-gold">
-        <div className="absolute inset-0 blur-[1px]" aria-hidden="true"><NineStarsArt main={pair?.main.token ?? "var(--primary)"} sub={pair?.sub.token ?? "var(--gold-glow)"} /></div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/30 p-5 backdrop-blur-[2px] sm:p-8">
-          <div className="flex size-12 items-center justify-center rounded-full border border-primary/40 bg-background/75 text-primary shadow-gold"><LockKeyhole className="size-5" /></div>
+        <div className={`absolute inset-0 transition-all duration-[1600ms] ease-out ${open ? "scale-100 blur-0 brightness-110" : "scale-105 blur-[1px]"}`} aria-hidden={!open}><NineStarsArt main={pair?.main.token ?? "var(--primary)"} sub={pair?.sub.token ?? "var(--gold-glow)"} /></div>
+        {open && <div key="burst" className="pointer-events-none absolute inset-0 rounded-full animate-[unlock-burst_1.6s_ease-out_forwards] bg-[radial-gradient(circle,var(--gold-glow)_0%,transparent_60%)]" aria-hidden="true" />}
+        <div className={`absolute inset-0 flex flex-col items-center justify-center bg-background/30 p-5 backdrop-blur-[2px] transition-opacity duration-700 sm:p-8 ${open ? "pointer-events-none opacity-0" : "opacity-100"}`}>
+          <div className="flex size-12 items-center justify-center rounded-full border border-primary/40 bg-background/75 text-primary shadow-gold">{testUnlocked ? <LockKeyholeOpen className="size-5" /> : <LockKeyhole className="size-5" />}</div>
           <p className="mt-4 flex items-center gap-2 font-serif text-lg text-primary"><Sparkles className="size-4" />{t.lock}</p>
-          <Button variant="champagne" onClick={onVip} className="mt-5 h-auto max-w-[330px] whitespace-normal px-5 py-3 text-center text-sm leading-6">
+          <Button variant="champagne" onClick={testUnlocked ? () => setRevealed(true) : onVip} className="mt-5 h-auto max-w-[330px] whitespace-normal px-5 py-3 text-center text-sm leading-6">
             <Crown className="size-4 shrink-0" />{t.unlock}
           </Button>
         </div>
       </div>
+      {open && <Button variant="ghost" size="sm" className="mt-3 text-xs text-muted-foreground" onClick={() => setRevealed(false)}>ロック演出をもう一度見る</Button>}
       <p className="mx-auto mt-6 max-w-md text-xs leading-6 text-muted-foreground">{t.note}</p>
       <Button variant="outline" disabled className="mt-5 border-primary/30 text-muted-foreground" title={t.unavailable}>
         <Download className="size-4" />{t.download}
