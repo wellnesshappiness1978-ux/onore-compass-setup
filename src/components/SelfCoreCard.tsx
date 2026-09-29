@@ -31,6 +31,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis }: { profi
   const sum = [...digits].reduce((total, digit) => total + Number(digit), 0);
   const number = sum > 0 ? ((sum - 1) % 9) + 1 : 0;
   const ideas = t.archetypes[(number - 1 + 4) % 4] ?? t.archetypes[0];
+  if (!ideas) return null;
   const named = Boolean(profile.nameKanji || profile.nameKana || profile.nameRomaji);
   const place = Boolean(profile.birthPlace || profile.birthCity);
   const completed = [Boolean(profile.birthDate), named, place, Boolean(profile.birthTime && !profile.birthTimeUnknown)].filter(Boolean).length;
