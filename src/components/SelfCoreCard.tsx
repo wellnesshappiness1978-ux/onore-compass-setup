@@ -25,6 +25,20 @@ const copy: Record<Language, Copy> = {
   fr: { title: "Vos traits", subtitle: "Réflexion sur votre essence", preview: "Aperçu illustratif · Pas une analyse vérifiée des 15 arts", diagnosis: "Analyse personnelle", diagnosisHint: "Vérifiez vos données de naissance et votre nom pour explorer votre guide", core: "Essence et force", pattern: "Pensée et action", talent: "Potentiel professionnel", manual: "Votre guide personnel", tags: ["Nombre natal", "Nom renseigné", "Lieu renseigné"], source: "Pistes de réflexion basées sur un nombre natal. Le nom et le lieu ne servent pas à juger le caractère ou les aptitudes.", progress: "Profil renseigné", archetypes: [["Essayez de prendre l'initiative", "Choisissez un petit premier pas, puis écoutez d'autres avis.", "Essayez d'ébaucher une nouvelle idée.", "Gardez votre autonomie sans tout porter seul."], ["Essayez de relier les personnes", "Vérifiez les intentions d'autrui avant de trancher.", "Essayez un rôle de coordination.", "Prenez du recul; ne décidez pas que pour les autres."], ["Essayez d'exprimer vos idées", "Notez vos idées et choisissez une priorité.", "Expérimentez un rôle de communication.", "Associez liberté créative et échéance."], ["Essayez de construire avec constance", "Clarifiez vos critères et commencez par le possible.", "Essayez de mettre en place des processus durables.", "N'attendez pas la perfection pour agir."]] },
 };
 
+type Weekly = { week: string; people: string; caution: string; labels: [string, string, string]; heading: string; note: string; items: [string, string, string][] };
+const weeklyJa: Weekly = { heading: "今週のあなた専用ガイド", labels: ["今週の具体的アドバイス", "対人関係のポイント", "避けるべき注意点"], week: "", people: "", caution: "", note: "生年月日の数と今週の暦から選んだ参考ガイドです。", items: [
+  ["月〜水に「やりたいこと」を3つ書き出し、金曜までに1つだけ最後までやり切りましょう。家事・勉強・仕事、どれでもOKです。", "話す前に「どう思う？」と一言聞くだけで、家族や友人・同僚との空気がやわらぎます。", "勢いで大きな買い物や約束をしないこと。一晩おいてから決めましょう。"],
+  ["今週は人に会う予定を1つ入れて、近況を聞く時間に。思わぬヒントや情報が手に入りやすい週です。", "頼まれごとは「ここまでならできる」と範囲を伝えてから引き受けると、疲れを溜めません。", "他人の期待に合わせすぎて自分の予定を削らないこと。1日30分は一人の時間を確保して。"],
+  ["気になっていることをメモやSNS下書きに言葉にしてみましょう。考えが整理され、次の一手が見えます。", "褒め言葉は具体的に（「あの説明わかりやすかった」など）。相手との距離がぐっと縮まります。", "夜更かしとダラダラ見続けるスマホに注意。週の後半に集中力が落ちやすくなります。"],
+  ["部屋の一角・机・スケジュール帳など、1か所だけ整えましょう。気持ちが落ち着き、判断が速くなります。", "結論を急がず、相手の話を最後まで聞くこと。信頼が積み上がる週です。", "完璧を目指して始めるのを先延ばしにしないこと。6割できたら一度出してみましょう。"],
+] };
+const weeklyEn: Weekly = { heading: "Your guide for this week", labels: ["Concrete advice this week", "Relationship tips", "Things to avoid"], week: "", people: "", caution: "", note: "A reference guide chosen from your birth-date number and this week's calendar.", items: [
+  ["Write down three things you want to do by Wednesday, and finish just one of them by Friday — chores, study or work all count.", "Simply asking \"What do you think?\" before sharing your view softens things with family, friends and coworkers.", "Avoid big purchases or promises made on impulse. Sleep on it first."],
+  ["Plan one catch-up with someone this week. Useful hints and information tend to come through people now.", "When asked for help, say how much you can do before agreeing, so you don't wear yourself out.", "Don't cut your own plans to meet others' expectations. Keep 30 minutes a day for yourself."],
+  ["Put what's on your mind into words in a note or draft. Your thoughts will clear and the next step will show.", "Make compliments specific (\"That explanation was really clear\"). It brings people closer.", "Watch out for late nights and endless scrolling — focus tends to dip later in the week."],
+  ["Tidy just one spot — a corner, your desk, or your planner. You'll feel calmer and decide faster.", "Listen to the end before concluding. Trust builds up this week.", "Don't postpone starting while aiming for perfection. Share it once it's 60% done."],
+] };
+
 export default function SelfCoreCard({ profile, language, onDiagnosis }: { profile: UserProfile; language: Language; onDiagnosis: () => void }) {
   const t = copy[language];
   const digits = profile.birthDate.replace(/\D/g, "");
@@ -34,6 +48,10 @@ export default function SelfCoreCard({ profile, language, onDiagnosis }: { profi
   if (!ideas) return null;
   const named = Boolean(profile.nameKanji || profile.nameKana || profile.nameRomaji);
   const place = Boolean(profile.birthPlace || profile.birthCity);
+  const w = language === "ja" ? weeklyJa : weeklyEn;
+  const now = new Date();
+  const weekNo = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 604800000);
+  const weekItems = w.items[(number + weekNo) % 4] ?? w.items[0]!;
   const completed = [Boolean(profile.birthDate), named, place, Boolean(profile.birthTime && !profile.birthTimeUnknown)].filter(Boolean).length;
   const sections = [
     { icon: Fingerprint, label: t.core, value: ideas[0] },
@@ -60,7 +78,10 @@ export default function SelfCoreCard({ profile, language, onDiagnosis }: { profi
         <p className="mt-5 border-t border-primary/15 pt-3 text-xs leading-5 text-muted-foreground">{t.preview}<br />{t.source}</p>
       </section>
       <section aria-label={t.diagnosis} className="flex min-w-0 flex-col justify-between rounded-lg border border-primary/25 bg-card/60 p-5 backdrop-blur-md sm:p-7">
-        <div><Sparkles className="size-6 text-primary" aria-hidden="true" /><h2 className="mt-4 font-serif text-xl text-foreground sm:text-2xl">{t.diagnosis}</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">{t.diagnosisHint}</p></div>
+        <div><Sparkles className="size-6 text-primary" aria-hidden="true" /><h2 className="mt-4 font-serif text-xl text-foreground sm:text-2xl">{t.diagnosis}</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">{t.diagnosisHint}</p>
+          <h3 className="mt-5 text-xs font-semibold text-primary">{w.heading}</h3>
+          <ul className="mt-3 space-y-3">{weekItems.map((item, i) => <li key={i} className={`rounded-md border p-3 ${i === 2 ? "border-destructive/40 bg-destructive/10" : "border-primary/20 bg-primary/5"}`}><p className="text-[11px] font-semibold text-primary">{w.labels[i]}</p><p className="mt-1 text-sm leading-6 text-foreground/90">{item}</p></li>)}</ul>
+          <p className="mt-2 text-[10px] leading-4 text-muted-foreground">{w.note}</p></div>
         <div className="mt-7"><div className="mb-2 flex justify-between text-xs text-muted-foreground"><span>{t.progress}</span><span>{completed}/4</span></div><div className="h-1.5 overflow-hidden rounded-full bg-primary/10" role="progressbar" aria-label={t.progress} aria-valuenow={completed} aria-valuemin={0} aria-valuemax={4}><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${completed * 25}%` }} /></div><Button variant="champagne" onClick={onDiagnosis} className="mt-5 w-full justify-between whitespace-normal text-sm">{t.diagnosis}<ArrowUpRight className="size-4 shrink-0" /></Button></div>
       </section>
     </div>
