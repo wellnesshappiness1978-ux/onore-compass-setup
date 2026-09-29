@@ -11,7 +11,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis }: { profi
   const t = homeReadingCopy[language];
   const generate = useServerFn(generateHomeReading);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading", profile, language],
+    queryKey: ["home-reading-v2", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
@@ -30,11 +30,8 @@ export default function SelfCoreCard({ profile, language, onDiagnosis }: { profi
       {isPending ? <div role="status" className="flex min-h-40 items-center gap-3 text-sm text-muted-foreground"><Sparkles className="size-5 animate-pulse text-primary" />{t.loading}</div> : isError || !data ? (
         <div className="flex min-h-40 flex-col items-start justify-center gap-3" role="alert"><p className="text-sm text-muted-foreground">{t.error}</p><Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>
       ) : <>
-        <div className="py-5"><h3 className="font-serif text-lg text-foreground">{t.portrait}</h3>
-          <div className="mt-3 grid gap-3 md:grid-cols-3">{short.map((value, index) => {
-            const Icon = shortIcons[index] ?? Sparkles;
-            return <div key={index} className="min-w-0 border-l-2 border-primary/45 bg-primary/5 px-4 py-3"><div className="flex items-center gap-2 text-primary"><Icon className="size-4 shrink-0" aria-hidden="true" /><h4 className="text-xs font-semibold">{t.labels[index]}</h4></div><p className="mt-2 break-words text-sm leading-7 text-foreground/90">{value}</p></div>;
-          })}</div>
+        <div className="py-6 sm:py-8"><h3 className="font-serif text-xl text-primary sm:text-2xl">{t.portrait}</h3>
+          <p className="mt-5 max-w-3xl whitespace-pre-line break-words font-serif text-[1.0625rem] leading-[2.1] text-foreground sm:text-xl sm:leading-[2.05]">{data.portrait}</p>
         </div>
         <div className="border-t border-primary/20 py-5"><h3 className="font-serif text-lg text-foreground">{t.core}</h3>
           <div className="mt-3 grid gap-5 lg:grid-cols-3">{long.map((value, index) => {
@@ -42,6 +39,13 @@ export default function SelfCoreCard({ profile, language, onDiagnosis }: { profi
             return <article key={index} className="min-w-0 border-t border-primary/30 pt-3"><div className="flex items-start gap-2 text-primary"><Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><h4 className="text-sm font-semibold leading-5">{t.labels[index + 3]}</h4></div><p className="mt-3 break-words text-sm leading-7 text-foreground/90">{value}</p></article>;
           })}</div>
         </div>
+        <section aria-label={t.action} className="border-t border-primary/20 bg-primary/5 py-5 sm:px-5">
+          <h3 className="font-serif text-lg text-primary">{t.action}</h3>
+          <div className="mt-4 grid gap-5 md:grid-cols-3">{short.map((value, index) => {
+            const Icon = shortIcons[index] ?? Sparkles;
+            return <article key={index} className="min-w-0 border-l-2 border-primary/45 pl-4"><div className="flex items-center gap-2 text-primary"><Icon className="size-4 shrink-0" aria-hidden="true" /><h4 className="text-sm font-semibold">{t.labels[index]}</h4></div><p className="mt-2 break-words text-sm leading-7 text-foreground/90">{value}</p></article>;
+          })}</div>
+        </section>
       </>}
       <footer className="flex flex-col gap-4 border-t border-primary/20 pt-4 sm:flex-row sm:items-end sm:justify-between">
         <p className="max-w-2xl text-xs leading-5 text-muted-foreground">{t.preview}</p>

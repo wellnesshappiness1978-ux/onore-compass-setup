@@ -23,3 +23,4 @@
 - [x] Rename the Home diagnosis card to 個別診断 and replace advice/caution content with innate-nature, charm, and hidden-potential copy (7 languages).
 
 - [x] Combine Home traits and diagnosis into one card with six AI-generated reflection fields, mobile layout, and clear illustrative labeling.
+- [x] Give the Home portrait its own longer, larger-type reflective passage; separate the three practical prompts into an action section in all seven languages.
