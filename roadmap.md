@@ -25,3 +25,5 @@
 - [x] Combine Home traits and diagnosis into one card with six AI-generated reflection fields, mobile layout, and clear illustrative labeling.
 - [x] Give the Home portrait its own longer, larger-type reflective passage; separate the three practical prompts into an action section in all seven languages.
 - [x] Rename three app designs, add seven-language nine-stars copy, and tint the locked illustrative wheel with two birth-date colors.
+- [x] Plan member limits (0/2/5/30/100), Business Premium ¥8,888, team studio (diagnosis, AI draft, catalog, calendar, balance, 1on1)
+- [ ] Signed-in team save test — blocked until first Google sign-in

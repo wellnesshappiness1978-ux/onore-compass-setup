@@ -19,3 +19,5 @@
 - Keep the nine-stars wheel locked and illustrative: date-based main/sub colors tint it, but star positions are decorative; no download until verified calculations and VIP access exist.
 - Keep My Page plan badge, B2B team data, notification toggles, and the Earth Calendar biorhythm timeline preview as local, clearly labeled previews in `SettingsPanel.tsx`; the plan test toggle changes only the preview rendering and must never unlock gated features until real billing and entitlements exist.
 - Keep seven appearance modes session-local, tier-limited (1/3/5/7) and CSS-scoped; vary typography, textures, compass, panels and navigation by tier, never imply actual paid access.
+- Plan limits/feature gates live in `src/lib/plans.ts` and are UI-only (preview plan toggle); no server enforcement until real billing exists. Why: no entitlement service yet.
+- Team members persist in `team_members` (owner-only RLS) when signed in, else localStorage `onore-team`; team scores come from deterministic `src/lib/team-analysis.ts`, AI draft/1on1 via `src/lib/ai/team-ai.functions.ts`. Why: keep scores reproducible and labeled as reference values.
