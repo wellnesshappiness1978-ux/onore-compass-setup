@@ -33,6 +33,14 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+const LOCAL_KEY = "onore-profile";
+const readLocal = (): UserProfile | null => {
+  try { const raw = window.localStorage.getItem(LOCAL_KEY); return raw ? (JSON.parse(raw) as UserProfile) : null; } catch { return null; }
+};
+const writeLocal = (p: UserProfile | null) => {
+  try { if (p) window.localStorage.setItem(LOCAL_KEY, JSON.stringify(p)); else window.localStorage.removeItem(LOCAL_KEY); } catch { /* ignore */ }
+};
+
 function Index() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editing, setEditing] = useState(false);
@@ -55,7 +63,7 @@ function Index() {
       if (!active || sequence !== loadSequence.current) return;
       if (authError || !data.user) {
         setUserId(null);
-        setProfile(null);
+        setProfile(readLocal());
         setEditing(false);
         setLoading(false);
         return;
@@ -64,8 +72,12 @@ function Index() {
       setProfile(null);
       setEditing(false);
       try {
-        const saved = await read();
-        if (active && sequence === loadSequence.current) { setProfile(saved as UserProfile | null); setError(null); }
+        const saved = (await read()) as UserProfile | null;
+        if (active && sequence === loadSequence.current) {
+          const next = saved ?? readLocal();
+          if (saved) writeLocal(saved);
+          setProfile(next); setError(null);
+        }
       } catch {
         if (active && sequence === loadSequence.current) setError("load");
       } finally { if (active && sequence === loadSequence.current) setLoading(false); }
@@ -82,6 +94,7 @@ function Index() {
 
   const saveProfile = async (next: UserProfile) => {
     if (userId) await save({ data: next });
+    writeLocal(next);
     setProfile(next);
     setEditing(false);
   };
@@ -98,6 +111,7 @@ function Index() {
     setProfile(null);
     setUserId(null);
     setEditing(false);
+    writeLocal(null);
     await supabase.auth.signOut();
   };
 
