@@ -59,7 +59,7 @@ export default function NineStarsPanel({ language, onVip, birthDate }: { languag
       <p className="text-[10px] text-primary/75 tracking-[0.2em]">{t.subtitle}</p>
       <p className="mt-5 font-serif text-sm text-primary/90">{t.tagline}</p>
       <h3 id="nine-stars-heading" className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h3>
-      <p className="mt-3 text-xs leading-6 text-muted-foreground">{pair ? t.preview : t.note}</p>
+      <p className="mt-3 text-xs leading-6 text-muted-foreground">{pair ? t.preview : t.fallback}</p>
       <div className="relative mx-auto mt-8 aspect-square w-full max-w-[560px] overflow-hidden rounded-full border border-primary/30 shadow-gold">
         <div className="absolute inset-0 blur-[1px]" aria-hidden="true"><NineStarsArt main={pair?.main.token ?? "var(--primary)"} sub={pair?.sub.token ?? "var(--gold-glow)"} /></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/30 p-5 backdrop-blur-[2px] sm:p-8">
@@ -70,7 +70,7 @@ export default function NineStarsPanel({ language, onVip, birthDate }: { languag
           </Button>
         </div>
       </div>
-      {pair && <p className="mx-auto mt-6 max-w-md text-xs leading-6 text-muted-foreground">{t.note}</p>}
+      <p className="mx-auto mt-6 max-w-md text-xs leading-6 text-muted-foreground">{t.note}</p>
       <Button variant="outline" disabled className="mt-5 border-primary/30 text-muted-foreground" title={t.unavailable}>
         <Download className="size-4" />{t.download}
       </Button>
