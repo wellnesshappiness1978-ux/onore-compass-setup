@@ -27,3 +27,4 @@
 - [x] Rename three app designs, add seven-language nine-stars copy, and tint the locked illustrative wheel with two birth-date colors.
 - [x] Plan member limits (0/2/5/30/100), Business Premium ¥8,888, team studio (diagnosis, AI draft, catalog, calendar, balance, 1on1)
 - [ ] Signed-in team save test — blocked until first Google sign-in
+- [x] Add ornate nine-stars reference grid, date/color motifs, and labelled preview PNG export/device image sharing without claiming a verified natal chart or paid membership.
