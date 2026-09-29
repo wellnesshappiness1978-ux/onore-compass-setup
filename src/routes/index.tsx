@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import Onboarding, { type UserProfile } from "@/components/Onboarding";
 import Dashboard from "@/components/Dashboard";
 import LanguageSelector from "@/components/LanguageSelector";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
+import { readMyProfile, saveMyProfile } from "@/lib/profile-storage.functions";
+import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { type Language } from "@/lib/translations";
 
 export const Route = createFileRoute("/")({
@@ -28,21 +35,91 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [editing, setEditing] = useState(false);
   const [language, setLanguage] = useState<Language>("ja");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const loadSequence = useRef(0);
+  const queryClient = useQueryClient();
+  const read = useServerFn(readMyProfile);
+  const save = useServerFn(saveMyProfile);
+  const copy = profileStorageCopy[language];
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const sequence = ++loadSequence.current;
+      setLoading(true);
+      const { data, error: authError } = await supabase.auth.getUser();
+      if (!active || sequence !== loadSequence.current) return;
+      if (authError || !data.user) {
+        setUserId(null);
+        setProfile(null);
+        setEditing(false);
+        setLoading(false);
+        return;
+      }
+      setUserId(data.user.id);
+      setProfile(null);
+      setEditing(false);
+      try {
+        const saved = await read();
+        if (active && sequence === loadSequence.current) { setProfile(saved as UserProfile | null); setError(null); }
+      } catch {
+        if (active && sequence === loadSequence.current) setError("load");
+      } finally { if (active && sequence === loadSequence.current) setLoading(false); }
+    };
+    void load();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        if (event === "SIGNED_OUT") { ++loadSequence.current; setProfile(null); setEditing(false); setUserId(null); setLoading(false); setError(null); }
+        else window.setTimeout(() => { if (active) void load(); }, 0);
+      }
+    });
+    return () => { active = false; ++loadSequence.current; subscription.unsubscribe(); };
+  }, [read]);
+
+  const saveProfile = async (next: UserProfile) => {
+    if (userId) await save({ data: next });
+    setProfile(next);
+    setEditing(false);
+  };
+
+  const signIn = async () => {
+    setError(null);
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+    if (result.error) setError("auth");
+  };
+  const signOut = async () => {
+    ++loadSequence.current;
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    setProfile(null);
+    setUserId(null);
+    setEditing(false);
+    await supabase.auth.signOut();
+  };
 
   return (
     <>
       <LanguageSelector language={language} onChange={setLanguage} />
-      {profile ? (
+      <div className="fixed left-4 top-4 z-50 max-w-[calc(100vw-9rem)] sm:left-6">
+        <Button variant="outline" className="h-10 max-w-full border-primary/40 bg-background/85 px-3 text-xs text-primary backdrop-blur-md" onClick={userId ? signOut : signIn}>
+          {userId ? copy.signOut : copy.signIn}
+        </Button>
+      </div>
+      {error && <div role="alert" className="fixed left-4 right-4 top-20 z-50 mx-auto max-w-sm border border-destructive bg-background p-3 text-sm text-destructive">{error === "load" ? copy.loadError : copy.saveError}</div>}
+      {loading ? <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">{copy.loading}</div> : profile && !editing ? (
         <Dashboard
           profile={profile}
-          onEdit={() => setProfile(null)}
-          onProfileChange={setProfile}
+          onEdit={() => setEditing(true)}
+          onProfileChange={saveProfile}
           language={language}
           onLanguageChange={setLanguage}
         />
       ) : (
-        <Onboarding onComplete={setProfile} language={language} />
+        <Onboarding key={userId ?? "guest"} {...(profile ? { initialProfile: profile } : {})} onComplete={saveProfile} language={language} signedIn={Boolean(userId)} />
       )}
     </>
   );

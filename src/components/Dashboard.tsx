@@ -38,7 +38,7 @@ import {
 type Props = {
   profile: UserProfile;
   onEdit: () => void;
-  onProfileChange: (profile: UserProfile) => void;
+  onProfileChange: (profile: UserProfile) => Promise<void>;
   language: Language;
   onLanguageChange: (language: Language) => void;
 };

@@ -3,11 +3,13 @@ import { CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } fr
 import { Button } from "@/components/ui/button";
 import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
+import { profileStorageCopy } from "@/lib/profile-storage-copy";
 
 export type UserProfile = {
   nameKanji: string;
   nameKana: string;
   nameRomaji: string;
+  gender: "female" | "male" | "other" | "undisclosed";
   birthCity: string;
   birthDate: string;
   birthTime: string;
@@ -50,17 +52,20 @@ const chipBase =
 const chipSelected = "border-primary/80 bg-primary/15 text-primary shadow-champagne";
 const chipIdle = "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5";
 
-type Props = { onComplete: (profile: UserProfile) => void; language: Language };
+type Props = { onComplete: (profile: UserProfile) => Promise<void>; language: Language; signedIn: boolean; initialProfile?: UserProfile };
 
-export default function Onboarding({ onComplete, language }: Props) {
+export default function Onboarding({ onComplete, language, signedIn, initialProfile }: Props) {
   const t = translations[language];
   const pt = profileTranslations[language];
+  const storage = profileStorageCopy[language];
   const [step, setStep] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
-  const [profile, setProfile] = useState<UserProfile>({
+  const [saveError, setSaveError] = useState(false);
+  const [profile, setProfile] = useState<UserProfile>(initialProfile ?? {
     nameKanji: "",
     nameKana: "",
     nameRomaji: "",
+    gender: "undisclosed",
     birthCity: "",
     birthDate: "",
     birthTime: "",
@@ -81,14 +86,21 @@ export default function Onboarding({ onComplete, language }: Props) {
 
   const isLast = step === t.steps.length - 1;
 
-  const handlePrimary = () => {
+  const handlePrimary = async () => {
     if (!stepValid) return;
     if (!isLast) {
       setStep((s) => s + 1);
       return;
     }
     setAnalyzing(true);
-    window.setTimeout(() => onComplete(profile), 1400);
+    setSaveError(false);
+    try {
+      await onComplete(profile);
+    } catch {
+      setSaveError(true);
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   return (
@@ -151,6 +163,12 @@ export default function Onboarding({ onComplete, language }: Props) {
                   <input id="name-romaji" maxLength={60} placeholder="NIIDA DAIJI" value={profile.nameRomaji} onChange={(e) => set("nameRomaji", e.target.value.toUpperCase())} className={inputClass} />
                   <p className="mt-1 text-xs text-muted-foreground">{pt.romajiHint}</p>
                 </div>
+              </div>
+              <div>
+                <label htmlFor="gender" className="mb-2 block font-serif text-sm font-semibold text-primary">{storage.gender}</label>
+                <select id="gender" value={profile.gender} onChange={(e) => set("gender", e.target.value as UserProfile["gender"])} className={inputClass}>
+                  <option value="undisclosed">{storage.undisclosed}</option><option value="female">{storage.female}</option><option value="male">{storage.male}</option><option value="other">{storage.other}</option>
+                </select>
               </div>
               <div>
                 <label htmlFor="birth-date" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
@@ -277,6 +295,8 @@ export default function Onboarding({ onComplete, language }: Props) {
 
           {/* Navigation */}
           <div className="mt-8 space-y-3">
+             {!signedIn && <p className="text-xs text-muted-foreground">{storage.signInRequired}</p>}
+             {saveError && <p role="alert" className="text-xs text-destructive">{storage.saveError}</p>}
             {step > 0 && (
               <Button
                 type="button"
@@ -298,7 +318,7 @@ export default function Onboarding({ onComplete, language }: Props) {
               {analyzing ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="inline-block size-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground" />
-                   {t.analyzing}
+                   {signedIn ? storage.saving : t.analyzing}
                 </span>
               ) : isLast ? (
                  <><Sparkles className="size-4" aria-hidden="true" />{t.analyze}</>

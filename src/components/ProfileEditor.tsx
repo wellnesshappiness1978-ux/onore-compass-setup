@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import { prefecturesRomanized, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
+import { profileStorageCopy } from "@/lib/profile-storage-copy";
 
 const ROMAJI = /^[A-Za-z][A-Za-z\s'-]*$/;
 
@@ -20,23 +21,29 @@ export function computeGokaku(p: UserProfile) {
 
 export default function ProfileEditor({
   profile, language, onSave,
-}: { profile: UserProfile; language: Language; onSave: (p: UserProfile) => void }) {
+}: { profile: UserProfile; language: Language; onSave: (p: UserProfile) => Promise<void> }) {
   const t = profileTranslations[language];
+  const storage = profileStorageCopy[language];
   const [draft, setDraft] = useState<UserProfile>(profile);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   const set = <K extends keyof UserProfile>(k: K, v: UserProfile[K]) => {
     setSaved(false);
     setDraft((d) => ({ ...d, [k]: v }));
   };
   const label = "mb-1.5 block text-xs font-semibold text-primary";
 
-  const save = () => {
+  const save = async () => {
     if (!draft.birthDate) return setError(t.dateError);
     if (draft.nameRomaji.trim() && !ROMAJI.test(draft.nameRomaji.trim())) return setError(t.romajiError);
     setError(null);
-    onSave({ ...draft, nameKanji: draft.nameKanji.trim().slice(0, 40), nameKana: draft.nameKana.trim().slice(0, 60), nameRomaji: draft.nameRomaji.trim().toUpperCase().slice(0, 60), birthCity: draft.birthCity.trim().slice(0, 80) });
-    setSaved(true);
+    setSaving(true);
+    try {
+      await onSave({ ...draft, nameKanji: draft.nameKanji.trim().slice(0, 40), nameKana: draft.nameKana.trim().slice(0, 60), nameRomaji: draft.nameRomaji.trim().toUpperCase().slice(0, 60), birthCity: draft.birthCity.trim().slice(0, 80) });
+      setSaved(true);
+    } catch { setError(storage.saveError); }
+    finally { setSaving(false); }
   };
 
   return (
@@ -55,6 +62,8 @@ export default function ProfileEditor({
         <div className="sm:col-span-2"><label className={label} htmlFor="pe-romaji">{t.nameRomaji}</label>
           <input id="pe-romaji" className={`${inputClass} uppercase`} maxLength={60} placeholder="NIIDA DAIJI" value={draft.nameRomaji} onChange={(e) => set("nameRomaji", e.target.value)} />
           <p className="mt-1 text-[11px] text-muted-foreground">{t.romajiHint}</p></div>
+        <div><label className={label} htmlFor="pe-gender">{storage.gender}</label>
+          <select id="pe-gender" className={inputClass} value={draft.gender} onChange={(e) => set("gender", e.target.value as UserProfile["gender"])}><option value="undisclosed">{storage.undisclosed}</option><option value="female">{storage.female}</option><option value="male">{storage.male}</option><option value="other">{storage.other}</option></select></div>
         <div><label className={label} htmlFor="pe-date">{t.birthDate}</label>
           <input id="pe-date" type="date" max="2026-12-31" className={inputClass} value={draft.birthDate} onChange={(e) => set("birthDate", e.target.value)} /></div>
         <div><label className={label} htmlFor="pe-time">{t.birthTime}</label>
@@ -72,7 +81,7 @@ export default function ProfileEditor({
       </div>
       {error && <p role="alert" className="mt-3 text-xs text-destructive">{error}</p>}
       {saved && <p role="status" className="mt-3 flex items-center gap-1 text-xs text-primary"><Check className="size-3.5" />{t.saved}</p>}
-      <Button type="button" variant="champagne" onClick={save} className="mt-4 h-12 w-full rounded-lg font-bold">{t.save}</Button>
+       <Button type="button" variant="champagne" onClick={save} disabled={saving} className="mt-4 h-12 w-full rounded-lg font-bold">{saving ? storage.saving : t.save}</Button>
     </details>
   );
 }
