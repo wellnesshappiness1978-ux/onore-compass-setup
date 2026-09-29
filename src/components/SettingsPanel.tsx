@@ -289,7 +289,7 @@ function BiorhythmPreview({
             className="flex items-center justify-between gap-2 rounded-md border border-primary/15 bg-background/40 px-3 py-2 text-xs"
           >
             {(() => { const Icon = eventIcons[index] ?? Target; return <Icon className={`size-4 shrink-0 ${eventColors[index]}`} aria-hidden="true" />; })()}
-            <span className="min-w-0 flex-1 leading-5">{indicator}</span>
+            <span className="min-w-0 flex-1 leading-5">{indicator.replace(/^[^\p{L}\p{N}]+/u, "")}</span>
             <span className="shrink-0 rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
               {monthLabel(indicatorMonths[index] ?? 0)}
             </span>
