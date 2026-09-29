@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import Onboarding, { type UserProfile } from "@/components/Onboarding";
@@ -39,6 +39,7 @@ function Index() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const loadSequence = useRef(0);
   const read = useServerFn(readMyProfile);
   const save = useServerFn(saveMyProfile);
   const copy = profileStorageCopy[language];
@@ -46,9 +47,10 @@ function Index() {
   useEffect(() => {
     let active = true;
     const load = async () => {
+      const sequence = ++loadSequence.current;
       setLoading(true);
       const { data, error: authError } = await supabase.auth.getUser();
-      if (!active) return;
+      if (!active || sequence !== loadSequence.current) return;
       if (authError || !data.user) {
         setUserId(null);
         setProfile(null);
@@ -61,23 +63,23 @@ function Index() {
       setEditing(false);
       try {
         const saved = await read();
-        if (active) { setProfile(saved as UserProfile | null); setError(null); }
+        if (active && sequence === loadSequence.current) { setProfile(saved as UserProfile | null); setError(null); }
       } catch {
-        if (active) setError("load");
-      } finally { if (active) setLoading(false); }
+        if (active && sequence === loadSequence.current) setError("load");
+      } finally { if (active && sequence === loadSequence.current) setLoading(false); }
     };
     void load();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
-        if (event === "SIGNED_OUT") { setProfile(null); setEditing(false); setUserId(null); setLoading(false); setError(null); }
-        else void load();
+        if (event === "SIGNED_OUT") { ++loadSequence.current; setProfile(null); setEditing(false); setUserId(null); setLoading(false); setError(null); }
+        else window.setTimeout(() => { if (active) void load(); }, 0);
       }
     });
-    return () => { active = false; subscription.unsubscribe(); };
+    return () => { active = false; ++loadSequence.current; subscription.unsubscribe(); };
   }, [read]);
 
   const saveProfile = async (next: UserProfile) => {
-    if (userId) await save({ data: next as Parameters<typeof save>[0]["data"] });
+    if (userId) await save({ data: next });
     setProfile(next);
     setEditing(false);
   };
@@ -112,7 +114,7 @@ function Index() {
           onLanguageChange={setLanguage}
         />
       ) : (
-        <Onboarding key={userId ?? "guest"} initialProfile={profile ?? undefined} onComplete={saveProfile} language={language} signedIn={Boolean(userId)} />
+        <Onboarding key={userId ?? "guest"} {...(profile ? { initialProfile: profile } : {})} onComplete={saveProfile} language={language} signedIn={Boolean(userId)} />
       )}
     </>
   );
