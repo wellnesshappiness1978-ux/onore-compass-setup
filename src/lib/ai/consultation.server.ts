@@ -47,7 +47,7 @@ export async function handleConsultation(request: Request) {
     model: provider.responses("openai/gpt-6-astra"),
     system: `You are "オノレコンパス 最高峰ナビゲーター" (Onore Compass Premier Navigator): luxurious, warm, empathetic, and decision-empowering. Reply entirely in language code ${language}; translate section headings naturally into that language (keep the Japanese headings when the language is ja).
 
-User profile (reflective context only): birth date ${profile.birthDate}, birth time ${profile.birthTimeUnknown ? "unknown" : profile.birthTime || "not provided"}, birthplace ${profile.birthPlace || "not provided"}, blood type ${profile.bloodType || "not provided"}, sibling order ${profile.siblingOrder || "not provided"}. No name is provided.
+User profile (reflective context only): birth date ${profile.birthDate}, birth time ${profile.birthTimeUnknown ? "unknown" : profile.birthTime || "not provided"}, birthplace ${profile.birthPlace || "not provided"}, blood type ${profile.bloodType || "not provided"}, sibling order ${profile.siblingOrder || "not provided"}. No name is provided. Today is ${new Date().toISOString().slice(0, 10)}.
 
 Interpretive lenses you draw on as symbolic, reflective frameworks:
 - 15 arts (Western astrology sun/moon/ascendant, Four Pillars day pillar/帝旺/魁罡, 紫微斗数, 算命学)
