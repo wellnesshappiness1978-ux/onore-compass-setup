@@ -721,7 +721,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               />
               </>
             ) : tab === "mandala" ? (
-              <NineStarsPanel language={language} birthDate={profile.birthDate} onVip={() => setModal("vip")} testUnlocked={previewPlan === "vip" || previewPlan === "b2b"} />
+              <NineStarsPanel language={language} birthDate={profile.birthDate} onVip={() => setModal("vip")} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
             ) : tab === "settings" ? (
               <SettingsPanel
                 profile={profile}
@@ -736,6 +736,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 onLanguageChange={onLanguageChange}
                 onEdit={onEdit}
                 onVip={() => setModal("vip")}
+                signedIn={signedIn}
               />
             ) : (
               <div className="border-y border-primary/15 py-12 text-center text-sm text-muted-foreground">

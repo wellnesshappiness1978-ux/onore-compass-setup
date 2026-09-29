@@ -1,6 +1,6 @@
 import type { Language } from "./translations";
 
-export type Plan = "free" | "standard" | "vip" | "b2b";
+export type Plan = "free" | "standard" | "vip" | "b2b" | "b2b-premium";
 export type DesignMode = "classic" | "masculine" | "feminine" | "masculine-luxe" | "feminine-luxe" | "business-night" | "business-day";
 
 export const designModes: { id: DesignMode; tier: Plan; icon: string }[] = [
@@ -13,7 +13,7 @@ export const designModes: { id: DesignMode; tier: Plan; icon: string }[] = [
   { id: "business-day", tier: "b2b", icon: "▤" },
 ];
 
-const rank: Record<Plan, number> = { free: 0, standard: 1, vip: 2, b2b: 3 };
+const rank: Record<Plan, number> = { free: 0, standard: 1, vip: 2, b2b: 3, "b2b-premium": 4 };
 export const canPreviewDesign = (plan: Plan, mode: DesignMode) =>
   rank[plan] >= rank[designModes.find((item) => item.id === mode)?.tier ?? "free"];
 

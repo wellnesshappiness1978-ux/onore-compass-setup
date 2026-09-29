@@ -95,6 +95,42 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          birth_date: string
+          blood_type: string
+          created_at: string
+          gender: string
+          id: string
+          name: string
+          role: string
+          skills: string[]
+          user_id: string
+        }
+        Insert: {
+          birth_date: string
+          blood_type?: string
+          created_at?: string
+          gender?: string
+          id?: string
+          name: string
+          role?: string
+          skills?: string[]
+          user_id: string
+        }
+        Update: {
+          birth_date?: string
+          blood_type?: string
+          created_at?: string
+          gender?: string
+          id?: string
+          name?: string
+          role?: string
+          skills?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

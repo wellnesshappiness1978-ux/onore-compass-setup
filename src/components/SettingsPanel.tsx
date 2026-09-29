@@ -27,7 +27,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
-import { settingsTranslations, type SettingsTranslation } from "@/lib/settings-translations";
+import { settingsTranslations, type SettingsTranslation, type PricingTier } from "@/lib/settings-translations";
+import TeamStudio from "@/components/team/TeamStudio";
+import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
 import type { UserProfile } from "./Onboarding";
 
@@ -41,6 +43,7 @@ type Props = {
   onPlanChange: (plan: Plan) => void;
   designMode: DesignMode;
   onDesignModeChange: (mode: DesignMode) => void;
+  signedIn?: boolean;
 };
 
 const SAMPLE_TEAM = ["M. Sato", "K. Tanaka", "Y. Suzuki", "R. Ito"];
@@ -315,6 +318,7 @@ export default function SettingsPanel({
   onPlanChange,
   designMode,
   onDesignModeChange,
+  signedIn = false,
 }: Props) {
   const t = settingsTranslations[language];
   const dc = designCopy[language];
@@ -327,8 +331,17 @@ export default function SettingsPanel({
   const [notice, setNotice] = useState<string | null>(null);
   const [lockedMode, setLockedMode] = useState<DesignMode | null>(null);
 
+  const tc = teamCopy[language];
+  const premiumTier: PricingTier = {
+    id: "b2b-premium", name: tc.planNames["b2b-premium"], priceMonthly: "¥8,888", priceYearly: "¥88,880",
+    features: language === "ja"
+      ? ["関係者登録 最大100人", "100名フル機能の組織コンサル", "優先AI生成（表示のみ）", "ビジネスプランの全機能"]
+      : ["Up to 100 registered members", "Full organization consulting for 100", "Priority AI generation (label only)", "Everything in Business"],
+    cta: tc.switchPlan,
+  };
+  const allTiers = [...t.tiers, premiumTier];
   const planLabel =
-    plan === "vip"
+    plan === "b2b-premium" ? tc.planNames["b2b-premium"] : plan === "vip"
       ? t.planVip
       : plan === "b2b"
         ? t.planB2b
@@ -374,8 +387,8 @@ export default function SettingsPanel({
         </div>
         <div className="mt-4 border-t border-primary/10 pt-3">
           <p className="mb-2 text-xs text-muted-foreground">{t.planTest}</p>
-          <div className="grid grid-cols-4 gap-2" role="radiogroup" aria-label={t.planTest}>
-            {(["free", "standard", "vip", "b2b"] as Plan[]).map((p) => (
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5" role="radiogroup" aria-label={t.planTest}>
+            {(["free", "standard", "vip", "b2b", "b2b-premium"] as Plan[]).map((p) => (
               <Button
                 key={p}
                 role="radio"
@@ -385,7 +398,7 @@ export default function SettingsPanel({
                  onClick={() => onPlanChange(p)}
                 className={`text-[10px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
               >
-                {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : "B2B"}
+                {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : p === "b2b" ? "B2B" : "B2B Premium"}
               </Button>
             ))}
           </div>
@@ -519,9 +532,9 @@ export default function SettingsPanel({
         </div>
 
         <div className="mt-4 space-y-3">
-          {t.tiers.map((tier) => {
+          {allTiers.map((tier) => {
             const isVip = tier.id === "vip";
-            const isB2b = tier.id === "b2b";
+            const isB2b = tier.id === "b2b" || tier.id === "b2b-premium";
             const open = openTier === tier.id;
             const price = yearly ? tier.priceYearly : tier.priceMonthly;
             const period = yearly ? t.perYear : t.perMonth;
@@ -588,7 +601,7 @@ export default function SettingsPanel({
                       ))}
                     </ul>
                     <Button
-                      onClick={() => (isVip ? onVip() : setNotice(`${tier.name}: ${t.soon}`))}
+                      onClick={() => (isVip ? onVip() : tier.id === "b2b-premium" ? onPlanChange("b2b-premium") : setNotice(`${tier.name}: ${t.soon}`))}
                       disabled={tier.id === "free"}
                       size="sm"
                       className={`mt-3 h-9 w-full ${isVip ? "shadow-champagne-strong" : ""}`}
@@ -604,6 +617,8 @@ export default function SettingsPanel({
         </div>
         <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
       </section>
+
+      <TeamStudio plan={plan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} onPlanChange={onPlanChange} />
 
       <section className={card}>
         <h3 className="font-serif text-lg text-primary">{t.b2bTitle}</h3>
