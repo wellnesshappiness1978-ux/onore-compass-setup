@@ -8,6 +8,13 @@
       "when": 1790674896307,
       "tag": "0000_create_private_profiles_and_divination_results",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790691316980,
+      "tag": "0001_create_team_members",
+      "breakpoints": true
     }
   ]
 }
