@@ -29,10 +29,10 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     vip: "無制限でAI相談を利用する（VIP特典）",
     quickLabel: "クイック質問",
     quick: [
+      "今月の勝負時期は？",
+      "新事業の立ち上げタイミング",
+      "チームの相性診断",
       "A社とB社の契約タイミングは？",
-      "今月の転職・独立の運気を診る",
-      "本日の対人関係・交渉アドバイス",
-      "今日の金運と投資のタイミング",
     ],
     greeting:
       "ようこそ。迷っていることや、決めたいことを聞かせてください。占術の視点は内省のヒントとして扱い、現実的な選択肢と次の一歩を一緒に整理します。",
@@ -53,10 +53,10 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     vip: "Unlimited AI consultations (VIP)",
     quickLabel: "Quick questions",
     quick: [
+      "When is my key window this month?",
+      "Timing for launching a new business",
+      "Team compatibility reading",
       "When should I time the contract with Company A or B?",
-      "Reflect on this month's career-change timing",
-      "Today's relationship and negotiation advice",
-      "Today's money and investment timing",
     ],
     greeting:
       "Welcome. Tell me what feels uncertain or what you need to decide. I’ll use divination themes only as reflective prompts and help organize practical options and a next step.",
@@ -78,10 +78,10 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     vip: "无限使用AI咨询（VIP特权）",
     quickLabel: "快捷提问",
     quick: [
+      "本月的关键时期是？",
+      "新事业的启动时机",
+      "团队相性诊断",
       "A公司和B公司的签约时机？",
-      "看看本月转职与独立的时机",
-      "今日人际关系与谈判建议",
-      "今日财运与投资时机",
     ],
     greeting:
       "欢迎。请告诉我你正在犹豫或需要决定的事情。我会把占术主题仅作为反思线索，帮你梳理现实选项与下一步。",
@@ -102,10 +102,10 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     vip: "無限使用AI諮詢（VIP特典）",
     quickLabel: "快速提問",
     quick: [
+      "本月的關鍵時期是？",
+      "新事業的啟動時機",
+      "團隊相性診斷",
       "A公司和B公司的簽約時機？",
-      "看看本月轉職與獨立的時機",
-      "今日人際關係與談判建議",
-      "今日財運與投資時機",
     ],
     greeting:
       "歡迎。請告訴我你正在猶豫或需要決定的事情。我會把占術主題僅作為反思線索，幫你整理現實選項與下一步。",
@@ -126,10 +126,10 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     vip: "AI 상담 무제한 이용 (VIP 혜택)",
     quickLabel: "빠른 질문",
     quick: [
+      "이번 달 승부 시기는?",
+      "신사업 시작 타이밍",
+      "팀 궁합 진단",
       "A사와 B사의 계약 타이밍은?",
-      "이번 달 이직·독립 시기를 살펴보기",
-      "오늘의 대인관계·협상 조언",
-      "오늘의 금전운과 투자 타이밍",
     ],
     greeting:
       "환영합니다. 망설이는 일이나 결정하고 싶은 일을 들려주세요. 점술 주제는 성찰의 힌트로만 활용하고, 현실적인 선택지와 다음 행동을 함께 정리합니다.",
@@ -150,10 +150,10 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     vip: "Consultas IA ilimitadas (VIP)",
     quickLabel: "Preguntas rápidas",
     quick: [
+      "¿Cuál es mi momento clave este mes?",
+      "Momento para lanzar un nuevo negocio",
+      "Compatibilidad del equipo",
       "¿Cuándo firmar con la empresa A o B?",
-      "Reflexionar sobre un cambio laboral este mes",
-      "Consejo de relaciones y negociación para hoy",
-      "Dinero e inversión: momento de hoy",
     ],
     greeting:
       "Bienvenido. Cuéntame qué te genera dudas o qué necesitas decidir. Usaré los temas adivinatorios solo como reflexión y te ayudaré a ordenar opciones prácticas y un próximo paso.",
@@ -175,10 +175,10 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     vip: "Consultations IA illimitées (VIP)",
     quickLabel: "Questions rapides",
     quick: [
+      "Quel est mon moment clé ce mois-ci ?",
+      "Timing pour lancer une nouvelle activité",
+      "Compatibilité de l’équipe",
       "Quand signer avec l’entreprise A ou B ?",
-      "Réfléchir à un changement professionnel ce mois-ci",
-      "Conseil relationnel et négociation du jour",
-      "Argent et investissement : timing du jour",
     ],
     greeting:
       "Bienvenue. Dites-moi ce qui vous fait hésiter ou ce que vous devez décider. Les thèmes divinatoires resteront des pistes de réflexion pour organiser des options concrètes et une prochaine étape.",
