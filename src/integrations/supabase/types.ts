@@ -14,7 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      divination_results: {
+        Row: {
+          art_id: string
+          created_at: string
+          id: string
+          methodology: string
+          profile_version: string
+          result: Json
+          user_id: string
+        }
+        Insert: {
+          art_id: string
+          created_at?: string
+          id?: string
+          methodology: string
+          profile_version: string
+          result: Json
+          user_id: string
+        }
+        Update: {
+          art_id?: string
+          created_at?: string
+          id?: string
+          methodology?: string
+          profile_version?: string
+          result?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          birth_city: string
+          birth_date: string | null
+          birth_place: string
+          birth_time: string | null
+          birth_time_unknown: boolean
+          blood_type: string
+          gender: string
+          name_kana: string
+          name_kanji: string
+          name_romaji: string
+          profile_version: string
+          sibling_order: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          birth_city?: string
+          birth_date?: string | null
+          birth_place?: string
+          birth_time?: string | null
+          birth_time_unknown?: boolean
+          blood_type?: string
+          gender?: string
+          name_kana?: string
+          name_kanji?: string
+          name_romaji?: string
+          profile_version?: string
+          sibling_order?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          birth_city?: string
+          birth_date?: string | null
+          birth_place?: string
+          birth_time?: string | null
+          birth_time_unknown?: boolean
+          blood_type?: string
+          gender?: string
+          name_kana?: string
+          name_kanji?: string
+          name_romaji?: string
+          profile_version?: string
+          sibling_order?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
