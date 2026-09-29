@@ -1,3 +1,4 @@
+import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
 import { useRef, useState, type CSSProperties } from "react";
 import {
   Bell,
@@ -35,6 +36,7 @@ import {
 type Props = {
   profile: UserProfile;
   onEdit: () => void;
+  onProfileChange: (profile: UserProfile) => void;
   language: Language;
   onLanguageChange: (language: Language) => void;
 };
@@ -540,7 +542,7 @@ function TorisetsuPanel({
   );
 }
 
-export default function Dashboard({ profile, onEdit, language, onLanguageChange }: Props) {
+export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange }: Props) {
   const t = dashboardTranslations[language];
   const base = translations[language];
   const [tab, setTab] = useState<Tab>("home");
@@ -693,13 +695,20 @@ export default function Dashboard({ profile, onEdit, language, onLanguageChange 
               </h2>
             </div>
             {tab === "arts" ? (
-              <TorisetsuPanel profile={profile} language={language} onVip={() => setModal("vip")} />
+              <>
+                <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
+                <NameAnalysisPreview profile={profile} language={language} />
+                <TorisetsuPanel profile={profile} language={language} onVip={() => setModal("vip")} />
+              </>
             ) : tab === "consult" ? (
+              <>
+              <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
               <ConsultationPanel
                 profile={profile}
                 language={language}
                 onVip={() => setModal("vip")}
               />
+              </>
             ) : tab === "mandala" ? (
               <NineStarsPanel language={language} onVip={() => setModal("vip")} />
             ) : tab === "settings" ? (

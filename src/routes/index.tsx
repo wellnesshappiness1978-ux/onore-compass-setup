@@ -37,6 +37,7 @@ function Index() {
         <Dashboard
           profile={profile}
           onEdit={() => setProfile(null)}
+          onProfileChange={setProfile}
           language={language}
           onLanguageChange={setLanguage}
         />
