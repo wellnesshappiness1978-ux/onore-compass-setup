@@ -46,12 +46,14 @@ export function NineStarsArtwork({ main, sub, bloodType, birthDate, language }: 
         <radialGradient id="auraA"><stop stopColor={main} stopOpacity=".9"/><stop offset="1" stopColor={main} stopOpacity="0"/></radialGradient>
         <radialGradient id="auraB"><stop stopColor={sub} stopOpacity=".8"/><stop offset="1" stopColor={sub} stopOpacity="0"/></radialGradient>
         <linearGradient id="veins" x1="0" y1="0" x2="1" y2="1"><stop stopColor={main}/><stop offset=".35" stopColor="var(--gold-glow)"/><stop offset=".7" stopColor={sub}/><stop offset="1" stopColor="var(--primary)"/></linearGradient>
+        <linearGradient id="spectrum" x1="0" y1="0" x2="1" y2="1"><stop stopColor="var(--art-emerald)"/><stop offset=".48" stopColor="var(--art-rose)"/><stop offset="1" stopColor="var(--art-coral)"/></linearGradient>
         <filter id="soft"><feGaussianBlur stdDeviation="24"/></filter>
         <filter id="light"><feGaussianBlur stdDeviation="3"/></filter>
       </defs>
       <rect width="800" height="800" fill="url(#sky)" />
       <circle cx="265" cy="255" r="290" fill="url(#auraA)" opacity=".38" filter="url(#soft)" />
       <circle cx="550" cy="536" r="280" fill="url(#auraB)" opacity=".45" filter="url(#soft)" />
+      <path d="M140 475 Q260 600 402 525 T660 367 M160 260 Q330 164 435 245 T640 310" fill="none" stroke="url(#spectrum)" strokeWidth="16" opacity=".22" filter="url(#soft)"/>
       <g fill="var(--gold-glow)">{stars.map((star, i) => <circle key={i} cx={star.x} cy={star.y} r={star.size} opacity={i % 5 === 0 ? .72 : .28}/>)}</g>
       <g fill="none" stroke="url(#veins)" strokeWidth="1">
         <circle cx="400" cy="400" r="366" opacity=".46"/><circle cx="400" cy="400" r="356" opacity=".18"/>
@@ -67,6 +69,7 @@ export function NineStarsArtwork({ main, sub, bloodType, birthDate, language }: 
       </g>
       <path d={`M 106 ${352 - motif * 3} Q 260 ${295 + motif * 12} 400 355 T 694 ${355 + motif * 5} M 106 ${460 + motif * 3} Q 300 ${545 - motif * 11} 400 470 T 694 ${435 - motif * 3}`} fill="none" stroke={sub} strokeWidth="2" opacity=".42" filter="url(#light)"/>
       <g transform="translate(400 400) rotate(45)" fill="none" stroke="url(#veins)" opacity=".73"><rect x="-177" y="-177" width="354" height="354" strokeWidth="1.5"/><rect x="-186" y="-186" width="372" height="372" opacity=".3"/></g>
+      <g fill="none" stroke="url(#spectrum)" opacity=".5"><path d="M220 220 L400 138 L580 220 M220 580 L400 662 L580 580"/><circle cx="400" cy="138" r="3"/><circle cx="400" cy="662" r="3"/></g>
       <g transform="translate(220 220)">
         <rect width="360" height="360" fill="var(--art-void)" fillOpacity=".76" stroke="url(#veins)" strokeWidth="2"/>
         <path d="M120 0V360 M240 0V360 M0 120H360 M0 240H360" stroke="url(#veins)" opacity=".8"/>
