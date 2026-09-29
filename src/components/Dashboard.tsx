@@ -25,6 +25,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import ConsultationPanel from "@/components/ConsultationPanel";
 import NineStarsPanel from "@/components/NineStarsPanel";
 import SettingsPanel from "@/components/SettingsPanel";
+import { canPreviewDesign, type DesignMode, type Plan } from "@/lib/design-modes";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -547,6 +548,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const t = dashboardTranslations[language];
   const base = translations[language];
   const [tab, setTab] = useState<Tab>("home");
+  const [previewPlan, setPreviewPlan] = useState<Plan>("free");
+  const [designMode, setDesignMode] = useState<DesignMode>("classic");
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
     { id: "home", label: t.home, icon: Home },
@@ -562,7 +565,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   ];
 
   return (
-    <div className="celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
+    <div data-design={designMode} className="design-canvas celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <header className="relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
@@ -718,6 +721,13 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               <SettingsPanel
                 profile={profile}
                 language={language}
+                plan={previewPlan}
+                onPlanChange={(next) => {
+                  setPreviewPlan(next);
+                  if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
+                }}
+                designMode={designMode}
+                onDesignModeChange={setDesignMode}
                 onLanguageChange={onLanguageChange}
                 onEdit={onEdit}
                 onVip={() => setModal("vip")}

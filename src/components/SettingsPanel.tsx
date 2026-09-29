@@ -27,15 +27,19 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
 import { settingsTranslations, type SettingsTranslation } from "@/lib/settings-translations";
+import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
 import type { UserProfile } from "./Onboarding";
 
-type Plan = "free" | "standard" | "vip" | "b2b";
 type Props = {
   profile: UserProfile;
   language: Language;
   onLanguageChange: (language: Language) => void;
   onEdit: () => void;
   onVip: () => void;
+  plan: Plan;
+  onPlanChange: (plan: Plan) => void;
+  designMode: DesignMode;
+  onDesignModeChange: (mode: DesignMode) => void;
 };
 
 const SAMPLE_TEAM = ["M. Sato", "K. Tanaka", "Y. Suzuki", "R. Ito"];
@@ -306,9 +310,13 @@ export default function SettingsPanel({
   onLanguageChange,
   onEdit,
   onVip,
+  plan,
+  onPlanChange,
+  designMode,
+  onDesignModeChange,
 }: Props) {
   const t = settingsTranslations[language];
-  const [plan, setPlan] = useState<Plan>("free");
+  const dc = designCopy[language];
   const [bioPlan, setBioPlan] = useState<Plan>("free");
   const [yearly, setYearly] = useState(false);
   const [openTier, setOpenTier] = useState<string | null>("vip");
@@ -372,7 +380,7 @@ export default function SettingsPanel({
                 aria-checked={plan === p}
                 variant="outline"
                 size="sm"
-                onClick={() => setPlan(p)}
+                 onClick={() => onPlanChange(p)}
                 className={`text-[10px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
               >
                 {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : "B2B"}
@@ -380,6 +388,50 @@ export default function SettingsPanel({
             ))}
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">{t.planTestNote}</p>
+        </div>
+      </section>
+
+      <section className="border-y border-primary/20 py-6" aria-labelledby="design-heading">
+        <div className="flex items-center gap-2">
+          <Sparkles className="size-5 text-primary" aria-hidden="true" />
+          <h3 id="design-heading" className="font-serif text-xl text-primary">{dc.title}</h3>
+        </div>
+        <p className="mt-2 text-xs leading-5 text-muted-foreground">{dc.note}</p>
+        <div className="mt-5 space-y-5">
+          {(["free", "standard", "vip", "b2b"] as Plan[]).map((tier, index) => (
+            <div key={tier}>
+              <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="h-px w-5 bg-primary/40" />{dc.groups[index]}
+              </div>
+              <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-2">
+                {designModes.filter((mode) => mode.tier === tier).map((mode) => {
+                  const available = canPreviewDesign(plan, mode.id);
+                  const selected = designMode === mode.id;
+                  return (
+                    <Button
+                      key={mode.id}
+                      type="button"
+                      variant="outline"
+                      aria-pressed={selected}
+                      disabled={!available}
+                      title={!available ? `${dc.requires}: ${dc.groups[index]}` : dc.names[mode.id]}
+                      onClick={() => onDesignModeChange(mode.id)}
+                      className={`design-choice design-choice--${mode.id} h-auto min-h-24 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left disabled:opacity-65 ${selected ? "ring-2 ring-primary" : ""}`}
+                    >
+                      <span className="design-choice-scene relative flex h-12 w-full items-center justify-center text-xl" aria-hidden="true">
+                        <span>{mode.icon}</span>
+                        {!available && <LockKeyhole className="absolute right-3 top-3 size-3.5" />}
+                      </span>
+                      <span className="flex w-full items-center justify-between gap-2 px-3 py-2 text-xs text-foreground">
+                        <span className="min-w-0 whitespace-normal leading-4">{dc.names[mode.id]}</span>
+                        {selected && <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} />}
+                      </span>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
