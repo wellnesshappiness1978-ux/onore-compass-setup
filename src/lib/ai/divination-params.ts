@@ -1,5 +1,6 @@
 // Deterministic pre-calculated parameters injected into the AI consultation prompt.
 // Only values that can be derived exactly from the profile are computed here.
+import { getBirthColorPair, reduceNumerology } from "@/lib/birth-colors";
 
 type Input = {
   birthDate: string;
@@ -10,11 +11,7 @@ type Input = {
   nameKanji: string;
 };
 
-const MASTER = new Set([11, 22, 33]);
-function reduce(n: number): number {
-  while (n > 9 && !MASTER.has(n)) n = String(n).split("").reduce((a, d) => a + Number(d), 0);
-  return n;
-}
+const reduce = reduceNumerology;
 const digitSum = (s: string) => s.replace(/\D/g, "").split("").reduce((a, d) => a + Number(d), 0);
 const letterValue = (c: string) => ((c.charCodeAt(0) - 65) % 9) + 1;
 
@@ -23,13 +20,6 @@ const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申",
 const STEM_ELEMENT = ["木(陽)", "木(陰)", "火(陽)", "火(陰)", "土(陽)", "土(陰)", "金(陽)", "金(陰)", "水(陽)", "水(陰)"];
 const TERMS = ["春分", "清明", "穀雨", "立夏", "小満", "芒種", "夏至", "小暑", "大暑", "立秋", "処暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至", "小寒", "大寒", "立春", "雨水", "啓蟄"];
 const SIGNS = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", "天秤座", "蠍座", "射手座", "山羊座", "水瓶座", "魚座"];
-const COLORS: Record<number, string> = {
-  1: "レッド（開拓・リーダーシップ）", 2: "オレンジ（協調・共感）", 3: "イエロー（表現・創造）",
-  4: "グリーン（安定・構築）", 5: "ターコイズ（自由・変化）", 6: "ピンク（愛・調和）",
-  7: "バイオレット（探究・叡智）", 8: "ゴールド（成果・豊かさ）", 9: "ホワイト（包容・完成）",
-  11: "シルバー（直感・啓示）", 22: "ロイヤルブルー（大志・実現）", 33: "パール（無償の愛・奉仕）",
-};
-
 function sunLongitude(date: Date): number {
   const n = date.getTime() / 86400000 - 10957.5; // days from J2000
   const L = 280.46 + 0.9856474 * n;
@@ -61,7 +51,7 @@ export function computeDivinationParams(p: Input, now = new Date()): string {
     const phase = (((nowSun - natalSun) % 360) + 360) % 360;
     lines.push(
       `[数秘術] ライフパス数 ${lifePath} / バースデー数 ${reduce(d)} / 個人年数(${now.getUTCFullYear()}) ${personalYear} / 個人月数 ${personalMonth}`,
-      `[バースカラー] ${COLORS[lifePath] ?? "—"}（ライフパス数対応）`,
+      `[バースカラー] ${getBirthColorPair(p.birthDate)?.main.label ?? "—"}（ライフパス数対応）`,
       `[四柱推命・動物占い基礎] 日柱 ${STEMS[dayIdx % 10]}${BRANCHES[dayIdx % 12]}（六十干支 ${dayIdx + 1}番）/ 日干の五行 ${STEM_ELEMENT[dayIdx % 10]} / 年柱 ${STEMS[yearIdx % 10]}${BRANCHES[yearIdx % 12]}（立春前生まれは前年干支の可能性あり）。60分類アニマル名は日柱番号に基づく独自解釈として扱う`,
       `[西洋占星術] 太陽星座 ${SIGNS[Math.floor(natalSun / 30) % 12]}（太陽黄経 ${natalSun.toFixed(1)}°）/ 出生の二十四節気 ${TERMS[Math.floor(natalSun / 15)]}${p.birthTimeUnknown || !p.birthTime ? " / 出生時刻不明のためアセンダント・月星座は算出不可" : ""}`,
       `[地球暦] 現在の太陽黄経 ${nowSun.toFixed(1)}°・二十四節気 ${TERMS[Math.floor(nowSun / 15)]} / 本人の太陽回帰からの位相 ${phase.toFixed(0)}°（${phase < 90 ? "始動期" : phase < 180 ? "成長期" : phase < 270 ? "収穫期" : "内省・準備期"}）`,

@@ -718,7 +718,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               />
               </>
             ) : tab === "mandala" ? (
-              <NineStarsPanel language={language} onVip={() => setModal("vip")} />
+              <NineStarsPanel language={language} birthDate={profile.birthDate} onVip={() => setModal("vip")} />
             ) : tab === "settings" ? (
               <SettingsPanel
                 profile={profile}

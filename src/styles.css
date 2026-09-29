@@ -71,6 +71,18 @@
   --gold-deep: #D4AF37;
   --nebula: oklch(0.38 0.1 265);
   --celestial-ink: oklch(0.27 0.05 225);
+  --birth-color-1: oklch(0.7 0.2 25);
+  --birth-color-2: oklch(0.78 0.16 53);
+  --birth-color-3: oklch(0.87 0.16 94);
+  --birth-color-4: oklch(0.72 0.14 148);
+  --birth-color-5: oklch(0.78 0.12 190);
+  --birth-color-6: oklch(0.78 0.13 355);
+  --birth-color-7: oklch(0.7 0.17 303);
+  --birth-color-8: oklch(0.84 0.14 84);
+  --birth-color-9: oklch(0.95 0.015 95);
+  --birth-color-11: oklch(0.82 0.02 255);
+  --birth-color-22: oklch(0.68 0.15 254);
+  --birth-color-33: oklch(0.91 0.045 15);
 }
 
 .dark {

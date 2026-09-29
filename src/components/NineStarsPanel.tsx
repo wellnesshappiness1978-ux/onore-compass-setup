@@ -1,5 +1,6 @@
 import { Crown, Download, LockKeyhole, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getBirthColorPair } from "@/lib/birth-colors";
 import { nineStarsTranslations } from "@/lib/nine-stars-translations";
 import type { Language } from "@/lib/translations";
 
@@ -8,16 +9,19 @@ const stars = Array.from({ length: 9 }, (_, i) => {
   return { x: 400 + Math.cos(angle) * 248, y: 400 + Math.sin(angle) * 248, number: i + 1 };
 });
 
-function NineStarsArt() {
+function NineStarsArt({ main, sub }: { main: string; sub: string }) {
   return (
     <svg viewBox="0 0 800 800" className="h-full w-full" role="img" aria-label="Nine stars decorative celestial wheel">
       <defs>
-        <radialGradient id="nineSky"><stop stopColor="var(--celestial-ink)" /><stop offset="1" stopColor="var(--background)" /></radialGradient>
-        <radialGradient id="nineCore"><stop stopColor="var(--gold-glow)" /><stop offset="0.3" stopColor="var(--primary)" /><stop offset="1" stopColor="var(--background)" /></radialGradient>
+        <radialGradient id="nineSky"><stop stopColor={main} /><stop offset="0.45" stopColor={sub} /><stop offset="1" stopColor="var(--background)" /></radialGradient>
+        <radialGradient id="nineCore"><stop stopColor="var(--gold-glow)" /><stop offset="0.3" stopColor={main} /><stop offset="0.7" stopColor={sub} /><stop offset="1" stopColor="var(--background)" /></radialGradient>
+        <linearGradient id="nineOrbit" x2="1" y2="1"><stop stopColor={main} /><stop offset=".5" stopColor="var(--gold-glow)" /><stop offset="1" stopColor={sub} /></linearGradient>
         <filter id="nineGlow"><feGaussianBlur stdDeviation="8" /></filter>
       </defs>
       <rect width="800" height="800" fill="url(#nineSky)" />
-      <g fill="none" stroke="var(--primary)">
+      <circle cx="270" cy="250" r="260" fill={main} opacity=".14" filter="url(#nineGlow)" />
+      <circle cx="550" cy="540" r="260" fill={sub} opacity=".18" filter="url(#nineGlow)" />
+      <g fill="none" stroke="url(#nineOrbit)">
         <circle cx="400" cy="400" r="355" opacity=".25" strokeWidth="1" />
         <circle cx="400" cy="400" r="337" opacity=".65" strokeWidth="1" />
         <circle cx="400" cy="400" r="304" opacity=".3" strokeDasharray="2 9" />
@@ -29,7 +33,7 @@ function NineStarsArt() {
         <path d={stars.filter((_, i) => i % 2 === 0).map((s, i) => `${i ? "L" : "M"}${s.x.toFixed(2)} ${s.y.toFixed(2)}`).join(" ") + "Z"} opacity=".2" />
         {stars.map((s) => <line key={s.number} x1="400" y1="400" x2={s.x} y2={s.y} opacity=".15" />)}
       </g>
-      <g fill="var(--gold-glow)">
+      <g fill={sub}>
         {Array.from({ length: 72 }, (_, i) => {
           const a = i * Math.PI / 36;
           const r = i % 3 === 0 ? 371 : 366;
@@ -38,24 +42,26 @@ function NineStarsArt() {
         <circle cx="400" cy="400" r="66" fill="url(#nineCore)" opacity=".45" filter="url(#nineGlow)" />
       </g>
       {stars.map((s) => <g key={s.number}>
-        <circle cx={s.x} cy={s.y} r="24" fill="var(--background)" stroke="var(--primary)" strokeOpacity=".7" />
-        <circle cx={s.x} cy={s.y} r="29" fill="none" stroke="var(--primary)" strokeOpacity=".18" />
-        <text x={s.x} y={s.y + 6} textAnchor="middle" fill="var(--gold-glow)" fontSize="16" fontFamily="serif">{s.number}</text>
+        <circle cx={s.x} cy={s.y} r="24" fill="var(--background)" stroke={s.number % 2 ? main : sub} strokeOpacity=".8" />
+        <circle cx={s.x} cy={s.y} r="29" fill="none" stroke={s.number % 2 ? main : sub} strokeOpacity=".35" />
+        <text x={s.x} y={s.y + 6} textAnchor="middle" fill={s.number % 2 ? main : sub} fontSize="16" fontFamily="serif">{s.number}</text>
       </g>)}
       <text x="400" y="414" textAnchor="middle" fill="var(--gold-glow)" fontSize="42" fontFamily="serif">✦</text>
     </svg>
   );
 }
 
-export default function NineStarsPanel({ language, onVip }: { language: Language; onVip: () => void }) {
+export default function NineStarsPanel({ language, onVip, birthDate }: { language: Language; onVip: () => void; birthDate: string }) {
   const t = nineStarsTranslations[language];
+  const pair = getBirthColorPair(birthDate);
   return (
     <section className="mx-auto max-w-2xl text-center" aria-labelledby="nine-stars-heading">
       <p className="text-[10px] text-primary/75 tracking-[0.2em]">{t.subtitle}</p>
-      <h3 id="nine-stars-heading" className="mt-3 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h3>
-      <p className="mt-3 text-xs text-muted-foreground">{t.preview}</p>
+      <p className="mt-5 font-serif text-sm text-primary/90">{t.tagline}</p>
+      <h3 id="nine-stars-heading" className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h3>
+      <p className="mt-3 text-xs leading-6 text-muted-foreground">{pair ? t.preview : t.fallback}</p>
       <div className="relative mx-auto mt-8 aspect-square w-full max-w-[560px] overflow-hidden rounded-full border border-primary/30 shadow-gold">
-        <div className="absolute inset-0 blur-[1px]" aria-hidden="true"><NineStarsArt /></div>
+        <div className="absolute inset-0 blur-[1px]" aria-hidden="true"><NineStarsArt main={pair?.main.token ?? "var(--primary)"} sub={pair?.sub.token ?? "var(--gold-glow)"} /></div>
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/30 p-5 backdrop-blur-[2px] sm:p-8">
           <div className="flex size-12 items-center justify-center rounded-full border border-primary/40 bg-background/75 text-primary shadow-gold"><LockKeyhole className="size-5" /></div>
           <p className="mt-4 flex items-center gap-2 font-serif text-lg text-primary"><Sparkles className="size-4" />{t.lock}</p>
