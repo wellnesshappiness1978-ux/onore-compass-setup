@@ -71,6 +71,11 @@
   --gold-deep: #D4AF37;
   --nebula: oklch(0.38 0.1 265);
   --celestial-ink: oklch(0.27 0.05 225);
+  --art-void: oklch(0.105 0.035 255);
+  --art-midnight: oklch(0.22 0.065 230);
+  --art-emerald: oklch(0.73 0.14 168);
+  --art-rose: oklch(0.83 0.095 11);
+  --art-coral: oklch(0.8 0.14 44);
   --birth-color-1: oklch(0.7 0.2 25);
   --birth-color-2: oklch(0.78 0.16 53);
   --birth-color-3: oklch(0.87 0.16 94);

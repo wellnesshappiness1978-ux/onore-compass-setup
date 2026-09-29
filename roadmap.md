@@ -7,7 +7,7 @@
 - [x] Extend the compatibility form with name, birth time/place, and relationship category; verify score, core dynamic, and advice on CTA click.
 - [ ] Build the AI Onore consultation screen with quick questions, live streaming chat, free-use counter, and VIP preview.
 - [ ] Verify consultation responses, error states, and mobile/desktop layouts.
-- [x] Add the Step 5 natal nine-stars art preview with a VIP lock and wallpaper action reserved for verified paid members.
+- [x] Add the Step 5 nine-stars art preview with a VIP lock; labelled illustrative wallpaper can be saved in test-unlocked mode, not as a verified paid chart.
 - [x] Verify the locked art and CTA on mobile and desktop.
 - [x] Step 6: My Page, VIP comparison, B2B team mode preview, and app settings.
 - [x] Replace the Free/VIP table with the 4-tier pricing (無料 / スタンダード ¥333・¥3,333 / VIP ¥777・¥7,777 人気No.1 / 法人 ¥3,580) using expandable cards and a monthly-yearly toggle in all 7 languages; verified mobile and desktop.
@@ -27,3 +27,4 @@
 - [x] Rename three app designs, add seven-language nine-stars copy, and tint the locked illustrative wheel with two birth-date colors.
 - [x] Plan member limits (0/2/5/30/100), Business Premium ¥8,888, team studio (diagnosis, AI draft, catalog, calendar, balance, 1on1)
 - [ ] Signed-in team save test — blocked until first Google sign-in
+- [x] Add ornate nine-stars reference grid, date/color motifs, and labelled preview PNG export/device image sharing without claiming a verified natal chart or paid membership.
