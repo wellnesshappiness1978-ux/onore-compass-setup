@@ -12,7 +12,7 @@ export const zodiacNames = ["牡羊座", "牡牛座", "双子座", "蟹座", "�
 const zodiacStarts = [120, 219, 321, 420, 521, 622, 723, 823, 923, 1024, 1123, 1222];
 const zodiacFor = (month: number, day: number) => {
   const value = month * 100 + day;
-  return value < 120 ? 9 : zodiacStarts.reduce((idx, start, i) => value >= start ? (i + 10) % 12 : idx, 9);
+  return value < 120 ? 9 : zodiacStarts.reduce((idx, start, i) => value >= start ? (i + 9) % 12 : idx, 9);
 };
 export const animalNames = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
 
