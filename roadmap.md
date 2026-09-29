@@ -29,4 +29,4 @@
 - [ ] Signed-in team save test — blocked until first Google sign-in
 - [x] Add ornate nine-stars reference grid, date/color motifs, and labelled preview PNG export/device image sharing without claiming a verified natal chart or paid membership.
 - [x] Remove Japanese-locale English leakage from Business Premium, team talent cards, plan controls, and team AI responses.
-- [ ] Verify AI team selection and 1on1 guide responses with 3–5 members.
+- [x] Verify AI team selection and 1on1 guide responses in Japanese with a three-member test roster.

@@ -610,7 +610,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
           <div className="design-heading mt-2 text-center">
             <p className="design-wordmark text-[9px] uppercase text-primary/70">ONORE COMPASS</p>
             <h1 className="design-title font-serif text-2xl font-bold text-gradient-gold sm:text-3xl">
-              Self Compass
+              {language === "ja" ? "自分を知るコンパス" : "Self Compass"}
             </h1>
             <p className="design-mode-caption mt-1 text-[10px] text-muted-foreground">{designCopy[language].names[designMode]} · {designCopy[language].note}</p>
           </div>
@@ -643,7 +643,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70">
-                      EARTH CALENDAR
+                      {language === "ja" ? "地球暦" : "EARTH CALENDAR"}
                     </p>
                     <h3 className="mt-1 font-serif text-lg text-foreground">{t.biorhythm}</h3>
                     <p className="mt-1 text-xs text-muted-foreground">{t.rhythmSubtitle}</p>
