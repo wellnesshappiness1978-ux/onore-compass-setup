@@ -398,7 +398,7 @@ export default function SettingsPanel({
                  onClick={() => onPlanChange(p)}
                 className={`text-[10px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
               >
-                {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : "B2B"}
+                {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : p === "b2b" ? "B2B" : "B2B Premium"}
               </Button>
             ))}
           </div>
