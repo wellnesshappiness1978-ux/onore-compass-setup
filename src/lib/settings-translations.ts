@@ -49,6 +49,16 @@ export type SettingsTranslation = {
   bioPrep: string;
   bioDecision: string;
   bioToday: string;
+  bioEnterpriseTab: string;
+  bioWeek: string;
+  bioFuture: string;
+  bioMonthTitle: string;
+  bioQuarterTitle: string;
+  bioAnnualTitle: string;
+  bioAdjust: string;
+  bioLucky: string;
+  bioRefresh: string;
+  bioAiDay: string;
   bioIndicators: string[];
   bioSample: string;
   b2bTitle: string;
@@ -160,23 +170,33 @@ const ja: SettingsTranslation = {
     },
   ],
   bioTitle: "地球暦バイオリズム",
-  bioIntro: "プランによって閲覧できる期間が変わります。下の表示テストで各プランの見え方を確認できます。",
+  bioIntro: "4つのプランの表示例を切り替えて比較できます。",
   bioRanges: [
-    { tier: "free", range: "ぼかし", scope: "ぼかし・モザイク表示（金のロック付き）" },
+    { tier: "free", range: "モザイク", scope: "今週のみ表示・未来はロック" },
     { tier: "standard", range: "1ヶ月", scope: "今月のバイオリズムと日常の決断タイミング" },
     {
       tier: "vip",
       range: "3ヶ月",
       scope: "四半期の運気波形・勝負時期・準備期・AI相談室無制限連携",
     },
-    { tier: "b2b", range: "年間計画", scope: "1年を通した年間バイオリズムロードマップ" },
+    { tier: "b2b", range: "1年全表示", scope: "1年を通した年間バイオリズムロードマップ" },
   ],
-  bioLock: "🔒 会員登録でバイオリズムを解放",
+  bioLock: "🔒 会員登録で未来のバイオリズムを解放",
   bioUnlockCta: "会員プランを見る",
   bioPeak: "勝負時期",
   bioPrep: "準備期",
   bioDecision: "決断タイミング",
   bioToday: "今日",
+  bioEnterpriseTab: "法人BtoB",
+  bioWeek: "今週の流れ",
+  bioFuture: "未来の流れ",
+  bioMonthTitle: "30日間のデイリーフロー",
+  bioQuarterTitle: "90日間の戦略ロードマップ",
+  bioAnnualTitle: "12ヶ月の年間計画",
+  bioAdjust: "調整日",
+  bioLucky: "決断吉日",
+  bioRefresh: "リフレッシュ期",
+  bioAiDay: "AI相談推奨日",
   bioIndicators: [
     "🚀 商品開発・新事業の最適なローンチ時期",
     "🧘 チームのリフレッシュ・休暇推奨期",
@@ -313,6 +333,16 @@ const en: SettingsTranslation = {
   bioPrep: "Prep period",
   bioDecision: "Decision timing",
   bioToday: "Today",
+  bioEnterpriseTab: "Enterprise B2B",
+  bioWeek: "This week",
+  bioFuture: "Future flow",
+  bioMonthTitle: "30-day daily flow",
+  bioQuarterTitle: "90-day strategic roadmap",
+  bioAnnualTitle: "12-month annual plan",
+  bioAdjust: "Adjust",
+  bioLucky: "Decision day",
+  bioRefresh: "Refresh period",
+  bioAiDay: "AI consultation day",
   bioIndicators: [
     "🚀 Best launch window for products & new ventures",
     "🧘 Team refresh & recommended vacation period",
@@ -444,6 +474,16 @@ const zhCN: SettingsTranslation = {
   bioPrep: "准备期",
   bioDecision: "决策时机",
   bioToday: "今天",
+  bioEnterpriseTab: "企业B2B",
+  bioWeek: "本周节律",
+  bioFuture: "未来节律",
+  bioMonthTitle: "30天日常节律",
+  bioQuarterTitle: "90天战略路线图",
+  bioAnnualTitle: "12个月年度计划",
+  bioAdjust: "调整日",
+  bioLucky: "决策吉日",
+  bioRefresh: "休整期",
+  bioAiDay: "AI咨询推荐日",
   bioIndicators: [
     "🚀 产品开发·新事业的最佳发布期",
     "🧘 团队休整·推荐休假时期",
@@ -571,6 +611,16 @@ const zhTW: SettingsTranslation = {
   bioPrep: "準備期",
   bioDecision: "決策時機",
   bioToday: "今天",
+  bioEnterpriseTab: "企業B2B",
+  bioWeek: "本週節律",
+  bioFuture: "未來節律",
+  bioMonthTitle: "30天日常節律",
+  bioQuarterTitle: "90天策略路線圖",
+  bioAnnualTitle: "12個月年度計劃",
+  bioAdjust: "調整日",
+  bioLucky: "決策吉日",
+  bioRefresh: "休整期",
+  bioAiDay: "AI諮詢推薦日",
   bioIndicators: [
     "🚀 產品開發·新事業的最佳發佈期",
     "🧘 團隊休整·推薦休假時期",
@@ -707,6 +757,16 @@ const ko: SettingsTranslation = {
   bioPrep: "준비기",
   bioDecision: "결정 타이밍",
   bioToday: "오늘",
+  bioEnterpriseTab: "법인B2B",
+  bioWeek: "이번 주 흐름",
+  bioFuture: "미래 흐름",
+  bioMonthTitle: "30일 데일리 흐름",
+  bioQuarterTitle: "90일 전략 로드맵",
+  bioAnnualTitle: "12개월 연간 계획",
+  bioAdjust: "조정일",
+  bioLucky: "결정 길일",
+  bioRefresh: "재충전기",
+  bioAiDay: "AI 상담 추천일",
   bioIndicators: [
     "🚀 상품 개발·신사업 최적 론치 시기",
     "🧘 팀 리프레시·휴가 추천 시기",
@@ -843,6 +903,16 @@ const es: SettingsTranslation = {
   bioPrep: "Periodo de preparación",
   bioDecision: "Momento de decisión",
   bioToday: "Hoy",
+  bioEnterpriseTab: "Empresa B2B",
+  bioWeek: "Esta semana",
+  bioFuture: "Flujo futuro",
+  bioMonthTitle: "Flujo diario de 30 días",
+  bioQuarterTitle: "Hoja de ruta estratégica de 90 días",
+  bioAnnualTitle: "Plan anual de 12 meses",
+  bioAdjust: "Ajuste",
+  bioLucky: "Día de decisión",
+  bioRefresh: "Periodo de descanso",
+  bioAiDay: "Día de consulta IA",
   bioIndicators: [
     "🚀 Mejor momento para lanzar productos y nuevos proyectos",
     "🧘 Descanso del equipo y vacaciones recomendadas",
@@ -980,6 +1050,16 @@ const fr: SettingsTranslation = {
   bioPrep: "Période de préparation",
   bioDecision: "Moment de décision",
   bioToday: "Aujourd'hui",
+  bioEnterpriseTab: "Entreprise B2B",
+  bioWeek: "Cette semaine",
+  bioFuture: "Flux futur",
+  bioMonthTitle: "Flux quotidien sur 30 jours",
+  bioQuarterTitle: "Feuille de route stratégique sur 90 jours",
+  bioAnnualTitle: "Plan annuel sur 12 mois",
+  bioAdjust: "Ajustement",
+  bioLucky: "Jour de décision",
+  bioRefresh: "Période de repos",
+  bioAiDay: "Jour de consultation IA",
   bioIndicators: [
     "🚀 Meilleure période pour lancer produits et nouveaux projets",
     "🧘 Ressourcement de l'équipe et congés recommandés",
