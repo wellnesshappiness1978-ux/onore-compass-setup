@@ -15,3 +15,4 @@
 - [x] Update the corporate displayed price to ¥3,580 and show an illustrative person portrait from profile fields prominently on Home and 15占術.
 - [x] Add seven session-only app design previews with plan-display-test selection limits and clear labeling; no paid access is claimed.
 - [x] Differentiate all seven designs by typography, background, compass, panel, and navigation treatments with increasing visual richness by plan tier.
+- [ ] Confirm this project's Lovable Cloud connection and whether any additional setup is needed.
