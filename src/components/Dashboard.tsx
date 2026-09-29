@@ -679,7 +679,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                     <Compass className="size-5" strokeWidth={1.2} />
                   </div>
                   <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-primary/70">
-                    DECISION COMPASS
+                  {language === "ja" ? "決断コンパス" : "DECISION COMPASS"}
                   </p>
                   <h3 className="mt-1 font-serif text-xl text-foreground">{t.decision}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{t.decisionSubtitle}</p>
@@ -749,7 +749,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
       <nav
         className="design-navigation fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"
-        aria-label="Main navigation"
+        aria-label={language === "ja" ? "メインナビゲーション" : "Main navigation"}
       >
         <div className="grid grid-cols-5">
           {navigation.map((item) => (

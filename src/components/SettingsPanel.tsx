@@ -455,7 +455,7 @@ export default function SettingsPanel({
             <Orbit className="size-5" strokeWidth={1.4} />
           </span>
           <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70">EARTH CALENDAR</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70">{language === "ja" ? "地球暦" : "EARTH CALENDAR"}</p>
             <h3 className="font-serif text-lg text-primary">{t.bioTitle}</h3>
           </div>
         </div>
