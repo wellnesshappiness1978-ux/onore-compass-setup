@@ -1,7 +1,7 @@
 import type { Language } from "./translations";
 
 export type PricingTier = {
-  id: "free" | "standard" | "vip" | "b2b";
+  id: "free" | "standard" | "vip" | "b2b" | "b2b-premium";
   name: string;
   badge?: string;
   priceMonthly: string;
