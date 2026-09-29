@@ -42,6 +42,7 @@ type Props = {
   onProfileChange: (profile: UserProfile) => Promise<void>;
   language: Language;
   onLanguageChange: (language: Language) => void;
+  signedIn?: boolean;
 };
 type Tab = "home" | "arts" | "consult" | "mandala" | "settings";
 
@@ -545,11 +546,13 @@ function TorisetsuPanel({
   );
 }
 
-export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange }: Props) {
+export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
   const t = dashboardTranslations[language];
   const base = translations[language];
   const [tab, setTab] = useState<Tab>("home");
-  const [previewPlan, setPreviewPlan] = useState<Plan>("free");
+  // Dev test only: signed-in users preview as Business. Not real billing/entitlement.
+  const [previewPlan, setPreviewPlan] = useState<Plan>(signedIn ? "b2b" : "free");
+  useEffect(() => { if (signedIn) setPreviewPlan("b2b"); }, [signedIn]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
@@ -718,7 +721,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               />
               </>
             ) : tab === "mandala" ? (
-              <NineStarsPanel language={language} birthDate={profile.birthDate} onVip={() => setModal("vip")} />
+              <NineStarsPanel language={language} birthDate={profile.birthDate} onVip={() => setModal("vip")} testUnlocked={previewPlan === "vip" || previewPlan === "b2b"} />
             ) : tab === "settings" ? (
               <SettingsPanel
                 profile={profile}
