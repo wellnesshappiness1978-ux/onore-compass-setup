@@ -24,6 +24,7 @@ import {
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
 import { settingsTranslations, type SettingsTranslation } from "@/lib/settings-translations";
@@ -324,6 +325,7 @@ export default function SettingsPanel({
   const [notifyTiming, setNotifyTiming] = useState(true);
   const [notifyBio, setNotifyBio] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [lockedMode, setLockedMode] = useState<DesignMode | null>(null);
 
   const planLabel =
     plan === "vip"
@@ -413,10 +415,9 @@ export default function SettingsPanel({
                       type="button"
                       variant="outline"
                       aria-pressed={selected}
-                      disabled={!available}
-                      title={!available ? `${dc.requires}: ${dc.groups[index]}` : dc.names[mode.id]}
-                      onClick={() => onDesignModeChange(mode.id)}
-                      className={`design-choice design-choice--${mode.id} h-auto min-h-28 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left disabled:opacity-65 ${selected ? "ring-2 ring-primary" : ""}`}
+                       title={!available ? `${dc.requires}: ${dc.groups[index]}` : dc.names[mode.id]}
+                       onClick={() => available ? onDesignModeChange(mode.id) : setLockedMode(mode.id)}
+                       className={`design-choice design-choice--${mode.id} h-auto min-h-28 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left ${selected ? "ring-2 ring-primary" : ""}`}
                     >
                       <span className="design-choice-scene relative flex h-12 w-full items-center justify-center text-xl" aria-hidden="true">
                         <span>{mode.icon}</span>
@@ -486,7 +487,7 @@ export default function SettingsPanel({
         <p className="mt-3 text-[11px] text-muted-foreground">{t.bioSample}</p>
       </section>
 
-      <section className={card}>
+      <section id="membership-plans" className={card}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h3 className="font-serif text-lg text-primary">{t.plansHeading}</h3>
           <div
@@ -764,6 +765,19 @@ export default function SettingsPanel({
           </p>
         )}
       </section>
+      <Dialog open={lockedMode !== null} onOpenChange={(open) => { if (!open) setLockedMode(null); }}>
+        <DialogContent className="max-w-sm border-primary/30 bg-card text-foreground">
+          <DialogTitle className="font-serif text-xl text-primary">{dc.title}</DialogTitle>
+          <DialogDescription className="text-sm leading-6 text-muted-foreground">
+            {lockedMode && dc.locked(dc.planNames[["standard", "vip", "b2b"].indexOf(designModes.find((mode) => mode.id === lockedMode)?.tier ?? "standard")] ?? dc.planNames[0] ?? "")}
+          </DialogDescription>
+          <p className="text-xs text-muted-foreground">{dc.note}</p>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setLockedMode(null)}>{dc.later}</Button>
+            <Button onClick={() => { setLockedMode(null); document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{dc.upgrade}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
