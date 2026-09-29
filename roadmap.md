@@ -21,3 +21,5 @@
 - [x] Add plan-tier background scenes and an upgrade dialog for locked design choices; keep all access as a clearly labeled local preview.
 - [x] Add profile-reactive self-core preview beside personal reading at the top of Home.
 - [x] Rename the Home diagnosis card to 個別診断 and replace advice/caution content with innate-nature, charm, and hidden-potential copy (7 languages).
+
+- [x] Combine Home traits and diagnosis into one card with six AI-generated reflection fields, mobile layout, and clear illustrative labeling.
