@@ -51,7 +51,7 @@ export function computeDivinationParams(p: Input, now = new Date()): string {
   if (m) {
     const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
     const birth = new Date(Date.UTC(y, mo - 1, d, 3)); // ~noon JST
-    const lifePath = reduce(reduce(digitSum(m[1])) + reduce(mo) + reduce(d));
+    const lifePath = reduce(reduce(digitSum(m[1] ?? "")) + reduce(mo) + reduce(d));
     const personalYear = reduce(digitSum(`${mo}${d}${now.getUTCFullYear()}`));
     const personalMonth = reduce(personalYear + now.getUTCMonth() + 1);
     const dayIdx = (((Math.floor((Date.UTC(y, mo - 1, d) - Date.UTC(1900, 0, 1)) / 86400000) + 10) % 60) + 60) % 60;
