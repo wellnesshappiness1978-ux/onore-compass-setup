@@ -1,7 +1,7 @@
 import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
 import PersonPortrait from "./PersonPortrait";
 import SelfCoreCard from "./SelfCoreCard";
-import { useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   Bell,
   CalendarDays,
