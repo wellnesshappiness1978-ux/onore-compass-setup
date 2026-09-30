@@ -5,7 +5,7 @@ import {
   Check,
   Crown,
   Globe2,
-  HelpCircle,
+  Gem,
   Lock,
   LockKeyhole,
   Orbit,
