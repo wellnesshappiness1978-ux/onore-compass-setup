@@ -809,7 +809,7 @@ export default function SettingsPanel({
           ))}
           <p className="text-[11px] text-muted-foreground">{t.notifyNote}</p>
         </div>
-        <DailyReminderPanel language={language} />
+        <DailyReminderPanel language={language} plan={plan} />
 
         <div className="mt-5 divide-y divide-primary/10 border-t border-primary/10">
           {[

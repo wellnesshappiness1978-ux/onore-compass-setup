@@ -444,6 +444,17 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const t = dashboardTranslations[language];
   const base = translations[language];
   const [tab, setTab] = useState<Tab>("home");
+  useEffect(() => {
+    const open = (target: string | null) => {
+      if (target === "compass") { setTab("home"); setTimeout(() => document.getElementById("day-compass")?.scrollIntoView({ behavior: "smooth", block: "start" }), 250); }
+      else if (target === "mandala") { setTab("mandala"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    };
+    const q = new URLSearchParams(window.location.search).get("open");
+    if (q) { open(q); window.history.replaceState(null, "", window.location.pathname); }
+    const onEvt = (e: Event) => open((e as CustomEvent<string>).detail);
+    window.addEventListener("onore-open", onEvt);
+    return () => window.removeEventListener("onore-open", onEvt);
+  }, []);
   const [artsEntry, setArtsEntry] = useState<"manual" | "compatibility">("manual");
   const [teamEntry, setTeamEntry] = useState(false);
   useEffect(() => {
