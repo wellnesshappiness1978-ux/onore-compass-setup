@@ -54,7 +54,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     else persistLocal(members.filter((m) => m.id !== id));
   };
   const feature = tabFeatures[tab]!;
-  const unlocked = hasFeature(plan, feature);
+  const unlocked = hasFeature(actualPlan, feature);
 
   return (
     <section className="rounded-3xl border border-primary/20 bg-card/60 p-4 backdrop-blur-md sm:p-5" aria-label={t.title}>
