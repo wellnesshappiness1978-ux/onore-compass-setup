@@ -15,7 +15,7 @@ import {
 import { addTeamMember, deleteTeamMember, listTeamMembers } from "@/lib/team-members.functions";
 import { draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
 
-type Props = { plan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string; onPlanChange: (p: Plan) => void };
+type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string; onPlanChange: (p: Plan) => void };
 const LOCAL = "onore-team";
 const card = "rounded-2xl border border-primary/15 bg-background/40 p-4";
 const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "draft", "catalog", "calendar", "balance", "oneOnOne"];
@@ -25,7 +25,7 @@ const summary = (m: TeamMember, t: TeamCopy) => ({
   element: dayElement(m.birthDate), lifePath: lifePath(m.birthDate), biorhythm: biorhythm(m.birthDate, todayIso()).total,
 });
 
-export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, onPlanChange }: Props) {
+export default function TeamStudio({ plan, actualPlan, language, signedIn, ownerBirthDate, onPlanChange }: Props) {
   const t = teamCopy[language];
   const [tab, setTab] = useState(0);
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -33,7 +33,7 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
   const list = useServerFn(listTeamMembers);
   const add = useServerFn(addTeamMember);
   const del = useServerFn(deleteTeamMember);
-  const max = memberLimit[plan];
+  const max = memberLimit[actualPlan];
 
   useEffect(() => {
     let active = true;
@@ -60,7 +60,7 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
     <section className="rounded-3xl border border-primary/20 bg-card/60 p-4 backdrop-blur-md sm:p-5" aria-label={t.title}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-serif text-lg text-primary">{t.title}</h3>
-        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[plan]} · {t.limit(members.length, max)}</span>
+        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[actualPlan]} · {t.limit(members.length, max)}</span>
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">{t.note}</p>
       {plan === "b2b-premium" && <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-primary"><Crown className="size-3" />{t.priority}</p>}
@@ -86,9 +86,9 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
-          <Diagnosis t={t} members={members} max={max} />
+          <Diagnosis t={t} members={members} max={Math.max(1, max)} />
         ) : feature === "draft" ? (
-          <Draft t={t} members={members} language={language} max={max} />
+          <Draft t={t} members={members} language={language} max={Math.max(1, max)} />
         ) : feature === "catalog" ? (
           <Catalog t={t} members={members} />
         ) : feature === "calendar" ? (

@@ -2,6 +2,7 @@ import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
 import PersonPortrait from "./PersonPortrait";
 import SelfCoreCard from "./SelfCoreCard";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Bell,
   CalendarDays,
@@ -27,6 +28,7 @@ import ConsultationPanel from "@/components/ConsultationPanel";
 import NineStarsPanel from "@/components/NineStarsPanel";
 import SettingsPanel from "@/components/SettingsPanel";
 import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/design-modes";
+import { getMyMembership } from "@/lib/membership.functions";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -562,9 +564,17 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     });
     return () => cancelAnimationFrame(frame);
   }, [tab, teamEntry]);
-  // Dev test only: signed-in users preview as Business. Not real billing/entitlement.
+  // Development display only; never use previewPlan as a paid entitlement for writes.
   const [previewPlan, setPreviewPlan] = useState<Plan>(signedIn ? "b2b" : "free");
   useEffect(() => { if (signedIn) setPreviewPlan("b2b"); }, [signedIn]);
+  const [actualPlan, setActualPlan] = useState<Plan>("free");
+  const membership = useServerFn(getMyMembership);
+  useEffect(() => {
+    let active = true;
+    setActualPlan("free");
+    if (signedIn) membership().then((plan) => { if (active) setActualPlan(plan); }).catch(() => { if (active) setActualPlan("free"); });
+    return () => { active = false; };
+  }, [signedIn, membership]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
@@ -739,6 +749,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 profile={profile}
                 language={language}
                 plan={previewPlan}
+                actualPlan={actualPlan}
                 onPlanChange={(next) => {
                   setPreviewPlan(next);
                   if (!canPreviewDesign(next, designMode)) setDesignMode("classic");

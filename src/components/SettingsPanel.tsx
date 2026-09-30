@@ -41,6 +41,7 @@ type Props = {
   onEdit: () => void;
   onVip: () => void;
   plan: Plan;
+  actualPlan: Plan;
   onPlanChange: (plan: Plan) => void;
   designMode: DesignMode;
   onDesignModeChange: (mode: DesignMode) => void;
@@ -70,6 +71,7 @@ const card = "rounded-2xl border border-primary/20 bg-card/60 p-5 shadow-2xl bac
 // Deterministic sample waveform for the plan display test — not a real reading.
 function BiorhythmPreview({
   plan,
+  actualPlan,
   profile,
   t,
   language,
@@ -627,7 +629,7 @@ export default function SettingsPanel({
         <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
       </section>
 
-      <div id="team-studio-entry"><TeamStudio plan={plan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} onPlanChange={onPlanChange} /></div>
+      <div id="team-studio-entry"><TeamStudio plan={plan} actualPlan={actualPlan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} onPlanChange={onPlanChange} /></div>
 
       <section className={card}>
         <h3 className="font-serif text-lg text-primary">{t.b2bTitle}</h3>
