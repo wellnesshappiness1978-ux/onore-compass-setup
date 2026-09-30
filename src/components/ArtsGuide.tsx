@@ -46,7 +46,6 @@ function IntroStars() {
       <span className="arts-orb" style={{ top: "-14%", left: "50%", width: 340, height: 340, transform: "translateX(-50%)" }} />
       <span className="arts-orb" style={{ bottom: "-18%", left: "-10%", width: 260, height: 260, animationDelay: "2.5s" }} />
       <span className="arts-orb" style={{ bottom: "-10%", right: "-12%", width: 220, height: 220, animationDelay: "4s" }} />
-etly
     </div>
   );
 }
