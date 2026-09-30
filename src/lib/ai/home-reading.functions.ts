@@ -31,7 +31,8 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     if (!apiKey) throw new Error("AI is unavailable");
     const { profile, language } = data;
     const elements = getFiveElements(profile);
-    const core = coreLayersPrompt(computeCoreLayers(profile));
+    const layers = computeCoreLayers(profile);
+    const core = coreLayersPrompt(layers);
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
       headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
@@ -65,5 +66,5 @@ nameFortune: about 150 Japanese characters. Only if the name grid exists: from ä
 All other fields must weave the name grid (when present) together with the sun sign, year branch, blood type and animal so name and birth date read as one consistent portrait. Return only the structured object.`,
       providerOptions: { openai: { store: false } },
     });
-    return { ...readingSchema.parse(result.output), elements };
+    return { ...readingSchema.parse(result.output), elements, layers };
   });
