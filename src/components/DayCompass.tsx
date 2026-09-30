@@ -165,7 +165,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
   );
 
   return (
-    <div>
+    <div id="day-compass" className="scroll-mt-4">
       <SolfeggioPlayer language={language} compact />
       <div
         ref={wheel}
