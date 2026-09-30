@@ -3,6 +3,7 @@ import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { z } from "zod";
 
 import { computeDivinationParams } from "./divination-params.ts";
+import { computeCoreLayers, coreLayersPrompt } from "./core-layers.ts";
 
 import {
   createLovableAiGatewayRunIdFetch,
@@ -42,7 +43,7 @@ export async function handleConsultation(request: Request) {
   }
 
   const { messages, profile, language } = parsed.data;
-  const params = computeDivinationParams(profile);
+  const params = `${computeDivinationParams(profile)}\n${coreLayersPrompt(computeCoreLayers(profile))}\nUse the 5 core layers and their cross-analysis (表の顔 vs 本音) to make answers specific to this person; say it in plain words, no hedging like "人それぞれ". Animal 表面/希望/隠れ layers are not computed.`;
   const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
   const provider = createOpenAI({
     baseURL: "https://ai.gateway.lovable.dev/v1",

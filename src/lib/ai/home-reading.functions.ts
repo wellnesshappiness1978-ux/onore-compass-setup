@@ -3,6 +3,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { getFiveElements } from "./five-elements";
+import { computeCoreLayers, coreLayersPrompt } from "./core-layers";
 
 const profileSchema = z.object({
   nameKanji: z.string().max(40), nameKana: z.string().max(60), nameRomaji: z.string().max(60),
@@ -30,6 +31,8 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     if (!apiKey) throw new Error("AI is unavailable");
     const { profile, language } = data;
     const elements = getFiveElements(profile);
+    const layers = computeCoreLayers(profile);
+    const core = coreLayersPrompt(layers);
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
       headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
@@ -46,6 +49,11 @@ Yearly zodiac branch: ${elements.eto ?? "uncertain/unknown near year boundary"} 
 Blood type: ${elements.blood ?? "not provided"} (no scientifically established personality inference).
 Animal character: ${elements.animal ?? "unavailable"} (reference 60-day-number mapping, not an official licensed animal-personality diagnosis). Date: ${profile.birthDate}.
 
+FIVE CORE LAYERS (computed by the app; cite exact values, never recalculate, never fill 未算出 values):
+${core}
+CROSS-ANALYSIS (required): In synthesis and strength, contrast the 表の顔 list with the 本音・潜在 list and use the [クロス解析] verdicts (一致 / ギャップ) explicitly: 日干×太陽, 人格×ソウル数, 動物×月星座. Weave in 通変星, 十二運星, 五行の最多/欠如, ライフパス, and 月・水星・金星 where they sharpen the portrait. Never mention 表面・希望・隠れ animal layers as computed. Treat these as traditional divination lenses, not scientific facts.
+BANNED hedges: "〜な面もあります", "人それぞれ", "〜かもしれません", "場合によっては", and any sentence that would fit anyone.
+
 STYLE (strict): Write in direct, declarative voice as a fortune-reading ("総格29が示すのは〜", "〜な人です"). Every sentence must name or rest on a specific computed value above. ABSOLUTELY FORBIDDEN: analogies, metaphors, examples or hypotheticals ("例えば", "〜のように", "仮に", "もし〜なら", "〜といった例", "たとえるなら", "〜かもしれません", "〜でしょう"), scenario sketches, preambles, general explanations of what an astrology system means, placeholder phrasing, and generic praise that fits anyone. Start each field with the conclusion. Short, strong sentences.
 Guardrails: do not invent values; if a lens is unavailable, say in one short sentence which one was not computed and use the rest (never claim all five were combined when not). Do not state facts about their job, relationships, health, or future events; no guaranteed outcomes or verified 15-arts claims. Blood type is described only as a traditional lens (never as science) — phrase its part as "血液型の見立てでは〜". No disclaimers or methodology inside passages; the interface states limits separately.
 
@@ -58,5 +66,5 @@ nameFortune: about 150 Japanese characters. Only if the name grid exists: from �
 All other fields must weave the name grid (when present) together with the sun sign, year branch, blood type and animal so name and birth date read as one consistent portrait. Return only the structured object.`,
       providerOptions: { openai: { store: false } },
     });
-    return { ...readingSchema.parse(result.output), elements };
+    return { ...readingSchema.parse(result.output), elements, layers };
   });
