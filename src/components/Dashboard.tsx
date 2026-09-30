@@ -1,3 +1,4 @@
+import { ArtsGuide } from "./ArtsGuide";
 import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
 import PersonPortrait from "./PersonPortrait";
 import SelfCoreCard from "./SelfCoreCard";
