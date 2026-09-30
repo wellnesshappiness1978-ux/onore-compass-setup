@@ -6,6 +6,7 @@ import {
   Crown,
   Globe2,
   Gem,
+  HelpCircle,
   Lock,
   LockKeyhole,
   Orbit,
