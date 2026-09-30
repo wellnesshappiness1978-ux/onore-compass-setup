@@ -116,7 +116,8 @@ const ja: SettingsTranslation = {
       priceMonthly: "¥0",
       priceYearly: "¥0",
       features: [
-        "単発基本診断",
+        "関係者の登録 0人（本人専用）",
+        "5大要素の個別診断をフル体験",
         "基本カラー2色",
         "曼陀羅プレビュー（モザイク表示）",
         "地球暦バイオリズムはぼかし・モザイク表示",
@@ -130,6 +131,7 @@ const ja: SettingsTranslation = {
       priceMonthly: "¥333",
       priceYearly: "¥3,333",
       features: [
+        "関係者を最大2人登録",
         "相性診断無制限",
         "15占術×動物占い 統合詳細トリセツ完全解放",
         "全6ジャンルバースカラー解放",
@@ -144,11 +146,12 @@ const ja: SettingsTranslation = {
       priceYearly: "¥7,777",
       priceNote: "初回7日間無料体験付き",
       features: [
-        "高画質バースカラー曼陀羅アート完全解放・壁紙保存",
-        "生誕九星配置アート全解放",
+        "関係者を最大5人登録",
+        "バースカラー曼陀羅アートの高画質表示・壁紙保存・共有",
+        "生誕九星配置アート（現在は参考図）",
         "AI「オノレ相談室」相談無制限",
         "地球暦バイオリズム「3ヶ月」中期ロードマップ",
-        "「決断・吉日」カレンダー自動同期",
+        "カレンダーへの予定追加（Google / Apple）",
         "完全広告除去",
       ],
       cta: "VIPプランに登録する",
@@ -160,11 +163,8 @@ const ja: SettingsTranslation = {
       priceYearly: "¥3,580",
       priceNote: "月額あたり（チーム単位）",
       features: [
-        "法人向け「チーム・コンパス」組織管理ダッシュボード",
-        "チームメンバー相性マトリックス",
-        "役割・配置最適化マップ",
-        "地球暦 年間バイオリズムダッシュボード",
-        "7日間組織意思決定カレンダー",
+        "関係者を最大30人登録",
+        "チーム・組織コンサル全7タブ（同時診断・AI人員選抜・アラートカレンダーなど）",
       ],
       cta: "法人プランに問い合わせる",
     },
@@ -261,7 +261,8 @@ const en: SettingsTranslation = {
       priceMonthly: "¥0",
       priceYearly: "¥0",
       features: [
-        "Single basic reading",
+        "0 registered members (personal only)",
+        "Full five-element personal reading",
         "2 basic colors",
         "Mandala preview (mosaic)",
         "Biorhythm: blurred preview",
@@ -275,6 +276,7 @@ const en: SettingsTranslation = {
       priceMonthly: "¥333",
       priceYearly: "¥3,333",
       features: [
+        "Register up to 2 members",
         "Unlimited compatibility readings",
         "Full 15-arts × Animal integrated manual",
         "All 6 birth color genres unlocked",
@@ -289,6 +291,7 @@ const en: SettingsTranslation = {
       priceYearly: "¥7,777",
       priceNote: "First 7 days free",
       features: [
+        "Register up to 5 members",
         "HD birth-color mandala art & wallpaper saving",
         "Full natal Nine Stars art",
         "Unlimited AI Consultation Room",
@@ -305,6 +308,8 @@ const en: SettingsTranslation = {
       priceYearly: "¥3,580",
       priceNote: "Per month, per team",
       features: [
+        "Register up to 30 members",
+        "All seven team and organization tools, including team diagnosis, AI drafting and alert calendar",
         "Team Compass organization dashboard",
         "Team member compatibility matrix",
         "Role & placement optimization map",
@@ -407,7 +412,8 @@ const zhCN: SettingsTranslation = {
       priceMonthly: "¥0",
       priceYearly: "¥0",
       features: [
-        "单次基础诊断",
+        "本人专用（可登记0人）",
+        "完整体验五大要素个人诊断",
         "基础颜色2色",
         "曼陀罗预览（马赛克显示）",
         "地球暦生物节律（模糊显示）",
@@ -421,6 +427,7 @@ const zhCN: SettingsTranslation = {
       priceMonthly: "¥333",
       priceYearly: "¥3,333",
       features: [
+        "最多登记2人",
         "相性诊断无限制",
         "15占术×动物占卜 综合详细手册完全解锁",
         "全部6类诞生颜色解锁",
@@ -435,6 +442,7 @@ const zhCN: SettingsTranslation = {
       priceYearly: "¥7,777",
       priceNote: "首7天免费体验",
       features: [
+        "最多登记5人",
         "高画质诞生颜色曼陀罗艺术完全解锁·壁纸保存",
         "出生九星配置图全解锁",
         "AI「オノレ相談室」咨询无限",
@@ -451,6 +459,7 @@ const zhCN: SettingsTranslation = {
       priceYearly: "¥3,580",
       priceNote: "按月·按团队计费",
       features: [
+        "最多登记30人，使用全部7项团队与组织咨询功能",
         "企业版「团队·罗盘」组织管理仪表板",
         "团队成员相性矩阵",
         "角色·配置优化图",
@@ -544,7 +553,8 @@ const zhTW: SettingsTranslation = {
       priceMonthly: "¥0",
       priceYearly: "¥0",
       features: [
-        "單次基礎診斷",
+        "本人專用（可登錄0人）",
+        "完整體驗五大要素個別診斷",
         "基礎顏色2色",
         "曼陀羅預覽（馬賽克顯示）",
         "地球暦生物節律（模糊顯示）",
@@ -558,6 +568,7 @@ const zhTW: SettingsTranslation = {
       priceMonthly: "¥333",
       priceYearly: "¥3,333",
       features: [
+        "最多登錄2人",
         "相性診斷無限制",
         "15占術×動物占卜 綜合詳細手冊完全解鎖",
         "全部6類誕生顏色解鎖",
@@ -572,6 +583,7 @@ const zhTW: SettingsTranslation = {
       priceYearly: "¥7,777",
       priceNote: "首7天免費體驗",
       features: [
+        "最多登錄5人",
         "高畫質誕生顏色曼陀羅藝術完全解鎖·桌布保存",
         "出生九星配置圖全解鎖",
         "AI「オノレ相談室」諮詢無限",
@@ -588,6 +600,7 @@ const zhTW: SettingsTranslation = {
       priceYearly: "¥3,580",
       priceNote: "按月·按團隊計費",
       features: [
+        "最多登錄30人，使用全部7項團隊與組織顧問功能",
         "企業版「團隊·羅盤」組織管理儀表板",
         "團隊成員相性矩陣",
         "角色·配置最佳化圖",
@@ -685,7 +698,8 @@ const ko: SettingsTranslation = {
       priceMonthly: "¥0",
       priceYearly: "¥0",
       features: [
-        "단회차 기본 진단",
+        "본인 전용 (추가 등록 0명)",
+        "5대 요소 개인 진단 전체 체험",
         "기본 컬러 2색",
         "만다라 미리보기(모자이크)",
         "지구력 바이오리듬 흐림 표시",
@@ -699,6 +713,7 @@ const ko: SettingsTranslation = {
       priceMonthly: "¥333",
       priceYearly: "¥3,333",
       features: [
+        "최대 2명 등록",
         "궁합 진단 무제한",
         "15점술×동물점 통합 상세 설명서 완전 해제",
         "전체 6장르 탄생 컬러 해제",
@@ -713,6 +728,7 @@ const ko: SettingsTranslation = {
       priceYearly: "¥7,777",
       priceNote: "첫 7일 무료 체험",
       features: [
+        "최대 5명 등록",
         "고화질 탄생 컬러 만다라 아트 완전 해제·배경화면 저장",
         "출생 구성 배치 아트 전체 해제",
         "AI「オノレ相談室」상담 무제한",
@@ -729,6 +745,7 @@ const ko: SettingsTranslation = {
       priceYearly: "¥3,580",
       priceNote: "월 단위·팀 단위 과금",
       features: [
+        "최대 30명 등록, 팀·조직 컨설팅 7개 탭 전체",
         "기업용「팀·컴패스」조직 관리 대시보드",
         "팀 멤버 궁합 매트릭스",
         "역할·배치 최적화 맵",
@@ -831,7 +848,8 @@ const es: SettingsTranslation = {
       priceMonthly: "¥0",
       priceYearly: "¥0",
       features: [
-        "Lectura básica individual",
+        "Solo para ti (0 miembros adicionales)",
+        "Lectura personal completa de cinco elementos",
         "2 colores básicos",
         "Vista previa del mandala (mosaico)",
         "Biorritmo: vista difuminada",
@@ -845,6 +863,7 @@ const es: SettingsTranslation = {
       priceMonthly: "¥333",
       priceYearly: "¥3,333",
       features: [
+        "Registra hasta 2 personas",
         "Lecturas de compatibilidad ilimitadas",
         "Manual integrado completo de 15 artes × horóscopo animal",
         "Los 6 géneros de colores de nacimiento desbloqueados",
@@ -859,6 +878,7 @@ const es: SettingsTranslation = {
       priceYearly: "¥7,777",
       priceNote: "Primeros 7 días gratis",
       features: [
+        "Registra hasta 5 personas",
         "Arte mandala HD de colores de nacimiento y guardado de fondos",
         "Arte natal de las Nueve Estrellas completo",
         "Sala de Consulta IA ilimitada",
@@ -875,6 +895,7 @@ const es: SettingsTranslation = {
       priceYearly: "¥3,580",
       priceNote: "Por mes, por equipo",
       features: [
+        "Registra hasta 30 personas; las siete herramientas de equipo y organización",
         "Panel de gestión organizativa Team Compass",
         "Matriz de compatibilidad del equipo",
         "Mapa de optimización de roles y posiciones",
@@ -978,7 +999,8 @@ const fr: SettingsTranslation = {
       priceMonthly: "¥0",
       priceYearly: "¥0",
       features: [
-        "Lecture de base unique",
+        "Usage personnel (0 membre supplémentaire)",
+        "Analyse personnelle complète des cinq éléments",
         "2 couleurs de base",
         "Aperçu du mandala (mosaïque)",
         "Biorythme : aperçu flouté",
@@ -992,6 +1014,7 @@ const fr: SettingsTranslation = {
       priceMonthly: "¥333",
       priceYearly: "¥3,333",
       features: [
+        "Enregistrez jusqu’à 2 personnes",
         "Lectures de compatibilité illimitées",
         "Manuel intégré complet 15 arts × horoscope animal",
         "Les 6 genres de couleurs de naissance débloqués",
@@ -1006,6 +1029,7 @@ const fr: SettingsTranslation = {
       priceYearly: "¥7,777",
       priceNote: "7 premiers jours offerts",
       features: [
+        "Enregistrez jusqu’à 5 personnes",
         "Art mandala HD des couleurs de naissance et fonds d'écran",
         "Art natal des Neuf Étoiles complet",
         "Salle de consultation IA illimitée",
@@ -1022,6 +1046,7 @@ const fr: SettingsTranslation = {
       priceYearly: "¥3,580",
       priceNote: "Par mois, par équipe",
       features: [
+        "Enregistrez jusqu’à 30 personnes ; les sept outils de conseil d’équipe",
         "Tableau de bord organisationnel Team Compass",
         "Matrice de compatibilité d'équipe",
         "Carte d'optimisation des rôles et positions",

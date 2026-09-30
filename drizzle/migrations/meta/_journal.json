@@ -15,6 +15,13 @@
       "when": 1790691316980,
       "tag": "0001_create_team_members",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790764072796,
+      "tag": "0002_enforce_five_membership_member_limits",
+      "breakpoints": true
     }
   ]
 }

@@ -31,6 +31,7 @@ import { settingsTranslations, type SettingsTranslation, type PricingTier } from
 import TeamStudio from "@/components/team/TeamStudio";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
+import { memberLimit, planOrder } from "@/lib/plans";
 import type { UserProfile } from "./Onboarding";
 
 type Props = {
@@ -40,6 +41,7 @@ type Props = {
   onEdit: () => void;
   onVip: () => void;
   plan: Plan;
+  actualPlan: Plan;
   onPlanChange: (plan: Plan) => void;
   designMode: DesignMode;
   onDesignModeChange: (mode: DesignMode) => void;
@@ -315,6 +317,7 @@ export default function SettingsPanel({
   onEdit,
   onVip,
   plan,
+  actualPlan,
   onPlanChange,
   designMode,
   onDesignModeChange,
@@ -332,11 +335,18 @@ export default function SettingsPanel({
   const [lockedMode, setLockedMode] = useState<DesignMode | null>(null);
 
   const tc = teamCopy[language];
+  const premiumFeatures: Record<Language, string[]> = {
+    ja: ["関係者を最大100人登録", "100人規模の組織コンサル全7タブ", "AI回答の優先生成（提供準備中）", "ビジネスプランの全機能"],
+    en: ["Register up to 100 members", "All seven organization tools for 100 people", "Priority AI generation (coming soon)", "Everything in Business"],
+    "zh-CN": ["最多登记100人", "100人规模的全部7项组织咨询功能", "优先生成AI回答（准备中）", "包含商务方案所有功能"],
+    "zh-TW": ["最多登錄100人", "100人規模的全部7項組織顧問功能", "優先生成AI回答（準備中）", "包含商務方案所有功能"],
+    ko: ["최대 100명 등록", "100명 규모의 조직 컨설팅 7개 탭 전체", "AI 답변 우선 생성 (준비 중)", "비즈니스 플랜의 모든 기능"],
+    es: ["Registra hasta 100 personas", "Las siete herramientas de organización para 100 personas", "Generación prioritaria de IA (próximamente)", "Todas las funciones de Empresa"],
+    fr: ["Enregistrez jusqu’à 100 personnes", "Les sept outils de conseil pour 100 personnes", "Génération IA prioritaire (à venir)", "Toutes les fonctions Entreprise"],
+  };
   const premiumTier: PricingTier = {
     id: "b2b-premium", name: tc.planNames["b2b-premium"], priceMonthly: "¥8,888", priceYearly: "¥88,880",
-    features: language === "ja"
-      ? ["最大100名のメンバー登録", "100名規模に対応した組織コンサルティング機能", "AI回答の優先生成（表示テスト）", "ビジネスプランの全機能"]
-      : ["Up to 100 registered members", "Full organization consulting for 100", "Priority AI generation (label only)", "Everything in Business"],
+    features: premiumFeatures[language],
     cta: tc.switchPlan,
   };
   const allTiers = [...t.tiers, premiumTier];
@@ -388,7 +398,7 @@ export default function SettingsPanel({
         <div className="mt-4 border-t border-primary/10 pt-3">
           <p className="mb-2 text-xs text-muted-foreground">{t.planTest}</p>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-5" role="radiogroup" aria-label={t.planTest}>
-            {(["free", "standard", "vip", "b2b", "b2b-premium"] as Plan[]).map((p) => (
+            {planOrder.map((p) => (
               <Button
                 key={p}
                 role="radio"
@@ -532,7 +542,7 @@ export default function SettingsPanel({
         </div>
 
         <div className="mt-4 space-y-3">
-          {allTiers.map((tier) => {
+            {allTiers.map((tier) => {
             const isVip = tier.id === "vip";
             const isB2b = tier.id === "b2b" || tier.id === "b2b-premium";
             const open = openTier === tier.id;
@@ -568,6 +578,7 @@ export default function SettingsPanel({
                         </span>
                       )}
                     </div>
+                    <p className="mt-1 text-xs text-muted-foreground">{language === "ja" ? `登録上限 ${memberLimit[tier.id]}人${tier.id === "free" ? " · 本人専用" : ""}` : tc.limit(0, memberLimit[tier.id])}</p>
                     <p className="mt-1 flex items-baseline gap-1">
                       <span
                         className={`text-xl font-semibold ${isVip ? "text-gradient-gold" : "text-foreground"}`}
@@ -601,7 +612,7 @@ export default function SettingsPanel({
                       ))}
                     </ul>
                     <Button
-                      onClick={() => (isVip ? onVip() : tier.id === "b2b-premium" ? onPlanChange("b2b-premium") : setNotice(`${tier.name}: ${t.soon}`))}
+                      onClick={() => { setNotice(`${tier.name}: ${t.upgradeNote}`); }}
                       disabled={tier.id === "free"}
                       size="sm"
                       className={`mt-3 h-9 w-full ${isVip ? "shadow-champagne-strong" : ""}`}
@@ -618,7 +629,7 @@ export default function SettingsPanel({
         <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
       </section>
 
-      <div id="team-studio-entry"><TeamStudio plan={plan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} onPlanChange={onPlanChange} /></div>
+      <div id="team-studio-entry"><TeamStudio plan={plan} actualPlan={actualPlan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} /></div>
 
       <section className={card}>
         <h3 className="font-serif text-lg text-primary">{t.b2bTitle}</h3>

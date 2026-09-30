@@ -15,7 +15,7 @@ import {
 import { addTeamMember, deleteTeamMember, listTeamMembers } from "@/lib/team-members.functions";
 import { draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
 
-type Props = { plan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string; onPlanChange: (p: Plan) => void };
+type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
 const LOCAL = "onore-team";
 const card = "rounded-2xl border border-primary/15 bg-background/40 p-4";
 const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "draft", "catalog", "calendar", "balance", "oneOnOne"];
@@ -25,15 +25,15 @@ const summary = (m: TeamMember, t: TeamCopy) => ({
   element: dayElement(m.birthDate), lifePath: lifePath(m.birthDate), biorhythm: biorhythm(m.birthDate, todayIso()).total,
 });
 
-export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, onPlanChange }: Props) {
+export default function TeamStudio({ plan, actualPlan, language, signedIn, ownerBirthDate }: Props) {
   const t = teamCopy[language];
   const [tab, setTab] = useState(0);
   const [members, setMembers] = useState<TeamMember[]>([]);
-  const [limitDialog, setLimitDialog] = useState<Plan | null>(null);
+  const [limitDialog, setLimitDialog] = useState<Plan | "max" | null>(null);
   const list = useServerFn(listTeamMembers);
   const add = useServerFn(addTeamMember);
   const del = useServerFn(deleteTeamMember);
-  const max = memberLimit[plan];
+  const max = memberLimit[actualPlan];
 
   useEffect(() => {
     let active = true;
@@ -44,7 +44,7 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
   const persistLocal = (next: TeamMember[]) => { setMembers(next); try { localStorage.setItem(LOCAL, JSON.stringify(next)); } catch { /* ignore */ } };
 
   const addMember = async (m: Omit<TeamMember, "id">) => {
-    if (members.length + 1 > max) { setLimitDialog(planForCount(members.length + 1)); return false; }
+    if (members.length + 1 > max) { setLimitDialog(planForCount(members.length + 1) ?? "max"); return false; }
     if (signedIn) setMembers([...members, await add({ data: m as never })]);
     else persistLocal([...members, { ...m, id: crypto.randomUUID() }]);
     return true;
@@ -60,7 +60,7 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
     <section className="rounded-3xl border border-primary/20 bg-card/60 p-4 backdrop-blur-md sm:p-5" aria-label={t.title}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-serif text-lg text-primary">{t.title}</h3>
-        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[plan]} · {t.limit(members.length, max)}</span>
+        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[actualPlan]} · {t.limit(members.length, max)}</span>
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">{t.note}</p>
       {plan === "b2b-premium" && <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-primary"><Crown className="size-3" />{t.priority}</p>}
@@ -69,26 +69,26 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
         {t.tabs.map((label, i) => (
           <button key={label} role="tab" aria-selected={tab === i} onClick={() => setTab(i)}
             className={`flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-xs ${tab === i ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>
-            {!hasFeature(plan, tabFeatures[i]!) && <Lock className="size-3" />}{label}
+            {!hasFeature(plan, tabFeatures[i]!) && i !== 0 && <Lock className="size-3" />}{label}
           </button>
         ))}
       </div>
 
       <div className="mt-4">
-        {!unlocked ? (
+        {!unlocked && feature !== "roster" ? (
           <div className={`${card} text-center`}>
             <Lock className="mx-auto size-6 text-primary" />
             <p className="mt-2 text-sm">{t.locked(t.planNames[requiredPlanFor(feature)])}</p>
-            <Button size="sm" className="mt-3" onClick={() => onPlanChange(requiredPlanFor(feature))}>{t.switchPlan}</Button>
+            <Button size="sm" className="mt-3" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.seePlans}</Button>
           </div>
         ) : feature === "roster" ? (
           <Roster t={t} members={members} max={max} signedIn={signedIn} onAdd={addMember} onRemove={removeMember} />
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
-          <Diagnosis t={t} members={members} max={Math.min(max, plan === "vip" ? 5 : max)} />
+          <Diagnosis t={t} members={members} max={Math.max(1, max)} />
         ) : feature === "draft" ? (
-          <Draft t={t} members={members} language={language} />
+          <Draft t={t} members={members} language={language} max={Math.max(1, max)} />
         ) : feature === "catalog" ? (
           <Catalog t={t} members={members} />
         ) : feature === "calendar" ? (
@@ -104,11 +104,12 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t.limitTitle}</DialogTitle>
-            <DialogDescription>{limitDialog && t.limitBody(t.planNames[limitDialog], memberLimit[limitDialog])}</DialogDescription>
+            <DialogDescription>{limitDialog === "max" ? t.absoluteLimit : limitDialog && t.limitBody(t.planNames[limitDialog], memberLimit[limitDialog])}</DialogDescription>
           </DialogHeader>
+          {limitDialog !== "max" && <p className="text-xs text-muted-foreground">{t.upgradePending}</p>}
           <DialogFooter>
             <Button variant="outline" onClick={() => setLimitDialog(null)}>{t.later}</Button>
-            <Button onClick={() => { if (limitDialog) onPlanChange(limitDialog); setLimitDialog(null); }}>{t.switchPlan}</Button>
+            {limitDialog !== "max" && <Button onClick={() => { setLimitDialog(null); document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{t.switchPlan}</Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -123,13 +124,16 @@ function RoleBadge({ role, t }: { role: TeamRole; t: TeamCopy }) {
 function Roster({ t, members, max, signedIn, onAdd, onRemove }: { t: TeamCopy; members: TeamMember[]; max: number; signedIn: boolean; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onRemove: (id: string) => void }) {
   const [form, setForm] = useState({ name: "", birthDate: "", role: "", skills: "" });
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.birthDate) return;
     setBusy(true);
+    setError(false);
     try {
       const ok = await onAdd({ name: form.name.trim(), birthDate: form.birthDate, gender: "undisclosed", bloodType: "", role: form.role.trim(), skills: form.skills.split(/[,、，]/).map((s) => s.trim()).filter(Boolean).slice(0, 12) });
       if (ok) setForm({ name: "", birthDate: "", role: "", skills: "" });
+    } catch { setError(true);
     } finally { setBusy(false); }
   };
   return (
@@ -141,6 +145,7 @@ function Roster({ t, members, max, signedIn, onAdd, onRemove }: { t: TeamCopy; m
         <Input aria-label={t.jobRole} placeholder={t.jobRole} value={form.role} maxLength={60} onChange={(e) => setForm({ ...form, role: e.target.value })} />
         <Input aria-label={t.skills} placeholder={`${t.skills}（${t.skillsHint}）`} value={form.skills} onChange={(e) => setForm({ ...form, skills: e.target.value })} />
         <Button type="submit" disabled={busy} className="sm:col-span-2"><UserPlus className="size-4" />{t.add} ({members.length}/{max})</Button>
+        {error && <p role="alert" className="text-xs text-destructive sm:col-span-2">{t.saveError}</p>}
       </form>
       {members.length === 0 ? <p className="text-sm text-muted-foreground">{t.empty}</p> : (
         <ul className="grid gap-2 sm:grid-cols-2">
@@ -221,7 +226,7 @@ function Diagnosis({ t, members, max }: { t: TeamCopy; members: TeamMember[]; ma
 }
 
 type DraftResult = { recommendedSize: number; ranking: { id: string; score: number; reason: string }[]; features: string; evaluation: string; cautions: string };
-function Draft({ t, members, language }: { t: TeamCopy; members: TeamMember[]; language: Language }) {
+function Draft({ t, members, language, max }: { t: TeamCopy; members: TeamMember[]; language: Language; max: number }) {
   const run = useServerFn(draftProjectTeam);
   const [goal, setGoal] = useState("");
   const [headcount, setHeadcount] = useState(0);
@@ -246,7 +251,7 @@ function Draft({ t, members, language }: { t: TeamCopy; members: TeamMember[]; l
           <label className="text-xs text-muted-foreground" htmlFor="draft-n">{t.headcount}</label>
           <select id="draft-n" value={headcount} onChange={(e) => setHeadcount(Number(e.target.value))} className="rounded-md border border-input bg-background/60 px-2 py-1 text-sm">
             <option value={0}>{t.auto}</option>
-            {Array.from({ length: Math.min(30, members.length) }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
+            {Array.from({ length: Math.min(max, members.length) }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
           </select>
           <Button size="sm" disabled={busy || goal.trim().length < 3} onClick={() => exec()}><Sparkles className="size-4" />{busy ? t.generating : t.runDraft}</Button>
         </div>
@@ -265,7 +270,7 @@ function Draft({ t, members, language }: { t: TeamCopy; members: TeamMember[]; l
           {[[t.features, result.features], [t.evaluation, result.evaluation], [t.cautions, result.cautions]].map(([h, b]) => <div key={h} className={card}><p className="text-sm text-primary">{h}</p><p className="mt-1 text-xs leading-6">{b}</p></div>)}
           <div className={card}>
             <p className="mb-2 text-xs text-muted-foreground">{t.swapHint}</p>
-            <div className="flex flex-wrap gap-1.5">{members.map((m) => { const on = picked.includes(m.id); return <button key={m.id} aria-pressed={on} onClick={() => setPicked(on ? picked.filter((x) => x !== m.id) : [...picked, m.id].slice(0, 30))} className={`rounded-full border px-3 py-1 text-xs ${on ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>{m.name}</button>; })}</div>
+            <div className="flex flex-wrap gap-1.5">{members.map((m) => { const on = picked.includes(m.id); return <button key={m.id} aria-pressed={on} onClick={() => setPicked(on ? picked.filter((x) => x !== m.id) : [...picked, m.id].slice(0, max))} className={`rounded-full border px-3 py-1 text-xs ${on ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>{m.name}</button>; })}</div>
             <Button size="sm" variant="outline" className="mt-3" disabled={busy || picked.length === 0} onClick={() => exec(picked)}>{t.reevaluate}</Button>
           </div>
         </div>
