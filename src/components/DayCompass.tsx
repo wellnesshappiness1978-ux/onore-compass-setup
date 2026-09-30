@@ -5,6 +5,7 @@ import type { Plan } from "@/lib/design-modes";
 import { planOrder } from "@/lib/plans";
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
+import SolfeggioPlayer from "./SolfeggioPlayer";
 import type { UserProfile } from "./Onboarding";
 import {
   dateAt, dayOfYear, dayProfile, daysInYear, directionAt, directionEnergy, directions,
@@ -165,6 +166,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
 
   return (
     <div>
+      <SolfeggioPlayer language={language} compact />
       <div
         ref={wheel}
         className="compass-wheel relative mx-auto mt-3 aspect-square w-full max-w-[430px] touch-none select-none"

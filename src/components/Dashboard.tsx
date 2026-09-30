@@ -3,6 +3,7 @@ import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
 import PersonPortrait from "./PersonPortrait";
 import SelfCoreCard from "./SelfCoreCard";
 import DayCompass from "./DayCompass";
+import ShareCardButton from "./ShareCardButton";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -401,6 +402,7 @@ function TorisetsuPanel({
                 </p>
               </div>
               <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
+              <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
             </section>
           ) : null}
           <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
