@@ -59,7 +59,7 @@
   --secondary: oklch(0.25 0.035 262);
   --secondary-foreground: oklch(0.94 0.015 95);
   --muted: oklch(0.25 0.035 262);
-  --muted-foreground: oklch(0.74 0.018 260);
+  --muted-foreground: oklch(0.84 0.018 260);
   --accent: oklch(0.25 0.035 262);
   --accent-foreground: oklch(0.94 0.015 95);
   --destructive: oklch(0.62 0.2 25);
@@ -102,7 +102,7 @@
   --secondary: oklch(0.25 0.035 262);
   --secondary-foreground: oklch(0.94 0.015 95);
   --muted: oklch(0.25 0.035 262);
-  --muted-foreground: oklch(0.74 0.018 260);
+  --muted-foreground: oklch(0.84 0.018 260);
   --accent: oklch(0.25 0.035 262);
   --accent-foreground: oklch(0.94 0.015 95);
   --destructive: oklch(0.62 0.2 25);
@@ -130,7 +130,11 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
   }
+  strong, b { color: var(--color-primary); font-weight: 700; }
 }
 
 @utility bg-lux-glow {
@@ -660,3 +664,13 @@
 @media (prefers-reduced-motion: reduce) {
   .zodiac-spark, .arts-star, .arts-shimmer, .arts-rise, .arts-orb { animation: none; }
 }
+
+/* Readability: raise small text to readable sizes across all screens. */
+@theme {
+  --text-xs: 0.875rem; --text-xs--line-height: 1.6;
+  --text-sm: 1rem; --text-sm--line-height: 1.75;
+  --text-base: 1.0625rem; --text-base--line-height: 1.8;
+  --text-lg: 1.25rem; --text-xl: 1.375rem; --text-2xl: 1.625rem; --text-3xl: 1.75rem;
+}
+.design-canvas [class*="text-[9px]"], .design-canvas [class*="text-[10px]"] { font-size: 12px !important; }
+.design-canvas [class*="text-[11px]"] { font-size: 13px !important; }
