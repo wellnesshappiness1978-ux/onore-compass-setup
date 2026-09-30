@@ -604,7 +604,7 @@ export default function SettingsPanel({
               <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-primary/10 blur-2xl" />
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <span aria-hidden="true" className="text-3xl">{item.emoji}</span>
+                  {(() => { const CardIcon = planIcon[item.id]; return <CardIcon className="size-7 shrink-0 text-primary" aria-hidden="true" />; })()}
                   <div className="min-w-0">
                     <p className={`font-serif text-base ${isVip ? "text-gradient-gold" : "text-foreground"}`}>{tier.name}</p>
                     <p className="mt-0.5 text-xs text-primary/80">{item.tagline}</p>
