@@ -574,8 +574,8 @@ export default function SettingsPanel({
         </div>
 
         {(() => {
-          const item = pc.cards.find((c) => c.id === cardPlan) ?? pc.cards[1];
-          const tier = allTiers.find((tr) => tr.id === item.id) ?? allTiers[2];
+          const item = selectedCard;
+          const tier = selectedTier;
           const isVip = item.id === "vip";
           const price = yearly ? tier.priceYearly : tier.priceMonthly;
           const period = yearly ? t.perYear : t.perMonth;
@@ -652,12 +652,12 @@ export default function SettingsPanel({
 
         <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-background/40 px-4 py-3">
           <div className="min-w-0">
-            <p className="text-xs text-muted-foreground">{t.tiers[0].name}</p>
+            <p className="text-xs text-muted-foreground">{freeTier.name}</p>
             <p className="truncate text-[11px] text-muted-foreground">
-              {t.tiers[0].features[0]} / {t.tiers[0].features[1]}
+              {freeTier.features[0]} / {freeTier.features[1]}
             </p>
           </div>
-          <span className="shrink-0 font-serif text-sm text-muted-foreground">{t.tiers[0].priceMonthly}</span>
+          <span className="shrink-0 font-serif text-sm text-muted-foreground">{freeTier.priceMonthly}</span>
         </div>
         <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
       </section>
