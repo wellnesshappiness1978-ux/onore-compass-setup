@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { fiveElementsCopy } from "@/lib/five-elements-copy";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
+import type { CoreLayers } from "@/lib/ai/core-layers";
 import { homePlanCardsCopy, type HomePlanId } from "@/lib/home-plan-cards";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
@@ -21,6 +22,30 @@ const nameCopy: Record<Language, { title: string; grids: [string, string, string
   es: { title: "Lectura del nombre (cinco cuadros)", grids: ["Cielo", "Persona", "Tierra", "Exterior", "Total"], fortune: "Fortalezas sociales que sugiere tu nombre", split: "Elige dónde termina tu apellido para calcular y guardar", save: "Guardar", note: "Valores de referencia con trazos modernos y una tabla común de 81 números." },
   fr: { title: "Lecture du nom (cinq cadres)", grids: ["Ciel", "Personne", "Terre", "Extérieur", "Total"], fortune: "Forces sociales suggérées par votre nom", split: "Choisissez la fin du nom de famille pour calculer et enregistrer", save: "Enregistrer", note: "Valeurs de référence avec traits modernes et une table courante de 81 nombres." },
 };
+
+function CoreLayersPanel({ layers: c }: { layers: CoreLayers }) {
+  const rows: [string, string][] = [
+    ["姓名判断", c.name ? `人格${c.name.person}（${c.name.luck.person}）・総格${c.name.total}（${c.name.luck.total}）` : "未算出"],
+    ["数秘術", `LP${c.numerology.lifePath}・D${c.numerology.destiny ?? "—"}・S${c.numerology.soul ?? "—"}・${c.numerology.cyclePhase}`],
+    ["西洋占星術", `太陽${c.western.sun}・月${c.western.moon}${c.western.moonUncertain ? "?" : ""}・水星${c.western.planets[0]?.sign}・金星${c.western.planets[1]?.sign}`],
+    ["四柱推命", `日干${c.shichu.dayMaster}・${c.shichu.pillars.map(p => p.kanshi).join(" ")}・五行最多${c.shichu.dominant}`],
+    ["動物占い", `${c.animal.core ?? "未算出"}${c.animal.group ? `・${c.animal.group}` : ""}`],
+  ];
+  return (
+    <section aria-label="5大コア占術レイヤー" className="border-b border-primary/20 py-6">
+      <p className="text-[10px] uppercase tracking-widest text-primary/75">5 CORE LAYERS</p>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+        {rows.map(([k, v]) => <li key={k} className="min-w-0 rounded-md border border-primary/25 bg-primary/5 px-3 py-2"><span className="text-xs text-primary">{k}</span><p className="break-words text-sm leading-6 text-foreground">{v}</p></li>)}
+      </ul>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-md border border-primary/30 p-3"><p className="text-xs text-primary">表の顔</p><p className="mt-1 text-sm text-foreground">{c.surface.join(" / ")}</p></div>
+        <div className="rounded-md border border-primary/30 bg-primary/10 p-3"><p className="text-xs text-primary">本音・潜在</p><p className="mt-1 text-sm text-foreground">{c.inner.join(" / ")}</p></div>
+      </div>
+      <ul className="mt-3 space-y-1 text-xs leading-6 text-muted-foreground">{c.cross.map(x => <li key={x.pair}>{x.pair}：{x.a} × {x.b} → <span className="text-primary">{x.verdict}</span></li>)}</ul>
+      <p className="mt-2 text-[11px] text-muted-foreground">東京基準の天体計算・伝統的な占術の見方による参考値です。動物占いの表面・希望・隠れは未算出です。</p>
+    </section>
+  );
+}
 
 const planIcons: Record<HomePlanId, typeof Sprout> = { standard: Sprout, vip: Gem, b2b: Building2, "b2b-premium": Crown };
 
@@ -58,6 +83,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
           <div className="grid grid-cols-2 gap-x-4 gap-y-4 border-b border-primary/20 py-6 sm:grid-cols-5 sm:gap-5">
             {f.axes.map((label, i) => <div key={label} className="min-w-0 border-l border-primary/35 pl-3"><p className="text-xs text-primary">{label}</p><p className="mt-2 break-words font-serif text-sm leading-6 text-foreground">{values[i] ?? f.missing}</p></div>)}
           </div>
+          {data.layers && <CoreLayersPanel layers={data.layers} />}
           <section aria-label={n.title} className="my-6 rounded-lg border border-primary/40 bg-primary/5 p-4 sm:p-6">
             <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
             {e?.name ? <>
