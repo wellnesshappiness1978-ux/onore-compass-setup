@@ -1,6 +1,7 @@
 import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
 import PersonPortrait from "./PersonPortrait";
 import SelfCoreCard from "./SelfCoreCard";
+import DayCompass from "./DayCompass";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -47,120 +48,6 @@ type Props = {
   signedIn?: boolean;
 };
 type Tab = "home" | "arts" | "consult" | "mandala" | "settings";
-
-const zodiac = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"];
-const trigrams = ["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"];
-const positions = (count: number, radius: number) =>
-  Array.from({ length: count }, (_, index) => {
-    const angle = (index / count) * Math.PI * 2 - Math.PI / 2;
-    return { x: 50 + Math.cos(angle) * radius, y: 50 + Math.sin(angle) * radius };
-  });
-const zodiacPositions = positions(12, 43);
-const trigramPositions = positions(8, 32);
-
-function CompassWheel({ language }: { language: Language }) {
-  const t = dashboardTranslations[language];
-  const [angle, setAngle] = useState(0);
-  const start = useRef<{ pointer: number; angle: number } | null>(null);
-  const wheel = useRef<HTMLDivElement>(null);
-  const pointerAngle = (x: number, y: number) => {
-    const rect = wheel.current?.getBoundingClientRect();
-    if (!rect) return 0;
-    return (
-      (Math.atan2(y - (rect.top + rect.height / 2), x - (rect.left + rect.width / 2)) * 180) /
-      Math.PI
-    );
-  };
-
-  return (
-    <div
-      className="compass-wheel relative mx-auto aspect-square w-full max-w-[410px] touch-none select-none"
-      ref={wheel}
-      role="slider"
-      tabIndex={0}
-      aria-label={t.rotate}
-      aria-valuemin={0}
-      aria-valuemax={359}
-      aria-valuenow={Math.round(((angle % 360) + 360) % 360)}
-      onKeyDown={(event) => {
-        if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-          event.preventDefault();
-          setAngle((a) => a + (event.key === "ArrowRight" ? 15 : -15));
-        }
-      }}
-      onPointerDown={(event) => {
-        start.current = { pointer: pointerAngle(event.clientX, event.clientY), angle };
-        event.currentTarget.setPointerCapture(event.pointerId);
-      }}
-      onPointerMove={(event) => {
-        if (start.current)
-          setAngle(
-            start.current.angle +
-              pointerAngle(event.clientX, event.clientY) -
-              start.current.pointer,
-          );
-      }}
-      onPointerUp={() => {
-        start.current = null;
-      }}
-      onPointerCancel={() => {
-        start.current = null;
-      }}
-    >
-      <div className="compass-halo absolute inset-[5%] rounded-full" />
-      <div
-        className="compass-rotor absolute inset-[5%] rounded-full"
-        style={{ transform: `rotate(${angle}deg)` }}
-      >
-        <div className="absolute inset-0 rounded-full border border-primary/45" />
-        <div className="absolute inset-[3%] rounded-full border border-primary/20" />
-        <div className="absolute inset-[15%] rounded-full border border-primary/20" />
-        <div className="absolute inset-[23%] rounded-full border border-primary/35" />
-        <div className="absolute inset-[36%] rounded-full border border-primary/20" />
-        <div className="absolute inset-[49%] bg-primary/60" />
-        <div className="absolute inset-0 rounded-full compass-ticks" />
-        <div className="absolute left-1/2 top-[-1%] -translate-x-1/2 text-primary text-lg">✦</div>
-        <div className="absolute left-1/2 bottom-[-1%] -translate-x-1/2 text-primary/70 text-sm">
-          ✧
-        </div>
-        {zodiac.map((sign, i) => (
-          <span
-            key={sign}
-            className="absolute flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center font-serif text-lg text-primary/80"
-            style={{
-              left: `${zodiacPositions[i]?.x ?? 50}%`,
-              top: `${zodiacPositions[i]?.y ?? 50}%`,
-              transform: `translate(-50%, -50%) rotate(${-angle}deg)`,
-            }}
-          >
-            {sign}
-          </span>
-        ))}
-        {trigrams.map((symbol, i) => (
-          <span
-            key={symbol}
-            className="absolute -translate-x-1/2 -translate-y-1/2 font-serif text-lg text-gold-glow/55"
-            style={{
-              left: `${trigramPositions[i]?.x ?? 50}%`,
-              top: `${trigramPositions[i]?.y ?? 50}%`,
-              transform: `translate(-50%, -50%) rotate(${-angle}deg)`,
-            }}
-          >
-            {symbol}
-          </span>
-        ))}
-        <div className="absolute inset-[28%] compass-cross pointer-events-none" />
-      </div>
-      <div className="compass-center pointer-events-none absolute inset-[33%] flex flex-col items-center justify-center rounded-full border border-primary/40 text-center shadow-champagne">
-        <span className="mb-1 text-[10px] text-primary/80 sm:text-xs">{t.theme}</span>
-        <strong className="font-serif text-3xl text-gradient-gold sm:text-4xl">{t.attack}</strong>
-        <span className="mt-1 text-[9px] text-muted-foreground sm:text-[11px]">
-          {t.energy} / {t.expansion}
-        </span>
-      </div>
-    </div>
-  );
-}
 
 function ProfileRows({ profile, language }: { profile: UserProfile; language: Language }) {
   const t = translations[language];
@@ -657,8 +544,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                   day: "numeric",
                 }).format(new Date())}
               </p>
-              <CompassWheel language={language} />
-              <p className="-mt-2 text-xs text-muted-foreground">{t.wheelHint}</p>
+              <DayCompass profile={profile} language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             </section>
             <div className="design-daily-grid mx-auto mt-7 grid max-w-4xl gap-4 md:grid-cols-[1.2fr_1fr]">
               <section className="design-daily-panel card-lux rounded-lg p-5 sm:p-6">
@@ -739,7 +625,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               <ConsultationPanel
                 profile={profile}
                 language={language}
-                onVip={() => setModal("vip")}
+                plan={previewPlan}
+                onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
               />
               </>
             ) : tab === "mandala" ? (
