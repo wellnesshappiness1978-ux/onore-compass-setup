@@ -32,6 +32,7 @@ import TeamStudio from "@/components/team/TeamStudio";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
 import { memberLimit, planOrder } from "@/lib/plans";
+import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 
 type Props = {
@@ -327,7 +328,8 @@ export default function SettingsPanel({
   const dc = designCopy[language];
   const [bioPlan, setBioPlan] = useState<Plan>("free");
   const [yearly, setYearly] = useState(false);
-  const [openTier, setOpenTier] = useState<string | null>("vip");
+  const [cardPlan, setCardPlan] = useState<PaidPlanId>("vip");
+  const [upgradePlan, setUpgradePlan] = useState<string | null>(null);
   const [b2b, setB2b] = useState(false);
   const [notifyTiming, setNotifyTiming] = useState(true);
   const [notifyBio, setNotifyBio] = useState(false);
