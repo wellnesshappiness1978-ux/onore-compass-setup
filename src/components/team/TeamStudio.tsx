@@ -54,7 +54,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     else persistLocal(members.filter((m) => m.id !== id));
   };
   const feature = tabFeatures[tab]!;
-  const unlocked = hasFeature(actualPlan, feature);
+  const unlocked = hasFeature(plan, feature);
 
   return (
     <section className="rounded-3xl border border-primary/20 bg-card/60 p-4 backdrop-blur-md sm:p-5" aria-label={t.title}>
@@ -69,7 +69,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
         {t.tabs.map((label, i) => (
           <button key={label} role="tab" aria-selected={tab === i} onClick={() => setTab(i)}
             className={`flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-xs ${tab === i ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>
-            {!hasFeature(plan, tabFeatures[i]!) && <Lock className="size-3" />}{label}
+            {!hasFeature(plan, tabFeatures[i]!) && i !== 0 && <Lock className="size-3" />}{label}
           </button>
         ))}
       </div>
