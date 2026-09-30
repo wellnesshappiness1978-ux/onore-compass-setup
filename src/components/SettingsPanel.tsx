@@ -618,7 +618,7 @@ export default function SettingsPanel({
         <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
       </section>
 
-      <TeamStudio plan={plan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} onPlanChange={onPlanChange} />
+      <div id="team-studio-entry"><TeamStudio plan={plan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} onPlanChange={onPlanChange} /></div>
 
       <section className={card}>
         <h3 className="font-serif text-lg text-primary">{t.b2bTitle}</h3>
