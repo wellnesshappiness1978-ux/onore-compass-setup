@@ -562,6 +562,7 @@ export default function SettingsPanel({
         <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={t.plansHeading}>
           {pc.cards.map((item) => {
             const active = cardPlan === item.id;
+            const TabIcon = planIcon[item.id];
             return (
               <button
                 key={item.id}
@@ -574,7 +575,7 @@ export default function SettingsPanel({
                     : "border-primary/15 bg-background/40 text-muted-foreground hover:text-primary"
                 }`}
               >
-                <span aria-hidden="true">{item.emoji}</span>
+                <TabIcon className={`size-3.5 ${active ? "text-primary" : "text-muted-foreground"}`} aria-hidden="true" />
                 {planTabName(item.id)}
               </button>
             );
