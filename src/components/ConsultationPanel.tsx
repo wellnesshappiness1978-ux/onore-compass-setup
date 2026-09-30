@@ -18,16 +18,36 @@ import {
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
+import type { Plan } from "@/lib/design-modes";
+import { consultationDailyLimit, nextPlan } from "@/lib/plans";
+import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import compassAvatar from "@/assets/onore-ai-compass.png";
 
-type Props = { profile: UserProfile; language: Language; onVip: () => void };
+type Props = { profile: UserProfile; language: Language; plan: Plan; onVip: () => void };
 
-export default function ConsultationPanel({ profile, language, onVip }: Props) {
+const dayKey = () => { const d = new Date(); return `onore-consult-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+const untilMidnight = () => { const n = new Date(); const m = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1); return m.getTime() - n.getTime(); };
+const hms = (ms: number) => { const s = Math.max(0, Math.floor(ms / 1000)); return [s / 3600, (s % 3600) / 60, s % 60].map((v) => String(Math.floor(v)).padStart(2, "0")).join(":"); };
+
+export default function ConsultationPanel({ profile, language, plan, onVip }: Props) {
   const t = consultationTranslations[language];
+  const planNames = teamCopy[language].planNames;
+  const isJa = language === "ja";
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [remaining, setRemaining] = useState(2);
+  const limit = consultationDailyLimit[plan];
+  const unlimited = !Number.isFinite(limit);
+  const [used, setUsed] = useState(0);
+  const [countdown, setCountdown] = useState(untilMidnight());
+  useEffect(() => {
+    const read = () => setUsed(Number(localStorage.getItem(dayKey()) ?? 0) || 0);
+    read();
+    const id = window.setInterval(() => { setCountdown(untilMidnight()); read(); }, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const remaining = unlimited ? Infinity : Math.max(0, limit - used);
+  const upgradeTo = nextPlan(plan);
   const [notice, setNotice] = useState<string | null>(null);
   const initialMessages = useMemo<UIMessage[]>(
     () => [{ id: "welcome", role: "assistant", parts: [{ type: "text", text: t.greeting }] }],
@@ -63,7 +83,11 @@ export default function ConsultationPanel({ profile, language, onVip }: Props) {
     }
     setNotice(null);
     clearError();
-    setRemaining((value) => Math.max(0, value - 1));
+    if (!unlimited) {
+      const next = used + 1;
+      localStorage.setItem(dayKey(), String(next));
+      setUsed(next);
+    }
     void sendMessage({ text: prompt });
     requestAnimationFrame(() => textareaRef.current?.focus());
   };
@@ -97,19 +121,40 @@ export default function ConsultationPanel({ profile, language, onVip }: Props) {
         <div className="flex items-center gap-3">
           <Radio className="size-5 shrink-0 text-primary" />
           <div>
-            <p className="text-sm font-semibold text-foreground">{t.remaining(remaining)}</p>
-            <p className="mt-0.5 text-[10px] text-muted-foreground">{language === "ja" ? "セッションプレビュー" : "SESSION PREVIEW"}</p>
+            <p className="text-sm font-semibold text-foreground">
+              {unlimited
+                ? (isJa ? `${planNames[plan]}：AI相談は無制限` : `${planNames[plan]}: unlimited consultations`)
+                : (isJa ? `本日あと ${remaining} 回（${planNames[plan]}・1日 ${limit} 回）` : `${remaining} left today (${planNames[plan]} · ${limit}/day)`)}
+            </p>
+            <p className="mt-0.5 text-[10px] text-muted-foreground">
+              {isJa ? `次回リセットまで ${hms(countdown)} · 表示テスト（課金未実装）` : `Resets in ${hms(countdown)} · display test (no billing)`}
+            </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          onClick={onVip}
-          className="min-h-10 whitespace-normal border-primary/30 bg-background/40 px-3 text-xs text-primary hover:bg-primary/10 hover:text-primary"
-        >
-          <Crown className="size-4" />
-          {t.vip}
-        </Button>
+        {upgradeTo && (
+          <Button
+            variant="outline"
+            onClick={onVip}
+            className="min-h-10 whitespace-normal border-primary/30 bg-background/40 px-3 text-xs text-primary hover:bg-primary/10 hover:text-primary"
+          >
+            <Crown className="size-4" />
+            {isJa ? `${planNames[upgradeTo]}で1日${Number.isFinite(consultationDailyLimit[upgradeTo]) ? `${consultationDailyLimit[upgradeTo]}回` : "無制限"}に` : `${planNames[upgradeTo]}: ${Number.isFinite(consultationDailyLimit[upgradeTo]) ? `${consultationDailyLimit[upgradeTo]}/day` : "unlimited"}`}
+          </Button>
+        )}
       </div>
+      {!unlimited && remaining <= 0 && (
+        <div role="status" className="mt-3 rounded-lg border border-primary/40 bg-card/70 p-4 text-center">
+          <p className="font-serif text-base text-gradient-gold">{isJa ? "本日の相談上限に達しました" : "Today's limit reached"}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{isJa ? "次回更新まで" : "Next refresh in"}</p>
+          <p className="mt-1 font-mono text-2xl text-primary">{hms(countdown)}</p>
+          {upgradeTo && (
+            <Button variant="champagne" onClick={onVip} className="mt-3 text-xs">
+              <Crown className="size-4" />
+              {isJa ? `${planNames[upgradeTo]}プランを見る` : `View ${planNames[upgradeTo]}`}
+            </Button>
+          )}
+        </div>
+      )}
 
       <div className="mt-6">
         <p className="mb-3 text-xs font-medium text-primary/80">{t.quickLabel}</p>

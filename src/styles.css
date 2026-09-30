@@ -614,3 +614,9 @@
   35% { opacity: 0.9; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.4); }
 }
+
+/* 12-sign monuments on the day compass */
+.zodiac-monument-on { filter: drop-shadow(0 0 1.4px var(--gold-glow)); }
+.zodiac-spark { animation: zodiac-spark 1.8s ease-in-out infinite; }
+@keyframes zodiac-spark { 0%,100% { opacity: .2; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .zodiac-spark { animation: none; } }
