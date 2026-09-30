@@ -18,16 +18,36 @@ import {
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
+import type { Plan } from "@/lib/design-modes";
+import { consultationDailyLimit, nextPlan } from "@/lib/plans";
+import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import compassAvatar from "@/assets/onore-ai-compass.png";
 
-type Props = { profile: UserProfile; language: Language; onVip: () => void };
+type Props = { profile: UserProfile; language: Language; plan: Plan; onVip: () => void };
 
-export default function ConsultationPanel({ profile, language, onVip }: Props) {
+const dayKey = () => { const d = new Date(); return `onore-consult-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+const untilMidnight = () => { const n = new Date(); const m = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1); return m.getTime() - n.getTime(); };
+const hms = (ms: number) => { const s = Math.max(0, Math.floor(ms / 1000)); return [s / 3600, (s % 3600) / 60, s % 60].map((v) => String(Math.floor(v)).padStart(2, "0")).join(":"); };
+
+export default function ConsultationPanel({ profile, language, plan, onVip }: Props) {
   const t = consultationTranslations[language];
+  const planNames = teamCopy[language].planNames;
+  const isJa = language === "ja";
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [remaining, setRemaining] = useState(2);
+  const limit = consultationDailyLimit[plan];
+  const unlimited = !Number.isFinite(limit);
+  const [used, setUsed] = useState(0);
+  const [countdown, setCountdown] = useState(untilMidnight());
+  useEffect(() => {
+    const read = () => setUsed(Number(localStorage.getItem(dayKey()) ?? 0) || 0);
+    read();
+    const id = window.setInterval(() => { setCountdown(untilMidnight()); read(); }, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const remaining = unlimited ? Infinity : Math.max(0, limit - used);
+  const upgradeTo = nextPlan(plan);
   const [notice, setNotice] = useState<string | null>(null);
   const initialMessages = useMemo<UIMessage[]>(
     () => [{ id: "welcome", role: "assistant", parts: [{ type: "text", text: t.greeting }] }],
