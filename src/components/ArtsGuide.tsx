@@ -16,18 +16,65 @@ const methods = [
   ["血液型占い（血液型気質学・行動統計）", "A・B・O・ABの4パターンがもたらす気質傾向と行動傾向を掛け合わせた伝統的な見立てです（科学的に確立された性格判定ではありません）。", "感情の現れ方、対人関係での距離感の保ち方、無意識の警戒心やストレス反応のパターンを捉えます。"],
 ];
 
+const stars = [
+  { top: "8%", left: "8%", size: 2, delay: "0s" },
+  { top: "18%", left: "20%", size: 1.5, delay: "0.8s", soft: true },
+  { top: "6%", left: "36%", size: 1.5, delay: "1.6s", soft: true },
+  { top: "14%", left: "58%", size: 2, delay: "0.4s" },
+  { top: "9%", left: "78%", size: 2.5, delay: "1.1s" },
+  { top: "22%", left: "90%", size: 1.5, delay: "2s", soft: true },
+  { top: "34%", left: "5%", size: 1.5, delay: "1.4s" },
+  { top: "44%", left: "14%", size: 2, delay: "2.6s", soft: true },
+  { top: "40%", left: "86%", size: 1.5, delay: "0.6s" },
+  { top: "58%", left: "92%", size: 2, delay: "1.9s", soft: true },
+  { top: "70%", left: "7%", size: 2, delay: "2.2s" },
+  { top: "78%", left: "26%", size: 1.5, delay: "1s", soft: true },
+  { top: "84%", left: "70%", size: 2, delay: "0.3s" },
+  { top: "74%", left: "88%", size: 1.5, delay: "2.4s", soft: true },
+];
+
+function IntroStars() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0">
+      {stars.map((s, i) => (
+        <span
+          key={i}
+          className={`arts-star${s.soft ? " arts-star--soft" : ""}`}
+          style={{ top: s.top, left: s.left, width: s.size, height: s.size, animationDelay: s.delay }}
+        />
+      ))}
+      <span className="arts-orb" style={{ top: "-14%", left: "50%", width: 340, height: 340, transform: "translateX(-50%)" }} />
+      <span className="arts-orb" style={{ bottom: "-18%", left: "-10%", width: 260, height: 260, animationDelay: "2.5s" }} />
+      <span className="arts-orb" style={{ bottom: "-10%", right: "-12%", width: 220, height: 220, animationDelay: "4s" }} />
+    </div>
+  );
+}
+
 export function ArtsGuide() {
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-primary/30 bg-card/60 backdrop-blur">
-      <div className="relative px-6 py-10 text-center">
+      <div className="relative px-6 py-14 text-center">
+        <IntroStars />
         <div aria-hidden className="pointer-events-none absolute inset-0 opacity-70" style={{ backgroundImage: "radial-gradient(1px 1px at 12% 20%, var(--primary), transparent), radial-gradient(1.5px 1.5px at 78% 30%, var(--primary), transparent), radial-gradient(1px 1px at 40% 70%, var(--foreground), transparent), radial-gradient(1px 1px at 88% 82%, var(--primary), transparent), radial-gradient(1px 1px at 24% 88%, var(--foreground), transparent), radial-gradient(ellipse at 50% 0%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 70%)" }} />
-        <p className="relative text-xs tracking-[0.3em] text-primary">INTRODUCTION</p>
-        <h3 className="relative mt-3 font-serif text-2xl text-primary">星々の引力と生命の原点</h3>
-        <div className="relative mx-auto mt-6 max-w-xl space-y-4 font-serif text-[15px] leading-8 text-foreground/90">
-          <p>私達すべての生命は、宇宙に浮かぶ星々が織りなす引力や磁場、天体の運行という大いなるエネルギーの影響を受けています。</p>
-          <p>あなたが<span className="text-primary">「いつ、どこで」</span>生まれたのか——その瞬間の宇宙の星々の配置とエネルギーこそが、あなたの生命の特性や感情の波、潜在能力の原点を形作っています。</p>
-          <p>世界の占星術や鑑定学は、太古よりこの<span className="text-primary">「星々と生命の共鳴法則」</span>を観察・体系化し、人が自らの天性を知り人生を豊かに航海するための知恵として活用してきたものです。</p>
-          <p>オノレコンパスは、この15以上の分析ロジックを最新AIで統合し、あなたという存在を多次元で解き明かします。</p>
+        <p className="arts-rise relative text-[11px] tracking-[0.55em] text-primary/80">INTRODUCTION</p>
+        <div className="relative mt-4 flex items-center justify-center gap-3" aria-hidden>
+          <span className="h-px w-14 bg-gradient-to-r from-transparent to-primary/60" />
+          <span className="text-primary/90" style={{ fontSize: 10 }}>✦</span>
+          <span className="h-px w-14 bg-gradient-to-l from-transparent to-primary/60" />
+        </div>
+        <h3 className="arts-rise relative mt-4 font-serif text-3xl tracking-wide" style={{ animationDelay: "0.15s", textShadow: "0 0 24px color-mix(in oklab, var(--gold-glow) 35%, transparent)" }}>
+          <span className="arts-shimmer">星々の引力と生命の原点</span>
+        </h3>
+        <div className="relative mx-auto mt-8 max-w-xl space-y-5 font-serif text-[15px] leading-8 text-foreground/90">
+          <p className="arts-rise" style={{ animationDelay: "0.3s" }}>私達すべての生命は、宇宙に浮かぶ星々が織りなす<span className="text-primary">引力</span>や<span className="text-primary">磁場</span>、天体の運行という大いなるエネルギーの影響を受けています。</p>
+          <p className="arts-rise" style={{ animationDelay: "0.45s" }}>あなたが<span className="text-primary">「いつ、どこで」</span>生まれたのか——その瞬間の宇宙の星々の配置とエネルギーこそが、あなたの生命の特性や感情の波、潜在能力の原点を形作っています。</p>
+          <p className="arts-rise" style={{ animationDelay: "0.6s" }}>世界の占星術や鑑定学は、太古よりこの<span className="text-primary">「星々と生命の共鳴法則」</span>を観察・体系化し、人が自らの天性を知り人生を豊かに航海するための知恵として活用してきたものです。</p>
+          <div className="flex items-center justify-center gap-3 pt-2" aria-hidden>
+            <span className="h-px w-10 bg-gradient-to-r from-transparent to-primary/50" />
+            <span className="text-primary/80" style={{ fontSize: 9 }}>✧</span>
+            <span className="h-px w-10 bg-gradient-to-l from-transparent to-primary/50" />
+          </div>
+          <p className="arts-rise text-primary" style={{ animationDelay: "0.75s" }}>オノレコンパスは、この15以上の分析ロジックを最新AIで統合し、あなたという存在を多次元で解き明かします。</p>
         </div>
       </div>
       <div className="space-y-6 border-t border-primary/20 px-5 py-6">
