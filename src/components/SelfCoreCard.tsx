@@ -22,8 +22,12 @@ const nameCopy: Record<Language, { title: string; grids: [string, string, string
   fr: { title: "Lecture du nom (cinq cadres)", grids: ["Ciel", "Personne", "Terre", "Extérieur", "Total"], fortune: "Forces sociales suggérées par votre nom", split: "Choisissez la fin du nom de famille pour calculer et enregistrer", save: "Enregistrer", note: "Valeurs de référence avec traits modernes et une table courante de 81 nombres." },
 };
 
-export default function SelfCoreCard({ profile, language, onDiagnosis, onConsult, onArt, onTeam, onProfileChange }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; onConsult: () => void; onArt: () => void; onTeam: () => void }) {
+const planIcons: Record<HomePlanId, typeof Sprout> = { standard: Sprout, vip: Gem, b2b: Building2, "b2b-premium": Crown };
+
+export default function SelfCoreCard({ profile, language, onDiagnosis, onProfileChange }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void }) {
   const t = homeReadingCopy[language];
+  const p = homePlanCardsCopy[language];
+  const [dialogPlan, setDialogPlan] = useState<HomePlanId | null>(null);
   const f = fiveElementsCopy[language];
   const generate = useServerFn(generateHomeReading);
   const n = nameCopy[language];
