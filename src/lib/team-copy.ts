@@ -6,7 +6,7 @@ export type TeamCopy = {
   title: string; note: string; planNames: Record<Plan, string>; limit: (used: number, max: number) => string;
   tabs: [string, string, string, string, string, string, string];
   add: string; name: string; birthDate: string; jobRole: string; skills: string; skillsHint: string; save: string; remove: string; empty: string; guestNote: string;
-  limitTitle: string; limitBody: (plan: string, max: number) => string; absoluteLimit: string; upgradePending: string; switchPlan: string; later: string;
+  limitTitle: string; limitBody: (plan: string, max: number) => string; absoluteLimit: string; upgradePending: string; saveError: string; switchPlan: string; later: string;
   locked: (plan: string) => string; seePlans: string;
   select: string; selectedOf: (n: number, max: number) => string; balance: string; synergy: string; conflict: string; axisX: [string, string]; axisY: [string, string]; pickTwo: string;
   goal: string; goalPh: string; headcount: string; auto: string; runDraft: string; reevaluate: string; features: string; evaluation: string; cautions: string; recommended: (n: number) => string; swapHint: string;
@@ -24,7 +24,7 @@ const ja: TeamCopy = {
   limit: (u, m) => `登録 ${u} / ${m}人`,
   tabs: ["関係者名簿", "チーム同時診断", "AI人員選抜", "タレント名簿", "アラートカレンダー", "組織バランス", "1on1トリセツ"],
   add: "関係者を追加", name: "名前", birthDate: "生年月日", jobRole: "得意職種・役職", skills: "スキル", skillsHint: "カンマ区切り", save: "追加する", remove: "削除", empty: "まだ関係者が登録されていません。", guestNote: "未ログインのため、この端末内だけに保存されます。",
-  limitTitle: "登録上限に達しました", limitBody: (p, m) => `この人数を登録するには${p}プラン（上限${m}人）への切り替えが必要です。`, absoluteLimit: "ビジネスプレミアムの登録上限は100人です。", upgradePending: "プランの申込受付前です。表示テストを切り替えても登録上限は変わりません。", switchPlan: "プランを見る", later: "あとで",
+  limitTitle: "登録上限に達しました", limitBody: (p, m) => `この人数を登録するには${p}プラン（上限${m}人）への切り替えが必要です。`, absoluteLimit: "ビジネスプレミアムの登録上限は100人です。", upgradePending: "プランの申込受付前です。表示テストを切り替えても登録上限は変わりません。", saveError: "保存できませんでした。会員資格と登録上限を確認してください。", switchPlan: "プランを見る", later: "あとで",
   locked: (p) => `この機能は${p}プラン以上で解放されます。`, seePlans: "プランを見る",
   select: "診断するメンバーを選択", selectedOf: (n, m) => `${n} / ${m}人選択中`, balance: "総合相性・バランス", synergy: "シナジー", conflict: "注意すべき衝突ポイント", axisX: ["論理", "共感"], axisY: ["計画", "行動"], pickTwo: "2人以上選ぶと診断できます。",
   goal: "企画・イベントの目的", goalPh: "例：新商品のローンチイベントを成功させたい", headcount: "希望人数", auto: "AIにおまかせ", runDraft: "AIで選抜する", reevaluate: "この組み合わせで再評価", features: "組み合わせの特徴", evaluation: "評価", cautions: "注意点", recommended: (n) => `推奨人数：${n}人`, swapHint: "チェックで手動差し替えできます",
@@ -45,7 +45,7 @@ const en: TeamCopy = {
   limit: (u, m) => `${u} / ${m} registered`,
   tabs: ["Members", "Team diagnosis", "AI draft", "Talent catalog", "Alert calendar", "Org balance", "1on1 guide"],
   add: "Add member", name: "Name", birthDate: "Birth date", jobRole: "Specialty / role", skills: "Skills", skillsHint: "comma separated", save: "Add", remove: "Remove", empty: "No members registered yet.", guestNote: "Not signed in — saved on this device only.",
-  limitTitle: "Member limit reached", limitBody: (p, m) => `To register this many people, switch to the ${p} plan (up to ${m}).`, absoluteLimit: "Business Premium allows up to 100 registered members.", upgradePending: "Enrollment is not open yet. Changing the display preview does not raise your limit.", switchPlan: "View plans", later: "Not now",
+  limitTitle: "Member limit reached", limitBody: (p, m) => `To register this many people, switch to the ${p} plan (up to ${m}).`, absoluteLimit: "Business Premium allows up to 100 registered members.", upgradePending: "Enrollment is not open yet. Changing the display preview does not raise your limit.", saveError: "Could not save. Check your membership and member limit.", switchPlan: "View plans", later: "Not now",
   locked: (p) => `Unlocked from the ${p} plan.`, seePlans: "View plans",
   select: "Select members to diagnose", selectedOf: (n, m) => `${n} / ${m} selected`, balance: "Overall compatibility & balance", synergy: "Synergies", conflict: "Potential friction points", axisX: ["Logic", "Empathy"], axisY: ["Plan", "Action"], pickTwo: "Select two or more people.",
   goal: "Project / event goal", goalPh: "e.g. Make our product launch event a success", headcount: "Headcount", auto: "Let AI decide", runDraft: "Draft with AI", reevaluate: "Re-evaluate this lineup", features: "Team character", evaluation: "Evaluation", cautions: "Watch points", recommended: (n) => `Recommended size: ${n}`, swapHint: "Tick boxes to swap members manually",

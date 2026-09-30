@@ -15,7 +15,7 @@ import {
 import { addTeamMember, deleteTeamMember, listTeamMembers } from "@/lib/team-members.functions";
 import { draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
 
-type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string; onPlanChange: (p: Plan) => void };
+type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
 const LOCAL = "onore-team";
 const card = "rounded-2xl border border-primary/15 bg-background/40 p-4";
 const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "draft", "catalog", "calendar", "balance", "oneOnOne"];
@@ -25,7 +25,7 @@ const summary = (m: TeamMember, t: TeamCopy) => ({
   element: dayElement(m.birthDate), lifePath: lifePath(m.birthDate), biorhythm: biorhythm(m.birthDate, todayIso()).total,
 });
 
-export default function TeamStudio({ plan, actualPlan, language, signedIn, ownerBirthDate, onPlanChange }: Props) {
+export default function TeamStudio({ plan, actualPlan, language, signedIn, ownerBirthDate }: Props) {
   const t = teamCopy[language];
   const [tab, setTab] = useState(0);
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -79,7 +79,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
           <div className={`${card} text-center`}>
             <Lock className="mx-auto size-6 text-primary" />
             <p className="mt-2 text-sm">{t.locked(t.planNames[requiredPlanFor(feature)])}</p>
-            <Button size="sm" className="mt-3" onClick={() => onPlanChange(requiredPlanFor(feature))}>{t.switchPlan}</Button>
+            <Button size="sm" className="mt-3" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.seePlans}</Button>
           </div>
         ) : feature === "roster" ? (
           <Roster t={t} members={members} max={max} signedIn={signedIn} onAdd={addMember} onRemove={removeMember} />
@@ -124,13 +124,16 @@ function RoleBadge({ role, t }: { role: TeamRole; t: TeamCopy }) {
 function Roster({ t, members, max, signedIn, onAdd, onRemove }: { t: TeamCopy; members: TeamMember[]; max: number; signedIn: boolean; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onRemove: (id: string) => void }) {
   const [form, setForm] = useState({ name: "", birthDate: "", role: "", skills: "" });
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.birthDate) return;
     setBusy(true);
+    setError(false);
     try {
       const ok = await onAdd({ name: form.name.trim(), birthDate: form.birthDate, gender: "undisclosed", bloodType: "", role: form.role.trim(), skills: form.skills.split(/[,、，]/).map((s) => s.trim()).filter(Boolean).slice(0, 12) });
       if (ok) setForm({ name: "", birthDate: "", role: "", skills: "" });
+    } catch { setError(true);
     } finally { setBusy(false); }
   };
   return (
@@ -142,6 +145,7 @@ function Roster({ t, members, max, signedIn, onAdd, onRemove }: { t: TeamCopy; m
         <Input aria-label={t.jobRole} placeholder={t.jobRole} value={form.role} maxLength={60} onChange={(e) => setForm({ ...form, role: e.target.value })} />
         <Input aria-label={t.skills} placeholder={`${t.skills}（${t.skillsHint}）`} value={form.skills} onChange={(e) => setForm({ ...form, skills: e.target.value })} />
         <Button type="submit" disabled={busy} className="sm:col-span-2"><UserPlus className="size-4" />{t.add} ({members.length}/{max})</Button>
+        {error && <p role="alert" className="text-xs text-destructive sm:col-span-2">{t.saveError}</p>}
       </form>
       {members.length === 0 ? <p className="text-sm text-muted-foreground">{t.empty}</p> : (
         <ul className="grid gap-2 sm:grid-cols-2">
