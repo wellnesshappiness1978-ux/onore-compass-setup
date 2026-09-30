@@ -83,7 +83,11 @@ export default function ConsultationPanel({ profile, language, plan, onVip }: Pr
     }
     setNotice(null);
     clearError();
-    setRemaining((value) => Math.max(0, value - 1));
+    if (!unlimited) {
+      const next = used + 1;
+      localStorage.setItem(dayKey(), String(next));
+      setUsed(next);
+    }
     void sendMessage({ text: prompt });
     requestAnimationFrame(() => textareaRef.current?.focus());
   };
@@ -117,19 +121,40 @@ export default function ConsultationPanel({ profile, language, plan, onVip }: Pr
         <div className="flex items-center gap-3">
           <Radio className="size-5 shrink-0 text-primary" />
           <div>
-            <p className="text-sm font-semibold text-foreground">{t.remaining(remaining)}</p>
-            <p className="mt-0.5 text-[10px] text-muted-foreground">{language === "ja" ? "セッションプレビュー" : "SESSION PREVIEW"}</p>
+            <p className="text-sm font-semibold text-foreground">
+              {unlimited
+                ? (isJa ? `${planNames[plan]}：AI相談は無制限` : `${planNames[plan]}: unlimited consultations`)
+                : (isJa ? `本日あと ${remaining} 回（${planNames[plan]}・1日 ${limit} 回）` : `${remaining} left today (${planNames[plan]} · ${limit}/day)`)}
+            </p>
+            <p className="mt-0.5 text-[10px] text-muted-foreground">
+              {isJa ? `次回リセットまで ${hms(countdown)} · 表示テスト（課金未実装）` : `Resets in ${hms(countdown)} · display test (no billing)`}
+            </p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          onClick={onVip}
-          className="min-h-10 whitespace-normal border-primary/30 bg-background/40 px-3 text-xs text-primary hover:bg-primary/10 hover:text-primary"
-        >
-          <Crown className="size-4" />
-          {t.vip}
-        </Button>
+        {upgradeTo && (
+          <Button
+            variant="outline"
+            onClick={onVip}
+            className="min-h-10 whitespace-normal border-primary/30 bg-background/40 px-3 text-xs text-primary hover:bg-primary/10 hover:text-primary"
+          >
+            <Crown className="size-4" />
+            {isJa ? `${planNames[upgradeTo]}で1日${Number.isFinite(consultationDailyLimit[upgradeTo]) ? `${consultationDailyLimit[upgradeTo]}回` : "無制限"}に` : `${planNames[upgradeTo]}: ${Number.isFinite(consultationDailyLimit[upgradeTo]) ? `${consultationDailyLimit[upgradeTo]}/day` : "unlimited"}`}
+          </Button>
+        )}
       </div>
+      {!unlimited && remaining <= 0 && (
+        <div role="status" className="mt-3 rounded-lg border border-primary/40 bg-card/70 p-4 text-center">
+          <p className="font-serif text-base text-gradient-gold">{isJa ? "本日の相談上限に達しました" : "Today's limit reached"}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{isJa ? "次回更新まで" : "Next refresh in"}</p>
+          <p className="mt-1 font-mono text-2xl text-primary">{hms(countdown)}</p>
+          {upgradeTo && (
+            <Button variant="champagne" onClick={onVip} className="mt-3 text-xs">
+              <Crown className="size-4" />
+              {isJa ? `${planNames[upgradeTo]}プランを見る` : `View ${planNames[upgradeTo]}`}
+            </Button>
+          )}
+        </div>
+      )}
 
       <div className="mt-6">
         <p className="mb-3 text-xs font-medium text-primary/80">{t.quickLabel}</p>
