@@ -84,7 +84,7 @@ export function computeCoreLayers(p: CoreInput, now = new Date()) {
   const firstEnd = 36 - (lifePath > 9 ? reduceNumerology(digitSum(String(lifePath))) : lifePath);
   const age = now.getUTCFullYear() - y;
   const turning = [firstEnd, firstEnd + 9, firstEnd + 18].find(a => a >= age) ?? null;
-  const numerology = { lifePath, destiny: sumOf(romaji), soul: sumOf(romaji.replace(/[^AEIOUY]/g, "")), personality: sumOf(romaji.replace(/[AEIOUY]/g, "")), personalYear, cyclePhase: `9年周期の${personalYear}年目`, turningAge: turning, turningYear: turning === null ? null : y + turning };
+  const numerology = { lifePath, destiny: sumOf(romaji), soul: sumOf(romaji.replace(/[^AEIOUY]/g, "")), personality: sumOf(romaji.replace(/[AEIOUY]/g, "")), personalYear, cyclePhase: `9年周期の${((personalYear - 1) % 9) + 1}年目`, turningAge: turning, turningYear: turning === null ? null : y + turning };
 
   // Name grid + animal (existing tables)
   const five = getFiveElements(p);
