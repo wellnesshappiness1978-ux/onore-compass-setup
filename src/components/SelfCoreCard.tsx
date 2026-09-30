@@ -29,7 +29,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onConsult
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-five-v2", profile, language],
+    queryKey: ["home-reading-five-v3", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
