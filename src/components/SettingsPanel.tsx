@@ -71,7 +71,6 @@ const card = "rounded-2xl border border-primary/20 bg-card/60 p-5 shadow-2xl bac
 // Deterministic sample waveform for the plan display test — not a real reading.
 function BiorhythmPreview({
   plan,
-  actualPlan,
   profile,
   t,
   language,
@@ -318,6 +317,7 @@ export default function SettingsPanel({
   onEdit,
   onVip,
   plan,
+  actualPlan,
   onPlanChange,
   designMode,
   onDesignModeChange,
