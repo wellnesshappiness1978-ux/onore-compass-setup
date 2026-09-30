@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowUpRight, Compass, Dna, Fingerprint, Heart, Orbit, Sparkles, Users, WandSparkles } from "lucide-react";
+import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, Heart, Orbit, Sparkles, Sprout } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { fiveElementsCopy } from "@/lib/five-elements-copy";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
+import { homePlanCardsCopy, type HomePlanId } from "@/lib/home-plan-cards";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
-import { useState } from "react";
 import { splittableName } from "@/lib/ai/five-elements";
 
 const nameCopy: Record<Language, { title: string; grids: [string, string, string, string, string]; fortune: string; split: string; save: string; note: string }> = {
@@ -20,8 +22,12 @@ const nameCopy: Record<Language, { title: string; grids: [string, string, string
   fr: { title: "Lecture du nom (cinq cadres)", grids: ["Ciel", "Personne", "Terre", "Extérieur", "Total"], fortune: "Forces sociales suggérées par votre nom", split: "Choisissez la fin du nom de famille pour calculer et enregistrer", save: "Enregistrer", note: "Valeurs de référence avec traits modernes et une table courante de 81 nombres." },
 };
 
-export default function SelfCoreCard({ profile, language, onDiagnosis, onConsult, onArt, onTeam, onProfileChange }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; onConsult: () => void; onArt: () => void; onTeam: () => void }) {
+const planIcons: Record<HomePlanId, typeof Sprout> = { standard: Sprout, vip: Gem, b2b: Building2, "b2b-premium": Crown };
+
+export default function SelfCoreCard({ profile, language, onDiagnosis, onProfileChange }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void }) {
   const t = homeReadingCopy[language];
+  const p = homePlanCardsCopy[language];
+  const [dialogPlan, setDialogPlan] = useState<HomePlanId | null>(null);
   const f = fiveElementsCopy[language];
   const generate = useServerFn(generateHomeReading);
   const n = nameCopy[language];
@@ -81,13 +87,40 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onConsult
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>
       {data && !isError && <footer className="border-t border-primary/25 bg-background/40 p-5 sm:p-8">
-        <div className="flex items-center gap-3"><Sparkles className="size-5 text-primary" aria-hidden="true" /><h3 className="font-serif text-lg text-primary sm:text-xl">{t.nextStepTitle}</h3></div>
-        <div className="mt-5 grid gap-2.5">
-          {([[WandSparkles, t.consultCta, onConsult, t.vipLabel], [Orbit, t.artCta, onArt, t.vipLabel], [Users, t.teamCta, onTeam, t.businessLabel]] as const).map(([Icon, label, action, badge]) => <Button key={label} type="button" variant="outline" onClick={action} className="group h-auto min-h-16 w-full justify-start gap-3 whitespace-normal border-primary/25 bg-card/50 px-4 py-3 text-left text-foreground hover:border-primary/65 hover:bg-primary/10 hover:text-foreground sm:px-5">
-            <Icon className="size-5 shrink-0 text-primary" aria-hidden="true" /><span className="min-w-0 flex-1 break-words text-sm leading-6">{label}</span><span className="shrink-0 text-[10px] text-primary">{badge}</span><ArrowUpRight className="size-4 shrink-0 text-primary transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transform-none" aria-hidden="true" />
-          </Button>)}
+        <div className="flex items-center gap-3"><Sparkles className="size-5 text-primary" aria-hidden="true" /><div className="min-w-0"><h3 className="font-serif text-lg text-primary sm:text-xl">{p.sectionTitle}</h3><p className="mt-1 text-xs text-muted-foreground">{p.sectionSub}</p></div></div>
+        <div className="mt-5 -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0">
+          {p.cards.map((card) => {
+            const Icon = planIcons[card.id];
+            const vip = card.id === "vip" || card.id === "b2b-premium";
+            return <article key={card.id} className={`flex w-[84%] min-w-[84%] snap-start flex-col rounded-lg border p-4 sm:w-auto sm:min-w-0 sm:p-5 ${vip ? "border-primary/50 bg-gradient-to-b from-primary/20 via-card/80 to-card/70 shadow-champagne" : "border-primary/25 bg-card/60"}`}>
+              <div className="flex items-center justify-between gap-2">
+                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] leading-none ${vip ? "bg-champagne-gradient font-medium text-primary-foreground" : "border border-primary/45 text-primary"}`}>{card.badge}</span>
+                <Icon className={`size-5 shrink-0 ${vip ? "text-(--gold-glow)" : "text-primary"}`} aria-hidden="true" />
+              </div>
+              <h4 className="mt-3 break-words font-serif text-base leading-snug text-foreground sm:text-lg">{card.name}</h4>
+              <p className="mt-2 break-words text-xs leading-6 text-primary sm:text-[13px]">{card.catch}</p>
+              <ul className="mt-4 flex-1 space-y-2.5">
+                {card.features.map((feat) => <li key={feat} className="flex items-start gap-2"><Check className={`mt-0.5 size-3.5 shrink-0 ${vip ? "text-(--gold-glow)" : "text-primary"}`} aria-hidden="true" /><span className="min-w-0 break-words text-xs leading-5 text-foreground/90">{feat}</span></li>)}
+              </ul>
+              <Button type="button" variant={vip ? "default" : "outline"} onClick={() => setDialogPlan(card.id)} className={`mt-4 h-11 w-full whitespace-normal text-xs leading-5 ${vip ? "shadow-champagne" : "border-primary/40 text-primary hover:bg-primary/10"}`}>{card.cta}</Button>
+            </article>;
+          })}
         </div>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2"><p className="text-xs leading-5 text-muted-foreground">{t.nextStepNote}</p><Button variant="link" className="h-auto p-0 text-xs" onClick={onDiagnosis}>{t.goToArts}<ArrowUpRight className="size-3" /></Button></div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2"><p className="text-xs leading-5 text-muted-foreground">{p.nextStepNote}</p><Button variant="link" className="h-auto p-0 text-xs" onClick={onDiagnosis}>{t.goToArts}<ArrowUpRight className="size-3" /></Button></div>
+        <Dialog open={dialogPlan !== null} onOpenChange={(open) => { if (!open) setDialogPlan(null); }}>
+          <DialogContent className="max-w-sm rounded-lg border-primary/40 bg-card p-5 text-left sm:p-6">
+            {(() => { const card = p.cards.find((c) => c.id === dialogPlan); if (!card) return null;
+              return <>
+                <DialogTitle className="break-words font-serif text-lg text-gradient-gold">{card.name}</DialogTitle>
+                <DialogDescription className="mt-2 break-words text-sm leading-6 text-primary">{card.catch}</DialogDescription>
+                <ul className="mt-4 space-y-2.5">
+                  {card.features.map((feat) => <li key={feat} className="flex items-start gap-2"><Check className="mt-0.5 size-3.5 shrink-0 text-primary" aria-hidden="true" /><span className="min-w-0 break-words text-xs leading-5 text-foreground/90">{feat}</span></li>)}
+                </ul>
+                <p className="mt-4 text-[11px] leading-5 text-muted-foreground">{p.dialogNote}</p>
+                <Button variant="outline" className="mt-4 w-full border-primary/40 text-primary hover:bg-primary/10" onClick={() => setDialogPlan(null)}>{p.close}</Button>
+              </>; })()}
+          </DialogContent>
+        </Dialog>
       </footer>}
     </section>
   );

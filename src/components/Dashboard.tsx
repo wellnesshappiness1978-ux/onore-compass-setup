@@ -543,7 +543,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <>
-            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => { setArtsEntry("manual"); setTab("arts"); window.scrollTo({ top: 0, behavior: "smooth" }); }} onConsult={() => { setTab("consult"); window.scrollTo({ top: 0, behavior: "smooth" }); }} onArt={() => { setTab("mandala"); window.scrollTo({ top: 0, behavior: "smooth" }); }} onTeam={() => { setTeamEntry(true); setTab("settings"); }} /></div>
+            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => { setArtsEntry("manual"); setTab("arts"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
             <section className="design-compass-section text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">
                 <span className="h-px w-8 bg-primary/30" />
