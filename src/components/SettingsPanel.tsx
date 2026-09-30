@@ -3,9 +3,9 @@ import {
   Bell,
   Building2,
   Check,
-  ChevronDown,
   Crown,
   Globe2,
+  Gem,
   HelpCircle,
   Lock,
   LockKeyhole,
@@ -14,6 +14,7 @@ import {
   ScrollText,
   Shield,
   Sparkles,
+  Sprout,
   Target,
   Moon,
   SlidersHorizontal,
@@ -32,6 +33,7 @@ import TeamStudio from "@/components/team/TeamStudio";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
 import { memberLimit, planOrder } from "@/lib/plans";
+import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 
 type Props = {
@@ -327,7 +329,8 @@ export default function SettingsPanel({
   const dc = designCopy[language];
   const [bioPlan, setBioPlan] = useState<Plan>("free");
   const [yearly, setYearly] = useState(false);
-  const [openTier, setOpenTier] = useState<string | null>("vip");
+  const [cardPlan, setCardPlan] = useState<PaidPlanId>("vip");
+  const [upgradePlan, setUpgradePlan] = useState<string | null>(null);
   const [b2b, setB2b] = useState(false);
   const [notifyTiming, setNotifyTiming] = useState(true);
   const [notifyBio, setNotifyBio] = useState(false);
@@ -335,6 +338,15 @@ export default function SettingsPanel({
   const [lockedMode, setLockedMode] = useState<DesignMode | null>(null);
 
   const tc = teamCopy[language];
+  const pc = planCardsCopy[language];
+  const planTabName = (id: PaidPlanId) =>
+    id === "standard" ? t.standard : id === "vip" ? "VIP" : id === "b2b" ? t.planB2b : tc.planNames["b2b-premium"];
+  const planIcon: Record<PaidPlanId, typeof Crown> = {
+    standard: Sprout,
+    vip: Gem,
+    b2b: Building2,
+    "b2b-premium": Crown,
+  };
   const premiumFeatures: Record<Language, string[]> = {
     ja: ["関係者を最大100人登録", "100人規模の組織コンサル全7タブ", "AI回答の優先生成（提供準備中）", "ビジネスプランの全機能"],
     en: ["Register up to 100 members", "All seven organization tools for 100 people", "Priority AI generation (coming soon)", "Everything in Business"],
@@ -350,6 +362,9 @@ export default function SettingsPanel({
     cta: tc.switchPlan,
   };
   const allTiers = [...t.tiers, premiumTier];
+  const selectedCard = pc.cards.find((c) => c.id === cardPlan) ?? pc.cards[1]!;
+  const selectedTier = allTiers.find((tr) => tr.id === selectedCard.id) ?? allTiers[2]!;
+  const freeTier = t.tiers[0]!;
   const planLabel =
     plan === "b2b-premium" ? tc.planNames["b2b-premium"] : plan === "vip"
       ? t.planVip
@@ -512,7 +527,10 @@ export default function SettingsPanel({
 
       <section id="membership-plans" className={card}>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h3 className="font-serif text-lg text-primary">{t.plansHeading}</h3>
+          <div className="min-w-0">
+            <h3 className="font-serif text-xl text-gradient-gold">{pc.sectionTitle}</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">{t.plansHeading} — {pc.sectionSub}</p>
+          </div>
           <div
             className="flex rounded-full border border-primary/25 bg-background/50 p-1 text-xs"
             role="radiogroup"
@@ -541,90 +559,114 @@ export default function SettingsPanel({
           </div>
         </div>
 
-        <div className="mt-4 space-y-3">
-            {allTiers.map((tier) => {
-            const isVip = tier.id === "vip";
-            const isB2b = tier.id === "b2b" || tier.id === "b2b-premium";
-            const open = openTier === tier.id;
-            const price = yearly ? tier.priceYearly : tier.priceMonthly;
-            const period = yearly ? t.perYear : t.perMonth;
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={t.plansHeading}>
+          {pc.cards.map((item) => {
+            const active = cardPlan === item.id;
+            const TabIcon = planIcon[item.id];
             return (
-              <div
-                key={tier.id}
-                className={`overflow-hidden rounded-2xl border transition-shadow ${
-                  isVip
-                    ? "border-primary/70 bg-primary/10 shadow-[0_0_28px_-6px_var(--gold-glow)]"
-                    : "border-primary/15 bg-background/40"
+              <button
+                key={item.id}
+                role="tab"
+                aria-selected={active}
+                onClick={() => setCardPlan(item.id)}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs transition-all ${
+                  active
+                    ? "border-primary bg-primary/20 text-primary shadow-[0_0_18px_-4px_var(--gold-glow)]"
+                    : "border-primary/15 bg-background/40 text-muted-foreground hover:text-primary"
                 }`}
               >
-                <button
-                  onClick={() => setOpenTier(open ? null : tier.id)}
-                  aria-expanded={open}
-                  className="flex w-full items-center gap-3 p-4 text-left"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className={`font-serif text-sm ${isVip ? "text-gradient-gold" : ""}`}>
-                        {tier.name}
-                      </p>
-                      {isVip && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-champagne-gradient px-2 py-0.5 text-[10px] font-semibold text-[#10131a] shadow-champagne">
-                          <Crown className="size-3" /> {t.popular}
-                        </span>
-                      )}
-                      {isB2b && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
-                          <Building2 className="size-3" /> {t.corporate}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{language === "ja" ? `登録上限 ${memberLimit[tier.id]}人${tier.id === "free" ? " · 本人専用" : ""}` : tc.limit(0, memberLimit[tier.id])}</p>
-                    <p className="mt-1 flex items-baseline gap-1">
-                      <span
-                        className={`text-xl font-semibold ${isVip ? "text-gradient-gold" : "text-foreground"}`}
-                      >
-                        {price}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">
-                        {tier.id === "b2b" ? tier.priceNote : period}
-                      </span>
-                      {tier.priceNote && tier.id !== "b2b" && (
-                        <span className="ml-1 text-[10px] text-primary">{tier.priceNote}</span>
-                      )}
-                    </p>
-                  </div>
-                  <ChevronDown
-                    className={`size-4 shrink-0 text-primary transition-transform ${open ? "rotate-180" : ""}`}
-                  />
-                </button>
-                {open && (
-                  <div className="border-t border-primary/10 px-4 pb-4 pt-3">
-                    <ul className="space-y-1.5">
-                      {tier.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2 text-xs">
-                          <Check
-                            className={`mt-0.5 size-3.5 shrink-0 ${isVip ? "text-primary" : "text-muted-foreground"}`}
-                          />
-                          <span className={isVip ? "text-foreground" : "text-muted-foreground"}>
-                            {f}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      onClick={() => { setNotice(`${tier.name}: ${t.upgradeNote}`); }}
-                      disabled={tier.id === "free"}
-                      size="sm"
-                      className={`mt-3 h-9 w-full ${isVip ? "shadow-champagne-strong" : ""}`}
-                      variant={isVip ? "default" : "outline"}
-                    >
-                      {tier.cta}
-                    </Button>
-                  </div>
-                )}
-              </div>
+                <TabIcon className={`size-3.5 ${active ? "text-primary" : "text-muted-foreground"}`} aria-hidden="true" />
+                {planTabName(item.id)}
+              </button>
             );
           })}
+        </div>
+
+        {(() => {
+          const item = selectedCard;
+          const tier = selectedTier;
+          const isVip = item.id === "vip";
+          const price = yearly ? tier.priceYearly : tier.priceMonthly;
+          const period = yearly ? t.perYear : t.perMonth;
+          return (
+            <div
+              key={item.id}
+              role="tabpanel"
+              aria-label={tier.name}
+              className={`relative mt-4 overflow-hidden rounded-2xl border p-5 transition-all ${
+                isVip
+                  ? "border-primary/70 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent shadow-[0_0_34px_-8px_var(--gold-glow)]"
+                  : item.id === "b2b-premium"
+                    ? "border-primary/50 bg-gradient-to-br from-primary/15 via-card/60 to-background/40"
+                    : "border-primary/25 bg-gradient-to-br from-primary/10 via-card/60 to-background/40"
+              }`}
+            >
+              <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-primary/10 blur-2xl" />
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {(() => { const CardIcon = planIcon[item.id]; return <CardIcon className="size-7 shrink-0 text-primary" aria-hidden="true" />; })()}
+                  <div className="min-w-0">
+                    <p className={`font-serif text-base ${isVip ? "text-gradient-gold" : "text-foreground"}`}>{tier.name}</p>
+                    <p className="mt-0.5 text-xs text-primary/80">{item.tagline}</p>
+                  </div>
+                </div>
+                {item.badge && (
+                  <span
+                    className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
+                      isVip
+                        ? "bg-champagne-gradient text-[#10131a] shadow-champagne"
+                        : "border border-primary/40 bg-primary/10 text-primary"
+                    }`}
+                  >
+                    {isVip && <Crown className="size-3" />} {item.badge}
+                  </span>
+                )}
+              </div>
+              <p className="mt-3 flex items-baseline gap-1">
+                <span className={`text-2xl font-semibold ${isVip ? "text-gradient-gold" : "text-foreground"}`}>
+                  {price}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  {tier.id === "b2b" ? tier.priceNote : period}
+                </span>
+                {tier.priceNote && tier.id !== "b2b" && (
+                  <span className="ml-1 text-[10px] text-primary">{tier.priceNote}</span>
+                )}
+              </p>
+              <ul className="mt-4 space-y-2">
+                {item.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-xs leading-5">
+                    <span
+                      className={`mt-0.5 grid size-4 shrink-0 place-items-center rounded-full ${
+                        isVip ? "bg-champagne-gradient text-[#10131a]" : "bg-primary/15 text-primary"
+                      }`}
+                    >
+                      <Check className="size-2.5" strokeWidth={3} />
+                    </span>
+                    <span className="text-foreground/90">{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button
+                onClick={() => setUpgradePlan(tier.name)}
+                size="sm"
+                className={`mt-5 h-10 w-full text-sm ${isVip ? "shadow-champagne-strong" : ""}`}
+                variant={isVip ? "default" : "outline"}
+              >
+                <Sparkles className="size-4" /> {pc.unlockCta}
+              </Button>
+            </div>
+          );
+        })()}
+
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-background/40 px-4 py-3">
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">{freeTier.name}</p>
+            <p className="truncate text-[11px] text-muted-foreground">
+              {freeTier.features[0]} / {freeTier.features[1]}
+            </p>
+          </div>
+          <span className="shrink-0 font-serif text-sm text-muted-foreground">{freeTier.priceMonthly}</span>
         </div>
         <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
       </section>
@@ -801,6 +843,18 @@ export default function SettingsPanel({
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={() => setLockedMode(null)}>{dc.later}</Button>
             <Button onClick={() => { setLockedMode(null); document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{dc.upgrade}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={upgradePlan !== null} onOpenChange={(open) => { if (!open) setUpgradePlan(null); }}>
+        <DialogContent className="max-w-sm border-primary/30 bg-card text-foreground">
+          <DialogTitle className="font-serif text-xl text-primary">{upgradePlan}</DialogTitle>
+          <DialogDescription className="text-sm leading-6 text-muted-foreground">
+            {t.upgradeNote}
+          </DialogDescription>
+          <p className="text-xs text-muted-foreground">{t.planTestNote}</p>
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" onClick={() => setUpgradePlan(null)}>{dc.later}</Button>
           </div>
         </DialogContent>
       </Dialog>
