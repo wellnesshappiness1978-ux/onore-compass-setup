@@ -619,4 +619,44 @@
 .zodiac-monument-on { filter: drop-shadow(0 0 1.4px var(--gold-glow)); }
 .zodiac-spark { animation: zodiac-spark 1.8s ease-in-out infinite; }
 @keyframes zodiac-spark { 0%,100% { opacity: .2; } 50% { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .zodiac-spark { animation: none; } }
+
+/* Arts guide intro: mystical starfield + shimmering title */
+.arts-star {
+  position: absolute;
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 0 6px 1px color-mix(in oklab, var(--gold-glow) 70%, transparent);
+  animation: arts-twinkle 3.4s ease-in-out infinite;
+}
+.arts-star--soft { background: var(--foreground); box-shadow: none; animation-duration: 4.6s; }
+@keyframes arts-twinkle {
+  0%, 100% { opacity: .12; transform: scale(.65); }
+  50% { opacity: .95; transform: scale(1.15); }
+}
+.arts-shimmer {
+  background: linear-gradient(100deg, var(--primary) 25%, color-mix(in oklab, var(--gold-glow) 75%, white 25%) 50%, var(--primary) 75%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: arts-shimmer 7s linear infinite;
+}
+@keyframes arts-shimmer { to { background-position: 200% center; } }
+.arts-rise { animation: arts-rise 1.1s ease-out both; }
+@keyframes arts-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.arts-orb {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle, color-mix(in oklab, var(--gold-glow) 22%, transparent), transparent 70%);
+  animation: arts-breathe 6s ease-in-out infinite;
+}
+@keyframes arts-breathe {
+  0%, 100% { opacity: .5; transform: scale(1); }
+  50% { opacity: .9; transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zodiac-spark, .arts-star, .arts-shimmer, .arts-rise, .arts-orb { animation: none; }
+}
