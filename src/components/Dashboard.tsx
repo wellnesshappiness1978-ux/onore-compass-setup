@@ -214,14 +214,16 @@ function TorisetsuPanel({
   profile,
   language,
   onVip,
+  initialMode = "manual",
 }: {
   profile: UserProfile;
   language: Language;
   onVip: () => void;
+  initialMode?: "manual" | "compatibility";
 }) {
   const t = torisetsuTranslations[language];
   const base = translations[language];
-  const [mode, setMode] = useState<"manual" | "compatibility">("manual");
+  const [mode, setMode] = useState<"manual" | "compatibility">(initialMode);
   const [partnerName, setPartnerName] = useState("");
   const [partnerDate, setPartnerDate] = useState("");
   const [partnerTime, setPartnerTime] = useState("");
@@ -550,6 +552,16 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const t = dashboardTranslations[language];
   const base = translations[language];
   const [tab, setTab] = useState<Tab>("home");
+  const [artsEntry, setArtsEntry] = useState<"manual" | "compatibility">("manual");
+  const [teamEntry, setTeamEntry] = useState(false);
+  useEffect(() => {
+    if (tab !== "settings" || !teamEntry) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById("team-studio-entry")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTeamEntry(false);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [tab, teamEntry]);
   // Dev test only: signed-in users preview as Business. Not real billing/entitlement.
   const [previewPlan, setPreviewPlan] = useState<Plan>(signedIn ? "b2b" : "free");
   useEffect(() => { if (signedIn) setPreviewPlan("b2b"); }, [signedIn]);
@@ -620,7 +632,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <>
-            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onDiagnosis={() => setTab("arts")} /></div>
+            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onDiagnosis={() => { setArtsEntry("manual"); setTab("arts"); window.scrollTo({ top: 0, behavior: "smooth" }); }} onConsult={() => { setTab("consult"); window.scrollTo({ top: 0, behavior: "smooth" }); }} onArt={() => { setTab("mandala"); window.scrollTo({ top: 0, behavior: "smooth" }); }} onTeam={() => { setTeamEntry(true); setTab("settings"); }} /></div>
             <section className="design-compass-section text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">
                 <span className="h-px w-8 bg-primary/30" />
@@ -709,7 +721,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
                 <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
                 <NameAnalysisPreview profile={profile} language={language} />
-                <TorisetsuPanel profile={profile} language={language} onVip={() => setModal("vip")} />
+                <TorisetsuPanel key={artsEntry} initialMode={artsEntry} profile={profile} language={language} onVip={() => setModal("vip")} />
               </>
             ) : tab === "consult" ? (
               <>
