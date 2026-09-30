@@ -339,9 +339,6 @@ export default function SettingsPanel({
   const pc = planCardsCopy[language];
   const planTabName = (id: PaidPlanId) =>
     id === "standard" ? t.standard : id === "vip" ? "VIP" : id === "b2b" ? t.planB2b : tc.planNames["b2b-premium"];
-  const selectedCard = pc.cards.find((c) => c.id === cardPlan) ?? pc.cards[1]!;
-  const selectedTier = allTiers.find((tr) => tr.id === selectedCard.id) ?? allTiers[2]!;
-  const freeTier = t.tiers[0]!;
   const premiumFeatures: Record<Language, string[]> = {
     ja: ["関係者を最大100人登録", "100人規模の組織コンサル全7タブ", "AI回答の優先生成（提供準備中）", "ビジネスプランの全機能"],
     en: ["Register up to 100 members", "All seven organization tools for 100 people", "Priority AI generation (coming soon)", "Everything in Business"],
@@ -357,6 +354,9 @@ export default function SettingsPanel({
     cta: tc.switchPlan,
   };
   const allTiers = [...t.tiers, premiumTier];
+  const selectedCard = pc.cards.find((c) => c.id === cardPlan) ?? pc.cards[1]!;
+  const selectedTier = allTiers.find((tr) => tr.id === selectedCard.id) ?? allTiers[2]!;
+  const freeTier = t.tiers[0]!;
   const planLabel =
     plan === "b2b-premium" ? tc.planNames["b2b-premium"] : plan === "vip"
       ? t.planVip
