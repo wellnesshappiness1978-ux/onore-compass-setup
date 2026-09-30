@@ -9,6 +9,13 @@ const branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申",
 // 1–60 correspondence from https://www.tjf.or.jp/hidamari/pdf/34_furoku.pdf
 const animals = ["チータ", "たぬき", "猿", "コアラ", "黒ひょう", "虎", "チータ", "たぬき", "猿", "コアラ", "こじか", "ゾウ", "狼", "ひつじ", "猿", "コアラ", "こじか", "ゾウ", "狼", "ひつじ", "ペガサス", "ペガサス", "ひつじ", "狼", "狼", "ひつじ", "ペガサス", "ペガサス", "ひつじ", "狼", "ゾウ", "こじか", "コアラ", "猿", "ひつじ", "狼", "ゾウ", "こじか", "コアラ", "猿", "たぬき", "チータ", "虎", "黒ひょう", "コアラ", "猿", "たぬき", "チータ", "虎", "黒ひょう", "ライオン", "ライオン", "黒ひょう", "虎", "虎", "黒ひょう", "ライオン", "ライオン", "黒ひょう", "虎"];
 
+const good = new Set([1,3,5,6,7,8,11,13,15,16,17,18,21,23,24,25,29,31,32,33,35,37,39,41,45,47,48,52,57,61,63,65,67,68,81]);
+const half = new Set([27,38,51,55,58,71,73,75,77,78]);
+/** Common 81-number convention (schools differ). */
+export const nameLuck = (n: number): "吉" | "半吉" | "凶" => { const k = n > 81 ? ((n - 1) % 80) + 1 : n; return good.has(k) ? "吉" : half.has(k) ? "半吉" : "凶"; };
+/** Kanji name whose every character has a known stroke count but no surname/given boundary yet. */
+export const splittableName = (nameKanji: string) => { const c = [...nameKanji.trim()]; return c.length >= 2 && c.length <= 8 && !/[\s　]/.test(nameKanji.trim()) && c.every(ch => Number.isInteger(counts[ch])) ? c : null; };
+
 export function getFiveElements(profile: { nameKanji: string; birthDate: string; bloodType: string }) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(profile.birthDate);
   const year = Number(match?.[1]); const month = Number(match?.[2]); const day = Number(match?.[3]);
@@ -31,7 +38,11 @@ export function getFiveElements(profile: { nameKanji: string; birthDate: string;
         const surname = [...(parts[0] ?? "")].map(char => counts[char] ?? 0);
         const given = [...(parts[1] ?? "")].map(char => counts[char] ?? 0);
         const sum = (ns: number[]) => ns.reduce((a, b) => a + b, 0);
-        return { sky: sum(surname), person: (surname.at(-1) ?? 0) + (given[0] ?? 0), earth: sum(given), total: sum(surname) + sum(given) };
+        const sky = sum(surname), earth = sum(given), person = (surname.at(-1) ?? 0) + (given[0] ?? 0), total = sky + earth;
+        // 霊数 convention: a one-character surname/given name adds 1 to the outer grid only.
+        const outer = Math.max(1, sky + (surname.length === 1 ? 1 : 0) + earth + (given.length === 1 ? 1 : 0) - person);
+        const luck = { sky: nameLuck(sky), person: nameLuck(person), earth: nameLuck(earth), outer: nameLuck(outer), total: nameLuck(total) };
+        return { sky, person, earth, outer, total, luck };
       })() : null;
   return { name, zodiac, eto, blood, animal, animalNumber, zodiacBoundary: valid && boundaries.some(b => Math.abs(md - b) <= 1), uncertainYear };
 }

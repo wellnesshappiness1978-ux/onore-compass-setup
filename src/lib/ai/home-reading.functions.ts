@@ -20,6 +20,7 @@ const readingSchema = z.object({
   mind: z.string().min(30).max(750),
   instinct: z.string().min(30).max(750),
   strength: z.string().min(30).max(750),
+  nameFortune: z.string().max(900),
 });
 
 export const generateHomeReading = createServerFn({ method: "POST" })
@@ -39,7 +40,7 @@ export const generateHomeReading = createServerFn({ method: "POST" })
       prompt: `Write a vivid, personal five-layer INTERPRETIVE reading in ${language}. Return exactly the five fields in the schema; no headings in field values. This is available in FULL to every user including free users. No paywall or upsell in the reading.
 
 Use ONLY these precomputed inputs (not unverified chart placements or invented stroke counts):
-Name character grid: ${elements.name ? `天格 ${elements.name.sky} / 人格 ${elements.name.person} / 地格 ${elements.name.earth} / 総格 ${elements.name.total} (modern Unihan stroke convention; surname/given name separated by a space)` : "not computable: needs a two-part, space-separated kanji name with supported characters"}.
+Name character grid: ${elements.name ? `天格 ${elements.name.sky}(${elements.name.luck.sky}) / 人格 ${elements.name.person}(${elements.name.luck.person}) / 地格 ${elements.name.earth}(${elements.name.luck.earth}) / 外格 ${elements.name.outer}(${elements.name.luck.outer}) / 総格 ${elements.name.total}(${elements.name.luck.total}); luck labels follow one common 81-number convention (modern Unihan stroke convention; surname/given name separated by a space)` : "not computable: needs a two-part, space-separated kanji name with supported characters"}.
 Western sun sign: ${elements.zodiac ?? "unknown"}${elements.zodiacBoundary ? " (near sign boundary; date-only conventional sign, exact astronomical sign unverified)" : ""}.
 Yearly zodiac branch: ${elements.eto ?? "uncertain/unknown near year boundary"} (traditional year starts around 立春; boundary dates are not asserted).
 Blood type: ${elements.blood ?? "not provided"} (no scientifically established personality inference).
@@ -51,7 +52,9 @@ synthesis: about 150 Japanese characters (equivalent depth in other languages). 
 name: about 100 Japanese characters. If name grid exists, reference at least two of its exact grid values and offer an interpretive reflection about public-facing strengths and interpersonal warmth, never assert actual luck/waves. Otherwise clearly explain that surname/given-name segmentation or character strokes are missing and draw no name-based conclusions; offer an inviting, specific reflection only from other available axes.
 mind: about 100 Japanese characters. Cross the animal character and sun sign by exact names/numbers; describe a plausible choice-making contrast with a concrete everyday example, conditional rather than factual. If unavailable, say so and don't invent.
 instinct: about 100 Japanese characters. Cross year branch and blood type by exact values; discuss an imagined pressure-response or emotional switch as metaphor, explicitly not a blood-type diagnosis. If unavailable, explain and avoid missing-value claims.
-strength: about 100 Japanese characters. Give a sharp, usable possible strength synthesizing at least two available lenses, grounded in a concrete work or relationship scenario, without claiming verified aptitude or repeating synthesis. Return only the structured object.`,
+strength: about 100 Japanese characters. Give a sharp, usable possible strength synthesizing at least two available lenses, grounded in a concrete work or relationship scenario, without claiming verified aptitude or repeating synthesis. 
+nameFortune: about 150 Japanese characters. Only if the name grid exists: based on 人格 and 総格 values and their luck labels, describe concretely how others may perceive their charm, talents that may show socially, and kinds of relationships/opportunities they may tend to draw, crossed with at least one birth-date lens. Conditional, vivid, no guaranteed fate. If the grid is missing, return an empty string.
+All other fields must weave the name grid (when present) together with the sun sign, year branch, blood type and animal so name and birth date read as one consistent portrait. Return only the structured object.`,
       providerOptions: { openai: { store: false } },
     });
     return { ...readingSchema.parse(result.output), elements };
