@@ -9,7 +9,7 @@ import type { Language } from "@/lib/translations";
 import { hasFeature, memberLimit, planForCount, requiredPlanFor, type TeamFeature } from "@/lib/plans";
 import { teamCopy, type TeamCopy } from "@/lib/team-copy";
 import {
-  biorhythm, dayElement, dayScore, elements, lifePath, matrixPoint, orgBalance, purposes, roleOf, teamDiagnosis, teamRoles, todayIso,
+  biorhythm, dayElement, dayScore, elements, lifePath, matrixPoint, orgBalance, pairScore, purposes, roleOf, teamDiagnosis, teamRoles, todayIso,
   type Purpose, type TeamMember, type TeamRole,
 } from "@/lib/team-analysis";
 import { addTeamMember, deleteTeamMember, listTeamMembers } from "@/lib/team-members.functions";
