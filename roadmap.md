@@ -34,3 +34,5 @@
 
 - [x] Rebuild Home personal reading around five named elements, explicit calculation limits, and five layered passages; verify free/mobile display.
 - [x] Align five membership definitions and limits across pricing and registration, with a read-only membership table and database-enforced member cap (missing paid entitlement = Free); billing remains unopened.
+
+- [x] AI相談の1日上限（プラン別）と365日コンパス・12星座モニュメント・プラン別メリット表示
