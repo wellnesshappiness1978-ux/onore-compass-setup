@@ -11,7 +11,7 @@ export const membership = {
   b2b: { memberLimit: 30, capabilities: ["sevenTeamTools"] },
   "b2b-premium": { memberLimit: 100, capabilities: ["fullHundredMemberTeam", "priorityAi"] },
 } as const satisfies Record<Plan, { memberLimit: number; capabilities: readonly string[] }>;
-/** Registered-member (関係者) limits per plan. UI-only until real billing exists. */
+/** Registered-member (関係者) limits per plan; the database mirrors these caps for writes. */
 export const memberLimit: Record<Plan, number> = Object.fromEntries(
   Object.entries(membership).map(([plan, value]) => [plan, value.memberLimit]),
 ) as Record<Plan, number>;
