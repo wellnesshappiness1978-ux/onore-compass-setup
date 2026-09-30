@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, Output } from "ai";
 import { z } from "zod";
-import { computeDivinationParams } from "./divination-params";
+import { getFiveElements } from "./five-elements";
 
 const profileSchema = z.object({
   nameKanji: z.string().max(40), nameKana: z.string().max(60), nameRomaji: z.string().max(60),
@@ -15,13 +15,11 @@ const inputSchema = z.object({
   language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]),
 });
 const readingSchema = z.object({
-  portrait: z.string().min(100).max(1600),
-  perspective: z.string().min(15).max(400),
-  selfCare: z.string().min(15).max(400),
-  nextStep: z.string().min(15).max(400),
-  identity: z.string().min(30).max(700),
-  decisions: z.string().min(30).max(700),
-  rhythm: z.string().min(30).max(700),
+  synthesis: z.string().min(60).max(1100),
+  name: z.string().min(30).max(750),
+  mind: z.string().min(30).max(750),
+  instinct: z.string().min(30).max(750),
+  strength: z.string().min(30).max(750),
 });
 
 export const generateHomeReading = createServerFn({ method: "POST" })
@@ -30,6 +28,7 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("AI is unavailable");
     const { profile, language } = data;
+    const elements = getFiveElements(profile);
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
       headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
@@ -37,21 +36,23 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     const result = await generateText({
       model: provider.responses("openai/gpt-6-astra"),
       output: Output.object({ schema: readingSchema }),
-       prompt: `Write a personal, warmly uplifting REFLECTIVE PREVIEW in language ${language} for this profile. Generate exactly seven distinct JSON fields matching the output schema. Do not include headings in the values. Give every user the same full-depth reading, without truncation, plan-based variation, upsells, or withholding any field.
-Birth date: ${profile.birthDate}; birth time: ${profile.birthTimeUnknown ? "unknown" : profile.birthTime}; birthplace: ${profile.birthPlace}, ${profile.birthCity}; name: ${profile.nameKanji || "not supplied"} / ${profile.nameKana || "not supplied"} / ${profile.nameRomaji || "not supplied"}; blood type: ${profile.bloodType || "unknown"}; sibling order: ${profile.siblingOrder || "unknown"}. Today: ${new Date().toISOString().slice(0, 10)}.
-Available computed reference values (some are approximations or interpretive mappings, NOT a validated 15-arts analysis):
-${computeDivinationParams(profile)}
+      prompt: `Write a vivid, personal five-layer INTERPRETIVE reading in ${language}. Return exactly the five fields in the schema; no headings in field values. This is available in FULL to every user including free users. No paywall or upsell in the reading.
 
-  Write positively, specifically, and with human warmth, without predicting outcomes or claiming knowledge of the person's true character. Ground the reflection in at least two distinct actually available computed values, woven naturally into the longer fields; cite numbers only when computed. These values are interpretive prompts, not evidence of anyone's personality. Do not invent correlations between name, birthplace, blood type, sibling order and personality. The name may be used to address the person, but cannot be treated as verified stroke-count analysis. Never invent missing chart placements, stroke counts, animal type or biorhythm readings. No claims of 15 verified arts, definitive destiny, guaranteed fortune, lucky days, exact future timing, or health outcomes. Treat Earth Calendar solar position and phase as astronomical/illustrative reflection, not a measured personal biorhythm or an objectively favorable date. If evidence is limited, acknowledge that gently within the prose, not with fabricated specificity. Do not repeat generic platitudes or reuse phrases across fields. Do not infer occupation. Build a coherent through-line from the person's available date-derived and, where provided, romanized-name-derived values; explore a tension or complementary pair of tendencies rather than stacking flattering adjectives. Distinguish what was computed from what is imaginative reflection. Make each of the seven fields add a fresh insight and avoid repeating the portrait in the core analysis.
- portrait: ~300 Japanese characters (or equivalent depth in the selected language), in two or three flowing paragraphs separated by newline. This is a pure character portrait: explore the possible inner contours, contrasting facets, natural sensibility and human warmth suggested by the available birth-date and name-derived values. Make it intimate and resonant but not a diagnosis or a factual assertion about an unknown person. Absolutely no advice, imperatives, action steps, self-care suggestions, timing, warnings, or references to the sections below. Avoid empty flattery and stock archetypes; connect at least two available computed values into one coherent, nuanced portrait. If name-derived calculations are unavailable, do not pretend to have them.
-perspective: ~50 Japanese characters (or equivalent in chosen language); suggest how a particular perspective can be used at home, study, or work.
-selfCare: ~50 Japanese characters; a specific way to regain balance when a habit or obstacle appears, non-judgmental.
-nextStep: ~50 Japanese characters; one immediately doable, encouraging action.
- identity: ~100 Japanese characters; thoughtful possible core strengths and warmth, grounded in the actual birth-date number and at least one other available value; avoid asserting innate personality as fact. Explore a different angle from portrait rather than paraphrasing it.
-decisions: ~100 Japanese characters; a possible choice-making tendency, how to handle it and one concrete example, grounded in the profile-derived values rather than stereotyping.
-rhythm: ~100 Japanese characters; mention the current approximate solar phase/season if available, suggest when to prepare versus move using conditional language and practical near-term steps, never claim validated personal favorable timing.
-Return only the structured object.`,
+Use ONLY these precomputed inputs (not unverified chart placements or invented stroke counts):
+Name character grid: ${elements.name ? `天格 ${elements.name.sky} / 人格 ${elements.name.person} / 地格 ${elements.name.earth} / 総格 ${elements.name.total} (modern Unihan stroke convention; surname/given name separated by a space)` : "not computable: needs a two-part, space-separated kanji name with supported characters"}.
+Western sun sign: ${elements.zodiac ?? "unknown"}${elements.zodiacBoundary ? " (near sign boundary; date-only conventional sign, exact astronomical sign unverified)" : ""}.
+Yearly zodiac branch: ${elements.eto ?? "uncertain/unknown near year boundary"} (traditional year starts around 立春; boundary dates are not asserted).
+Blood type: ${elements.blood ?? "not provided"} (no scientifically established personality inference).
+Animal character: ${elements.animal ?? "unavailable"} (reference 60-day-number mapping, not an official licensed animal-personality diagnosis). Date: ${profile.birthDate}.
+
+The five axes are storytelling lenses, not proof of personality, social luck, success, instincts, or emotional traits. Never present blood type as a scientific predictor. Avoid saying you know their true nature or fate; use vivid conditional language that still feels intimate. Do not infer facts about their job or relationships. State precisely when a lens is unavailable and use the remaining computed lenses; do not invent substitutions. Do not claim all five were combined when one or more are unavailable. Use concrete human-scale contrasts and examples, not generic praise, vague abstractions or interchangeable fortunes. Distinguish the numbers/categories (computed) from interpretation (creative). No predictions, guaranteed outcomes, health advice or verified 15-arts claims.
+
+synthesis: about 150 Japanese characters (equivalent depth in other languages). Integrate available axes by their exact labels/values and articulate one nuanced through-line; for missing axes explicitly say which was not computed. Be a portrait, not advice.
+name: about 100 Japanese characters. If name grid exists, reference at least two of its exact grid values and offer an interpretive reflection about public-facing strengths and interpersonal warmth, never assert actual luck/waves. Otherwise clearly explain that surname/given-name segmentation or character strokes are missing and draw no name-based conclusions; offer an inviting, specific reflection only from other available axes.
+mind: about 100 Japanese characters. Cross the animal character and sun sign by exact names/numbers; describe a plausible choice-making contrast with a concrete everyday example, conditional rather than factual. If unavailable, say so and don't invent.
+instinct: about 100 Japanese characters. Cross year branch and blood type by exact values; discuss an imagined pressure-response or emotional switch as metaphor, explicitly not a blood-type diagnosis. If unavailable, explain and avoid missing-value claims.
+strength: about 100 Japanese characters. Give a sharp, usable possible strength synthesizing at least two available lenses, grounded in a concrete work or relationship scenario, without claiming verified aptitude or repeating synthesis. Return only the structured object.`,
       providerOptions: { openai: { store: false } },
     });
-    return readingSchema.parse(result.output);
+    return { ...readingSchema.parse(result.output), elements };
   });
