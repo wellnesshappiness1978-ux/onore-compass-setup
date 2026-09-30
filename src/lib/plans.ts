@@ -16,7 +16,7 @@ export const memberLimit: Record<Plan, number> = Object.fromEntries(
   Object.entries(membership).map(([plan, value]) => [plan, value.memberLimit]),
 ) as Record<Plan, number>;
 
-export type TeamFeature = "roster" | "teamDiagnosis" | "draft" | "catalog" | "calendar" | "balance" | "oneOnOne";
+export type TeamFeature = "roster" | "teamDiagnosis" | "draft" | "catalog" | "calendar" | "balance" | "oneOnOne" | "recruit";
 const featureMin: Record<TeamFeature, Plan> = {
   roster: "standard",
   teamDiagnosis: "b2b",
@@ -25,6 +25,7 @@ const featureMin: Record<TeamFeature, Plan> = {
   calendar: "b2b",
   balance: "b2b",
   oneOnOne: "b2b",
+  recruit: "b2b",
 };
 export const hasFeature = (plan: Plan, feature: TeamFeature) => rank(plan) >= rank(featureMin[feature]);
 export const requiredPlanFor = (feature: TeamFeature) => featureMin[feature];

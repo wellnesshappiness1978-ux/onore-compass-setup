@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createOpenAI } from "@ai-sdk/openai";
-import { generateText, Output } from "ai";
+import { generateText, Output, streamText } from "ai";
 import { z } from "zod";
 
 const lang = z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]);
@@ -57,4 +57,26 @@ export const generateOneOnOneGuide = createServerFn({ method: "POST" })
       providerOptions: { openai: { store: false } },
     });
     return output;
+  });
+
+const recruitOut = z.object({
+  teamFit: z.string().max(600), rolePrediction: z.string().max(600), motivation: z.string().max(600), onboarding: z.string().max(600),
+});
+
+export const analyzeCandidate = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => z.object({
+    candidate: z.object({ name: z.string().trim().max(60), role: z.string().max(30), element: z.string().max(10), lifePath: z.number().int(), avgFit: z.number().int() }),
+    pairs: z.array(z.object({ name: z.string().max(60), teamRole: z.string().max(30), score: z.number().int() })).max(100),
+    language: lang,
+  }).parse(input))
+  .handler(async ({ data }) => {
+    const apiKey = process.env["LOVABLE_API_KEY"];
+    if (!apiKey) throw new Error("AI is unavailable");
+    const result = streamText({
+      model: provider(apiKey).responses("openai/gpt-6-astra"),
+      output: Output.object({ schema: recruitOut }),
+      prompt: `${RULES}\n${outputLanguage(data.language)} This is a hiring-interview reflection aid. It must NEVER be used as a pass/fail criterion; say the decision rests on skills, experience and the interview itself. Candidate (reference values): ${JSON.stringify(data.candidate)}. Reference compatibility with existing members: ${JSON.stringify(data.pairs)}.\nteamFit = how they may mesh with the current team, naming 1-3 members with high reference scores. rolePrediction = the role they may naturally take in the organisation. motivation = how to sustain their motivation after joining (praise style, environment). onboarding = first-90-days support tips for the manager. Each 100-200 Japanese characters (or ~60 words), warm and concrete.`,
+      providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", store: false, include: ["reasoning.encrypted_content"] } },
+    });
+    return await result.output;
   });
