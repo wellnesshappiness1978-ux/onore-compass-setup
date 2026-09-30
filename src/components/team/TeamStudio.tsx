@@ -106,9 +106,10 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <DialogTitle>{t.limitTitle}</DialogTitle>
             <DialogDescription>{limitDialog === "max" ? t.absoluteLimit : limitDialog && t.limitBody(t.planNames[limitDialog], memberLimit[limitDialog])}</DialogDescription>
           </DialogHeader>
+          {limitDialog !== "max" && <p className="text-xs text-muted-foreground">{t.upgradePending}</p>}
           <DialogFooter>
             <Button variant="outline" onClick={() => setLimitDialog(null)}>{t.later}</Button>
-            {limitDialog !== "max" && <Button onClick={() => { if (limitDialog) onPlanChange(limitDialog); setLimitDialog(null); }}>{t.switchPlan}</Button>}
+            {limitDialog !== "max" && <Button onClick={() => { setLimitDialog(null); document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{t.switchPlan}</Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>
