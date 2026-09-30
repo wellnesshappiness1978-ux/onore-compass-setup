@@ -29,7 +29,7 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
   const t = teamCopy[language];
   const [tab, setTab] = useState(0);
   const [members, setMembers] = useState<TeamMember[]>([]);
-  const [limitDialog, setLimitDialog] = useState<Plan | null>(null);
+  const [limitDialog, setLimitDialog] = useState<Plan | "max" | null>(null);
   const list = useServerFn(listTeamMembers);
   const add = useServerFn(addTeamMember);
   const del = useServerFn(deleteTeamMember);
@@ -44,7 +44,7 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
   const persistLocal = (next: TeamMember[]) => { setMembers(next); try { localStorage.setItem(LOCAL, JSON.stringify(next)); } catch { /* ignore */ } };
 
   const addMember = async (m: Omit<TeamMember, "id">) => {
-    if (members.length + 1 > max) { setLimitDialog(planForCount(members.length + 1)); return false; }
+    if (members.length + 1 > max) { setLimitDialog(planForCount(members.length + 1) ?? "max"); return false; }
     if (signedIn) setMembers([...members, await add({ data: m as never })]);
     else persistLocal([...members, { ...m, id: crypto.randomUUID() }]);
     return true;
@@ -75,7 +75,7 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
       </div>
 
       <div className="mt-4">
-        {!unlocked ? (
+        {!unlocked && feature !== "roster" ? (
           <div className={`${card} text-center`}>
             <Lock className="mx-auto size-6 text-primary" />
             <p className="mt-2 text-sm">{t.locked(t.planNames[requiredPlanFor(feature)])}</p>
@@ -86,9 +86,9 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
-          <Diagnosis t={t} members={members} max={Math.min(max, plan === "vip" ? 5 : max)} />
+          <Diagnosis t={t} members={members} max={max} />
         ) : feature === "draft" ? (
-          <Draft t={t} members={members} language={language} />
+          <Draft t={t} members={members} language={language} max={max} />
         ) : feature === "catalog" ? (
           <Catalog t={t} members={members} />
         ) : feature === "calendar" ? (
@@ -104,11 +104,11 @@ export default function TeamStudio({ plan, language, signedIn, ownerBirthDate, o
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t.limitTitle}</DialogTitle>
-            <DialogDescription>{limitDialog && t.limitBody(t.planNames[limitDialog], memberLimit[limitDialog])}</DialogDescription>
+            <DialogDescription>{limitDialog === "max" ? t.absoluteLimit : limitDialog && t.limitBody(t.planNames[limitDialog], memberLimit[limitDialog])}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setLimitDialog(null)}>{t.later}</Button>
-            <Button onClick={() => { if (limitDialog) onPlanChange(limitDialog); setLimitDialog(null); }}>{t.switchPlan}</Button>
+            {limitDialog !== "max" && <Button onClick={() => { if (limitDialog) onPlanChange(limitDialog); setLimitDialog(null); }}>{t.switchPlan}</Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -221,7 +221,7 @@ function Diagnosis({ t, members, max }: { t: TeamCopy; members: TeamMember[]; ma
 }
 
 type DraftResult = { recommendedSize: number; ranking: { id: string; score: number; reason: string }[]; features: string; evaluation: string; cautions: string };
-function Draft({ t, members, language }: { t: TeamCopy; members: TeamMember[]; language: Language }) {
+function Draft({ t, members, language, max }: { t: TeamCopy; members: TeamMember[]; language: Language; max: number }) {
   const run = useServerFn(draftProjectTeam);
   const [goal, setGoal] = useState("");
   const [headcount, setHeadcount] = useState(0);
@@ -246,7 +246,7 @@ function Draft({ t, members, language }: { t: TeamCopy; members: TeamMember[]; l
           <label className="text-xs text-muted-foreground" htmlFor="draft-n">{t.headcount}</label>
           <select id="draft-n" value={headcount} onChange={(e) => setHeadcount(Number(e.target.value))} className="rounded-md border border-input bg-background/60 px-2 py-1 text-sm">
             <option value={0}>{t.auto}</option>
-            {Array.from({ length: Math.min(30, members.length) }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
+            {Array.from({ length: Math.min(max, members.length) }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
           </select>
           <Button size="sm" disabled={busy || goal.trim().length < 3} onClick={() => exec()}><Sparkles className="size-4" />{busy ? t.generating : t.runDraft}</Button>
         </div>
@@ -265,7 +265,7 @@ function Draft({ t, members, language }: { t: TeamCopy; members: TeamMember[]; l
           {[[t.features, result.features], [t.evaluation, result.evaluation], [t.cautions, result.cautions]].map(([h, b]) => <div key={h} className={card}><p className="text-sm text-primary">{h}</p><p className="mt-1 text-xs leading-6">{b}</p></div>)}
           <div className={card}>
             <p className="mb-2 text-xs text-muted-foreground">{t.swapHint}</p>
-            <div className="flex flex-wrap gap-1.5">{members.map((m) => { const on = picked.includes(m.id); return <button key={m.id} aria-pressed={on} onClick={() => setPicked(on ? picked.filter((x) => x !== m.id) : [...picked, m.id].slice(0, 30))} className={`rounded-full border px-3 py-1 text-xs ${on ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>{m.name}</button>; })}</div>
+            <div className="flex flex-wrap gap-1.5">{members.map((m) => { const on = picked.includes(m.id); return <button key={m.id} aria-pressed={on} onClick={() => setPicked(on ? picked.filter((x) => x !== m.id) : [...picked, m.id].slice(0, max))} className={`rounded-full border px-3 py-1 text-xs ${on ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>{m.name}</button>; })}</div>
             <Button size="sm" variant="outline" className="mt-3" disabled={busy || picked.length === 0} onClick={() => exec(picked)}>{t.reevaluate}</Button>
           </div>
         </div>
