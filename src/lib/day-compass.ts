@@ -22,13 +22,11 @@ export const zodiacSigns = [
   { glyph: "♌", m: 7, d: 23 }, { glyph: "♍", m: 8, d: 23 }, { glyph: "♎", m: 9, d: 23 }, { glyph: "♏", m: 10, d: 24 },
   { glyph: "♐", m: 11, d: 23 }, { glyph: "♑", m: 12, d: 22 }, { glyph: "♒", m: 1, d: 20 }, { glyph: "♓", m: 2, d: 19 },
 ] as const;
+const signStarts = zodiacSigns.map((s, i) => ({ i, v: s.m * 100 + s.d })).sort((a, b) => a.v - b.v);
 export const signIndexOf = (d: Date) => {
   const md = (d.getMonth() + 1) * 100 + d.getDate();
-  let idx = 9; // Capricorn default (Dec 22 – Jan 19)
-  zodiacSigns.forEach((s, i) => { if (s.m >= 3 && md >= s.m * 100 + s.d) idx = i; });
-  if (md >= 120 && md < 219) idx = 10;
-  else if (md >= 219 && md < 321) idx = 11;
-  else if (md >= 1222 || md < 120) idx = 9;
+  let idx = signStarts[signStarts.length - 1]!.i;
+  for (const s of signStarts) if (md >= s.v) idx = s.i;
   return idx;
 };
 
