@@ -5,6 +5,7 @@ import { getBirthColorPair } from "@/lib/birth-colors";
 import { nineStarsTranslations } from "@/lib/nine-stars-translations";
 import { animalNames, getArtSymbols, NineStarsArtwork, palaceGrid, zodiacGlyphs, zodiacNames } from "./NineStarsArtwork";
 import type { Language } from "@/lib/translations";
+import SolfeggioPlayer from "./SolfeggioPlayer";
 
 type Props = { language: Language; onVip: () => void; birthDate: string; bloodType?: string; testUnlocked?: boolean };
 
@@ -114,6 +115,7 @@ export default function NineStarsPanel({ language, onVip, birthDate, bloodType =
         </div>
       </div>
       {open && <Button variant="ghost" size="sm" className="mt-3 text-xs text-muted-foreground" onClick={() => setRevealed(false)}>{t.replay}</Button>}
+      <SolfeggioPlayer language={language} />
       <p className="mx-auto mt-7 max-w-xl text-xs leading-6 text-muted-foreground">{t.note}</p>
       <div className="mx-auto mt-7 max-w-[640px] border-y border-primary/25 py-5 text-left">
         <div className="flex items-baseline justify-between gap-4"><h4 className="font-serif text-base text-primary">{t.gridTitle}</h4><span className="text-[10px] text-muted-foreground">{t.gridQualifier}</span></div>

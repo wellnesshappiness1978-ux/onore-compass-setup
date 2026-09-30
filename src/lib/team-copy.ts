@@ -4,7 +4,7 @@ import type { Element, Purpose, TeamRole } from "./team-analysis";
 
 export type TeamCopy = {
   title: string; note: string; planNames: Record<Plan, string>; limit: (used: number, max: number) => string;
-  tabs: [string, string, string, string, string, string, string];
+  tabs: [string, string, string, string, string, string, string, string];
   add: string; name: string; birthDate: string; jobRole: string; skills: string; skillsHint: string; save: string; remove: string; empty: string; guestNote: string;
   limitTitle: string; limitBody: (plan: string, max: number) => string; absoluteLimit: string; upgradePending: string; saveError: string; switchPlan: string; later: string;
   locked: (plan: string) => string; seePlans: string;
@@ -22,7 +22,7 @@ const ja: TeamCopy = {
   title: "チーム・組織コンサル", note: "開発テスト表示です。課金は未実装で、スコアは生年月日からの参考値です（正式な15占術鑑定ではありません）。",
   planNames: { free: "無料", standard: "スタンダード", vip: "VIP", b2b: "ビジネス", "b2b-premium": "ビジネスプレミアム" },
   limit: (u, m) => `登録 ${u} / ${m}人`,
-  tabs: ["関係者名簿", "チーム同時診断", "AI人員選抜", "タレント名簿", "アラートカレンダー", "組織バランス", "1on1トリセツ"],
+  tabs: ["関係者名簿", "チーム同時診断", "AI人員選抜", "タレント名簿", "アラートカレンダー", "組織バランス", "1on1トリセツ", "採用面接AI分析"],
   add: "関係者を追加", name: "名前", birthDate: "生年月日", jobRole: "得意職種・役職", skills: "スキル", skillsHint: "カンマ区切り", save: "追加する", remove: "削除", empty: "まだ関係者が登録されていません。", guestNote: "未ログインのため、この端末内だけに保存されます。",
   limitTitle: "登録上限に達しました", limitBody: (p, m) => `この人数を登録するには${p}プラン（上限${m}人）への切り替えが必要です。`, absoluteLimit: "ビジネスプレミアムの登録上限は100人です。", upgradePending: "プランの申込受付前です。表示テストを切り替えても登録上限は変わりません。", saveError: "保存できませんでした。会員資格と登録上限を確認してください。", switchPlan: "プランを見る", later: "あとで",
   locked: (p) => `この機能は${p}プラン以上で解放されます。`, seePlans: "プランを見る",
@@ -43,7 +43,7 @@ const en: TeamCopy = {
   title: "Team & Organization Consulting", note: "Development test view. Billing is not live; scores are reference values from birth dates, not a verified 15-arts reading.",
   planNames: { free: "Free", standard: "Standard", vip: "VIP", b2b: "Business", "b2b-premium": "Business Premium" },
   limit: (u, m) => `${u} / ${m} registered`,
-  tabs: ["Members", "Team diagnosis", "AI draft", "Talent catalog", "Alert calendar", "Org balance", "1on1 guide"],
+  tabs: ["Members", "Team diagnosis", "AI draft", "Talent catalog", "Alert calendar", "Org balance", "1on1 guide", "Hiring AI"],
   add: "Add member", name: "Name", birthDate: "Birth date", jobRole: "Specialty / role", skills: "Skills", skillsHint: "comma separated", save: "Add", remove: "Remove", empty: "No members registered yet.", guestNote: "Not signed in — saved on this device only.",
   limitTitle: "Member limit reached", limitBody: (p, m) => `To register this many people, switch to the ${p} plan (up to ${m}).`, absoluteLimit: "Business Premium allows up to 100 registered members.", upgradePending: "Enrollment is not open yet. Changing the display preview does not raise your limit.", saveError: "Could not save. Check your membership and member limit.", switchPlan: "View plans", later: "Not now",
   locked: (p) => `Unlocked from the ${p} plan.`, seePlans: "View plans",
@@ -65,7 +65,7 @@ const mk = (base: TeamCopy, o: Partial<TeamCopy>): TeamCopy => ({ ...base, ...o 
 const zhCN = mk(en, {
   title: "团队・组织咨询", note: "开发测试显示。尚未启用付费；分数为基于出生日期的参考值，并非正式的15占术鉴定。",
   planNames: { free: "免费", standard: "标准", vip: "VIP", b2b: "企业", "b2b-premium": "企业尊享" }, limit: (u, m) => `已登记 ${u} / ${m}人`,
-  tabs: ["相关人员", "团队同时诊断", "AI人员选拔", "人才名册", "提醒日历", "组织平衡", "1on1指南"],
+  tabs: ["相关人员", "团队同时诊断", "AI人员选拔", "人才名册", "提醒日历", "组织平衡", "1on1指南", "招聘面试AI分析"],
   add: "添加人员", name: "姓名", birthDate: "出生日期", jobRole: "擅长职种・职位", skills: "技能", skillsHint: "用逗号分隔", save: "添加", remove: "删除", empty: "尚未登记人员。", guestNote: "未登录，仅保存在本设备。",
   limitTitle: "已达登记上限", limitBody: (p, m) => `登记这么多人需要切换到${p}方案（上限${m}人）。`, switchPlan: "切换方案", later: "以后再说", locked: (p) => `此功能从${p}方案起开放。`, seePlans: "查看方案",
   select: "选择诊断成员", selectedOf: (n, m) => `已选 ${n} / ${m}人`, balance: "综合相性・平衡", synergy: "协同", conflict: "需注意的冲突点", axisX: ["逻辑", "共情"], axisY: ["计划", "行动"], pickTwo: "请选择2人以上。",
@@ -82,7 +82,7 @@ const zhCN = mk(en, {
 const zhTW = mk(zhCN, {
   title: "團隊・組織諮詢", note: "開發測試顯示。尚未啟用付費；分數為依出生日期計算的參考值，並非正式的15占術鑑定。",
   planNames: { free: "免費", standard: "標準", vip: "VIP", b2b: "企業", "b2b-premium": "企業尊享" }, limit: (u, m) => `已登錄 ${u} / ${m}人`,
-  tabs: ["相關人員", "團隊同時診斷", "AI人員選拔", "人才名冊", "提醒日曆", "組織平衡", "1on1指南"],
+  tabs: ["相關人員", "團隊同時診斷", "AI人員選拔", "人才名冊", "提醒日曆", "組織平衡", "1on1指南", "招聘面試AI分析"],
   add: "新增人員", name: "姓名", birthDate: "出生日期", jobRole: "擅長職種・職位", skills: "技能", skillsHint: "以逗號分隔", save: "新增", remove: "刪除", empty: "尚未登錄人員。", guestNote: "未登入，僅儲存在本裝置。",
   limitTitle: "已達登錄上限", limitBody: (p, m) => `登錄這麼多人需要切換到${p}方案（上限${m}人）。`, switchPlan: "切換方案", later: "稍後", locked: (p) => `此功能自${p}方案起開放。`, seePlans: "查看方案",
   select: "選擇診斷成員", selectedOf: (n, m) => `已選 ${n} / ${m}人`, balance: "綜合相性・平衡", synergy: "協同", conflict: "需注意的衝突點", axisX: ["邏輯", "共感"], axisY: ["計畫", "行動"], pickTwo: "請選擇2人以上。",
@@ -99,7 +99,7 @@ const zhTW = mk(zhCN, {
 const ko = mk(en, {
   title: "팀・조직 컨설팅", note: "개발 테스트 화면입니다. 결제는 미구현이며 점수는 생년월일 기반 참고값입니다(정식 15점술 감정 아님).",
   planNames: { free: "무료", standard: "스탠다드", vip: "VIP", b2b: "비즈니스", "b2b-premium": "비즈니스 프리미엄" }, limit: (u, m) => `등록 ${u} / ${m}명`,
-  tabs: ["관계자 명단", "팀 동시 진단", "AI 인원 선발", "탤런트 명부", "알림 캘린더", "조직 밸런스", "1on1 가이드"],
+  tabs: ["관계자 명단", "팀 동시 진단", "AI 인원 선발", "탤런트 명부", "알림 캘린더", "조직 밸런스", "1on1 가이드", "채용 면접 AI 분석"],
   add: "관계자 추가", name: "이름", birthDate: "생년월일", jobRole: "전문 직종・직책", skills: "스킬", skillsHint: "쉼표로 구분", save: "추가", remove: "삭제", empty: "아직 등록된 관계자가 없습니다.", guestNote: "로그인하지 않아 이 기기에만 저장됩니다.",
   limitTitle: "등록 한도에 도달했습니다", limitBody: (p, m) => `이 인원을 등록하려면 ${p} 플랜(최대 ${m}명)으로 전환해야 합니다.`, switchPlan: "플랜 전환", later: "나중에", locked: (p) => `${p} 플랜부터 이용할 수 있습니다.`, seePlans: "플랜 보기",
   select: "진단할 멤버 선택", selectedOf: (n, m) => `${n} / ${m}명 선택`, balance: "종합 궁합・밸런스", synergy: "시너지", conflict: "주의할 충돌 포인트", axisX: ["논리", "공감"], axisY: ["계획", "행동"], pickTwo: "2명 이상 선택하세요.",
@@ -116,7 +116,7 @@ const ko = mk(en, {
 const es = mk(en, {
   title: "Consultoría de equipos y organización", note: "Vista de prueba. Sin cobro real; las puntuaciones son valores de referencia por fecha de nacimiento, no una lectura verificada.",
   planNames: { free: "Gratis", standard: "Estándar", vip: "VIP", b2b: "Empresa", "b2b-premium": "Empresa Premium" }, limit: (u, m) => `${u} / ${m} registrados`,
-  tabs: ["Miembros", "Diagnóstico de equipo", "Selección IA", "Catálogo de talento", "Calendario de alertas", "Balance organizativo", "Guía 1on1"],
+  tabs: ["Miembros", "Diagnóstico de equipo", "Selección IA", "Catálogo de talento", "Calendario de alertas", "Balance organizativo", "Guía 1on1", "Análisis IA de selección"],
   add: "Añadir miembro", name: "Nombre", birthDate: "Fecha de nacimiento", jobRole: "Especialidad / cargo", skills: "Habilidades", skillsHint: "separadas por comas", save: "Añadir", remove: "Quitar", empty: "Aún no hay miembros.", guestNote: "Sin sesión: se guarda solo en este dispositivo.",
   limitTitle: "Límite alcanzado", limitBody: (p, m) => `Para registrar a tantas personas, cambia al plan ${p} (hasta ${m}).`, switchPlan: "Cambiar plan", later: "Ahora no", locked: (p) => `Disponible desde el plan ${p}.`, seePlans: "Ver planes",
   select: "Selecciona miembros", selectedOf: (n, m) => `${n} / ${m} seleccionados`, balance: "Compatibilidad y balance", synergy: "Sinergias", conflict: "Posibles fricciones", axisX: ["Lógica", "Empatía"], axisY: ["Plan", "Acción"], pickTwo: "Selecciona dos o más personas.",
@@ -133,7 +133,7 @@ const es = mk(en, {
 const fr = mk(en, {
   title: "Conseil équipe & organisation", note: "Vue de test. Pas de facturation réelle ; les scores sont des valeurs de référence issues des dates de naissance, pas une lecture vérifiée.",
   planNames: { free: "Gratuit", standard: "Standard", vip: "VIP", b2b: "Entreprise", "b2b-premium": "Entreprise Premium" }, limit: (u, m) => `${u} / ${m} inscrits`,
-  tabs: ["Membres", "Diagnostic d’équipe", "Sélection IA", "Catalogue talents", "Calendrier d’alertes", "Équilibre", "Guide 1on1"],
+  tabs: ["Membres", "Diagnostic d’équipe", "Sélection IA", "Catalogue talents", "Calendrier d’alertes", "Équilibre", "Guide 1on1", "Analyse IA recrutement"],
   add: "Ajouter un membre", name: "Nom", birthDate: "Date de naissance", jobRole: "Spécialité / poste", skills: "Compétences", skillsHint: "séparées par des virgules", save: "Ajouter", remove: "Retirer", empty: "Aucun membre pour l’instant.", guestNote: "Non connecté : enregistré sur cet appareil uniquement.",
   limitTitle: "Limite atteinte", limitBody: (p, m) => `Pour inscrire autant de personnes, passez à l’offre ${p} (jusqu’à ${m}).`, switchPlan: "Changer d’offre", later: "Plus tard", locked: (p) => `Disponible à partir de l’offre ${p}.`, seePlans: "Voir les offres",
   select: "Choisir les membres", selectedOf: (n, m) => `${n} / ${m} sélectionnés`, balance: "Compatibilité et équilibre", synergy: "Synergies", conflict: "Points de friction", axisX: ["Logique", "Empathie"], axisY: ["Plan", "Action"], pickTwo: "Choisissez au moins deux personnes.",

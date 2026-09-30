@@ -9,16 +9,17 @@ import type { Language } from "@/lib/translations";
 import { hasFeature, memberLimit, planForCount, requiredPlanFor, type TeamFeature } from "@/lib/plans";
 import { teamCopy, type TeamCopy } from "@/lib/team-copy";
 import {
-  biorhythm, dayElement, dayScore, elements, lifePath, matrixPoint, orgBalance, purposes, roleOf, teamDiagnosis, teamRoles, todayIso,
+  biorhythm, dayElement, dayScore, elements, lifePath, matrixPoint, orgBalance, pairScore, purposes, roleOf, teamDiagnosis, teamRoles, todayIso,
   type Purpose, type TeamMember, type TeamRole,
 } from "@/lib/team-analysis";
 import { addTeamMember, deleteTeamMember, listTeamMembers } from "@/lib/team-members.functions";
-import { draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
+import { analyzeCandidate, draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
+import ShareCardButton from "@/components/ShareCardButton";
 
 type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
 const LOCAL = "onore-team";
 const card = "rounded-2xl border border-primary/15 bg-background/40 p-4";
-const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "draft", "catalog", "calendar", "balance", "oneOnOne"];
+const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "draft", "catalog", "calendar", "balance", "oneOnOne", "recruit"];
 
 const summary = (m: TeamMember, t: TeamCopy) => ({
   id: m.id, name: m.name, role: m.role, skills: m.skills, teamRole: t.roles[roleOf(m)],
@@ -86,7 +87,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
-          <Diagnosis t={t} members={members} max={Math.max(1, max)} />
+          <Diagnosis t={t} members={members} max={Math.max(1, max)} language={language} />
         ) : feature === "draft" ? (
           <Draft t={t} members={members} language={language} max={Math.max(1, max)} />
         ) : feature === "catalog" ? (
@@ -95,8 +96,10 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
           <BizCalendar t={t} members={members} ownerBirthDate={ownerBirthDate} language={language} />
         ) : feature === "balance" ? (
           <Balance t={t} members={members} />
-        ) : (
+        ) : feature === "oneOnOne" ? (
           <OneOnOne t={t} members={members} language={language} />
+        ) : (
+          <Recruit t={t} members={members} language={language} />
         )}
       </div>
 
@@ -182,7 +185,7 @@ function MemberPicker({ t, members, selected, setSelected, max }: { t: TeamCopy;
   );
 }
 
-function Diagnosis({ t, members, max }: { t: TeamCopy; members: TeamMember[]; max: number }) {
+function Diagnosis({ t, members, max, language }: { t: TeamCopy; members: TeamMember[]; max: number; language: Language }) {
   const [selected, setSelected] = useState<string[]>(() => members.slice(0, max).map((m) => m.id));
   const team = members.filter((m) => selected.includes(m.id));
   const d = useMemo(() => teamDiagnosis(team), [team]);
@@ -195,6 +198,9 @@ function Diagnosis({ t, members, max }: { t: TeamCopy; members: TeamMember[]; ma
           <div className={`${card} flex items-center gap-4`}>
             <div className="grid size-20 shrink-0 place-items-center rounded-full border-2 border-primary text-2xl font-semibold text-primary shadow-[0_0_24px_var(--gold-glow)]">{d.total}</div>
             <div><p className="font-serif text-primary">{t.balance}</p><p className="text-xs text-muted-foreground">{team.length} · {[...new Set(team.map(roleOf))].map((r) => t.roles[r]).join(" / ")}</p></div>
+          </div>
+          <div className="flex justify-center">
+            <ShareCardButton language={language} data={{ kicker: language === "ja" ? "チーム相性診断" : "Team chemistry", title: [...new Set(team.map(roleOf))].map((r) => t.roles[r]).join(" / "), score: d.total, names: team.slice(0, 5).map((m) => m.name), lines: [t.balance] }} />
           </div>
           <div className={`${card} relative aspect-square max-w-md`}>
             <div className="absolute inset-4 border-l border-t border-primary/10" style={{ left: "50%", top: "50%" }} />
@@ -398,6 +404,55 @@ function OneOnOne({ t, members, language }: { t: TeamCopy; members: TeamMember[]
       {m && <p className="text-xs text-muted-foreground">{m.name} · <RoleBadge role={roleOf(m)} t={t} /> {t.roleDesc[roleOf(m)]}</p>}
       {error && <p role="alert" className="text-sm text-destructive">{t.aiError}</p>}
       {g && <div className="grid gap-3 sm:grid-cols-3">{[[t.praise, g.praise, "text-primary"], [t.ng, g.ngInstructions, "text-destructive"], [t.low, g.lowMotivation, "text-primary"]].map(([h, b, c]) => <div key={h} className={card}><p className={`text-sm ${c}`}>{h}</p><p className="mt-1 text-xs leading-6">{b}</p></div>)}</div>}
+    </div>
+  );
+}
+
+const recruitCopy = {
+  ja: { title: "採用面接AIフィットネス診断", sub: "応募者の生年月日から、既存チームとの相性・役割予測・定着のヒントを参考表示します。", name: "応募者名（任意）", birth: "生年月日", run: "AI分析する", busy: "分析中…", fit: "既存チームとの相性", role: "組織内での役割予測", mot: "入社後のモチベーション維持", onb: "最初の90日のサポート", avg: "チーム平均相性", top: "相性の高いメンバー", note: "※生年月日から算出した参考値です。合否判断には使用せず、スキル・経験・面接内容で判断してください。応募者情報は保存されません。" },
+  en: { title: "Hiring interview AI fit report", sub: "Reference view of team chemistry, likely role and retention tips from a candidate's birth date.", name: "Candidate name (optional)", birth: "Birth date", run: "Analyze with AI", busy: "Analyzing…", fit: "Fit with current team", role: "Predicted role", mot: "Sustaining motivation", onb: "First 90 days support", avg: "Avg. team fit", top: "Best-matched members", note: "Reference values from birth dates. Never use for pass/fail; decide on skills, experience and the interview. Candidate data is not saved." },
+};
+
+function Recruit({ t, members, language }: { t: TeamCopy; members: TeamMember[]; language: Language }) {
+  const c = language === "ja" ? recruitCopy.ja : recruitCopy.en;
+  const run = useServerFn(analyzeCandidate);
+  const [name, setName] = useState("");
+  const [birth, setBirth] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
+  const [report, setReport] = useState<{ teamFit: string; rolePrediction: string; motivation: string; onboarding: string } | null>(null);
+  const cand: TeamMember | null = /^\d{4}-\d{2}-\d{2}$/.test(birth) ? { id: "candidate", name: name || "?", birthDate: birth, gender: "", bloodType: "", role: "", skills: [] } : null;
+  const pairs = cand ? members.map((m) => ({ m, score: pairScore(cand, m) })).sort((a, b) => b.score - a.score) : [];
+  const avg = pairs.length ? Math.round(pairs.reduce((s, p) => s + p.score, 0) / pairs.length) : 0;
+  const go = async () => {
+    if (!cand) return; setBusy(true); setError(false); setReport(null);
+    try {
+      setReport(await run({ data: { candidate: { name: name.slice(0, 60), role: t.roles[roleOf(cand)], element: dayElement(birth), lifePath: lifePath(birth), avgFit: avg }, pairs: pairs.slice(0, 100).map((p) => ({ name: p.m.name, teamRole: t.roles[roleOf(p.m)], score: p.score })), language } }));
+    } catch { setError(true); } finally { setBusy(false); }
+  };
+  return (
+    <div className="space-y-3">
+      <div className={card}>
+        <p className="font-serif text-primary">{c.title}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{c.sub}</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto_auto]">
+          <Input aria-label={c.name} placeholder={c.name} value={name} maxLength={60} onChange={(e) => setName(e.target.value)} />
+          <Input aria-label={c.birth} type="date" value={birth} max={todayIso()} onChange={(e) => setBirth(e.target.value)} />
+          <Button disabled={!cand || busy} onClick={go}><Sparkles className="size-4" />{busy ? c.busy : c.run}</Button>
+        </div>
+      </div>
+      {cand && (
+        <div className={`${card} flex items-center gap-4`}>
+          <div className="grid size-16 shrink-0 place-items-center rounded-full border-2 border-primary text-xl font-semibold text-primary">{avg}</div>
+          <div className="min-w-0 text-xs">
+            <p className="text-primary">{c.avg} · <RoleBadge role={roleOf(cand)} t={t} /></p>
+            <p className="mt-1 text-muted-foreground">{c.top}: {pairs.slice(0, 3).map((p) => `${p.m.name} ${p.score}`).join(" / ")}</p>
+          </div>
+        </div>
+      )}
+      {error && <p role="alert" className="text-sm text-destructive">{t.aiError}</p>}
+      {report && <div className="grid gap-3 sm:grid-cols-2">{([[c.fit, report.teamFit], [c.role, report.rolePrediction], [c.mot, report.motivation], [c.onb, report.onboarding]] as const).map(([h, b]) => <div key={h} className={card}><p className="text-sm text-primary">{h}</p><p className="mt-1 text-xs leading-6">{b}</p></div>)}</div>}
+      <p className="text-[10px] leading-4 text-muted-foreground">{c.note}</p>
     </div>
   );
 }
