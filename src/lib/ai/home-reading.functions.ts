@@ -24,7 +24,7 @@ const readingSchema = z.object({
 });
 
 export const generateHomeReading = createServerFn({ method: "POST" })
-  .validator((input: unknown) => inputSchema.parse(input))
+  .inputValidator((input: unknown) => inputSchema.parse(input))
   .handler(async ({ data }) => {
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("AI is unavailable");
