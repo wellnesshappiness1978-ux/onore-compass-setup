@@ -32,4 +32,4 @@
 - [x] Verify AI team selection and 1on1 guide responses in Japanese with a three-member test roster.
 - [x] Show the complete Home personal reading to everyone, and add next-step links to consultation, mandala art, and team features without claiming paid access.
 
-- [ ] Rebuild Home personal reading around five named elements, explicit calculation limits, and five layered passages; verify free/mobile display.
+- [x] Rebuild Home personal reading around five named elements, explicit calculation limits, and five layered passages; verify free/mobile display.
