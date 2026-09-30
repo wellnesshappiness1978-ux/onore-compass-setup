@@ -614,6 +614,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             </div>
             {tab === "arts" ? (
               <>
+                <ArtsGuide />
                 <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
                 <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
                 <NameAnalysisPreview profile={profile} language={language} />
