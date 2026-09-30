@@ -3,7 +3,6 @@ import {
   Bell,
   Building2,
   Check,
-  ChevronDown,
   Crown,
   Globe2,
   HelpCircle,
@@ -832,6 +831,18 @@ export default function SettingsPanel({
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={() => setLockedMode(null)}>{dc.later}</Button>
             <Button onClick={() => { setLockedMode(null); document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{dc.upgrade}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={upgradePlan !== null} onOpenChange={(open) => { if (!open) setUpgradePlan(null); }}>
+        <DialogContent className="max-w-sm border-primary/30 bg-card text-foreground">
+          <DialogTitle className="font-serif text-xl text-primary">{upgradePlan}</DialogTitle>
+          <DialogDescription className="text-sm leading-6 text-muted-foreground">
+            {t.upgradeNote}
+          </DialogDescription>
+          <p className="text-xs text-muted-foreground">{t.planTestNote}</p>
+          <div className="flex justify-end pt-2">
+            <Button variant="outline" onClick={() => setUpgradePlan(null)}>{dc.later}</Button>
           </div>
         </DialogContent>
       </Dialog>
