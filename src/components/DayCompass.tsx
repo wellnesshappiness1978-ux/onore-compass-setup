@@ -166,7 +166,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
 
   return (
     <div id="day-compass" className="scroll-mt-4">
-      <SolfeggioPlayer language={language} compact />
+      {rank(plan) >= rank("vip") && <SolfeggioPlayer language={language} compact />}
       <div
         ref={wheel}
         className="compass-wheel relative mx-auto mt-3 aspect-square w-full max-w-[430px] touch-none select-none"

@@ -421,7 +421,8 @@ export default function SettingsPanel({
                 aria-checked={plan === p}
                 variant="outline"
                 size="sm"
-                 onClick={() => onPlanChange(p)}
+                disabled={planOrder.indexOf(p) > planOrder.indexOf(actualPlan)}
+                onClick={() => onPlanChange(p)}
                 className={`text-[10px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
               >
                 {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : p === "b2b" ? t.planB2b : tc.planNames["b2b-premium"]}

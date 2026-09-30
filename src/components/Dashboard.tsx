@@ -32,6 +32,8 @@ import NineStarsPanel from "@/components/NineStarsPanel";
 import SettingsPanel from "@/components/SettingsPanel";
 import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/design-modes";
 import { getMyMembership } from "@/lib/membership.functions";
+import { planOrder } from "@/lib/plans";
+import DailyLifeGuide from "./DailyLifeGuide";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -465,10 +467,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     });
     return () => cancelAnimationFrame(frame);
   }, [tab, teamEntry]);
-  // Development display only; never use previewPlan as a paid entitlement for writes.
-  const [previewPlan, setPreviewPlan] = useState<Plan>(signedIn ? "b2b" : "free");
-  useEffect(() => { if (signedIn) setPreviewPlan("b2b"); }, [signedIn]);
+  // Strict entitlement: the read-only membership row decides access. The switch may only preview equal or lower plans.
+  const [selectedPlan, setPreviewPlan] = useState<Plan>("b2b-premium");
   const [actualPlan, setActualPlan] = useState<Plan>("free");
+  const previewPlan: Plan = planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
   const membership = useServerFn(getMyMembership);
   useEffect(() => {
     let active = true;
@@ -543,6 +545,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <>
+            <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
             <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => { setArtsEntry("manual"); setTab("arts"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
             <section className="design-compass-section text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">
