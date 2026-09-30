@@ -36,3 +36,5 @@
 - [x] Align five membership definitions and limits across pricing and registration, with a read-only membership table and database-enforced member cap (missing paid entitlement = Free); billing remains unopened.
 
 - [x] AI相談の1日上限（プラン別）と365日コンパス・12星座モニュメント・プラン別メリット表示
+
+- [ ] Grant owner test account b2b-premium in plan_memberships (blocked: no signed-in user yet)
