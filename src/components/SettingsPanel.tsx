@@ -514,7 +514,10 @@ export default function SettingsPanel({
 
       <section id="membership-plans" className={card}>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h3 className="font-serif text-lg text-primary">{t.plansHeading}</h3>
+          <div className="min-w-0">
+            <h3 className="font-serif text-xl text-gradient-gold">{pc.sectionTitle}</h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">{t.plansHeading} — {pc.sectionSub}</p>
+          </div>
           <div
             className="flex rounded-full border border-primary/25 bg-background/50 p-1 text-xs"
             role="radiogroup"
@@ -543,90 +546,113 @@ export default function SettingsPanel({
           </div>
         </div>
 
-        <div className="mt-4 space-y-3">
-            {allTiers.map((tier) => {
-            const isVip = tier.id === "vip";
-            const isB2b = tier.id === "b2b" || tier.id === "b2b-premium";
-            const open = openTier === tier.id;
-            const price = yearly ? tier.priceYearly : tier.priceMonthly;
-            const period = yearly ? t.perYear : t.perMonth;
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={t.plansHeading}>
+          {pc.cards.map((item) => {
+            const active = cardPlan === item.id;
             return (
-              <div
-                key={tier.id}
-                className={`overflow-hidden rounded-2xl border transition-shadow ${
-                  isVip
-                    ? "border-primary/70 bg-primary/10 shadow-[0_0_28px_-6px_var(--gold-glow)]"
-                    : "border-primary/15 bg-background/40"
+              <button
+                key={item.id}
+                role="tab"
+                aria-selected={active}
+                onClick={() => setCardPlan(item.id)}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs transition-all ${
+                  active
+                    ? "border-primary bg-primary/20 text-primary shadow-[0_0_18px_-4px_var(--gold-glow)]"
+                    : "border-primary/15 bg-background/40 text-muted-foreground hover:text-primary"
                 }`}
               >
-                <button
-                  onClick={() => setOpenTier(open ? null : tier.id)}
-                  aria-expanded={open}
-                  className="flex w-full items-center gap-3 p-4 text-left"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className={`font-serif text-sm ${isVip ? "text-gradient-gold" : ""}`}>
-                        {tier.name}
-                      </p>
-                      {isVip && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-champagne-gradient px-2 py-0.5 text-[10px] font-semibold text-[#10131a] shadow-champagne">
-                          <Crown className="size-3" /> {t.popular}
-                        </span>
-                      )}
-                      {isB2b && (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[10px] text-primary">
-                          <Building2 className="size-3" /> {t.corporate}
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{language === "ja" ? `登録上限 ${memberLimit[tier.id]}人${tier.id === "free" ? " · 本人専用" : ""}` : tc.limit(0, memberLimit[tier.id])}</p>
-                    <p className="mt-1 flex items-baseline gap-1">
-                      <span
-                        className={`text-xl font-semibold ${isVip ? "text-gradient-gold" : "text-foreground"}`}
-                      >
-                        {price}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">
-                        {tier.id === "b2b" ? tier.priceNote : period}
-                      </span>
-                      {tier.priceNote && tier.id !== "b2b" && (
-                        <span className="ml-1 text-[10px] text-primary">{tier.priceNote}</span>
-                      )}
-                    </p>
-                  </div>
-                  <ChevronDown
-                    className={`size-4 shrink-0 text-primary transition-transform ${open ? "rotate-180" : ""}`}
-                  />
-                </button>
-                {open && (
-                  <div className="border-t border-primary/10 px-4 pb-4 pt-3">
-                    <ul className="space-y-1.5">
-                      {tier.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2 text-xs">
-                          <Check
-                            className={`mt-0.5 size-3.5 shrink-0 ${isVip ? "text-primary" : "text-muted-foreground"}`}
-                          />
-                          <span className={isVip ? "text-foreground" : "text-muted-foreground"}>
-                            {f}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      onClick={() => { setNotice(`${tier.name}: ${t.upgradeNote}`); }}
-                      disabled={tier.id === "free"}
-                      size="sm"
-                      className={`mt-3 h-9 w-full ${isVip ? "shadow-champagne-strong" : ""}`}
-                      variant={isVip ? "default" : "outline"}
-                    >
-                      {tier.cta}
-                    </Button>
-                  </div>
-                )}
-              </div>
+                <span aria-hidden="true">{item.emoji}</span>
+                {planTabName(item.id)}
+              </button>
             );
           })}
+        </div>
+
+        {(() => {
+          const item = pc.cards.find((c) => c.id === cardPlan) ?? pc.cards[1];
+          const tier = allTiers.find((tr) => tr.id === item.id) ?? allTiers[2];
+          const isVip = item.id === "vip";
+          const price = yearly ? tier.priceYearly : tier.priceMonthly;
+          const period = yearly ? t.perYear : t.perMonth;
+          return (
+            <div
+              key={item.id}
+              role="tabpanel"
+              aria-label={tier.name}
+              className={`relative mt-4 overflow-hidden rounded-2xl border p-5 transition-all ${
+                isVip
+                  ? "border-primary/70 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent shadow-[0_0_34px_-8px_var(--gold-glow)]"
+                  : item.id === "b2b-premium"
+                    ? "border-primary/50 bg-gradient-to-br from-primary/15 via-card/60 to-background/40"
+                    : "border-primary/25 bg-gradient-to-br from-primary/10 via-card/60 to-background/40"
+              }`}
+            >
+              <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-primary/10 blur-2xl" />
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span aria-hidden="true" className="text-3xl">{item.emoji}</span>
+                  <div className="min-w-0">
+                    <p className={`font-serif text-base ${isVip ? "text-gradient-gold" : "text-foreground"}`}>{tier.name}</p>
+                    <p className="mt-0.5 text-xs text-primary/80">{item.tagline}</p>
+                  </div>
+                </div>
+                {item.badge && (
+                  <span
+                    className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
+                      isVip
+                        ? "bg-champagne-gradient text-[#10131a] shadow-champagne"
+                        : "border border-primary/40 bg-primary/10 text-primary"
+                    }`}
+                  >
+                    {isVip && <Crown className="size-3" />} {item.badge}
+                  </span>
+                )}
+              </div>
+              <p className="mt-3 flex items-baseline gap-1">
+                <span className={`text-2xl font-semibold ${isVip ? "text-gradient-gold" : "text-foreground"}`}>
+                  {price}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  {tier.id === "b2b" ? tier.priceNote : period}
+                </span>
+                {tier.priceNote && tier.id !== "b2b" && (
+                  <span className="ml-1 text-[10px] text-primary">{tier.priceNote}</span>
+                )}
+              </p>
+              <ul className="mt-4 space-y-2">
+                {item.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-xs leading-5">
+                    <span
+                      className={`mt-0.5 grid size-4 shrink-0 place-items-center rounded-full ${
+                        isVip ? "bg-champagne-gradient text-[#10131a]" : "bg-primary/15 text-primary"
+                      }`}
+                    >
+                      <Check className="size-2.5" strokeWidth={3} />
+                    </span>
+                    <span className="text-foreground/90">{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button
+                onClick={() => setUpgradePlan(tier.name)}
+                size="sm"
+                className={`mt-5 h-10 w-full text-sm ${isVip ? "shadow-champagne-strong" : ""}`}
+                variant={isVip ? "default" : "outline"}
+              >
+                <Sparkles className="size-4" /> {pc.unlockCta}
+              </Button>
+            </div>
+          );
+        })()}
+
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-background/40 px-4 py-3">
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">{t.tiers[0].name}</p>
+            <p className="truncate text-[11px] text-muted-foreground">
+              {t.tiers[0].features[0]} / {t.tiers[0].features[1]}
+            </p>
+          </div>
+          <span className="shrink-0 font-serif text-sm text-muted-foreground">{t.tiers[0].priceMonthly}</span>
         </div>
         <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
       </section>
