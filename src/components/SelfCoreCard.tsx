@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowUpRight, Compass, Dna, Fingerprint, Heart, Orbit, Sparkles, Users, WandSparkles } from "lucide-react";
+import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, Heart, Orbit, Sparkles, Sprout } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { fiveElementsCopy } from "@/lib/five-elements-copy";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
+import { homePlanCardsCopy, type HomePlanId } from "@/lib/home-plan-cards";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
-import { useState } from "react";
 import { splittableName } from "@/lib/ai/five-elements";
 
 const nameCopy: Record<Language, { title: string; grids: [string, string, string, string, string]; fortune: string; split: string; save: string; note: string }> = {
