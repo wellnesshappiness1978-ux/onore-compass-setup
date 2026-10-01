@@ -50,7 +50,6 @@ function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
 }
 
 function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "onCapture">) {
-  const root = useRef<THREE.Group>(null);
   const aura = useRef<THREE.Points>(null);
   const particles = useMemo(() => {
     const pts = new Float32Array(330 * 3);
