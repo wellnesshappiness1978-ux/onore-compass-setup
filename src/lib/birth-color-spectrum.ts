@@ -33,6 +33,6 @@ export function birthColorSpectrum(p: Birth) {
   const sunSlot = Math.floor(A.SunPosition(instant).elon * 4);
   const seed = [...`${p.birthDate}|${p.birthPlace || "東京都"}`].reduce((v, ch) => (v * 31 + ch.charCodeAt(0)) % 1440, 0);
   const base = (seed + minute + sunSlot) % 1440;
-  const color = (index: number) => palette[(index + 1440) % 1440];
+  const color = (index: number) => palette[(index + 1440) % 1440] ?? { slot: 1, name: "参考色", code: hex(0, 0.57, 0.51) };
   return { main: color(base), sub: color(base + 215), mind: color(base + 487), provisional: !hasTime, placeDefault: !p.birthPlace };
 }

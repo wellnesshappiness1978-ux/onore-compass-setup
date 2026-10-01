@@ -22,6 +22,27 @@
       "when": 1790764072796,
       "tag": "0002_enforce_five_membership_member_limits",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790862573298,
+      "tag": "0003_add_debug_plan_admin_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790862608082,
+      "tag": "0004_expire_temporary_debug_plans",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790862745149,
+      "tag": "0005_preserve_membership_after_debug_expiry",
+      "breakpoints": true
     }
   ]
 }
