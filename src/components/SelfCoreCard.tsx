@@ -9,7 +9,7 @@ import { fiveElementsCopy } from "@/lib/five-elements-copy";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import type { CoreLayers } from "@/lib/ai/core-layers";
 import { homePlanCardsCopy, type HomePlanId } from "@/lib/home-plan-cards";
-import type { Language } from "@/lib/translations";
+import { torisetsuTranslations, type Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import { splittableName } from "@/lib/ai/five-elements";
 
