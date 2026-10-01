@@ -47,18 +47,21 @@ export type Database = {
       plan_memberships: {
         Row: {
           debug_expires_at: string | null
+          debug_previous_plan: string | null
           plan: string
           updated_at: string
           user_id: string
         }
         Insert: {
           debug_expires_at?: string | null
+          debug_previous_plan?: string | null
           plan?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           debug_expires_at?: string | null
+          debug_previous_plan?: string | null
           plan?: string
           updated_at?: string
           user_id?: string

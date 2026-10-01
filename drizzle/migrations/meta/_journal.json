@@ -36,6 +36,13 @@
       "when": 1790862608082,
       "tag": "0004_expire_temporary_debug_plans",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790862745149,
+      "tag": "0005_preserve_membership_after_debug_expiry",
+      "breakpoints": true
     }
   ]
 }
