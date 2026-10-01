@@ -44,7 +44,7 @@ export function mingGua(date: string, gender: string) {
   const selected = [gender] as ("male" | "female")[];
   return { ...solar, branches: selected.map(branch => {
     const number = normalize(branch === "male" ? male : female, branch);
-    const [shengQi, tianYi, yanNian, fuWei] = directionsByKua[number] ?? directionsByKua[1];
+    const [shengQi, tianYi, yanNian, fuWei] = directionsByKua[number] ?? ["SE", "E", "S", "N"];
     return { branch, number, group: [1, 3, 4, 9].includes(number) ? "東四命" : "西四命", shengQi, tianYi, yanNian, fuWei };
   }) };
 }
