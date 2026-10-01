@@ -1,4 +1,5 @@
 // A reproducible 1440-slot visual palette, not a measured wavelength or a validated birth-color method.
+import * as A from "astronomy-engine";
 type Birth = { birthDate: string; birthTime: string; birthTimeUnknown: boolean; birthPlace: string };
 const names = ["サンライズコーラル", "シャンパンローズ", "アンバーゴールド", "翡翠グリーン", "ターコイズ", "瑠璃ブルー", "アメジスト", "モーヴピンク"];
 const hex = (h: number, s: number, l: number) => {
@@ -16,9 +17,12 @@ export function birthColorSpectrum(p: Birth) {
   if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== p.birthDate) return null;
   const hasTime = !p.birthTimeUnknown && /^([01]\d|2[0-3]):[0-5]\d$/.test(p.birthTime);
   const minute = hasTime ? Number(p.birthTime.slice(0, 2)) * 60 + Number(p.birthTime.slice(3, 5)) : 720;
-  // Place and date change the palette offset; no geographic or astronomical accuracy is claimed.
+  // The Sun's calculated longitude is one input to an illustrative palette, not a physical color measurement.
+  const instant = new Date(`${p.birthDate}T00:00:00Z`);
+  instant.setUTCMinutes(minute - 540);
+  const sunSlot = Math.floor(A.SunPosition(instant).elon * 4);
   const seed = [...`${p.birthDate}|${p.birthPlace || "東京都"}`].reduce((v, ch) => (v * 31 + ch.charCodeAt(0)) % 1440, 0);
-  const base = (seed + minute) % 1440;
+  const base = (seed + minute + sunSlot) % 1440;
   const color = (index: number) => {
     const slot = (index + 1440) % 1440;
     const hue = slot / 4;
