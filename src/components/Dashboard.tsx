@@ -480,7 +480,21 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   }, [tab, teamEntry]);
   // Strict entitlement: the read-only membership row decides access. The switch may only preview equal or lower plans.
   const [selectedPlan, setPreviewPlan] = useState<Plan>("b2b-premium");
-  const [actualPlan, setActualPlan] = useState<Plan>("free");
+  const [serverPlan, setActualPlan] = useState<Plan>("free");
+  // Dev-only override (localStorage devPlanOverride). Disabled in published builds so it can't unlock paid features in production.
+  const devOverrideEnabled = import.meta.env.DEV;
+  const [devPlanOverride, setDevPlanOverride] = useState<Plan | null>(null);
+  useEffect(() => {
+    if (!devOverrideEnabled) return;
+    try { const v = window.localStorage.getItem("devPlanOverride") as Plan | null; if (v && planOrder.includes(v)) { setDevPlanOverride(v); setPreviewPlan(v); } } catch { /* ignore */ }
+  }, [devOverrideEnabled]);
+  const applyDevOverride = (next: Plan) => {
+    try { window.localStorage.setItem("devPlanOverride", next); } catch { /* ignore */ }
+    setDevPlanOverride(next);
+    setPreviewPlan(next);
+    if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
+  };
+  const actualPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : serverPlan;
   const [debugAllowed, setDebugAllowed] = useState(false);
   const previewPlan: Plan = planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
   const membership = useServerFn(getMyMembership);
@@ -674,8 +688,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 plan={previewPlan}
                 actualPlan={actualPlan}
                 debugAllowed={debugAllowed}
+                devOverrideEnabled={devOverrideEnabled}
                 onDebugPlanChanged={(next) => { setActualPlan(next); setPreviewPlan(next); if (!canPreviewDesign(next, designMode)) setDesignMode("classic"); }}
                 onPlanChange={(next) => {
+                  if (devOverrideEnabled) { applyDevOverride(next); return; }
                   setPreviewPlan(next);
                   if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
                 }}
