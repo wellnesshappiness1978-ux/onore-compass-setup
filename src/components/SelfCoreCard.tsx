@@ -119,7 +119,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
             </article>;
           })}
            <article className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "あなたの注意ポイント" : "A tendency to watch"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data.caution}</p></article>
-           <section aria-label="自分のトリセツ" className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "自分のトリセツ · クロス解析" : "My manual · cross analysis"}</h3><div className="mt-4 space-y-5">{[data.manualCore, data.manualDecision, data.manualTiming].map((body, i) => <article key={i}><h4 className="font-serif text-lg text-primary">{["あなたの本質・コアアイデンティティ", "思考と決断のバイアス", "攻め時・守り時の行動指針"][i]}</h4><p className="mt-2 text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
+            <section aria-label={torisetsuTranslations[language].manual} className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{torisetsuTranslations[language].manualTitle}</h3><div className="mt-4 space-y-5">{[data.manualCore, data.manualDecision, data.manualTiming].map((body, i) => <article key={i}><h4 className="font-serif text-lg text-primary">{t.labels[i + 3]}</h4><p className="mt-2 text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
         </>}
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>
