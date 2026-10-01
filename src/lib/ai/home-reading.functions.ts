@@ -4,6 +4,8 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import { getFiveElements } from "./five-elements";
 import { computeCoreLayers, coreLayersPrompt } from "./core-layers";
+import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
+import { helioPhase } from "./helio-phase";
 
 const profileSchema = z.object({
   nameKanji: z.string().max(40), nameKana: z.string().max(60), nameRomaji: z.string().max(60),
@@ -26,6 +28,13 @@ const readingSchema = z.object({
   manualCore: z.string().min(30).max(500),
   manualDecision: z.string().min(30).max(500),
   manualTiming: z.string().min(30).max(500),
+  keySummary: z.string(),
+  numerologyTrial: z.string(),
+  astroRecovery: z.string(),
+  pillarsTiming: z.string(),
+  animalSwitch: z.string(),
+  colorPractice: z.string(),
+  helioGuide: z.string(),
 });
 
 export const generateHomeReading = createServerFn({ method: "POST" })
@@ -37,6 +46,8 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     const elements = getFiveElements(profile);
     const layers = computeCoreLayers(profile);
     const core = coreLayersPrompt(layers);
+    const color = birthColorSpectrum(profile);
+    const helio = helioPhase(profile.birthDate);
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
       headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
@@ -69,7 +80,20 @@ strength: about 100 Japanese characters. Declare the single strongest attractive
 nameFortune: about 150 Japanese characters. Only if the name grid exists: from 人格 and 総格 values and luck labels, state directly the charm others see, the talent shown socially, and the kind of connections they tend to draw, crossed with one birth-date lens. If the grid is missing, return an empty string.
 caution: about 100 Japanese characters. Describe a specific tendency to watch for, grounded in at least two available calculated values; give one practical way to notice it. Never diagnose health or assert inevitable harm.
 manualCore, manualDecision, manualTiming: around 100 Japanese characters each. Write three DISTINCT cross-layer interpretations: (1) identity from day master, sun and life path; (2) decision bias from name person grid, soul number and Mercury, skipping unavailable values; (3) an actionable advance/pause guideline from five-element balance and personal year. Cite the actual computed values in every answer; avoid unverifiable auspicious dates and do not claim all 15 arts have been calculated.
-All other fields must weave the name grid (when present) together with the sun sign, year branch, blood type and animal so name and birth date read as one consistent portrait. Return only the structured object.`,
+All other fields must weave the name grid (when present) together with the sun sign, year branch, blood type and animal so name and birth date read as one consistent portrait.
+
+BIRTH COLOR (illustrative 1440-slot palette): ${color ? `main ${color.main.name} ${color.main.code}, sub ${color.sub.name} ${color.sub.code}, mind ${color.mind.name} ${color.mind.code}` : "unavailable"}.
+EARTH CALENDAR PHASE (Earth has moved ${helio ? `${helio.degrees}° around the Sun since the birth-day position → phase 「${helio.phase}」` : "unavailable"}; four 90° phases 種まき/育成/収穫/休息).
+
+PRO COUNSELOR VOICE: speak like a seasoned diviner and behavioral counselor — confident, sharp, warm, declarative; name their unconscious habits outright. BANNED (Barnum phrases): "〜かもしれません", "人それぞれ", "慎重に行動しましょう", "感謝を忘れずに", "無理せず", "バランスが大切", or any line fitting anyone. Every advice field MUST contain all three: (a) 具体的な行動 with a when (e.g. 朝の最初の30分 / 週の前半 / 返信前) and what, (b) 避けるべき具体的リスク, (c) one effective interpersonal phrase in 「」 quotes. Never assert job, health, relationship or future facts.
+keySummary: about 100 Japanese characters. Opens the reading: the essence and action key that the computed layers (numerology, four pillars, astrology, name, animal, earth-calendar phase) point to in common; cite 2–3 values.
+numerologyTrial: about 120 chars. From life path and soul number: the trial pattern that repeats in their life and the specific talent that breaks through it, plus (a)(b)(c).
+astroRecovery: about 120 chars. Sun vs moon gap (建前 vs 本音) and a concrete recovery action when emotions are disturbed, plus (a)(b)(c). If moon is uncertain, say so in a few words.
+pillarsTiming: about 120 chars. From the five-element excess/lack and day master: where to spend energy (攻め時) and the trap where they spin their wheels (守り時), plus (a)(b)(c).
+animalSwitch: about 120 chars. From the animal character and its group: decision habit and the exact conditions that flip their motivation switch, plus (a)(b)(c). Only the 本質 layer is computed; do not invent 表面・希望・隠れ.
+colorPractice: about 120 chars. Daily ways to use the birth colors: one small item, one interior idea, one focus of attention, naming the color names.
+helioGuide: about 120 chars. State the phase explicitly and what to do in this phase this week/month, plus (a)(b)(c). Describe as an earth-calendar reflection, not verified luck.
+Return only the structured object.`,
       providerOptions: { openai: { store: false } },
     });
     return { ...readingSchema.parse(result.output), elements, layers };
