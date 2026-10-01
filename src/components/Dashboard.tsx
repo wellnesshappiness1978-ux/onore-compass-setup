@@ -37,6 +37,7 @@ import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { quickReading, quickUsageKey } from "@/lib/quick-compatibility";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
+import { homeReadingCopy } from "@/lib/home-reading-copy";
 import DailyLifeGuide from "./DailyLifeGuide";
 import BirthColorGuide from "./BirthColorGuide";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
@@ -124,9 +125,9 @@ function TorisetsuPanel({
   const t = torisetsuTranslations[language];
   const base = translations[language];
   const q = quickCompatibilityCopy[language];
+  const [mode, setMode] = useState<"manual" | "compatibility">(initialMode);
   const generate = useServerFn(generateHomeReading);
   const manualReading = useQuery({ queryKey: ["home-reading-five-v3", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
-  const [mode, setMode] = useState<"manual" | "compatibility">(initialMode);
   const [partnerName, setPartnerName] = useState("");
   const [partnerDate, setPartnerDate] = useState("");
   const [partnerTime, setPartnerTime] = useState("");
@@ -212,7 +213,7 @@ function TorisetsuPanel({
                   <div>
                     <p className="mb-1 text-[10px] text-primary/65">0{index + 1} / 03</p>
                     <h4 className="font-serif text-base text-gold-glow sm:text-lg">{part.title}</h4>
-                     <p className="mt-3 text-base leading-8 text-foreground/80" role={!part.body ? "status" : undefined}>{part.body ?? (manualReading.isError ? translations[language].comingFeature : homeReadingCopy[language].loading)}</p>
+                     <p className="mt-3 text-base leading-8 text-foreground/80" role={!part.body ? "status" : undefined}>{part.body ?? (manualReading.isError ? homeReadingCopy[language].error : homeReadingCopy[language].loading)}</p>
                   </div>
                 </div>
               ))}
