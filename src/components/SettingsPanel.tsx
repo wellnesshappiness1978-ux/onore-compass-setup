@@ -426,7 +426,7 @@ export default function SettingsPanel({
                 aria-checked={plan === p}
                 variant="outline"
                 size="sm"
-                disabled={planOrder.indexOf(p) > planOrder.indexOf(actualPlan)}
+                disabled={!devOverrideEnabled && planOrder.indexOf(p) > planOrder.indexOf(actualPlan)}
                 onClick={() => onPlanChange(p)}
                 className={`text-[10px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
               >
@@ -434,7 +434,9 @@ export default function SettingsPanel({
               </Button>
             ))}
           </div>
-          <p className="mt-2 text-[11px] text-muted-foreground">{t.planTestNote}</p>
+          {devOverrideEnabled
+            ? <p className="mt-2 text-[11px] text-primary">開発モード：選んだプランの機能がこの端末で実際に解放されます（公開版では無効）。</p>
+            : <p className="mt-2 text-[11px] text-muted-foreground">{t.planTestNote}</p>}
         </div>
       </section>
 
