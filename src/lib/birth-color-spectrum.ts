@@ -10,6 +10,18 @@ const hex = (h: number, s: number, l: number) => {
   };
   return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
 };
+const used = new Set<string>();
+const palette = Array.from({ length: 1440 }, (_, slot) => {
+  const hue = slot / 4;
+  let code = hex(hue, 0.57, 0.47 + (slot % 4) * 0.035);
+  // 8-bit RGB rounding can collapse adjacent HSL values. Resolve collisions deterministically.
+  while (used.has(code)) {
+    const blue = (parseInt(code.slice(5), 16) + 1) % 256;
+    code = `${code.slice(0, 5)}${blue.toString(16).padStart(2, "0")}`.toUpperCase();
+  }
+  used.add(code);
+  return { slot: slot + 1, name: names[Math.floor(hue / 45) % names.length], code };
+});
 
 export function birthColorSpectrum(p: Birth) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(p.birthDate)) return null;
@@ -23,10 +35,6 @@ export function birthColorSpectrum(p: Birth) {
   const sunSlot = Math.floor(A.SunPosition(instant).elon * 4);
   const seed = [...`${p.birthDate}|${p.birthPlace || "東京都"}`].reduce((v, ch) => (v * 31 + ch.charCodeAt(0)) % 1440, 0);
   const base = (seed + minute + sunSlot) % 1440;
-  const color = (index: number) => {
-    const slot = (index + 1440) % 1440;
-    const hue = slot / 4;
-    return { slot: slot + 1, name: names[Math.floor(hue / 45) % names.length], code: hex(hue, 0.57, 0.47 + (slot % 4) * 0.035) };
-  };
+  const color = (index: number) => palette[(index + 1440) % 1440];
   return { main: color(base), sub: color(base + 215), mind: color(base + 487), provisional: !hasTime, placeDefault: !p.birthPlace };
 }
