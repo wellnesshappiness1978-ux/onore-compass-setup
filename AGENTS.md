@@ -28,3 +28,5 @@
 - Share card, hiring AI tab, Solfeggio BGM, daily reminders: shared canvas card component, recruit tab gated b2b, Web Audio synth (no external audio), reminders in localStorage onore-reminders fire only while app open.
 
 - Quick compatibility uses deterministic birth-date reference copy and a local-day per-device usage counter keyed by profile and actual membership; do not describe it as verified astrology or server-enforced billing. Why: partner details are not saved and billing is not connected.
+- HelioCalendar calculates heliocentric planet positions for the selected day, but calendar events use only illustrative daily rhythm and require a user-confirmed Google or ICS import; never call these verified auspicious dates or automatic sync. Why: astronomical positions do not validate personal timing.
+- Birth color spectrum maps profile fields and solar longitude to reproducible 1440-slot colors, explicitly as an illustrative palette rather than measured frequencies or an established 1440-color system. Why: no validated correspondence or birthplace coordinates are available.

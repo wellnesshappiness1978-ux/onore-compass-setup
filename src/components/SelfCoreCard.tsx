@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { fiveElementsCopy } from "@/lib/five-elements-copy";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
-import type { CoreLayers } from "@/lib/ai/core-layers";
+import { computeCoreLayers, type CoreLayers } from "@/lib/ai/core-layers";
 import { homePlanCardsCopy, type HomePlanId } from "@/lib/home-plan-cards";
 import { torisetsuTranslations, type Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
@@ -26,18 +26,18 @@ const nameCopy: Record<Language, { title: string; grids: [string, string, string
 function CoreLayersPanel({ layers: c }: { layers: CoreLayers }) {
   const [selected, setSelected] = useState(0);
   const rows: [string, string][] = [
-    ["姓名判断", c.name ? `人格${c.name.person}（${c.name.luck.person}）・総格${c.name.total}（${c.name.luck.total}）` : "未算出"],
+    ["姓名判断", c.name ? `人格${c.name.person}（${c.name.luck.person}）・総格${c.name.total}（${c.name.luck.total}）` : "姓と名を区切ると画数を確認できます"],
     ["数秘術", `LP${c.numerology.lifePath}・D${c.numerology.destiny ?? "—"}・S${c.numerology.soul ?? "—"}・${c.numerology.cyclePhase}`],
     ["西洋占星術", `太陽${c.western.sun}・月${c.western.moon}${c.western.moonUncertain ? "?" : ""}・水星${c.western.planets[0]?.sign}・金星${c.western.planets[1]?.sign}`],
     ["四柱推命", `日干${c.shichu.dayMaster}・${c.shichu.pillars.map(p => p.kanshi).join(" ")}・五行最多${c.shichu.dominant}`],
-    ["動物占い", `${c.animal.core ?? "未算出"}${c.animal.group ? `・${c.animal.group}` : ""}`],
+    ["動物占い", `${c.animal.core ?? "生年月日を確認してください"}${c.animal.group ? `・${c.animal.group}` : ""}`],
   ];
   const details = [
-    c.name ? `天格${c.name.sky}画・人格${c.name.person}画・地格${c.name.earth}画・外格${c.name.outer}画・総格${c.name.total}画。人格は日常の対人運、総格は全体の流れを読む伝統的な指標です。` : "姓と名を分け、対応する文字の画数が揃うと五運を表示します。",
-    `ライフパス${c.numerology.lifePath}・ディスティニー${c.numerology.destiny ?? "未算出"}・ソウル${c.numerology.soul ?? "未算出"}。${c.numerology.cyclePhase}。名前のローマ字と生年月日を異なる観点から還元した数値です。`,
-    `太陽${c.western.sun}・月${c.western.moon}${c.western.moonUncertain ? "（出生時間がないため境界付近では不確定）" : ""}。${c.western.planets.map(x => `${x.name}${x.sign}`).join("・")}。アセンダント：${c.western.ascendant ?? "未算出"}。出生地は東京基準です。`,
-    `${c.shichu.pillars.map(x => `${x.label}${x.kanshi}（${x.tsuhen}・${x.stage}）`).join("／")}。日干${c.shichu.dayMaster}。五行：${Object.entries(c.shichu.balance).map(([k,v]) => `${k}${v}`).join("・")}。出生時間がなければ時柱は未算出です。`,
-    `本質：${c.animal.core ?? "未算出"}。行動タイプ：${c.animal.group ?? "未算出"}。表面・希望・隠れ：未算出。公開された対応表がないため創作していません。`,
+    c.name ? `名字と名前の画数から天格${c.name.sky}・人格${c.name.person}・地格${c.name.earth}・外格${c.name.outer}・総格${c.name.total}を計算。人格は対人や社会での姿、総格は全体像を見る伝統的な目安です。画数表や流派で解釈は異なり、職業や将来を確定しません。` : "名字と名前の区切り、および対応する文字の画数が必要です。分割を選んで保存すると五運を確認できます。推測の画数は表示しません。",
+    `生年月日からライフパス${c.numerology.lifePath}、${c.numerology.cyclePhase}を計算。${c.numerology.destiny ? `ローマ字氏名からディスティニー${c.numerology.destiny}・ソウル${c.numerology.soul}を求めます。` : "ローマ字氏名を登録すると名前由来の数値も見られます。"} 9年周期を振り返る参考指標であり、未来の出来事を予言する数値ではありません。`,
+    `誕生時の太陽${c.western.sun}、月${c.western.moon}、${c.western.planets.map(x => `${x.name}${x.sign}`).join("・")}を天文計算から星座に対応。${c.hasTime ? `東京基準のアセンダントは${c.western.ascendant}。` : "出生時間がないため月は昼12時の参考配置です。"} 天体位置は計算値ですが、性格の解釈は占星術上の見方です。`,
+    `${c.shichu.pillars.map(x => `${x.label}${x.kanshi}`).join("・")}、日干${c.shichu.dayMaster}。五行は${Object.entries(c.shichu.balance).map(([k,v]) => `${k}${v}`).join("・")}。通変星と十二運星を日干との関係から示す伝統的な読みです。${c.hasTime ? "時柱には登録した出生時刻を使用。" : "出生時刻がないため年・月・日の三柱で読みます。"}`,
+    `生年月日の日周期を公開対応表の60分類に照合し、本質キャラ${c.animal.core ?? "（生年月日を確認）"}を表示します。${c.animal.group ? `行動タイプは${c.animal.group}。` : ""} 表面・希望・隠れの3分類は対応表がないため表示せず、本質1層のみを参考にします。`,
   ];
   return (
     <section aria-label="5大コア占術レイヤー" className="border-b border-primary/20 py-6">
@@ -51,7 +51,8 @@ function CoreLayersPanel({ layers: c }: { layers: CoreLayers }) {
         <div className="rounded-md border border-primary/30 bg-primary/10 p-3"><p className="text-xs text-primary">本音・潜在</p><p className="mt-1 text-sm text-foreground">{c.inner.join(" / ")}</p></div>
       </div>
       <ul className="mt-3 space-y-1 text-xs leading-6 text-muted-foreground">{c.cross.map(x => <li key={x.pair}>{x.pair}：{x.a} × {x.b} → <span className="text-primary">{x.verdict}</span></li>)}</ul>
-      <p className="mt-2 text-[11px] text-muted-foreground">東京基準の天体計算・伝統的な占術の見方による参考値です。動物占いの表面・希望・隠れは未算出です。</p>
+       {!c.hasTime && <p className="mt-3 inline-block border border-primary/30 px-3 py-2 text-sm text-primary">※出生時間を設定するとさらに精密度が向上します</p>}
+       <p className="mt-2 text-xs leading-6 text-muted-foreground">出生地は東京基準の天体計算・伝統的な占術の見方による参考値です。動物占いの4層全体は対応表がないため提供していません。</p>
     </section>
   );
 }
@@ -66,6 +67,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const generate = useServerFn(generateHomeReading);
   const n = nameCopy[language];
   const chars = splittableName(profile.nameKanji);
+  const localLayers = computeCoreLayers(profile);
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
@@ -86,13 +88,13 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">ONORE COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{t.title}</h2></div>
       </header>
       <div className="px-5 sm:px-8">
+        {localLayers && <CoreLayersPanel layers={localLayers} />}
         {isPending ? <div role="status" className="flex min-h-40 items-center gap-3 text-sm text-muted-foreground"><Sparkles className="size-5 animate-pulse text-primary" />{t.loading}</div> : isError || !data ? (
           <div className="flex min-h-40 flex-col items-start justify-center gap-3" role="alert"><p className="text-sm text-muted-foreground">{t.error}</p><Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>
         ) : <>
           <div className="grid grid-cols-2 gap-x-4 gap-y-4 border-b border-primary/20 py-6 sm:grid-cols-5 sm:gap-5">
             {f.axes.map((label, i) => <div key={label} className="min-w-0 border-l border-primary/35 pl-3"><p className="text-xs text-primary">{label}</p><p className="mt-2 break-words font-serif text-sm leading-6 text-foreground">{values[i] ?? f.missing}</p></div>)}
           </div>
-           {data.layers && <CoreLayersPanel layers={data.layers} />}
           <section aria-label={n.title} className="my-6 rounded-lg border border-primary/40 bg-primary/5 p-4 sm:p-6">
             <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
             {e?.name ? <>
