@@ -100,7 +100,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
         <Button variant="champagne" onClick={testUnlocked && sky ? start : onVip} className="mt-5 h-auto max-w-[300px] whitespace-normal px-4 py-3 text-center text-sm leading-6"><Crown className="size-4 shrink-0" />{testUnlocked && sky ? t.viewPreview : t.unlock}</Button>
       </div>}
     </div>
-    {open && <div className="mt-3 flex flex-wrap justify-center gap-2"><Button variant="ghost" size="sm" onClick={start}><Play className="size-4" />{t.replay}</Button><p className="self-center text-sm text-muted-foreground">{language === "ja" ? "ドラッグで回転 · スクロールで拡大" : "Drag to rotate · Scroll to zoom"}</p></div>}
+    {open && <div className="mt-3 flex flex-wrap justify-center gap-2"><Button variant="ghost" size="sm" onClick={start}><Play className="size-4" />{t.replay}</Button></div>}
     {testUnlocked && <SolfeggioPlayer language={language} />}
     <p className="mx-auto mt-7 max-w-2xl text-sm leading-7 text-muted-foreground">{language === "ja" ? `惑星の方角は出生日時の地心位置を天文計算した参考図。${sky?.approximate ? "出生時間がないため正午（日本時間）で表示。" : ""}惑星の大きさ・軌道線・曼陀羅と五行の光は装飾表現です。色は測定された波長・周波数ではなく、効能を保証しません。${t.gridDisclaimer}` : `${sky?.approximate ? "Birth time unknown: shown at noon Japan time. " : ""}Planet directions are calculated; sizes, orbit lines, mandala and five-element light are artistic. Colors are not measured wavelengths. ${t.gridDisclaimer}`}</p>
     <div className="mx-auto mt-7 max-w-[640px] border-y border-primary/25 py-5 text-left"><div className="flex items-baseline justify-between gap-4"><h4 className="font-serif text-xl text-primary">{t.gridTitle}</h4><span className="text-xs text-muted-foreground">{t.gridQualifier}</span></div>

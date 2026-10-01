@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Lightformer, OrbitControls } from "@react-three/drei";
+import { Environment, Lightformer } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { ReturnTypeNatal } from "@/lib/natal-sky-types";
@@ -120,7 +120,6 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
         <mesh rotation-x={i * .3}><torusGeometry args={[.21 + i * .015, .006, 4, 48]} /><meshBasicMaterial color={gold} transparent opacity={.55} /></mesh>
       </group>)}
     </group>
-    <OrbitControls enablePan={false} minDistance={8} maxDistance={17} enableDamping dampingFactor={.07} autoRotate={false} />
   </>;
 }
 
