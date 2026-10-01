@@ -10,10 +10,11 @@ export const getMyMembership = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase.from("plan_memberships")
-      .select("plan, debug_expires_at").eq("user_id", context.userId).maybeSingle();
+      .select("plan, debug_expires_at, debug_previous_plan").eq("user_id", context.userId).maybeSingle();
     if (error) throw error;
-    if (data?.debug_expires_at && Date.parse(data.debug_expires_at) <= Date.now()) return "free";
-    return validPlans.find((plan) => plan === data?.plan) ?? "free";
+    const effective = data?.debug_expires_at && Date.parse(data.debug_expires_at) <= Date.now()
+      ? data.debug_previous_plan : data?.plan;
+    return validPlans.find((plan) => plan === effective) ?? "free";
   });
 
 export const canManageDebugPlan = createServerFn({ method: "GET" })
@@ -31,9 +32,14 @@ export const setMyDebugPlan = createServerFn({ method: "POST" })
     const { data: allowed, error: roleError } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (roleError || !allowed) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: current, error: readError } = await context.supabase.from("plan_memberships")
+      .select("plan, debug_expires_at, debug_previous_plan").eq("user_id", context.userId).maybeSingle();
+    if (readError) throw readError;
+    const originalPlan = current?.debug_expires_at ? current.debug_previous_plan ?? "free" : current?.plan ?? "free";
     const { error } = await supabaseAdmin.from("plan_memberships").upsert({
       user_id: context.userId,
       plan: data.plan,
+      debug_previous_plan: originalPlan,
       debug_expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
