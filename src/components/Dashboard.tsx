@@ -414,7 +414,7 @@ function TorisetsuPanel({
                 </p>
               </div>
               <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
-               {quick && <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">{q.headings.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-4"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? [quick.love, quick.friend, quick.business, quick.overall][i] : q.messages[i]}</p></article>)}</div>}
+               {quick && <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">{q.headings.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-4"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? [quick.love, quick.friend, quick.business, quick.overall][i] : quick.same ? q.messages[i] : q.contrast?.[i] ?? q.messages[i]}</p></article>)}</div>}
               <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
             </section>
           ) : null}
