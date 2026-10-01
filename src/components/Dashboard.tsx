@@ -680,7 +680,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               />
               </>
             ) : tab === "mandala" ? (
-              <NineStarsPanel language={language} birthDate={profile.birthDate} bloodType={profile.bloodType} onVip={() => setModal("vip")} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
+              <NineStarsPanel language={language} profile={profile} onVip={() => setModal("vip")} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
             ) : tab === "settings" ? (
               <SettingsPanel
                 profile={profile}

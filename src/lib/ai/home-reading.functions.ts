@@ -6,11 +6,12 @@ import { getFiveElements } from "./five-elements";
 import { computeCoreLayers, coreLayersPrompt } from "./core-layers";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { helioPhase } from "./helio-phase";
+import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 
 const profileSchema = z.object({
   nameKanji: z.string().max(40), nameKana: z.string().max(60), nameRomaji: z.string().max(60),
   birthDate: z.string().date(), birthTime: z.string().max(20), birthTimeUnknown: z.boolean(),
-  birthPlace: z.string().max(80), birthCity: z.string().max(80),
+  birthPlace: z.string().max(80), birthCity: z.string().max(80), gender: z.enum(["male", "female", "other", "undisclosed"]).optional(),
   bloodType: z.string().max(4), siblingOrder: z.string().max(20),
 });
 const inputSchema = z.object({
@@ -48,6 +49,7 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     const core = coreLayersPrompt(layers);
     const color = birthColorSpectrum(profile);
     const helio = helioPhase(profile.birthDate);
+    const gua = mingGua(profile.birthDate, profile.gender ?? "undisclosed");
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
       headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
@@ -84,6 +86,7 @@ All other fields must weave the name grid (when present) together with the sun s
 
 BIRTH COLOR (illustrative 1440-slot palette): ${color ? `main ${color.main.name} ${color.main.code}, sub ${color.sub.name} ${color.sub.code}, mind ${color.mind.name} ${color.mind.code}` : "unavailable"}.
 EARTH CALENDAR PHASE (Earth has moved ${helio ? `${helio.degrees}° around the Sun since the birth-day position → phase 「${helio.phase}」` : "unavailable"}; four 90° phases 種まき/育成/収穫/休息).
+FENG SHUI (traditional Ba Zhai reference, solar year from Li Chun): ${gua ? gua.branches.map(b => `${b.branch} formula: Kua ${b.number}, 生気 ${fengDirectionNames[b.shengQi]}, 天医 ${fengDirectionNames[b.tianYi]}, 延年 ${fengDirectionNames[b.yanNian]}`).join("; ") : "birth date unavailable"}. If two branches are given, do not choose one for the user. Mention only as a traditional directional reflection; do not infer a home's facing, a room's location or an individual's health/wealth outcomes. Annual Flying Stars cannot yield a building-specific natal chart without building period and facing.
 
 PRO COUNSELOR VOICE: speak like a seasoned diviner and behavioral counselor — confident, sharp, warm, declarative; name their unconscious habits outright. BANNED (Barnum phrases): "〜かもしれません", "人それぞれ", "慎重に行動しましょう", "感謝を忘れずに", "無理せず", "バランスが大切", or any line fitting anyone. Every advice field MUST contain all three: (a) 具体的な行動 with a when (e.g. 朝の最初の30分 / 週の前半 / 返信前) and what, (b) 避けるべき具体的リスク, (c) one effective interpersonal phrase in 「」 quotes. Never assert job, health, relationship or future facts.
 keySummary: about 100 Japanese characters. Opens the reading: the essence and action key that the computed layers (numerology, four pillars, astrology, name, animal, earth-calendar phase) point to in common; cite 2–3 values.
