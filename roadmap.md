@@ -41,3 +41,6 @@
 - [x] Put the free personal reading first, add caution points, interactive five-layer details and data-grounded manual.
 - [x] Add daily quick compatibility limits and four practical result sections across membership tiers (per-device preview, not server-enforced).
 - [x] Update paid-plan comparison and add birth-color explanation/table without claiming measured personal frequencies.
+- [ ] Refine five-layer reference displays without inventing unavailable name/animal data.
+- [ ] Add VIP heliocentric calendar visualization and manual Google/iOS event export, clearly marking illustrative timing.
+- [ ] Add profile-based 1440-shade birth-color mapping with explicit approximation and no measured frequency claims.
