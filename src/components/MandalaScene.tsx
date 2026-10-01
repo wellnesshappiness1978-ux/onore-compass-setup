@@ -78,7 +78,7 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
     <directionalLight position={[3, 5, 8]} intensity={2.4} color={gold} />
     <pointLight position={[-4, -2, 4]} intensity={2.2} color={sub} />
     <Environment><Lightformer intensity={2} position={[0, 5, 5]} scale={[10, 10, 1]} /><Lightformer intensity={1} color={main} position={[-5, 1, 1]} rotation-y={Math.PI / 2} scale={[10, 1, 1]} /></Environment>
-    <group ref={root}>
+    <group>
       <points ref={aura} scale={Math.max(.2, progress / 2)}>
         <bufferGeometry><bufferAttribute attach="attributes-position" args={[particles, 3]} /></bufferGeometry>
         <pointsMaterial color={main} size={.035} transparent opacity={.85} sizeAttenuation depthWrite={false} />
