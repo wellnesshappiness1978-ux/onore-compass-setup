@@ -47,6 +47,7 @@ type Props = {
   plan: Plan;
   actualPlan: Plan;
   debugAllowed: boolean;
+  devOverrideEnabled?: boolean;
   onDebugPlanChanged: (plan: Plan) => void;
   onPlanChange: (plan: Plan) => void;
   designMode: DesignMode;
@@ -325,6 +326,7 @@ export default function SettingsPanel({
   plan,
   actualPlan,
   debugAllowed,
+  devOverrideEnabled = false,
   onDebugPlanChanged,
   onPlanChange,
   designMode,
