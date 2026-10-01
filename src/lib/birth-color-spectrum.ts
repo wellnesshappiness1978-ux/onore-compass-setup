@@ -26,7 +26,7 @@ export function birthColorSpectrum(p: Birth) {
   const color = (index: number) => {
     const slot = (index + 1440) % 1440;
     const hue = slot / 4;
-    return { slot: slot + 1, name: names[Math.floor(hue / 45) % names.length], code: hex(hue, 0.57, 0.53) };
+    return { slot: slot + 1, name: names[Math.floor(hue / 45) % names.length], code: hex(hue, 0.57, 0.47 + (slot % 4) * 0.035) };
   };
   return { main: color(base), sub: color(base + 215), mind: color(base + 487), provisional: !hasTime, placeDefault: !p.birthPlace };
 }
