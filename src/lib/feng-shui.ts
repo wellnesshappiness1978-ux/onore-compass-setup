@@ -24,7 +24,7 @@ const directionsByKua: Record<number, [Direction, Direction, Direction, Directio
 export const fengDirectionNames: Record<Direction, string> = { N: "北", NE: "北東", E: "東", SE: "南東", S: "南", SW: "南西", W: "西", NW: "北西" };
 
 export function solarYear(date: string) {
-  const parsed = /^\d{4}-\d{2}-\d{2}$/.exec(date);
+  const parsed = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   if (!parsed) return null;
   const y = Number(parsed[1]);
   const d = new Date(`${date}T03:00:00Z`); // local noon JST; date-only input cannot resolve birth-hour boundary

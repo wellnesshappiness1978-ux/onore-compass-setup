@@ -7,7 +7,7 @@ export const natalBodies = [
 ] as const;
 
 export function natalSky(date: string, time: string, unknown: boolean) {
-  const d = /^\d{4}-\d{2}-\d{2}$/.exec(date);
+  const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   if (!d) return null;
   const valid = new Date(`${date}T03:00:00Z`);
   if (Number.isNaN(valid.getTime()) || valid.toISOString().slice(0, 10) !== date) return null;
