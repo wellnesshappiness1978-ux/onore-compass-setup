@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { fiveElementsCopy } from "@/lib/five-elements-copy";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
-import type { CoreLayers } from "@/lib/ai/core-layers";
+import { computeCoreLayers, type CoreLayers } from "@/lib/ai/core-layers";
 import { homePlanCardsCopy, type HomePlanId } from "@/lib/home-plan-cards";
 import { torisetsuTranslations, type Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
@@ -67,6 +67,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const generate = useServerFn(generateHomeReading);
   const n = nameCopy[language];
   const chars = splittableName(profile.nameKanji);
+  const localLayers = computeCoreLayers(profile);
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
@@ -87,13 +88,13 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">ONORE COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{t.title}</h2></div>
       </header>
       <div className="px-5 sm:px-8">
+        {localLayers && <CoreLayersPanel layers={localLayers} />}
         {isPending ? <div role="status" className="flex min-h-40 items-center gap-3 text-sm text-muted-foreground"><Sparkles className="size-5 animate-pulse text-primary" />{t.loading}</div> : isError || !data ? (
           <div className="flex min-h-40 flex-col items-start justify-center gap-3" role="alert"><p className="text-sm text-muted-foreground">{t.error}</p><Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>
         ) : <>
           <div className="grid grid-cols-2 gap-x-4 gap-y-4 border-b border-primary/20 py-6 sm:grid-cols-5 sm:gap-5">
             {f.axes.map((label, i) => <div key={label} className="min-w-0 border-l border-primary/35 pl-3"><p className="text-xs text-primary">{label}</p><p className="mt-2 break-words font-serif text-sm leading-6 text-foreground">{values[i] ?? f.missing}</p></div>)}
           </div>
-           {data.layers && <CoreLayersPanel layers={data.layers} />}
           <section aria-label={n.title} className="my-6 rounded-lg border border-primary/40 bg-primary/5 p-4 sm:p-6">
             <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
             {e?.name ? <>
