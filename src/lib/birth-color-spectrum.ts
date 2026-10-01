@@ -10,16 +10,11 @@ const hex = (h: number, s: number, l: number) => {
   };
   return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
 };
-const used = new Set<string>();
 const palette = Array.from({ length: 1440 }, (_, slot) => {
   const hue = slot / 4;
-  let code = hex(hue, 0.57, 0.47 + (slot % 4) * 0.035);
-  // 8-bit RGB rounding can collapse adjacent HSL values. Resolve collisions deterministically.
-  while (used.has(code)) {
-    const blue = (parseInt(code.slice(5), 16) + 1) % 256;
-    code = `${code.slice(0, 5)}${blue.toString(16).padStart(2, "0")}`.toUpperCase();
-  }
-  used.add(code);
+  // Encode the within-quadrant shade directly into the blue channel to guarantee 1440 distinct HEX values.
+  const base = hex(hue, 0.57, 0.51);
+  const code = `${base.slice(0, 5)}${Math.floor(slot / 4).toString(16).padStart(3, "0").slice(-2)}`.toUpperCase();
   return { slot: slot + 1, name: names[Math.floor(hue / 45) % names.length], code };
 });
 
