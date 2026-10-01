@@ -32,7 +32,7 @@ import ConsultationPanel from "@/components/ConsultationPanel";
 import NineStarsPanel from "@/components/NineStarsPanel";
 import SettingsPanel from "@/components/SettingsPanel";
 import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/design-modes";
-import { getMyMembership } from "@/lib/membership.functions";
+import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { quickReading, quickUsageKey } from "@/lib/quick-compatibility";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
@@ -481,14 +481,20 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   // Strict entitlement: the read-only membership row decides access. The switch may only preview equal or lower plans.
   const [selectedPlan, setPreviewPlan] = useState<Plan>("b2b-premium");
   const [actualPlan, setActualPlan] = useState<Plan>("free");
+  const [debugAllowed, setDebugAllowed] = useState(false);
   const previewPlan: Plan = planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
   const membership = useServerFn(getMyMembership);
+  const checkDebugAccess = useServerFn(canManageDebugPlan);
   useEffect(() => {
     let active = true;
     setActualPlan("free");
-    if (signedIn) membership().then((plan) => { if (active) setActualPlan(plan); }).catch(() => { if (active) setActualPlan("free"); });
+    setDebugAllowed(false);
+    if (signedIn) {
+      membership().then((plan) => { if (active) setActualPlan(plan); }).catch(() => { if (active) setActualPlan("free"); });
+      checkDebugAccess().then((allowed) => { if (active) setDebugAllowed(allowed); }).catch(() => { if (active) setDebugAllowed(false); });
+    }
     return () => { active = false; };
-  }, [signedIn, membership]);
+  }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
@@ -667,6 +673,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 language={language}
                 plan={previewPlan}
                 actualPlan={actualPlan}
+                debugAllowed={debugAllowed}
+                onDebugPlanChanged={(next) => { setActualPlan(next); setPreviewPlan(next); if (!canPreviewDesign(next, designMode)) setDesignMode("classic"); }}
                 onPlanChange={(next) => {
                   setPreviewPlan(next);
                   if (!canPreviewDesign(next, designMode)) setDesignMode("classic");

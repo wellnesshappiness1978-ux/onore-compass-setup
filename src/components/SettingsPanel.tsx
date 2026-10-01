@@ -31,6 +31,7 @@ import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
 import { settingsTranslations, type SettingsTranslation, type PricingTier } from "@/lib/settings-translations";
 import TeamStudio from "@/components/team/TeamStudio";
+import DebugPlanSwitcher from "@/components/DebugPlanSwitcher";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
 import { memberLimit, planOrder } from "@/lib/plans";
@@ -45,6 +46,8 @@ type Props = {
   onVip: () => void;
   plan: Plan;
   actualPlan: Plan;
+  debugAllowed: boolean;
+  onDebugPlanChanged: (plan: Plan) => void;
   onPlanChange: (plan: Plan) => void;
   designMode: DesignMode;
   onDesignModeChange: (mode: DesignMode) => void;
@@ -321,6 +324,8 @@ export default function SettingsPanel({
   onVip,
   plan,
   actualPlan,
+  debugAllowed,
+  onDebugPlanChanged,
   onPlanChange,
   designMode,
   onDesignModeChange,
@@ -432,6 +437,8 @@ export default function SettingsPanel({
           <p className="mt-2 text-[11px] text-muted-foreground">{t.planTestNote}</p>
         </div>
       </section>
+
+      {signedIn && debugAllowed && <DebugPlanSwitcher plan={actualPlan} onChanged={onDebugPlanChanged} />}
 
       <section className="border-y border-primary/20 py-6" aria-labelledby="design-heading">
         <div className="flex items-center gap-2">
