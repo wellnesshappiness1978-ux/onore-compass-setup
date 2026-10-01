@@ -22,6 +22,10 @@ const readingSchema = z.object({
   instinct: z.string().min(30).max(750),
   strength: z.string().min(30).max(750),
   nameFortune: z.string().max(900),
+  caution: z.string().min(30).max(500),
+  manualCore: z.string().min(30).max(500),
+  manualDecision: z.string().min(30).max(500),
+  manualTiming: z.string().min(30).max(500),
 });
 
 export const generateHomeReading = createServerFn({ method: "POST" })
@@ -40,10 +44,10 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     const result = await generateText({
       model: provider.responses("openai/gpt-6-astra"),
       output: Output.object({ schema: readingSchema }),
-      prompt: `Write a vivid, personal five-layer INTERPRETIVE reading in ${language}. Return exactly the five fields in the schema; no headings in field values. This is available in FULL to every user including free users. No paywall or upsell in the reading.
+      prompt: `Write a vivid, personal five-layer INTERPRETIVE reading in ${language}. Return exactly the fields in the schema; no headings in field values. This is available in FULL to every user including free users. No paywall or upsell in the reading.
 
 Use ONLY these precomputed inputs (not unverified chart placements or invented stroke counts):
-Name character grid: ${elements.name ? `天格 ${elements.name.sky}(${elements.name.luck.sky}) / 人格 ${elements.name.person}(${elements.name.luck.person}) / 地格 ${elements.name.earth}(${elements.name.luck.earth}) / 外格 ${elements.name.outer}(${elements.name.luck.outer}) / 総格 ${elements.name.total}(${elements.name.luck.total}); luck labels follow one common 81-number convention (modern Unihan stroke convention; surname/given name separated by a space)` : "not computable: needs a two-part, space-separated kanji name with supported characters"}.
+Name character grid: ${elements.name ? `天格 ${elements.name.sky}(${elements.name.luck.sky}) / 人格 ${elements.name.person}(${elements.name.luck.person}) / 地格 ${elements.name.earth}(${elements.name.luck.earth}) / 外格 ${elements.name.outer}(${elements.name.luck.outer}) / 総格 ${elements.name.total}(${elements.name.luck.total}); luck labels follow one common 81-number convention (modern Unihan stroke convention; surname/given name separated by a space)` : "not computable: needs a two-part, space-separated name with supported kanji or kana characters"}.
 Western sun sign: ${elements.zodiac ?? "unknown"}${elements.zodiacBoundary ? " (near sign boundary; date-only conventional sign, exact astronomical sign unverified)" : ""}.
 Yearly zodiac branch: ${elements.eto ?? "uncertain/unknown near year boundary"} (traditional year starts around 立春; boundary dates are not asserted).
 Blood type: ${elements.blood ?? "not provided"} (no scientifically established personality inference).
@@ -63,6 +67,8 @@ mind: about 100 Japanese characters. Cross sun sign and animal character by exac
 instinct: about 100 Japanese characters. Cross year branch and blood type by exact values; state their last-minute tenacity, emotional switch, and real interpersonal core.
 strength: about 100 Japanese characters. Declare the single strongest attractive trait they exert unconsciously, synthesizing at least two lenses; do not repeat synthesis.
 nameFortune: about 150 Japanese characters. Only if the name grid exists: from 人格 and 総格 values and luck labels, state directly the charm others see, the talent shown socially, and the kind of connections they tend to draw, crossed with one birth-date lens. If the grid is missing, return an empty string.
+caution: about 100 Japanese characters. Describe a specific tendency to watch for, grounded in at least two available calculated values; give one practical way to notice it. Never diagnose health or assert inevitable harm.
+manualCore, manualDecision, manualTiming: around 100 Japanese characters each. Write three DISTINCT cross-layer interpretations: (1) identity from day master, sun and life path; (2) decision bias from name person grid, soul number and Mercury, skipping unavailable values; (3) an actionable advance/pause guideline from five-element balance and personal year. Cite the actual computed values in every answer; avoid unverifiable auspicious dates and do not claim all 15 arts have been calculated.
 All other fields must weave the name grid (when present) together with the sun sign, year branch, blood type and animal so name and birth date read as one consistent portrait. Return only the structured object.`,
       providerOptions: { openai: { store: false } },
     });

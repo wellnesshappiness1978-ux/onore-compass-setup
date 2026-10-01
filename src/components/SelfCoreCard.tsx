@@ -24,6 +24,7 @@ const nameCopy: Record<Language, { title: string; grids: [string, string, string
 };
 
 function CoreLayersPanel({ layers: c }: { layers: CoreLayers }) {
+  const [selected, setSelected] = useState(0);
   const rows: [string, string][] = [
     ["姓名判断", c.name ? `人格${c.name.person}（${c.name.luck.person}）・総格${c.name.total}（${c.name.luck.total}）` : "未算出"],
     ["数秘術", `LP${c.numerology.lifePath}・D${c.numerology.destiny ?? "—"}・S${c.numerology.soul ?? "—"}・${c.numerology.cyclePhase}`],
@@ -31,12 +32,20 @@ function CoreLayersPanel({ layers: c }: { layers: CoreLayers }) {
     ["四柱推命", `日干${c.shichu.dayMaster}・${c.shichu.pillars.map(p => p.kanshi).join(" ")}・五行最多${c.shichu.dominant}`],
     ["動物占い", `${c.animal.core ?? "未算出"}${c.animal.group ? `・${c.animal.group}` : ""}`],
   ];
+  const details = [
+    c.name ? `天格${c.name.sky}画・人格${c.name.person}画・地格${c.name.earth}画・外格${c.name.outer}画・総格${c.name.total}画。人格は日常の対人運、総格は全体の流れを読む伝統的な指標です。` : "姓と名を分け、対応する文字の画数が揃うと五運を表示します。",
+    `ライフパス${c.numerology.lifePath}・ディスティニー${c.numerology.destiny ?? "未算出"}・ソウル${c.numerology.soul ?? "未算出"}。${c.numerology.cyclePhase}。名前のローマ字と生年月日を異なる観点から還元した数値です。`,
+    `太陽${c.western.sun}・月${c.western.moon}${c.western.moonUncertain ? "（出生時間がないため境界付近では不確定）" : ""}。${c.western.planets.map(x => `${x.name}${x.sign}`).join("・")}。アセンダント：${c.western.ascendant ?? "未算出"}。出生地は東京基準です。`,
+    `${c.shichu.pillars.map(x => `${x.label}${x.kanshi}（${x.tsuhen}・${x.stage}）`).join("／")}。日干${c.shichu.dayMaster}。五行：${Object.entries(c.shichu.balance).map(([k,v]) => `${k}${v}`).join("・")}。出生時間がなければ時柱は未算出です。`,
+    `本質：${c.animal.core ?? "未算出"}。行動タイプ：${c.animal.group ?? "未算出"}。表面・希望・隠れ：未算出。公開された対応表がないため創作していません。`,
+  ];
   return (
     <section aria-label="5大コア占術レイヤー" className="border-b border-primary/20 py-6">
-      <p className="text-[10px] uppercase tracking-widest text-primary/75">5 CORE LAYERS</p>
-      <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-        {rows.map(([k, v]) => <li key={k} className="min-w-0 rounded-md border border-primary/25 bg-primary/5 px-3 py-2"><span className="text-xs text-primary">{k}</span><p className="break-words text-sm leading-6 text-foreground">{v}</p></li>)}
-      </ul>
+      <h3 className="font-serif text-xl text-primary">5大コア占術レイヤー</h3>
+      <div role="tablist" aria-label="占術レイヤーを選択" className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
+        {rows.map(([k], i) => <Button key={k} type="button" role="tab" aria-selected={selected === i} aria-controls="core-layer-detail" variant={selected === i ? "default" : "outline"} onClick={() => setSelected(i)} className="h-auto min-h-12 whitespace-normal px-2 text-sm">{k}</Button>)}
+      </div>
+      <div id="core-layer-detail" role="tabpanel" className="mt-3 rounded-md border border-primary/30 bg-primary/5 p-4" aria-live="polite"><h4 className="font-serif text-lg text-primary">{rows[selected]?.[0]}</h4><p className="mt-2 break-words text-base leading-8 text-foreground">{rows[selected]?.[1]}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{details[selected]}</p></div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div className="rounded-md border border-primary/30 p-3"><p className="text-xs text-primary">表の顔</p><p className="mt-1 text-sm text-foreground">{c.surface.join(" / ")}</p></div>
         <div className="rounded-md border border-primary/30 bg-primary/10 p-3"><p className="text-xs text-primary">本音・潜在</p><p className="mt-1 text-sm text-foreground">{c.inner.join(" / ")}</p></div>
@@ -83,7 +92,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
           <div className="grid grid-cols-2 gap-x-4 gap-y-4 border-b border-primary/20 py-6 sm:grid-cols-5 sm:gap-5">
             {f.axes.map((label, i) => <div key={label} className="min-w-0 border-l border-primary/35 pl-3"><p className="text-xs text-primary">{label}</p><p className="mt-2 break-words font-serif text-sm leading-6 text-foreground">{values[i] ?? f.missing}</p></div>)}
           </div>
-          {data.layers && <CoreLayersPanel layers={data.layers} />}
+           {data.layers && <CoreLayersPanel layers={data.layers} />}
           <section aria-label={n.title} className="my-6 rounded-lg border border-primary/40 bg-primary/5 p-4 sm:p-6">
             <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
             {e?.name ? <>
@@ -109,6 +118,8 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
               <p className={`mt-5 max-w-3xl whitespace-pre-line break-words text-foreground ${i === 0 ? "font-serif text-[1.0625rem] leading-[2.1] sm:text-xl sm:leading-[2.05]" : "text-sm leading-8 sm:text-base"}`}>{text}</p>
             </article>;
           })}
+           <article className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "あなたの注意ポイント" : "A tendency to watch"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data.caution}</p></article>
+           <section aria-label="自分のトリセツ" className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "自分のトリセツ · クロス解析" : "My manual · cross analysis"}</h3><div className="mt-4 space-y-5">{[data.manualCore, data.manualDecision, data.manualTiming].map((body, i) => <article key={i}><h4 className="font-serif text-lg text-primary">{["あなたの本質・コアアイデンティティ", "思考と決断のバイアス", "攻め時・守り時の行動指針"][i]}</h4><p className="mt-2 text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
         </>}
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>
