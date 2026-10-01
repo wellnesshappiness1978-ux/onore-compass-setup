@@ -1,4 +1,5 @@
 import type { Plan } from "./design-modes";
+import { quickCompatibilityLimit } from "./quick-compatibility";
 
 export const planOrder: Plan[] = ["free", "standard", "vip", "b2b", "b2b-premium"];
 const rank = (plan: Plan) => planOrder.indexOf(plan);
@@ -33,4 +34,5 @@ export const requiredPlanFor = (feature: TeamFeature) => featureMin[feature];
 export const planForCount = (count: number): Plan | null => planOrder.find((p) => memberLimit[p] >= count) ?? null;
 /** Daily AI consultation caps per plan (Infinity = unlimited). Display-test counter until billing exists. */
 export const consultationDailyLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 10, b2b: 30, "b2b-premium": Infinity };
+export { quickCompatibilityLimit };
 export const nextPlan = (plan: Plan): Plan | null => planOrder[rank(plan) + 1] ?? null;

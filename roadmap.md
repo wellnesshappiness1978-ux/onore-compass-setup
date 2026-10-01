@@ -38,3 +38,6 @@
 - [x] AI相談の1日上限（プラン別）と365日コンパス・12星座モニュメント・プラン別メリット表示
 
 - [ ] Grant owner test account b2b-premium in plan_memberships (blocked: no signed-in user yet)
+- [x] Put the free personal reading first, add caution points, interactive five-layer details and data-grounded manual.
+- [x] Add daily quick compatibility limits and four practical result sections across membership tiers (per-device preview, not server-enforced).
+- [x] Update paid-plan comparison and add birth-color explanation/table without claiming measured personal frequencies.

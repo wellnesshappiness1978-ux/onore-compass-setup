@@ -19,6 +19,7 @@ export type PlanCardsCopy = {
 
 const JA_FEATURES = {
   standard: [
+    "クイック相性診断 1日3回",
     "関係者を最大2人登録",
     "AI相談 1日3回まで",
     "相性診断＆統合詳細トリセツ 無制限",
@@ -26,6 +27,7 @@ const JA_FEATURES = {
     "毎日の個人アドバイス",
   ],
   vip: [
+    "クイック相性診断 1日10回",
     "関係者を最大5人登録",
     "AI相談 1日10回まで",
     "高画質曼陀羅アート完全解放・壁紙保存・共有",
@@ -34,12 +36,14 @@ const JA_FEATURES = {
     "広告非表示",
   ],
   b2b: [
+    "クイック相性診断 1日30回",
     "関係者を最大30人登録",
     "AI相談 1日30回まで",
     "チーム・組織コンサル全7機能（チーム診断・AI人員選抜・タレント名簿・アラートカレンダー・1on1トリセツ等）",
     "365日企業ロードマップ",
   ],
   premium: [
+    "クイック相性診断 無制限",
     "関係者を最大100人登録",
     "AI相談 無制限",
     "100名大型組織コンサルフル対応",
@@ -65,6 +69,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
     unlockCta: "Unlock this plan",
     cards: [
       { id: "standard", badge: "Easy start", tagline: "Your daily compass, in living color", features: [
+        "Quick compatibility: 3/day",
         "Register up to 2 members",
         "AI consultation: 3 questions a day",
         "Unlimited compatibility checks & detailed manual",
@@ -72,6 +77,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "Daily personal guidance",
       ] },
       { id: "vip", badge: "Most popular", tagline: "Every radiance, nothing held back", features: [
+        "Quick compatibility: 10/day",
         "Register up to 5 members",
         "AI consultation: 10 questions a day",
         "Full HD mandala art, wallpaper saving & sharing",
@@ -80,12 +86,14 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "Ad-free",
       ] },
       { id: "b2b", badge: "For business", tagline: "Bring out the full power of your team", features: [
+        "Quick compatibility: 30/day",
         "Register up to 30 members",
         "AI consultation: 30 questions a day",
         "All 7 team & organization consulting tools (team diagnosis, AI selection, talent catalog, alert calendar, 1-on-1 manual and more)",
         "365-day business roadmap",
       ] },
       { id: "b2b-premium", badge: "Flagship", tagline: "The fastest way forward for large organizations", features: [
+        "Quick compatibility: unlimited",
         "Register up to 100 members",
         "Unlimited AI consultation",
         "Full consulting for organizations up to 100 people",
@@ -99,6 +107,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
     unlockCta: "开通此方案，释放可能性",
     cards: [
       { id: "standard", badge: "轻松入门", tagline: "点亮每一天的专属指南", features: [
+        "快速契合诊断 每天3次",
         "最多登记2人",
         "AI咨询 每天3次",
         "相性诊断与详细指南 无限制",
@@ -106,6 +115,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "每日个人建议",
       ] },
       { id: "vip", badge: "人气No.1", tagline: "释放全部光彩，毫无保留", features: [
+        "快速契合诊断 每天10次",
         "最多登记5人",
         "AI咨询 每天10次",
         "高清曼陀罗艺术全解锁·壁纸保存·分享",
@@ -114,12 +124,14 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "无广告",
       ] },
       { id: "b2b", badge: "企业推荐", tagline: "最大限度激发团队力量", features: [
+        "快速契合诊断 每天30次",
         "最多登记30人",
         "AI咨询 每天30次",
         "全部7项团队·组织咨询功能（团队诊断·AI人才选拔·人才名册·提醒日历·1on1指南等）",
         "365天企业路线图",
       ] },
       { id: "b2b-premium", badge: "旗舰方案", tagline: "大型组织的高速未来", features: [
+        "快速契合诊断 无限制",
         "最多登记100人",
         "AI咨询 无限制",
         "100人大型组织咨询完整支持",
@@ -133,6 +145,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
     unlockCta: "開通此方案，釋放可能性",
     cards: [
       { id: "standard", badge: "輕鬆入門", tagline: "點亮每一天的專屬指南", features: [
+        "快速契合診斷 每天3次",
         "最多登錄2人",
         "AI諮詢 每天3次",
         "契合度診斷與詳細指南 無限制",
@@ -140,6 +153,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "每日個人建議",
       ] },
       { id: "vip", badge: "人氣No.1", tagline: "釋放全部光彩，毫無保留", features: [
+        "快速契合診斷 每天10次",
         "最多登錄5人",
         "AI諮詢 每天10次",
         "高畫質曼陀羅藝術全解鎖·桌布保存·分享",
@@ -148,12 +162,14 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "無廣告",
       ] },
       { id: "b2b", badge: "企業推薦", tagline: "最大限度激發團隊力量", features: [
+        "快速契合診斷 每天30次",
         "最多登錄30人",
         "AI諮詢 每天30次",
         "全部7項團隊·組織顧問功能（團隊診斷·AI人才選拔·人才名冊·提醒行事曆·1on1指南等）",
         "365天企業路線圖",
       ] },
       { id: "b2b-premium", badge: "旗艦方案", tagline: "大型組織的高速未來", features: [
+        "快速契合診斷 無限制",
         "最多登錄100人",
         "AI諮詢 無限制",
         "100人大型組織顧問完整支援",
@@ -167,6 +183,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
     unlockCta: "이 플랜으로 가능성 열기",
     cards: [
       { id: "standard", badge: "가볍게 시작", tagline: "매일을 빛내는 나만의 나침반", features: [
+        "빠른 궁합 진단 하루 3회",
         "최대 2명 등록",
         "AI 상담 하루 3회",
         "궁합 진단 & 상세 가이드 무제한",
@@ -174,6 +191,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "매일의 개인 조언",
       ] },
       { id: "vip", badge: "인기 No.1", tagline: "모든 빛남을 온전히", features: [
+        "빠른 궁합 진단 하루 10회",
         "최대 5명 등록",
         "AI 상담 하루 10회",
         "고화질 만다라 아트 완전 해제·배경화면 저장·공유",
@@ -182,12 +200,14 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "광고 없음",
       ] },
       { id: "b2b", badge: "비즈니스 추천", tagline: "팀의 힘을 최대로 끌어올리기", features: [
+        "빠른 궁합 진단 하루 30회",
         "최대 30명 등록",
         "AI 상담 하루 30회",
         "팀·조직 컨설팅 전체 7가지 기능 (팀 진단·AI 인선·인물 명부·알림 캘린더·1on1 가이드 등)",
         "365일 기업 로드맵",
       ] },
       { id: "b2b-premium", badge: "최상위 플랜", tagline: "대형 조직의 미래를 가장 빠르게", features: [
+        "빠른 궁합 진단 무제한",
         "최대 100명 등록",
         "AI 상담 무제한",
         "100명 규모 조직 컨설팅 완전 지원",
@@ -201,6 +221,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
     unlockCta: "Desbloquear este plan",
     cards: [
       { id: "standard", badge: "Para empezar", tagline: "Tu brújula diaria, a todo color", features: [
+        "Compatibilidad rápida: 3/día",
         "Registra hasta 2 personas",
         "Consulta de IA: 3 veces al día",
         "Compatibilidad y manual detallado sin límites",
@@ -208,6 +229,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "Consejo personal diario",
       ] },
       { id: "vip", badge: "N.º1 en popularidad", tagline: "Todo tu brillo, sin reservas", features: [
+        "Compatibilidad rápida: 10/día",
         "Registra hasta 5 personas",
         "Consulta de IA: 10 veces al día",
         "Arte mandala en alta definición, fondos y compartir",
@@ -216,12 +238,14 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "Sin anuncios",
       ] },
       { id: "b2b", badge: "Recomendado para empresas", tagline: "Saca el máximo partido a tu equipo", features: [
+        "Compatibilidad rápida: 30/día",
         "Registra hasta 30 personas",
         "Consulta de IA: 30 veces al día",
         "Las 7 herramientas de consultoría de equipo y organización (diagnóstico de equipo, selección con IA, catálogo de talentos, calendario de alertas, manual 1a1 y más)",
         "Hoja de ruta empresarial de 365 días",
       ] },
       { id: "b2b-premium", badge: "Plan insignia", tagline: "El camino más rápido para grandes organizaciones", features: [
+        "Compatibilidad rápida: sin límite",
         "Registra hasta 100 personas",
         "Consulta de IA ilimitada",
         "Consultoría completa para organizaciones de hasta 100 personas",
@@ -235,6 +259,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
     unlockCta: "Débloquer ce plan",
     cards: [
       { id: "standard", badge: "Pour commencer", tagline: "Votre boussole quotidienne, en couleurs", features: [
+        "Affinités rapides : 3/jour",
         "Inscrivez jusqu’à 2 personnes",
         "Consultation IA : 3 fois par jour",
         "Affinités et manuel détaillé illimités",
@@ -242,6 +267,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "Conseil personnel quotidien",
       ] },
       { id: "vip", badge: "Nº1 de la popularité", tagline: "Tout votre éclat, sans retenue", features: [
+        "Affinités rapides : 10/jour",
         "Inscrivez jusqu’à 5 personnes",
         "Consultation IA : 10 fois par jour",
         "Art mandala en haute définition, fonds d’écran et partage",
@@ -250,12 +276,14 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
         "Sans publicité",
       ] },
       { id: "b2b", badge: "Recommandé pour les entreprises", tagline: "Révélez toute la puissance de votre équipe", features: [
+        "Affinités rapides : 30/jour",
         "Inscrivez jusqu’à 30 personnes",
         "Consultation IA : 30 fois par jour",
         "Les 7 outils de conseil d’équipe et d’organisation (diagnostic d’équipe, sélection IA, catalogue de talents, calendrier d’alertes, guide 1à1, etc.)",
         "Feuille de route d’entreprise sur 365 jours",
       ] },
       { id: "b2b-premium", badge: "Plan phare", tagline: "La voie la plus rapide pour les grandes organisations", features: [
+        "Affinités rapides : illimité",
         "Inscrivez jusqu’à 100 personnes",
         "Consultation IA illimitée",
         "Conseil complet pour les organisations jusqu’à 100 personnes",

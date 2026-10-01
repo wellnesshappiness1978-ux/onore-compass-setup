@@ -3,6 +3,19 @@ import strokes from "./data/unihan-strokes.json";
 // Unihan kTotalStrokes (Unicode UCD); modern character counts, not school-specific old-form counts.
 // Name grids need a deliberate surname/given-name boundary; never guess it from an unspaced name.
 const counts = strokes as Record<string, number>;
+// Common handwritten kana stroke convention (modern forms). Small kana share their full-size form.
+const kanaRows: [string, number][] = [..."あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん"].map((ch, i) => [ch, [3,2,2,2,3,3,4,1,3,2,3,1,1,3,1,4,2,1,1,2,4,3,2,2,1,3,1,4,1,1,3,2,4,2,3,3,3,3,2,3,3,2,2,2,3,2][i] ?? 0]);
+const kanaCounts = Object.fromEntries(kanaRows);
+const kataRows: [string, number][] = [..."アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン"].map((ch, i) => [ch, [2,2,3,3,3,2,3,2,3,2,3,3,2,2,2,3,3,3,3,2,2,2,2,4,1,2,2,1,2,2,2,3,2,2,3,2,2,2,2,2,2,2,2,2,2,2][i] ?? 0]);
+const kataCounts = Object.fromEntries(kataRows);
+const countStroke = (char: string) => {
+  if (Number.isInteger(counts[char])) return counts[char];
+  const code = char.codePointAt(0) ?? 0;
+  const normalized = char.normalize("NFKC").normalize("NFD").replace(/[゙゚]/g, "");
+  const small: Record<string, string> = { ぁ: "あ", ぃ: "い", ぅ: "う", ぇ: "え", ぉ: "お", っ: "つ", ゃ: "や", ゅ: "ゆ", ょ: "よ", ゎ: "わ", ァ: "ア", ィ: "イ", ゥ: "ウ", ェ: "エ", ォ: "オ", ッ: "ツ", ャ: "ヤ", ュ: "ユ", ョ: "ヨ", ヮ: "ワ" };
+  const base = small[normalized] ?? normalized;
+  return code >= 0x30a1 && code <= 0x30f6 ? kataCounts[base] ?? null : kanaCounts[base] ?? null;
+};
 const signs = ["山羊座", "水瓶座", "魚座", "牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", "天秤座", "蠍座", "射手座"];
 const boundaries = [120, 219, 321, 420, 521, 622, 723, 823, 923, 1024, 1123, 1222];
 const branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
@@ -14,7 +27,7 @@ const half = new Set([27,38,51,55,58,71,73,75,77,78]);
 /** Common 81-number convention (schools differ). */
 export const nameLuck = (n: number): "吉" | "半吉" | "凶" => { const k = n > 81 ? ((n - 1) % 80) + 1 : n; return good.has(k) ? "吉" : half.has(k) ? "半吉" : "凶"; };
 /** Kanji name whose every character has a known stroke count but no surname/given boundary yet. */
-export const splittableName = (nameKanji: string) => { const c = [...nameKanji.trim()]; return c.length >= 2 && c.length <= 8 && !/[\s　]/.test(nameKanji.trim()) && c.every(ch => Number.isInteger(counts[ch])) ? c : null; };
+export const splittableName = (nameKanji: string) => { const c = [...nameKanji.trim()]; return c.length >= 2 && c.length <= 8 && !/[\s　]/.test(nameKanji.trim()) && c.every(ch => countStroke(ch) !== null) ? c : null; };
 
 export function getFiveElements(profile: { nameKanji: string; birthDate: string; bloodType: string }) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(profile.birthDate);
@@ -33,10 +46,10 @@ export function getFiveElements(profile: { nameKanji: string; birthDate: string;
   const animal = animalNumber ? `${animals[animalNumber - 1]}（60分類 ${animalNumber}番）` : null;
   const blood = ["A", "B", "O", "AB"].includes(profile.bloodType) ? `${profile.bloodType}型` : null;
   const parts = profile.nameKanji.trim().split(/[\s　]+/).filter(Boolean);
-  const name = parts.length === 2 && parts.every(part => [...part].every(char => Number.isInteger(counts[char])))
+  const name = parts.length === 2 && parts.every(part => [...part].every(char => countStroke(char) !== null))
     ? (() => {
-        const surname = [...(parts[0] ?? "")].map(char => counts[char] ?? 0);
-        const given = [...(parts[1] ?? "")].map(char => counts[char] ?? 0);
+        const surname = [...(parts[0] ?? "")].map(char => countStroke(char) ?? 0);
+        const given = [...(parts[1] ?? "")].map(char => countStroke(char) ?? 0);
         const sum = (ns: number[]) => ns.reduce((a, b) => a + b, 0);
         const sky = sum(surname), earth = sum(given), person = (surname.at(-1) ?? 0) + (given[0] ?? 0), total = sky + earth;
         // 霊数 convention: a one-character surname/given name adds 1 to the outer grid only.
