@@ -1,142 +1,115 @@
-import { useEffect, useRef, useState } from "react";
-import { Copy, Crown, Download, LockKeyhole, LockKeyholeOpen, Share2, Sparkles } from "lucide-react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Copy, Crown, Download, LockKeyhole, Play, Share2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getBirthColorPair } from "@/lib/birth-colors";
+import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
+import { natalSky } from "@/lib/natal-sky";
+import { computeCoreLayers } from "@/lib/ai/core-layers";
 import { nineStarsTranslations } from "@/lib/nine-stars-translations";
 import { animalNames, getArtSymbols, NineStarsArtwork, palaceGrid, zodiacGlyphs, zodiacNames } from "./NineStarsArtwork";
 import type { Language } from "@/lib/translations";
+import type { UserProfile } from "./Onboarding";
+import type { Capture } from "./MandalaScene";
 import SolfeggioPlayer from "./SolfeggioPlayer";
 
-type Props = { language: Language; onVip: () => void; birthDate: string; bloodType?: string; testUnlocked?: boolean };
+const MandalaScene = lazy(() => import("./MandalaScene"));
+type Props = { language: Language; onVip: () => void; profile: UserProfile; testUnlocked?: boolean };
 
-export default function NineStarsPanel({ language, onVip, birthDate, bloodType = "", testUnlocked = false }: Props) {
+export default function NineStarsPanel({ language, onVip, profile, testUnlocked = false }: Props) {
   const t = nineStarsTranslations[language];
-  const pair = getBirthColorPair(birthDate);
+  const { birthDate, bloodType } = profile;
+  const palette = birthColorSpectrum(profile);
+  const sky = natalSky(birthDate, profile.birthTime, profile.birthTimeUnknown);
+  const element = computeCoreLayers(profile)?.shichu.dayElement ?? "木";
   const symbols = getArtSymbols(birthDate);
-  const [revealed, setRevealed] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [reduced, setReduced] = useState(false);
+  const [colors, setColors] = useState({ main: "#D4AF37", sub: "#F3E5AB" });
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
-  const artRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (!testUnlocked) setRevealed(false); }, [testUnlocked]);
-  const open = testUnlocked && revealed;
+  const capture = useRef<Capture | null>(null);
+  const setCapture = useCallback((fn: Capture | null) => { capture.current = fn; }, []);
+  useEffect(() => {
+    setMounted(true);
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const css = getComputedStyle(document.documentElement);
+    setColors({ main: css.getPropertyValue("--primary").trim() || "#D4AF37", sub: css.getPropertyValue("--gold-glow").trim() || "#F3E5AB" });
+  }, []);
+  useEffect(() => { if (!testUnlocked) { setPlaying(false); setProgress(0); } }, [testUnlocked]);
+  useEffect(() => {
+    if (!playing || reduced) return;
+    const start = performance.now();
+    const id = window.setInterval(() => {
+      const elapsed = Math.min(7, (performance.now() - start) / 1000);
+      setProgress(elapsed);
+      if (elapsed >= 7) { window.clearInterval(id); setPlaying(false); }
+    }, 50);
+    return () => window.clearInterval(id);
+  }, [playing, reduced]);
+  const open = testUnlocked && progress >= 7;
+  const start = () => { setProgress(reduced ? 7 : 0); setPlaying(!reduced); };
 
-  // Rasterize only the labelled illustrative SVG, never the lock overlay or private profile.
-  async function createWallpaper(): Promise<Blob> {
-    const svg = artRef.current?.querySelector("svg");
-    if (!svg) throw new Error("Artwork unavailable");
-    const clone = svg.cloneNode(true) as SVGSVGElement;
-    const tokens = ["art-void", "art-midnight", "art-emerald", "art-rose", "art-coral", "gold-glow", "primary", "birth-color-1", "birth-color-2", "birth-color-3", "birth-color-4", "birth-color-5", "birth-color-6", "birth-color-7", "birth-color-8", "birth-color-9", "birth-color-11", "birth-color-22", "birth-color-33"];
-    const css = getComputedStyle(svg);
-    let serialized = new XMLSerializer().serializeToString(clone);
-    for (const token of tokens) {
-      const color = css.getPropertyValue(`--${token}`).trim();
-      if (color) serialized = serialized.replaceAll(`var(--${token})`, color);
-    }
-    const source = new Blob([serialized], { type: "image/svg+xml;charset=utf-8" });
-    const src = URL.createObjectURL(source);
-    try {
-      const image = new Image();
-      image.src = src;
-      await image.decode();
-      const canvas = document.createElement("canvas");
-      canvas.width = 1080;
-      canvas.height = 1920;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Canvas unavailable");
-      const bg = css.getPropertyValue("--art-void").trim();
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, 1080, 1920);
-      ctx.drawImage(image, 0, 350, 1080, 1080);
-      ctx.textAlign = "center";
-      ctx.fillStyle = css.getPropertyValue("--gold-glow").trim();
-      ctx.font = '38px "Noto Serif JP", serif';
-      ctx.fillText(t.wallpaperTitle, 540, 225);
-      ctx.font = '24px "Noto Sans JP", sans-serif';
-      ctx.fillText(t.watermark, 540, 1585);
-      ctx.font = '20px "Noto Sans JP", sans-serif';
-      ctx.fillText("ONORE COMPASS  ·  NINE STAR REFERENCE", 540, 1640);
-      return await new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("PNG unavailable")), "image/png"));
-    } finally { URL.revokeObjectURL(src); }
+  async function createWallpaper() {
+    if (!capture.current) throw new Error("Artwork unavailable");
+    return capture.current();
   }
-
   async function download() {
     setBusy(true);
     try {
-      const blob = await createWallpaper();
+      const { blob, width, height } = await createWallpaper();
       const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = "onore-nine-stars-preview.png";
-      document.body.append(anchor);
-      anchor.click();
-      anchor.remove();
+      const link = document.createElement("a"); link.href = url; link.download = "onore-celestial-mandala-preview.png";
+      document.body.append(link); link.click(); link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 10000);
-      setStatus(t.saved);
+      setStatus(`${t.saved} · ${width} × ${height}`);
     } catch { setStatus(t.exportError); }
     finally { setBusy(false); }
   }
-
   async function shareImage() {
     setBusy(true);
     try {
-      const file = new File([await createWallpaper()], "onore-nine-stars-preview.png", { type: "image/png" });
-      if (navigator.canShare?.({ files: [file] }) && navigator.share) {
-        await navigator.share({ files: [file], title: t.wallpaperTitle, text: t.shareText });
-        setStatus(t.shared);
-      } else if (navigator.clipboard?.write && typeof ClipboardItem !== "undefined") {
-        await navigator.clipboard.write([new ClipboardItem({ "image/png": file })]);
-        setStatus(t.imageCopied);
-      } else setStatus(t.shareFallback);
+      const { blob } = await createWallpaper();
+      const file = new File([blob], "onore-celestial-mandala-preview.png", { type: "image/png" });
+      if (navigator.canShare?.({ files: [file] }) && navigator.share) { await navigator.share({ files: [file], title: t.wallpaperTitle, text: t.shareText }); setStatus(t.shared); }
+      else if (navigator.clipboard?.write && typeof ClipboardItem !== "undefined") { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); setStatus(t.imageCopied); }
+      else setStatus(t.shareFallback);
     } catch (error) { if (!(error instanceof DOMException && error.name === "AbortError")) setStatus(t.shareFallback); }
     finally { setBusy(false); }
   }
-
   async function copyLink() {
     try { await navigator.clipboard.writeText(window.location.origin); setStatus(t.linkCopied); }
     catch { setStatus(t.shareFallback); }
   }
 
-  return (
-    <section className="mx-auto max-w-3xl text-center" aria-labelledby="nine-stars-heading">
-      <p className="text-[10px] text-primary/75 tracking-[0.2em]">{t.subtitle}</p>
-      <p className="mt-5 font-serif text-sm text-primary/90">{t.tagline}</p>
-      <h3 id="nine-stars-heading" className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h3>
-      <p className="mt-3 text-xs leading-6 text-muted-foreground">{pair ? t.preview : t.fallback}</p>
-      {testUnlocked && <p className="mx-auto mt-3 inline-block border border-primary/40 px-3 py-1 text-[11px] text-primary">{t.testNotice}</p>}
-      <div className="relative mx-auto mt-8 aspect-square w-full max-w-[640px] overflow-hidden rounded-full border border-primary/40 shadow-gold">
-        <div ref={artRef} className={`absolute inset-0 transition-all duration-[1600ms] ease-out ${open ? "scale-100 blur-0" : "scale-105 blur-[2px]"}`}>
-          <NineStarsArtwork main={pair?.main.token ?? "var(--primary)"} sub={pair?.sub.token ?? "var(--gold-glow)"} bloodType={bloodType} birthDate={birthDate} language={language}/>
-        </div>
-        {open && <div className="pointer-events-none absolute inset-0 animate-[unlock-burst_1.6s_ease-out_forwards] bg-[radial-gradient(circle,var(--gold-glow)_0%,transparent_60%)] motion-reduce:animate-none" aria-hidden="true" />}
-        <div className={`absolute inset-0 flex flex-col items-center justify-center bg-background/45 p-4 backdrop-blur-[3px] transition-opacity duration-700 sm:p-8 ${open ? "pointer-events-none opacity-0" : "opacity-100"}`}>
-          <div className="flex size-12 items-center justify-center rounded-full border border-primary/40 bg-background/75 text-primary shadow-gold">{testUnlocked ? <LockKeyholeOpen className="size-5" /> : <LockKeyhole className="size-5" />}</div>
-          <p className="mt-4 flex items-center gap-2 font-serif text-base text-primary sm:text-lg"><Sparkles className="size-4" />{testUnlocked ? t.testUnlock : t.lock}</p>
-          <Button variant="champagne" onClick={testUnlocked ? () => setRevealed(true) : onVip} className="mt-5 h-auto max-w-[300px] whitespace-normal px-4 py-2 text-center text-xs leading-5 sm:max-w-[330px] sm:px-5 sm:py-3 sm:text-sm sm:leading-6"><Crown className="size-4 shrink-0" />{testUnlocked ? t.viewPreview : t.unlock}</Button>
-        </div>
-      </div>
-      {open && <Button variant="ghost" size="sm" className="mt-3 text-xs text-muted-foreground" onClick={() => setRevealed(false)}>{t.replay}</Button>}
-      {testUnlocked && <SolfeggioPlayer language={language} />}
-      <p className="mx-auto mt-7 max-w-xl text-xs leading-6 text-muted-foreground">{t.note}</p>
-      <div className="mx-auto mt-7 max-w-[640px] border-y border-primary/25 py-5 text-left">
-        <div className="flex items-baseline justify-between gap-4"><h4 className="font-serif text-base text-primary">{t.gridTitle}</h4><span className="text-[10px] text-muted-foreground">{t.gridQualifier}</span></div>
-        <div className="mt-4 grid grid-cols-3 gap-px border border-primary/25 bg-primary/25">
-          {palaceGrid.map((cell) => <div key={cell.number} className="min-h-20 bg-background/90 p-2 text-center sm:min-h-24 sm:p-3">
-            <span className="block text-[10px] text-muted-foreground">{cell.direction}</span>
-            <span className="mt-1 block font-serif text-xl text-primary sm:text-2xl">{cell.number}</span>
-            <span className="block text-[11px] text-foreground sm:text-sm">{cell.star}</span>
-          </div>)}
-        </div>
-        <p className="mt-3 text-xs leading-5 text-muted-foreground">{t.gridDisclaimer}</p>
-        {symbols && <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground"><span>{t.zodiac}: <strong className="font-normal text-foreground">{zodiacGlyphs[symbols.zodiac]} {zodiacNames[symbols.zodiac]}</strong></span><span>{t.animal}: <strong className="font-normal text-foreground">{animalNames[symbols.animal]}</strong></span>{bloodType && <span>{t.blood}: <strong className="font-normal text-foreground">{bloodType}</strong></span>}</div>}
-        <p className="mt-2 text-[11px] leading-5 text-muted-foreground">{t.symbolDisclaimer}</p>
-      </div>
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
-        <Button variant="outline" onClick={download} disabled={!open || busy} className="h-auto min-h-10 border-primary/40 text-primary"><Download />{t.downloadPreview}</Button>
-        <Button variant="outline" onClick={shareImage} disabled={!open || busy} className="h-auto min-h-10 border-primary/40 text-primary"><Share2 />{t.shareImage}</Button>
-        <Button variant="ghost" onClick={copyLink} className="h-auto min-h-10 text-muted-foreground"><Copy />{t.copyLink}</Button>
-      </div>
-      <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{t.shareNote}</p>
-      <p role="status" aria-live="polite" className="mt-2 min-h-5 text-xs text-primary">{status}</p>
-    </section>
-  );
+  return <section className="mx-auto max-w-3xl text-center" aria-labelledby="nine-stars-heading">
+    <p className="text-xs text-primary/75">{t.subtitle}</p>
+    <p className="mt-5 font-serif text-base text-primary/90">{t.tagline}</p>
+    <h3 id="nine-stars-heading" className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h3>
+    <p className="mt-3 text-sm leading-7 text-muted-foreground">{palette ? (language === "ja" ? `バースカラー ${palette.main.name} ${palette.main.code} × ${palette.sub.name} ${palette.sub.code}。1440色の参考パレットです。` : `Illustrative birth-color palette: ${palette.main.name} ${palette.main.code} × ${palette.sub.name} ${palette.sub.code}.`) : t.fallback}</p>
+    {testUnlocked && <p className="mx-auto mt-3 inline-block border border-primary/40 px-3 py-1 text-sm text-primary">{t.testNotice}</p>}
+    <div className="relative mx-auto mt-7 aspect-square w-full max-w-[700px] overflow-hidden border-y border-primary/35 bg-background shadow-gold" aria-label={language === "ja" ? "立体曼陀羅アート" : "3D mandala art"}>
+      {mounted && testUnlocked && sky ? <Suspense fallback={<div className="flex h-full items-center justify-center text-primary"><Sparkles className="size-7 animate-pulse" /></div>}>
+        <MandalaScene sky={sky} main={palette?.main.code ?? colors.main} sub={palette?.sub.code ?? colors.sub} element={element} progress={progress} reduced={reduced} onCapture={setCapture} />
+      </Suspense> : <NineStarsArtwork main={colors.main} sub={colors.sub} bloodType={bloodType} birthDate={birthDate} language={language} />}
+      {testUnlocked && sky && progress > 0 && progress < 7 && <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-background/70 px-5 py-4 text-primary" role="status"><p className="font-serif text-sm">{progress < 2 ? "光が集まる" : progress < 5 ? "星々と五行の環が巡る" : "曼陀羅が開花する"}</p><div className="mt-2 h-1 bg-primary/25"><div className="h-full bg-primary transition-[width] duration-100" style={{ width: `${progress / 7 * 100}%` }} /></div></div>}
+      {!open && !playing && <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/65 p-4 backdrop-blur-[2px]">
+        <div className="flex size-12 items-center justify-center rounded-full border border-primary/50 bg-background/80 text-primary"><LockKeyhole className="size-5" /></div>
+        <p className="mt-4 font-serif text-lg text-primary">{testUnlocked ? t.testUnlock : t.lock}</p>
+        <Button variant="champagne" onClick={testUnlocked && sky ? start : onVip} className="mt-5 h-auto max-w-[300px] whitespace-normal px-4 py-3 text-center text-sm leading-6"><Crown className="size-4 shrink-0" />{testUnlocked && sky ? t.viewPreview : t.unlock}</Button>
+      </div>}
+    </div>
+    {open && <div className="mt-3 flex flex-wrap justify-center gap-2"><Button variant="ghost" size="sm" onClick={start}><Play className="size-4" />{t.replay}</Button><p className="self-center text-sm text-muted-foreground">{language === "ja" ? "ドラッグで回転 · スクロールで拡大" : "Drag to rotate · Scroll to zoom"}</p></div>}
+    {testUnlocked && <SolfeggioPlayer language={language} />}
+    <p className="mx-auto mt-7 max-w-2xl text-sm leading-7 text-muted-foreground">{language === "ja" ? `惑星の方角は出生日時の地心位置を天文計算した参考図。${sky?.approximate ? "出生時間がないため正午（日本時間）で表示。" : ""}惑星の大きさ・軌道線・曼陀羅と五行の光は装飾表現です。色は測定された波長・周波数ではなく、効能を保証しません。${t.gridDisclaimer}` : `${sky?.approximate ? "Birth time unknown: shown at noon Japan time. " : ""}Planet directions are calculated; sizes, orbit lines, mandala and five-element light are artistic. Colors are not measured wavelengths. ${t.gridDisclaimer}`}</p>
+    <div className="mx-auto mt-7 max-w-[640px] border-y border-primary/25 py-5 text-left"><div className="flex items-baseline justify-between gap-4"><h4 className="font-serif text-xl text-primary">{t.gridTitle}</h4><span className="text-xs text-muted-foreground">{t.gridQualifier}</span></div>
+      <div className="mt-4 grid grid-cols-3 gap-px border border-primary/25 bg-primary/25">{palaceGrid.map(cell => <div key={cell.number} className="min-h-20 bg-background/90 p-2 text-center sm:min-h-24 sm:p-3"><span className="block text-xs text-muted-foreground">{cell.direction}</span><span className="mt-1 block font-serif text-xl text-primary sm:text-2xl">{cell.number}</span><span className="block text-xs text-foreground sm:text-sm">{cell.star}</span></div>)}</div>
+      <p className="mt-3 text-sm leading-6 text-muted-foreground">{t.gridDisclaimer}</p>
+      {symbols && <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground"><span>{t.zodiac}: <strong className="font-normal text-foreground">{zodiacGlyphs[symbols.zodiac]} {zodiacNames[symbols.zodiac]}</strong></span><span>{t.animal}: <strong className="font-normal text-foreground">{animalNames[symbols.animal]}</strong></span></div>}
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">{t.symbolDisclaimer}</p>
+    </div>
+    <div className="mt-6 flex flex-wrap justify-center gap-2"><Button variant="outline" onClick={download} disabled={!open || busy} className="min-h-11 border-primary/40 text-primary"><Download />{t.downloadPreview}</Button><Button variant="outline" onClick={shareImage} disabled={!open || busy} className="min-h-11 border-primary/40 text-primary"><Share2 />{t.shareImage}</Button><Button variant="ghost" onClick={copyLink} className="min-h-11 text-muted-foreground"><Copy />{t.copyLink}</Button></div>
+    <p className="mt-3 text-sm leading-6 text-muted-foreground">{t.shareNote}</p><p role="status" aria-live="polite" className="mt-2 min-h-6 text-sm text-primary">{status}</p>
+  </section>;
 }
