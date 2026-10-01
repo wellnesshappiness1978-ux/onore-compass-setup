@@ -113,6 +113,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
               <Button className="mt-3" disabled={saving} onClick={async () => { setSaving(true); try { await onProfileChange({ ...profile, nameKanji: `${chars.slice(0, cut).join("")} ${chars.slice(cut).join("")}` }); } finally { setSaving(false); } }}>{n.save}</Button>
             </div> : <p className="mt-3 text-sm text-muted-foreground">{f.nameNote}</p>}
           </section>
+          {data.keySummary && <section aria-label="本質と行動の鍵" className="my-6 rounded-lg border border-primary/50 bg-gradient-to-b from-primary/15 to-transparent p-5 sm:p-6"><p className="text-xs text-primary">{language === "ja" ? "全レイヤーが共通して示す、あなたの本質と行動の鍵" : "The essence and action key all layers share"}</p><p className="mt-3 font-serif text-lg leading-9 text-foreground sm:text-xl">{data.keySummary}</p></section>}
           {sections.map((text, i) => {
             const Icon = icons[i] ?? Sparkles;
             return <article key={i} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9">
@@ -122,6 +123,14 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
           })}
            <article className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "あなたの注意ポイント" : "A tendency to watch"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data.caution}</p></article>
             <section aria-label={torisetsuTranslations[language].manual} className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{torisetsuTranslations[language].manualTitle}</h3><div className="mt-4 space-y-5">{[data.manualCore, data.manualDecision, data.manualTiming].map((body, i) => <article key={i}><h4 className="font-serif text-lg text-primary">{t.labels[i + 3]}</h4><p className="mt-2 text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
+            <section aria-label="深層ガイド" className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "占術別 深層ガイド" : "Deep guide by art"}</h3><div className="mt-4 space-y-6">{([
+              ["精密数秘術｜繰り返す試練と突破の才能", data.numerologyTrial],
+              ["西洋占星術｜建前と本音・心の回復法", data.astroRecovery],
+              ["四柱推命｜攻め時と空回りの罠", data.pillarsTiming],
+              ["動物占い｜決断の癖とやる気スイッチ", data.animalSwitch],
+              ["バースカラー｜日常での取り入れ方", data.colorPractice],
+              [`地球暦｜今のフェーズ${data.helio ? `「${data.helio.phase}」` : ""}`, data.helioGuide],
+            ] as const).filter(([, body]) => body).map(([title, body]) => <article key={title}><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
         </>}
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>

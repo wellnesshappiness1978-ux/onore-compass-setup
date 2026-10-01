@@ -96,5 +96,5 @@ helioGuide: about 120 chars. State the phase explicitly and what to do in this p
 Return only the structured object.`,
       providerOptions: { openai: { store: false } },
     });
-    return { ...readingSchema.parse(result.output), elements, layers };
+    return { ...readingSchema.parse(result.output), elements, layers, helio };
   });
