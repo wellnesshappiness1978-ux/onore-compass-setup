@@ -47,3 +47,4 @@
 - [x] Add administrator-only, 24-hour debug plan switching in My Page with immediate screen updates, original-plan restoration, and database-backed team limits.
 - [ ] Grant the requesting test account an administrator role after its first sign-in (blocked: no auth users exist yet).
 - [x] AI診断プロンプトのプロ化（冒頭サマリー・6占術深層セクション・具体行動/リスク/フレーズ）
+- [x] Add Li Chun Ming Gua and annual common nine-palace reference with a gender-input prompt; add interactive 3D mandala, seven-second reveal and portrait PNG sharing.

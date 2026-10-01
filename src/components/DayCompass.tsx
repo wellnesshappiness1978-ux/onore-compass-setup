@@ -7,6 +7,7 @@ import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import SolfeggioPlayer from "./SolfeggioPlayer";
 import HelioCalendar from "./HelioCalendar";
+import FengShuiGuide from "./FengShuiGuide";
 import type { UserProfile } from "./Onboarding";
 import {
   dateAt, dayOfYear, dayProfile, daysInYear, directionAt, directionEnergy, directions,
@@ -362,6 +363,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
           </Card>
         </div>
       </div>
+      <FengShuiGuide profile={profile} date={date} language={language} />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { computeDivinationParams } from "./divination-params.ts";
 import { computeCoreLayers, coreLayersPrompt } from "./core-layers.ts";
+import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 
 import {
   createLovableAiGatewayRunIdFetch,
@@ -24,6 +25,7 @@ const requestSchema = z.object({
     birthPlace: z.string().max(40),
     bloodType: z.string().max(4),
     siblingOrder: z.string().max(20),
+    gender: z.enum(["male", "female", "other", "undisclosed"]).optional(),
   }),
   language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]),
 });
@@ -43,7 +45,9 @@ export async function handleConsultation(request: Request) {
   }
 
   const { messages, profile, language } = parsed.data;
-  const params = `${computeDivinationParams(profile)}\n${coreLayersPrompt(computeCoreLayers(profile))}\nUse the 5 core layers and their cross-analysis (表の顔 vs 本音) to make answers specific to this person; say it in plain words, no hedging like "人それぞれ". Animal 表面/希望/隠れ layers are not computed.`;
+  const gua = mingGua(profile.birthDate, profile.gender ?? "undisclosed");
+  const feng = gua ? gua.branches.map(b => `${b.branch} formula Kua ${b.number}: 生気 ${fengDirectionNames[b.shengQi]}, 天医 ${fengDirectionNames[b.tianYi]}, 延年 ${fengDirectionNames[b.yanNian]}`).join("; ") : "unavailable";
+  const params = `${computeDivinationParams(profile)}\n${coreLayersPrompt(computeCoreLayers(profile))}\nTraditional feng shui (Li Chun solar year): ${feng}. Use only as a directional reflection if relevant. If gender is not specified, ask the user to set it in their profile; do not guess a formula branch. Interior ideas may reference directional five elements and ventilation/clear pathways; never infer room locations, building-specific Flying Stars, health or financial effects.\nUse the 5 core layers and their cross-analysis (表の顔 vs 本音) to make answers specific to this person; say it in plain words, no hedging like "人それぞれ". Animal 表面/希望/隠れ layers are not computed.`;
   const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
   const provider = createOpenAI({
     baseURL: "https://ai.gateway.lovable.dev/v1",

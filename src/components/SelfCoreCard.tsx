@@ -12,6 +12,7 @@ import { homePlanCardsCopy, type HomePlanId } from "@/lib/home-plan-cards";
 import { torisetsuTranslations, type Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import { splittableName } from "@/lib/ai/five-elements";
+import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 
 const nameCopy: Record<Language, { title: string; grids: [string, string, string, string, string]; fortune: string; split: string; save: string; note: string }> = {
   ja: { title: "本格 姓名判断（五運と人生の軸）", grids: ["天格（家系運）", "人格（主運・内面）", "地格（基礎運）", "外格（対人・環境運）", "総格（総合・晩年運）"], fortune: "名前が示す社会的な強みと引き寄せる運命", split: "姓と名の区切りを選ぶと五運を算出して保存します", save: "この区切りで保存", note: "現代字体の画数・霊数を外格のみに加える方式・一般的な81数の吉凶表に基づく参考値です。流派により異なります。" },
@@ -68,6 +69,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const n = nameCopy[language];
   const chars = splittableName(profile.nameKanji);
   const localLayers = computeCoreLayers(profile);
+  const gua = mingGua(profile.birthDate, profile.gender);
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
@@ -89,6 +91,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
       </header>
       <div className="px-5 sm:px-8">
         {localLayers && <CoreLayersPanel layers={localLayers} />}
+        <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜本命卦" : "Feng shui · Ming Gua"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性式" : "女性式"} · ${b.number}卦` : `${b.branch === "male" ? "Male" : "Female"} formula · Kua ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `生気 ${fengDirectionNames[b.shengQi]} · 天医 ${fengDirectionNames[b.tianYi]} · 延年 ${fengDirectionNames[b.yanNian]}` : `Sheng Qi ${b.shengQi} · Tian Yi ${b.tianYi} · Yan Nian ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "立春を境とする伝統的な方位の参考値。住まいごとの吉凶や効果を保証するものではありません。" : "Traditional solar-year direction reference, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "本命卦には生年月日と性別が必要です。マイページのプロフィールで入力してください。" : "Add birth date and gender in your profile to view Ming Gua."}</p>}</section>
         {isPending ? <div role="status" className="flex min-h-40 items-center gap-3 text-sm text-muted-foreground"><Sparkles className="size-5 animate-pulse text-primary" />{t.loading}</div> : isError || !data ? (
           <div className="flex min-h-40 flex-col items-start justify-center gap-3" role="alert"><p className="text-sm text-muted-foreground">{t.error}</p><Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>
         ) : <>
