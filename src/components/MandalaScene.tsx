@@ -66,7 +66,7 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
   useFrame((_, raw) => {
     if (reduced) return;
     const dt = Math.min(raw, .05);
-    if (root.current) root.current.rotation.z += dt * .045;
+    // Keep calculated planet directions fixed; only decorative particles move.
     if (aura.current) aura.current.rotation.z -= dt * .025;
   });
   const ring = Math.min(1, Math.max(0, (progress - 2) / 3));
@@ -88,6 +88,17 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
         <torusGeometry args={[2.7 + i * .32, .008 + (i === 0 ? .014 : 0), 6, 128]} />
         <meshBasicMaterial color={i % 2 ? sub : gold} transparent opacity={element === ["木", "火", "土", "金", "水"][i] ? .9 : .37} />
       </mesh>)}
+      {Array.from({ length: 36 }, (_, i) => <group key={`ray-${i}`} rotation-z={i * Math.PI / 18} scale={.1 + flower * .9}>
+        <mesh position={[0, 3.98, -.12]}><boxGeometry args={[.012, i % 3 === 0 ? .34 : .16, .01]} /><meshBasicMaterial color={i % 3 ? main : gold} transparent opacity={i % 3 ? .45 : .8} /></mesh>
+        {i % 3 === 0 && <mesh position={[0, 4.29, -.12]} rotation-z={Math.PI / 4}><planeGeometry args={[.065, .065]} /><meshBasicMaterial color={gold} transparent opacity={.88} side={THREE.DoubleSide} /></mesh>}
+      </group>)}
+      {Array.from({ length: 24 }, (_, i) => <group key={`petal-${i}`} rotation-z={i * Math.PI / 12} scale={.1 + flower * .9}>
+        <mesh position={[0, 2.65, -.17]} scale={[.5, 1.15, 1]}><torusGeometry args={[.48, .009, 5, 64]} /><meshBasicMaterial color={i % 2 ? main : gold} transparent opacity={.52} /></mesh>
+        <mesh position={[0, 3.12, -.15]} rotation-z={Math.PI / 4}><planeGeometry args={[.095, .095]} /><meshBasicMaterial color={sub} transparent opacity={.7} side={THREE.DoubleSide} /></mesh>
+      </group>)}
+      {Array.from({ length: 12 }, (_, i) => <group key={`inner-${i}`} rotation-z={i * Math.PI / 6} scale={.1 + flower * .9}>
+        <mesh position={[0, 1.55, -.16]} scale={[.38, 1, 1]}><torusGeometry args={[.56, .012, 5, 64]} /><meshBasicMaterial color={gold} transparent opacity={.7} /></mesh>
+      </group>)}
       {Array.from({ length: 19 }, (_, i) => {
         const outer = i >= 7;
         const n = outer ? 12 : 6;
