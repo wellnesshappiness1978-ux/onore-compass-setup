@@ -7,10 +7,9 @@ describe("traditional feng shui references", () => {
     expect(solarYear("2024-02-02")?.year).toBe(2023);
     expect(solarYear("2024-02-06")?.year).toBe(2024);
   });
-  it("shows both formula branches when gender isn't specified", () => {
+  it("prompts for gender rather than guessing a formula branch", () => {
     const result = mingGua("1985-08-12", "undisclosed");
-    expect(result?.branches.map(b => b.number)).toEqual([6, 9]);
-    expect(result?.branches[0]?.shengQi).toBe("W");
+    expect(result).toBeNull();
   });
   it("substitutes five into a direction-bearing kua", () => {
     expect(mingGua("1977-09-10", "male")?.branches[0]?.number).toBe(2);

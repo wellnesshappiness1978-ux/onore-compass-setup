@@ -36,15 +36,15 @@ export function solarYear(date: string) {
 
 export function mingGua(date: string, gender: string) {
   const solar = solarYear(date);
-  if (!solar || solar.year < 1900 || solar.year > 2099) return null;
+  if (!solar || solar.year < 1900 || solar.year > 2099 || (gender !== "male" && gender !== "female")) return null;
   const root = digit(solar.year % 100);
   const male = wrap((solar.year >= 2000 ? 9 : 10) - root);
   const female = digit(root + (solar.year >= 2000 ? 6 : 5));
   const normalize = (n: number, branch: "male" | "female") => n === 5 ? branch === "male" ? 2 : 8 : n;
-  const selected = gender === "male" ? ["male"] as const : gender === "female" ? ["female"] as const : ["male", "female"] as const;
+  const selected = [gender] as ("male" | "female")[];
   return { ...solar, branches: selected.map(branch => {
     const number = normalize(branch === "male" ? male : female, branch);
-    const [shengQi, tianYi, yanNian, fuWei] = directionsByKua[number];
+    const [shengQi, tianYi, yanNian, fuWei] = directionsByKua[number] ?? directionsByKua[1];
     return { branch, number, group: [1, 3, 4, 9].includes(number) ? "東四命" : "西四命", shengQi, tianYi, yanNian, fuWei };
   }) };
 }
