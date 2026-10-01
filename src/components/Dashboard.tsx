@@ -6,6 +6,7 @@ import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
   CalendarDays,
@@ -34,6 +35,8 @@ import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/
 import { getMyMembership } from "@/lib/membership.functions";
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { quickReading, quickUsageKey } from "@/lib/quick-compatibility";
+import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
+import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import DailyLifeGuide from "./DailyLifeGuide";
 import BirthColorGuide from "./BirthColorGuide";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
@@ -120,6 +123,9 @@ function TorisetsuPanel({
 }) {
   const t = torisetsuTranslations[language];
   const base = translations[language];
+  const q = quickCompatibilityCopy[language];
+  const generate = useServerFn(generateHomeReading);
+  const manualReading = useQuery({ queryKey: ["home-reading-five-v3", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
   const [mode, setMode] = useState<"manual" | "compatibility">(initialMode);
   const [partnerName, setPartnerName] = useState("");
   const [partnerDate, setPartnerDate] = useState("");
@@ -133,15 +139,9 @@ function TorisetsuPanel({
   const remaining = quickCompatibilityLimit[plan] - used;
   const quick = partnerDate ? quickReading(profile.birthDate, partnerDate) : null;
   const canAnalyze = partnerDate !== "" && relation !== null;
-  const score = canAnalyze
-    ? 56 +
-      (Array.from(
-        `${profile.birthDate}${partnerDate}${relation}${partnerTimeUnknown ? "u" : partnerTime}${partnerPlace}`,
-      ).reduce((total, character) => total + character.charCodeAt(0), 0) %
-        41)
-    : 0;
+  const score = quick?.score ?? 0;
   const advice = score >= 84 ? t.advice[2] : score >= 70 ? t.advice[1] : t.advice[0];
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Date().toLocaleDateString("en-CA");
 
   return (
     <div>
@@ -168,7 +168,7 @@ function TorisetsuPanel({
           onClick={() => setMode("compatibility")}
           className={`min-h-11 whitespace-normal rounded-md px-2 text-xs sm:text-sm ${mode === "compatibility" ? "bg-champagne-gradient text-primary-foreground shadow-champagne hover:text-primary-foreground" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
         >
-          {language === "ja" ? "クイック相性診断" : t.compatibility}
+          {q.title}
         </Button>
       </div>
 
@@ -195,9 +195,9 @@ function TorisetsuPanel({
             </div>
             <div className="relative space-y-0">
               {[
-                { title: t.coreTitle, body: t.coreBody, symbol: "✦" },
-                { title: t.decisionTitle, body: t.decisionBody, symbol: "◇" },
-                { title: t.timingTitle, body: t.timingBody, symbol: "☼" },
+                { title: t.coreTitle, body: manualReading.data?.manualCore, symbol: "✦" },
+                { title: t.decisionTitle, body: manualReading.data?.manualDecision, symbol: "◇" },
+                { title: t.timingTitle, body: manualReading.data?.manualTiming, symbol: "☼" },
               ].map((part, index) => (
                 <div
                   key={part.title}
@@ -212,7 +212,7 @@ function TorisetsuPanel({
                   <div>
                     <p className="mb-1 text-[10px] text-primary/65">0{index + 1} / 03</p>
                     <h4 className="font-serif text-base text-gold-glow sm:text-lg">{part.title}</h4>
-                    <p className="mt-3 text-sm leading-7 text-foreground/80">{part.body}</p>
+                     <p className="mt-3 text-base leading-8 text-foreground/80" role={!part.body ? "status" : undefined}>{part.body ?? (manualReading.isError ? translations[language].comingFeature : homeReadingCopy[language].loading)}</p>
                   </div>
                 </div>
               ))}
@@ -251,9 +251,9 @@ function TorisetsuPanel({
           <div className="text-center">
             <HeartHandshake className="mx-auto size-6 text-primary" strokeWidth={1.2} />
             <h3 className="mt-3 font-serif text-xl text-gradient-gold sm:text-2xl">
-              {language === "ja" ? "クイック相性診断" : t.compatibility}
+               {q.title}
             </h3>
-            <p className="mt-2 text-sm text-muted-foreground">{language === "ja" ? "お相手を入力すると、あなたとの相性を診断できます" : t.partnerHint}</p><p className="mt-2 text-xs text-primary">{language === "ja" ? `本日の残り ${Number.isFinite(remaining) ? Math.max(0, remaining) : "無制限"}回（端末内の表示テスト）` : `Remaining today: ${Number.isFinite(remaining) ? Math.max(0, remaining) : "unlimited"} (device preview)`}</p>
+             <p className="mt-2 text-sm text-muted-foreground">{q.hint}</p><p className="mt-2 text-xs text-primary">{q.remaining(remaining)}</p>
           </div>
           <section className="card-lux mt-6 rounded-lg p-5 sm:p-7" aria-label={language === "ja" ? "クイック相性診断" : t.compatibility}>
             <div className="space-y-5">
@@ -385,11 +385,11 @@ function TorisetsuPanel({
                 className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
               >
                 <Sparkles className="size-4 shrink-0" aria-hidden="true" />
-                {remaining <= 0 ? (language === "ja" ? "本日の利用上限に達しました" : "Daily limit reached") : (language === "ja" ? "クイック相性を診る" : t.analyzeCta)}
+                 {remaining <= 0 ? q.limit : q.action}
               </Button>
             </div>
           </section>
-          {remaining <= 0 && !analyzed && <p role="status" className="mt-3 text-center text-sm text-primary">{language === "ja" ? "明日0時に回数が更新されます。上位プランの回数はマイページで確認できます。" : "Your allowance refreshes tomorrow at midnight."}</p>}
+           {remaining <= 0 && !analyzed && <p role="status" className="mt-3 text-center text-sm text-primary">{q.refresh}</p>}
           {analyzed && canAnalyze ? (
             <section className="py-8 text-center" aria-live="polite">
               {partnerName ? (
@@ -413,7 +413,7 @@ function TorisetsuPanel({
                 </p>
               </div>
               <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
-              {quick && <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">{([["💕 恋愛相性", quick.love], ["🤝 友人相性", quick.friend], ["💼 ビジネス相性", quick.business], ["⚡ 総合診断と注意点", quick.overall]] as const).map(([title, body]) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-4"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-7 text-foreground">{body}</p></article>)}</div>}
+               {quick && <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">{q.headings.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-4"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? [quick.love, quick.friend, quick.business, quick.overall][i] : q.messages[i]}</p></article>)}</div>}
               <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
             </section>
           ) : null}
