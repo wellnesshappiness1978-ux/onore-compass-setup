@@ -46,3 +46,4 @@
 - [x] Add profile-based 1440-shade birth-color mapping with explicit approximation and no measured frequency claims.
 - [x] Add administrator-only, 24-hour debug plan switching in My Page with immediate screen updates, original-plan restoration, and database-backed team limits.
 - [ ] Grant the requesting test account an administrator role after its first sign-in (blocked: no auth users exist yet).
+- [x] AI診断プロンプトのプロ化（冒頭サマリー・6占術深層セクション・具体行動/リスク/フレーズ）
