@@ -10,11 +10,15 @@ const hex = (h: number, s: number, l: number) => {
   };
   return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
 };
+const used = new Set<string>();
 const palette = Array.from({ length: 1440 }, (_, slot) => {
   const hue = slot / 4;
-  // Encode the within-quadrant shade directly into the blue channel to guarantee 1440 distinct HEX values.
-  const base = hex(hue, 0.57, 0.51);
-  const code = `${base.slice(0, 5)}${Math.floor(slot / 4).toString(16).padStart(3, "0").slice(-2)}`.toUpperCase();
+  let code = hex(hue, 0.57, 0.47 + (slot % 4) * 0.035);
+  while (used.has(code)) {
+    const blue = (parseInt(code.slice(5), 16) + 1) % 256;
+    code = `${code.slice(0, 5)}${blue.toString(16).padStart(2, "0")}`.toUpperCase();
+  }
+  used.add(code);
   return { slot: slot + 1, name: names[Math.floor(hue / 45) % names.length], code };
 });
 
@@ -25,8 +29,7 @@ export function birthColorSpectrum(p: Birth) {
   const hasTime = !p.birthTimeUnknown && /^([01]\d|2[0-3]):[0-5]\d$/.test(p.birthTime);
   const minute = hasTime ? Number(p.birthTime.slice(0, 2)) * 60 + Number(p.birthTime.slice(3, 5)) : 720;
   // The Sun's calculated longitude is one input to an illustrative palette, not a physical color measurement.
-  const instant = new Date(`${p.birthDate}T00:00:00Z`);
-  instant.setUTCMinutes(minute - 540);
+  const instant = new Date(`${p.birthDate}T03:00:00Z`); // noon JST reference longitude
   const sunSlot = Math.floor(A.SunPosition(instant).elon * 4);
   const seed = [...`${p.birthDate}|${p.birthPlace || "東京都"}`].reduce((v, ch) => (v * 31 + ch.charCodeAt(0)) % 1440, 0);
   const base = (seed + minute + sunSlot) % 1440;
