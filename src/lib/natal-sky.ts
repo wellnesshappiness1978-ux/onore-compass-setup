@@ -16,7 +16,7 @@ export function natalSky(date: string, time: string, unknown: boolean) {
   const mm = hasTime ? Number(time.slice(3, 5)) : 0;
   const instant = new Date(Date.UTC(Number(d[1]), Number(d[2]) - 1, Number(d[3]), hh - 9, mm));
   return { approximate: !hasTime, bodies: natalBodies.map(([name, body], i) => {
-    const vector = A.GeoVector(body, instant, true);
+    const vector = A.GeoVector(body, (instant.getTime() - Date.UTC(2000, 0, 1, 12)) / 86400000, true);
     const distance = Math.hypot(vector.x, vector.y, vector.z) || 1;
     return { name, position: [vector.x / distance * (1.35 + i * .22), vector.z / distance * (1.35 + i * .22), vector.y / distance * (1.35 + i * .22)] as [number, number, number] };
   }) };

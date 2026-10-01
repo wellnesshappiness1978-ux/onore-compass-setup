@@ -29,7 +29,7 @@ export function solarYear(date: string) {
   const y = Number(parsed[1]);
   const d = new Date(`${date}T03:00:00Z`); // local noon JST; date-only input cannot resolve birth-hour boundary
   if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== date) return null;
-  const start = A.SearchSunLongitude(315, new Date(Date.UTC(y, 0, 25)), 25);
+  const start = A.SearchSunLongitude(315, (Date.UTC(y, 0, 25) - Date.UTC(2000, 0, 1, 12)) / 86400000, 25);
   if (!start) return null;
   return { year: d.getTime() < start.date.getTime() ? y - 1 : y, nearBoundary: Math.abs(d.getTime() - start.date.getTime()) < 86400000 };
 }
