@@ -6,6 +6,7 @@ import { planOrder } from "@/lib/plans";
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import SolfeggioPlayer from "./SolfeggioPlayer";
+import HelioCalendar from "./HelioCalendar";
 import type { UserProfile } from "./Onboarding";
 import {
   dateAt, dayOfYear, dayProfile, daysInYear, directionAt, directionEnergy, directions,
@@ -268,6 +269,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
         <Button size="sm" variant="ghost" className="mt-1 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => setAngle(0)}>{c.today}</Button>
       )}
       <p className="mt-1 text-[10px] text-muted-foreground/80">{c.preview}</p>
+      {rank(plan) >= rank("vip") && <HelioCalendar date={date} profile={profile} />}
 
       <div className="mx-auto mt-6 grid max-w-4xl gap-4 md:grid-cols-2">
         <Card icon={Sparkles} title={c.dayTitle} tier="free">
