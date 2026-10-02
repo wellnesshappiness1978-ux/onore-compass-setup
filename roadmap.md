@@ -48,3 +48,5 @@
 - [ ] Grant the requesting test account an administrator role after its first sign-in (blocked: no auth users exist yet).
 - [x] AI診断プロンプトのプロ化（冒頭サマリー・6占術深層セクション・具体行動/リスク/フレーズ）
 - [x] Add Li Chun Ming Gua and annual common nine-palace reference with a gender-input prompt; add interactive 3D mandala, seven-second reveal and portrait PNG sharing.
+- [x] Remove the fixed Tokyo/animal note and use saved birthplace representative coordinates for timed ascendant; Ba Zhai directions do not depend on birthplace.
+- [ ] Official animal surface/hope/hidden results — blocked by an authoritative calculation table or licensed source; do not fabricate characters.

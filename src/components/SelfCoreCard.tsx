@@ -53,6 +53,7 @@ function CoreLayersPanel({ layers: c }: { layers: CoreLayers }) {
       </div>
       <ul className="mt-3 space-y-1 text-xs leading-6 text-muted-foreground">{c.cross.map(x => <li key={x.pair}>{x.pair}：{x.a} × {x.b} → <span className="text-primary">{x.verdict}</span></li>)}</ul>
        {!c.hasTime && <p className="mt-3 inline-block border border-primary/30 px-3 py-2 text-sm text-primary">※出生時間を設定するとさらに精密度が向上します</p>}
+       {c.birthplace && <p className="mt-3 text-xs leading-6 text-muted-foreground">出生地：{c.birthplace.label}の{c.birthplace.precision === "municipality" ? "市区町村" : "都道府県"}代表座標をアセンダントに使用。位置データ：<a className="underline" href="https://github.com/geolonia/japanese-addresses" target="_blank" rel="noopener noreferrer">Geolonia 住所データ</a>（CC BY 4.0）。</p>}
     </section>
   );
 }

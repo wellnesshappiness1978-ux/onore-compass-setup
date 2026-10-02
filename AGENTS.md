@@ -29,7 +29,7 @@
 
 - Quick compatibility uses deterministic birth-date reference copy and a local-day per-device usage counter keyed by profile and actual membership; do not describe it as verified astrology or server-enforced billing. Why: partner details are not saved and billing is not connected.
 - HelioCalendar calculates heliocentric planet positions for the selected day, but calendar events use only illustrative daily rhythm and require a user-confirmed Google or ICS import; never call these verified auspicious dates or automatic sync. Why: astronomical positions do not validate personal timing.
-- Birth color spectrum maps profile fields and solar longitude to reproducible 1440-slot colors, explicitly as an illustrative palette rather than measured frequencies or an established 1440-color system. Why: no validated correspondence or birthplace coordinates are available.
+- Birth colors map profile fields and solar longitude to illustrative 1440-slot colors, not measured frequencies or validated correspondences. Why: no established mapping exists.
 - Debug plan changes require a server-verified admin role and expire after 24 hours; membership reads and team-write caps restore the original plan after expiry. Why: testing tiers must not overwrite paid entitlements.
-- Feng shui calculates Li Chun Ming Gua only with entered gender and shows a common annual nine-palace chart. Why: a property's Flying Star chart requires its facing and period.
+- Feng shui uses Li Chun Ming Gua with entered gender and a common annual chart; birthplace centroids affect timed ascendants only, not geocentric planets or Ba Zhai directions. Attribute Geolonia CC BY 4.0. Why: location changes local sky angles; property charts need facing and period.
 - The client-only 3D mandala uses calculated geocentric directions with decorative color/geometry and exports a labeled preview PNG. Why: art and test unlocks are not verified charts or paid entitlements.
