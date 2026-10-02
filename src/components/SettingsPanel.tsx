@@ -661,12 +661,13 @@ export default function SettingsPanel({
                 ))}
               </ul>
               <Button
-                onClick={() => setUpgradePlan(tier.name)}
+                onClick={() => devOverrideEnabled ? onPlanChange(item.id as Plan) : setUpgradePlan(tier.name)}
+                disabled={devOverrideEnabled && plan === item.id}
                 size="sm"
                 className={`mt-5 h-10 w-full text-sm ${isVip ? "shadow-champagne-strong" : ""}`}
                 variant={isVip ? "default" : "outline"}
               >
-                <Sparkles className="size-4" /> {pc.unlockCta}
+                <Sparkles className="size-4" /> {devOverrideEnabled && plan === item.id ? "利用中" : pc.unlockCta}
               </Button>
             </div>
           );
@@ -681,7 +682,7 @@ export default function SettingsPanel({
           </div>
           <span className="shrink-0 font-serif text-sm text-muted-foreground">{freeTier.priceMonthly}</span>
         </div>
-        <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>
+        {!devOverrideEnabled && <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>}
       </section>
 
       <div id="team-studio-entry"><TeamStudio plan={plan} actualPlan={actualPlan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} /></div>

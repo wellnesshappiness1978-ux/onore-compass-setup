@@ -65,7 +65,7 @@ function CoreLayersPanel({ layers: c, profile }: { layers: CoreLayers; profile: 
 
 const planIcons: Record<HomePlanId, typeof Sprout> = { standard: Sprout, vip: Gem, b2b: Building2, "b2b-premium": Crown };
 
-export default function SelfCoreCard({ profile, language, onDiagnosis, onProfileChange }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void }) {
+export default function SelfCoreCard({ profile, language, onDiagnosis, onProfileChange, currentPlan, onSelectPlan }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; currentPlan?: string; onSelectPlan?: (plan: HomePlanId) => void }) {
   const t = homeReadingCopy[language];
   const p = homePlanCardsCopy[language];
   const [dialogPlan, setDialogPlan] = useState<HomePlanId | null>(null);
@@ -158,7 +158,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
               <ul className="mt-4 flex-1 space-y-2.5">
                 {card.features.map((feat) => <li key={feat} className="flex items-start gap-2"><Check className={`mt-0.5 size-3.5 shrink-0 ${vip ? "text-(--gold-glow)" : "text-primary"}`} aria-hidden="true" /><span className="min-w-0 break-words text-xs leading-5 text-foreground/90">{feat}</span></li>)}
               </ul>
-              <Button type="button" variant={vip ? "default" : "outline"} onClick={() => setDialogPlan(card.id)} className={`mt-4 h-11 w-full whitespace-normal text-xs leading-5 ${vip ? "shadow-champagne" : "border-primary/40 text-primary hover:bg-primary/10"}`}>{card.cta}</Button>
+              <Button type="button" variant={vip ? "default" : "outline"} disabled={currentPlan === card.id} onClick={() => onSelectPlan ? onSelectPlan(card.id) : setDialogPlan(card.id)} className={`mt-4 h-11 w-full whitespace-normal text-xs leading-5 ${vip ? "shadow-champagne" : "border-primary/40 text-primary hover:bg-primary/10"}`}>{currentPlan === card.id ? "利用中" : card.cta}</Button>
             </article>;
           })}
         </div>

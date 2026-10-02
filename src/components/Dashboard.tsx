@@ -505,6 +505,14 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
   };
   const actualPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : serverPlan;
+  // Test preview only: plan cards switch the plan and jump to the newly unlocked feature.
+  const selectTestPlan = (next: Plan) => {
+    applyDevOverride(next);
+    if (next === "vip") setTab("mandala");
+    else if (next === "b2b" || next === "b2b-premium") setTab("settings");
+    else setTab("home");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const [debugAllowed, setDebugAllowed] = useState(false);
   const previewPlan: Plan = planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
   const membership = useServerFn(getMyMembership);
@@ -591,7 +599,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <>
-            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => { setArtsEntry("manual"); setTab("arts"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
+            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => { setArtsEntry("manual"); setTab("arts"); window.scrollTo({ top: 0, behavior: "smooth" }); }} {...(devOverrideEnabled ? { currentPlan: actualPlan, onSelectPlan: selectTestPlan } : {})} /></div>
             <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
             <section className="design-compass-section text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">
