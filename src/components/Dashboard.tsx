@@ -453,6 +453,10 @@ function TorisetsuPanel({
   );
 }
 
+const urlToPlan: Record<string, Plan> = { free: "free", standard: "standard", vip: "vip", business: "b2b", b2b: "b2b", business_premium: "b2b-premium", "b2b-premium": "b2b-premium" };
+const planToUrl: Record<Plan, string> = { free: "free", standard: "standard", vip: "vip", b2b: "business", "b2b-premium": "business_premium" };
+const devPlanLabels: Record<Plan, string> = { free: "無料", standard: "有料", vip: "VIP", b2b: "ビジネス", "b2b-premium": "Bプレミアム" };
+
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
   const t = dashboardTranslations[language];
   const base = translations[language];
@@ -799,5 +803,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
