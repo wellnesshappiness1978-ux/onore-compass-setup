@@ -453,6 +453,10 @@ function TorisetsuPanel({
   );
 }
 
+const urlToPlan: Record<string, Plan> = { free: "free", standard: "standard", vip: "vip", business: "b2b", b2b: "b2b", business_premium: "b2b-premium", "b2b-premium": "b2b-premium" };
+const planToUrl: Record<Plan, string> = { free: "free", standard: "standard", vip: "vip", b2b: "business", "b2b-premium": "business_premium" };
+const devPlanLabels: Record<Plan, string> = { free: "無料", standard: "有料", vip: "VIP", b2b: "ビジネス", "b2b-premium": "Bプレミアム" };
+
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
   const t = dashboardTranslations[language];
   const base = translations[language];
@@ -486,12 +490,18 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const [devPlanOverride, setDevPlanOverride] = useState<Plan | null>(null);
   useEffect(() => {
     if (!devOverrideEnabled) return;
-    try { const v = window.localStorage.getItem("devPlanOverride") as Plan | null; if (v && planOrder.includes(v)) { setDevPlanOverride(v); setPreviewPlan(v); } } catch { /* ignore */ }
+    try {
+      // URL ?plan= wins over the saved value so a new tab opens in the requested plan.
+      const fromUrl = urlToPlan[new URLSearchParams(window.location.search).get("plan") ?? ""];
+      const v = fromUrl ?? (window.localStorage.getItem("devPlanOverride") as Plan | null);
+      if (v && planOrder.includes(v)) { setDevPlanOverride(v); setPreviewPlan(v); if (fromUrl) window.localStorage.setItem("devPlanOverride", v); }
+    } catch { /* ignore */ }
   }, [devOverrideEnabled]);
   const applyDevOverride = (next: Plan) => {
     try { window.localStorage.setItem("devPlanOverride", next); } catch { /* ignore */ }
     setDevPlanOverride(next);
     setPreviewPlan(next);
+    try { const u = new URL(window.location.href); u.searchParams.set("plan", planToUrl[next]); window.history.replaceState(window.history.state, "", u); } catch { /* ignore */ }
     if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
   };
   const actualPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : serverPlan;
@@ -525,6 +535,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   ];
 
   return (
+    <>
+    {devOverrideEnabled && <div role="group" aria-label="開発用プラン切替バー" className="fixed right-2 top-2 z-[60] flex max-w-[calc(100vw-1rem)] flex-wrap items-center gap-1 rounded-md border border-primary/40 bg-background/95 p-1.5 text-xs shadow-lg backdrop-blur">
+      <span className="px-1 text-primary">DEV</span>
+      {planOrder.map((p) => <button key={p} type="button" aria-pressed={actualPlan === p} onClick={() => applyDevOverride(p)} className={`rounded px-2 py-1 ${actualPlan === p ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-primary/10"}`}>{devPlanLabels[p]}</button>)}
+    </div>}
     <div data-design={designMode} data-tier={previewPlan} className="design-canvas celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
@@ -788,5 +803,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
