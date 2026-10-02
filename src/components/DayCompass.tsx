@@ -270,7 +270,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
         <Button size="sm" variant="ghost" className="mt-1 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => setAngle(0)}>{c.today}</Button>
       )}
       <p className="mt-1 text-[10px] text-muted-foreground/80">{c.preview}</p>
-      {rank(plan) >= rank("vip") && <HelioCalendar date={date} profile={profile} />}
+      <HelioCalendar date={date} profile={profile} plan={plan} onUpgrade={onUpgrade} />
 
       <div className="mx-auto mt-6 grid max-w-4xl gap-4 md:grid-cols-2">
         <Card icon={Sparkles} title={c.dayTitle} tier="free">

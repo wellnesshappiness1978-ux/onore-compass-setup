@@ -24,26 +24,31 @@ const nameCopy: Record<Language, { title: string; grids: [string, string, string
   fr: { title: "Lecture du nom (cinq cadres)", grids: ["Ciel", "Personne", "Terre", "Extérieur", "Total"], fortune: "Forces sociales suggérées par votre nom", split: "Choisissez la fin du nom de famille pour calculer et enregistrer", save: "Enregistrer", note: "Valeurs de référence avec traits modernes et une table courante de 81 nombres." },
 };
 
-function CoreLayersPanel({ layers: c }: { layers: CoreLayers }) {
+function CoreLayersPanel({ layers: c, profile }: { layers: CoreLayers; profile: UserProfile }) {
   const [selected, setSelected] = useState(0);
+  const gua = mingGua(profile.birthDate, profile.gender)?.branches[0] ?? null;
+  const N = fengDirectionNames;
+  const lp = c.numerology.lifePath;
   const rows: [string, string][] = [
-    ["姓名判断", c.name ? `人格${c.name.person}（${c.name.luck.person}）・総格${c.name.total}（${c.name.luck.total}）` : "姓と名を区切ると画数を確認できます"],
-    ["数秘術", `LP${c.numerology.lifePath}・D${c.numerology.destiny ?? "—"}・S${c.numerology.soul ?? "—"}・${c.numerology.cyclePhase}`],
-    ["西洋占星術", `太陽${c.western.sun}・月${c.western.moon}${c.western.moonUncertain ? "?" : ""}・水星${c.western.planets[0]?.sign}・金星${c.western.planets[1]?.sign}`],
-    ["四柱推命", `日干${c.shichu.dayMaster}・${c.shichu.pillars.map(p => p.kanshi).join(" ")}・五行最多${c.shichu.dominant}`],
-    ["動物占い", `${c.animal.core ?? "生年月日を確認してください"}${c.animal.group ? `・${c.animal.group}` : ""}`],
+    ["本格姓名判断", c.name ? `人格${c.name.person}（${c.name.luck.person}）・総格${c.name.total}（${c.name.luck.total}）` : "姓と名を区切ると五運を計算します"],
+    ["精密数秘術", `ライフパス${lp}・ソウル${c.numerology.soul ?? "—"}・ディスティニー${c.numerology.destiny ?? "—"}`],
+    ["西洋占星術", `太陽${c.western.sun}・月${c.western.moon}${c.western.ascendant ? `・ASC${c.western.ascendant}` : ""}`],
+    ["四柱推命", `日干${c.shichu.dayMaster}・五行最多${c.shichu.dominant}・月柱${c.shichu.pillars[1]?.tsuhen}`],
+    ["4層動物占い", `本質：${c.animal.core ?? "生年月日を確認"}${c.animal.group ? `（${c.animal.group}）` : ""}`],
+    ["本格風水学", gua ? `本命卦${gua.number}・${gua.group}・生気${N[gua.shengQi]}` : "性別（男性/女性）を登録すると本命卦を計算します"],
   ];
   const details = [
-    c.name ? `名字と名前の画数から天格${c.name.sky}・人格${c.name.person}・地格${c.name.earth}・外格${c.name.outer}・総格${c.name.total}を計算。人格は対人や社会での姿、総格は全体像を見る伝統的な目安です。画数表や流派で解釈は異なり、職業や将来を確定しません。` : "名字と名前の区切り、および対応する文字の画数が必要です。分割を選んで保存すると五運を確認できます。推測の画数は表示しません。",
-    `生年月日からライフパス${c.numerology.lifePath}、${c.numerology.cyclePhase}を計算。${c.numerology.destiny ? `ローマ字氏名からディスティニー${c.numerology.destiny}・ソウル${c.numerology.soul}を求めます。` : "ローマ字氏名を登録すると名前由来の数値も見られます。"} 9年周期を振り返る参考指標であり、未来の出来事を予言する数値ではありません。`,
-    `誕生時の太陽${c.western.sun}、月${c.western.moon}、${c.western.planets.map(x => `${x.name}${x.sign}`).join("・")}を天文計算から星座に対応。${c.western.ascendant ? `${c.birthplace?.label}の代表座標を使ったアセンダントは${c.western.ascendant}。` : c.hasTime ? "出生地の座標を確認するとアセンダントを表示できます。" : "出生時間がないため月は昼12時の参考配置です。"} 天体位置は計算値ですが、性格の解釈は占星術上の見方です。`,
-    `${c.shichu.pillars.map(x => `${x.label}${x.kanshi}`).join("・")}、日干${c.shichu.dayMaster}。五行は${Object.entries(c.shichu.balance).map(([k,v]) => `${k}${v}`).join("・")}。通変星と十二運星を日干との関係から示す伝統的な読みです。${c.hasTime ? "時柱には登録した出生時刻を使用。" : "出生時刻がないため年・月・日の三柱で読みます。"}`,
-    `生年月日の日周期を公開対応表の60分類に照合し、本質キャラ${c.animal.core ?? "（生年月日を確認）"}を表示します。${c.animal.group ? `行動タイプは${c.animal.group}。` : ""} 個人の性格を確定するものではありません。`,
+    c.name ? `人格${c.name.person}画は人前で見せる顔、総格${c.name.total}画は全体の流れの目安。自己紹介では人格の強みを先に出し、大事な署名は丁寧に書くと印象が整います。` : "名字と名前の区切りを選んで保存すると、天格〜総格の五運と吉凶を表示します。推測の画数は出しません。",
+    `ライフパス${lp}は人生で繰り返すテーマの目安。今は${c.numerology.cyclePhase}。${c.numerology.soul ? `ソウル${c.numerology.soul}が示す本音の欲求を、週に一度は予定に入れて満たしましょう。` : "ローマ字氏名を登録するとソウル・ディスティニーも出ます。"}`,
+    `太陽${c.western.sun}は建前、月${c.western.moon}は本音の目安。気持ちが乱れたら月の星座らしい過ごし方で回復を。${c.hasTime ? "" : "出生時間を入れると月とASCが精密になります。"}`,
+    `日干${c.shichu.dayMaster}、五行は${c.shichu.dominant}が最多${c.shichu.missing.length ? `、${c.shichu.missing.join("・")}が不足` : ""}。最多の要素が活きる場面で攻め、不足する要素は人や環境で補うのがコツです。`,
+    `本質キャラ${c.animal.core ?? "—"}が意思決定の土台。表面・希望・隠れの3層は検証できる算出表がないため表示していません（表をご提供いただければ追加できます）。`,
+    gua ? `${gua.group}の本命卦${gua.number}。机や枕は生気${N[gua.shengQi]}・天医${N[gua.tianYi]}・延年${N[gua.yanNian]}へ向けると落ち着きやすい配置。玄関と廊下は物を置かず明るく保ちましょう。` : "本命卦は生年（立春区切り）と性別で決まります。プロフィールで男性または女性を選ぶと表示します。",
   ];
   return (
-    <section aria-label="5大コア占術レイヤー" className="border-b border-primary/20 py-6">
-      <h3 className="font-serif text-xl text-primary">5大コア占術レイヤー</h3>
-      <div role="tablist" aria-label="占術レイヤーを選択" className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
+    <section aria-label="6大占術レイヤー" className="border-b border-primary/20 py-6">
+      <h3 className="font-serif text-xl text-primary">6大占術レイヤー</h3>
+      <div role="tablist" aria-label="占術レイヤーを選択" className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
         {rows.map(([k], i) => <Button key={k} type="button" role="tab" aria-selected={selected === i} aria-controls="core-layer-detail" variant={selected === i ? "default" : "outline"} onClick={() => setSelected(i)} className="h-auto min-h-12 whitespace-normal px-2 text-sm">{k}</Button>)}
       </div>
       <div id="core-layer-detail" role="tabpanel" className="mt-3 rounded-md border border-primary/30 bg-primary/5 p-4" aria-live="polite"><h4 className="font-serif text-lg text-primary">{rows[selected]?.[0]}</h4><p className="mt-2 break-words text-base leading-8 text-foreground">{rows[selected]?.[1]}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{details[selected]}</p></div>
@@ -90,7 +95,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">ONORE COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{t.title}</h2></div>
       </header>
       <div className="px-5 sm:px-8">
-        {localLayers && <CoreLayersPanel layers={localLayers} />}
+        {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} />}
         <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜本命卦" : "Feng shui · Ming Gua"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性式" : "女性式"} · ${b.number}卦` : `${b.branch === "male" ? "Male" : "Female"} formula · Kua ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `生気 ${fengDirectionNames[b.shengQi]} · 天医 ${fengDirectionNames[b.tianYi]} · 延年 ${fengDirectionNames[b.yanNian]}` : `Sheng Qi ${b.shengQi} · Tian Yi ${b.tianYi} · Yan Nian ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "立春を境とする伝統的な方位の参考値。住まいごとの吉凶や効果を保証するものではありません。" : "Traditional solar-year direction reference, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "本命卦には生年月日と性別が必要です。マイページのプロフィールで入力してください。" : "Add birth date and gender in your profile to view Ming Gua."}</p>}</section>
         {isPending ? <div role="status" className="flex min-h-40 items-center gap-3 text-sm text-muted-foreground"><Sparkles className="size-5 animate-pulse text-primary" />{t.loading}</div> : isError || !data ? (
           <div className="flex min-h-40 flex-col items-start justify-center gap-3" role="alert"><p className="text-sm text-muted-foreground">{t.error}</p><Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>
@@ -101,7 +106,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
           <section aria-label={n.title} className="my-6 rounded-lg border border-primary/40 bg-primary/5 p-4 sm:p-6">
             <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
             {e?.name ? <>
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-5">
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {(["sky", "person", "earth", "outer", "total"] as const).map((k, i) => { const l = e.name!.luck[k]; return <div key={k} className="rounded-md border border-primary/25 bg-background/40 p-3 text-center">
                   <p className="text-[11px] leading-4 text-muted-foreground">{n.grids[i]}</p>
                   <p className="mt-1 font-serif text-2xl text-primary">{e.name![k]}<span className="text-xs">画</span></p>
