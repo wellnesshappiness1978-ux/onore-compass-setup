@@ -25,7 +25,7 @@ const bizKinds: [string, [number, number, number]][] = [["契約", [0.2, 0.2, 0.
 const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const weighted = (birth: string, iso: string, w: [number, number, number]) => { const r = biorhythm(birth, iso); return ((r.physical * w[0] + r.emotional * w[1] + r.intellectual * w[2]) + 1) * 50; };
 
-function Gate({ plan, feature, onUpgrade, children }: { plan: Plan; feature: ContentFeature; onUpgrade?: () => void; children: React.ReactNode }) {
+function Gate({ plan, feature, onUpgrade, children }: { plan: Plan; feature: ContentFeature; onUpgrade?: (() => void) | undefined; children: React.ReactNode }) {
   if (canUse(plan, feature)) return <>{children}</>;
   return <div className="mt-5 flex flex-col items-center gap-2 border border-dashed border-primary/30 p-5 text-center"><LockKeyhole className="size-5 text-primary" /><p className="text-sm text-foreground">{planName[minPlanFor(feature)]}プラン以上で開放</p>{onUpgrade && <Button size="sm" variant="outline" onClick={onUpgrade}><Crown className="size-3.5" />プランを見る</Button>}</div>;
 }
