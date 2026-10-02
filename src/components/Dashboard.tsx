@@ -666,7 +666,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
                 <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
                 <NameAnalysisPreview profile={profile} language={language} />
-                <BirthColorGuide profile={profile} />
+                <BirthColorGuide profile={profile} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
                 <TorisetsuPanel key={artsEntry} initialMode={artsEntry} plan={actualPlan} profile={profile} language={language} onVip={() => setModal("vip")} />
               </>
             ) : tab === "consult" ? (
