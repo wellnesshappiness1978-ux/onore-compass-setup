@@ -68,7 +68,7 @@ Animal character: ${elements.animal ?? "unavailable"} (reference 60-day-number m
 
 FIVE CORE LAYERS (computed by the app; cite exact values, never recalculate, never fill 未算出 values):
 ${core}
-CROSS-ANALYSIS (required): In synthesis and strength, contrast the 表の顔 list with the 本音・潜在 list and use the [クロス解析] verdicts (一致 / ギャップ) explicitly: 日干×太陽, 人格×ソウル数, 動物×月星座. Weave in 通変星, 十二運星, 五行の最多/欠如, ライフパス, and 月・水星・金星 where they sharpen the portrait. Never mention 表面・希望・隠れ animal layers as computed. Treat these as traditional divination lenses, not scientific facts.
+CROSS-ANALYSIS (required): In synthesis and strength, contrast the 表の顔 list with the 本音・潜在 list and use the [クロス解析] verdicts (一致 / ギャップ) explicitly: 日干×太陽, 人格×ソウル数, 動物×月星座. Weave in 通変星, 十二運星, 五行の最多/欠如, ライフパス, and 月・水星・金星 where they sharpen the portrait. Never mention 表面・希望・隠れ animal layers as computed. The ascendant uses birthplace representative coordinates only when available and birth time is known. Geocentric planets and Ba Zhai directions are not birthplace-dependent. Treat these as traditional divination lenses, not scientific facts.
 BANNED hedges: "〜な面もあります", "人それぞれ", "〜かもしれません", "場合によっては", and any sentence that would fit anyone.
 
 STYLE (strict): Write in direct, declarative voice as a fortune-reading ("総格29が示すのは〜", "〜な人です"). Every sentence must name or rest on a specific computed value above. ABSOLUTELY FORBIDDEN: analogies, metaphors, examples or hypotheticals ("例えば", "〜のように", "仮に", "もし〜なら", "〜といった例", "たとえるなら", "〜かもしれません", "〜でしょう"), scenario sketches, preambles, general explanations of what an astrology system means, placeholder phrasing, and generic praise that fits anyone. Start each field with the conclusion. Short, strong sentences.
