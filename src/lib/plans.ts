@@ -36,3 +36,8 @@ export const planForCount = (count: number): Plan | null => planOrder.find((p) =
 export const consultationDailyLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 10, b2b: 30, "b2b-premium": Infinity };
 export { quickCompatibilityLimit };
 export const nextPlan = (plan: Plan): Plan | null => planOrder[rank(plan) + 1] ?? null;
+/** Minimum plan for birth-color and earth-calendar sections. */
+export type ContentFeature = "birthColorsFull" | "helioPersonal" | "helioDirections" | "helioBusiness";
+const contentMin: Record<ContentFeature, Plan> = { birthColorsFull: "standard", helioPersonal: "standard", helioDirections: "vip", helioBusiness: "b2b" };
+export const canUse = (plan: Plan, feature: ContentFeature) => rank(plan) >= rank(contentMin[feature]);
+export const minPlanFor = (feature: ContentFeature) => contentMin[feature];
