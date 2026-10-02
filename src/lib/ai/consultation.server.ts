@@ -22,7 +22,7 @@ const requestSchema = z.object({
     birthDate: z.string().max(20),
     birthTime: z.string().max(20),
     birthTimeUnknown: z.boolean(),
-    birthPlace: z.string().max(40),
+    birthPlace: z.string().max(80),
     bloodType: z.string().max(4),
     siblingOrder: z.string().max(20),
     gender: z.enum(["male", "female", "other", "undisclosed"]).optional(),

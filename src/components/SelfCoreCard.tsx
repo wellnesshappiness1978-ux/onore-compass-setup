@@ -36,9 +36,9 @@ function CoreLayersPanel({ layers: c }: { layers: CoreLayers }) {
   const details = [
     c.name ? `名字と名前の画数から天格${c.name.sky}・人格${c.name.person}・地格${c.name.earth}・外格${c.name.outer}・総格${c.name.total}を計算。人格は対人や社会での姿、総格は全体像を見る伝統的な目安です。画数表や流派で解釈は異なり、職業や将来を確定しません。` : "名字と名前の区切り、および対応する文字の画数が必要です。分割を選んで保存すると五運を確認できます。推測の画数は表示しません。",
     `生年月日からライフパス${c.numerology.lifePath}、${c.numerology.cyclePhase}を計算。${c.numerology.destiny ? `ローマ字氏名からディスティニー${c.numerology.destiny}・ソウル${c.numerology.soul}を求めます。` : "ローマ字氏名を登録すると名前由来の数値も見られます。"} 9年周期を振り返る参考指標であり、未来の出来事を予言する数値ではありません。`,
-    `誕生時の太陽${c.western.sun}、月${c.western.moon}、${c.western.planets.map(x => `${x.name}${x.sign}`).join("・")}を天文計算から星座に対応。${c.hasTime ? `東京基準のアセンダントは${c.western.ascendant}。` : "出生時間がないため月は昼12時の参考配置です。"} 天体位置は計算値ですが、性格の解釈は占星術上の見方です。`,
+    `誕生時の太陽${c.western.sun}、月${c.western.moon}、${c.western.planets.map(x => `${x.name}${x.sign}`).join("・")}を天文計算から星座に対応。${c.western.ascendant ? `${c.birthplace?.label}の代表座標を使ったアセンダントは${c.western.ascendant}。` : c.hasTime ? "出生地の座標を確認するとアセンダントを表示できます。" : "出生時間がないため月は昼12時の参考配置です。"} 天体位置は計算値ですが、性格の解釈は占星術上の見方です。`,
     `${c.shichu.pillars.map(x => `${x.label}${x.kanshi}`).join("・")}、日干${c.shichu.dayMaster}。五行は${Object.entries(c.shichu.balance).map(([k,v]) => `${k}${v}`).join("・")}。通変星と十二運星を日干との関係から示す伝統的な読みです。${c.hasTime ? "時柱には登録した出生時刻を使用。" : "出生時刻がないため年・月・日の三柱で読みます。"}`,
-    `生年月日の日周期を公開対応表の60分類に照合し、本質キャラ${c.animal.core ?? "（生年月日を確認）"}を表示します。${c.animal.group ? `行動タイプは${c.animal.group}。` : ""} 表面・希望・隠れの3分類は対応表がないため表示せず、本質1層のみを参考にします。`,
+    `生年月日の日周期を公開対応表の60分類に照合し、本質キャラ${c.animal.core ?? "（生年月日を確認）"}を表示します。${c.animal.group ? `行動タイプは${c.animal.group}。` : ""} 個人の性格を確定するものではありません。`,
   ];
   return (
     <section aria-label="5大コア占術レイヤー" className="border-b border-primary/20 py-6">
@@ -53,7 +53,6 @@ function CoreLayersPanel({ layers: c }: { layers: CoreLayers }) {
       </div>
       <ul className="mt-3 space-y-1 text-xs leading-6 text-muted-foreground">{c.cross.map(x => <li key={x.pair}>{x.pair}：{x.a} × {x.b} → <span className="text-primary">{x.verdict}</span></li>)}</ul>
        {!c.hasTime && <p className="mt-3 inline-block border border-primary/30 px-3 py-2 text-sm text-primary">※出生時間を設定するとさらに精密度が向上します</p>}
-       <p className="mt-2 text-xs leading-6 text-muted-foreground">出生地は東京基準の天体計算・伝統的な占術の見方による参考値です。動物占いの4層全体は対応表がないため提供していません。</p>
     </section>
   );
 }
