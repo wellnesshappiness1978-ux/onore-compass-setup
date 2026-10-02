@@ -1,10 +1,11 @@
 // Five core divination layers + deterministic cross analysis. Pure: same input -> same output.
-// Astronomy uses Tokyo coordinates because the profile has no geocoded birthplace.
+// Geocentric positions do not depend on birthplace; the local ascendant does.
 import * as A from "astronomy-engine";
 import { reduceNumerology } from "@/lib/birth-colors";
+import { resolveBirthplace } from "@/lib/birthplace";
 import { getFiveElements } from "./five-elements";
 
-export type CoreInput = { nameKanji: string; nameRomaji: string; birthDate: string; birthTime: string; birthTimeUnknown: boolean; bloodType: string };
+export type CoreInput = { nameKanji: string; nameRomaji: string; birthDate: string; birthTime: string; birthTimeUnknown: boolean; bloodType: string; birthPlace?: string; birthCity?: string };
 
 const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
 const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
@@ -15,7 +16,6 @@ const SIGN_EL = ["火", "地", "風", "水"];
 const STAGES = ["長生", "沐浴", "冠帯", "建禄", "帝旺", "衰", "病", "死", "墓", "絶", "胎", "養"];
 const CHOSEI = [11, 6, 2, 9, 2, 9, 5, 0, 8, 3];
 const TSUHEN = [["比肩", "劫財"], ["食神", "傷官"], ["偏財", "正財"], ["偏官", "正官"], ["偏印", "印綬"]];
-const TOKYO = { lat: 35.68, lon: 139.69 };
 const PLANETS: [string, A.Body][] = [["水星", A.Body.Mercury], ["金星", A.Body.Venus], ["火星", A.Body.Mars], ["木星", A.Body.Jupiter], ["土星", A.Body.Saturn], ["天王星", A.Body.Uranus], ["海王星", A.Body.Neptune], ["冥王星", A.Body.Pluto]];
 const ANIMAL_GROUP: Record<string, string> = { 狼: "EARTH・目標指向型", 猿: "EARTH・目標指向型", 虎: "EARTH・目標指向型", コアラ: "EARTH・目標指向型", こじか: "MOON・状況対応型", 黒ひょう: "MOON・状況対応型", たぬき: "MOON・状況対応型", ひつじ: "MOON・状況対応型", チータ: "SUN・状況対応型", ライオン: "SUN・状況対応型", ゾウ: "SUN・状況対応型", ペガサス: "SUN・状況対応型" };
 
@@ -33,15 +33,16 @@ export function computeCoreLayers(p: CoreInput, now = new Date()) {
   const [hh, mm] = hasTime ? p.birthTime.split(":").map(Number) as [number, number] : [12, 0];
   const when = new Date(Date.UTC(y, mo - 1, d, hh - 9, mm)); // JST
   const time = A.MakeTime(when);
+  const birthplace = resolveBirthplace(p.birthPlace ?? "", p.birthCity ?? "");
 
   // Western astrology
   const sunLon = A.SunPosition(time).elon;
   const moonLon = A.EclipticGeoMoon(time).lon;
   const planets = PLANETS.map(([n, b]) => ({ name: n, sign: sign(A.Ecliptic(A.GeoVector(b, time, true)).elon) }));
   let ascendant: string | null = null;
-  if (hasTime) {
-    const ramc = (mod(A.SiderealTime(time) + TOKYO.lon / 15, 24) * 15 * Math.PI) / 180;
-    const e = (23.4367 * Math.PI) / 180, f = (TOKYO.lat * Math.PI) / 180;
+  if (hasTime && birthplace) {
+    const ramc = (mod(A.SiderealTime(time) + birthplace.lon / 15, 24) * 15 * Math.PI) / 180;
+    const e = (23.4367 * Math.PI) / 180, f = (birthplace.lat * Math.PI) / 180;
     const asc = (Math.atan2(Math.cos(ramc), -(Math.sin(ramc) * Math.cos(e) + Math.tan(f) * Math.sin(e))) * 180) / Math.PI;
     ascendant = sign(asc);
   }
@@ -103,7 +104,7 @@ export function computeCoreLayers(p: CoreInput, now = new Date()) {
   const surface = [five.name ? `人格${five.name.person}画` : null, `太陽${western.sun}`, `月柱通変星${shichu.pillars[1]!.tsuhen}`].filter(Boolean) as string[];
   const inner = [numerology.soul ? `ソウル数${numerology.soul}` : null, `月${western.moon}`, `日柱十二運${shichu.pillars[2]!.stage}`].filter(Boolean) as string[];
 
-  return { western, shichu, numerology, name: five.name, animal, cross, surface, inner, hasTime };
+  return { western, shichu, numerology, name: five.name, animal, cross, surface, inner, hasTime, birthplace };
 }
 
 export type CoreLayers = NonNullable<ReturnType<typeof computeCoreLayers>>;
@@ -114,9 +115,9 @@ export function coreLayersPrompt(c: CoreLayers | null): string {
   return [
     `[姓名判断] ${n ? `天格${n.sky}(${n.luck.sky}) 人格${n.person}(${n.luck.person}) 地格${n.earth}(${n.luck.earth}) 外格${n.outer}(${n.luck.outer}) 総格${n.total}(${n.luck.total})` : "未算出（空白区切りの漢字氏名が必要）"}`,
     `[数秘術] ライフパス${c.numerology.lifePath} / ディスティニー${c.numerology.destiny ?? "未算出"} / ソウル${c.numerology.soul ?? "未算出"} / パーソナリティ${c.numerology.personality ?? "未算出"} / ${c.numerology.cyclePhase} / 次の転機 ${c.numerology.turningAge ? `${c.numerology.turningAge}歳（${c.numerology.turningYear}年・ピナクル切替）` : "—"}`,
-    `[西洋占星術・東京基準] 太陽${c.western.sun} 月${c.western.moon}${c.western.moonUncertain ? "（出生時間不明のため月星座は確定できない）" : ""} ${c.western.planets.map(p => `${p.name}${p.sign}`).join(" ")} / ASC ${c.western.ascendant ?? "未算出（出生時間なし）"}`,
+    `[西洋占星術] 太陽${c.western.sun} 月${c.western.moon}${c.western.moonUncertain ? "（出生時間不明のため月星座は確定できない）" : ""} ${c.western.planets.map(p => `${p.name}${p.sign}`).join(" ")} / ASC ${c.western.ascendant ? `${c.western.ascendant}（${c.birthplace?.label}の代表座標を使用）` : "出生時刻・日本国内の出生地が揃うと表示"}`,
     `[四柱推命] ${c.shichu.pillars.map(p => `${p.label}${p.kanshi}(通変星:${p.tsuhen}/十二運:${p.stage})`).join(" ")}${c.hasTime ? "" : " 時柱:未算出"} / 日干${c.shichu.dayMaster} / 五行 ${Object.entries(c.shichu.balance).map(([k, v]) => `${k}${v}`).join(" ")} 最多${c.shichu.dominant} 欠如${c.shichu.missing.join("・") || "なし"}${c.shichu.yearBoundary || c.shichu.monthBoundary ? " ※節入り境界付近" : ""}`,
-    `[動物占い] 本質 ${c.animal.core ?? "未算出"} / ${c.animal.group ?? "—"} / 表面・希望・隠れ: 未算出（公開された算出法がないため）`,
+    `[動物占い] 本質 ${c.animal.core ?? "未算出"} / ${c.animal.group ?? "—"} / 表面・希望・隠れの値は計算根拠未確認のため解釈に含めない`,
     `[クロス解析] ${c.cross.map(x => `${x.pair}: ${x.a} × ${x.b} → ${x.verdict}`).join(" | ")}`,
     `[表の顔] ${c.surface.join("・")} ／ [本音・潜在] ${c.inner.join("・")}`,
   ].join("\n");
