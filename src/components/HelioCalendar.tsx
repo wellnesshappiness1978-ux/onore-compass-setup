@@ -123,7 +123,7 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
     <h4 className="mt-6 font-serif text-lg text-primary">365日の個人バイオリズム</h4>
     <Gate plan={plan} feature="helioPersonal" onUpgrade={onUpgrade}>
       <p className="mt-2 text-sm text-muted-foreground">{year}年 · 実日付による参考周期（体23日・心28日・知33日の平均）。高い日・切替点・低い日を選ぶと内訳が開きます。</p>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label={`${year}年の日付カレンダー`}>
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2" aria-label={`${year}年の日付カレンダー`}>
         {calendarMonths.map(({ month, offset, days }) => <section key={month} className="min-w-0 border-t border-primary/30 pt-3" aria-label={`${month + 1}月`}>
           <h5 className="font-serif text-base text-primary">{year}年 {month + 1}月</h5>
           <div className="mt-2 grid grid-cols-7 gap-0.5 text-center text-[10px] text-muted-foreground">{["日", "月", "火", "水", "木", "金", "土"].map(d => <span key={d}>{d}</span>)}</div>
