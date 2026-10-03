@@ -56,29 +56,30 @@ function render(format: Format, d: ShareCardData, brand: string, scoreLabel: str
   ctx.font = `500 ${story ? 34 : 26}px ${serif}`; ctx.fillText(d.kind === "identity" ? (brand === "オノレコンパス" ? "あなたの特性" : "YOUR ESSENCE") : scoreLabel, cx, cy - r * 0.32);
   ctx.fillStyle = g; ctx.font = `700 ${story ? 150 : 110}px ${serif}`; ctx.fillText(d.kind === "identity" ? "✧" : `${d.score}%`, cx, cy + r * 0.28);
   // text block
-  const tx = story ? w / 2 : w * 0.6, maxW = story ? w - 180 : w * 0.52;
+  const tx = story ? w / 2 : w * 0.6, maxW = story ? w - 180 : w * 0.4;
   ctx.textAlign = story ? "center" : "left";
   const left = story ? tx : w * 0.52;
-  let y = story ? 830 : 140;
+  let y = story ? 830 : 115;
   ctx.fillStyle = GOLD; ctx.font = `500 ${story ? 32 : 22}px ${serif}`; ctx.fillText(d.kicker, left, y); y += story ? 80 : 54;
   ctx.fillStyle = CREAM; ctx.font = `700 ${story ? 64 : 40}px ${serif}`;
   for (const l of wrap(ctx, d.title, maxW).slice(0, 2)) { ctx.fillText(l, left, y); y += story ? 80 : 50; }
   if (d.names.length) { ctx.fillStyle = GOLD; ctx.font = `500 ${story ? 36 : 24}px ${serif}`; ctx.fillText(d.names.join("  ×  ").slice(0, 60), left, y); y += story ? 80 : 46; }
   ctx.fillStyle = CREAM; ctx.font = `400 ${story ? 34 : 22}px ${serif}`;
-  for (const para of d.lines) for (const l of wrap(ctx, para, maxW).slice(0, story ? 5 : 3)) { ctx.fillText(l, left, y); y += story ? 54 : 34; }
+  for (const para of d.lines) for (const l of wrap(ctx, para, maxW).slice(0, story ? 5 : 2)) { ctx.fillText(l, left, y); y += story ? 54 : 32; }
   if (d.kind === "identity") {
-    y += story ? 64 : 20;
+    y += story ? 64 : 12;
     ctx.fillStyle = GOLD; ctx.font = `600 ${story ? 30 : 21}px ${serif}`; ctx.fillText(brand === "オノレコンパス" ? "今日の注意ポイント" : "Today's insight", left, y); y += story ? 58 : 34;
     ctx.fillStyle = CREAM; ctx.font = `400 ${story ? 31 : 20}px ${serif}`;
-    for (const l of wrap(ctx, d.caution ?? "", maxW).slice(0, story ? 4 : 2)) { ctx.fillText(l, left, y); y += story ? 49 : 29; }
+    for (const l of wrap(ctx, d.caution ?? "", maxW).slice(0, story ? 4 : 2)) { ctx.fillText(l, left, y); y += story ? 49 : 27; }
     if (d.palette?.length) {
-      y += story ? 45 : 14;
+      y = story ? y + 45 : Math.min(y + 14, 498);
       d.palette.slice(0,2).forEach((color, i) => {
         const x = story ? w / 2 - 180 + i * 110 : left + i * 100;
         ctx.fillStyle = color.code; ctx.beginPath(); ctx.arc(x, y, story ? 38 : 23, 0, Math.PI * 2); ctx.fill();
       });
       ctx.fillStyle = CREAM; ctx.font = `400 ${story ? 25 : 17}px ${serif}`;
-      ctx.fillText(d.palette.map(c => `${c.label} ${c.code}`).join(" · "), left, y + (story ? 85 : 48));
+      const paletteText = d.palette.map(c => `${c.label} ${c.code}`).join(" · ");
+      ctx.fillText(paletteText, left, y + (story ? 85 : 44), story ? maxW : maxW);
     }
   }
   ctx.textAlign = "center"; ctx.fillStyle = GOLD; ctx.font = `600 ${story ? 40 : 26}px ${serif}`;
