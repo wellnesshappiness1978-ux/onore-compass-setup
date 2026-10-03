@@ -525,6 +525,10 @@ export default function SettingsPanel({
           <p className="flex items-center gap-2 text-sm">
             <Bell className="size-4 text-primary" /> {t.notifications}
           </p>
+          <label className="flex items-center justify-between gap-3 rounded-md border border-primary/20 px-3 py-2.5 text-sm">
+            <span>{language === "ja" ? "毎朝8時のプッシュ通知" : language === "zh-TW" ? "每日早上8點推播通知" : "8 AM push notifications"}</span>
+            <Switch checked={false} disabled aria-label={language === "ja" ? "毎朝8時のプッシュ通知（配信サービス未接続）" : "8 AM push notifications (delivery unavailable)"} />
+          </label>
           {[
             [t.notifyTiming, notifyTiming, setNotifyTiming] as const,
             [t.notifyBio, notifyBio, setNotifyBio] as const,

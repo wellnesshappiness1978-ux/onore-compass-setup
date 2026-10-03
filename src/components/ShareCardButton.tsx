@@ -132,7 +132,7 @@ export default function ShareCardButton({ data, language, className }: { data: S
           <DialogHeader><DialogTitle>{t.title}</DialogTitle><DialogDescription>{t.desc}</DialogDescription></DialogHeader>
           <div role="radiogroup" className="flex gap-2">
             {(["story", "x"] as const).map((f) => (
-              <button key={f} type="button" role="radio" aria-checked={format === f} onClick={() => build(f)}
+              <Button key={f} type="button" role="radio" aria-checked={format === f} variant={format === f ? "default" : "outline"} size="sm" onClick={() => build(f)}
                 className={`flex-1 rounded-full border px-3 py-1.5 text-xs ${format === f ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>{t[f]}</button>
             ))}
           </div>
@@ -144,7 +144,7 @@ export default function ShareCardButton({ data, language, className }: { data: S
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             {links.map(([name, href]) => <a key={name} href={href} target="_blank" rel="noreferrer" className="rounded-full border border-primary/30 px-3 py-1 text-xs text-primary hover:bg-primary/10">{name}</a>)}
-            <button type="button" onClick={save} className="rounded-full border border-primary/30 px-3 py-1 text-xs text-primary hover:bg-primary/10">Instagram</button>
+            <Button type="button" variant="outline" size="sm" onClick={save} className="rounded-full border-primary/30 text-xs text-primary">Instagram</Button>
           </div>
           {status && <p role="status" className="text-center text-xs text-primary">{status}</p>}
           <p className="text-[11px] leading-5 text-muted-foreground">{t.note}</p>
