@@ -30,7 +30,7 @@ describe("birth-sky inputs", () => {
   it("uses a stated noon approximation only without birth time", () => {
     const noon = natalSky("1995-04-08", "", true);
     expect(noon?.approximate).toBe(true);
-    expect(noon?.bodies).toHaveLength(7);
+    expect(noon?.bodies).toHaveLength(10);
     expect(natalSky("1995-04-08", "10:30", false)?.approximate).toBe(false);
     expect(natalSky("1995-02-30", "10:30", false)).toBeNull();
   });

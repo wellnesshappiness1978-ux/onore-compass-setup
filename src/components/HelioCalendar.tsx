@@ -59,7 +59,8 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
   };
   const phase = helioPhase(profile.birthDate, date);
   const year = date.getFullYear();
-  const curve = useMemo(() => profile.birthDate ? Array.from({ length: 365 }, (_, i) => biorhythm(profile.birthDate, localIso(new Date(year, 0, 1 + i))).total) : [], [profile.birthDate, year]);
+  const yearDays = Math.round((new Date(year + 1, 0, 1).getTime() - new Date(year, 0, 1).getTime()) / 86400000);
+  const curve = useMemo(() => profile.birthDate ? Array.from({ length: yearDays }, (_, i) => biorhythm(profile.birthDate, localIso(new Date(year, 0, 1 + i))).total) : [], [profile.birthDate, year, yearDays]);
   const topDays = useMemo(() => curve.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v).slice(0, 5).sort((a, b) => a.i - b.i).map(x => localIso(new Date(year, 0, 1 + x.i))), [curve, year]);
   const dirs = useMemo(() => [...directionEnergy(profile.birthDate, date)].sort((a, b) => b.score - a.score), [profile.birthDate, iso]);
   const biz = canUse(plan, "helioBusiness");
@@ -96,7 +97,8 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
         <polyline fill="none" className="stroke-primary" strokeWidth="1" points={curve.map((v, i) => `${i},${100 - v}`).join(" ")} />
       </svg>
       <p className="mt-2 text-sm text-muted-foreground">線が中央より上＝攻め時、下＝守り時の目安（体・心・知の3周期の平均）。</p>
-      <p className="mt-2 text-base text-foreground">今年の勝負日候補：<span className="mt-2 flex flex-wrap gap-2">{topDays.map(day => <Button key={day} size="sm" variant={eventIso === day ? "default" : "outline"} aria-pressed={eventIso === day} onClick={() => setEventIso(day)}>{day}</Button>)}</span></p>
+      <div className="mt-2 text-base text-foreground">今年の勝負日候補（参考）：<div className="mt-2 flex flex-wrap gap-2">{topDays.map(day => <Button key={day} size="sm" variant={eventIso === day ? "default" : "outline"} aria-pressed={eventIso === day} onClick={() => setEventIso(day)}>{day}</Button>)}</div></div>
+      <label className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">予定の日付<input aria-label="カレンダーに登録する日付" type="date" value={eventIso} onChange={e => { if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) setEventIso(e.target.value); }} className="rounded-md border border-primary/30 bg-background px-3 py-2 text-foreground" /></label>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="text-base text-foreground">{eventIso} · {label}</p>
         <div className="flex flex-wrap gap-2"><Button variant="outline" asChild><a href={google} target="_blank" rel="noopener noreferrer"><CalendarDays className="size-4" />Google カレンダー<ExternalLink className="size-3" /></a></Button><Button variant="outline" onClick={download}><Download className="size-4" />iOS / .ics</Button></div>
       </div>
@@ -112,7 +114,7 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
       <p className="mt-2 text-sm text-muted-foreground">あなた{members.length ? `＋登録メンバー${members.length}名` : ""}のリズムを重ねた参考値。成功を保証するものではありません。</p>
       <div className="mt-3 overflow-x-auto"><table className="w-full min-w-[560px] border-collapse text-xs"><thead><tr><th className="p-1 text-left text-primary">{year}年</th>{Array.from({ length: 12 }, (_, m) => <th key={m} className="p-1 text-primary">{m + 1}月</th>)}</tr></thead><tbody>{gantt.map(g => <tr key={g.name}><th scope="row" className="whitespace-nowrap p-1 text-left font-normal text-foreground">{g.name}</th>{g.months.map((v, m) => <td key={m} className="p-0.5"><div title={`${v}`} className={`h-5 rounded-sm ${v >= 55 ? "bg-primary" : v >= 48 ? "bg-primary/40" : "bg-muted"}`} /></td>)}</tr>)}</tbody></table></div>
       <p className="mt-1 text-xs text-muted-foreground">濃い色＝追い風の月、薄い＝通常、灰色＝慎重に進める月。</p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">{bestDays.map(b => <div key={b.name} className="border border-primary/25 p-3"><p className="text-sm text-primary">{b.name}の候補日（90日以内）</p><p className="mt-1 text-base text-foreground">{b.days.join("、")}</p></div>)}</div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">{bestDays.map(b => <div key={b.name} className="border border-primary/25 p-3"><p className="text-sm text-primary">{b.name}の候補日（90日以内・参考）</p><div className="mt-2 flex flex-wrap gap-2">{b.days.map(di => <Button key={di} size="sm" variant={eventIso === di ? "default" : "outline"} onClick={() => setEventIso(di)} aria-pressed={eventIso === di}>{di}</Button>)}</div></div>)}</div>
       <h5 className="mt-5 font-serif text-base text-primary">組織の好調期・注意期アラート（6週間）</h5>
       <ul className="mt-2 space-y-2">{weeks.map(w => <li key={w.start} className="border-l-2 border-primary/50 pl-3 text-sm leading-7 text-foreground"><span className="text-primary">{w.start}〜 {w.v >= 55 ? "好調期" : w.v <= 45 ? "注意期" : "平常期"}</span>：{w.v >= 55 ? "提案・発表・採用面接など前に出る予定をこの週に寄せる。決裁は週前半に。" : w.v <= 45 ? "大型の決裁は先送りし、ダブルチェックを1段増やす。会議は短く、1on1で負担を聞く。" : "既存案件の進行と準備に集中。翌週の好調期に向けて資料を仕上げる。"}</li>)}</ul>
       {!members.length && <p className="mt-2 text-xs text-muted-foreground">チームタブでメンバーを登録すると、全員の波を重ねて表示します。</p>}

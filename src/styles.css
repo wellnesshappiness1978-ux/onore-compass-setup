@@ -688,3 +688,52 @@ html[data-test-preview="true"] { --preview-bar-height: 104px; }
 .design-canvas .design-title { font-size: 28px; line-height: 1.5; }
 .design-canvas p, .design-canvas li { overflow-wrap: anywhere; }
 html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
+
+/* Rank rewards apply even when the appearance picker has not been touched. */
+.design-canvas[data-tier="free"], .design-canvas[data-tier="standard"] {
+  background-image: none; --design-texture: none; --design-stroke: 1px;
+  --design-line: color-mix(in oklab, var(--primary) 20%, transparent);
+}
+.design-canvas[data-tier="free"] .celestial-stars,
+.design-canvas[data-tier="standard"] .celestial-stars { opacity: .04; }
+.design-canvas[data-tier="vip"] {
+  --background: oklch(.12 .025 265); --card: oklch(.19 .035 265);
+  --primary: oklch(.86 .135 90); --primary-foreground: oklch(.13 .02 260);
+  --gold-glow: oklch(.96 .055 92); --gold-deep: oklch(.65 .11 80);
+  --design-line: color-mix(in oklab, var(--primary) 50%, transparent);
+  --design-surface: var(--card); --design-stroke: 1px;
+  background-image: linear-gradient(155deg, var(--card), var(--background) 45%);
+}
+.design-canvas[data-tier="vip"] .celestial-stars {
+  opacity: .75; position: fixed; animation: rank-starlight 16s ease-in-out infinite alternate;
+}
+@keyframes rank-starlight { from { transform: translateY(0); opacity: .4; } to { transform: translateY(-28px); opacity: .85; } }
+.design-canvas[data-tier="b2b"], .design-canvas[data-tier="b2b-premium"] {
+  --background: oklch(.12 .004 260); --card: oklch(.2 .008 260);
+  --foreground: oklch(.95 .009 95); --card-foreground: var(--foreground);
+  --primary: oklch(.85 .09 90); --primary-foreground: oklch(.13 .003 260);
+  --gold-glow: oklch(.96 .025 95); --gold-deep: oklch(.65 .06 85);
+  --muted-foreground: oklch(.8 .012 260); --secondary: oklch(.25 .008 260);
+  --design-line: color-mix(in oklab, var(--gold-glow) 40%, transparent);
+  --design-surface: linear-gradient(145deg, var(--secondary), var(--card));
+  --design-texture: repeating-linear-gradient(90deg, transparent 0 119px, color-mix(in oklab, var(--gold-glow) 4%, transparent) 120px 121px);
+  background-image: linear-gradient(145deg, var(--card), var(--background) 55%);
+}
+.design-canvas[data-tier="b2b-premium"] { --design-line: color-mix(in oklab, var(--gold-glow) 65%, transparent); }
+.design-canvas[data-tier="b2b"] .card-lux, .design-canvas[data-tier="b2b-premium"] .card-lux {
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--gold-glow) 30%, transparent), inset 0 -2px 0 var(--background), 0 16px 30px color-mix(in oklab, var(--background) 65%, transparent);
+  border-top: 2px solid var(--design-line);
+}
+.audio-controller {
+  position: fixed; z-index: 40; right: max(16px, env(safe-area-inset-right)); bottom: 108px;
+  width: min(360px, calc(100vw - 32px)); border: 1px solid var(--design-line);
+  border-radius: 8px; padding: 12px 14px; background: color-mix(in oklab, var(--card) 94%, transparent);
+  backdrop-filter: blur(20px); box-shadow: 0 8px 30px color-mix(in oklab, var(--background) 70%, transparent);
+}
+.design-canvas:has(.audio-controller) { padding-bottom: 230px; }
+@media (max-width: 600px) {
+  .audio-controller { bottom: 90px; padding: 10px 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .design-canvas[data-tier="vip"] .celestial-stars { animation: none; }
+}

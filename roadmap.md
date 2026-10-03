@@ -52,6 +52,7 @@
 - [ ] Official animal surface/hope/hidden results — blocked by an authoritative calculation table or licensed source; do not fabricate characters.
 
 ## 全面改訂マスター改修
+- [x] Six-value update: upgrade-only marketing, ambient piano controls, consolidated Home, ten-body natal geometry, automatic luxury themes, and reference-only paid/business workflows; verified five preview plans, playback, 2160×3840 wallpaper, two-member matrix and selected-date Google/ICS export. Billing, therapeutic effects and successful outcomes are not claimed.
 - [x] Centralize preview plan state and fixed toolbar; verify five plans and fresh tabs.
 - [x] Remove free color leaks and independent earth-calendar tier bypasses.
 - [x] Clean reading hierarchy and prompts; integrate feng shui reference advice.

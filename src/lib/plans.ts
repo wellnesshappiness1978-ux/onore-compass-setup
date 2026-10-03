@@ -3,6 +3,8 @@ import { quickCompatibilityLimit } from "./quick-compatibility";
 
 export const planOrder: Plan[] = ["free", "standard", "vip", "b2b", "b2b-premium"];
 const rank = (plan: Plan) => planOrder.indexOf(plan);
+/** Marketing shows upgrades only; the active plan is a status, never a sales card. */
+export const isUpgradePlan = (current: Plan, candidate: Plan) => rank(candidate) > rank(current);
 
 /** The one membership catalogue used by pricing and preview gates. Paid access remains a preview. */
 export const membership = {
