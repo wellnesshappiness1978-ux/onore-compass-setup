@@ -63,4 +63,4 @@
 
 - [x] Add shareable essence/daily insight/birth-color cards, JP/EN/繁體 quick switch, Business team grouping, VIP consultation voice, and preview-plan gates.
 - [ ] Background 08:00 push and LINE delivery — blocked: Firebase Messaging connection was declined and LINE account/identity integration is unavailable; open-app reminders remain available.
-- [ ] Verify live AI output, card save, voice playback, and team drag/drop through the signed-in UI; complete where browser services allow.
+- [x] Verify live AI output, card save, and two-member team grouping through the signed-in preview; the voice control is present and starts, but audible speech cannot be confirmed in headless Chromium.
