@@ -133,7 +133,7 @@ export default function ShareCardButton({ data, language, className }: { data: S
           <div role="radiogroup" className="flex gap-2">
             {(["story", "x"] as const).map((f) => (
               <Button key={f} type="button" role="radio" aria-checked={format === f} variant={format === f ? "default" : "outline"} size="sm" onClick={() => build(f)}
-                className={`flex-1 rounded-full border px-3 py-1.5 text-xs ${format === f ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>{t[f]}</button>
+                className="flex-1 text-xs">{t[f]}</Button>
             ))}
           </div>
           {data.kind === "identity" && <label className="flex items-center gap-2 text-xs text-foreground"><input type="checkbox" checked={includeName} onChange={e => setIncludeName(e.target.checked)} />{language === "ja" ? "名前を画像に載せる（初期設定は非表示）" : language === "zh-TW" ? "在圖片顯示姓名（預設隱藏）" : "Include my name (hidden by default)"}</label>}
