@@ -45,7 +45,7 @@ function render(format: Format, d: ShareCardData, brand: string, scoreLabel: str
   }
   const serif = '"Noto Serif JP", serif';
   const story = format === "story";
-  const cx = story ? w / 2 : w * 0.28, cy = story ? h * 0.36 : h / 2, r = story ? 230 : 170;
+  const cx = story ? w / 2 : w * 0.28, cy = story ? h * 0.27 : h / 2, r = story ? 230 : 170;
   // score ring
   ctx.lineWidth = story ? 22 : 16; ctx.strokeStyle = "rgba(244,208,63,0.18)";
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
@@ -53,13 +53,13 @@ function render(format: Format, d: ShareCardData, brand: string, scoreLabel: str
   ctx.strokeStyle = g; ctx.lineCap = "round"; ctx.shadowColor = GOLD; ctx.shadowBlur = 30;
   ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * d.score) / 100); ctx.stroke();
   ctx.shadowBlur = 0; ctx.textAlign = "center"; ctx.fillStyle = CREAM;
-  ctx.font = `500 ${story ? 34 : 26}px ${serif}`; ctx.fillText(d.kind === "identity" ? "あなたの特性" : scoreLabel, cx, cy - r * 0.32);
+  ctx.font = `500 ${story ? 34 : 26}px ${serif}`; ctx.fillText(d.kind === "identity" ? (brand === "オノレコンパス" ? "あなたの特性" : "YOUR ESSENCE") : scoreLabel, cx, cy - r * 0.32);
   ctx.fillStyle = g; ctx.font = `700 ${story ? 150 : 110}px ${serif}`; ctx.fillText(d.kind === "identity" ? "✧" : `${d.score}%`, cx, cy + r * 0.28);
   // text block
   const tx = story ? w / 2 : w * 0.6, maxW = story ? w - 180 : w * 0.52;
   ctx.textAlign = story ? "center" : "left";
   const left = story ? tx : w * 0.52;
-  let y = story ? h * 0.36 + r + 120 : 140;
+  let y = story ? 830 : 140;
   ctx.fillStyle = GOLD; ctx.font = `500 ${story ? 32 : 22}px ${serif}`; ctx.fillText(d.kicker, left, y); y += story ? 80 : 54;
   ctx.fillStyle = CREAM; ctx.font = `700 ${story ? 64 : 40}px ${serif}`;
   for (const l of wrap(ctx, d.title, maxW).slice(0, 2)) { ctx.fillText(l, left, y); y += story ? 80 : 50; }
