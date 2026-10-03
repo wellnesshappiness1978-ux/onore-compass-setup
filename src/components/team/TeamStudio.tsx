@@ -35,24 +35,26 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
   const list = useServerFn(listTeamMembers);
   const add = useServerFn(addTeamMember);
   const del = useServerFn(deleteTeamMember);
-  const max = memberLimit[actualPlan];
+  const previewOnly = plan !== actualPlan;
+  const localMode = !signedIn || previewOnly;
+  const max = memberLimit[previewOnly ? plan : actualPlan];
 
   useEffect(() => {
     let active = true;
-    if (signedIn) list().then((m) => active && setMembers(m)).catch(() => undefined);
+    if (!localMode) list().then((m) => active && setMembers(m)).catch(() => undefined);
     else { try { setMembers(JSON.parse(localStorage.getItem(LOCAL) ?? "[]")); } catch { setMembers([]); } }
     return () => { active = false; };
-  }, [signedIn, list]);
+  }, [localMode, list]);
   const persistLocal = (next: TeamMember[]) => { setMembers(next); try { localStorage.setItem(LOCAL, JSON.stringify(next)); } catch { /* ignore */ } };
 
   const addMember = async (m: Omit<TeamMember, "id">) => {
     if (members.length + 1 > max) { setLimitDialog(planForCount(members.length + 1) ?? "max"); return false; }
-    if (signedIn) setMembers([...members, await add({ data: m as never })]);
+    if (!localMode) setMembers([...members, await add({ data: m as never })]);
     else persistLocal([...members, { ...m, id: crypto.randomUUID() }]);
     return true;
   };
   const removeMember = async (id: string) => {
-    if (signedIn) { await del({ data: { id } }); setMembers(members.filter((m) => m.id !== id)); }
+    if (!localMode) { await del({ data: { id } }); setMembers(members.filter((m) => m.id !== id)); }
     else persistLocal(members.filter((m) => m.id !== id));
   };
   const feature = tabFeatures[tab]!;
@@ -62,7 +64,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     <section className="rounded-3xl border border-primary/20 bg-card/60 p-4 backdrop-blur-md sm:p-5" aria-label={t.title}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-serif text-lg text-primary">{t.title}</h3>
-        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[actualPlan]} · {t.limit(members.length, max)}</span>
+        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[plan]} · {t.limit(members.length, max)}</span>
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">{t.note}</p>
       {plan === "b2b-premium" && <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-primary"><Crown className="size-3" />{t.priority}</p>}
@@ -84,7 +86,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <Button size="sm" className="mt-3" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.seePlans}</Button>
           </div>
         ) : feature === "roster" ? (
-          <Roster t={t} members={members} max={max} signedIn={signedIn} onAdd={addMember} onRemove={removeMember} />
+          <Roster t={t} members={members} max={max} signedIn={!localMode} onAdd={addMember} onRemove={removeMember} />
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
