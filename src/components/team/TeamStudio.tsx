@@ -225,6 +225,11 @@ function Diagnosis({ t, members, max, language }: { t: TeamCopy; members: TeamMe
             <div className={card}><p className="mb-2 text-sm text-primary">{t.synergy}</p><ul className="space-y-1 text-xs">{d.synergies.length ? d.synergies.map((p) => <li key={p.a.id + p.b.id}>{p.a.name} × {p.b.name} <span className="text-primary">{p.score}</span></li>) : <li className="text-muted-foreground">{t.none}</li>}</ul></div>
             <div className={card}><p className="mb-2 text-sm text-destructive">{t.conflict}</p><ul className="space-y-1 text-xs">{d.conflicts.length ? d.conflicts.map((p) => <li key={p.a.id + p.b.id}>{p.a.name} × {p.b.name} <span className="text-destructive">{p.score}</span></li>) : <li className="text-muted-foreground">{t.none}</li>}</ul></div>
           </div>
+          <section aria-label={language === "ja" ? "相性と組織最適化マトリクス" : "Team compatibility matrix"} className="border-y border-primary/25 py-5">
+            <h3 className="font-serif text-xl text-primary">{language === "ja" ? "相性＆組織最適化マトリクス" : "Compatibility & organization matrix"}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{language === "ja" ? "80以上は協働候補、65未満は役割・連絡方法を先に確認する参考値。採用・評価・利益を保証する指標ではありません。" : "Reference scores: 80+ for collaboration exploration, below 65 for discussing roles first. Not a hiring or performance measure."}</p>
+            <div className="mt-4 overflow-auto"><table className="w-full border-collapse text-sm"><thead><tr><th scope="col" className="p-3 text-left text-primary">{language === "ja" ? "関係者" : "Member"}</th>{team.map(m => <th key={m.id} scope="col" className="min-w-24 p-3 text-primary">{m.name}</th>)}</tr></thead><tbody>{team.map(a => <tr key={a.id} className="border-t border-primary/15"><th scope="row" className="whitespace-nowrap p-3 text-left font-normal">{a.name}</th>{team.map(b => { const score = a.id === b.id ? null : pairScore(a, b); return <td key={b.id} className={`p-3 text-center ${score === null ? "text-muted-foreground" : score >= 80 ? "bg-primary/20 text-primary" : score < 65 ? "bg-destructive/10 text-foreground" : "text-foreground"}`}>{score ?? "—"}</td>; })}</tr>)}</tbody></table></div>
+          </section>
         </>
       )}
     </div>

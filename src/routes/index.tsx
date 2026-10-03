@@ -15,16 +15,16 @@ import { type Language } from "@/lib/translations";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "オノレコンパス | 15の占術で自分を知る" },
+      { title: "オノレコンパス | 自分を知る・今日を整える" },
       {
         name: "description",
         content:
-          "生年月日・出生時間・血液型・兄弟構成から、15の占術であなたの本質を解析するパーソナル占術アプリ。",
+          "出生情報からの個別診断、毎日の参考ガイド、天体配置の曼陀羅アートとチーム分析を一つに。オノレコンパスで自分を知り、今日を整える。",
       },
-      { property: "og:title", content: "オノレコンパス | 15の占術で自分を知る" },
+      { property: "og:title", content: "オノレコンパス | 自分を知る・今日を整える" },
       {
         property: "og:description",
-        content: "生まれた瞬間の情報から、15の占術であなたの本質を解析します。",
+        content: "個別診断・毎日の参考ガイド・出生天体アート・チーム分析を一つにまとめたオノレコンパス。",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
