@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, Music2, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { createAmbientPiano, type AmbientPiano } from "@/lib/ambient-piano";
+import { createAmbientPiano, pianoTones, type AmbientPiano } from "@/lib/ambient-piano";
 import type { Language } from "@/lib/translations";
 
-const tones = [396, 432, 528, 639, 741, 963];
 export default function SolfeggioPlayer({ language, compact = false }: { language: Language; compact?: boolean }) {
   const ja = language === "ja";
   const [hz, setHz] = useState(528);
@@ -43,7 +42,7 @@ export default function SolfeggioPlayer({ language, compact = false }: { languag
       <Button size="icon" variant="ghost" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-label={ja ? "音楽の設定" : "Audio settings"} title={ja ? "音楽の設定" : "Audio settings"}>{expanded ? <ChevronDown /> : <ChevronUp />}</Button>
     </div>
     {expanded && <div className="mt-3 border-t border-primary/20 pt-3">
-      <div role="group" aria-label={ja ? "周波数" : "Frequency"} className="grid grid-cols-3 gap-2">{tones.map(f => <Button key={f} size="sm" variant={hz === f ? "default" : "outline"} aria-pressed={hz === f} disabled={busy} onClick={() => { setHz(f); if (playing) void start(f); }}>{f} Hz</Button>)}</div>
+      <div role="group" aria-label={ja ? "周波数" : "Frequency"} className="grid grid-cols-3 gap-2">{pianoTones.map(f => <Button key={f} size="sm" variant={hz === f ? "default" : "outline"} aria-pressed={hz === f} disabled={busy} onClick={() => { setHz(f); if (playing) void start(f); }}>{f} Hz</Button>)}</div>
       <label className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">{ja ? "音量" : "Volume"}<input aria-label={ja ? "BGM音量" : "BGM volume"} type="range" min={0} max={0.6} step={0.01} value={volume} onChange={e => setVolume(Number(e.target.value))} className="min-w-0 flex-1 accent-primary" /></label>
       <p className="mt-2 text-xs leading-6 text-muted-foreground">{ja ? "周波数を基音にした創作音楽です。DNA修復・治療などの効果は保証しません。" : "Original music tuned to a reference frequency; no therapeutic or DNA-repair effects are claimed."}</p>
     </div>}
