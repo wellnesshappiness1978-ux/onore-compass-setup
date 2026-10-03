@@ -40,6 +40,7 @@ import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import DailyLifeGuide from "./DailyLifeGuide";
 import BirthColorGuide from "./BirthColorGuide";
+import { usePlan } from "./PlanProvider";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -99,15 +100,6 @@ function ProfileRows({ profile, language }: { profile: UserProfile; language: La
     </div>
   );
 }
-
-const swatchClasses = [
-  "profile-swatch-overall",
-  "profile-swatch-wealth",
-  "profile-swatch-work",
-  "profile-swatch-love",
-  "profile-swatch-social",
-  "profile-swatch-health",
-];
 
 function TorisetsuPanel({
   profile,
@@ -215,32 +207,6 @@ function TorisetsuPanel({
                     <h4 className="font-serif text-base text-gold-glow sm:text-lg">{part.title}</h4>
                      <p className="mt-3 text-base leading-8 text-foreground/80" role={!part.body ? "status" : undefined}>{part.body ?? (manualReading.isError ? homeReadingCopy[language].error : homeReadingCopy[language].loading)}</p>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section className="mt-6 border-y border-primary/15 py-6">
-            <div className="flex items-center gap-3">
-              <span className="flex size-10 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-primary">
-                <Palette className="size-5" strokeWidth={1.2} />
-              </span>
-              <div>
-                <h3 className="font-serif text-lg text-foreground">{t.colorsTitle}</h3>
-                <p className="text-xs text-muted-foreground">{t.colorsIntro}</p>
-              </div>
-            </div>
-            <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3">
-              {t.colorLabels.map((label, index) => (
-                <div key={label} className="flex items-center gap-3">
-                  <span
-                    className={`size-9 shrink-0 rounded-full border-2 border-foreground/20 shadow-champagne ${swatchClasses[index]}`}
-                  />
-                  <span>
-                    <span className="block text-xs text-muted-foreground">{label}</span>
-                    <strong className="mt-0.5 block text-xs font-medium text-foreground">
-                      {t.colorNames[index]}
-                    </strong>
-                  </span>
                 </div>
               ))}
             </div>
@@ -418,7 +384,7 @@ function TorisetsuPanel({
               <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
             </section>
           ) : null}
-          <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
+          {plan === "free" && <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
             <div className="select-none space-y-3 opacity-20 blur-[2px]" aria-hidden="true">
               <div className="mx-auto h-3 w-3/4 rounded-full bg-primary/40" />
               <div className="mx-auto h-3 w-full rounded-full bg-foreground/30" />
@@ -445,17 +411,13 @@ function TorisetsuPanel({
                 {t.unlock}
               </Button>
             </div>
-          </section>
+          </section>}
           <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
         </div>
       )}
     </div>
   );
 }
-
-const urlToPlan: Record<string, Plan> = { free: "free", standard: "standard", vip: "vip", business: "b2b", b2b: "b2b", business_premium: "b2b-premium", "b2b-premium": "b2b-premium" };
-const planToUrl: Record<Plan, string> = { free: "free", standard: "standard", vip: "vip", b2b: "business", "b2b-premium": "business_premium" };
-const devPlanLabels: Record<Plan, string> = { free: "無料", standard: "有料", vip: "VIP", b2b: "ビジネス", "b2b-premium": "Bプレミアム" };
 
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
   const t = dashboardTranslations[language];
@@ -467,7 +429,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       else if (target === "mandala") { setTab("mandala"); window.scrollTo({ top: 0, behavior: "smooth" }); }
     };
     const q = new URLSearchParams(window.location.search).get("open");
-    if (q) { open(q); window.history.replaceState(null, "", window.location.pathname); }
+    if (q) { open(q); const url = new URL(window.location.href); url.searchParams.delete("open"); window.history.replaceState(window.history.state, "", url); }
     const onEvt = (e: Event) => open((e as CustomEvent<string>).detail);
     window.addEventListener("onore-open", onEvt);
     return () => window.removeEventListener("onore-open", onEvt);
@@ -485,23 +447,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   // Strict entitlement: the read-only membership row decides access. The switch may only preview equal or lower plans.
   const [selectedPlan, setPreviewPlan] = useState<Plan>("b2b-premium");
   const [serverPlan, setActualPlan] = useState<Plan>("free");
-  // Dev-only override (localStorage devPlanOverride). Disabled in published builds so it can't unlock paid features in production.
-  const devOverrideEnabled = import.meta.env.DEV;
-  const [devPlanOverride, setDevPlanOverride] = useState<Plan | null>(null);
-  useEffect(() => {
-    if (!devOverrideEnabled) return;
-    try {
-      // URL ?plan= wins over the saved value so a new tab opens in the requested plan.
-      const fromUrl = urlToPlan[new URLSearchParams(window.location.search).get("plan") ?? ""];
-      const v = fromUrl ?? (window.localStorage.getItem("devPlanOverride") as Plan | null);
-      if (v && planOrder.includes(v)) { setDevPlanOverride(v); setPreviewPlan(v); if (fromUrl) window.localStorage.setItem("devPlanOverride", v); }
-    } catch { /* ignore */ }
-  }, [devOverrideEnabled]);
+  const { enabled: devOverrideEnabled, override: devPlanOverride, selectPlan } = usePlan();
   const applyDevOverride = (next: Plan) => {
-    try { window.localStorage.setItem("devPlanOverride", next); } catch { /* ignore */ }
-    setDevPlanOverride(next);
+    selectPlan(next);
     setPreviewPlan(next);
-    try { const u = new URL(window.location.href); u.searchParams.set("plan", planToUrl[next]); window.history.replaceState(window.history.state, "", u); } catch { /* ignore */ }
     if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
   };
   const actualPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : serverPlan;
@@ -514,7 +463,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const [debugAllowed, setDebugAllowed] = useState(false);
-  const previewPlan: Plan = planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
+  const previewPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
   const membership = useServerFn(getMyMembership);
   const checkDebugAccess = useServerFn(canManageDebugPlan);
   useEffect(() => {
@@ -528,6 +477,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     return () => { active = false; };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
+  useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
     { id: "home", label: t.home, icon: Home },
@@ -544,10 +494,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
   return (
     <>
-    {devOverrideEnabled && <div role="group" aria-label="開発用プラン切替バー" className="fixed right-2 top-2 z-[60] flex max-w-[calc(100vw-1rem)] flex-wrap items-center gap-1 rounded-md border border-primary/40 bg-background/95 p-1.5 text-xs shadow-lg backdrop-blur">
-      <span className="px-1 text-primary">DEV</span>
-      {planOrder.map((p) => <button key={p} type="button" aria-pressed={actualPlan === p} onClick={() => applyDevOverride(p)} className={`rounded px-2 py-1 ${actualPlan === p ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-primary/10"}`}>{devPlanLabels[p]}</button>)}
-    </div>}
     <div data-design={designMode} data-tier={previewPlan} className="design-canvas celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
@@ -567,7 +513,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setModal("vip")}
+                onClick={() => { setTab("settings"); window.scrollTo({ top: 0 }); }}
                 aria-label={t.vip}
                 title={t.vip}
                 className="size-9 text-primary hover:bg-primary/10 hover:text-primary"
@@ -703,7 +649,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               />
               </>
             ) : tab === "mandala" ? (
-              <NineStarsPanel language={language} profile={profile} onVip={() => setModal("vip")} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
+              <NineStarsPanel language={language} profile={profile} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
             ) : tab === "settings" ? (
               <SettingsPanel
                 profile={profile}

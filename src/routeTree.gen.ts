@@ -10,11 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as ApiConsultationRouteImport } from './routes/api/consultation'
+import { Route as LegalDocumentRouteImport } from './routes/legal.$document'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiConsultationRoute = ApiConsultationRouteImport.update({
@@ -22,31 +29,44 @@ const ApiConsultationRoute = ApiConsultationRouteImport.update({
   path: '/api/consultation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalDocumentRoute = LegalDocumentRouteImport.update({
+  id: '/legal/$document',
+  path: '/legal/$document',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/support': typeof SupportRoute
   '/api/consultation': typeof ApiConsultationRoute
+  '/legal/$document': typeof LegalDocumentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/support': typeof SupportRoute
   '/api/consultation': typeof ApiConsultationRoute
+  '/legal/$document': typeof LegalDocumentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/support': typeof SupportRoute
   '/api/consultation': typeof ApiConsultationRoute
+  '/legal/$document': typeof LegalDocumentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/consultation'
+  fullPaths: '/' | '/support' | '/api/consultation' | '/legal/$document'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/consultation'
-  id: '__root__' | '/' | '/api/consultation'
+  to: '/' | '/support' | '/api/consultation' | '/legal/$document'
+  id: '__root__' | '/' | '/support' | '/api/consultation' | '/legal/$document'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SupportRoute: typeof SupportRoute
   ApiConsultationRoute: typeof ApiConsultationRoute
+  LegalDocumentRoute: typeof LegalDocumentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +78,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/consultation': {
       id: '/api/consultation'
       path: '/api/consultation'
@@ -65,12 +92,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiConsultationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal/$document': {
+      id: '/legal/$document'
+      path: '/legal/$document'
+      fullPath: '/legal/$document'
+      preLoaderRoute: typeof LegalDocumentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SupportRoute: SupportRoute,
   ApiConsultationRoute: ApiConsultationRoute,
+  LegalDocumentRoute: LegalDocumentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

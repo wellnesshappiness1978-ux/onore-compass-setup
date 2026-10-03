@@ -52,10 +52,10 @@ function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
 function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "onCapture">) {
   const aura = useRef<THREE.Points>(null);
   const particles = useMemo(() => {
-    const pts = new Float32Array(330 * 3);
-    for (let i = 0; i < 330; i++) {
+    const pts = new Float32Array(1440 * 3);
+    for (let i = 0; i < 1440; i++) {
       const theta = i * 2.39996;
-      const radius = 1.55 + (i % 47) / 47 * 3.7;
+      const radius = 1.55 + (i % 127) / 127 * 3.7;
       pts[i * 3] = Math.cos(theta) * radius;
       pts[i * 3 + 1] = Math.sin(theta) * radius;
       pts[i * 3 + 2] = ((i * 17) % 43) / 43 * 2 - 1;
@@ -81,7 +81,7 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
     <group>
       <points ref={aura} scale={Math.max(.2, progress / 2)}>
         <bufferGeometry><bufferAttribute attach="attributes-position" args={[particles, 3]} /></bufferGeometry>
-        <pointsMaterial color={main} size={.035} transparent opacity={.85} sizeAttenuation depthWrite={false} />
+        <pointsMaterial color={main} size={.02} transparent opacity={.85} sizeAttenuation depthWrite={false} />
       </points>
       {Array.from({ length: 5 }, (_, i) => <mesh key={`element-${i}`} scale={ring} rotation={[.15 * i, .12 * i, i * .19]}>
         <torusGeometry args={[2.7 + i * .32, .008 + (i === 0 ? .014 : 0), 6, 128]} />

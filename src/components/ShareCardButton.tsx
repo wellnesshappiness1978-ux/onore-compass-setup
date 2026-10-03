@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Download, Share2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Language } from "@/lib/translations";
 
 type Format = "story" | "x";
-export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[] };
+export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility" };
 
 const copy = {
   ja: { cta: "✨ SNSでシェアする", title: "シェア用カード", desc: "サイズを選んで保存・シェアできます。", story: "ストーリーズ 9:16", x: "X 16:9", save: "画像を保存", share: "端末でシェア", note: "※生年月日から計算した参考値のカードです。Instagramは保存した画像をストーリーズで選んで投稿してください。", brand: "オノレコンパス", scoreLabel: "相性スコア", shared: "シェア画面を開きました", saved: "画像を保存しました" },
@@ -24,7 +24,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, max: number) {
 function render(format: Format, d: ShareCardData, brand: string, scoreLabel: string) {
   const [w, h] = format === "story" ? [1080, 1920] : [1200, 675];
   const c = document.createElement("canvas"); c.width = w; c.height = h;
-  const ctx = c.getContext("2d")!;
+  const ctx = c.getContext("2d"); if (!ctx) throw new Error("画像を作成できませんでした。");
   const bg = ctx.createRadialGradient(w / 2, h * 0.38, 40, w / 2, h / 2, Math.max(w, h));
   bg.addColorStop(0, "#1E2A55"); bg.addColorStop(0.55, NAVY); bg.addColorStop(1, "#050914");
   ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
@@ -47,8 +47,8 @@ function render(format: Format, d: ShareCardData, brand: string, scoreLabel: str
   ctx.strokeStyle = g; ctx.lineCap = "round"; ctx.shadowColor = GOLD; ctx.shadowBlur = 30;
   ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * d.score) / 100); ctx.stroke();
   ctx.shadowBlur = 0; ctx.textAlign = "center"; ctx.fillStyle = CREAM;
-  ctx.font = `500 ${story ? 34 : 26}px ${serif}`; ctx.fillText(scoreLabel, cx, cy - r * 0.32);
-  ctx.fillStyle = g; ctx.font = `700 ${story ? 150 : 110}px ${serif}`; ctx.fillText(`${d.score}%`, cx, cy + r * 0.28);
+  ctx.font = `500 ${story ? 34 : 26}px ${serif}`; ctx.fillText(d.kind === "identity" ? "あなたの特性" : scoreLabel, cx, cy - r * 0.32);
+  ctx.fillStyle = g; ctx.font = `700 ${story ? 150 : 110}px ${serif}`; ctx.fillText(d.kind === "identity" ? "✧" : `${d.score}%`, cx, cy + r * 0.28);
   // text block
   const tx = story ? w / 2 : w * 0.6, maxW = story ? w - 180 : w * 0.52;
   ctx.textAlign = story ? "center" : "left";
@@ -73,8 +73,14 @@ export default function ShareCardButton({ data, language, className }: { data: S
   const [status, setStatus] = useState("");
 
   const build = (f: Format) => { setFormat(f); setStatus(""); setUrl(render(f, data, t.brand, t.scoreLabel).toDataURL("image/png")); };
+  useEffect(() => {
+    if (data.kind !== "identity") return;
+    const handle = (event: Event) => { event.preventDefault(); setOpen(true); build(format); };
+    window.addEventListener("onore-share-card", handle);
+    return () => window.removeEventListener("onore-share-card", handle);
+  }, [data, format]);
   const filename = `onore-${format}-${data.score}.png`;
-  const text = `${data.kicker} ${data.title} ${data.score}% | ${t.brand}`;
+  const text = `${data.kicker} ${data.title} ${data.kind === "identity" ? "" : `${data.score}%`} | ${t.brand}`;
   const appUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   const save = () => { if (!url) return; const a = document.createElement("a"); a.href = url; a.download = filename; a.click(); setStatus(t.saved); };

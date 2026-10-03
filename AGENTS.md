@@ -11,20 +11,19 @@
 
 <!-- LOVABLE:END -->
 
-- Profile persists in localStorage (key onore-profile) for auto-restore plus private `profiles` rows when signed in; sign-out clears local copy. Why: user requested no re-entry on reload.
-- Keep dashboard tabs, compass interaction, and daily demo state local to `Dashboard.tsx`; there is no calculation service or persistent account yet, so avoid implying real readings or VIP entitlement.
-- Keep the synthesized Torisetsu profile, color profiles, compatibility scoring, and VIP lock state as clearly labeled deterministic previews in `Dashboard.tsx` until a real analysis and entitlement service exists; this avoids presenting sample copy as actual readings.
+- Auto-restore profiles from localStorage `onore-profile`; signed-in users use private `profiles` rows. Sign-out clears the local copy.
+- Keep dashboard tabs, compass interaction, and daily demo state local to `Dashboard.tsx`. Label deterministic Torisetsu, compatibility and lock previews honestly; calculations and saved accounts do not establish verified readings or paid entitlement.
 - Keep the arts portrait illustrative; show the full AI self-core preview from available calculations to every plan before upsells, never claiming verified 15-art results or entitlement. Why: free readings must stay complete and honest.
 - Home day compass lives in `DayCompass.tsx` + deterministic `src/lib/day-compass.ts` (rotation = day of year, pointer = 8 directions), gated by preview plan and labeled reference values. Why: no real calculation or billing yet.
 - AI consultation daily caps (1/3/10/30/unlimited) live in `plans.ts`, counted per device in localStorage by preview plan; display test only.
 - Keep AI consultation as one session-only conversation with no persistence; the AI endpoint may use profile fields as reflective context but must never present divination, timing, VIP, or the free-use counter as verified calculations or entitlements.
 - Keep nine-stars fixed grid explicitly illustrative, never natal. Save/share only labelled preview art after test unlock; no verified chart or entitlement without calculations/billing. Why: neither exists yet.
-- Keep My Page plan badge, B2B team data, notification toggles, and the Earth Calendar biorhythm timeline preview as local, clearly labeled previews in `SettingsPanel.tsx`; the plan test toggle changes only the preview rendering and must never unlock gated features until real billing and entitlements exist.
+- Centralize preview overrides in PlanProvider and use the shared effective plan for every UI gate; enable only on development/known preview hosts and keep server membership validation intact. Why: guest tests must work without granting production entitlements.
 - Keep seven appearance modes session-local, tier-limited (1/3/5/7) and CSS-scoped; vary typography, textures, compass, panels and navigation by tier, never imply actual paid access.
 - Plan caps live in `src/lib/plans.ts`; member writes use read-only `plan_memberships` and a DB cap (missing row = Free). Preview toggles grant no paid writes.
-- Team members persist in `team_members` (owner-only RLS) when signed in, else localStorage `onore-team`; team scores come from deterministic `src/lib/team-analysis.ts`, AI draft/1on1 via `src/lib/ai/team-ai.functions.ts`. Why: keep scores reproducible and labeled as reference values.
+- Team members persist in `team_members` (owner-only RLS) when signed in outside preview override; guest and override tests use localStorage `onore-team`; team scores come from deterministic `src/lib/team-analysis.ts`, AI draft/1on1 via `src/lib/ai/team-ai.functions.ts`. Why: keep scores reproducible and labeled as reference values.
 - Home's five-axis reading uses Unihan modern stroke counts only for space-separated kanji surname/given name, conventional sun/year signs, a published 60-day animal mapping, and explicitly non-diagnostic blood type; missing axes stay missing and AI interpretation never asserts verified traits. Why: avoid fabricated charts and personality claims while grounding the five-section preview.
-- My Page paid-plan cards (4 tiers, tabs + gradient card) copy lives in `src/lib/plan-cards.ts` (7 languages); prices come from `settings-translations` tiers plus the premium tier built in `SettingsPanel.tsx`; the unlock button opens an information dialog only. Why: billing is not connected, so plan selection must stay a labeled preview.
+- My Page's four paid cards use seven-language `src/lib/plan-cards.ts` copy and `settings-translations` prices plus Premium in `SettingsPanel.tsx`. Buttons switch preview plans only on test hosts; production shows information until billing is connected.
 - Share card, hiring AI tab, Solfeggio BGM, daily reminders: shared canvas card component, recruit tab gated b2b, Web Audio synth (no external audio), reminders in localStorage onore-reminders fire only while app open.
 
 - Quick compatibility uses deterministic birth-date reference copy and a local-day per-device usage counter keyed by profile and actual membership; do not describe it as verified astrology or server-enforced billing. Why: partner details are not saved and billing is not connected.
@@ -33,3 +32,6 @@
 - Debug plan changes require a server-verified admin role and expire after 24 hours; membership reads and team-write caps restore the original plan after expiry. Why: testing tiers must not overwrite paid entitlements.
 - Feng shui uses Li Chun Ming Gua with entered gender and a common annual chart; birthplace centroids affect timed ascendants only, not geocentric planets or Ba Zhai directions. Attribute Geolonia CC BY 4.0. Why: location changes local sky angles; property charts need facing and period.
 - The client-only 3D mandala uses calculated geocentric directions with decorative color/geometry and exports a labeled preview PNG. Why: art and test unlocks are not verified charts or paid entitlements.
+
+- Use HelioCalendar for both Home and My Page and BirthColorGuide for color output; remove independent fake panels. Why: duplicate render paths bypassed tier gates.
+- Legal content has shareable leaf pages and footer dialogs; support requests require authentication and owner-only RLS. Why: avoid invented legal identity and anonymous personal-data exposure.

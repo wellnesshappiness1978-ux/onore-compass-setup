@@ -132,7 +132,7 @@
     -webkit-font-smoothing: antialiased;
     font-size: 16px;
     line-height: 1.8;
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
   }
   strong, b { color: var(--color-primary); font-weight: 700; }
 }
@@ -439,18 +439,18 @@
 .design-canvas .design-compass-section::after { content: ""; position: absolute; pointer-events: none; left: 50%; top: 52%; transform: translate(-50%, -50%); border-radius: 50%; width: min(94vw, var(--design-outer-size, 470px)); aspect-ratio: 1; border: var(--design-orbit-border, 0 solid transparent); }
 .design-canvas .design-compass-section::after { width: min(87vw, var(--design-inner-size, 450px)); transform: translate(-50%, -50%) rotate(25deg); border-style: dashed; opacity: var(--design-inner-opacity, 0); }
 
-/* Free · porcelain and ink: intentionally light, restrained, open. */
+/* Free · midnight and gold: clear instrument surfaces. */
 .design-canvas[data-design="classic"] {
-  --background: oklch(.975 .008 94); --foreground: oklch(.22 .02 260);
-  --card: oklch(.992 .004 92); --card-foreground: var(--foreground);
+  --background: oklch(.16 .035 260); --foreground: oklch(.94 .015 95);
+  --card: oklch(.2 .035 260); --card-foreground: var(--foreground);
   --popover: var(--card); --popover-foreground: var(--foreground);
-  --primary: oklch(.43 .07 258); --primary-foreground: oklch(.99 0 0);
-  --secondary: oklch(.93 .01 94); --secondary-foreground: var(--foreground);
-  --muted: var(--secondary); --muted-foreground: oklch(.45 .02 260);
+  --primary: oklch(.82 .13 90); --primary-foreground: oklch(.15 .02 260);
+  --secondary: oklch(.25 .035 262); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .018 260);
   --accent: var(--secondary); --accent-foreground: var(--foreground);
-  --border: oklch(.79 .02 260); --input: var(--border); --ring: var(--primary);
-  --gold-glow: oklch(.62 .05 95); --gold-deep: oklch(.36 .045 258);
-  --nebula: oklch(.85 .025 258); --celestial-ink: oklch(.85 .015 95);
+  --border: oklch(.38 .025 260); --input: var(--border); --ring: var(--primary);
+  --gold-glow: oklch(.92 .07 95); --gold-deep: oklch(.65 .12 85);
+  --nebula: oklch(.38 .1 265); --celestial-ink: oklch(.27 .05 225);
   --design-texture: repeating-linear-gradient(0deg, transparent 0 11px, color-mix(in oklab, var(--primary) 5%, transparent) 12px 13px);
   --design-texture-opacity: .35; --design-surface: var(--card);
   --design-line: color-mix(in oklab, var(--primary) 20%, transparent);
@@ -674,3 +674,17 @@
 }
 .design-canvas [class*="text-[9px]"], .design-canvas [class*="text-[10px]"] { font-size: 12px !important; }
 .design-canvas [class*="text-[11px]"] { font-size: 13px !important; }
+
+:root { --preview-bar-height: 0px; }
+html[data-test-preview="true"] { --preview-bar-height: 104px; }
+@media (min-width: 700px) { html[data-test-preview="true"] { --preview-bar-height: 56px; } }
+.preview-plan-bar { position: fixed; inset: 0 0 auto; height: var(--preview-bar-height); z-index: 70; background: var(--background); border-bottom: 1px solid var(--primary); }
+.preview-plan-bar > div { min-height: 100%; }
+@media (max-width: 699px) { .preview-plan-bar [role="group"] { flex-basis: 100%; } }
+.app-content { padding-top: var(--preview-bar-height); }
+.account-controls, .language-controls { top: calc(var(--preview-bar-height) + 16px); }
+.app-alert { top: calc(var(--preview-bar-height) + 80px); }
+.design-header { padding-top: 56px; }
+.design-canvas .design-title { font-size: 28px; line-height: 1.5; }
+.design-canvas p, .design-canvas li { overflow-wrap: anywhere; }
+html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
