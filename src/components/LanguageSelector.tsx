@@ -11,7 +11,7 @@ export default function LanguageSelector({ language, onChange }: Props) {
   const active = languages.find((item) => item.code === language) ?? languages[0];
 
   return (
-    <div className="fixed right-4 top-4 z-50 sm:right-6 sm:top-6">
+    <div className="language-controls fixed right-4 z-50 sm:right-6">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" aria-label={`Language / 言語: ${active.label}`} className="h-10 gap-2 rounded-lg border-primary/30 bg-card/70 px-3 text-foreground shadow-lg backdrop-blur-md hover:border-primary/60 hover:bg-card focus-visible:ring-primary">

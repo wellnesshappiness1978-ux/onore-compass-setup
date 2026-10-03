@@ -132,7 +132,7 @@
     -webkit-font-smoothing: antialiased;
     font-size: 16px;
     line-height: 1.8;
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
   }
   strong, b { color: var(--color-primary); font-weight: 700; }
 }
@@ -674,3 +674,16 @@
 }
 .design-canvas [class*="text-[9px]"], .design-canvas [class*="text-[10px]"] { font-size: 12px !important; }
 .design-canvas [class*="text-[11px]"] { font-size: 13px !important; }
+
+:root { --preview-bar-height: 0px; }
+html[data-test-preview="true"] { --preview-bar-height: 104px; }
+@media (min-width: 700px) { html[data-test-preview="true"] { --preview-bar-height: 56px; } }
+.preview-plan-bar { position: fixed; inset: 0 0 auto; height: var(--preview-bar-height); z-index: 70; background: var(--background); border-bottom: 1px solid var(--primary); }
+.preview-plan-bar > div { min-height: 100%; }
+.app-content { padding-top: var(--preview-bar-height); }
+.account-controls, .language-controls { top: calc(var(--preview-bar-height) + 16px); }
+.app-alert { top: calc(var(--preview-bar-height) + 80px); }
+.design-header { padding-top: 56px; }
+.design-canvas .design-title { font-size: 28px; line-height: 1.5; }
+.design-canvas p, .design-canvas li { overflow-wrap: anywhere; }
+html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
