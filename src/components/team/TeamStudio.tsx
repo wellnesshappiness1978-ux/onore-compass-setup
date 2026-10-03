@@ -86,7 +86,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <Button size="sm" className="mt-3" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.seePlans}</Button>
           </div>
         ) : feature === "roster" ? (
-          <Roster t={t} members={members} max={max} signedIn={!localMode} onAdd={addMember} onRemove={removeMember} />
+          <Roster t={t} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly} language={language} onAdd={addMember} onRemove={removeMember} />
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
@@ -129,7 +129,7 @@ function RoleBadge({ role, t }: { role: TeamRole; t: TeamCopy }) {
   return <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] text-primary">{t.roles[role]}</span>;
 }
 
-function Roster({ t, members, max, signedIn, onAdd, onRemove }: { t: TeamCopy; members: TeamMember[]; max: number; signedIn: boolean; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onRemove: (id: string) => void }) {
+function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onRemove }: { t: TeamCopy; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onRemove: (id: string) => void }) {
   const [form, setForm] = useState({ name: "", birthDate: "", role: "", skills: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
@@ -146,7 +146,7 @@ function Roster({ t, members, max, signedIn, onAdd, onRemove }: { t: TeamCopy; m
   };
   return (
     <div className="space-y-4">
-      {!signedIn && <p className="text-[11px] text-muted-foreground">{t.guestNote}</p>}
+      {!signedIn && <p className="text-[11px] text-muted-foreground">{previewOnly ? language === "ja" ? "開発テストの登録はこの端末内だけに保存され、実際の会員登録枠は変わりません。" : language === "zh-TW" ? "測試名單僅儲存於此裝置，不會更改實際會員名額。" : "Preview members stay on this device and do not change your paid member limit." : t.guestNote}</p>}
       <form onSubmit={submit} className={`${card} grid gap-2 sm:grid-cols-2`}>
         <Input aria-label={t.name} placeholder={t.name} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <Input aria-label={t.birthDate} type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
