@@ -12,7 +12,7 @@
 <!-- LOVABLE:END -->
 
 - Auto-restore profiles from localStorage `onore-profile`; signed-in users use private `profiles` rows. Sign-out clears the local copy.
-- Keep dashboard tabs, compass interaction, and daily demo state local to `Dashboard.tsx`. Label deterministic Torisetsu, compatibility and lock previews honestly; calculations and saved accounts do not establish verified readings or paid entitlement.
+- Dashboard owns tabs and daily state. Torisetsu and compatibility remain references, not verified readings or paid entitlement.
 - Keep the arts portrait illustrative; show the full AI self-core preview from available calculations to every plan before upsells, never claiming verified 15-art results or entitlement. Why: free readings must stay complete and honest.
 - Home day compass lives in `DayCompass.tsx` + deterministic `src/lib/day-compass.ts` (rotation = day of year, pointer = 8 directions), gated by preview plan and labeled reference values. Why: no real calculation or billing yet.
 - AI consultation daily caps (1/3/10/30/unlimited) live in `plans.ts`, counted per device in localStorage by preview plan; display test only.
@@ -31,7 +31,8 @@
 - Birth colors map profile fields and solar longitude to illustrative 1440-slot colors, not measured frequencies or validated correspondences. Why: no established mapping exists.
 - Debug plan changes require a server-verified admin role and expire after 24 hours; membership reads and team-write caps restore the original plan after expiry. Why: testing tiers must not overwrite paid entitlements.
 - Feng shui uses Li Chun Ming Gua with entered gender and a common annual chart; birthplace centroids affect timed ascendants only, not geocentric planets or Ba Zhai directions. Attribute Geolonia CC BY 4.0. Why: location changes local sky angles; property charts need facing and period.
-- The client-only 3D mandala uses calculated geocentric directions with decorative color/geometry and exports a labeled preview PNG. Why: art and test unlocks are not verified charts or paid entitlements.
+- Mandala uses 10 geocentric bodies plus ecliptic longitude/aspect lines; JST missing-time noon is labeled. PNG is illustrative, not paid entitlement.
 
 - Use HelioCalendar for both Home and My Page and BirthColorGuide for color output; remove independent fake panels. Why: duplicate render paths bypassed tier gates.
 - Legal content has shareable leaf pages and footer dialogs; support requests require authentication and owner-only RLS. Why: avoid invented legal identity and anonymous personal-data exposure.
+- Sales cards use isUpgradePlan; active tier is status. Tier CSS defaults are automatic. One Dashboard audio instance uses gesture-started ambient-piano; no overlapping players.
