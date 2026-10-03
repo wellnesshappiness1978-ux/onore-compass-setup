@@ -41,8 +41,9 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
     const theta = Math.atan2(v.y, v.x);
     return { name, radius, x: 60 + radius * Math.cos(theta), y: 60 - radius * Math.sin(theta) };
   }), [iso]);
-  const rhythm = personal(profile.birthDate, date);
-  const best = [...directionEnergy(profile.birthDate, date)].sort((a, b) => b.score - a.score)[0];
+  const selectedDate = new Date(`${eventIso}T12:00:00`);
+  const rhythm = personal(profile.birthDate, selectedDate);
+  const best = [...directionEnergy(profile.birthDate, selectedDate)].sort((a, b) => b.score - a.score)[0];
   const label = rhythm.total >= 60 ? "予定を整える日（参考）" : "ペースを見直す日（参考）";
   const description = `オノレコンパスの参考指標。地球暦の天体位置は天文計算、日取りと方位は独自の参考値です。吉日・契約の成功を保証しません。方位: ${best?.dir ?? "—"}`;
   const start = eventIso.replaceAll("-", "");
