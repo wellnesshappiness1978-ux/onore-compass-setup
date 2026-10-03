@@ -1,5 +1,19 @@
 // Gesture-started Web Audio instrument. Frequencies are artistic tunings, not treatments.
 export type AmbientPiano = { stop: () => Promise<void>; setVolume: (value: number) => void };
+export const pianoTones = [174, 285, 396, 417, 528, 639, 741, 852, 963] as const;
+
+// Each tuning is an original composition, not a therapeutic frequency claim.
+const scores: Record<number, { chords: number[][]; melody: number[]; pace: number; register: number }> = {
+  174: { chords: [[0,3,7,10],[-5,0,3,7],[-7,-2,3,5]], melody: [7,10,12,10,7,3,5,3,0,3,7,5], pace: .98, register: 2 },
+  285: { chords: [[0,4,7,9],[-2,2,5,9],[-5,0,4,7]], melody: [4,7,9,12,9,7,4,2,0,2,5,7], pace: .82, register: 2 },
+  396: { chords: [[0,3,7,12],[-3,2,5,10],[-5,0,3,7]], melody: [12,7,10,7,3,5,7,0,3,7,10,5], pace: .91, register: 2 },
+  417: { chords: [[0,4,7,11],[-2,2,7,9],[-5,0,4,9]], melody: [7,11,12,16,12,9,7,4,7,9,11,4], pace: .77, register: 2 },
+  528: { chords: [[0,4,7,11],[-3,0,4,7],[-5,0,2,7],[-7,-3,0,4]], melody: [12,7,4,11,7,2,4,0,7,11,12,9,7,4,2,0], pace: .87, register: 2 },
+  639: { chords: [[0,4,7,14],[-5,0,4,9],[-2,2,7,11]], melody: [7,9,14,12,9,7,4,2,4,7,11,9], pace: .84, register: 4 },
+  741: { chords: [[0,5,7,12],[-2,3,7,10],[-7,0,5,9]], melody: [12,10,7,5,7,12,14,12,9,7,5,2], pace: .73, register: 4 },
+  852: { chords: [[0,4,9,12],[-5,0,5,9],[-7,0,4,7]], melody: [9,12,16,12,9,7,4,7,9,12,7,4], pace: .95, register: 4 },
+  963: { chords: [[0,4,7,12],[-4,0,5,9],[-7,-2,4,7]], melody: [12,16,19,16,12,9,7,4,7,12,16,9], pace: 1.05, register: 4 },
+};
 
 export async function createAmbientPiano(hz: number, volume: number): Promise<AmbientPiano> {
   const ctx = new AudioContext();
@@ -31,11 +45,12 @@ export async function createAmbientPiano(hz: number, volume: number): Promise<Am
   const note = (frequency: number, at: number, strength: number, pan: number) => {
     const envelope = ctx.createGain();
     envelope.gain.setValueAtTime(0, at);
-    envelope.gain.linearRampToValueAtTime(strength, at + 0.015);
-    envelope.gain.exponentialRampToValueAtTime(0.001, at + 4.5);
+    envelope.gain.linearRampToValueAtTime(strength, at + 0.009);
+    envelope.gain.exponentialRampToValueAtTime(strength * .42, at + .18);
+    envelope.gain.exponentialRampToValueAtTime(0.001, at + 5.2);
     const stereo = ctx.createStereoPanner(); stereo.pan.value = pan;
     envelope.connect(stereo); stereo.connect(dry); stereo.connect(reverb); stereo.connect(delay);
-    const partials = [1, 0.27, 0.1, 0.04];
+    const partials = [1, 0.22, 0.08, 0.025];
     let remaining = partials.length;
     partials.forEach((weight, index) => {
       const oscillator = ctx.createOscillator(); oscillator.type = 'sine';
@@ -48,11 +63,11 @@ export async function createAmbientPiano(hz: number, volume: number): Promise<Am
         remaining -= 1;
         if (remaining === 0) { envelope.disconnect(); stereo.disconnect(); }
       };
-      oscillator.start(at); oscillator.stop(at + 4.6);
+      oscillator.start(at); oscillator.stop(at + 5.3);
     });
   };
-  const chords = [[0, 4, 7, 11], [-3, 0, 4, 7], [-5, 0, 2, 7], [-7, -3, 0, 4]];
-  const melody = [12, 7, 4, 11, 7, 2, 4, 0];
+  const score = scores[hz] ?? scores[528];
+  if (!score) throw new Error("Piano score unavailable");
   let step = 0;
   let next = ctx.currentTime + 0.06;
   let stopped = false;
@@ -61,10 +76,12 @@ export async function createAmbientPiano(hz: number, volume: number): Promise<Am
     // Schedule against the audio clock, not callback arrival time.
     if (next < ctx.currentTime) next = ctx.currentTime + 0.04;
     while (next < ctx.currentTime + 0.4) {
-      const chord = chords[Math.floor(step / 8) % chords.length] ?? chords[0];
-      if (chord && step % 4 === 0) chord.forEach((semitone, i) => note(hz / 4 * 2 ** (semitone / 12), next + i * 0.07, 0.1, (i - 1.5) * 0.3));
-      note(hz / 2 * 2 ** ((melody[step % melody.length] ?? 0) / 12), next, 0.16, step % 2 ? 0.3 : -0.3);
-      next += 0.9; step += 1;
+      const chord = score.chords[Math.floor(step / 8) % score.chords.length];
+      if (chord && step % 4 === 0) chord.forEach((semitone, i) => note(hz / score.register * 2 ** (semitone / 12), next + i * 0.09, 0.095, (i - 1.5) * 0.28));
+      const pitch = score.melody[step % score.melody.length] ?? 0;
+      note(hz / (score.register / 2) * 2 ** (pitch / 12), next, step % 4 === 3 ? .11 : .14, step % 2 ? .24 : -.24);
+      if (step % 8 === 5) note(hz / score.register * 2 ** ((pitch + 7) / 12), next + .22, .052, -.33);
+      next += score.pace; step += 1;
     }
   };
   schedule();

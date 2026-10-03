@@ -68,9 +68,10 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
     // Keep calculated planet directions fixed; only decorative particles move.
     if (aura.current) aura.current.rotation.z -= dt * .025;
   });
-  const ring = Math.min(1, Math.max(0, (progress - 2) / 3));
-  const flower = Math.min(1, Math.max(0, (progress - 5) / 2));
-  const planet = Math.min(1, Math.max(0, (progress - 1.6) / 3.4));
+  const ease = (t: number) => { const x = Math.min(1, Math.max(0, t)); return x * x * (3 - 2 * x); };
+  const ring = ease((progress - 1.8) / 2.6);
+  const flower = ease((progress - 4.4) / 2.6);
+  const planet = ease((progress - 2.7) / 3);
   const gold = "#F3E5AB"; // scene fallback; DOM tokens passed in from computed CSS
   return <>
     <color attach="background" args={["#050B18"]} />
@@ -79,13 +80,17 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
     <pointLight position={[-4, -2, 4]} intensity={2.2} color={sub} />
     <Environment><Lightformer intensity={2} position={[0, 5, 5]} scale={[10, 10, 1]} /><Lightformer intensity={1} color={main} position={[-5, 1, 1]} rotation-y={Math.PI / 2} scale={[10, 1, 1]} /></Environment>
     <group>
-      <points ref={aura} scale={Math.max(.2, progress / 2)}>
+      <points ref={aura} scale={.08 + ease(progress / 2.2) * .92}>
         <bufferGeometry><bufferAttribute attach="attributes-position" args={[particles, 3]} /></bufferGeometry>
         <pointsMaterial color={main} size={.02} transparent opacity={.85} sizeAttenuation depthWrite={false} />
       </points>
       {Array.from({ length: 5 }, (_, i) => <mesh key={`element-${i}`} scale={ring} rotation={[.15 * i, .12 * i, i * .19]}>
         <torusGeometry args={[2.7 + i * .32, .008 + (i === 0 ? .014 : 0), 6, 128]} />
         <meshBasicMaterial color={i % 2 ? sub : gold} transparent opacity={element === ["木", "火", "土", "金", "水"][i] ? .9 : .37} />
+      </mesh>)}
+      {Array.from({ length: 8 }, (_, i) => <mesh key={`facet-${i}`} rotation-z={i * Math.PI / 4 + (1 - ring) * .3} scale={.08 + ring * .92}>
+        <torusGeometry args={[3.16 + i % 2 * .14, .005, 3, 8]} />
+        <meshBasicMaterial color={i % 2 ? main : gold} transparent opacity={i % 2 ? .28 : .44} />
       </mesh>)}
       {Array.from({ length: 36 }, (_, i) => <group key={`ray-${i}`} rotation-z={i * Math.PI / 18} scale={.1 + flower * .9}>
         <mesh position={[0, 3.98, -.12]}><boxGeometry args={[.012, i % 3 === 0 ? .34 : .16, .01]} /><meshBasicMaterial color={i % 3 ? main : gold} transparent opacity={i % 3 ? .45 : .8} /></mesh>

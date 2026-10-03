@@ -26,6 +26,27 @@ const bizKinds: [string, [number, number, number]][] = [["契約", [0.2, 0.2, 0.
 const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const weighted = (birth: string, iso: string, w: [number, number, number]) => { const r = biorhythm(birth, iso); return ((r.physical * w[0] + r.emotional * w[1] + r.intellectual * w[2]) + 1) * 50; };
 
+type DayMark = "high" | "turn" | "low";
+function yearlyMarks(values: number[]): Map<number, DayMark> {
+  const marks = new Map<number, DayMark>();
+  // Pick local extrema and changes of slope, spaced apart to avoid crowded repeats.
+  const candidates: { index: number; kind: DayMark; score: number }[] = [];
+  for (let i = 1; i < values.length - 1; i++) {
+    const before = values[i - 1] ?? 50, now = values[i] ?? 50, after = values[i + 1] ?? 50;
+    if (now >= 70 && now >= before && now >= after) candidates.push({ index: i, kind: "high", score: now });
+    else if (now <= 30 && now <= before && now <= after) candidates.push({ index: i, kind: "low", score: 100 - now });
+    else if ((before < 50 && now >= 50) || (before > 50 && now <= 50)) candidates.push({ index: i, kind: "turn", score: 55 + Math.abs(after - before) });
+  }
+  for (const kind of ["high", "low", "turn"] as const) {
+    for (const c of candidates.filter(x => x.kind === kind).sort((a, b) => b.score - a.score)) {
+      if ([...marks.keys()].some(index => Math.abs(index - c.index) < 5)) continue;
+      marks.set(c.index, c.kind);
+    }
+  }
+  return marks;
+}
+const markLabel: Record<DayMark, string> = { high: "高い日", turn: "切替点", low: "低い日" };
+
 function Gate({ plan, feature, onUpgrade, children }: { plan: Plan; feature: ContentFeature; onUpgrade?: (() => void) | undefined; children: React.ReactNode }) {
   if (canUse(plan, feature)) return <>{children}</>;
   return <div className="mt-5 flex flex-col items-center gap-2 border border-dashed border-primary/30 p-5 text-center"><LockKeyhole className="size-5 text-primary" /><p className="text-sm text-foreground">{planName[minPlanFor(feature)]}プラン以上で開放</p>{onUpgrade && <Button size="sm" variant="outline" onClick={onUpgrade}><Crown className="size-3.5" />プランを見る</Button>}</div>;
@@ -61,7 +82,16 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
   const year = date.getFullYear();
   const yearDays = Math.round((new Date(year + 1, 0, 1).getTime() - new Date(year, 0, 1).getTime()) / 86400000);
   const curve = useMemo(() => profile.birthDate ? Array.from({ length: yearDays }, (_, i) => biorhythm(profile.birthDate, localIso(new Date(year, 0, 1 + i))).total) : [], [profile.birthDate, year, yearDays]);
-  const topDays = useMemo(() => curve.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v).slice(0, 5).sort((a, b) => a.i - b.i).map(x => localIso(new Date(year, 0, 1 + x.i))), [curve, year]);
+  const marks = useMemo(() => yearlyMarks(curve), [curve]);
+  const calendarMonths = useMemo(() => Array.from({ length: 12 }, (_, month) => {
+    const offset = new Date(year, month, 1).getDay();
+    const days = new Date(year, month + 1, 0).getDate();
+    return { month, offset, days: Array.from({ length: days }, (_, i) => ({ day: i + 1, index: Math.round((new Date(year, month, i + 1).getTime() - new Date(year, 0, 1).getTime()) / 86400000), iso: localIso(new Date(year, month, i + 1)) })) };
+  }), [year]);
+  const selectedValue = biorhythm(profile.birthDate, eventIso);
+  const selectedIndex = Math.round((new Date(`${eventIso}T12:00:00`).getTime() - new Date(year, 0, 1, 12).getTime()) / 86400000);
+  const selectedMark = eventIso.startsWith(`${year}-`) ? marks.get(selectedIndex) : undefined;
+  const rhythmNote = selectedValue.total >= 65 ? "3つの参考周期の平均が高め。予定を入れるなら準備と確認を同じ日に分けて組めます。" : selectedValue.total <= 35 ? "3つの参考周期の平均が低め。予定は余白を残し、重要な判断は資料の確認時間を先に確保できます。" : "3つの参考周期の平均は中間。予定の間に振り返りの時間を置く組み方ができます。";
   const dirs = useMemo(() => [...directionEnergy(profile.birthDate, date)].sort((a, b) => b.score - a.score), [profile.birthDate, iso]);
   const biz = canUse(plan, "helioBusiness");
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -92,12 +122,19 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
     {phase && <div className="border-t border-primary/20 pt-5"><p className="text-sm text-muted-foreground">誕生日から地球が進んだ角度 {phase.degrees}°</p><p className="mt-1 font-serif text-lg text-primary">今は「{phase.phase}」のフェーズ</p><p className="mt-1 text-base leading-8 text-foreground">{phaseText[phase.phase]}</p></div>}
     <h4 className="mt-6 font-serif text-lg text-primary">365日の個人バイオリズム</h4>
     <Gate plan={plan} feature="helioPersonal" onUpgrade={onUpgrade}>
-      <svg role="img" aria-label={`${year}年の個人バイオリズム曲線`} viewBox="0 0 365 100" preserveAspectRatio="none" className="mt-3 h-32 w-full border border-primary/20">
-        <line x1="0" y1="50" x2="365" y2="50" className="stroke-primary/25" strokeWidth=".5" />
-        <polyline fill="none" className="stroke-primary" strokeWidth="1" points={curve.map((v, i) => `${i},${100 - v}`).join(" ")} />
-      </svg>
-      <p className="mt-2 text-sm text-muted-foreground">線が中央より上＝攻め時、下＝守り時の目安（体・心・知の3周期の平均）。</p>
-      <div className="mt-2 text-base text-foreground">今年の勝負日候補（参考）：<div className="mt-2 flex flex-wrap gap-2">{topDays.map(day => <Button key={day} size="sm" variant={eventIso === day ? "default" : "outline"} aria-pressed={eventIso === day} onClick={() => setEventIso(day)}>{day}</Button>)}</div></div>
+      <p className="mt-2 text-sm text-muted-foreground">{year}年 · 実日付による参考周期（体23日・心28日・知33日の平均）。高い日・切替点・低い日を選ぶと内訳が開きます。</p>
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2" aria-label={`${year}年の日付カレンダー`}>
+        {calendarMonths.map(({ month, offset, days }) => <section key={month} className="min-w-0 border-t border-primary/30 pt-3" aria-label={`${month + 1}月`}>
+          <h5 className="font-serif text-base text-primary">{year}年 {month + 1}月</h5>
+          <div className="mt-2 grid grid-cols-7 gap-0.5 text-center text-[10px] text-muted-foreground">{["日", "月", "火", "水", "木", "金", "土"].map(d => <span key={d}>{d}</span>)}</div>
+          <div className="mt-1 grid grid-cols-7 gap-0.5">{Array.from({ length: offset }, (_, i) => <span key={`empty-${i}`} className="aspect-square" />)}{days.map(d => {
+            const kind = marks.get(d.index); const current = d.iso === eventIso;
+            return <Button key={d.iso} type="button" size="icon" variant="ghost" title={`${d.iso} · ${curve[d.index] ?? 50} / 100${kind ? ` · ${markLabel[kind]}` : ""}`} aria-label={`${d.iso} ${kind ? markLabel[kind] : "参考値"} ${curve[d.index] ?? 50}`} aria-pressed={current} onClick={() => setEventIso(d.iso)} className={`aspect-square size-auto min-h-8 min-w-0 rounded-sm p-0 text-xs ${current ? "ring-2 ring-primary" : ""} ${kind === "high" ? "bg-primary text-primary-foreground" : kind === "low" ? "border border-destructive/60 text-destructive" : kind === "turn" ? "border border-primary/50 text-primary" : "text-muted-foreground"}`}>{d.day}</Button>;
+          })}</div>
+        </section>)}
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">■ 高い日　▣ 切替点　□ 低い日 · 日付ごとの値は未来の出来事を予測しません。</p>
+      <div role="status" className="mt-4 border-l-2 border-primary bg-primary/5 px-4 py-3"><h5 className="font-serif text-base text-primary">{eventIso} · {selectedMark ? markLabel[selectedMark] : "参考周期"} · {selectedValue.total}/100</h5><p className="mt-1 text-sm text-foreground">体 {Math.round((selectedValue.physical + 1) * 50)} · 心 {Math.round((selectedValue.emotional + 1) * 50)} · 知 {Math.round((selectedValue.intellectual + 1) * 50)}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{rhythmNote} 体調や実際の出来事を診断する値ではありません。</p></div>
       <label className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">予定の日付<input aria-label="カレンダーに登録する日付" type="date" value={eventIso} onChange={e => { if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) setEventIso(e.target.value); }} className="rounded-md border border-primary/30 bg-background px-3 py-2 text-foreground" /></label>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="text-base text-foreground">{eventIso} · {label}</p>
         <div className="flex flex-wrap gap-2"><Button variant="outline" asChild><a href={google} target="_blank" rel="noopener noreferrer"><CalendarDays className="size-4" />Google カレンダー<ExternalLink className="size-3" /></a></Button><Button variant="outline" onClick={download}><Download className="size-4" />iOS / .ics</Button></div>

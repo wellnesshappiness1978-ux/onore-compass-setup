@@ -59,3 +59,4 @@
 - [x] Verify fixed-camera mandala reveal, 2160×3840 PNG export, and diagnostic share dialog; native SNS destinations remain device-dependent.
 - [x] Add legal draft pages/modals and private support intake; verify guest blocking and signed-in receipt/history. Staff reply workflow remains unimplemented.
 - [ ] Official birth-color/Hz mapping and operator/refund details — blocked: authoritative data and business information not supplied.
+- [x] Six-part quality revision: portrait-only Home, six layers, nine piano scores, annual date calendar, mandala reveal and global preview bar; verified in browser. Three animal layers remain explicitly original reference models, not official classifications.
