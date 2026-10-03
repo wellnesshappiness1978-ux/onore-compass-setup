@@ -50,3 +50,11 @@
 - [x] Add Li Chun Ming Gua and annual common nine-palace reference with a gender-input prompt; add interactive 3D mandala, seven-second reveal and portrait PNG sharing.
 - [x] Remove the fixed Tokyo/animal note and use saved birthplace representative coordinates for timed ascendant; Ba Zhai directions do not depend on birthplace.
 - [ ] Official animal surface/hope/hidden results — blocked by an authoritative calculation table or licensed source; do not fabricate characters.
+
+## 全面改訂マスター改修
+- [ ] Centralize preview plan state and fixed toolbar; verify five plans and fresh tabs.
+- [ ] Remove free color leaks and independent earth-calendar tier bypasses.
+- [ ] Clean reading hierarchy and prompts; integrate feng shui reference advice.
+- [ ] Verify fixed-camera mandala reveal, wallpaper export, and sharing.
+- [ ] Add legal pages/modals and private support form; verify submission validation.
+- [ ] Official birth-color/Hz mapping and operator/refund details — blocked: authoritative data and business information not supplied.
