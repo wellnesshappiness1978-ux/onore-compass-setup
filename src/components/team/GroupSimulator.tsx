@@ -9,7 +9,7 @@ const labels = {
   zh: { title: "團隊相性模擬器", pool: "未分配", groups: ["專案 A", "專案 B", "專案 C"], synergy: "協同效應", complement: "互補關係", friction: "留意摩擦", note: "依生日與五行建立的參考模型，不預測實際成果或人事適性。", move: "移至", score: "參考分數" },
 };
 const colors = { synergy: "text-emerald-300 border-emerald-400/40 bg-emerald-500/10", complement: "text-sky-300 border-sky-400/40 bg-sky-500/10", friction: "text-rose-300 border-rose-400/40 bg-rose-500/10" };
-const classify = (a: TeamMember, b: TeamMember) => {
+const classify = (a: TeamMember, b: TeamMember): "synergy" | "complement" | "friction" => {
   const rel = relation(a, b), score = pairScore(a, b);
   return rel === "control" || score < 60 ? "friction" : rel === "generate" && score >= 75 ? "synergy" : "complement";
 };
