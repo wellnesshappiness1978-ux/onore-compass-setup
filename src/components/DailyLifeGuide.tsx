@@ -6,7 +6,7 @@ import type { UserProfile } from "./Onboarding";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
 import { planOrder } from "@/lib/plans";
-import { directionEnergy, localIso } from "@/lib/day-compass";
+import { directionEnergy, localIso, personal } from "@/lib/day-compass";
 import { dayElement, relation, type Element, type TeamMember } from "@/lib/team-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
 
@@ -54,24 +54,27 @@ export default function DailyLifeGuide({ profile, language, plan, signedIn, onUp
   const iso = localIso(today);
   const el = dayElement(iso);
   const tip = tips[el][isJa ? "ja" : "en"];
-  const best = useMemo(() => [...directionEnergy(profile.birthDate, today)].sort((a, b) => b.score - a.score)[0]!, [profile.birthDate, iso]);
+  const best = useMemo(() => [...directionEnergy(profile.birthDate, today)].sort((a, b) => b.score - a.score)[0], [profile.birthDate, iso]);
+  const rhythm = personal(profile.birthDate, today);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [pick, setPick] = useState<string>("");
   const list = useServerFn(listTeamMembers);
   useEffect(() => {
-    if (!open) return;
-    if (signedIn) list().then(setMembers).catch(() => setMembers([]));
-    else { try { setMembers(JSON.parse(localStorage.getItem("onore-team") ?? "[]")); } catch { setMembers([]); } }
+    let active = true;
+    if (!open) { setMembers([]); return; }
+    if (signedIn) list().then(values => { if (active) setMembers(values); }).catch(() => { if (active) setMembers([]); });
+    else { try { const values = JSON.parse(localStorage.getItem("onore-team") ?? "[]"); setMembers(Array.isArray(values) ? values : []); } catch { setMembers([]); } }
+    return () => { active = false; };
   }, [open, signedIn, list]);
   const me: TeamMember = { id: "me", name: "", birthDate: profile.birthDate, gender: "", bloodType: "", role: "", skills: [] };
   const target = members.find((m) => m.id === pick);
-  const advice = target ? talk[relation(me, target)]![isJa ? "ja" : "en"] : null;
+  const advice = target ? talk[relation(me, target)]?.[isJa ? "ja" : "en"] : null;
 
   const items = [
     { icon: Utensils, label: t.food, value: tip[0] },
     { icon: ShoppingBag, label: t.shop, value: tip[1] },
     { icon: HeartPulse, label: t.health, value: tip[2] },
-    { icon: Compass, label: t.dir, value: t.dirs[best.dir] },
+    { icon: Compass, label: t.dir, value: best ? t.dirs[best.dir] : "—" },
   ];
 
   const Lock = ({ text }: { text: string }) => (
@@ -83,8 +86,14 @@ export default function DailyLifeGuide({ profile, language, plan, signedIn, onUp
   );
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <section className="card-lux rounded-lg p-5 sm:p-6">
+    <div className="border-y border-primary/20 py-6">
+      {open && <section aria-label="今日の具体的決断" className="mb-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-3"><h2 className="font-serif text-2xl text-primary">{isJa ? "今日の具体的決断" : "Today's concrete decision"}</h2><span className="text-sm text-muted-foreground">{iso} · {isJa ? "3周期の参考値" : "Three-cycle reference"} {Math.round(rhythm.total)}</span></div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2"><article className="border-l-2 border-primary pl-4"><h3 className="font-serif text-xl text-primary">{isJa ? "攻めるなら" : "Advance"}</h3><p className="mt-2 text-base leading-8">{isJa ? (rhythm.total >= 55 ? "準備済みの提案を1件届ける。送る前に目的・相手の利点・次の一歩を3行で確認。まず小さく反応を確かめる。" : "大きな賭けではなく、小さな試作を1件進める。15分だけ着手して、不明点を1つ解消する。") : (rhythm.total >= 55 ? "Send one prepared proposal. State the goal, benefit and next step; test the response before committing." : "Build one small prototype. Work for 15 minutes and resolve one uncertainty.")}</p></article><article className="border-l border-primary/30 pl-4"><h3 className="font-serif text-xl text-primary">{isJa ? "守るなら" : "Protect"}</h3><p className="mt-2 text-base leading-8">{isJa ? (rhythm.total < 45 ? "費用と期限が大きい判断は、事実・代替案・撤退条件を紙に整理。判断を急がず、信頼できる人の確認を1回入れる。" : "引き受ける前に所要時間と締切を確認。予定に30分の余白を残し、返事は確約できる範囲で伝える。") : "Check costs, deadlines and alternatives. Leave room in your schedule and seek a second review for high-stakes decisions."}</p></article></div>
+        <p className="mt-3 text-xs text-muted-foreground">{isJa ? "周期を使った振り返りの提案です。決断・健康・取引の結果を予測しません。" : "Reflection prompts, not predictions of decisions, health or transactions."}</p>
+      </section>}
+    <div className="grid gap-6 md:grid-cols-2">
+      <section className="py-3">
         <h2 className="font-serif text-2xl font-bold text-gradient-gold">{t.title}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t.sub}</p>
         {open ? (
@@ -98,7 +107,7 @@ export default function DailyLifeGuide({ profile, language, plan, signedIn, onUp
           </ul>
         ) : <Lock text={t.lock} />}
       </section>
-      <section className="card-lux rounded-lg p-5 sm:p-6">
+      <section className="py-3">
         <h2 className="flex items-center gap-2 font-serif text-2xl font-bold text-gradient-gold"><MessageCircleHeart className="size-6 text-primary" />{t.relTitle}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{t.relSub}</p>
         {!open ? <Lock text={t.relLock} /> : members.length === 0 ? <p className="mt-4 text-base text-foreground">{t.empty}</p> : (
@@ -117,6 +126,6 @@ export default function DailyLifeGuide({ profile, language, plan, signedIn, onUp
           </>
         )}
       </section>
-    </div>
+    </div></div>
   );
 }
