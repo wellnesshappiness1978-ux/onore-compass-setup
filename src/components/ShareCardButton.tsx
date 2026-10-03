@@ -65,12 +65,12 @@ function render(format: Format, d: ShareCardData, brand: string, scoreLabel: str
   for (const l of wrap(ctx, d.title, maxW).slice(0, 2)) { ctx.fillText(l, left, y); y += story ? 80 : 50; }
   if (d.names.length) { ctx.fillStyle = GOLD; ctx.font = `500 ${story ? 36 : 24}px ${serif}`; ctx.fillText(d.names.join("  ×  ").slice(0, 60), left, y); y += story ? 80 : 46; }
   ctx.fillStyle = CREAM; ctx.font = `400 ${story ? 34 : 22}px ${serif}`;
-  for (const para of d.lines) for (const l of wrap(ctx, para, maxW).slice(0, story ? 5 : 2)) { ctx.fillText(l, left, y); y += story ? 54 : 32; }
+  for (const para of d.lines) for (const l of wrap(ctx, para, maxW).slice(0, story ? 5 : 2)) { ctx.fillText(l, left, y, maxW); y += story ? 54 : 32; }
   if (d.kind === "identity") {
     y += story ? 64 : 12;
     ctx.fillStyle = GOLD; ctx.font = `600 ${story ? 30 : 21}px ${serif}`; ctx.fillText(brand === "オノレコンパス" ? "今日の注意ポイント" : "Today's insight", left, y); y += story ? 58 : 34;
     ctx.fillStyle = CREAM; ctx.font = `400 ${story ? 31 : 20}px ${serif}`;
-    for (const l of wrap(ctx, d.caution ?? "", maxW).slice(0, story ? 4 : 2)) { ctx.fillText(l, left, y); y += story ? 49 : 27; }
+    for (const l of wrap(ctx, d.caution ?? "", maxW).slice(0, story ? 4 : 2)) { ctx.fillText(l, left, y, maxW); y += story ? 49 : 27; }
     if (d.palette?.length) {
       y = story ? y + 45 : Math.min(y + 14, 498);
       d.palette.slice(0,2).forEach((color, i) => {
