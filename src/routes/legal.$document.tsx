@@ -3,7 +3,7 @@ import { legalContent, type LegalKey } from "@/lib/legal-content";
 import { LegalText } from "@/components/LegalFooter";
 
 export const Route = createFileRoute("/legal/$document")({
-  loader: ({ params }) => { if (!(params.document in legalContent)) throw notFound(); return params.document as LegalKey; },
+  loader: ({ params }) => { if (!Object.prototype.hasOwnProperty.call(legalContent, params.document)) throw notFound(); return params.document as LegalKey; },
   head: ({ loaderData }) => {
     const entry = loaderData ? legalContent[loaderData] : null;
     const title = `${entry?.title ?? "案内が見つかりません"} | オノレコンパス`;

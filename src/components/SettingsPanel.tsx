@@ -408,7 +408,8 @@ export default function SettingsPanel({
         {!devOverrideEnabled && <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>}
       </section>
 
-      <div id="team-studio-entry"><TeamStudio plan={plan} actualPlan={actualPlan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} /></div>
+      {devOverrideEnabled && <p className="text-xs text-primary">開発テストの関係者編集はこの端末に保存します。ログイン中の本番データ・登録権限は変更しません。</p>}
+      <div id="team-studio-entry"><TeamStudio plan={plan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></div>
 
       <section className={card}>
         <h3 className="font-serif text-lg text-primary">{t.b2bTitle}</h3>

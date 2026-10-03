@@ -13,7 +13,7 @@ export default function LegalFooter() {
   const [open, setOpen] = useState<LegalKey | "support" | null>(null);
   const [status, setStatus] = useState("");
   useEffect(() => {
-    const handle = (event: Event) => { const key = (event as CustomEvent<string>).detail; if (key === "support" || key in legalContent) setOpen(key as LegalKey | "support"); };
+    const handle = (event: Event) => { const key = (event as CustomEvent<string>).detail; if (key === "support" || Object.prototype.hasOwnProperty.call(legalContent, key)) setOpen(key as LegalKey | "support"); };
     window.addEventListener("onore-legal", handle); return () => window.removeEventListener("onore-legal", handle);
   }, []);
   return <footer className="relative border-t border-primary/20 bg-background px-4 pb-32 pt-8 text-foreground">
