@@ -52,6 +52,7 @@
 - [ ] Official animal surface/hope/hidden results — blocked by an authoritative calculation table or licensed source; do not fabricate characters.
 
 ## 全面改訂マスター改修
+- [ ] Six-value update: remove lower-tier marketing, refresh ambient piano, concentrate Home, add natal geometry, automatic tier luxury, and practical paid/business workflows; verify tier changes and playback/export.
 - [x] Centralize preview plan state and fixed toolbar; verify five plans and fresh tabs.
 - [x] Remove free color leaks and independent earth-calendar tier bypasses.
 - [x] Clean reading hierarchy and prompts; integrate feng shui reference advice.
