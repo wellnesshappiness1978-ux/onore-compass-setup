@@ -13,7 +13,7 @@ export default function PlanProvider({ children }: { children: ReactNode }) {
     const test = isTestPreview(window.location.hostname);
     setEnabled(test);
     if (!test) return;
-    document.documentElement.dataset.testPreview = "true";
+    document.documentElement.dataset["testPreview"] = "true";
     const restore = () => {
       let stored: string | null = null;
       try { stored = localStorage.getItem("devPlanOverride"); } catch { /* Storage may be disabled. */ }
@@ -32,7 +32,7 @@ export default function PlanProvider({ children }: { children: ReactNode }) {
     restore();
     window.addEventListener("popstate", restore);
     window.addEventListener("storage", storage);
-    return () => { delete document.documentElement.dataset.testPreview; window.removeEventListener("popstate", restore); window.removeEventListener("storage", storage); };
+    return () => { delete document.documentElement.dataset["testPreview"]; window.removeEventListener("popstate", restore); window.removeEventListener("storage", storage); };
   }, []);
   const selectPlan = (next: Plan) => {
     if (!enabled) return;
