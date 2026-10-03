@@ -15,11 +15,12 @@ import {
 import { addTeamMember, deleteTeamMember, listTeamMembers } from "@/lib/team-members.functions";
 import { analyzeCandidate, draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
 import ShareCardButton from "@/components/ShareCardButton";
+import GroupSimulator from "./GroupSimulator";
 
 type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
 const LOCAL = "onore-team";
 const card = "rounded-2xl border border-primary/15 bg-background/40 p-4";
-const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "draft", "catalog", "calendar", "balance", "oneOnOne", "recruit"];
+const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "simulator", "draft", "catalog", "calendar", "balance", "oneOnOne", "recruit"];
 
 const summary = (m: TeamMember, t: TeamCopy) => ({
   id: m.id, name: m.name, role: m.role, skills: m.skills, teamRole: t.roles[roleOf(m)],
@@ -67,12 +68,12 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
       {plan === "b2b-premium" && <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-primary"><Crown className="size-3" />{t.priority}</p>}
 
       <div role="tablist" className="mt-4 flex gap-1 overflow-x-auto pb-1">
-        {t.tabs.map((label, i) => (
+        {tabFeatures.map((featureName, i) => { const label = featureName === "simulator" ? (language === "ja" ? "組織相性シミュレーター" : language === "zh-TW" ? "團隊相性模擬" : "Team simulator") : t.tabs[i > 2 ? i - 1 : i]; return (
           <button key={label} role="tab" aria-selected={tab === i} onClick={() => setTab(i)}
             className={`flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-xs ${tab === i ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>
             {!hasFeature(plan, tabFeatures[i]!) && i !== 0 && <Lock className="size-3" />}{label}
           </button>
-        ))}
+        ); })}
       </div>
 
       <div className="mt-4">
@@ -88,6 +89,8 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
           <Diagnosis t={t} members={members} max={Math.max(1, max)} language={language} />
+        ) : feature === "simulator" ? (
+          <GroupSimulator members={members} language={language} />
         ) : feature === "draft" ? (
           <Draft t={t} members={members} language={language} max={Math.max(1, max)} />
         ) : feature === "catalog" ? (

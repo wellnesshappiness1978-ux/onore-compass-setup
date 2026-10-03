@@ -19,10 +19,11 @@ export const memberLimit: Record<Plan, number> = Object.fromEntries(
   Object.entries(membership).map(([plan, value]) => [plan, value.memberLimit]),
 ) as Record<Plan, number>;
 
-export type TeamFeature = "roster" | "teamDiagnosis" | "draft" | "catalog" | "calendar" | "balance" | "oneOnOne" | "recruit";
+export type TeamFeature = "roster" | "teamDiagnosis" | "simulator" | "draft" | "catalog" | "calendar" | "balance" | "oneOnOne" | "recruit";
 const featureMin: Record<TeamFeature, Plan> = {
   roster: "standard",
   teamDiagnosis: "b2b",
+  simulator: "b2b",
   draft: "b2b",
   catalog: "b2b",
   calendar: "b2b",

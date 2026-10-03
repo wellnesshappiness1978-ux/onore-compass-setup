@@ -45,6 +45,8 @@ function Index() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [language, setLanguage] = useState<Language>("ja");
+  useEffect(() => { const stored = localStorage.getItem("onore-language"); if (stored && ["ja","en","zh-TW","zh-CN","ko","es"].includes(stored)) setLanguage(stored as Language); }, []);
+  useEffect(() => { document.documentElement.lang = language; localStorage.setItem("onore-language", language); }, [language]);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

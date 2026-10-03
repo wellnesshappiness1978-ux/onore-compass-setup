@@ -19,11 +19,12 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
 import type { Plan } from "@/lib/design-modes";
-import { consultationDailyLimit, nextPlan } from "@/lib/plans";
+import { consultationDailyLimit, nextPlan, planOrder } from "@/lib/plans";
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import compassAvatar from "@/assets/onore-ai-compass.png";
+import ConsultationVoice from "./ConsultationVoice";
 
 type Props = { profile: UserProfile; language: Language; plan: Plan; onVip: () => void };
 
@@ -206,6 +207,7 @@ export default function ConsultationPanel({ profile, language, plan, onVip }: Pr
                     ) : null,
                   )}
                 </MessageContent>
+                {message.role === "assistant" && message.id !== "welcome" && planOrder.indexOf(plan) >= planOrder.indexOf("vip") && status === "ready" && <ConsultationVoice key={`${message.id}-${language}`} text={message.parts.filter(part => part.type === "text").map(part => part.text).join(" ")} language={language} />}
               </Message>
             ))}
             {status === "submitted" ? (
