@@ -39,7 +39,7 @@ function CoreLayersPanel({ layers: c, profile }: { layers: CoreLayers; profile: 
     ["精密数秘術", `ライフパス${lp}・ソウル${c.numerology.soul ?? "—"}・ディスティニー${c.numerology.destiny ?? "—"}`],
     ["西洋占星術", `太陽${c.western.sun}・月${c.western.moon}${c.western.ascendant ? `・ASC${c.western.ascendant}` : ""}`],
     ["四柱推命", `日干${c.shichu.dayMaster}・五行最多${c.shichu.dominant}・月柱${c.shichu.pillars[1]?.tsuhen}`],
-    ["4層動物占い", `本質：${c.animal.core ?? "生年月日を確認"}${c.animal.group ? `（${c.animal.group}）` : ""}`],
+    ["動物占い・独自4層参考", `本質：${c.animal.core ?? "生年月日を確認"}${c.animal.group ? `（${c.animal.group}）` : ""}`],
     ["本格風水学", gua ? `本命卦${gua.number}・${gua.group}・生気${N[gua.shengQi]}` : "性別（男性/女性）を登録すると本命卦を計算します"],
   ];
   const details = [
@@ -48,7 +48,7 @@ function CoreLayersPanel({ layers: c, profile }: { layers: CoreLayers; profile: 
     `太陽${c.western.sun}・月${c.western.moon}${c.western.moonUncertain ? "（時刻不明で星座境界のため参考）" : ""}。${c.western.planets.map(p => `${p.name}${p.sign}`).join("・")}。ASC ${c.western.ascendant ?? "出生時刻と国内出生地が必要"}。天体位置は天文計算、解釈は占星術上の参考です。`,
     `${c.shichu.pillars.map(p => `${p.label}${p.kanshi}（${p.tsuhen}・${p.stage}）`).join(" / ")}。日干${c.shichu.dayMaster}、五行は${Object.entries(c.shichu.balance).map(([k, v]) => `${k}${v}`).join("・")}。${c.hasTime ? "" : "時柱には出生時刻が必要です。"}節入り境界では暦法によって異なります。`,
     `本質：${c.animal.core ?? "生年月日を確認"}。表面：${c.animal.referenceAnimals?.surface ?? "—"}、希望：${c.animal.referenceAnimals?.hope ?? "—"}、隠れ：${c.animal.referenceAnimals?.hidden ?? "—"}。後の3層は本質の60日周期をそれぞれ1・2・3日ずらした独自参考モデルで、公式4層分類や性格判定ではありません。`,
-    gua ? `立春で区切る生年${gua.year}年・${gua.group}の本命卦${gua.number}。生気${N[gua.shengQi]}・天医${N[gua.tianYi]}・延年${N[gua.yanNian]}・伏位${N[gua.fuWei]}。建物の向き・竣工期を使う個別の住居鑑定ではありません。` : "生年月日と男性式・女性式の選択があると立春基準の本命卦を表示します。性別未指定の式は推測しません。",
+    gua ? `立春で区切る生年・${gua.group}の本命卦${gua.number}。生気${N[gua.shengQi]}・天医${N[gua.tianYi]}・延年${N[gua.yanNian]}・伏位${N[gua.fuWei]}。建物の向き・竣工期を使う個別の住居鑑定ではありません。` : "生年月日と男性式・女性式の選択があると立春基準の本命卦を表示します。性別未指定の式は推測しません。",
   ];
   return (
     <section aria-label="6大占術レイヤー" className="border-b border-primary/20 py-6">
