@@ -19,7 +19,7 @@
 - AI consultation daily caps (1/3/10/30/unlimited) live in `plans.ts`, counted per device in localStorage by preview plan; display test only.
 - Keep AI consultation as one session-only conversation with no persistence; the AI endpoint may use profile fields as reflective context but must never present divination, timing, VIP, or the free-use counter as verified calculations or entitlements.
 - Keep nine-stars fixed grid explicitly illustrative, never natal. Save/share only labelled preview art after test unlock; no verified chart or entitlement without calculations/billing. Why: neither exists yet.
-- Keep My Page plan badge, B2B team data, notification toggles, and the Earth Calendar biorhythm timeline preview as local, clearly labeled previews in `SettingsPanel.tsx`; the plan test toggle changes only the preview rendering and must never unlock gated features until real billing and entitlements exist.
+- Centralize preview overrides in PlanProvider and use the shared effective plan for every UI gate; enable only on development/known preview hosts and keep server membership validation intact. Why: guest tests must work without granting production entitlements.
 - Keep seven appearance modes session-local, tier-limited (1/3/5/7) and CSS-scoped; vary typography, textures, compass, panels and navigation by tier, never imply actual paid access.
 - Plan caps live in `src/lib/plans.ts`; member writes use read-only `plan_memberships` and a DB cap (missing row = Free). Preview toggles grant no paid writes.
 - Team members persist in `team_members` (owner-only RLS) when signed in, else localStorage `onore-team`; team scores come from deterministic `src/lib/team-analysis.ts`, AI draft/1on1 via `src/lib/ai/team-ai.functions.ts`. Why: keep scores reproducible and labeled as reference values.
@@ -33,3 +33,6 @@
 - Debug plan changes require a server-verified admin role and expire after 24 hours; membership reads and team-write caps restore the original plan after expiry. Why: testing tiers must not overwrite paid entitlements.
 - Feng shui uses Li Chun Ming Gua with entered gender and a common annual chart; birthplace centroids affect timed ascendants only, not geocentric planets or Ba Zhai directions. Attribute Geolonia CC BY 4.0. Why: location changes local sky angles; property charts need facing and period.
 - The client-only 3D mandala uses calculated geocentric directions with decorative color/geometry and exports a labeled preview PNG. Why: art and test unlocks are not verified charts or paid entitlements.
+
+- Use HelioCalendar for both Home and My Page and BirthColorGuide for color output; remove independent fake panels. Why: duplicate render paths bypassed tier gates.
+- Legal content has shareable leaf pages and footer dialogs; support requests require authentication and owner-only RLS. Why: avoid invented legal identity and anonymous personal-data exposure.

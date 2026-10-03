@@ -48,6 +48,13 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
     }, 50);
     return () => window.clearInterval(id);
   }, [playing, reduced]);
+  useEffect(() => { if (!mounted || !testUnlocked || !sky) return; setProgress(reduced ? 7 : 0); setPlaying(!reduced); }, [mounted, testUnlocked, reduced, profile.birthDate, profile.birthTime, profile.birthTimeUnknown]);
+  useEffect(() => {
+    if (!testUnlocked || progress < 7) return;
+    const share = (event: Event) => { event.preventDefault(); void shareImage(); };
+    window.addEventListener("onore-share-card", share);
+    return () => window.removeEventListener("onore-share-card", share);
+  }, [testUnlocked, progress]);
   const open = testUnlocked && progress >= 7;
   const start = () => { setProgress(reduced ? 7 : 0); setPlaying(!reduced); };
 
@@ -87,7 +94,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
     <p className="text-xs text-primary/75">{t.subtitle}</p>
     <p className="mt-5 font-serif text-base text-primary/90">{t.tagline}</p>
     <h3 id="nine-stars-heading" className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h3>
-    <p className="mt-3 text-sm leading-7 text-muted-foreground">{palette ? (language === "ja" ? `バースカラー ${palette.main.name} ${palette.main.code} × ${palette.sub.name} ${palette.sub.code}。1440色の参考パレットです。` : `Illustrative birth-color palette: ${palette.main.name} ${palette.main.code} × ${palette.sub.name} ${palette.sub.code}.`) : t.fallback}</p>
+    <p className="mt-3 text-sm leading-7 text-muted-foreground">{palette && testUnlocked ? (language === "ja" ? `バースカラー ${palette.main.name} ${palette.main.code} × ${palette.sub.name} ${palette.sub.code}。1440色の参考パレットです。` : `Illustrative birth-color palette: ${palette.main.name} ${palette.main.code} × ${palette.sub.name} ${palette.sub.code}.`) : t.fallback}</p>
     {testUnlocked && <p className="mx-auto mt-3 inline-block border border-primary/40 px-3 py-1 text-sm text-primary">{t.testNotice}</p>}
     <div className="relative mx-auto mt-7 aspect-square w-full max-w-[700px] overflow-hidden border-y border-primary/35 bg-background shadow-gold" aria-label={language === "ja" ? "立体曼陀羅アート" : "3D mandala art"}>
       {mounted && testUnlocked && sky ? <Suspense fallback={<div className="flex h-full items-center justify-center text-primary"><Sparkles className="size-7 animate-pulse" /></div>}>
