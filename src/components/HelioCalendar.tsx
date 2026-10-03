@@ -8,6 +8,7 @@ import { canUse, minPlanFor, type ContentFeature } from "@/lib/plans";
 import type { Plan } from "@/lib/design-modes";
 import { supabase } from "@/integrations/supabase/client";
 import { listTeamMembers } from "@/lib/team-members.functions";
+import { usePlan } from "./PlanProvider";
 import { fengDirectionNames } from "@/lib/feng-shui";
 import { Button } from "@/components/ui/button";
 import { dayProfile, directionEnergy, localIso, personal } from "@/lib/day-compass";
@@ -32,6 +33,9 @@ function Gate({ plan, feature, onUpgrade, children }: { plan: Plan; feature: Con
 
 export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date: Date; profile: UserProfile; plan: Plan; onUpgrade?: () => void }) {
   const iso = localIso(date);
+  const { enabled: testMode } = usePlan();
+  const [eventIso, setEventIso] = useState(iso);
+  useEffect(() => setEventIso(iso), [iso]);
   const positions = useMemo(() => bodies.map(([name, body, radius]) => {
     const v = A.HelioVector(body, new Date(`${iso}T03:00:00Z`)); // local noon in Japan
     const theta = Math.atan2(v.y, v.x);
@@ -41,14 +45,15 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
   const best = [...directionEnergy(profile.birthDate, date)].sort((a, b) => b.score - a.score)[0];
   const label = rhythm.total >= 60 ? "予定を整える日（参考）" : "ペースを見直す日（参考）";
   const description = `オノレコンパスの参考指標。地球暦の天体位置は天文計算、日取りと方位は独自の参考値です。吉日・契約の成功を保証しません。方位: ${best?.dir ?? "—"}`;
-  const start = iso.replaceAll("-", "");
-  const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+  const start = eventIso.replaceAll("-", "");
+  const eventDate = new Date(`${eventIso}T12:00:00`);
+  const endDate = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate() + 1);
   const end = localIso(endDate).replaceAll("-", "");
   const google = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(label)}&dates=${start}/${end}&details=${encodeURIComponent(description)}`;
   const download = () => {
     const content = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Onore Compass//Reference Calendar//JA", "BEGIN:VEVENT", `UID:${start}-${profile.birthDate.replaceAll("-", "")}@onore-compass`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`, `DTSTART;VALUE=DATE:${start}`, `DTEND;VALUE=DATE:${end}`, `SUMMARY:${escapeIcs(label)}`, `DESCRIPTION:${escapeIcs(description)}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n") + "\r\n";
     const url = URL.createObjectURL(new Blob([content], { type: "text/calendar;charset=utf-8" }));
-    const link = document.createElement("a"); link.href = url; link.download = `onore-${iso}.ics`; link.click();
+    const link = document.createElement("a"); link.href = url; link.download = `onore-${eventIso}.ics`; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   const phase = helioPhase(profile.birthDate, date);
@@ -60,12 +65,16 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
   const [members, setMembers] = useState<TeamMember[]>([]);
   const list = useServerFn(listTeamMembers);
   useEffect(() => {
-    if (!biz) return;
+    let active = true;
+    if (!biz) { setMembers([]); return; }
+    const local = () => { try { const values = JSON.parse(localStorage.getItem("onore-team") ?? "[]"); if (active) setMembers(Array.isArray(values) ? values : []); } catch { if (active) setMembers([]); } };
+    if (testMode) { local(); return () => { active = false; }; }
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) list().then(setMembers).catch(() => setMembers([]));
-      else { try { setMembers(JSON.parse(localStorage.getItem("onore-team") ?? "[]")); } catch { setMembers([]); } }
+      if (data.session) list().then(values => { if (active) setMembers(values); }).catch(() => { if (active) setMembers([]); });
+      else local();
     });
-  }, [biz, list]);
+    return () => { active = false; };
+  }, [biz, list, testMode]);
   const births = [profile.birthDate, ...members.map(m => m.birthDate)].filter(b => /^\d{4}-\d{2}-\d{2}$/.test(b));
   const gantt = useMemo(() => biz ? bizKinds.map(([name, w]) => ({ name, months: Array.from({ length: 12 }, (_, m) => { const days = new Date(year, m + 1, 0).getDate(); let sum = 0; for (let d = 1; d <= days; d++) { const di = localIso(new Date(year, m, d)); sum += births.reduce((a, b) => a + weighted(b, di, w), 0) / births.length; } return Math.round(sum / days); }) })) : [], [biz, births.join(), year]);
   const bestDays = useMemo(() => biz ? bizKinds.map(([name, w]) => ({ name, days: Array.from({ length: 90 }, (_, i) => { const d = addDays(date, i); const di = localIso(d); return { di, v: births.reduce((a, b) => a + weighted(b, di, w), 0) / births.length }; }).sort((a, b) => b.v - a.v).slice(0, 3).map(x => x.di).sort() })) : [], [biz, births.join(), iso]);
@@ -86,8 +95,8 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
         <polyline fill="none" className="stroke-primary" strokeWidth="1" points={curve.map((v, i) => `${i},${100 - v}`).join(" ")} />
       </svg>
       <p className="mt-2 text-sm text-muted-foreground">線が中央より上＝攻め時、下＝守り時の目安（体・心・知の3周期の平均）。</p>
-      <p className="mt-2 text-base text-foreground">今年の勝負日候補：<span className="text-primary">{topDays.join("、")}</span></p>
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="text-base text-foreground">{iso} · {label}</p>
+      <p className="mt-2 text-base text-foreground">今年の勝負日候補：<span className="mt-2 flex flex-wrap gap-2">{topDays.map(day => <Button key={day} size="sm" variant={eventIso === day ? "default" : "outline"} aria-pressed={eventIso === day} onClick={() => setEventIso(day)}>{day}</Button>)}</span></p>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="text-base text-foreground">{eventIso} · {label}</p>
         <div className="flex flex-wrap gap-2"><Button variant="outline" asChild><a href={google} target="_blank" rel="noopener noreferrer"><CalendarDays className="size-4" />Google カレンダー<ExternalLink className="size-3" /></a></Button><Button variant="outline" onClick={download}><Download className="size-4" />iOS / .ics</Button></div>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">選んだ1日分を確認してから登録します。自動同期ではありません。</p>
