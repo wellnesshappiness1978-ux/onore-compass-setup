@@ -14,6 +14,9 @@ import { homePlanCardsCopy, type HomePlanId } from "@/lib/home-plan-cards";
 import { torisetsuTranslations, type Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import { splittableName } from "@/lib/ai/five-elements";
+import { isUpgradePlan } from "@/lib/plans";
+import type { Plan } from "@/lib/design-modes";
+import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 
 const nameCopy: Record<Language, { title: string; grids: [string, string, string, string, string]; fortune: string; split: string; save: string; note: string }> = {
@@ -67,11 +70,13 @@ function CoreLayersPanel({ layers: c, profile }: { layers: CoreLayers; profile: 
 
 const planIcons: Record<HomePlanId, typeof Sprout> = { standard: Sprout, vip: Gem, b2b: Building2, "b2b-premium": Crown };
 
-export default function SelfCoreCard({ profile, language, onDiagnosis, onProfileChange, currentPlan, onSelectPlan }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; currentPlan?: string; onSelectPlan?: (plan: HomePlanId) => void }) {
+export default function SelfCoreCard({ profile, language, onDiagnosis, onProfileChange, currentPlan, onSelectPlan }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; currentPlan?: Plan; onSelectPlan?: (plan: HomePlanId) => void }) {
   const { override, enabled } = usePlan();
   const activePlan = enabled && override ? override : currentPlan ?? "free";
+  const palette = birthColorSpectrum(profile);
   const t = homeReadingCopy[language];
   const p = homePlanCardsCopy[language];
+  const upgradeCards = p.cards.filter(card => isUpgradePlan(activePlan, card.id));
   const [dialogPlan, setDialogPlan] = useState<HomePlanId | null>(null);
   const f = fiveElementsCopy[language];
   const generate = useServerFn(generateHomeReading);
@@ -106,7 +111,17 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
           ["日干", localLayers.shichu.dayMaster], ["太陽 / 月", `${localLayers.western.sun} / ${localLayers.western.moon}`],
           ["本命卦", gua?.branches[0] ? String(gua.branches[0].number) : "性別を設定"],
         ].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-1 text-sm font-semibold text-primary">{value}</dd></div>)}</dl></section>}
-        {data && <section aria-label="あなたの本質と行動" className="py-6">{data.keySummary && <p className="mb-6 font-serif text-lg leading-9 text-foreground">{data.keySummary}</p>}{[data.manualCore, data.manualDecision, data.manualTiming].map((body, i) => <article key={i} className="border-t border-primary/20 py-5"><h3 className="font-serif text-xl text-primary">{coreSections[i]}</h3><p className="mt-3 text-base leading-8 text-foreground">{body}</p></article>)}<ShareCardButton language={language} data={{ kicker: "あなたの特性", title: profile.nameKanji || "自分を知るコンパス", names: [], lines: [data.manualCore], score: localLayers?.numerology.lifePath ?? 0, kind: "identity" }} /></section>}
+        <section aria-label="自分を知る・今日のダイジェスト" className="py-6">
+          <h3 className="font-serif text-xl text-primary">{language === "ja" ? "あなたの本質" : "Your essence"}</h3>
+          <p role={isPending ? "status" : undefined} className="mt-3 font-serif text-lg leading-9 text-foreground">{data?.keySummary ?? (isError ? t.error : t.loading)}</p>
+          {isError && <Button variant="outline" className="mt-3" onClick={() => void refetch()}>{t.retry}</Button>}
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+            <article><h3 className="font-serif text-xl text-primary">{language === "ja" ? "個別診断" : "Personal reading"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data?.manualCore ?? t.loading}</p></article>
+            <article><h3 className="font-serif text-xl text-primary">{language === "ja" ? "今日の注意ポイント" : "Today's tendency to watch"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data?.caution ?? t.loading}</p><p className="mt-2 text-xs text-muted-foreground">{language === "ja" ? "性格傾向を今日の振り返りに。未来の危険を予測するものではありません。" : "A reflection on tendencies, not a prediction of harm."}</p></article>
+          </div>
+          {palette && <article className="mt-6 flex items-center gap-4 border-y border-primary/25 py-5"><span className="size-16 shrink-0 rounded-full border border-primary/30" style={{ backgroundColor: palette.main.code }} aria-hidden="true" /><div><h3 className="font-serif text-xl text-primary">{language === "ja" ? "今日の守護バースカラー" : "Your birth color today"}</h3><p className="mt-1 text-base text-foreground">{palette.main.name} · {palette.main.code}</p><p className="text-xs text-muted-foreground">{language === "ja" ? "変わらないメイン参考色を、今日の小物や装いに。保護効果を示すものではありません。" : "Your stable reference color for today's accessories; no protective effect is claimed."}</p></div></article>}
+          {data && <><details className="mt-5"><summary className="cursor-pointer text-primary">{language === "ja" ? "思考と行動の指針" : "Thought and action"}</summary>{[data.manualDecision, data.manualTiming].map((body, i) => <article key={i} className="border-t border-primary/20 py-5"><h3 className="font-serif text-xl text-primary">{coreSections[i + 1]}</h3><p className="mt-3 text-base leading-8 text-foreground">{body}</p></article>)}</details><ShareCardButton language={language} data={{ kicker: "あなたの特性", title: profile.nameKanji || "自分を知るコンパス", names: [], lines: [data.manualCore], score: localLayers?.numerology.lifePath ?? 0, kind: "identity" }} /></>}
+        </section>
         <details className="border-t border-primary/20 py-5"><summary className="cursor-pointer font-serif text-lg text-primary">{language === "ja" ? "6大占術と詳しい分析" : "Six layers and detailed reading"}</summary>
         {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} />}
         <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜本命卦" : "Feng shui · Ming Gua"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性式" : "女性式"} · ${b.number}卦` : `${b.branch === "male" ? "Male" : "Female"} formula · Kua ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `生気 ${fengDirectionNames[b.shengQi]} · 天医 ${fengDirectionNames[b.tianYi]} · 延年 ${fengDirectionNames[b.yanNian]}` : `Sheng Qi ${b.shengQi} · Tian Yi ${b.tianYi} · Yan Nian ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "立春を境とする伝統的な方位の参考値。住まいごとの吉凶や効果を保証するものではありません。" : "Traditional solar-year direction reference, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "本命卦には生年月日と性別が必要です。マイページのプロフィールで入力してください。" : "Add birth date and gender in your profile to view Ming Gua."}</p>}</section>
@@ -156,10 +171,10 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         </details>
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>
-      {<footer className="border-t border-primary/25 bg-background/40 p-5 sm:p-8">
+      {upgradeCards.length > 0 && <footer className="border-t border-primary/25 bg-background/40 p-5 sm:p-8">
         <div className="flex items-center gap-3"><Sparkles className="size-5 text-primary" aria-hidden="true" /><div className="min-w-0"><h3 className="font-serif text-lg text-primary sm:text-xl">{p.sectionTitle}</h3><p className="mt-1 text-xs text-muted-foreground">{p.sectionSub}</p></div></div>
         <div className="mt-5 -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0">
-          {p.cards.map((card) => {
+          {upgradeCards.map((card) => {
             const Icon = planIcons[card.id];
             const vip = card.id === "vip" || card.id === "b2b-premium";
             return <article key={card.id} className={`flex w-[84%] min-w-[84%] snap-start flex-col rounded-lg border p-4 sm:w-auto sm:min-w-0 sm:p-5 ${vip ? "border-primary/50 bg-gradient-to-b from-primary/20 via-card/80 to-card/70 shadow-champagne" : "border-primary/25 bg-card/60"}`}>

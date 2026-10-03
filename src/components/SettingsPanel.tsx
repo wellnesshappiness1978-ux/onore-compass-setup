@@ -35,7 +35,7 @@ import TeamStudio from "@/components/team/TeamStudio";
 import DebugPlanSwitcher from "@/components/DebugPlanSwitcher";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
-import { memberLimit, planOrder } from "@/lib/plans";
+import { isUpgradePlan, memberLimit, planOrder } from "@/lib/plans";
 import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 
@@ -128,9 +128,9 @@ export default function SettingsPanel({
     cta: tc.switchPlan,
   };
   const allTiers = [...t.tiers, premiumTier];
-  const selectedCard = pc.cards.find((c) => c.id === cardPlan) ?? pc.cards[1]!;
-  const selectedTier = allTiers.find((tr) => tr.id === selectedCard.id) ?? allTiers[2]!;
-  const freeTier = t.tiers[0]!;
+  const upgradeCards = pc.cards.filter(c => isUpgradePlan(plan, c.id));
+  const selectedCard = upgradeCards.find(c => c.id === cardPlan) ?? upgradeCards[0];
+  const selectedTier = allTiers.find(tr => tr.id === selectedCard?.id);
   const planLabel =
     plan === "b2b-premium" ? tc.planNames["b2b-premium"] : plan === "vip"
       ? t.planVip
@@ -176,7 +176,7 @@ export default function SettingsPanel({
             </span>
           </div>
         </div>
-        <div className="mt-4 border-t border-primary/10 pt-3">
+        {devOverrideEnabled && <div className="mt-4 border-t border-primary/10 pt-3">
           <p className="mb-2 text-xs text-muted-foreground">{t.planTest}</p>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-5" role="radiogroup" aria-label={t.planTest}>
             {planOrder.map((p) => (
@@ -197,7 +197,7 @@ export default function SettingsPanel({
           {devOverrideEnabled
             ? <p className="mt-2 text-[11px] text-primary">開発モード：選んだプランの機能がこの端末で実際に解放されます（公開版では無効）。</p>
             : <p className="mt-2 text-[11px] text-muted-foreground">{t.planTestNote}</p>}
-        </div>
+        </div>}
       </section>
 
       {signedIn && debugAllowed && <DebugPlanSwitcher plan={actualPlan} onChanged={onDebugPlanChanged} />}
@@ -261,7 +261,7 @@ export default function SettingsPanel({
         <p className="mt-3 text-[11px] text-muted-foreground">{t.bioSample}</p>
       </section>
 
-      <section id="membership-plans" className={card}>
+      {upgradeCards.length > 0 && <section id="membership-plans" className={card}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             <h3 className="font-serif text-xl text-gradient-gold">{pc.sectionTitle}</h3>
@@ -296,11 +296,12 @@ export default function SettingsPanel({
         </div>
 
         <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={t.plansHeading}>
-          {pc.cards.map((item) => {
+          {upgradeCards.map((item) => {
             const active = cardPlan === item.id;
             const TabIcon = planIcon[item.id];
             return (
-              <button
+              <Button
+                variant="outline"
                 key={item.id}
                 role="tab"
                 aria-selected={active}
@@ -313,7 +314,7 @@ export default function SettingsPanel({
               >
                 <TabIcon className={`size-3.5 ${active ? "text-primary" : "text-muted-foreground"}`} aria-hidden="true" />
                 {planTabName(item.id)}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -321,6 +322,7 @@ export default function SettingsPanel({
         {(() => {
           const item = selectedCard;
           const tier = selectedTier;
+          if (!item || !tier) return null;
           const isVip = item.id === "vip";
           const price = yearly ? tier.priceYearly : tier.priceMonthly;
           const period = yearly ? t.perYear : t.perMonth;
@@ -396,17 +398,8 @@ export default function SettingsPanel({
           );
         })()}
 
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-background/40 px-4 py-3">
-          <div className="min-w-0">
-            <p className="text-xs text-muted-foreground">{freeTier.name}</p>
-            <p className="truncate text-[11px] text-muted-foreground">
-              {freeTier.features[0]} / {freeTier.features[1]}
-            </p>
-          </div>
-          <span className="shrink-0 font-serif text-sm text-muted-foreground">{freeTier.priceMonthly}</span>
-        </div>
         {!devOverrideEnabled && <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>}
-      </section>
+      </section>}
 
       {devOverrideEnabled && <p className="text-xs text-primary">開発テストの関係者編集はこの端末に保存します。ログイン中の本番データ・登録権限は変更しません。</p>}
       <div id="team-studio-entry"><TeamStudio plan={plan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></div>

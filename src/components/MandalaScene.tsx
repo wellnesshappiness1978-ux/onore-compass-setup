@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Lightformer } from "@react-three/drei";
+import { Environment, Lightformer, Line } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { ReturnTypeNatal } from "@/lib/natal-sky-types";
@@ -115,6 +115,19 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
       </mesh>)}
       <mesh scale={.55 + flower * .3}><icosahedronGeometry args={[.86, 3]} /><meshPhysicalMaterial color={main} metalness={.6} roughness={.15} emissive={main} emissiveIntensity={.3} clearcoat={1} /></mesh>
       <mesh scale={1.1 + flower * .25}><torusGeometry args={[.85, .025, 8, 96]} /><meshBasicMaterial color={gold} /></mesh>
+      <group scale={planet}>
+        {sky.bodies.map((body) => <group key={`chart-${body.name}`}>
+          <Line points={[[0, 0, .25], body.chartPosition]} color={gold} lineWidth={.7} transparent opacity={.25} />
+          <mesh position={body.chartPosition}><octahedronGeometry args={[.075]} /><meshBasicMaterial color={main} /></mesh>
+        </group>)}
+        {sky.bodies.flatMap((a, i) => sky.bodies.slice(i + 1).map(b => {
+          const separation = Math.abs(a.longitude - b.longitude);
+          const angle = Math.min(separation, 360 - separation);
+          const harmony = [60, 120].some(target => Math.abs(angle - target) <= 6);
+          const tension = [90, 180].some(target => Math.abs(angle - target) <= 6);
+          return harmony || tension ? <Line key={`${a.name}-${b.name}`} points={[a.chartPosition, b.chartPosition]} color={harmony ? main : sub} lineWidth={1} transparent opacity={.6} /> : null;
+        }))}
+      </group>
       {sky.bodies.map((body, i) => <group key={body.name} position={body.position} scale={planet}>
         <mesh><sphereGeometry args={[i === 0 ? .16 : i === 1 ? .12 : .085 + i * .014, 20, 16]} /><meshStandardMaterial color={i % 2 ? sub : gold} emissive={i % 2 ? sub : gold} emissiveIntensity={.32} metalness={.48} roughness={.27} /></mesh>
         <mesh rotation-x={i * .3}><torusGeometry args={[.21 + i * .015, .006, 4, 48]} /><meshBasicMaterial color={gold} transparent opacity={.55} /></mesh>
@@ -124,7 +137,7 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
 }
 
 export default function MandalaScene({ onCapture, ...props }: Props) {
-  return <Canvas aria-label="出生天体位置を使った操作可能な立体曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
+  return <Canvas aria-label="出生10天体の黄経と角度を重ねた固定カメラ曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
     <Mandala {...props} />
     <CaptureBridge onCapture={onCapture} />
   </Canvas>;

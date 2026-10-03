@@ -40,6 +40,8 @@ import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import DailyLifeGuide from "./DailyLifeGuide";
 import BirthColorGuide from "./BirthColorGuide";
+import SolfeggioPlayer from "./SolfeggioPlayer";
+import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
@@ -477,6 +479,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     return () => { active = false; };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
+  const tierDesign: DesignMode = previewPlan === "vip" ? "masculine-luxe" : previewPlan === "b2b" || previewPlan === "b2b-premium" ? "business-night" : "classic";
+  const effectiveDesign = designMode === "classic" ? tierDesign : designMode;
   useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
@@ -486,15 +490,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     { id: "mandala", label: t.mandala, icon: Orbit },
     { id: "settings", label: t.settings, icon: Settings2 },
   ];
-  const meters = [
-    { label: t.momentum, value: 78 },
-    { label: t.clarity, value: 64 },
-    { label: t.intuition, value: 86 },
-  ];
+
 
   return (
     <>
-    <div data-design={designMode} data-tier={previewPlan} className="design-canvas celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
+    <div data-design={effectiveDesign} data-tier={previewPlan} className="design-canvas celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
@@ -537,7 +537,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             <h1 className="design-title font-serif text-2xl font-bold text-gradient-gold sm:text-3xl">
               {language === "ja" ? "自分を知るコンパス" : "Self Compass"}
             </h1>
-            <p className="design-mode-caption mt-1 text-[10px] text-muted-foreground">{designCopy[language].names[designMode]} · {designCopy[language].note}</p>
+            <p className="design-mode-caption mt-1 text-[10px] text-muted-foreground">{teamCopy[language].planNames[previewPlan]} · {devOverrideEnabled ? (language === "ja" ? "表示テスト" : "Preview") : (language === "ja" ? "現在のステータス" : "Current status")}</p>
           </div>
         </div>
       </header>
@@ -545,8 +545,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <>
-            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => { setArtsEntry("manual"); setTab("arts"); window.scrollTo({ top: 0, behavior: "smooth" }); }} {...(devOverrideEnabled ? { currentPlan: actualPlan, onSelectPlan: selectTestPlan } : {})} /></div>
-            <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
+            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => { setArtsEntry("manual"); setTab("arts"); window.scrollTo({ top: 0, behavior: "smooth" }); }} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} /></div>
+            <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
             <section className="design-compass-section text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">
                 <span className="h-px w-8 bg-primary/30" />
@@ -563,63 +563,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </p>
               <DayCompass profile={profile} language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             </section>
-            <div className="design-daily-grid mx-auto mt-7 grid max-w-4xl gap-4 md:grid-cols-[1.2fr_1fr]">
-              <section className="design-daily-panel card-lux rounded-lg p-5 sm:p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70">
-                      {language === "ja" ? "地球暦" : "EARTH CALENDAR"}
-                    </p>
-                    <h3 className="mt-1 font-serif text-lg text-foreground">{t.biorhythm}</h3>
-                    <p className="mt-1 text-xs text-muted-foreground">{t.rhythmSubtitle}</p>
-                  </div>
-                  <Orbit className="size-6 shrink-0 text-primary/70" strokeWidth={1} />
-                </div>
-                <div className="mt-6 space-y-4">
-                  {meters.map((meter) => (
-                    <div key={meter.label}>
-                      <div className="mb-1.5 flex justify-between text-xs">
-                        <span className="text-muted-foreground">{meter.label}</span>
-                        <span className="text-primary">{meter.value}%</span>
-                      </div>
-                      <div className="h-1.5 overflow-hidden rounded-full bg-primary/10">
-                        <div
-                          className="h-full rounded-full bg-champagne-gradient"
-                          style={{ width: `${meter.value}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 flex items-center justify-between border-t border-primary/15 pt-4 text-sm">
-                  <span className="text-muted-foreground">{t.actionFocus}</span>
-                  <strong className="text-primary">
-                    {t.attack} <span aria-hidden="true">↗</span>
-                  </strong>
-                </div>
-              </section>
-              <section className="design-daily-panel card-lux flex flex-col justify-between rounded-lg p-5 sm:p-6">
-                <div>
-                  <div className="flex size-10 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
-                    <Compass className="size-5" strokeWidth={1.2} />
-                  </div>
-                  <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-primary/70">
-                  {language === "ja" ? "決断コンパス" : "DECISION COMPASS"}
-                  </p>
-                  <h3 className="mt-1 font-serif text-xl text-foreground">{t.decision}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{t.decisionSubtitle}</p>
-                </div>
-                <Button
-                  variant="champagne"
-                  onClick={() => setModal("timing")}
-                  className="mt-6 h-11 w-full justify-between whitespace-normal rounded-md px-4 text-xs font-semibold sm:text-sm"
-                >
-                  {t.timing}
-                  <ChevronRight className="size-4 shrink-0" />
-                </Button>
-              </section>
-            </div>
-            <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.demo}</p>
           </>
         ) : (
           <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
@@ -664,7 +607,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                   setPreviewPlan(next);
                   if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
                 }}
-                designMode={designMode}
+                designMode={effectiveDesign}
                 onDesignModeChange={setDesignMode}
                 onLanguageChange={onLanguageChange}
                 onEdit={onEdit}
@@ -679,6 +622,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
           </section>
         )}
       </main>
+
+      {planOrder.indexOf(previewPlan) >= planOrder.indexOf("vip") && <SolfeggioPlayer language={language} compact />}
 
       <nav
         className="design-navigation fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"

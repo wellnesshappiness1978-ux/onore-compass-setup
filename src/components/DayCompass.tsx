@@ -5,7 +5,6 @@ import type { Plan } from "@/lib/design-modes";
 import { planOrder } from "@/lib/plans";
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
-import SolfeggioPlayer from "./SolfeggioPlayer";
 import HelioCalendar from "./HelioCalendar";
 import FengShuiGuide from "./FengShuiGuide";
 import type { UserProfile } from "./Onboarding";
@@ -160,7 +159,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
     <section className="design-daily-panel card-lux rounded-lg p-5 text-left">
       <div className="mb-4 flex items-center justify-between gap-2">
         <h3 className="flex items-center gap-2 font-serif text-base text-foreground"><Icon className="size-4 text-primary" />{title}</h3>
-        <span className="rounded-full border border-primary/25 px-2 py-0.5 text-[10px] text-primary">{names[tier]}+</span>
+        {rank(plan) < rank(tier) && <span className="rounded-full border border-primary/25 px-2 py-0.5 text-[10px] text-primary">{names[tier]}+</span>}
       </div>
       {children}
     </section>
@@ -168,7 +167,6 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
 
   return (
     <div id="day-compass" className="scroll-mt-4">
-      {rank(plan) >= rank("vip") && <SolfeggioPlayer language={language} compact />}
       <div
         ref={wheel}
         className="compass-wheel relative mx-auto mt-3 aspect-square w-full max-w-[430px] touch-none select-none"
