@@ -1,79 +1,52 @@
 import { useEffect, useRef, useState } from "react";
-import { Music2, Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { ChevronDown, ChevronUp, Music2, Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { createAmbientPiano, type AmbientPiano } from "@/lib/ambient-piano";
 import type { Language } from "@/lib/translations";
 
-const tones = [
-  { hz: 528, ja: "愛と再生", en: "Renewal" },
-  { hz: 432, ja: "宇宙の調和", en: "Harmony" },
-  { hz: 396, ja: "解放", en: "Release" },
-  { hz: 639, ja: "つながり", en: "Connection" },
-  { hz: 741, ja: "直感", en: "Intuition" },
-];
-
-type Engine = { ctx: AudioContext; master: GainNode; nodes: AudioScheduledSourceNode[] };
-
+const tones = [396, 432, 528, 639, 741, 963];
 export default function SolfeggioPlayer({ language, compact = false }: { language: Language; compact?: boolean }) {
   const ja = language === "ja";
   const [hz, setHz] = useState(528);
   const [playing, setPlaying] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [volume, setVolume] = useState(0.35);
-  const eng = useRef<Engine | null>(null);
-
-  const stop = () => {
-    const e = eng.current; if (!e) return;
-    const t = e.ctx.currentTime;
-    e.master.gain.cancelScheduledValues(t); e.master.gain.setValueAtTime(e.master.gain.value, t); e.master.gain.linearRampToValueAtTime(0, t + 1.2);
-    setTimeout(() => { e.nodes.forEach((n) => { try { n.stop(); } catch { /* */ } }); void e.ctx.close(); }, 1300);
-    eng.current = null;
+  const [volume, setVolume] = useState(0.25);
+  const [error, setError] = useState(false);
+  const engine = useRef<AmbientPiano | null>(null);
+  const sequence = useRef(0);
+  const level = useRef(volume);
+  level.current = muted ? 0 : volume;
+  useEffect(() => () => { sequence.current += 1; void engine.current?.stop(); engine.current = null; }, []);
+  useEffect(() => engine.current?.setVolume(muted ? 0 : volume), [volume, muted]);
+  const start = async (frequency: number) => {
+    const token = ++sequence.current;
+    const old = engine.current; engine.current = null;
+    void old?.stop(); setBusy(true); setError(false);
+    try {
+      const next = await createAmbientPiano(frequency, level.current);
+      if (token !== sequence.current) { void next.stop(); return; }
+      engine.current = next; setPlaying(true);
+    } catch { if (token === sequence.current) { setError(true); setPlaying(false); } }
+    finally { if (token === sequence.current) setBusy(false); }
   };
-
-  const start = (freq: number) => {
-    stop();
-    const ctx = new AudioContext();
-    const master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
-    const nodes: AudioScheduledSourceNode[] = [];
-    // soft pad: fundamental, gentle beat, fifth and octave
-    const voices: [number, number, OscillatorType][] = [[freq, 0.45, "sine"], [freq + 4, 0.3, "sine"], [freq * 1.5, 0.12, "sine"], [freq / 2, 0.25, "triangle"]];
-    const pad = ctx.createGain(); pad.gain.value = 0.25;
-    const lfo = ctx.createOscillator(); lfo.frequency.value = 0.08; const lfoGain = ctx.createGain(); lfoGain.gain.value = 0.08;
-    lfo.connect(lfoGain).connect(pad.gain); lfo.start(); nodes.push(lfo);
-    for (const [f, g, type] of voices) { const o = ctx.createOscillator(); o.type = type; o.frequency.value = f; const vg = ctx.createGain(); vg.gain.value = g; o.connect(vg).connect(pad); o.start(); nodes.push(o); }
-    const filter = ctx.createBiquadFilter(); filter.type = "lowpass"; filter.frequency.value = 2200;
-    pad.connect(filter).connect(master);
-    master.gain.linearRampToValueAtTime(muted ? 0 : volume, ctx.currentTime + 2);
-    eng.current = { ctx, master, nodes };
+  const toggle = () => {
+    if (playing) { sequence.current += 1; void engine.current?.stop(); engine.current = null; setPlaying(false); }
+    else void start(hz);
   };
-
-  useEffect(() => () => stop(), []);
-  useEffect(() => { const e = eng.current; if (e) e.master.gain.setTargetAtTime(muted ? 0 : volume, e.ctx.currentTime, 0.2); }, [volume, muted]);
-
-  const toggle = () => { if (playing) { stop(); setPlaying(false); } else { start(hz); setPlaying(true); } };
-  const pick = (f: number) => { setHz(f); if (playing) start(f); };
-
-  return (
-    <section aria-label={ja ? "ソルフェジオ波動BGM" : "Solfeggio healing sound"} className={`mx-auto w-full max-w-[640px] rounded-2xl border border-primary/25 bg-card/60 p-4 text-left backdrop-blur-md ${compact ? "" : "mt-6"}`}>
-      <div className="flex items-center gap-3">
-        <button type="button" onClick={toggle} aria-label={playing ? (ja ? "停止" : "Stop") : (ja ? "再生" : "Play")} aria-pressed={playing}
-          className={`grid size-12 shrink-0 place-items-center rounded-full bg-champagne-gradient text-primary-foreground shadow-champagne ${playing ? "animate-pulse motion-reduce:animate-none" : ""}`}>
-          {playing ? <Pause className="size-5" /> : <Play className="ml-0.5 size-5" />}
-        </button>
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1.5 font-serif text-sm text-primary"><Music2 className="size-4" />{ja ? "ソルフェジオ波動BGM" : "Solfeggio healing sound"}</p>
-          <p className="text-xs text-muted-foreground">{hz}Hz · {ja ? tones.find((x) => x.hz === hz)?.ja : tones.find((x) => x.hz === hz)?.en}</p>
-        </div>
-        <button type="button" onClick={() => setMuted(!muted)} aria-label={muted ? (ja ? "消音を解除" : "Unmute") : (ja ? "消音" : "Mute")} className="grid size-10 place-items-center rounded-full border border-primary/30 text-primary">
-          {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4" />}
-        </button>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {tones.map((x) => <button key={x.hz} type="button" onClick={() => pick(x.hz)} aria-pressed={hz === x.hz}
-          className={`rounded-full border px-3 py-1 text-xs ${hz === x.hz ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>{x.hz}Hz</button>)}
-      </div>
-      <label className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">{ja ? "音量" : "Volume"}
-        <input type="range" min={0} max={0.8} step={0.01} value={volume} onChange={(e) => setVolume(Number(e.target.value))} className="flex-1 accent-primary" />
-      </label>
-      <p className="mt-2 text-[10px] leading-4 text-muted-foreground">{ja ? "※リラックス用のBGMです。効果・効能を保証するものではありません。音量にご注意ください。" : "For relaxation only; no health effects are claimed. Mind your volume."}</p>
-    </section>
-  );
+  return <section aria-label={ja ? "アンビエントピアノ" : "Ambient piano"} className={`audio-controller ${compact ? "audio-controller--compact" : ""}`}>
+    <div className="flex items-center gap-3">
+      <Button size="icon" variant="default" onClick={toggle} disabled={busy} aria-label={playing ? (ja ? "BGMを停止" : "Stop BGM") : (ja ? "BGMを再生" : "Play BGM")} aria-pressed={playing} title={ja ? "再生・停止" : "Play / stop"} className="size-11 shrink-0 rounded-full">{playing ? <Pause /> : <Play />}</Button>
+      <div className="min-w-0 flex-1"><p className="flex items-center gap-2 font-serif text-sm text-primary"><Music2 className="size-4 shrink-0" />{ja ? "星音のピアノ" : "Celestial piano"}</p><p className="text-xs text-muted-foreground">{hz} Hz · {ja ? "アンビエント" : "Ambient"}</p></div>
+      <Button size="icon" variant="ghost" onClick={() => setMuted(!muted)} aria-label={muted ? (ja ? "消音を解除" : "Unmute") : (ja ? "消音" : "Mute")} aria-pressed={muted} title={ja ? "消音" : "Mute"}>{muted ? <VolumeX /> : <Volume2 />}</Button>
+      <Button size="icon" variant="ghost" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-label={ja ? "音楽の設定" : "Audio settings"} title={ja ? "音楽の設定" : "Audio settings"}>{expanded ? <ChevronDown /> : <ChevronUp />}</Button>
+    </div>
+    {expanded && <div className="mt-3 border-t border-primary/20 pt-3">
+      <div role="group" aria-label={ja ? "周波数" : "Frequency"} className="grid grid-cols-3 gap-2">{tones.map(f => <Button key={f} size="sm" variant={hz === f ? "default" : "outline"} aria-pressed={hz === f} disabled={busy} onClick={() => { setHz(f); if (playing) void start(f); }}>{f} Hz</Button>)}</div>
+      <label className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">{ja ? "音量" : "Volume"}<input aria-label={ja ? "BGM音量" : "BGM volume"} type="range" min={0} max={0.6} step={0.01} value={volume} onChange={e => setVolume(Number(e.target.value))} className="min-w-0 flex-1 accent-primary" /></label>
+      <p className="mt-2 text-xs leading-6 text-muted-foreground">{ja ? "周波数を基音にした創作音楽です。DNA修復・治療などの効果は保証しません。" : "Original music tuned to a reference frequency; no therapeutic or DNA-repair effects are claimed."}</p>
+    </div>}
+    {error && <p role="alert" className="mt-2 text-sm text-destructive">{ja ? "音声を開始できませんでした。再生を押して再試行してください。" : "Audio could not start. Try Play again."}</p>}
+  </section>;
 }
