@@ -90,7 +90,14 @@ export function computeCoreLayers(p: CoreInput, now = new Date()) {
   // Name grid + animal (existing tables)
   const five = getFiveElements(p);
   const animalName = five.animal?.split("（")[0] ?? null;
-  const animal = { core: five.animal, group: animalName ? ANIMAL_GROUP[animalName] ?? null : null };
+  // Original reference model: offsets in the published 60-day sequence. These are
+  // not the licensed surface/hope/hidden animal classifications.
+  const referenceAnimals = five.animalNumber ? {
+    surface: getFiveElements({ ...p, birthDate: new Date(Date.UTC(y, mo - 1, d + 1)).toISOString().slice(0, 10) }).animal,
+    hope: getFiveElements({ ...p, birthDate: new Date(Date.UTC(y, mo - 1, d + 2)).toISOString().slice(0, 10) }).animal,
+    hidden: getFiveElements({ ...p, birthDate: new Date(Date.UTC(y, mo - 1, d + 3)).toISOString().slice(0, 10) }).animal,
+  } : null;
+  const animal = { core: five.animal, group: animalName ? ANIMAL_GROUP[animalName] ?? null : null, referenceAnimals };
   const personEl = five.name ? EL[Math.floor(mod(five.name.person - 1, 10) / 2)]! : null;
 
   // Cross analysis (rules defined by this app)
@@ -117,7 +124,7 @@ export function coreLayersPrompt(c: CoreLayers | null): string {
     `[数秘術] ライフパス${c.numerology.lifePath} / ディスティニー${c.numerology.destiny ?? "未算出"} / ソウル${c.numerology.soul ?? "未算出"} / パーソナリティ${c.numerology.personality ?? "未算出"} / ${c.numerology.cyclePhase} / 次の転機 ${c.numerology.turningAge ? `${c.numerology.turningAge}歳（${c.numerology.turningYear}年・ピナクル切替）` : "—"}`,
     `[西洋占星術] 太陽${c.western.sun} 月${c.western.moon}${c.western.moonUncertain ? "（出生時間不明のため月星座は確定できない）" : ""} ${c.western.planets.map(p => `${p.name}${p.sign}`).join(" ")} / ASC ${c.western.ascendant ? `${c.western.ascendant}（${c.birthplace?.label}の代表座標を使用）` : "出生時刻・日本国内の出生地が揃うと表示"}`,
     `[四柱推命] ${c.shichu.pillars.map(p => `${p.label}${p.kanshi}(通変星:${p.tsuhen}/十二運:${p.stage})`).join(" ")}${c.hasTime ? "" : " 時柱:未算出"} / 日干${c.shichu.dayMaster} / 五行 ${Object.entries(c.shichu.balance).map(([k, v]) => `${k}${v}`).join(" ")} 最多${c.shichu.dominant} 欠如${c.shichu.missing.join("・") || "なし"}${c.shichu.yearBoundary || c.shichu.monthBoundary ? " ※節入り境界付近" : ""}`,
-    `[動物占い] 本質 ${c.animal.core ?? "未算出"} / ${c.animal.group ?? "—"} / 表面・希望・隠れの値は計算根拠未確認のため解釈に含めない`,
+    `[動物占い] 本質 ${c.animal.core ?? "未算出"} / ${c.animal.group ?? "—"} / 表面・希望・隠れは独自参考モデル（本質の60日周期をそれぞれ+1日/+2日/+3日ずらした値、公式分類ではない）: ${c.animal.referenceAnimals ? `${c.animal.referenceAnimals.surface} / ${c.animal.referenceAnimals.hope} / ${c.animal.referenceAnimals.hidden}` : "入力不足"}。独自3層を公式の性格判定として扱わない`,
     `[クロス解析] ${c.cross.map(x => `${x.pair}: ${x.a} × ${x.b} → ${x.verdict}`).join(" | ")}`,
     `[表の顔] ${c.surface.join("・")} ／ [本音・潜在] ${c.inner.join("・")}`,
   ].join("\n");

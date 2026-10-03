@@ -5,18 +5,13 @@ import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import { prefecturesRomanized, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
+import { getFiveElements } from "@/lib/ai/five-elements";
 
 const ROMAJI = /^[A-Za-z][A-Za-z\s'-]*$/;
 
 export function computeGokaku(p: UserProfile) {
-  const src = (p.nameKanji || p.nameRomaji || "").replace(/\s+/g, " ").trim();
-  const [sur = "", given = ""] = src.split(" ");
-  const w = (s: string) => [...s].reduce((a, c) => a + ((c.codePointAt(0) ?? 0) % 17) + 1, 0);
-  const s = w(sur), g = w(given);
-  const first = sur ? ((sur.codePointAt(0) ?? 0) % 17) + 1 : 0;
-  const lastG = given ? (([...given].at(-1)?.codePointAt(0) ?? 0) % 17) + 1 : 0;
-  const total = s + g;
-  return [s, first + (given ? ((given.codePointAt(0) ?? 0) % 17) + 1 : 0), g, Math.max(1, total - first - lastG + 2), total];
+  const name = getFiveElements(p).name;
+  return name ? [name.sky, name.person, name.earth, name.outer, name.total] : null;
 }
 
 export default function ProfileEditor({
@@ -89,7 +84,7 @@ export default function ProfileEditor({
 export function NameAnalysisPreview({ profile, language }: { profile: UserProfile; language: Language }) {
   const t = profileTranslations[language];
   const values = computeGokaku(profile);
-  const hasName = Boolean(profile.nameKanji || profile.nameRomaji);
+  const hasName = values !== null;
   return (
     <section className="card-lux mb-6 rounded-2xl p-5 text-left">
       <p className="text-xs font-semibold text-primary">{t.lensesTitle}</p>
@@ -103,14 +98,14 @@ export function NameAnalysisPreview({ profile, language }: { profile: UserProfil
         {t.gokaku.map((g, i) => (
           <div key={g} className="rounded-lg border border-primary/20 bg-background/40 p-2 text-center">
             <p className="text-[10px] text-muted-foreground">{g}</p>
-            <p className="font-serif text-lg text-primary">{hasName ? values[i] : "—"}</p>
+            <p className="font-serif text-lg text-primary">{hasName ? values?.[i] : "—"}</p>
           </div>
         ))}
       </div>
       {hasName && (profile.nameKana || profile.nameRomaji) && (
         <p className="mt-3 text-xs text-muted-foreground">{t.kotodama}: {[profile.nameKana, profile.nameRomaji].filter(Boolean).join(" / ")}</p>
       )}
-      <p className="mt-2 text-[11px] text-muted-foreground">{t.gokakuNote}</p>
+      <p className="mt-2 text-[11px] text-muted-foreground">{hasName ? t.gokakuNote : t.nameSplitNote}</p>
     </section>
   );
 }

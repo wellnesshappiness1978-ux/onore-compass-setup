@@ -5,7 +5,7 @@ type ProfileCopy = {
   romajiHint: string; birthDate: string; birthTime: string; timeUnknown: string; prefecture: string;
   city: string; save: string; saved: string; romajiError: string; dateError: string; optional: string;
   required: string; lensesTitle: string; lenses: string[]; gokakuTitle: string; gokaku: string[];
-  gokakuNote: string; kotodama: string;
+  gokakuNote: string; nameSplitNote: string; kotodama: string;
 };
 
 const ja: ProfileCopy = {
@@ -17,8 +17,8 @@ const ja: ProfileCopy = {
   romajiError: "ローマ字はアルファベットで入力してください", dateError: "生年月日を入力してください",
   optional: "任意", required: "必須", lensesTitle: "統合する占術レイヤー",
   lenses: ["本格姓名判断", "精密数秘術", "西洋占星術", "四柱推命", "4層動物占い"],
-  gokakuTitle: "本格姓名判断 五格プレビュー", gokaku: ["天格", "人格", "地格", "外格", "総格"],
-  gokakuNote: "正式な画数表による算出は準備中のため、五格の数値は名前から生成したプレビューです。",
+  gokakuTitle: "姓名判断 五格（現代字体）", gokaku: ["天格", "人格", "地格", "外格", "総格"],
+  gokakuNote: "Unihanの現代字体画数に基づく参考値。流派により異なります。", nameSplitNote: "姓名を漢字で姓と名に空白区切りで入力してください。対応しない字の画数は推測しません。",
   kotodama: "音霊（よみがな・ローマ字）",
 };
 
