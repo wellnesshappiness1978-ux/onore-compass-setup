@@ -11,7 +11,7 @@
 
 <!-- LOVABLE:END -->
 
-- Profile persists in localStorage (key onore-profile) for auto-restore plus private `profiles` rows when signed in; sign-out clears local copy. Why: user requested no re-entry on reload.
+- Auto-restore profiles from localStorage `onore-profile`; signed-in users use private `profiles` rows. Sign-out clears the local copy.
 - Keep dashboard tabs, compass interaction, and daily demo state local to `Dashboard.tsx`. Label deterministic Torisetsu, compatibility and lock previews honestly; calculations and saved accounts do not establish verified readings or paid entitlement.
 - Keep the arts portrait illustrative; show the full AI self-core preview from available calculations to every plan before upsells, never claiming verified 15-art results or entitlement. Why: free readings must stay complete and honest.
 - Home day compass lives in `DayCompass.tsx` + deterministic `src/lib/day-compass.ts` (rotation = day of year, pointer = 8 directions), gated by preview plan and labeled reference values. Why: no real calculation or billing yet.
