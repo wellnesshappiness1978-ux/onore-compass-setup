@@ -15,11 +15,12 @@ import {
 import { addTeamMember, deleteTeamMember, listTeamMembers } from "@/lib/team-members.functions";
 import { analyzeCandidate, draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
 import ShareCardButton from "@/components/ShareCardButton";
+import GroupSimulator from "./GroupSimulator";
 
 type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
 const LOCAL = "onore-team";
 const card = "rounded-2xl border border-primary/15 bg-background/40 p-4";
-const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "draft", "catalog", "calendar", "balance", "oneOnOne", "recruit"];
+const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "simulator", "draft", "catalog", "calendar", "balance", "oneOnOne", "recruit"];
 
 const summary = (m: TeamMember, t: TeamCopy) => ({
   id: m.id, name: m.name, role: m.role, skills: m.skills, teamRole: t.roles[roleOf(m)],
@@ -34,24 +35,26 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
   const list = useServerFn(listTeamMembers);
   const add = useServerFn(addTeamMember);
   const del = useServerFn(deleteTeamMember);
-  const max = memberLimit[actualPlan];
+  const previewOnly = plan !== actualPlan;
+  const localMode = !signedIn || previewOnly;
+  const max = memberLimit[previewOnly ? plan : actualPlan];
 
   useEffect(() => {
     let active = true;
-    if (signedIn) list().then((m) => active && setMembers(m)).catch(() => undefined);
+    if (!localMode) list().then((m) => active && setMembers(m)).catch(() => undefined);
     else { try { setMembers(JSON.parse(localStorage.getItem(LOCAL) ?? "[]")); } catch { setMembers([]); } }
     return () => { active = false; };
-  }, [signedIn, list]);
+  }, [localMode, list]);
   const persistLocal = (next: TeamMember[]) => { setMembers(next); try { localStorage.setItem(LOCAL, JSON.stringify(next)); } catch { /* ignore */ } };
 
   const addMember = async (m: Omit<TeamMember, "id">) => {
     if (members.length + 1 > max) { setLimitDialog(planForCount(members.length + 1) ?? "max"); return false; }
-    if (signedIn) setMembers([...members, await add({ data: m as never })]);
+    if (!localMode) setMembers([...members, await add({ data: m as never })]);
     else persistLocal([...members, { ...m, id: crypto.randomUUID() }]);
     return true;
   };
   const removeMember = async (id: string) => {
-    if (signedIn) { await del({ data: { id } }); setMembers(members.filter((m) => m.id !== id)); }
+    if (!localMode) { await del({ data: { id } }); setMembers(members.filter((m) => m.id !== id)); }
     else persistLocal(members.filter((m) => m.id !== id));
   };
   const feature = tabFeatures[tab]!;
@@ -61,18 +64,18 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     <section className="rounded-3xl border border-primary/20 bg-card/60 p-4 backdrop-blur-md sm:p-5" aria-label={t.title}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-serif text-lg text-primary">{t.title}</h3>
-        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[actualPlan]} · {t.limit(members.length, max)}</span>
+        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[plan]} · {t.limit(members.length, max)}</span>
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">{t.note}</p>
       {plan === "b2b-premium" && <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-primary"><Crown className="size-3" />{t.priority}</p>}
 
       <div role="tablist" className="mt-4 flex gap-1 overflow-x-auto pb-1">
-        {t.tabs.map((label, i) => (
+        {tabFeatures.map((featureName, i) => { const label = featureName === "simulator" ? (language === "ja" ? "組織相性シミュレーター" : language === "zh-TW" ? "團隊相性模擬" : "Team simulator") : t.tabs[i > 2 ? i - 1 : i]; return (
           <button key={label} role="tab" aria-selected={tab === i} onClick={() => setTab(i)}
             className={`flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-xs ${tab === i ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>
             {!hasFeature(plan, tabFeatures[i]!) && i !== 0 && <Lock className="size-3" />}{label}
           </button>
-        ))}
+        ); })}
       </div>
 
       <div className="mt-4">
@@ -83,11 +86,13 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <Button size="sm" className="mt-3" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.seePlans}</Button>
           </div>
         ) : feature === "roster" ? (
-          <Roster t={t} members={members} max={max} signedIn={signedIn} onAdd={addMember} onRemove={removeMember} />
+          <Roster t={t} members={members} max={max} signedIn={!localMode} onAdd={addMember} onRemove={removeMember} />
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
           <Diagnosis t={t} members={members} max={Math.max(1, max)} language={language} />
+        ) : feature === "simulator" ? (
+          <GroupSimulator members={members} language={language} />
         ) : feature === "draft" ? (
           <Draft t={t} members={members} language={language} max={Math.max(1, max)} />
         ) : feature === "catalog" ? (

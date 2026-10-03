@@ -17,6 +17,11 @@ export default function SolfeggioPlayer({ language, compact = false }: { languag
   const sequence = useRef(0);
   const level = useRef(volume);
   level.current = muted ? 0 : volume;
+  useEffect(() => {
+    const pauseForVoice = () => { sequence.current += 1; void engine.current?.stop(); engine.current = null; setPlaying(false); };
+    window.addEventListener("onore-voice-start", pauseForVoice);
+    return () => window.removeEventListener("onore-voice-start", pauseForVoice);
+  }, []);
   useEffect(() => () => { sequence.current += 1; void engine.current?.stop(); engine.current = null; }, []);
   useEffect(() => engine.current?.setVolume(muted ? 0 : volume), [volume, muted]);
   const start = async (frequency: number) => {

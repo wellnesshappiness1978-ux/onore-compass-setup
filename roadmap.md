@@ -60,3 +60,7 @@
 - [x] Add legal draft pages/modals and private support intake; verify guest blocking and signed-in receipt/history. Staff reply workflow remains unimplemented.
 - [ ] Official birth-color/Hz mapping and operator/refund details — blocked: authoritative data and business information not supplied.
 - [x] Six-part quality revision: portrait-only Home, six layers, nine piano scores, annual date calendar, mandala reveal and global preview bar; verified in browser. Three animal layers remain explicitly original reference models, not official classifications.
+
+- [x] Add shareable essence/daily insight/birth-color cards, JP/EN/繁體 quick switch, Business team grouping, VIP consultation voice, and preview-plan gates.
+- [ ] Background 08:00 push and LINE delivery — blocked: Firebase Messaging connection was declined and LINE account/identity integration is unavailable; open-app reminders remain available.
+- [ ] Verify live AI output, card save, voice playback, and team drag/drop through the signed-in UI; complete where browser services allow.

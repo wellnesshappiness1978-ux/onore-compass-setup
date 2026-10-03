@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
 import { planOrder } from "@/lib/plans";
+import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
+import { directionEnergy, personal } from "@/lib/day-compass";
+import type { UserProfile } from "./Onboarding";
 
 type Settings = { morning: boolean; morningTime: string; night: boolean; nightTime: string };
 const KEY = "onore-reminders";
@@ -53,13 +56,19 @@ function openTarget(target: Template["open"]) {
   window.dispatchEvent(new CustomEvent("onore-open", { detail: target }));
 }
 
-export default function DailyReminderPanel({ language, plan }: { language: Language; plan: Plan }) {
+export default function DailyReminderPanel({ language, plan, profile }: { language: Language; plan: Plan; profile: UserProfile }) {
   const ja = language === "ja";
   const t = ja ? copy.ja : copy.en;
   const tpl = ja ? templates.ja : templates.en;
   const tier = tierOf(plan);
   const [s, setS] = useState<Settings>(DEFAULTS);
   const [msg, setMsg] = useState("");
+  const color = birthColorSpectrum(profile)?.main;
+  const directions = directionEnergy(profile.birthDate, new Date());
+  const direction = [...directions].sort((a,b) => b.score - a.score)[0]?.dir ?? "N";
+  const rhythm = personal(profile.birthDate, new Date());
+  const morning = { ...tpl.morning[tier], body: (language === "ja" ? `今日の参考色 ${color?.name ?? "—"} / 方位 ${direction} / ${rhythm.total >= 55 ? "攻め時" : "守り時"}（参考値）` : language === "zh-TW" ? `今日參考色 ${color?.name ?? "—"} / 方向 ${direction} / ${rhythm.total >= 55 ? "主動" : "沉穩"}（參考值）` : `Today's reference color ${color?.name ?? "—"} / direction ${direction} / ${rhythm.total >= 55 ? "active" : "reflective"} phase (reference)`) };
+  const messageFor = (slot: Slot) => slot === "morning" ? morning : tpl.night[tier];
 
   useEffect(() => { try { setS({ ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) ?? "{}") }); } catch { /* */ } }, []);
   const save = (next: Settings) => { setS(next); try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { /* */ } };
@@ -67,6 +76,7 @@ export default function DailyReminderPanel({ language, plan }: { language: Langu
   const ensurePermission = async () => {
     if (typeof Notification === "undefined") { setMsg(t.unsupported); return false; }
     if (Notification.permission === "granted") return true;
+    if (window.top !== window.self) { setMsg(language === "ja" ? "通知を許可するにはアプリを別タブで開いてください。" : "Open the app in its own tab to allow notifications."); return false; }
     const p = await Notification.requestPermission();
     if (p !== "granted") { setMsg(t.denied); return false; }
     return true;
@@ -85,7 +95,7 @@ export default function DailyReminderPanel({ language, plan }: { language: Langu
       const now = new Date(); const hm = now.toTimeString().slice(0, 5); const day = now.toDateString();
       for (const slot of ["morning", "night"] as const) {
         const k = `${KEY}-sent-${slot}`;
-        if (s[slot] && hm === s[`${slot}Time`] && localStorage.getItem(k) !== day) { localStorage.setItem(k, day); notify(tpl[slot][tier]); }
+        if (s[slot] && hm === s[`${slot}Time`] && localStorage.getItem(k) !== day) { localStorage.setItem(k, day); notify(messageFor(slot)); }
       }
     };
     tick(); const id = setInterval(tick, 30_000);
@@ -100,7 +110,7 @@ export default function DailyReminderPanel({ language, plan }: { language: Langu
       <p className="mt-1 text-[11px] text-muted-foreground">{t.sub}</p>
       <div className="mt-3 space-y-2">
         {(["morning", "night"] as const).map((slot) => {
-          const m = tpl[slot][tier]; const Icon = slot === "morning" ? Sun : Moon;
+          const m = messageFor(slot); const Icon = slot === "morning" ? Sun : Moon;
           return (
             <div key={slot} className="rounded-xl border border-primary/15 bg-background/40 px-3 py-2.5">
               <div className="flex items-center justify-between gap-3">
@@ -124,7 +134,9 @@ export default function DailyReminderPanel({ language, plan }: { language: Langu
         })}
       </div>
       {msg && <p role="alert" className="mt-2 text-xs text-destructive">{msg}</p>}
-      <p className="mt-2 text-[10px] leading-4 text-muted-foreground">{t.note}</p>
+      <p className="mt-3 text-xs text-primary">{language === "ja" ? "LINE連携" : language === "zh-TW" ? "LINE 連動" : "LINE connection"}</p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">{language === "ja" ? "LINE公式アカウント・本人連携が未設定のため、LINEへの自動通知はまだ届きません。" : language === "zh-TW" ? "尚未設定 LINE 官方帳號及個人連動，因此不會發送 LINE 通知。" : "LINE account and individual connection are not configured yet; LINE notifications are not sent."}</p>
+      <p className="mt-2 text-[10px] leading-4 text-muted-foreground">{language === "ja" ? "通知はアプリを開いている間のみ届きます。閉じた状態へのプッシュ配信は通知サービス未接続のため利用できません。方位・色・攻守は参考情報です。" : language === "zh-TW" ? "目前僅於開啟應用程式時提醒。尚未連接背景推播服務；方向與色彩僅供參考。" : "Notifications work only while the app is open. Background push is not connected. Color, direction and timing are illustrative."}</p>
     </section>
   );
 }
