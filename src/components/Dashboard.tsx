@@ -37,7 +37,8 @@ import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/
 import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { quickUsageKey } from "@/lib/quick-compatibility";
-import { analyzeCompatibility, partnerSchema } from "@/lib/compatibility-analysis";
+import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
+import { profileTranslations } from "@/lib/profile-translations";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
@@ -141,7 +142,7 @@ function TorisetsuPanel({
   const [used, setUsed] = useState(0);
   useEffect(() => { try { setUsed(Number(localStorage.getItem(quickUsageKey(profile.birthDate, plan))) || 0); } catch { setUsed(0); } }, [profile.birthDate, plan]);
   const remaining = quickCompatibilityLimit[plan] - used;
-  const partnerInput = { name: partnerName, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
+  const partnerInput: PartnerInput = { name: partnerName, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
   const score = result?.score ?? 0;
   const advice = score >= 84 ? t.advice[2] : score >= 70 ? t.advice[1] : t.advice[0];
@@ -333,7 +334,7 @@ function TorisetsuPanel({
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="text-sm text-primary">{base.birthCity}<span className="text-muted-foreground"> ({t.optional})</span><input aria-label={base.birthCity} className={`${inputClass} mt-2`} maxLength={80} value={partnerCity} onChange={e => setPartnerCity(e.target.value)} /></label>
+                <label className="text-sm text-primary">{profileTranslations[language].city}<span className="text-muted-foreground"> ({t.optional})</span><input aria-label={profileTranslations[language].city} className={`${inputClass} mt-2`} maxLength={80} value={partnerCity} onChange={e => setPartnerCity(e.target.value)} /></label>
                 <label className="text-sm text-primary">{base.bloodType}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.bloodType} className={`${inputClass} mt-2`} value={partnerBlood} onChange={e => setPartnerBlood(e.target.value as typeof partnerBlood)}><option value="">—</option>{["A","B","O","AB"].map(x => <option key={x} value={x}>{x}</option>)}</select></label>
                 <label className="text-sm text-primary">{base.siblingOrder}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.siblingOrder} className={`${inputClass} mt-2`} value={partnerSibling} onChange={e => setPartnerSibling(e.target.value as typeof partnerSibling)}><option value="">—</option>{["first","middle","last","only"].map((x,i) => <option key={x} value={x}>{base.siblings[i]}</option>)}</select></label>
               </div>

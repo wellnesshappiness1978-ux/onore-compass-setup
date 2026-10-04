@@ -35,8 +35,8 @@ export function analyzeCompatibility(owner: Owner, input: PartnerInput, language
   const b = computeCoreLayers({ nameKanji: partner.name, nameRomaji: "", birthDate: partner.birthDate, birthTime: partner.birthTime, birthTimeUnknown: !partner.birthTime, bloodType: partner.bloodType, birthPlace: partner.birthPlace, birthCity: partner.birthCity });
   if (!a || !b) return null;
   const w = words[language];
-  const pair = { birthDate: owner.birthDate, id: "owner" };
-  const other = { birthDate: partner.birthDate, id: "partner" };
+  const pair = { birthDate: owner.birthDate, id: "owner", name: owner.name, gender: owner.gender, bloodType: owner.bloodType, role: "", skills: [] };
+  const other = { birthDate: partner.birthDate, id: "partner", name: partner.name, gender: "undisclosed", bloodType: partner.bloodType, role: "", skills: [] };
   const rel = relation(pair, other);
   const score = pairScore(pair, other);
   const colorsA = birthColorSpectrum({ ...owner, birthPlace: owner.birthPlace });
