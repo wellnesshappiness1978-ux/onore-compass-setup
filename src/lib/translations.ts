@@ -45,27 +45,27 @@ export const translations: Record<Language, Translation> = {
     bloodSuffix: "",
   },
   "zh-CN": {
-    brand: "自我罗盘", subtitle: "通过15种占术，解读你出生的秘密",
+    brand: "自我罗盘", subtitle: "通过多层统合占术，解读你出生的秘密",
     profileEntry: "填写出生资料", step: "步骤", steps: ["出生日期与时间", "出生地", "血型与排行"],
     birthDate: "出生日期", birthTime: "出生时间", birthPlace: "出生地（都道府县）", bloodType: "血型", siblingOrder: "兄弟姐妹排行",
     required: "必填", timeUnknown: "不知道出生时间", unknown: "未知", selectPlace: "请选择都道府县",
     placeHint: "出生地用于西方占星术的宫位等计算。", siblings: ["老大", "中间", "最小", "独生子女"],
-    back: "返回", next: "下一步", analyze: "用15种占术解析自我", analyzing: "正在解析…",
+    back: "返回", next: "下一步", analyze: "用多层统合占术解析自我", analyzing: "正在解析…",
     privacy: "所填信息仅用于占术解析。", edit: "编辑资料", welcome: "欢迎", dashboardTitle: "解读你的内在罗盘",
-    registeredProfile: "已登记资料", artsTitle: "15种占术", preparing: "解析准备中",
+    registeredProfile: "已登记资料", artsTitle: "多层统合占术", preparing: "解析准备中",
     comingSoon: "第二步将在此显示综合解析报告。",
     arts: ["四柱推命", "数字命理", "西方占星术", "塔罗牌", "姓名分析", "九星气学", "卢恩符文", "手相", "动物占卜", "色彩占卜", "算命学", "宿曜占星术", "易经占卜", "卡巴拉数字命理", "紫微斗数"],
     bloodSuffix: "型",
   },
   "zh-TW": {
-    brand: "自我羅盤", subtitle: "透過15種占術，解讀你出生的秘密",
+    brand: "自我羅盤", subtitle: "透過多層統合占術，解讀你出生的秘密",
     profileEntry: "填寫出生資料", step: "步驟", steps: ["出生日期與時間", "出生地", "血型與排行"],
     birthDate: "出生日期", birthTime: "出生時間", birthPlace: "出生地（都道府縣）", bloodType: "血型", siblingOrder: "兄弟姊妹排行",
     required: "必填", timeUnknown: "不知道出生時間", unknown: "未知", selectPlace: "請選擇都道府縣",
     placeHint: "出生地用於西洋占星術的宮位等計算。", siblings: ["老大", "中間", "最小", "獨生子女"],
-    back: "返回", next: "下一步", analyze: "用15種占術解析自我", analyzing: "正在解析…",
+    back: "返回", next: "下一步", analyze: "用多層統合占術解析自我", analyzing: "正在解析…",
     privacy: "填寫的資訊僅用於占術解析。", edit: "編輯資料", welcome: "歡迎", dashboardTitle: "解讀你的內在羅盤",
-    registeredProfile: "已登記資料", artsTitle: "15種占術", preparing: "解析準備中",
+    registeredProfile: "已登記資料", artsTitle: "多層統合占術", preparing: "解析準備中",
     comingSoon: "第二步將在此顯示綜合解析報告。",
     arts: ["四柱推命", "數字命理", "西洋占星術", "塔羅牌", "姓名分析", "九星氣學", "盧恩符文", "手相", "動物占卜", "色彩占卜", "算命學", "宿曜占星術", "易經占卜", "卡巴拉數字命理", "紫微斗數"],
     bloodSuffix: "型",
@@ -132,12 +132,12 @@ export const dashboardTranslations: Record<Language, {
   comingFeature: string; profile: string; rotate: string;
 }> = {
   ja: { home: "ホーム", arts: "多層統合占術", consult: "AI相談室", mandala: "曼陀羅", settings: "設定", today: "今日のコンパス", theme: "今日のテーマ", attack: "攻め", energy: "高エネルギー", expansion: "拡大のとき", wheelHint: "リングをなぞって方角を変える", biorhythm: "地球暦バイオリズム", rhythmSubtitle: "今日のリズム", actionFocus: "アクション指針", momentum: "行動力", clarity: "明晰さ", intuition: "直感", decision: "決断コンパス", decisionSubtitle: "一歩を踏み出すためのヒント", timing: "今日の勝負タイミングを診る", timingResult: "今日は前に進む意識を。大切な決断は、気持ちが整ったときに。", demo: "プレビュー表示 · 占術による計算は未接続", notifications: "お知らせ", noNotifications: "新しいお知らせはありません", vip: "VIP", artsSubtitle: "15の占術をひとつの視点に", comingFeature: "この機能は準備中です", profile: "登録プロフィール", rotate: "コンパスを回す" },
-  en: { home: "Home", arts: "15 Arts", consult: "AI Guide", mandala: "Mandala", settings: "Settings", today: "Today's compass", theme: "Today's theme", attack: "Go forward", energy: "High energy", expansion: "A time to expand", wheelHint: "Drag the ring to turn the compass", biorhythm: "Earth Calendar Biorhythm", rhythmSubtitle: "Today's rhythm", actionFocus: "Action focus", momentum: "Momentum", clarity: "Clarity", intuition: "Intuition", decision: "Decision Compass", decisionSubtitle: "A moment to find your next step", timing: "Explore today's timing", timingResult: "Move forward with intention today. Make important decisions when you feel centered.", demo: "Preview only · No divination calculation connected", notifications: "Notifications", noNotifications: "No new notifications", vip: "VIP", artsSubtitle: "Fifteen traditions, one perspective", comingFeature: "This feature is coming soon", profile: "Saved profile", rotate: "Rotate compass" },
-  "zh-CN": { home: "首页", arts: "15种占术", consult: "AI咨询", mandala: "曼陀罗", settings: "设置", today: "今日罗盘", theme: "今日主题", attack: "进取", energy: "高能量", expansion: "拓展之时", wheelHint: "拖动圆环旋转罗盘", biorhythm: "地球历生物节律", rhythmSubtitle: "今日节律", actionFocus: "行动指引", momentum: "行动力", clarity: "清晰度", intuition: "直觉", decision: "决策罗盘", decisionSubtitle: "寻找下一步的方向", timing: "查看今日良机", timingResult: "今天适合主动前进。重要决定请在内心平静时做出。", demo: "预览展示 · 尚未接入占术计算", notifications: "通知", noNotifications: "暂无新通知", vip: "VIP", artsSubtitle: "十五种占术，一个视角", comingFeature: "此功能即将推出", profile: "已登记资料", rotate: "旋转罗盘" },
-  "zh-TW": { home: "首頁", arts: "15種占術", consult: "AI諮詢", mandala: "曼陀羅", settings: "設定", today: "今日羅盤", theme: "今日主題", attack: "進取", energy: "高能量", expansion: "拓展之時", wheelHint: "拖動圓環旋轉羅盤", biorhythm: "地球曆生物節律", rhythmSubtitle: "今日節律", actionFocus: "行動指引", momentum: "行動力", clarity: "清晰度", intuition: "直覺", decision: "決策羅盤", decisionSubtitle: "尋找下一步的方向", timing: "查看今日良機", timingResult: "今天適合主動前進。重要決定請在內心平靜時做出。", demo: "預覽展示 · 尚未接入占術計算", notifications: "通知", noNotifications: "暫無新通知", vip: "VIP", artsSubtitle: "十五種占術，一個視角", comingFeature: "此功能即將推出", profile: "已登記資料", rotate: "旋轉羅盤" },
+  en: { home: "Home", arts: "Multi-layer Arts", consult: "AI Guide", mandala: "Mandala", settings: "Settings", today: "Today's compass", theme: "Today's theme", attack: "Go forward", energy: "High energy", expansion: "A time to expand", wheelHint: "Drag the ring to turn the compass", biorhythm: "Earth Calendar Biorhythm", rhythmSubtitle: "Today's rhythm", actionFocus: "Action focus", momentum: "Momentum", clarity: "Clarity", intuition: "Intuition", decision: "Decision Compass", decisionSubtitle: "A moment to find your next step", timing: "Explore today's timing", timingResult: "Move forward with intention today. Make important decisions when you feel centered.", demo: "Preview only · No divination calculation connected", notifications: "Notifications", noNotifications: "No new notifications", vip: "VIP", artsSubtitle: "Fifteen traditions, one perspective", comingFeature: "This feature is coming soon", profile: "Saved profile", rotate: "Rotate compass" },
+  "zh-CN": { home: "首页", arts: "多层统合占术", consult: "AI咨询", mandala: "曼陀罗", settings: "设置", today: "今日罗盘", theme: "今日主题", attack: "进取", energy: "高能量", expansion: "拓展之时", wheelHint: "拖动圆环旋转罗盘", biorhythm: "地球历生物节律", rhythmSubtitle: "今日节律", actionFocus: "行动指引", momentum: "行动力", clarity: "清晰度", intuition: "直觉", decision: "决策罗盘", decisionSubtitle: "寻找下一步的方向", timing: "查看今日良机", timingResult: "今天适合主动前进。重要决定请在内心平静时做出。", demo: "预览展示 · 尚未接入占术计算", notifications: "通知", noNotifications: "暂无新通知", vip: "VIP", artsSubtitle: "十五种占术，一个视角", comingFeature: "此功能即将推出", profile: "已登记资料", rotate: "旋转罗盘" },
+  "zh-TW": { home: "首頁", arts: "多層統合占術", consult: "AI諮詢", mandala: "曼陀羅", settings: "設定", today: "今日羅盤", theme: "今日主題", attack: "進取", energy: "高能量", expansion: "拓展之時", wheelHint: "拖動圓環旋轉羅盤", biorhythm: "地球曆生物節律", rhythmSubtitle: "今日節律", actionFocus: "行動指引", momentum: "行動力", clarity: "清晰度", intuition: "直覺", decision: "決策羅盤", decisionSubtitle: "尋找下一步的方向", timing: "查看今日良機", timingResult: "今天適合主動前進。重要決定請在內心平靜時做出。", demo: "預覽展示 · 尚未接入占術計算", notifications: "通知", noNotifications: "暫無新通知", vip: "VIP", artsSubtitle: "十五種占術，一個視角", comingFeature: "此功能即將推出", profile: "已登記資料", rotate: "旋轉羅盤" },
   ko: { home: "홈", arts: "다층 통합 점술", consult: "AI 상담", mandala: "만다라", settings: "설정", today: "오늘의 나침반", theme: "오늘의 테마", attack: "전진", energy: "높은 에너지", expansion: "확장의 시간", wheelHint: "원을 끌어 나침반을 돌려보세요", biorhythm: "지구력 바이오리듬", rhythmSubtitle: "오늘의 리듬", actionFocus: "행동 방향", momentum: "추진력", clarity: "명료함", intuition: "직감", decision: "결정의 나침반", decisionSubtitle: "다음 걸음을 위한 힌트", timing: "오늘의 타이밍 보기", timingResult: "오늘은 의도적으로 앞으로 나아가세요. 중요한 결정은 마음이 차분할 때 하세요.", demo: "미리보기 · 점술 계산 미연결", notifications: "알림", noNotifications: "새 알림이 없습니다", vip: "VIP", artsSubtitle: "열다섯 가지 전통, 하나의 시선", comingFeature: "이 기능은 준비 중입니다", profile: "등록된 프로필", rotate: "나침반 회전" },
   es: { home: "Inicio", arts: "artes multicapa", consult: "Consulta IA", mandala: "Mandala", settings: "Ajustes", today: "Brújula de hoy", theme: "Tema de hoy", attack: "Avanzar", energy: "Alta energía", expansion: "Momento de expandirse", wheelHint: "Arrastra el anillo para girar", biorhythm: "Biorritmo del calendario terrestre", rhythmSubtitle: "Ritmo de hoy", actionFocus: "Enfoque de acción", momentum: "Impulso", clarity: "Claridad", intuition: "Intuición", decision: "Brújula de decisiones", decisionSubtitle: "Una pista para dar el siguiente paso", timing: "Explorar el momento de hoy", timingResult: "Avanza con intención hoy. Toma decisiones importantes cuando te sientas en calma.", demo: "Vista previa · Sin cálculo astrológico", notifications: "Avisos", noNotifications: "No hay avisos nuevos", vip: "VIP", artsSubtitle: "Quince tradiciones, una perspectiva", comingFeature: "Esta función estará disponible pronto", profile: "Perfil guardado", rotate: "Girar brújula" },
-  fr: { home: "Accueil", arts: "multi-layer arts", consult: "Conseil IA", mandala: "Mandala", settings: "Réglages", today: "Boussole du jour", theme: "Thème du jour", attack: "Avancer", energy: "Énergie élevée", expansion: "Le temps de s'ouvrir", wheelHint: "Faites glisser l'anneau pour tourner", biorhythm: "Biorythme du calendrier terrestre", rhythmSubtitle: "Rythme du jour", actionFocus: "Cap du jour", momentum: "Élan", clarity: "Clarté", intuition: "Intuition", decision: "Boussole de décision", decisionSubtitle: "Une piste pour votre prochain pas", timing: "Explorer le moment du jour", timingResult: "Avancez avec intention aujourd'hui. Prenez vos décisions importantes l'esprit apaisé.", demo: "Aperçu · Aucun calcul divinatoire connecté", notifications: "Notifications", noNotifications: "Aucune nouvelle notification", vip: "VIP", artsSubtitle: "Quinze traditions, un regard", comingFeature: "Cette fonctionnalité arrive bientôt", profile: "Profil enregistré", rotate: "Tourner la boussole" },
+  fr: { home: "Accueil", arts: "arts multicouches", consult: "Conseil IA", mandala: "Mandala", settings: "Réglages", today: "Boussole du jour", theme: "Thème du jour", attack: "Avancer", energy: "Énergie élevée", expansion: "Le temps de s'ouvrir", wheelHint: "Faites glisser l'anneau pour tourner", biorhythm: "Biorythme du calendrier terrestre", rhythmSubtitle: "Rythme du jour", actionFocus: "Cap du jour", momentum: "Élan", clarity: "Clarté", intuition: "Intuition", decision: "Boussole de décision", decisionSubtitle: "Une piste pour votre prochain pas", timing: "Explorer le moment du jour", timingResult: "Avancez avec intention aujourd'hui. Prenez vos décisions importantes l'esprit apaisé.", demo: "Aperçu · Aucun calcul divinatoire connecté", notifications: "Notifications", noNotifications: "Aucune nouvelle notification", vip: "VIP", artsSubtitle: "Quinze traditions, un regard", comingFeature: "Cette fonctionnalité arrive bientôt", profile: "Profil enregistré", rotate: "Tourner la boussole" },
 };
 
 type TorisetsuTranslation = {
@@ -169,7 +169,7 @@ export const torisetsuTranslations: Record<Language, TorisetsuTranslation> = {
     lockedTitle: "詳しい相性レポート", lockedBody: "価値観・会話・恋愛・長期関係の詳細アドバイスはVIP機能です。", unlock: "VIPで全機能解放", preview: "プレビュー表示 · 実際の占術計算ではありません", detailLabel: "読み解きを開く", summaryThemes: ["本質と人生のリズム", "決断と行動の傾向", "人との距離感", "才能が活きる場面", "心を整えるヒント"]
   },
   en: {
-    manual: "My Manual", compatibility: "Compatibility", manualTitle: "15 Arts × Animal Horoscope · Integrated Profile", manualIntro: "INTEGRATED AI PROFILE · A sample cross-tradition portrait, not a calculated reading.",
+    manual: "My Manual", compatibility: "Compatibility", manualTitle: "Multi-layer Arts × Animal Horoscope · Integrated Profile", manualIntro: "INTEGRATED AI PROFILE · A sample cross-tradition portrait, not a calculated reading.",
     coreTitle: "Your essence & core identity", coreBody: "Imagine Western astrology, Four Pillars, numerology, animal horoscope and Eastern trigrams as one lens. This sample portrait balances curiosity with care, stepping forward when conviction grows.",
     decisionTitle: "Thinking & decision biases", decisionBody: "You may scan possibilities before finding the essential thread. Let intuition set direction, then check the evidence. When overthinking, choose one small next step.",
     timingTitle: "When to advance, when to pause", timingBody: "Move on new ideas when purpose and preparation align. If you're tired or missing context, make room to regroup. This is not a date-based timing forecast.",
@@ -184,7 +184,7 @@ export const torisetsuTranslations: Record<Language, TorisetsuTranslation> = {
     lockedTitle: "Detailed compatibility report", lockedBody: "Values, communication, romance, and long-term guidance are available with VIP.", unlock: "Unlock all with VIP", preview: "Preview only · Not a real divination calculation", detailLabel: "Open insight", summaryThemes: ["Core nature and life rhythm", "Decision and action patterns", "Relationship boundaries", "Where talent shines", "A cue for inner balance"]
   },
   "zh-CN": {
-    manual: "我的使用说明", compatibility: "缘分诊断（对方）", manualTitle: "15种占术×动物占卜 综合交叉解析", manualIntro: "INTEGRATED AI PROFILE · 跨传统综合画像预览，并非实际计算结果。",
+    manual: "我的使用说明", compatibility: "缘分诊断（对方）", manualTitle: "多层统合占术×动物占卜 综合交叉解析", manualIntro: "INTEGRATED AI PROFILE · 跨传统综合画像预览，并非实际计算结果。",
     coreTitle: "你的本质与核心身份", coreBody: "将西方占星、四柱推命、数字命理、动物占卜与东方八卦视为一个整体。这份示例画像描绘出兼具好奇与审慎、确认方向后愿意前进的性格。",
     decisionTitle: "思考与决策倾向", decisionBody: "你可能先审视多种选择，再抓住关键。让直觉指引方向，再用事实核实；想得太多时，不妨先确定一个小步骤。",
     timingTitle: "进取与休整的行动指引", timingBody: "目标与准备都明确时，适合推进新想法。疲惫或信息不足时，不妨暂缓决定、重新调整。这不是基于日期的吉凶预测。",
@@ -192,13 +192,13 @@ export const torisetsuTranslations: Record<Language, TorisetsuTranslation> = {
     partnerName: "对方的姓名或昵称", partnerNamePlaceholder: "例：A公司 ○○社长",
     partnerTime: "对方出生时间", partnerPlace: "对方出生地", optional: "选填",
     relationLabel: "关系类别", relations: ["商务", "上司·部下", "恋爱·伴侣", "朋友·家人"],
-    analyzeCta: "用15种占术×动物占卜交叉解析缘分", coreLabel: "缘分核心动力",
+    analyzeCta: "用多层统合占术×动物占卜交叉解析缘分", coreLabel: "缘分核心动力",
     coreDynamics: ["互相认可专业能力的“战友型”。共享目标会让进展加速。", "角色自然分工的“互补型”。以对话达成共识更能发挥优势。", "情感温度相近的“共鸣型”。确认彼此距离能让纽带更长久。", "可以放松相处的“安心型”。不互相期待的时光会加深关系。"],
-    partnerBirthDate: "对方的出生日期", partnerHint: "15种占术×动物占卜的缘分诊断概念。输入日期与关系可查看示例分数。", calculate: "查看缘分", score: "缘分分数", advice: ["不要急于消除差异，说出彼此的节奏会让关系更稳定。", "共同点与差异平衡良好，日常沟通会加深信任。", "你们的节奏自然契合，重要决定前请确认共同目标。"],
+    partnerBirthDate: "对方的出生日期", partnerHint: "多层统合占术×动物占卜的缘分诊断概念。输入日期与关系可查看示例分数。", calculate: "查看缘分", score: "缘分分数", advice: ["不要急于消除差异，说出彼此的节奏会让关系更稳定。", "共同点与差异平衡良好，日常沟通会加深信任。", "你们的节奏自然契合，重要决定前请确认共同目标。"],
     lockedTitle: "详细缘分报告", lockedBody: "价值观、沟通、恋爱与长期关系建议为VIP功能。", unlock: "VIP解锁全部功能", preview: "预览展示 · 并非真实占术计算", detailLabel: "展开解读", summaryThemes: ["本质与人生节奏", "决策与行动倾向", "人际距离感", "才能发挥场景", "内心平衡提示"]
   },
   "zh-TW": {
-    manual: "我的使用說明", compatibility: "緣分診斷（對方）", manualTitle: "15種占術×動物占卜 綜合交叉解析", manualIntro: "INTEGRATED AI PROFILE · 跨傳統綜合畫像預覽，並非實際計算結果。",
+    manual: "我的使用說明", compatibility: "緣分診斷（對方）", manualTitle: "多層統合占術×動物占卜 綜合交叉解析", manualIntro: "INTEGRATED AI PROFILE · 跨傳統綜合畫像預覽，並非實際計算結果。",
     coreTitle: "你的本質與核心身份", coreBody: "將西洋占星、四柱推命、數字命理、動物占卜與東方八卦視為一體。這份示例畫像描繪出兼具好奇與審慎、確認方向後願意前進的性格。",
     decisionTitle: "思考與決策傾向", decisionBody: "你可能先審視多種選擇，再抓住關鍵。讓直覺指引方向，再用事實核實；想得太多時，不妨先確定一個小步驟。",
     timingTitle: "進取與休整的行動指引", timingBody: "目標與準備都明確時，適合推進新想法。疲憊或資訊不足時，不妨暫緩決定、重新調整。這不是基於日期的吉凶預測。",
@@ -206,9 +206,9 @@ export const torisetsuTranslations: Record<Language, TorisetsuTranslation> = {
     partnerName: "對方的姓名或暱稱", partnerNamePlaceholder: "例：A公司 ○○社長",
     partnerTime: "對方出生時間", partnerPlace: "對方出生地", optional: "選填",
     relationLabel: "關係類別", relations: ["商務", "上司·部下", "戀愛·伴侶", "朋友·家人"],
-    analyzeCta: "用15種占術×動物占卜交叉解析緣分", coreLabel: "緣分核心動力",
+    analyzeCta: "用多層統合占術×動物占卜交叉解析緣分", coreLabel: "緣分核心動力",
     coreDynamics: ["互相認可專業能力的「戰友型」。共享目標會讓進展加速。", "角色自然分工的「互補型」。以對話達成共識更能發揮優勢。", "情感溫度相近的「共鳴型」。確認彼此距離能讓羈絆更長久。", "可以放鬆相處的「安心型」。不互相期待的時光會加深關係。"],
-    partnerBirthDate: "對方的出生日期", partnerHint: "15種占術×動物占卜的緣分診斷概念。輸入日期與關係可查看示例分數。", calculate: "查看緣分", score: "緣分分數", advice: ["不要急於消除差異，說出彼此的節奏會讓關係更穩定。", "共同點與差異平衡良好，日常溝通會加深信任。", "你們的節奏自然契合，重要決定前請確認共同目標。"],
+    partnerBirthDate: "對方的出生日期", partnerHint: "多層統合占術×動物占卜的緣分診斷概念。輸入日期與關係可查看示例分數。", calculate: "查看緣分", score: "緣分分數", advice: ["不要急於消除差異，說出彼此的節奏會讓關係更穩定。", "共同點與差異平衡良好，日常溝通會加深信任。", "你們的節奏自然契合，重要決定前請確認共同目標。"],
     lockedTitle: "詳細緣分報告", lockedBody: "價值觀、溝通、戀愛與長期關係建議為VIP功能。", unlock: "VIP解鎖全部功能", preview: "預覽展示 · 並非真實占術計算", detailLabel: "展開解讀", summaryThemes: ["本質與人生節奏", "決策與行動傾向", "人際距離感", "才能發揮場景", "內心平衡提示"]
   },
   ko: {

@@ -364,7 +364,7 @@ const en: SettingsTranslation = {
   team: "Team Members",
   roles: ["Executive", "Manager", "Member", "Member"],
   matrix: "Team Compatibility Matrix",
-  roleMap: "Optimal Role Map (15 Arts × Animal Horoscope)",
+  roleMap: "Optimal Role Map (Multi-layer Arts × Animal Horoscope)",
   roleAreas: ["Vision", "Drive & Execution", "Coordination", "Analysis & Quality"],
   calendar: "Team Decision Timing",
   push: "Push",
