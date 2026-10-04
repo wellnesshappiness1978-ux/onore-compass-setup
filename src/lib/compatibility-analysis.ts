@@ -39,6 +39,7 @@ export function analyzeCompatibility(owner: Owner, input: PartnerInput, language
   const other = { birthDate: partner.birthDate, id: "partner", name: partner.name, gender: "undisclosed", bloodType: partner.bloodType, role: "", skills: [] };
   const rel = relation(pair, other);
   const score = pairScore(pair, other);
+  const sky = [a.western.ascendant && b.western.ascendant ? `ASC ${a.western.ascendant} × ${b.western.ascendant}` : null, !a.western.moonUncertain && !b.western.moonUncertain ? `${a.western.moon} × ${b.western.moon}` : null].filter(Boolean).join(" / ");
   const colorsA = birthColorSpectrum({ ...owner, birthPlace: owner.birthPlace });
   const colorsB = birthColorSpectrum({ birthDate: partner.birthDate, birthTime: partner.birthTime, birthTimeUnknown: !partner.birthTime, birthPlace: partner.birthPlace });
   const nameA = getFiveElements({ nameKanji: owner.name, birthDate: owner.birthDate, bloodType: owner.bloodType });
@@ -50,10 +51,11 @@ export function analyzeCompatibility(owner: Owner, input: PartnerInput, language
     `${w.labels[0]} ${a.name ? `${a.name.person}・${a.name.total}` : w.notAvailable} · ${w.labels[1]} ${b.name ? `${b.name.person}・${b.name.total}` : w.notAvailable}`,
     `${nameA.eto ?? w.notAvailable} × ${nameB.eto ?? w.notAvailable} · ${w.labels[0]} ${kuaA?.branches.map(branch => branch.number).join("/") ?? w.notAvailable} / ${w.labels[1]} ${w.notAvailable}`,
     `${w.labels[1]}: ${partner.birthTime && partner.birthPlace ? `${partner.birthTime} ${partner.birthPlace} ${partner.birthCity}` : w.notAvailable} · ${partner.bloodType || w.notAvailable} · ${partner.siblingOrder || w.notAvailable}`,
+    `Moon / ASC: ${sky || w.notAvailable} · Animal reference: ${a.animal.referenceAnimals?.surface ?? w.notAvailable} × ${b.animal.referenceAnimals?.surface ?? w.notAvailable}`,
   ];
   const dynamic = rel === "same" ? w.same : rel === "generate" ? w.generation : rel === "control" ? w.control : w.neutral;
   const sentences = language === "ja" ? [
-    `太陽は${a.western.sun}と${b.western.sun}、本質動物は${a.animal.core ?? "未算出"}と${b.animal.core ?? "未算出"}。生年月日由来の五行は${dynamic}。これは惹かれ方の参考パターンで、好意を証明する値ではありません。`,
+    `太陽は${a.western.sun}と${b.western.sun}、本質動物は${a.animal.core ?? "未算出"}と${b.animal.core ?? "未算出"}。${sky ? `月・ASCは${sky}。` : "出生時間が揃わない天体層は比較しません。"}生年月日由来の五行は${dynamic}。これは惹かれ方の参考パターンで、好意を証明する値ではありません。`,
     `ライフパス${lifePath(owner.birthDate)}と${lifePath(partner.birthDate)}、日干は${a.shichu.dayMaster}と${b.shichu.dayMaster}。${rel === "generate" ? "発想と実行を分担する形を試せます。" : "同じ結論でも考える順序が違う前提で、役割を言葉にすると話し合いが進みます。"}`,
     `${rel === "control" ? "五行では抑制関係があるため、結論を急ぐ場面で意見の違いを拾いやすい組み合わせ。" : "生年月日から見えるペースの違いを、性格の断定として扱わないことが大切です。"}${w.phrases[rel === "control" ? 0 : 1]}。${w.caution}。`,
     `${w.labels[0]} ${colorsA?.main.name ?? w.notAvailable} ${colorsA?.main.code ?? ""} × ${w.labels[1]} ${colorsB?.main.name ?? w.notAvailable} ${colorsB?.main.code ?? ""}。1440色の独自参考パレットを並べた組み合わせであり、科学的な相性測定ではありません。`,
@@ -61,7 +63,7 @@ export function analyzeCompatibility(owner: Owner, input: PartnerInput, language
     `${w.labels[0]} ${a.western.sun} / ${a.animal.core ?? w.notAvailable}; ${w.labels[1]} ${b.western.sun} / ${b.animal.core ?? w.notAvailable}. ${dynamic}; this is a reflective pattern, not proof of attraction.`,
     `${w.labels[0]} ${lifePath(owner.birthDate)} / ${a.shichu.dayMaster}; ${w.labels[1]} ${lifePath(partner.birthDate)} / ${b.shichu.dayMaster}. ${w.phrases[1]}.`,
     `${dynamic}. ${w.phrases[0]}; ${w.caution}.`,
-    `${w.labels[0]} ${colorsA?.main.name ?? w.notAvailable} ${colorsA?.main.code ?? ""} × ${w.labels[1]} ${colorsB?.main.name ?? w.notAvailable} ${colorsB?.main.code ?? ""}. ${w.color}: an illustrative palette, not a measured compatibility scale.`,
+    `${w.labels[0]} ${colorsA?.main.code ?? w.notAvailable} × ${w.labels[1]} ${colorsB?.main.code ?? w.notAvailable}. ${w.color}: an illustrative palette, not a measured compatibility scale.`,
   ];
   return { score, titles: w.titles, sentences, evidence, colors: [colorsA?.main.code, colorsB?.main.code], note: `${w.missing} ${w.reference}`, dynamic, elementPair: `${dayElement(owner.birthDate)} × ${dayElement(partner.birthDate)}` };
 }

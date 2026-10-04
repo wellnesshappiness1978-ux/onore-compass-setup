@@ -39,3 +39,5 @@
 - Sales cards use isUpgradePlan; active tier is status. Tier CSS defaults are automatic. One Dashboard audio instance uses gesture-started ambient-piano; no overlapping players.
 - Home: SelfCoreCard → owner manual → guides → GrandSummaryCard; quick compatibility in consult tab; plan features in PlanPerksTab.
 - Themes are session-local, cumulative by tier in `design-modes.ts`, CSS-scoped; VIP ids end `-luxe`, Business/Premium start `business-`. Why: inherit tier styles.
+- Quick compatibility computes available name, numerology, sky, Four Pillars, animal, color and owner Ming Gua references client-side, without inventing absent partner gender or time; preview caps remain device-local. Why: richer comparisons must not imply verified psychology or billing.
+- Consultation targets use the owner-only team roster when signed in and local preview roster otherwise; missing member fields remain blank, with per-target session histories. Why: switching people must not leak context or fabricate birth details.

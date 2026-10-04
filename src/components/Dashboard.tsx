@@ -603,7 +603,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             ) : tab === "consult" ? (
               <>
               <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
-              <div className="mb-8"><TorisetsuPanel only="compatibility" plan={actualPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+              <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
               <ConsultationPanel
                 profile={profile}
                 language={language}
