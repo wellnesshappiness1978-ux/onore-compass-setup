@@ -30,6 +30,7 @@ const readingSchema = z.object({
   manualDecision: z.string().min(30).max(500),
   manualTiming: z.string().min(30).max(500),
   keySummary: z.string(),
+  grandSummary: z.string(),
   numerologyTrial: z.string(),
   astroRecovery: z.string(),
   pillarsTiming: z.string(),
@@ -88,7 +89,8 @@ BIRTH COLOR (illustrative 1440-slot palette): ${color ? `main ${color.main.name}
 EARTH CALENDAR PHASE (Earth has moved ${helio ? `${helio.degrees}° around the Sun since the birth-day position → phase 「${helio.phase}」` : "unavailable"}; four 90° phases 種まき/育成/収穫/休息).
 FENG SHUI (traditional Ba Zhai reference, solar year from Li Chun): ${gua ? gua.branches.map(b => `${b.branch} formula: Kua ${b.number}, 生気 ${fengDirectionNames[b.shengQi]}, 天医 ${fengDirectionNames[b.tianYi]}, 延年 ${fengDirectionNames[b.yanNian]}`).join("; ") : "birth date or gender unavailable; ask for profile input, do not infer"}. Mention only as a traditional directional reflection; do not infer a home's facing, a room's location or an individual's health/wealth outcomes. Annual Flying Stars cannot yield a building-specific natal chart without building period and facing.
 
-PORTRAIT VOICE: sharply perceptive but never superior. BANNED in keySummary, synthesis, name, mind, instinct, strength, caution, manualCore, manualDecision and manualTiming: instructions or moral advice, 「〜しましょう」「〜してください」「〜に気をつけなさい」「〜すべき」「〜が大切」, warnings, generic praise or claims to know the person's actual private thoughts. Describe only what the traditional reference model suggests, grounded in available values. Never assert job, health, relationship or future facts.
+PORTRAIT VOICE: sharply perceptive but never superior. BANNED in keySummary, grandSummary, synthesis, name, mind, instinct, strength, caution, manualCore, manualDecision and manualTiming: instructions or moral advice, 「〜しましょう」「〜してください」「〜に気をつけなさい」「〜すべき」「〜が大切」, warnings, generic praise or claims to know the person's actual private thoughts. Describe only what the traditional reference model suggests, grounded in available values. Never assert job, health, relationship or future facts.
+grandSummary: about 300 Japanese characters (scale for other languages). The capstone multi-layer overview shown last on the home screen: no preface, no greeting, no advice. Weave at least four computed layers (name grid, numerology, sun/moon, day master/five elements, animal core, Ming Gua) into one striking, specific portrait of how this person is built inside, with concrete contrasts. Same banned phrases as the portrait voice; never assert private thoughts as fact, nor job, health, relationship or future facts.
 keySummary: about 100 Japanese characters, plain language with no technical parameter list. Opens with a portrait of the contrast between the outward face, hidden desire and unconscious decision pattern indicated by 2–3 computed layers. No action key or instruction.
 numerologyTrial: about 120 chars. From life path and soul number: the trial pattern that repeats in their life and the specific talent that breaks through it, plus (a)(b)(c).
 astroRecovery: about 120 chars. Sun vs moon gap (建前 vs 本音) and a concrete recovery action when emotions are disturbed, plus (a)(b)(c). If moon is uncertain, say so in a few words.

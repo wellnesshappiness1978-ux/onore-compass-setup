@@ -121,7 +121,7 @@ function TorisetsuPanel({
   const q = quickCompatibilityCopy[language];
   const [mode, setMode] = useState<"manual" | "compatibility">(initialMode);
   const generate = useServerFn(generateHomeReading);
-  const manualReading = useQuery({ queryKey: ["home-reading-five-v3", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
+  const manualReading = useQuery({ queryKey: ["home-reading-five-v5", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
   const [partnerName, setPartnerName] = useState("");
   const [partnerDate, setPartnerDate] = useState("");
   const [partnerTime, setPartnerTime] = useState("");
