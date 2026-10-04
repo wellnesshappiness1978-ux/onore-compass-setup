@@ -24,7 +24,8 @@ export default function BirthColorGuide({ profile, plan, onUpgrade }: { profile:
   const layers = computeCoreLayers(profile);
   return <section className="mt-8 border-y border-primary/25 py-7" aria-label="バースカラーと波動の解説">
     <h3 className="font-serif text-xl text-primary">そもそもバースカラーとは？</h3>
-    <p className="mt-3 text-base leading-8 text-foreground">バースカラーは、出生情報を色で表現し、内面や気分を振り返る考え方です。外見に似合う色を扱うパーソナルカラーとは異なります。このアプリでは1日1,440分を着想とする1,440色の独自パレットを使用し、同じ出生情報なら同じ色を表示します。cocolor.bizの公式色対応表による算出ではなく、心身の波長を測定した結果でもありません。</p>
+    <p className="mt-3 font-serif text-lg leading-9 text-gradient-gold">バースカラーは、あなたが生まれた瞬間の星の配置・星々の巡りや生命の引力になぞらえて表した、あなた固有の「波動色」です。</p>
+    <p className="mt-2 text-base leading-8 text-foreground">外見を引き立てるパーソナルカラーとは異なり、内面や無意識のエネルギーに目を向け、潜在的な持ち味や惹かれるものを振り返るための色として、伝統的な色彩象徴の考え方に基づいて読み解きます。このアプリでは1日1,440分を着想とする1,440色の独自パレットを使用し、同じ出生情報なら同じ色を表示します。cocolor.bizの公式色対応表による算出ではなく、心身の波長を測定した結果や効果を保証するものでもありません。</p>
     <div className="mt-5 grid gap-3 sm:grid-cols-3">{[
       ["✦ 一生変わらない", "登録された出生情報が同じなら、何度開いても同じ色を表示します。"],
       ["✦ 1,440段階の色", "1日の分数を着想にした独自の配色。色数は測定精度や天体との共鳴を意味しません。"],
