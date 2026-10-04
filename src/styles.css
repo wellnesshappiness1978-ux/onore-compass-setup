@@ -744,3 +744,195 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 @media (prefers-reduced-motion: reduce) {
   .design-canvas[data-tier="vip"] .celestial-stars { animation: none; }
 }
+
+/* Expanded tier themes: VIP luxe trio, Business quartet, Premium sacred five. */
+.design-canvas[data-design="aura-gold-luxe"] {
+  --background: oklch(0.12 0.03 75); --foreground: oklch(.96 .015 85);
+  --card: oklch(0.19 0.03 75); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.23 0.03 75); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 75);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.36 0.03 75); --input: var(--border);
+  --primary: oklch(0.84 0.15 85); --primary-foreground: oklch(.14 .03 75); --ring: var(--primary);
+  --gold-glow: oklch(0.92 0.090 85); --gold-deep: oklch(0.66 0.15 85);
+  --nebula: oklch(.36 0.108 75); --celestial-ink: oklch(.26 0.056 75);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.23 0.03 75), oklch(0.16 0.03 75));
+}
+.design-canvas[data-design="deepsea-luxe"] {
+  --background: oklch(0.12 0.06 240); --foreground: oklch(.96 .015 200);
+  --card: oklch(0.19 0.06 240); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.23 0.06 240); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 240);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.36 0.06 240); --input: var(--border);
+  --primary: oklch(0.82 0.11 200); --primary-foreground: oklch(.14 .03 240); --ring: var(--primary);
+  --gold-glow: oklch(0.90 0.066 200); --gold-deep: oklch(0.64 0.11 200);
+  --nebula: oklch(.36 0.108 240); --celestial-ink: oklch(.26 0.084 240);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.23 0.06 240), oklch(0.16 0.06 240));
+}
+.design-canvas[data-design="shion-luxe"] {
+  --background: oklch(0.14 0.07 300); --foreground: oklch(.96 .015 310);
+  --card: oklch(0.21 0.07 300); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.25 0.07 300); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 300);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.38 0.07 300); --input: var(--border);
+  --primary: oklch(0.84 0.1 310); --primary-foreground: oklch(.14 .03 300); --ring: var(--primary);
+  --gold-glow: oklch(0.92 0.060 310); --gold-deep: oklch(0.66 0.1 310);
+  --nebula: oklch(.36 0.126 300); --celestial-ink: oklch(.26 0.098 300);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.25 0.07 300), oklch(0.18 0.07 300));
+}
+.design-canvas[data-design="business-platinum"] {
+  --background: oklch(0.15 0.008 250); --foreground: oklch(.96 .015 250);
+  --card: oklch(0.22 0.008 250); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.26 0.008 250); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 250);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.39 0.008 250); --input: var(--border);
+  --primary: oklch(0.88 0.02 250); --primary-foreground: oklch(.14 .03 250); --ring: var(--primary);
+  --gold-glow: oklch(0.96 0.012 250); --gold-deep: oklch(0.70 0.02 250);
+  --nebula: oklch(.36 0.108 250); --celestial-ink: oklch(.26 0.056 250);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.26 0.008 250), oklch(0.19 0.008 250));
+}
+.design-canvas[data-design="business-jade"] {
+  --background: oklch(0.14 0.05 165); --foreground: oklch(.96 .015 90);
+  --card: oklch(0.21 0.05 165); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.25 0.05 165); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 165);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.38 0.05 165); --input: var(--border);
+  --primary: oklch(0.83 0.13 90); --primary-foreground: oklch(.14 .03 165); --ring: var(--primary);
+  --gold-glow: oklch(0.91 0.078 90); --gold-deep: oklch(0.65 0.13 90);
+  --nebula: oklch(.36 0.108 165); --celestial-ink: oklch(.26 0.070 165);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.25 0.05 165), oklch(0.18 0.05 165));
+}
+.design-canvas[data-design="business-diamond"] {
+  --background: oklch(0.08 0.005 260); --foreground: oklch(.96 .015 220);
+  --card: oklch(0.15 0.005 260); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.19 0.005 260); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 260);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.32 0.005 260); --input: var(--border);
+  --primary: oklch(0.92 0.03 220); --primary-foreground: oklch(.14 .03 260); --ring: var(--primary);
+  --gold-glow: oklch(0.98 0.018 220); --gold-deep: oklch(0.74 0.03 220);
+  --nebula: oklch(.36 0.108 260); --celestial-ink: oklch(.26 0.056 260);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.19 0.005 260), oklch(0.12 0.005 260));
+}
+.design-canvas[data-design="business-orion"] {
+  --background: oklch(0.13 0.08 255); --foreground: oklch(.96 .015 235);
+  --card: oklch(0.20 0.08 255); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.24 0.08 255); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 255);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.37 0.08 255); --input: var(--border);
+  --primary: oklch(0.8 0.12 235); --primary-foreground: oklch(.14 .03 255); --ring: var(--primary);
+  --gold-glow: oklch(0.88 0.072 235); --gold-deep: oklch(0.62 0.12 235);
+  --nebula: oklch(.36 0.144 255); --celestial-ink: oklch(.26 0.112 255);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.24 0.08 255), oklch(0.17 0.08 255));
+}
+.design-canvas[data-design="business-cosmos"] {
+  --background: oklch(0.1 0.06 280); --foreground: oklch(.96 .015 60);
+  --card: oklch(0.17 0.06 280); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.21 0.06 280); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 280);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.34 0.06 280); --input: var(--border);
+  --primary: oklch(0.85 0.12 60); --primary-foreground: oklch(.14 .03 280); --ring: var(--primary);
+  --gold-glow: oklch(0.93 0.072 60); --gold-deep: oklch(0.67 0.12 60);
+  --nebula: oklch(.36 0.108 280); --celestial-ink: oklch(.26 0.084 280);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.21 0.06 280), oklch(0.14 0.06 280));
+}
+.design-canvas[data-design="business-emperor"] {
+  --background: oklch(0.11 0.03 40); --foreground: oklch(.96 .015 80);
+  --card: oklch(0.18 0.03 40); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.22 0.03 40); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 40);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.35 0.03 40); --input: var(--border);
+  --primary: oklch(0.86 0.16 80); --primary-foreground: oklch(.14 .03 40); --ring: var(--primary);
+  --gold-glow: oklch(0.94 0.096 80); --gold-deep: oklch(0.68 0.16 80);
+  --nebula: oklch(.36 0.108 40); --celestial-ink: oklch(.26 0.056 40);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.22 0.03 40), oklch(0.15 0.03 40));
+}
+.design-canvas[data-design="business-geometry"] {
+  --background: oklch(0.12 0.05 210); --foreground: oklch(.96 .015 180);
+  --card: oklch(0.19 0.05 210); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.23 0.05 210); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 210);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.36 0.05 210); --input: var(--border);
+  --primary: oklch(0.88 0.12 180); --primary-foreground: oklch(.14 .03 210); --ring: var(--primary);
+  --gold-glow: oklch(0.96 0.072 180); --gold-deep: oklch(0.70 0.12 180);
+  --nebula: oklch(.36 0.108 210); --celestial-ink: oklch(.26 0.070 210);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.23 0.05 210), oklch(0.16 0.05 210));
+}
+.design-canvas[data-design="business-dragon"] {
+  --background: oklch(0.12 0.06 160); --foreground: oklch(.96 .015 155);
+  --card: oklch(0.19 0.06 160); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.23 0.06 160); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 160);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.36 0.06 160); --input: var(--border);
+  --primary: oklch(0.82 0.15 155); --primary-foreground: oklch(.14 .03 160); --ring: var(--primary);
+  --gold-glow: oklch(0.90 0.090 155); --gold-deep: oklch(0.64 0.15 155);
+  --nebula: oklch(.36 0.108 160); --celestial-ink: oklch(.26 0.084 160);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.23 0.06 160), oklch(0.16 0.06 160));
+}
+.design-canvas[data-design="business-zero"] {
+  --background: oklch(0.09 0.01 270); --foreground: oklch(.96 .015 95);
+  --card: oklch(0.16 0.01 270); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(0.20 0.01 270); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.84 .02 270);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --border: oklch(0.33 0.01 270); --input: var(--border);
+  --primary: oklch(0.95 0.05 95); --primary-foreground: oklch(.14 .03 270); --ring: var(--primary);
+  --gold-glow: oklch(0.98 0.030 95); --gold-deep: oklch(0.77 0.05 95);
+  --nebula: oklch(.36 0.108 270); --celestial-ink: oklch(.26 0.056 270);
+  --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
+  --design-surface: linear-gradient(135deg, oklch(0.20 0.01 270), oklch(0.13 0.01 270));
+}
+.design-canvas[data-design="aura-gold-luxe"], .design-canvas[data-design="deepsea-luxe"], .design-canvas[data-design="shion-luxe"] {
+  background-image: radial-gradient(circle at 50% 260px, color-mix(in oklab, var(--gold-glow) 24%, transparent), transparent 420px), linear-gradient(160deg, var(--celestial-ink), var(--background) 65%);
+}
+.design-canvas[data-tier="b2b-premium"][data-design^="business-"] .card-lux { box-shadow: 0 0 32px color-mix(in oklab, var(--primary) 22%, transparent); }
+.design-canvas[data-design="business-cosmos"], .design-canvas[data-design="business-geometry"], .design-canvas[data-design="business-zero"] {
+  background-image: repeating-conic-gradient(from 0deg at 50% 300px, color-mix(in oklab, var(--primary) 5%, transparent) 0deg 1deg, transparent 1deg 12deg), radial-gradient(circle at 50% 300px, color-mix(in oklab, var(--nebula) 60%, transparent), transparent 480px), var(--background);
+}
+.design-canvas[data-design="business-cosmos"] .celestial-stars, .design-canvas[data-design="business-zero"] .celestial-stars { opacity: .85; }
+.design-canvas[data-design="business-emperor"] .design-title, .design-canvas[data-design="business-dragon"] .design-title { letter-spacing: .08em; }
+
+.design-choice--aura-gold-luxe .design-choice-scene { background: linear-gradient(135deg, oklch(0.22 0.03 75), oklch(0.84 0.15 85)); color: oklch(.97 .02 85); }
+.design-choice--deepsea-luxe .design-choice-scene { background: linear-gradient(135deg, oklch(0.22 0.06 240), oklch(0.82 0.11 200)); color: oklch(.97 .02 200); }
+.design-choice--shion-luxe .design-choice-scene { background: linear-gradient(135deg, oklch(0.24 0.07 300), oklch(0.84 0.1 310)); color: oklch(.97 .02 310); }
+.design-choice--business-platinum .design-choice-scene { background: linear-gradient(135deg, oklch(0.25 0.008 250), oklch(0.88 0.02 250)); color: oklch(.97 .02 250); }
+.design-choice--business-jade .design-choice-scene { background: linear-gradient(135deg, oklch(0.24 0.05 165), oklch(0.83 0.13 90)); color: oklch(.97 .02 90); }
+.design-choice--business-diamond .design-choice-scene { background: linear-gradient(135deg, oklch(0.18 0.005 260), oklch(0.92 0.03 220)); color: oklch(.97 .02 220); }
+.design-choice--business-orion .design-choice-scene { background: linear-gradient(135deg, oklch(0.23 0.08 255), oklch(0.8 0.12 235)); color: oklch(.97 .02 235); }
+.design-choice--business-cosmos .design-choice-scene { background: linear-gradient(135deg, oklch(0.20 0.06 280), oklch(0.85 0.12 60)); color: oklch(.97 .02 60); }
+.design-choice--business-emperor .design-choice-scene { background: linear-gradient(135deg, oklch(0.21 0.03 40), oklch(0.86 0.16 80)); color: oklch(.97 .02 80); }
+.design-choice--business-geometry .design-choice-scene { background: linear-gradient(135deg, oklch(0.22 0.05 210), oklch(0.88 0.12 180)); color: oklch(.97 .02 180); }
+.design-choice--business-dragon .design-choice-scene { background: linear-gradient(135deg, oklch(0.22 0.06 160), oklch(0.82 0.15 155)); color: oklch(.97 .02 155); }
+.design-choice--business-zero .design-choice-scene { background: linear-gradient(135deg, oklch(0.19 0.01 270), oklch(0.95 0.05 95)); color: oklch(.97 .02 95); }

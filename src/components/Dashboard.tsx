@@ -2,6 +2,8 @@ import { ArtsGuide } from "./ArtsGuide";
 import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
 import PersonPortrait from "./PersonPortrait";
 import SelfCoreCard from "./SelfCoreCard";
+import GrandSummaryCard from "./GrandSummaryCard";
+import PlanPerksTab from "./PlanPerksTab";
 import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
@@ -60,7 +62,7 @@ type Props = {
   onLanguageChange: (language: Language) => void;
   signedIn?: boolean;
 };
-type Tab = "home" | "arts" | "consult" | "mandala" | "settings";
+type Tab = "home" | "arts" | "consult" | "perks" | "mandala" | "settings";
 
 function ProfileRows({ profile, language }: { profile: UserProfile; language: Language }) {
   const t = translations[language];
@@ -109,19 +111,21 @@ function TorisetsuPanel({
   onVip,
   initialMode = "manual",
   plan,
+  only,
 }: {
   profile: UserProfile;
   language: Language;
   onVip: () => void;
   initialMode?: "manual" | "compatibility";
   plan: Plan;
+  only?: "manual" | "compatibility";
 }) {
   const t = torisetsuTranslations[language];
   const base = translations[language];
   const q = quickCompatibilityCopy[language];
-  const [mode, setMode] = useState<"manual" | "compatibility">(initialMode);
+  const [mode, setMode] = useState<"manual" | "compatibility">(only ?? initialMode);
   const generate = useServerFn(generateHomeReading);
-  const manualReading = useQuery({ queryKey: ["home-reading-five-v3", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
+  const manualReading = useQuery({ queryKey: ["home-reading-five-v5", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
   const [partnerName, setPartnerName] = useState("");
   const [partnerDate, setPartnerDate] = useState("");
   const [partnerTime, setPartnerTime] = useState("");
@@ -140,7 +144,7 @@ function TorisetsuPanel({
 
   return (
     <div>
-      <div
+      {!only && <div
         className="mx-auto grid max-w-xl grid-cols-2 rounded-lg border border-primary/20 bg-background/55 p-1 shadow-champagne"
         role="tablist"
         aria-label={base.artsTitle}
@@ -165,7 +169,7 @@ function TorisetsuPanel({
         >
           {q.title}
         </Button>
-      </div>
+      </div>}
 
       {mode === "manual" ? (
         <div className="mt-7">
@@ -436,7 +440,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     window.addEventListener("onore-open", onEvt);
     return () => window.removeEventListener("onore-open", onEvt);
   }, []);
-  const [artsEntry, setArtsEntry] = useState<"manual" | "compatibility">("manual");
   const [teamEntry, setTeamEntry] = useState(false);
   useEffect(() => {
     if (tab !== "settings" || !teamEntry) return;
@@ -487,6 +490,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     { id: "home", label: t.home, icon: Home },
     { id: "arts", label: t.arts, icon: Compass },
     { id: "consult", label: t.consult, icon: WandSparkles },
+    { id: "perks", label: language === "ja" ? "プラン特典" : language === "zh-TW" || language === "zh-CN" ? "方案特權" : language === "ko" ? "플랜 혜택" : language === "es" ? "Ventajas" : language === "fr" ? "Avantages" : "Perks", icon: Crown },
     { id: "mandala", label: t.mandala, icon: Orbit },
     { id: "settings", label: t.settings, icon: Settings2 },
   ];
@@ -494,7 +498,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
   return (
     <>
-    <div data-design={effectiveDesign} data-tier={previewPlan} className="design-canvas celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
+    <div data-design={effectiveDesign} data-tier={previewPlan} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
@@ -545,7 +549,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <>
-            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => { setArtsEntry("manual"); setTab("arts"); window.scrollTo({ top: 0, behavior: "smooth" }); }} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} /></div>
+            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => document.getElementById("owner-manual")?.scrollIntoView({ behavior: "smooth", block: "start" })} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} /></div>
+            <div id="owner-manual" className="mb-8 scroll-mt-4"><TorisetsuPanel only="manual" plan={actualPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
             <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
             <section className="design-compass-section text-center" aria-label={t.today}>
               <div className="flex items-center justify-center gap-3 text-primary/70">
@@ -563,6 +568,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </p>
               <DayCompass profile={profile} language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             </section>
+            <GrandSummaryCard profile={profile} language={language} plan={previewPlan} />
           </>
         ) : (
           <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
@@ -579,11 +585,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
                 <NameAnalysisPreview profile={profile} language={language} />
                 <BirthColorGuide profile={profile} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
-                <TorisetsuPanel key={artsEntry} initialMode={artsEntry} plan={actualPlan} profile={profile} language={language} onVip={() => setModal("vip")} />
               </>
             ) : tab === "consult" ? (
               <>
               <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
+              <div className="mb-8"><TorisetsuPanel only="compatibility" plan={actualPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
               <ConsultationPanel
                 profile={profile}
                 language={language}
@@ -591,6 +597,12 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
               />
               </>
+            ) : tab === "perks" ? (
+              <PlanPerksTab profile={profile} language={language} plan={previewPlan} go={(target) => {
+                if (target === "team") { setTab("settings"); setTeamEntry(true); return; }
+                if (target === "plans") { setTab("settings"); setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 250); return; }
+                setTab(target); window.scrollTo({ top: 0, behavior: "smooth" });
+              }} />
             ) : tab === "mandala" ? (
               <NineStarsPanel language={language} profile={profile} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
             ) : tab === "settings" ? (
@@ -629,7 +641,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         className="design-navigation fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"
         aria-label={language === "ja" ? "メインナビゲーション" : "Main navigation"}
       >
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-6">
           {navigation.map((item) => (
             <Button
               key={item.id}

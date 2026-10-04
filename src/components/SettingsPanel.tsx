@@ -209,7 +209,7 @@ export default function SettingsPanel({
         </div>
         <p className="mt-2 text-xs leading-5 text-muted-foreground">{dc.note}</p>
         <div className="mt-5 space-y-5">
-          {(["free", "standard", "vip", "b2b"] as Plan[]).map((tier, index) => (
+          {(["free", "standard", "vip", "b2b", "b2b-premium"] as Plan[]).map((tier, index) => (
             <div key={tier}>
               <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="h-px w-5 bg-primary/40" />{dc.groups[index]}
@@ -573,7 +573,7 @@ export default function SettingsPanel({
         <DialogContent className="max-w-sm border-primary/30 bg-card text-foreground">
           <DialogTitle className="font-serif text-xl text-primary">{dc.title}</DialogTitle>
           <DialogDescription className="text-sm leading-6 text-muted-foreground">
-            {lockedMode && dc.locked(dc.planNames[["standard", "vip", "b2b"].indexOf(designModes.find((mode) => mode.id === lockedMode)?.tier ?? "standard")] ?? dc.planNames[0] ?? "")}
+            {lockedMode && dc.locked(dc.planNames[["standard", "vip", "b2b", "b2b-premium"].indexOf(designModes.find((mode) => mode.id === lockedMode)?.tier ?? "standard")] ?? dc.planNames[0] ?? "")}
           </DialogDescription>
           <p className="text-xs text-muted-foreground">{dc.note}</p>
           <div className="flex justify-end gap-2 pt-2">

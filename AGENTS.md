@@ -14,17 +14,16 @@
 - Auto-restore profiles from localStorage `onore-profile`; signed-in users use private `profiles` rows. Sign-out clears the local copy.
 - Dashboard owns tabs and daily state. Torisetsu and compatibility remain references, not verified readings or paid entitlement.
 - Show complete illustrative self-core readings before upsells on every plan; never claim verified 15-art results or paid entitlement. Why: Free remains complete and honest.
-- Home day compass lives in `DayCompass.tsx` + deterministic `src/lib/day-compass.ts` (rotation = day of year, pointer = 8 directions), gated by preview plan and labeled reference values. Why: no real calculation or billing yet.
+- Day compass: deterministic `src/lib/day-compass.ts`, plan-gated reference values.
 - AI consultation daily caps (1/3/10/30/unlimited) live in `plans.ts`, counted per device in localStorage by preview plan; display test only.
-- Keep consultation session-only; profile context, timing and usage counts are reflective previews, not verified readings or entitlements. Why: avoid false claims.
-- Keep nine-stars fixed grid explicitly illustrative, never natal. Save/share only labelled preview art after test unlock; no verified chart or entitlement without calculations/billing. Why: neither exists yet.
+- Consultation is session-only; context and counts are previews, not entitlements.
+- Keep nine-stars fixed grid explicitly illustrative, never natal. Save/share only labelled preview art after test unlock; no verified chart or entitlement without calculations/billing.
 - Centralize preview overrides in PlanProvider and use the shared effective plan for every UI gate; enable only on development/known preview hosts and keep server membership validation intact. Why: guest tests must work without granting production entitlements.
-- Keep seven appearance modes session-local, tier-limited (1/3/5/7) and CSS-scoped; vary typography, textures, compass, panels and navigation by tier, never imply actual paid access.
 - Plan caps live in `src/lib/plans.ts`; member writes use read-only `plan_memberships` and a DB cap (missing row = Free). Preview toggles grant no paid writes.
-- Team members persist in `team_members` (owner-only RLS) when signed in outside preview override; guest and override tests use localStorage `onore-team`; team scores come from deterministic `src/lib/team-analysis.ts`, AI draft/1on1 via `src/lib/ai/team-ai.functions.ts`. Why: keep scores reproducible and labeled as reference values.
+- Team members persist in `team_members` (owner-only RLS) when signed in outside preview override; guest and override tests use localStorage `onore-team`; team scores come from deterministic `src/lib/team-analysis.ts`, AI draft/1on1 via `src/lib/ai/team-ai.functions.ts`.
 - Five-grid displays share Unihan strokes for spaced surname/given name, never synthetic counts. Animal core uses published 60-day map; other three are labeled original day-offset models, not official classifications. Home portraits give no moral advice. Why: avoid fabricated claims.
 - My Page's four paid cards use seven-language `src/lib/plan-cards.ts` copy and `settings-translations` prices plus Premium in `SettingsPanel.tsx`. Buttons switch preview plans only on test hosts; production shows information until billing is connected.
-- Share cards use a shared client canvas renderer, language-specific readings and effective-plan palettes (Free main only); names default hidden and native sharing falls back to save. Why: prevent language/color leaks and false automatic SNS upload claims.
+- Share cards use a shared client canvas renderer, language-specific readings and effective-plan palettes (Free main only); names default hidden and native sharing falls back to save.
 - Team simulator uses the existing deterministic pair model and the effective preview plan; consultation voice uses browser speech and one 528Hz ambient piano instance. Why: reference scores are reproducible and concurrent audio must not overlap.
 - Reminders remain open-app only until a push service and LINE identity connection exist. Why: local browser timers cannot deliver after the app closes.
 
@@ -38,3 +37,5 @@
 - Use HelioCalendar for both Home and My Page and BirthColorGuide for color output; remove independent fake panels. Why: duplicate render paths bypassed tier gates.
 - Legal content has shareable leaf pages and footer dialogs; support requests require authentication and owner-only RLS. Why: avoid invented legal identity and anonymous personal-data exposure.
 - Sales cards use isUpgradePlan; active tier is status. Tier CSS defaults are automatic. One Dashboard audio instance uses gesture-started ambient-piano; no overlapping players.
+- Home: SelfCoreCard → owner manual → guides → GrandSummaryCard; quick compatibility in consult tab; plan features in PlanPerksTab.
+- Themes are session-local, cumulative by tier in `design-modes.ts`, CSS-scoped; VIP ids end `-luxe`, Business/Premium start `business-`. Why: inherit tier styles.

@@ -24,7 +24,7 @@ export type HomePlanCardsCopy = {
 export const homePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
   ja: {
     sectionTitle: "あなたの可能性を、もう一歩先へ",
-    sectionSub: "4つの有料プランの特権サービスを比較できます",
+    sectionSub: "上位プランへアップグレードすることで、下位プランのすべての特権サービスを完全に引き継ぎ、さらに高度で特別な限定機能・更なる分析サービスが解放されます。",
     dialogNote: "登録・決済の受付は準備中です。この表示はプラン内容の参考プレビューで、現在の会員資格は変更されません。",
     close: "閉じる",
     nextStepNote: "プランの表示は参考プレビューであり、実際の登録・課金とは連動していません。",
@@ -37,7 +37,7 @@ export const homePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
   },
   en: {
     sectionTitle: "Take your next step",
-    sectionSub: "Compare the privileges of the four paid plans",
+    sectionSub: "Each higher plan carries over every benefit of the plans below it and adds more advanced, exclusive features and deeper analysis.",
     dialogNote: "Registration and billing are not open yet. This is a reference preview of each plan; your current membership does not change here.",
     close: "Close",
     nextStepNote: "Plan details are a reference preview and are not linked to real sign-up or billing.",
@@ -50,7 +50,7 @@ export const homePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
   },
   "zh-CN": {
     sectionTitle: "继续探索你的可能性",
-    sectionSub: "比较四种付费方案的专属权益",
+    sectionSub: "升级到更高方案后，将完整保留下级方案的全部特权，并解锁更高级的专属功能与更深入的分析服务。",
     dialogNote: "注册与支付功能正在准备中。此显示仅为方案内容的参考预览，不会改变你当前的会员资格。",
     close: "关闭",
     nextStepNote: "方案显示为参考预览，尚未与真实注册或支付联动。",
@@ -63,7 +63,7 @@ export const homePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
   },
   "zh-TW": {
     sectionTitle: "繼續探索你的可能性",
-    sectionSub: "比較四種付費方案的專屬權益",
+    sectionSub: "升級到更高方案後，將完整保留下級方案的全部特權，並解鎖更進階的專屬功能與更深入的分析服務。",
     dialogNote: "註冊與付款功能正在準備中。此顯示僅為方案內容的參考預覽，不會變更你目前的會員資格。",
     close: "關閉",
     nextStepNote: "方案顯示為參考預覽，尚未與實際註冊或付款連動。",
@@ -76,7 +76,7 @@ export const homePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
   },
   ko: {
     sectionTitle: "가능성을 더 탐색해 보세요",
-    sectionSub: "유료 4개 플랜의 특권 서비스를 비교해 보세요",
+    sectionSub: "상위 플랜으로 업그레이드하면 하위 플랜의 모든 혜택을 그대로 이어받고, 더 고급스러운 전용 기능과 심층 분석이 열립니다.",
     dialogNote: "가입과 결제는 아직 준비 중입니다. 이 표시는 플랜 내용의 참고 미리보기이며 현재 회원 자격은 바뀌지 않습니다.",
     close: "닫기",
     nextStepNote: "플랜 표시는 참고 미리보기이며 실제 가입·결제와 연동되지 않습니다.",
@@ -89,7 +89,7 @@ export const homePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
   },
   es: {
     sectionTitle: "Explora el siguiente paso",
-    sectionSub: "Compara los privilegios de los cuatro planes de pago",
+    sectionSub: "Cada plan superior conserva todas las ventajas de los planes inferiores y suma funciones exclusivas y análisis más profundos.",
     dialogNote: "El registro y el pago aún no están disponibles. Esta vista es una referencia de cada plan; tu membresía actual no cambia aquí.",
     close: "Cerrar",
     nextStepNote: "Los planes se muestran como referencia y no están vinculados a un registro o pago real.",
@@ -102,7 +102,7 @@ export const homePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
   },
   fr: {
     sectionTitle: "Explorez la suite",
-    sectionSub: "Comparez les privilèges des quatre plans payants",
+    sectionSub: "Chaque offre supérieure conserve tous les avantages des offres inférieures et ajoute des fonctions exclusives et des analyses plus poussées.",
     dialogNote: "L'inscription et le paiement ne sont pas encore ouverts. Cet affichage est une référence des plans ; votre abonnement actuel ne change pas ici.",
     close: "Fermer",
     nextStepNote: "Les plans sont présentés à titre indicatif et ne sont pas liés à une inscription ou un paiement réel.",
