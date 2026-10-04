@@ -23,7 +23,10 @@ export default function ShareCardButton({ data, language, className, loading = f
     if (!open) return;
     let active = true, imageUrl: string | undefined;
     setUrl(null); setBlob(null); setStatus(""); setRendering(true);
-    if (!payload || loading) return () => { active = false; };
+    if (!payload || loading) {
+      if (!loading) { setRendering(false); setStatus(t.error); }
+      return () => { active = false; };
+    }
     const build = async () => {
       try {
         await document.fonts.ready;
