@@ -1,5 +1,5 @@
 // Deterministic, illustrative team analytics derived from birth dates.
-// These are reference values for reflection — NOT verified 15-arts readings.
+// These are reference values for reflection — NOT verified multi-layer readings.
 
 export type TeamMember = {
   id: string;

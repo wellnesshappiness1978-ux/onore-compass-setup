@@ -19,7 +19,7 @@ export type TeamCopy = {
 };
 
 const ja: TeamCopy = {
-  title: "チーム・組織コンサル", note: "開発テスト表示です。課金は未実装で、スコアは生年月日からの参考値です（正式な15占術鑑定ではありません）。",
+  title: "チーム・組織コンサル", note: "開発テスト表示です。課金は未実装で、スコアは生年月日からの参考値です（正式な多層統合占術鑑定ではありません）。",
   planNames: { free: "無料", standard: "スタンダード", vip: "VIP", b2b: "ビジネス", "b2b-premium": "ビジネスプレミアム" },
   limit: (u, m) => `登録 ${u} / ${m}人`,
   tabs: ["関係者名簿", "チーム同時診断", "AI人員選抜", "タレント名簿", "アラートカレンダー", "組織バランス", "1on1トリセツ", "採用面接AI分析"],
@@ -40,7 +40,7 @@ const ja: TeamCopy = {
 };
 
 const en: TeamCopy = {
-  title: "Team & Organization Consulting", note: "Development test view. Billing is not live; scores are reference values from birth dates, not a verified 15-arts reading.",
+  title: "Team & Organization Consulting", note: "Development test view. Billing is not live; scores are reference values from birth dates, not a verified multi-layer reading.",
   planNames: { free: "Free", standard: "Standard", vip: "VIP", b2b: "Business", "b2b-premium": "Business Premium" },
   limit: (u, m) => `${u} / ${m} registered`,
   tabs: ["Members", "Team diagnosis", "AI draft", "Talent catalog", "Alert calendar", "Org balance", "1on1 guide", "Hiring AI"],
@@ -63,7 +63,7 @@ const en: TeamCopy = {
 const mk = (base: TeamCopy, o: Partial<TeamCopy>): TeamCopy => ({ ...base, ...o });
 
 const zhCN = mk(en, {
-  title: "团队・组织咨询", note: "开发测试显示。尚未启用付费；分数为基于出生日期的参考值，并非正式的15占术鉴定。",
+  title: "团队・组织咨询", note: "开发测试显示。尚未启用付费；分数为基于出生日期的参考值，并非正式的多层统合占术鉴定。",
   planNames: { free: "免费", standard: "标准", vip: "VIP", b2b: "企业", "b2b-premium": "企业尊享" }, limit: (u, m) => `已登记 ${u} / ${m}人`,
   tabs: ["相关人员", "团队同时诊断", "AI人员选拔", "人才名册", "提醒日历", "组织平衡", "1on1指南", "招聘面试AI分析"],
   add: "添加人员", name: "姓名", birthDate: "出生日期", jobRole: "擅长职种・职位", skills: "技能", skillsHint: "用逗号分隔", save: "添加", remove: "删除", empty: "尚未登记人员。", guestNote: "未登录，仅保存在本设备。",
@@ -80,7 +80,7 @@ const zhCN = mk(en, {
   priority: "优先AI生成（仅显示）", aiError: "AI生成失败，请稍后再试。", generating: "生成中…",
 });
 const zhTW = mk(zhCN, {
-  title: "團隊・組織諮詢", note: "開發測試顯示。尚未啟用付費；分數為依出生日期計算的參考值，並非正式的15占術鑑定。",
+  title: "團隊・組織諮詢", note: "開發測試顯示。尚未啟用付費；分數為依出生日期計算的參考值，並非正式的多層統合占術鑑定。",
   planNames: { free: "免費", standard: "標準", vip: "VIP", b2b: "企業", "b2b-premium": "企業尊享" }, limit: (u, m) => `已登錄 ${u} / ${m}人`,
   tabs: ["相關人員", "團隊同時診斷", "AI人員選拔", "人才名冊", "提醒日曆", "組織平衡", "1on1指南", "招聘面試AI分析"],
   add: "新增人員", name: "姓名", birthDate: "出生日期", jobRole: "擅長職種・職位", skills: "技能", skillsHint: "以逗號分隔", save: "新增", remove: "刪除", empty: "尚未登錄人員。", guestNote: "未登入，僅儲存在本裝置。",
