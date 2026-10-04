@@ -48,7 +48,7 @@ export function analyzeCompatibility(owner: Owner, input: PartnerInput, language
     `${w.labels[0]}: ${a.western.sun} / ${a.shichu.dayMaster} / ${a.animal.core ?? w.notAvailable} / ${lifePath(owner.birthDate)}`,
     `${w.labels[1]}: ${b.western.sun} / ${b.shichu.dayMaster} / ${b.animal.core ?? w.notAvailable} / ${lifePath(partner.birthDate)}`,
     `${w.labels[0]} ${a.name ? `${a.name.person}・${a.name.total}` : w.notAvailable} · ${w.labels[1]} ${b.name ? `${b.name.person}・${b.name.total}` : w.notAvailable}`,
-    `${nameA.eto ?? w.notAvailable} × ${nameB.eto ?? w.notAvailable} · ${kuaA?.branches[0]?.number ?? w.notAvailable} × ${w.notAvailable}`,
+    `${nameA.eto ?? w.notAvailable} × ${nameB.eto ?? w.notAvailable} · ${kuaA?.branches.map(branch => branch.number).join("/") ?? w.notAvailable} × ${w.notAvailable}`,
   ];
   const dynamic = rel === "same" ? w.same : rel === "generate" ? w.generation : rel === "control" ? w.control : w.neutral;
   const sentences = language === "ja" ? [

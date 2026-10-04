@@ -235,7 +235,7 @@ export default function SettingsPanel({
                       </span>
                       <span className="flex w-full items-center justify-between gap-2 px-3 py-2 text-xs text-foreground">
                         <span className="min-w-0 whitespace-normal leading-4">{dc.names[mode.id]}<span className="mt-0.5 block text-[10px] text-muted-foreground">{dc.groups[index]}</span></span>
-                        {selected ? <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} /> : !available ? <span className="shrink-0 rounded-sm border border-primary/40 bg-primary/10 px-1 py-0.5 text-[9px] text-primary">{dc.planNames[index - 1] ?? dc.requires}</span> : null}
+                        {selected ? <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} /> : !available ? <span className="shrink-0 rounded-sm border border-primary/40 bg-primary/10 px-1 py-0.5 text-[9px] text-primary">{dc.planNames[["standard", "vip", "b2b", "b2b-premium"].indexOf(mode.tier)] ?? dc.requires}</span> : null}
                       </span>
                     </Button>
                   );
