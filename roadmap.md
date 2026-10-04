@@ -70,4 +70,4 @@
 - [x] Fix selected design application and add palette previews, theme fonts and lock badges across 19 themes.
 - [x] Add optional partner inputs and computed reference-layer comparison, without claiming verified personality or storing partner details.
 - [x] Rename profile data and add owner/team consultation target selection with isolated conversation context.
-- [ ] Verify saved-profile interaction, all theme choices, quick comparison, and AI consultation in the preview.
+- [x] Verify signed-in saved-profile interaction, all 19 theme choices, quick comparison, and member-targeted AI consultation in the preview.
