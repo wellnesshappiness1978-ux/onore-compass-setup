@@ -498,7 +498,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
   return (
     <>
-    <div data-design={effectiveDesign} data-tier={previewPlan} className="design-canvas celestial-scene relative min-h-screen overflow-hidden bg-background pb-32 text-foreground">
+    <div data-design={effectiveDesign} data-tier={previewPlan} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
