@@ -170,7 +170,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     title: "Salon AI Onore",
     subtitle: "Éclairer calmement votre prochaine décision",
     active: "Actif",
-    engine: "IA réflexive · multi-layer arts × horoscope animal",
+    engine: "IA réflexive · arts multicouches × horoscope animal",
     remaining: (count) => `Encore ${count} consultations gratuites aujourd’hui`,
     vip: "Consultations IA illimitées (VIP)",
     quickLabel: "Questions rapides",

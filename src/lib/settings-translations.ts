@@ -1016,7 +1016,7 @@ const fr: SettingsTranslation = {
       features: [
         "Enregistrez jusqu’à 2 personnes",
         "Lectures de compatibilité illimitées",
-        "Manuel intégré complet multi-layer arts × horoscope animal",
+        "Manuel intégré complet arts multicouches × horoscope animal",
         "Les 6 genres de couleurs de naissance débloqués",
         "Vue biorythme sur 1 mois",
       ],
@@ -1101,7 +1101,7 @@ const fr: SettingsTranslation = {
   team: "Membres de l'équipe",
   roles: ["Dirigeant", "Manager", "Membre", "Membre"],
   matrix: "Matrice de compatibilité",
-  roleMap: "Carte des rôles (multi-layer arts × horoscope animal)",
+  roleMap: "Carte des rôles (arts multicouches × horoscope animal)",
   roleAreas: ["Vision", "Exécution", "Coordination", "Analyse et qualité"],
   calendar: "Calendrier des décisions",
   push: "Agir",
