@@ -25,14 +25,31 @@ import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import compassAvatar from "@/assets/onore-ai-compass.png";
 import ConsultationVoice from "./ConsultationVoice";
+import { listTeamMembers } from "@/lib/team-members.functions";
+import { readPreviewMembers } from "@/lib/consultation-targets";
+import { useServerFn } from "@tanstack/react-start";
+import type { TeamMember } from "@/lib/team-analysis";
 
-type Props = { profile: UserProfile; language: Language; plan: Plan; onVip: () => void };
+type Props = { profile: UserProfile; language: Language; plan: Plan; actualPlan: Plan; signedIn: boolean; onVip: () => void };
 
 const dayKey = () => { const d = new Date(); return `onore-consult-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
 const untilMidnight = () => { const n = new Date(); const m = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1); return m.getTime() - n.getTime(); };
 const hms = (ms: number) => { const s = Math.max(0, Math.floor(ms / 1000)); return [s / 3600, (s % 3600) / 60, s % 60].map((v) => String(Math.floor(v)).padStart(2, "0")).join(":"); };
 
-export default function ConsultationPanel({ profile, language, plan, onVip }: Props) {
+export default function ConsultationPanel({ profile, language, plan, actualPlan, signedIn, onVip }: Props) {
+  const listMembers = useServerFn(listTeamMembers);
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [targetId, setTargetId] = useState("owner");
+  useEffect(() => {
+    let active = true;
+    if (signedIn && plan === actualPlan) listMembers().then(rows => { if (active) setMembers(rows); }).catch(() => { if (active) setMembers([]); });
+    else setMembers(readPreviewMembers());
+    return () => { active = false; };
+  }, [signedIn, plan, actualPlan, listMembers]);
+  useEffect(() => { if (targetId !== "owner" && !members.some(m => m.id === targetId)) setTargetId("owner"); }, [members, targetId]);
+  const target = members.find(m => m.id === targetId);
+  const targetProfile = target ? { ...profile, nameKanji: target.name, nameKana: "", nameRomaji: "", birthDate: target.birthDate, birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", bloodType: target.bloodType, siblingOrder: "", gender: target.gender as UserProfile["gender"] } : profile;
+  const targetLabel = target?.name ?? (language === "ja" ? "本人（登録オーナー）" : language === "zh-TW" ? "本人（帳戶擁有人）" : "You (owner)");
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
   const isJa = language === "ja";
@@ -55,16 +72,17 @@ export default function ConsultationPanel({ profile, language, plan, onVip }: Pr
     [t.greeting],
   );
   const transport = useMemo(
-    () => new DefaultChatTransport({ api: "/api/consultation", body: { profile, language } }),
-    [profile, language],
+    () => new DefaultChatTransport({ api: "/api/consultation", body: { profile: targetProfile, ownerProfile: target ? profile : undefined, targetLabel, language } }),
+    [targetProfile, profile, targetLabel, language],
   );
-  const { messages, sendMessage, status, stop, error, clearError } = useChat({
-    id: "onore-single-session",
+  const { messages, sendMessage, status, stop, error, clearError, setMessages } = useChat({
+    id: `onore-consult-${targetId}-${language}`,
     messages: initialMessages,
     transport,
     onError: () => setNotice(t.error),
     onFinish: () => textareaRef.current?.focus(),
   });
+  useEffect(() => { setMessages(initialMessages); clearError(); }, [targetId, language, setMessages, clearError, initialMessages]);
   const busy = status === "submitted" || status === "streaming";
 
   useEffect(() => {
@@ -118,6 +136,14 @@ export default function ConsultationPanel({ profile, language, plan, onVip }: Pr
         </div>
       </div>
 
+      <div className="mt-6 border-y border-primary/20 py-4">
+        <label htmlFor="consult-target" className="mb-2 block font-serif text-sm text-primary">{language === "ja" ? "相談する人の個人データ" : language === "zh-TW" ? "諮詢對象的個人資料" : "Person to consult about"}</label>
+        <select id="consult-target" className="w-full rounded-md border border-primary/30 bg-card px-3 py-3 text-foreground" value={targetId} onChange={e => { stop(); setTargetId(e.target.value); setNotice(null); }}>
+          <option value="owner">{language === "ja" ? "本人（登録オーナー）" : language === "zh-TW" ? "本人（帳戶擁有人）" : "You (owner)"}</option>
+          {members.map(m => <option key={m.id} value={m.id}>{m.name} · {m.role || m.birthDate}</option>)}
+        </select>
+        {target && <p className="mt-2 text-xs text-muted-foreground">{target.birthDate} · {language === "ja" ? "出生時間・出生地は未登録" : "Birth time and place not recorded"}</p>}
+      </div>
       <div className="mt-6 grid gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
         <div className="flex items-center gap-3">
           <Radio className="size-5 shrink-0 text-primary" />

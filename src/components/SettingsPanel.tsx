@@ -226,15 +226,16 @@ export default function SettingsPanel({
                       aria-pressed={selected}
                        title={!available ? `${dc.requires}: ${dc.groups[index]}` : dc.names[mode.id]}
                        onClick={() => available ? onDesignModeChange(mode.id) : setLockedMode(mode.id)}
-                       className={`design-choice design-choice--${mode.id} h-auto min-h-28 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left ${selected ? "ring-2 ring-primary" : ""}`}
+                       className={`design-choice design-choice--${mode.id} h-auto min-h-32 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left ${selected ? "ring-2 ring-primary" : ""}`}
                     >
                       <span className="design-choice-scene relative flex h-12 w-full items-center justify-center text-xl" aria-hidden="true">
                         <span>{mode.icon}</span>
-                        {!available && <LockKeyhole className="absolute right-3 top-3 size-3.5" />}
+                        {!available && <LockKeyhole className="design-choice-unlock absolute right-3 top-3 size-3.5" />}
+                        <span className="design-choice-palette absolute bottom-1 left-2 flex gap-1" aria-hidden="true"><span className="size-2 rounded-full border border-primary/30" /><span className="size-2 rounded-full border border-primary/30" /><span className="size-2 rounded-full border border-primary/30" /></span>
                       </span>
                       <span className="flex w-full items-center justify-between gap-2 px-3 py-2 text-xs text-foreground">
                         <span className="min-w-0 whitespace-normal leading-4">{dc.names[mode.id]}<span className="mt-0.5 block text-[10px] text-muted-foreground">{dc.groups[index]}</span></span>
-                        {selected && <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} />}
+                        {selected ? <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} /> : !available ? <span className="shrink-0 rounded-sm border border-primary/40 bg-primary/10 px-1 py-0.5 text-[9px] text-primary">{dc.planNames[["standard", "vip", "b2b", "b2b-premium"].indexOf(mode.tier)] ?? dc.requires}</span> : null}
                       </span>
                     </Button>
                   );

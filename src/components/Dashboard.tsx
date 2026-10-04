@@ -36,7 +36,9 @@ import SettingsPanel from "@/components/SettingsPanel";
 import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/design-modes";
 import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
-import { quickReading, quickUsageKey } from "@/lib/quick-compatibility";
+import { quickUsageKey } from "@/lib/quick-compatibility";
+import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
+import { profileTranslations } from "@/lib/profile-translations";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
@@ -131,16 +133,21 @@ function TorisetsuPanel({
   const [partnerTime, setPartnerTime] = useState("");
   const [partnerTimeUnknown, setPartnerTimeUnknown] = useState(false);
   const [partnerPlace, setPartnerPlace] = useState("");
+  const [partnerCity, setPartnerCity] = useState("");
+  const [partnerBlood, setPartnerBlood] = useState<"" | "A" | "B" | "O" | "AB">("");
+  const [partnerSibling, setPartnerSibling] = useState<"" | "first" | "middle" | "last" | "only">("");
+  const [result, setResult] = useState<ReturnType<typeof analyzeCompatibility>>(null);
   const [relation, setRelation] = useState<number | null>(null);
   const [analyzed, setAnalyzed] = useState(false);
   const [used, setUsed] = useState(0);
   useEffect(() => { try { setUsed(Number(localStorage.getItem(quickUsageKey(profile.birthDate, plan))) || 0); } catch { setUsed(0); } }, [profile.birthDate, plan]);
   const remaining = quickCompatibilityLimit[plan] - used;
-  const quick = partnerDate ? quickReading(profile.birthDate, partnerDate) : null;
-  const canAnalyze = partnerDate !== "" && relation !== null;
-  const score = quick?.score ?? 0;
+  const partnerInput: PartnerInput = { name: partnerName, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
+  const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
+  const score = result?.score ?? 0;
   const advice = score >= 84 ? t.advice[2] : score >= 70 ? t.advice[1] : t.advice[0];
   const today = new Date().toLocaleDateString("en-CA");
+  useEffect(() => { setAnalyzed(false); }, [partnerName, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, profile]);
 
   return (
     <div>
@@ -326,6 +333,11 @@ function TorisetsuPanel({
                   </select>
                 </div>
               </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="text-sm text-primary">{profileTranslations[language].city}<span className="text-muted-foreground"> ({t.optional})</span><input aria-label={profileTranslations[language].city} className={`${inputClass} mt-2`} maxLength={80} value={partnerCity} onChange={e => setPartnerCity(e.target.value)} /></label>
+                <label className="text-sm text-primary">{base.bloodType}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.bloodType} className={`${inputClass} mt-2`} value={partnerBlood} onChange={e => setPartnerBlood(e.target.value as typeof partnerBlood)}><option value="">—</option>{["A","B","O","AB"].map(x => <option key={x} value={x}>{x}</option>)}</select></label>
+                <label className="text-sm text-primary">{base.siblingOrder}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.siblingOrder} className={`${inputClass} mt-2`} value={partnerSibling} onChange={e => setPartnerSibling(e.target.value as typeof partnerSibling)}><option value="">—</option>{["first","middle","last","only"].map((x,i) => <option key={x} value={x}>{base.siblings[i]}</option>)}</select></label>
+              </div>
               <div>
                 <p className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <Network className="size-4 stroke-[1.4]" aria-hidden="true" />
@@ -354,7 +366,7 @@ function TorisetsuPanel({
                 type="button"
                 variant="champagne"
                 disabled={!canAnalyze || remaining <= 0}
-                onClick={() => { if (!canAnalyze || remaining <= 0) return; const next = used + 1; try { localStorage.setItem(quickUsageKey(profile.birthDate, plan), String(next)); } catch { /* private browsing */ } setUsed(next); setAnalyzed(true); }}
+                onClick={() => { if (!canAnalyze || remaining <= 0) return; const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language); if (!analysis) return; setResult(analysis); const next = used + 1; try { localStorage.setItem(quickUsageKey(profile.birthDate, plan), String(next)); } catch { /* private browsing */ } setUsed(next); setAnalyzed(true); }}
                 className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
               >
                 <Sparkles className="size-4 shrink-0" aria-hidden="true" />
@@ -363,7 +375,7 @@ function TorisetsuPanel({
             </div>
           </section>
            {remaining <= 0 && !analyzed && <p role="status" className="mt-3 text-center text-sm text-primary">{q.refresh}</p>}
-          {analyzed && canAnalyze ? (
+          {analyzed && result ? (
             <section className="py-8 text-center" aria-live="polite">
               {partnerName ? (
                 <p className="mb-4 text-sm text-muted-foreground">{partnerName}</p>
@@ -386,7 +398,8 @@ function TorisetsuPanel({
                 </p>
               </div>
               <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
-               {quick && <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">{q.headings.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-4"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? [quick.love, quick.friend, quick.business, quick.overall][i] : quick.same ? q.messages[i] : q.contrast?.[i] ?? q.messages[i]}</p></article>)}</div>}
+               <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-4"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-7 text-foreground">{result.sentences[i]}</p>{i === 3 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
+               <div className="mt-4 rounded-md border border-primary/15 p-4 text-left text-xs leading-6 text-muted-foreground"><p>{result.elementPair} · {result.dynamic}</p>{result.evidence.map((line,i) => <p key={i}>{line}</p>)}<p className="mt-2">{result.note}</p></div>
               <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
             </section>
           ) : null}
@@ -482,8 +495,9 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     return () => { active = false; };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
-  const tierDesign: DesignMode = previewPlan === "vip" ? "masculine-luxe" : previewPlan === "b2b" || previewPlan === "b2b-premium" ? "business-night" : "classic";
-  const effectiveDesign = designMode === "classic" ? tierDesign : designMode;
+  useEffect(() => { try { const saved = sessionStorage.getItem("onore-design"); if (saved && designCopy.ja.names[saved as DesignMode] && canPreviewDesign(previewPlan, saved as DesignMode)) setDesignMode(saved as DesignMode); } catch { /* private browsing */ } }, []);
+  useEffect(() => { try { sessionStorage.setItem("onore-design", designMode); } catch { /* private browsing */ } }, [designMode]);
+  const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
   useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
@@ -589,11 +603,13 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             ) : tab === "consult" ? (
               <>
               <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
-              <div className="mb-8"><TorisetsuPanel only="compatibility" plan={actualPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+              <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
               <ConsultationPanel
                 profile={profile}
                 language={language}
                 plan={previewPlan}
+                actualPlan={serverPlan}
+                signedIn={signedIn}
                 onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
               />
               </>

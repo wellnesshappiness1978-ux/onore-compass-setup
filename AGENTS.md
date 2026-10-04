@@ -16,18 +16,18 @@
 - Show complete illustrative self-core readings before upsells on every plan; never claim verified 15-art results or paid entitlement. Why: Free remains complete and honest.
 - Day compass: deterministic `src/lib/day-compass.ts`, plan-gated reference values.
 - AI consultation daily caps (1/3/10/30/unlimited) live in `plans.ts`, counted per device in localStorage by preview plan; display test only.
-- Consultation is session-only; context and counts are previews, not entitlements.
+- Consultation is session-only; counts are previews. Target uses owner-only roster or local preview roster, omits missing fields, and isolates histories per person. Why: no entitlement, context leaks, or invented data.
 - Keep nine-stars fixed grid explicitly illustrative, never natal. Save/share only labelled preview art after test unlock; no verified chart or entitlement without calculations/billing.
 - Centralize preview overrides in PlanProvider and use the shared effective plan for every UI gate; enable only on development/known preview hosts and keep server membership validation intact. Why: guest tests must work without granting production entitlements.
 - Plan caps live in `src/lib/plans.ts`; member writes use read-only `plan_memberships` and a DB cap (missing row = Free). Preview toggles grant no paid writes.
-- Team members persist in `team_members` (owner-only RLS) when signed in outside preview override; guest and override tests use localStorage `onore-team`; team scores come from deterministic `src/lib/team-analysis.ts`, AI draft/1on1 via `src/lib/ai/team-ai.functions.ts`.
+- Team roster: owner-only `team_members` when signed in, otherwise local `onore-team`; deterministic `team-analysis.ts` scores, `team-ai.functions.ts` drafts/1on1. Why: guest previews grant no writes.
 - Five-grid displays share Unihan strokes for spaced surname/given name, never synthetic counts. Animal core uses published 60-day map; other three are labeled original day-offset models, not official classifications. Home portraits give no moral advice. Why: avoid fabricated claims.
 - My Page's four paid cards use seven-language `src/lib/plan-cards.ts` copy and `settings-translations` prices plus Premium in `SettingsPanel.tsx`. Buttons switch preview plans only on test hosts; production shows information until billing is connected.
 - Share cards use a shared client canvas renderer, language-specific readings and effective-plan palettes (Free main only); names default hidden and native sharing falls back to save.
 - Team simulator uses the existing deterministic pair model and the effective preview plan; consultation voice uses browser speech and one 528Hz ambient piano instance. Why: reference scores are reproducible and concurrent audio must not overlap.
 - Reminders remain open-app only until a push service and LINE identity connection exist. Why: local browser timers cannot deliver after the app closes.
 
-- Quick compatibility uses deterministic birth-date reference copy and a local-day per-device usage counter keyed by profile and actual membership; do not describe it as verified astrology or server-enforced billing. Why: partner details are not saved and billing is not connected.
+- Quick compatibility compares available name, numerology, sky, Four Pillars, animal, color and owner Ming Gua references; omit missing partner gender/time. Local-day usage is device-only, keyed by profile and actual membership; partner details are not saved. Why: no verified psychology or billing.
 - HelioCalendar calculates heliocentric planet positions for the selected day, but calendar events use only illustrative daily rhythm and require a user-confirmed Google or ICS import; never call these verified auspicious dates or automatic sync. Why: astronomical positions do not validate personal timing.
 - Birth colors map profile fields and solar longitude to illustrative 1440-slot colors, not measured frequencies or validated correspondences. Why: no established mapping exists.
 - Debug plan changes require a server-verified admin role and expire after 24 hours; membership reads and team-write caps restore the original plan after expiry. Why: testing tiers must not overwrite paid entitlements.
