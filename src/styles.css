@@ -88,7 +88,14 @@
   --birth-color-11: oklch(0.82 0.02 255);
   --birth-color-22: oklch(0.68 0.15 254);
   --birth-color-33: oklch(0.91 0.045 15);
+  --share-midnight: oklch(0.105 0.008 265);
+  --share-gold: oklch(0.84 0.115 85);
+  --share-paper: oklch(0.96 0.016 90);
+  --share-veil: oklch(0.105 0.008 265 / 0.7);
+  --share-panel: oklch(0.16 0.008 265 / 0.9);
 }
+
+.share-card-modal { background: var(--share-midnight); z-index: 100; }
 
 .dark {
   --background: #050B18;
