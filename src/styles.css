@@ -95,7 +95,7 @@
   --share-panel: oklch(0.16 0.008 265 / 0.9);
 }
 
-.share-card-modal { background: var(--share-midnight); }
+.share-card-modal { background: var(--share-midnight); z-index: 100; }
 
 .dark {
   --background: #050B18;

@@ -11,9 +11,10 @@ export const cardCopy = (language: Language) => shareCopy[language === "ja" ? "j
 
 function lines(ctx: CanvasRenderingContext2D, text: string, width: number) {
   const result: string[] = []; let line = "";
-  for (const ch of text) {
+  const tokens = text.match(/[A-Za-z0-9]+(?:[’'–-][A-Za-z0-9]+)*|[^A-Za-z0-9]/gu) ?? [];
+  for (const ch of tokens) {
     if (ch === "\n") { result.push(line); line = ""; continue; }
-    if (line && ctx.measureText(line + ch).width > width) { result.push(line.trim()); line = ch; } else line += ch;
+    if (line && ctx.measureText(line + ch).width > width) { result.push(line.trim()); line = ch.trimStart(); } else line += ch;
   }
   if (line) result.push(line.trim());
   return result;
