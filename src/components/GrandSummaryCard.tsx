@@ -48,7 +48,7 @@ export default function GrandSummaryCard({ profile, language, plan }: { profile:
         loading={isPending}
         label={share}
         autoOpen={false}
-        data={text && data?.caution ? { kicker: "", title: "", names: [], lines: [data.keySummary || text.slice(0, 120)], caution: data.caution, palette: colors.map((c) => ({ label: c.name, code: c.code })), score: 0, kind: "identity" } : null}
+        data={text && data?.caution ? { kicker: "", title: "", names: [], lines: [data.keySummary || text.slice(0, 120)], caution: data.caution, palette: colors.map((c) => ({ label: c.name ?? "", code: c.code })), score: 0, kind: "identity" } : null}
       />
     </section>
   );
