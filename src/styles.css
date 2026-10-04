@@ -936,3 +936,40 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-choice--business-geometry .design-choice-scene { background: linear-gradient(135deg, oklch(0.22 0.05 210), oklch(0.88 0.12 180)); color: oklch(.97 .02 180); }
 .design-choice--business-dragon .design-choice-scene { background: linear-gradient(135deg, oklch(0.22 0.06 160), oklch(0.82 0.15 155)); color: oklch(.97 .02 155); }
 .design-choice--business-zero .design-choice-scene { background: linear-gradient(135deg, oklch(0.19 0.01 270), oklch(0.95 0.05 95)); color: oklch(.97 .02 95); }
+
+/* Selection previews inherit the same palette as their full-screen themes. */
+.design-choice { --preview-base: var(--background); --preview-accent: var(--primary); --preview-glint: var(--gold-glow); }
+.design-choice-scene {
+  background: radial-gradient(circle at 28% 35%, color-mix(in oklab, var(--preview-accent) 40%, transparent), transparent 60%), linear-gradient(125deg, var(--preview-base), color-mix(in oklab, var(--preview-accent) 24%, var(--preview-base)));
+}
+.design-choice-scene::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(circle, var(--preview-glint) 1px, transparent 2px); background-size: 17px 17px; opacity: .44; }
+.design-choice-scene > span { z-index: 1; }
+.design-choice--classic { --preview-base: oklch(.16 .035 260); --preview-accent: oklch(.82 .13 90); --preview-glint: oklch(.92 .07 95); }
+.design-choice--aura-gold-luxe { --preview-base: oklch(.12 .03 75); --preview-accent: oklch(.84 .15 85); --preview-glint: oklch(.92 .09 85); }
+.design-choice--deepsea-luxe { --preview-base: oklch(.12 .06 240); --preview-accent: oklch(.82 .11 200); --preview-glint: oklch(.90 .066 200); }
+.design-choice--shion-luxe { --preview-base: oklch(.14 .07 300); --preview-accent: oklch(.84 .1 310); --preview-glint: oklch(.93 .05 310); }
+.design-choice--business-platinum { --preview-base: oklch(.12 .008 250); --preview-accent: oklch(.88 .02 250); --preview-glint: oklch(.95 .02 250); }
+.design-choice--business-jade { --preview-base: oklch(.12 .05 165); --preview-accent: oklch(.83 .13 90); --preview-glint: oklch(.94 .06 90); }
+.design-choice--business-diamond { --preview-base: oklch(.1 .005 260); --preview-accent: oklch(.92 .03 220); --preview-glint: oklch(.97 .015 220); }
+.design-choice--business-orion { --preview-base: oklch(.13 .08 255); --preview-accent: oklch(.8 .12 235); --preview-glint: oklch(.94 .04 235); }
+.design-choice--business-cosmos { --preview-base: oklch(.12 .06 280); --preview-accent: oklch(.85 .12 60); --preview-glint: oklch(.96 .04 60); }
+.design-choice--business-emperor { --preview-base: oklch(.12 .03 40); --preview-accent: oklch(.86 .16 80); --preview-glint: oklch(.96 .06 80); }
+.design-choice--business-geometry { --preview-base: oklch(.12 .05 210); --preview-accent: oklch(.88 .12 180); --preview-glint: oklch(.96 .04 180); }
+.design-choice--business-dragon { --preview-base: oklch(.12 .06 160); --preview-accent: oklch(.82 .15 155); --preview-glint: oklch(.95 .05 155); }
+.design-choice--business-zero { --preview-base: oklch(.11 .01 270); --preview-accent: oklch(.95 .05 95); --preview-glint: oklch(.98 .02 95); }
+.design-choice-palette span { background: var(--preview-base); }
+.design-choice-palette span:nth-child(2) { background: var(--preview-accent); }
+.design-choice-palette span:nth-child(3) { background: var(--preview-glint); }
+.design-choice-unlock { animation: preview-unlock 2.8s ease-in-out infinite; }
+@keyframes preview-unlock { 0%,100% { filter: drop-shadow(0 0 1px var(--preview-accent)); } 50% { filter: drop-shadow(0 0 9px var(--preview-glint)); } }
+@media (prefers-reduced-motion: reduce) { .design-choice-unlock { animation: none; } }
+/* Define visual roles on each chosen theme, rather than inheriting a previous tier's typography. */
+.design-canvas[data-design="classic"] { --design-font-body: "Karla", "Noto Sans JP", sans-serif; --design-font-heading: "Noto Serif JP", serif; }
+.design-canvas[data-design="masculine"], .design-canvas[data-design="business-diamond"], .design-canvas[data-design="business-zero"] { --design-font-body: "Noto Sans JP", sans-serif; --design-font-heading: "Noto Sans JP", sans-serif; }
+.design-canvas[data-design="feminine"], .design-canvas[data-design="shion-luxe"], .design-canvas[data-design="feminine-luxe"] { --design-font-body: "Karla", "Noto Sans JP", sans-serif; --design-font-heading: "Cormorant Garamond", "Noto Serif JP", serif; }
+.design-canvas[data-design="masculine-luxe"], .design-canvas[data-design="aura-gold-luxe"], .design-canvas[data-design="business-emperor"], .design-canvas[data-design="business-dragon"] { --design-font-body: "Noto Sans JP", sans-serif; --design-font-heading: "Noto Serif JP", serif; }
+.design-canvas[data-design="business-night"], .design-canvas[data-design="business-day"], .design-canvas[data-design="business-platinum"], .design-canvas[data-design="business-jade"], .design-canvas[data-design="business-orion"], .design-canvas[data-design="business-geometry"] { --design-font-body: "Karla", "Noto Sans JP", sans-serif; --design-font-heading: "Noto Serif JP", serif; }
+.design-canvas[data-design="deepsea-luxe"], .design-canvas[data-design="business-cosmos"] { --design-font-body: "Karla", "Noto Sans JP", sans-serif; --design-font-heading: "Cormorant Garamond", "Noto Serif JP", serif; }
+.design-canvas { font-family: var(--design-font-body, var(--font-sans)); }
+.design-canvas .font-serif, .design-canvas .design-title { font-family: var(--design-font-heading, var(--font-serif)); }
+.design-canvas .card-lux { background: var(--design-surface, var(--card)); }
