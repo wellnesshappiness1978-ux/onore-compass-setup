@@ -64,4 +64,4 @@
 - [x] Add shareable essence/daily insight/birth-color cards, JP/EN/繁體 quick switch, Business team grouping, VIP consultation voice, and preview-plan gates.
 - [ ] Background 08:00 push and LINE delivery — blocked: Firebase Messaging connection was declined and LINE account/identity integration is unavailable; open-app reminders remain available.
 - [x] Verify live AI output, card save, and two-member team grouping through the signed-in preview; the voice control is present and starts, but audible speech cannot be confirmed in headless Chromium.
-- [ ] Refine the SNS card and modal: midnight portrait PNG, localized reading, tier-safe palettes, device sharing and five-plan guest export checks.
+- [x] Refine SNS card/modal: midnight portrait PNG, localized readings, tier-safe palettes and save/share fallback; verified guest 1080×1920 exports on all five plans, JP/EN/繁體 cards and mobile layout. Native app destination selection remains device-dependent.
