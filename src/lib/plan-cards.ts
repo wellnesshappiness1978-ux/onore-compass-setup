@@ -54,7 +54,7 @@ const JA_FEATURES = {
 export const planCardsCopy: Record<Language, PlanCardsCopy> = {
   ja: {
     sectionTitle: "あなたの可能性を、もう一歩先へ",
-    sectionSub: "有料4プランの特典を比較できます",
+    sectionSub: "上位プランへアップグレードすることで、下位プランのすべての特権サービスを完全に引き継ぎ、さらに高度で特別な限定機能・更なる分析サービスが解放されます。",
     unlockCta: "このプランで可能性を開放する",
     cards: [
       { id: "standard", badge: "手軽にスタート", tagline: "毎日を彩る、あなた専用のコンパス", features: JA_FEATURES.standard },
@@ -65,7 +65,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
   },
   en: {
     sectionTitle: "Take your next step",
-    sectionSub: "Compare the benefits of the four paid plans",
+    sectionSub: "Each higher plan carries over every benefit of the plans below it and adds more advanced, exclusive features and deeper analysis.",
     unlockCta: "Unlock this plan",
     cards: [
       { id: "standard", badge: "Easy start", tagline: "Your daily compass, in living color", features: [
@@ -103,7 +103,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
   },
   "zh-CN": {
     sectionTitle: "继续探索你的可能性",
-    sectionSub: "比较四种付费方案的全部权益",
+    sectionSub: "升级到更高方案后，将完整保留下级方案的全部特权，并解锁更高级的专属功能与更深入的分析服务。",
     unlockCta: "开通此方案，释放可能性",
     cards: [
       { id: "standard", badge: "轻松入门", tagline: "点亮每一天的专属指南", features: [
@@ -141,7 +141,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
   },
   "zh-TW": {
     sectionTitle: "繼續探索你的可能性",
-    sectionSub: "比較四種付費方案的全部權益",
+    sectionSub: "升級到更高方案後，將完整保留下級方案的全部特權，並解鎖更進階的專屬功能與更深入的分析服務。",
     unlockCta: "開通此方案，釋放可能性",
     cards: [
       { id: "standard", badge: "輕鬆入門", tagline: "點亮每一天的專屬指南", features: [
@@ -179,7 +179,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
   },
   ko: {
     sectionTitle: "가능성을 더 탐색해 보세요",
-    sectionSub: "유료 4개 플랜의 혜택을 비교해 보세요",
+    sectionSub: "상위 플랜으로 업그레이드하면 하위 플랜의 모든 혜택을 그대로 이어받고, 더 고급스러운 전용 기능과 심층 분석이 열립니다.",
     unlockCta: "이 플랜으로 가능성 열기",
     cards: [
       { id: "standard", badge: "가볍게 시작", tagline: "매일을 빛내는 나만의 나침반", features: [
@@ -217,7 +217,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
   },
   es: {
     sectionTitle: "Explora el siguiente paso",
-    sectionSub: "Compara las ventajas de los cuatro planes de pago",
+    sectionSub: "Cada plan superior conserva todas las ventajas de los planes inferiores y suma funciones exclusivas y análisis más profundos.",
     unlockCta: "Desbloquear este plan",
     cards: [
       { id: "standard", badge: "Para empezar", tagline: "Tu brújula diaria, a todo color", features: [
@@ -255,7 +255,7 @@ export const planCardsCopy: Record<Language, PlanCardsCopy> = {
   },
   fr: {
     sectionTitle: "Explorez la suite",
-    sectionSub: "Comparez les avantages des quatre plans payants",
+    sectionSub: "Chaque offre supérieure conserve tous les avantages des offres inférieures et ajoute des fonctions exclusives et des analyses plus poussées.",
     unlockCta: "Débloquer ce plan",
     cards: [
       { id: "standard", badge: "Pour commencer", tagline: "Votre boussole quotidienne, en couleurs", features: [
