@@ -15,7 +15,7 @@ export const partnerSchema = z.object({
   siblingOrder: z.enum(["", "first", "middle", "last", "only"]),
 });
 export type PartnerInput = z.infer<typeof partnerSchema>;
-type Owner = PartnerInput & { nameRomaji: string; gender: string; birthTimeUnknown: boolean };
+type Owner = { name: string; birthDate: string; birthTime: string; birthTimeUnknown: boolean; birthPlace: string; birthCity: string; bloodType: string; siblingOrder: string; nameRomaji: string; gender: string };
 
 const words: Record<Language, { titles: [string, string, string, string]; labels: [string, string]; same: string; different: string; generation: string; control: string; neutral: string; color: string; notAvailable: string; missing: string; reference: string; phrases: [string, string]; caution: string }> = {
   ja: { titles: ["引き寄せの傾向", "思考の相乗効果", "衝突点と対処", "バースカラーの補完"], labels: ["本人", "相手"], same: "同じ五行が重なる", different: "異なる五行が向き合う", generation: "五行が生み合う組み合わせ", control: "五行が抑制し合う組み合わせ", neutral: "五行は直接の生克関係にない", color: "参考カラー", notAvailable: "未算出", missing: "姓名五格は姓と名を空白で区切り、対応漢字が揃った場合のみ計算します。出生時間・出生地・性別がない層も推測しません。", reference: "占術上の比較と独自参考モデルです。相手の気持ち・性格・未来は判定できません。", phrases: ["話す順番と結論の期限を先に決める", "得意な役割を分け、意見が違う理由を言葉で確かめる"], caution: "相手の意図を推測せず、予定と希望を直接確認する" },
