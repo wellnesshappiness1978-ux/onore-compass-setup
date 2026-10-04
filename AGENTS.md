@@ -38,3 +38,5 @@
 - Use HelioCalendar for both Home and My Page and BirthColorGuide for color output; remove independent fake panels. Why: duplicate render paths bypassed tier gates.
 - Legal content has shareable leaf pages and footer dialogs; support requests require authentication and owner-only RLS. Why: avoid invented legal identity and anonymous personal-data exposure.
 - Sales cards use isUpgradePlan; active tier is status. Tier CSS defaults are automatic. One Dashboard audio instance uses gesture-started ambient-piano; no overlapping players.
+- Home stacks portrait (SelfCoreCard) → owner manual → daily guides → GrandSummaryCard; quick compatibility lives in the consult tab and plan-exclusive features are gathered in PlanPerksTab. Why: owner readings in one place, plan value in one tab.
+- Design themes are cumulative by tier in `design-modes.ts` (CSS-scoped in styles.css); VIP names end in `-luxe`, Business/Premium start with `business-` to inherit tier styling. Why: shared tier styles without per-theme duplication.
