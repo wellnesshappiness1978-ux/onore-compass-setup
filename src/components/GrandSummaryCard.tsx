@@ -43,11 +43,12 @@ export default function GrandSummaryCard({ profile, language, plan }: { profile:
       </p>
       <p className="mt-5 text-center text-[11px] text-muted-foreground">{copy.preview}</p>
       <ShareCardButton
-        className="mt-6"
+        className="mt-6 h-auto min-h-12 w-full whitespace-normal px-4 py-3 text-base"
         language={language}
         loading={isPending}
-        label={`📱 ${share}`}
-        data={text && data?.caution ? { kicker: "", title: "", names: [], lines: [data.keySummary || text.slice(0, 120)], caution: data.caution, palette: colors.map((c) => ({ label: c.name, code: c.code })), score: 0, kind: "grand" } : null}
+        label={share}
+        autoOpen={false}
+        data={text && data?.caution ? { kicker: "", title: "", names: [], lines: [data.keySummary || text.slice(0, 120)], caution: data.caution, palette: colors.map((c) => ({ label: c.name, code: c.code })), score: 0, kind: "identity" } : null}
       />
     </section>
   );

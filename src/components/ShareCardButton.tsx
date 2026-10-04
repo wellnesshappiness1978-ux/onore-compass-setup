@@ -7,7 +7,7 @@ import type { Language } from "@/lib/translations";
 import { cardCopy, renderShareCard, type CardFormat, type ShareCardData } from "@/lib/share-card-renderer";
 export type { ShareCardData } from "@/lib/share-card-renderer";
 
-export default function ShareCardButton({ data, language, className, loading = false }: { data: ShareCardData | null; language: Language; className?: string; loading?: boolean }) {
+export default function ShareCardButton({ data, language, className, loading = false, label, autoOpen = true }: { data: ShareCardData | null; language: Language; className?: string; loading?: boolean; label?: string; autoOpen?: boolean }) {
   const t = cardCopy(language);
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState<CardFormat>("story");
@@ -45,11 +45,11 @@ export default function ShareCardButton({ data, language, className, loading = f
   }, [open, payload, language, format, includeName, loading]);
 
   useEffect(() => {
-    if (data?.kind !== "identity") return;
+    if (data?.kind !== "identity" || !autoOpen) return;
     const handle = () => { setFormat("story"); setOpen(true); };
     window.addEventListener("onore-share-card", handle);
     return () => window.removeEventListener("onore-share-card", handle);
-  }, [data?.kind]);
+  }, [data?.kind, autoOpen]);
   const filename = `onore-insight-${language}-${format}.png`;
   const ready = Boolean(url && blob && !rendering && !loading);
   const save = () => {
@@ -73,7 +73,7 @@ export default function ShareCardButton({ data, language, className, loading = f
     window.open(href, "_blank", "noopener,noreferrer"); save();
   };
   return <>
-    <Button type="button" variant="champagne" className={className ?? "mt-6 h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto"} onClick={() => { setFormat("story"); setOpen(true); }}><Smartphone className="size-4 shrink-0" />{t.cta}</Button>
+    <Button type="button" variant="champagne" className={className ?? "mt-6 h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto"} onClick={() => { setFormat("story"); setOpen(true); }}><Smartphone className="size-4 shrink-0" />{label ?? t.cta}</Button>
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="share-card-modal max-h-[92dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 p-5 sm:max-w-4xl sm:p-7">
         <DialogHeader className="pr-6 text-left"><DialogDescription className="text-xs text-primary">SELF COMPASS · {t.description}</DialogDescription><DialogTitle className="font-serif text-xl leading-relaxed sm:text-2xl">{t.title}</DialogTitle></DialogHeader>
