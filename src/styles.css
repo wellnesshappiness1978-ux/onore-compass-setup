@@ -388,7 +388,7 @@
   background: repeating-linear-gradient(90deg, transparent 0 29px, color-mix(in oklab, var(--preview-accent) 12%, transparent) 30px 31px), linear-gradient(125deg, var(--preview-base), color-mix(in oklab, var(--preview-accent) 28%, var(--preview-base)));
   border-bottom: 1px solid color-mix(in oklab, var(--preview-accent) 35%, transparent);
 }
-.design-choice-scene > span {
+.design-choice-scene > span:first-child {
   display: grid;
   place-items: center;
   width: 34px;
@@ -943,7 +943,7 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
   background: radial-gradient(circle at 28% 35%, color-mix(in oklab, var(--preview-accent) 40%, transparent), transparent 60%), linear-gradient(125deg, var(--preview-base), color-mix(in oklab, var(--preview-accent) 24%, var(--preview-base)));
 }
 .design-choice-scene::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(circle, var(--preview-glint) 1px, transparent 2px); background-size: 17px 17px; opacity: .44; }
-.design-choice-scene > span { z-index: 1; }
+.design-choice-scene > span:first-child { z-index: 1; }
 .design-choice--classic { --preview-base: oklch(.16 .035 260); --preview-accent: oklch(.82 .13 90); --preview-glint: oklch(.92 .07 95); }
 .design-choice--aura-gold-luxe { --preview-base: oklch(.12 .03 75); --preview-accent: oklch(.84 .15 85); --preview-glint: oklch(.92 .09 85); }
 .design-choice--deepsea-luxe { --preview-base: oklch(.12 .06 240); --preview-accent: oklch(.82 .11 200); --preview-glint: oklch(.90 .066 200); }

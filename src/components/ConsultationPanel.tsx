@@ -75,13 +75,14 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
     () => new DefaultChatTransport({ api: "/api/consultation", body: { profile: targetProfile, ownerProfile: target ? profile : undefined, targetLabel, language } }),
     [targetProfile, profile, targetLabel, language],
   );
-  const { messages, sendMessage, status, stop, error, clearError } = useChat({
+  const { messages, sendMessage, status, stop, error, clearError, setMessages } = useChat({
     id: `onore-consult-${targetId}-${language}`,
     messages: initialMessages,
     transport,
     onError: () => setNotice(t.error),
     onFinish: () => textareaRef.current?.focus(),
   });
+  useEffect(() => { setMessages(initialMessages); clearError(); }, [targetId, language, setMessages, clearError, initialMessages]);
   const busy = status === "submitted" || status === "streaming";
 
   useEffect(() => {
