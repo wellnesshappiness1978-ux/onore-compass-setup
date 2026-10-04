@@ -440,7 +440,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     window.addEventListener("onore-open", onEvt);
     return () => window.removeEventListener("onore-open", onEvt);
   }, []);
-  const [artsEntry, setArtsEntry] = useState<"manual" | "compatibility">("manual");
   const [teamEntry, setTeamEntry] = useState(false);
   useEffect(() => {
     if (tab !== "settings" || !teamEntry) return;
