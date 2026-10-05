@@ -66,7 +66,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
     try {
       const { blob, width, height } = await createWallpaper();
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a"); link.href = url; link.download = "onore-celestial-mandala-preview.png";
+       const link = document.createElement("a"); link.href = url; link.download = "agolmen-celestial-mandala-preview.png";
       document.body.append(link); link.click(); link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 10000);
       setStatus(`${t.saved} · ${width} × ${height}`);
@@ -77,7 +77,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
     setBusy(true);
     try {
       const { blob } = await createWallpaper();
-      const file = new File([blob], "onore-celestial-mandala-preview.png", { type: "image/png" });
+       const file = new File([blob], "agolmen-celestial-mandala-preview.png", { type: "image/png" });
       if (navigator.canShare?.({ files: [file] }) && navigator.share) { await navigator.share({ files: [file], title: t.wallpaperTitle, text: t.shareText }); setStatus(t.shared); }
       else if (navigator.clipboard?.write && typeof ClipboardItem !== "undefined") { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); setStatus(t.imageCopied); }
       else setStatus(t.shareFallback);

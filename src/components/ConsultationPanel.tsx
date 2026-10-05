@@ -15,7 +15,6 @@ import {
   PromptInputSubmit,
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
-import { Shimmer } from "@/components/ai-elements/shimmer";
 import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
@@ -239,17 +238,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
             ))}
             {status === "submitted" ? (
               <Message from="assistant">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={compassAvatar}
-                    alt=""
-                    width={816}
-                    height={816}
-                    loading="lazy"
-                    className="size-8 drop-shadow-[0_0_8px_var(--primary)]"
-                  />
-                  <AgolmenLoading compact label={t.thinking} />
-                </div>
+                 <AgolmenLoading compact label={t.thinking} />
               </Message>
             ) : null}
             {error || notice ? (
