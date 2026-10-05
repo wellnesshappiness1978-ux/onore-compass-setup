@@ -553,7 +553,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             </div>
           </div>
           <div className="design-heading mt-2 text-center">
-            <AgolmenLogo className="mx-auto mb-1 size-16 object-contain drop-shadow-[0_0_12px_var(--gold-glow)]" />
+            <AgolmenLogo className="mx-auto mb-1 size-20 object-contain drop-shadow-[0_0_12px_var(--gold-glow)]" />
             <p className="design-wordmark text-[9px] uppercase text-primary/70">AGOLMEN'S COMPASS</p>
             <h1 className="design-title font-serif text-2xl font-bold text-gradient-gold sm:text-3xl">
               {translations[language].brand}

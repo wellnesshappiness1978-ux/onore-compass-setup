@@ -1,4 +1,6 @@
-import logo from "@/assets/agolmen-logo-orbit.png";
+import logoAsset from "@/assets/agolmen-compass-tile.png.asset.json";
+
+const logo = logoAsset.url;
 
 const points = Array.from({ length: 230 }, (_, i) => {
   const angle = i * 0.12;
@@ -22,12 +24,13 @@ export function AgolmenLoading({ label, compact = false }: { label: string; comp
     <div className={`agolmen-loading-art relative ${compact ? "size-24" : "size-48"}`} aria-hidden="true">
       <SpiralLines className="agolmen-loading-orbit absolute inset-0 size-full text-primary" />
       {particles.map(i => <span key={i} className="agolmen-particle" style={{ "--i": i } as React.CSSProperties} />)}
-      <img src={logo} alt="" width={1024} height={1024} className="agolmen-loading-logo absolute inset-[20%] size-[60%] object-contain" />
+      <span className="agolmen-loading-aura absolute inset-[19%] rounded-full" />
+      <img src={logo} alt="" width={512} height={512} className="agolmen-loading-logo absolute inset-[16%] size-[68%] object-contain" />
     </div>
     <p className="mt-3 px-4 font-serif text-sm text-primary">{label}</p>
   </div>;
 }
 
 export function AgolmenLogo({ className = "" }: { className?: string }) {
-  return <img src={logo} alt="" width={1024} height={1024} className={className} />;
+  return <img src={logo} alt="" width={512} height={512} className={className} />;
 }

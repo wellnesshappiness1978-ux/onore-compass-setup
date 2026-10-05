@@ -574,10 +574,10 @@ export default function SettingsPanel({
         )}
       </section>
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
-        <DialogContent className="max-w-lg overflow-hidden border-primary/40 bg-card text-foreground">
-          <div className="relative mx-auto size-40" aria-hidden="true"><SpiralLines className="absolute inset-0 size-full text-primary/70" /><AgolmenLogo className="absolute inset-[22%] size-[56%] object-contain" /></div>
+        <DialogContent className="agolmen-story-dialog max-w-lg overflow-hidden border-primary/40 bg-card text-foreground">
+          <div className="relative mx-auto size-40" aria-hidden="true"><SpiralLines className="absolute inset-0 size-full text-primary/70" /><AgolmenLogo className="absolute inset-[18%] size-[64%] object-contain" /></div>
           <DialogTitle className="text-center font-serif text-2xl text-primary">{language === "ja" ? "アゴルメンの物語" : "The story of Agolmen"}</DialogTitle>
-          <DialogDescription className="text-center text-sm leading-8 text-foreground/80">{language === "ja" ? "カタツムリは、どこへ向かうときも自分の殻を携えています。その姿に、揺るぎない自分軸を重ねました。殻に見いだした黄金螺旋は、自然の調和を想うための象徴。羅針盤と重なるこの印が、あなた自身の歩幅で選ぶ時間に寄り添います。" : "The snail carries its shell wherever it goes: a symbol of an inner center that travels with us. The golden spiral evokes harmony in nature. Joined with a compass, it invites each person to find a direction at their own pace."}</DialogDescription>
+          <DialogDescription className="text-center text-sm leading-8 text-foreground/80">{language === "ja" ? "カタツムリは、どこへ向かうときも自分の殻を携えています。その姿に、自分を守る揺るぎない軸を重ねました。殻の螺旋は、自然の調和を想うための象徴。宝石を抱く羅針盤とともに、あなた自身の歩幅で選ぶ時間に寄り添います。" : "The snail carries its shell wherever it goes: a symbol of a steady center that protects us. Its spiral evokes the harmony we imagine in nature. Joined with a jeweled compass, it invites each person to find a direction at their own pace."}</DialogDescription>
         </DialogContent>
       </Dialog>
       <Dialog open={lockedMode !== null} onOpenChange={(open) => { if (!open) setLockedMode(null); }}>

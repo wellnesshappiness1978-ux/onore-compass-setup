@@ -1,5 +1,7 @@
 import type { Language } from "./translations";
-import logoUrl from "@/assets/agolmen-logo-orbit.png";
+import logoAsset from "@/assets/agolmen-compass-tile.png.asset.json";
+
+const logoUrl = logoAsset.url;
 
 export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility"; caution?: string; palette?: { label: string; code: string }[] };
 export type CardFormat = "story" | "x";
@@ -41,6 +43,9 @@ export async function renderShareCard(format: CardFormat, data: ShareCardData, l
   const token = (name: string) => css.getPropertyValue(name).trim();
   const gold = token("--share-gold"), ink = token("--share-midnight"), paper = token("--share-paper");
   ctx.fillStyle = ink; ctx.fillRect(0, 0, w, h);
+  const cosmic = ctx.createRadialGradient(w * .5, story ? 560 : 285, 50, w * .5, story ? 650 : 310, story ? 780 : 550);
+  cosmic.addColorStop(0, token("--share-amethyst")); cosmic.addColorStop(.36, token("--share-lavender")); cosmic.addColorStop(.7, token("--share-rose")); cosmic.addColorStop(1, ink);
+  ctx.globalAlpha = .35; ctx.fillStyle = cosmic; ctx.fillRect(0, 0, w, h); ctx.globalAlpha = 1;
   const palette = data.palette?.slice(0, 6) ?? [];
   const aura = ctx.createLinearGradient(0, 0, w, h);
   (palette.length ? palette : [{ code: gold }]).forEach((color, i, arr) => aura.addColorStop(arr.length === 1 ? 0 : i / (arr.length - 1), color.code));
@@ -55,10 +60,10 @@ export async function renderShareCard(format: CardFormat, data: ShareCardData, l
   for (const radius of [180, 238, 290, 325]) { ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.stroke(); }
   for (let i = 0; i < 12; i++) { const angle = i * Math.PI / 6; ctx.beginPath(); ctx.moveTo(cx + Math.cos(angle) * 325, cy + Math.sin(angle) * 325); ctx.lineTo(cx + Math.cos(angle + Math.PI * 2 / 3) * 325, cy + Math.sin(angle + Math.PI * 2 / 3) * 325); ctx.stroke(); }
    const spiralGradient = ctx.createLinearGradient(0, 0, w, h); spiralGradient.addColorStop(0, gold); spiralGradient.addColorStop(.5, paper); spiralGradient.addColorStop(1, gold);
-   ctx.strokeStyle = spiralGradient; ctx.globalAlpha = .65; ctx.strokeRect(34, 34, w - 68, h - 68); ctx.globalAlpha = .2; ctx.strokeRect(49, 49, w - 98, h - 98); ctx.globalAlpha = .42;
+   ctx.strokeStyle = spiralGradient; ctx.globalAlpha = .7; ctx.lineWidth = 2; ctx.strokeRect(34, 34, w - 68, h - 68); ctx.globalAlpha = .28; ctx.lineWidth = 1; ctx.strokeRect(49, 49, w - 98, h - 98); ctx.globalAlpha = .42;
    ctx.beginPath(); for (let i = 0; i < 450; i++) { const angle = i * .09, radius = 3 * Math.exp(.065 * angle); const sx = (story ? 575 : 300) + Math.cos(angle) * radius, sy = (story ? 640 : 340) + Math.sin(angle) * radius; if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy); } ctx.stroke(); ctx.globalAlpha = 1;
-   ctx.drawImage(logo, w / 2 - (story ? 65 : 33), story ? 75 : 38, story ? 130 : 66, story ? 130 : 66);
-   ctx.textAlign = "center"; ctx.fillStyle = gold; ctx.font = `500 ${story ? 34 : 25}px "Noto Serif JP", serif`; ctx.fillText(language === "ja" ? "アゴルメンの羅針盤" : language === "zh-TW" ? "阿戈爾曼的羅盤" : "Agolmen's Compass", w / 2, story ? 240 : 133, w - 150);
+   ctx.drawImage(logo, w / 2 - (story ? 72 : 38), story ? 70 : 32, story ? 144 : 76, story ? 144 : 76);
+   ctx.textAlign = "center"; ctx.fillStyle = gold; ctx.font = `500 ${story ? 34 : 25}px "Noto Serif JP", serif`; ctx.fillText(language === "ja" ? "アゴルメンの羅針盤" : language === "zh-TW" ? "阿戈爾曼的羅盤" : "Agolmen's Compass", w / 2, story ? 240 : 136, w - 150);
   ctx.textAlign = "left";
   const x = story ? 100 : 90, width = story ? 880 : 500;
   ctx.fillStyle = gold; ctx.font = '500 24px "Noto Sans JP", sans-serif'; ctx.fillText(data.kind === "identity" ? t.essence : t.match, x, story ? 338 : 204);
