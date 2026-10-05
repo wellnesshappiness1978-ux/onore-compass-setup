@@ -39,6 +39,7 @@ import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { quickUsageKey } from "@/lib/quick-compatibility";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
 import { profileTranslations } from "@/lib/profile-translations";
+import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
@@ -127,7 +128,7 @@ function TorisetsuPanel({
   const q = quickCompatibilityCopy[language];
   const [mode, setMode] = useState<"manual" | "compatibility">(only ?? initialMode);
   const generate = useServerFn(generateHomeReading);
-  const manualReading = useQuery({ queryKey: ["home-reading-five-v6", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
+  const manualReading = useQuery({ queryKey: ["home-reading-five-v7", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
   const [partnerName, setPartnerName] = useState("");
   const [partnerKana, setPartnerKana] = useState("");
   const [partnerGender, setPartnerGender] = useState<UserProfile["gender"]>("undisclosed");
