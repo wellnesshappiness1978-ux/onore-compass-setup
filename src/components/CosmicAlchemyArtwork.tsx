@@ -10,8 +10,8 @@ function paint(canvas: HTMLCanvasElement, sky: ReturnTypeNatal, main: string, su
   const { width: w, height: h } = canvas;
   const cx = w / 2, cy = h * .49, r = w * .38;
   const root = getComputedStyle(document.documentElement);
-  const voidColor = root.getPropertyValue("--art-void").trim() || "#050B18";
-  const gold = root.getPropertyValue("--gold-glow").trim() || "#F3E5AB";
+  const voidColor = root.getPropertyValue("--art-void").trim() || "oklch(0.105 0.035 255)";
+  const gold = root.getPropertyValue("--gold-glow").trim() || "oklch(0.96 0.055 92)";
   const bg = ctx.createRadialGradient(cx, cy, w * .06, cx, cy, h * .73);
   bg.addColorStop(0, main); bg.addColorStop(.19, voidColor); bg.addColorStop(1, voidColor);
   ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);

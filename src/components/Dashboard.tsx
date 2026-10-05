@@ -584,7 +584,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </p>
               <DayCompass profile={profile} language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
             </section>
-            <GrandSummaryCard profile={profile} language={language} plan={previewPlan} />
           </>
         ) : (
           <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
