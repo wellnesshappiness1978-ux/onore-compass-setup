@@ -6,7 +6,7 @@ import GrandSummaryCard from "./GrandSummaryCard";
 import PlanPerksTab from "./PlanPerksTab";
 import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
-import { AgolmenLogo } from "./AgolmenSpiral";
+import { AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -515,6 +515,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     <>
     <div data-design={effectiveDesign} data-tier={previewPlan} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
+      <SpiralLines className="agolmen-background-spiral pointer-events-none absolute right-[-14rem] top-20 z-0 size-[min(88vw,44rem)] text-primary sm:right-[-8rem]" />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
           <div className="flex h-10 items-center justify-between pr-28 sm:pr-36">
