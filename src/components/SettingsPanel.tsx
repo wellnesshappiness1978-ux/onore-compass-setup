@@ -1,5 +1,6 @@
 import DailyReminderPanel from "./DailyReminderPanel";
 import { AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
+import { ThemeSample } from "./ThemeSample";
 import HelioCalendar from "./HelioCalendar";
 import { Fragment, useState } from "react";
 import {
@@ -106,6 +107,8 @@ export default function SettingsPanel({
   const [aboutOpen, setAboutOpen] = useState(false);
 
   const tc = teamCopy[language];
+  const lockedTheme = designModes.find(mode => mode.id === lockedMode);
+  const lockedTierName = lockedTheme?.tier === "free" ? t.planFree : lockedTheme ? teamCopy[language].planNames[lockedTheme.tier] : "";
   const pc = planCardsCopy[language];
   const planTabName = (id: PaidPlanId) =>
     id === "standard" ? t.standard : id === "vip" ? "VIP" : id === "b2b" ? t.planB2b : tc.planNames["b2b-premium"];
@@ -226,18 +229,15 @@ export default function SettingsPanel({
                       type="button"
                       variant="outline"
                       aria-pressed={selected}
-                       title={!available ? `${dc.requires}: ${dc.groups[index]}` : dc.names[mode.id]}
-                       onClick={() => available ? onDesignModeChange(mode.id) : setLockedMode(mode.id)}
-                       className={`design-choice design-choice--${mode.id} h-auto min-h-32 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left ${selected ? "ring-2 ring-primary" : ""}`}
+                      aria-label={`${dc.names[mode.id]} · ${dc.groups[index]}`}
+                      title={dc.names[mode.id]}
+                      onClick={() => available ? onDesignModeChange(mode.id) : setLockedMode(mode.id)}
+                      className={`theme-choice h-auto min-h-48 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left ${selected ? "ring-2 ring-primary" : ""}`}
                     >
-                      <span className="design-choice-scene relative flex h-12 w-full items-center justify-center text-xl" aria-hidden="true">
-                        <span>{mode.icon}</span>
-                        {!available && <LockKeyhole className="design-choice-unlock absolute right-3 top-3 size-3.5" />}
-                        <span className="design-choice-palette absolute bottom-1 left-2 flex gap-1" aria-hidden="true"><span className="size-2 rounded-full border border-primary/30" /><span className="size-2 rounded-full border border-primary/30" /><span className="size-2 rounded-full border border-primary/30" /></span>
-                      </span>
+                      <ThemeSample mode={mode.id} tier={mode.tier} name={dc.names[mode.id]} />
                       <span className="flex w-full items-center justify-between gap-2 px-3 py-2 text-xs text-foreground">
-                        <span className="min-w-0 whitespace-normal leading-4">{dc.names[mode.id]}<span className="mt-0.5 block text-[10px] text-muted-foreground">{dc.groups[index]}</span></span>
-                        {selected ? <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} /> : !available ? <span className="shrink-0 rounded-sm border border-primary/40 bg-primary/10 px-1 py-0.5 text-[9px] text-primary">{dc.planNames[["standard", "vip", "b2b", "b2b-premium"].indexOf(mode.tier)] ?? dc.requires}</span> : null}
+                        <span className="min-w-0 whitespace-normal leading-5">{dc.names[mode.id]}<span className="mt-0.5 block text-[10px] text-muted-foreground">{dc.groups[index]}</span></span>
+                        {selected ? <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} /> : !available ? <LockKeyhole className="size-4 shrink-0 text-primary" aria-label={dc.requires} /> : null}
                       </span>
                     </Button>
                   );
@@ -549,7 +549,7 @@ export default function SettingsPanel({
         <DailyReminderPanel language={language} plan={plan} profile={profile} />
 
         <div className="mt-5 divide-y divide-primary/10 border-t border-primary/10">
-          <Button variant="ghost" className="h-auto w-full justify-start gap-3 rounded-none py-3 text-left text-sm" onClick={() => setAboutOpen(true)}><Orbit className="size-4 text-primary" />{language === "ja" ? "アプリについて · アゴルメンの物語" : "About · The story of Agolmen"}</Button>
+          <Button variant="ghost" className="h-auto w-full justify-start gap-3 rounded-none py-3 text-left text-sm" onClick={() => setAboutOpen(true)}><Orbit className="size-4 text-primary" />{language === "ja" ? "アプリについて · アゴルメンの由来" : "About · The origin of Agolmen"}</Button>
           {[
             [t.terms, ScrollText],
             [t.privacy, Shield],
@@ -576,21 +576,25 @@ export default function SettingsPanel({
       <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
         <DialogContent className="agolmen-story-dialog max-w-lg overflow-hidden border-primary/40 bg-card text-foreground">
           <div className="relative mx-auto size-40" aria-hidden="true"><SpiralLines className="absolute inset-0 size-full text-primary/70" /><AgolmenLogo className="absolute inset-[18%] size-[64%] object-contain" /></div>
-          <DialogTitle className="text-center font-serif text-2xl text-primary">{language === "ja" ? "アゴルメンの物語" : "The story of Agolmen"}</DialogTitle>
-          <DialogDescription className="text-center text-sm leading-8 text-foreground/80">{language === "ja" ? "カタツムリは、どこへ向かうときも自分の殻を携えています。その姿に、自分を守る揺るぎない軸を重ねました。殻の螺旋は、自然の調和を想うための象徴。宝石を抱く羅針盤とともに、あなた自身の歩幅で選ぶ時間に寄り添います。" : "The snail carries its shell wherever it goes: a symbol of a steady center that protects us. Its spiral evokes the harmony we imagine in nature. Joined with a jeweled compass, it invites each person to find a direction at their own pace."}</DialogDescription>
+          <DialogTitle className="text-center font-serif text-2xl text-primary">{language === "ja" ? "アゴルメンの由来" : "The origin of Agolmen"}</DialogTitle>
+          <DialogDescription className="max-h-[50vh] overflow-y-auto text-center text-sm leading-8 text-foreground/80">{language === "ja" ? "「アゴルメン（Agolmen）」とは、古代より宇宙の絶対調和と生命の原点とされる「カタツムリやオウムガイの殻（黄金螺旋 / フィボナッチスパイラル）」に由来します。自然界が描く黄金比（1:1.618）の美しい殻は、外界の乱れから「自分の強固な軸・本質」を護る聖なる家であり、中心から無限へと開運の波動を広げる象徴です。" : "Agolmen takes its name from the shells of snails and nautiluses—the golden spiral, or Fibonacci spiral, long imagined as a symbol of cosmic harmony and the origin of life. The shell's golden ratio (1:1.618) represents a sacred home that protects one's inner axis and essence amid the outside world's turmoil, with a wave of good fortune spreading outward from its center."}</DialogDescription>
         </DialogContent>
       </Dialog>
       <Dialog open={lockedMode !== null} onOpenChange={(open) => { if (!open) setLockedMode(null); }}>
-        <DialogContent className="max-w-sm border-primary/30 bg-card text-foreground">
-          <DialogTitle className="font-serif text-xl text-primary">{dc.title}</DialogTitle>
-          <DialogDescription className="text-sm leading-6 text-muted-foreground">
-            {lockedMode && dc.locked(dc.planNames[["standard", "vip", "b2b", "b2b-premium"].indexOf(designModes.find((mode) => mode.id === lockedMode)?.tier ?? "standard")] ?? dc.planNames[0] ?? "")}
-          </DialogDescription>
-          <p className="text-xs text-muted-foreground">{dc.note}</p>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setLockedMode(null)}>{dc.later}</Button>
-            <Button onClick={() => { setLockedMode(null); document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{dc.upgrade}</Button>
-          </div>
+        <DialogContent className="theme-preview-dialog flex h-[min(92dvh,900px)] w-[min(100vw,760px)] max-w-none flex-col gap-0 overflow-hidden border-primary/30 bg-card p-0 text-foreground">
+          {lockedTheme && <>
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <ThemeSample mode={lockedTheme.id} tier={lockedTheme.tier} name={dc.names[lockedTheme.id]} large />
+              <div className="px-5 py-5 text-center">
+                <DialogTitle className="font-serif text-xl text-primary">{dc.names[lockedTheme.id]}</DialogTitle>
+                <DialogDescription className="mt-2 text-sm leading-6 text-muted-foreground">{language === "ja" ? `このデザインは${lockedTierName}で解放されます。` : dc.locked(lockedTierName)}</DialogDescription>
+              </div>
+            </div>
+            <div className="flex shrink-0 justify-center gap-2 border-t border-primary/20 bg-card px-5 py-4">
+              <Button variant="outline" onClick={() => setLockedMode(null)}>{dc.later}</Button>
+              <Button onClick={() => { setLockedMode(null); window.setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }}>{dc.upgrade}</Button>
+            </div>
+          </>}
         </DialogContent>
       </Dialog>
       <Dialog open={upgradePlan !== null} onOpenChange={(open) => { if (!open) setUpgradePlan(null); }}>
