@@ -71,3 +71,8 @@
 - [x] Add optional partner inputs and computed reference-layer comparison, without claiming verified personality or storing partner details.
 - [x] Rename profile data and add owner/team consultation target selection with isolated conversation context.
 - [x] Verify signed-in saved-profile interaction, all 19 theme choices, quick comparison, and member-targeted AI consultation in the preview.
+
+## Agolmen rebrand
+- [ ] Rename visible brand, metadata, logo and downloadable labels without migrating saved storage keys.
+- [ ] Add shell-spiral loading and theme backgrounds plus the About story dialog.
+- [ ] Refresh portrait/landscape share artwork and verify mobile, desktop, reduced-motion, and image export.
