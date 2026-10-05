@@ -78,10 +78,10 @@
 - [x] Refresh portrait/landscape share artwork and verify mobile, desktop, reduced-motion, and 1080×1920 image rendering. Native sharing depends on the device.
 
 ## Final logo and palette
-- [ ] Rebrand specified labels, soften logo edge, and place Agolmen origin after the cosmic introduction.
-- [ ] Strengthen profile-based reading while keeping unsupported animal layers and blood personality claims explicitly illustrative; reorder final reading and upgrade proposal.
-- [ ] Offer two VIP illustrative artwork styles with high-resolution save and device sharing.
-- [ ] Restrict theme gallery to 15 tiered choices, preview locks, and deliver legible white-based Free design.
+- [x] Rebrand specified labels, soften logo edge, and place Agolmen origin after the cosmic introduction.
+- [x] Strengthen profile-based reading while keeping unsupported animal layers and blood personality claims explicitly illustrative; reorder final reading and upgrade proposal.
+- [x] Offer two VIP illustrative artwork styles with high-resolution save and device sharing.
+- [x] Restrict theme gallery to 15 tiered choices, preview locks, and deliver legible white-based Free design.
 - [x] Replace the temporary logo and favicon with the uploaded amethyst compass tile, without the source watermark.
 - [x] Apply the black marble, gold and rose/amethyst nebula palette to existing themes and dialogs.
 - [x] Update loading light, share cards and About story; verify desktop/mobile and 1080×1920 image rendering. Live share UI stays pending until its reading finishes.
