@@ -1,7 +1,7 @@
 import * as A from "astronomy-engine";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarDays, Crown, Download, ExternalLink, LockKeyhole, Orbit } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Crown, Download, ExternalLink, LockKeyhole, Orbit } from "lucide-react";
 import { helioPhase } from "@/lib/ai/helio-phase";
 import { biorhythm, type TeamMember } from "@/lib/team-analysis";
 import { canUse, minPlanFor, type ContentFeature } from "@/lib/plans";
@@ -11,6 +11,7 @@ import { listTeamMembers } from "@/lib/team-members.functions";
 import { usePlan } from "./PlanProvider";
 import { fengDirectionNames } from "@/lib/feng-shui";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { dayProfile, directionEnergy, localIso, personal } from "@/lib/day-compass";
 import type { UserProfile } from "./Onboarding";
 
@@ -56,7 +57,9 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
   const iso = localIso(date);
   const { enabled: testMode } = usePlan();
   const [eventIso, setEventIso] = useState(iso);
-  useEffect(() => setEventIso(iso), [iso]);
+  const [calendarView, setCalendarView] = useState<"calendar" | "detail">("calendar");
+  const [visibleMonth, setVisibleMonth] = useState(date.getMonth());
+  useEffect(() => { setEventIso(iso); setVisibleMonth(date.getMonth()); }, [iso, date]);
   const positions = useMemo(() => bodies.map(([name, body, radius]) => {
     const v = A.HelioVector(body, new Date(`${iso}T03:00:00Z`)); // local noon in Japan
     const theta = Math.atan2(v.y, v.x);
@@ -114,7 +117,7 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
   return <section aria-label="高精度 地球暦カレンダー" className="mt-7 border-y border-primary/30 py-7 text-left">
     <div className="flex items-center gap-3"><Orbit className="size-6 text-primary" /><h3 className="font-serif text-xl text-primary">地球暦 · Helio Compass</h3></div>
     <p className="mt-2 text-sm leading-7 text-muted-foreground">{iso} 日本時間12時の太陽中心の天体位置。軌道の半径は見やすさのため模式化しています。</p>
-    <svg role="img" aria-label={`${iso}の太陽・水星・金星・地球・火星・木星・土星の位置`} viewBox="0 0 120 120" className="mx-auto mt-4 aspect-square w-full max-w-[480px]">
+    <svg role="img" aria-label={`${iso}の太陽・水星・金星・地球・火星・木星・土星の位置`} viewBox="0 0 120 120" className="mx-auto mt-4 aspect-square w-full max-w-[280px]">
       {bodies.map(([, , r]) => <circle key={r} cx="60" cy="60" r={r} fill="none" className="stroke-primary/25" strokeWidth=".3" />)}
       <circle cx="60" cy="60" r="4" className="fill-primary" /><text x="60" y="69" textAnchor="middle" fontSize="3" className="fill-primary">太陽</text>
       {positions.map((p) => <g key={p.name}><circle cx={p.x} cy={p.y} r={p.name === "地球" ? 2.7 : 1.8} className={p.name === "地球" ? "fill-gold-glow" : "fill-foreground"} /><text x={p.x} y={p.y - 3.5} textAnchor="middle" fontSize="2.8" className="fill-foreground">{p.name}</text></g>)}
@@ -122,24 +125,36 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
     {phase && <div className="border-t border-primary/20 pt-5"><p className="text-sm text-muted-foreground">誕生日から地球が進んだ角度 {phase.degrees}°</p><p className="mt-1 font-serif text-lg text-primary">今は「{phase.phase}」のフェーズ</p><p className="mt-1 text-base leading-8 text-foreground">{phaseText[phase.phase]}</p></div>}
     <h4 className="mt-6 font-serif text-lg text-primary">365日の個人バイオリズム</h4>
     <Gate plan={plan} feature="helioPersonal" onUpgrade={onUpgrade}>
-      <p className="mt-2 text-sm text-muted-foreground">{year}年 · 実日付による参考周期（体23日・心28日・知33日の平均）。高い日・切替点・低い日を選ぶと内訳が開きます。</p>
-      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2" aria-label={`${year}年の日付カレンダー`}>
-        {calendarMonths.map(({ month, offset, days }) => <section key={month} className="min-w-0 border-t border-primary/30 pt-3" aria-label={`${month + 1}月`}>
-          <h5 className="font-serif text-base text-primary">{year}年 {month + 1}月</h5>
-          <div className="mt-2 grid grid-cols-7 gap-0.5 text-center text-[10px] text-muted-foreground">{["日", "月", "火", "水", "木", "金", "土"].map(d => <span key={d}>{d}</span>)}</div>
-          <div className="mt-1 grid grid-cols-7 gap-0.5">{Array.from({ length: offset }, (_, i) => <span key={`empty-${i}`} className="aspect-square" />)}{days.map(d => {
-            const kind = marks.get(d.index); const current = d.iso === eventIso;
-            return <Button key={d.iso} type="button" size="icon" variant="ghost" title={`${d.iso} · ${curve[d.index] ?? 50} / 100${kind ? ` · ${markLabel[kind]}` : ""}`} aria-label={`${d.iso} ${kind ? markLabel[kind] : "参考値"} ${curve[d.index] ?? 50}`} aria-pressed={current} onClick={() => setEventIso(d.iso)} className={`aspect-square size-auto min-h-8 min-w-0 rounded-sm p-0 text-xs ${current ? "ring-2 ring-primary" : ""} ${kind === "high" ? "bg-primary text-primary-foreground" : kind === "low" ? "border border-destructive/60 text-destructive" : kind === "turn" ? "border border-primary/50 text-primary" : "text-muted-foreground"}`}>{d.day}</Button>;
-          })}</div>
-        </section>)}
-      </div>
-      <p className="mt-3 text-xs text-muted-foreground">■ 高い日　▣ 切替点　□ 低い日 · 日付ごとの値は未来の出来事を予測しません。</p>
-      <div role="status" className="mt-4 border-l-2 border-primary bg-primary/5 px-4 py-3"><h5 className="font-serif text-base text-primary">{eventIso} · {selectedMark ? markLabel[selectedMark] : "参考周期"} · {selectedValue.total}/100</h5><p className="mt-1 text-sm text-foreground">体 {Math.round((selectedValue.physical + 1) * 50)} · 心 {Math.round((selectedValue.emotional + 1) * 50)} · 知 {Math.round((selectedValue.intellectual + 1) * 50)}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{rhythmNote} 体調や実際の出来事を診断する値ではありません。</p></div>
-      <label className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">予定の日付<input aria-label="カレンダーに登録する日付" type="date" value={eventIso} onChange={e => { if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) setEventIso(e.target.value); }} className="rounded-md border border-primary/30 bg-background px-3 py-2 text-foreground" /></label>
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="text-base text-foreground">{eventIso} · {label}</p>
-        <div className="flex flex-wrap gap-2"><Button variant="outline" asChild><a href={google} target="_blank" rel="noopener noreferrer"><CalendarDays className="size-4" />Google カレンダー<ExternalLink className="size-3" /></a></Button><Button variant="outline" onClick={download}><Download className="size-4" />iOS / .ics</Button></div>
-      </div>
-      <p className="mt-2 text-xs text-muted-foreground">選んだ1日分を確認してから登録します。自動同期ではありません。</p>
+      <p className="mt-2 text-sm text-muted-foreground">{year}年 · 体23日・心28日・知33日の参考周期。月を切り替えて日付を選べます。</p>
+      <Tabs value={calendarView} onValueChange={(value) => setCalendarView(value as "calendar" | "detail")} className="mt-4">
+        <TabsList className="grid h-11 w-full grid-cols-2 border border-primary/20 bg-background/50">
+          <TabsTrigger value="calendar">カレンダー</TabsTrigger>
+          <TabsTrigger value="detail">選択日の解説</TabsTrigger>
+        </TabsList>
+        <TabsContent value="calendar" className="mt-4">
+          <div className="mx-auto max-w-md rounded-md border border-primary/25 bg-background/30 p-3" aria-label={`${year}年の日付カレンダー`}>
+            <div className="flex items-center justify-between">
+              <Button type="button" size="icon" variant="ghost" aria-label="前の月" onClick={() => setVisibleMonth(month => (month + 11) % 12)}><ChevronLeft className="size-4" /></Button>
+              <h5 className="font-serif text-base text-primary">{year}年 {visibleMonth + 1}月</h5>
+              <Button type="button" size="icon" variant="ghost" aria-label="次の月" onClick={() => setVisibleMonth(month => (month + 1) % 12)}><ChevronRight className="size-4" /></Button>
+            </div>
+            {(() => { const month = calendarMonths[visibleMonth]; if (!month) return null; return <>
+              <div className="mt-2 grid grid-cols-7 gap-0.5 text-center text-[10px] text-muted-foreground">{["日", "月", "火", "水", "木", "金", "土"].map(d => <span key={d}>{d}</span>)}</div>
+              <div className="mt-1 grid grid-cols-7 gap-0.5">{Array.from({ length: month.offset }, (_, i) => <span key={`empty-${i}`} className="aspect-square" />)}{month.days.map(d => {
+                const kind = marks.get(d.index); const current = d.iso === eventIso;
+                return <Button key={d.iso} type="button" size="icon" variant="ghost" title={`${d.iso} · ${curve[d.index] ?? 50} / 100${kind ? ` · ${markLabel[kind]}` : ""}`} aria-label={`${d.iso} ${kind ? markLabel[kind] : "参考値"} ${curve[d.index] ?? 50}`} aria-pressed={current} onClick={() => { setEventIso(d.iso); setCalendarView("detail"); }} className={`aspect-square size-auto min-h-8 min-w-0 rounded-sm p-0 text-xs ${current ? "ring-2 ring-primary" : ""} ${kind === "high" ? "bg-primary text-primary-foreground" : kind === "low" ? "border border-destructive/60 text-destructive" : kind === "turn" ? "border border-primary/50 text-primary" : "text-muted-foreground"}`}>{d.day}</Button>;
+              })}</div>
+            </>; })()}
+          </div>
+          <p className="mt-3 text-center text-xs text-muted-foreground">■ 高い日　▣ 切替点　□ 低い日 · 未来の出来事を予測する値ではありません。</p>
+        </TabsContent>
+        <TabsContent value="detail" className="mt-4">
+          <div role="status" className="border-l-2 border-primary bg-primary/5 px-4 py-4"><h5 className="font-serif text-base text-primary">{eventIso} · {selectedMark ? markLabel[selectedMark] : "参考周期"} · {selectedValue.total}/100</h5><p className="mt-1 text-sm text-foreground">体 {Math.round((selectedValue.physical + 1) * 50)} · 心 {Math.round((selectedValue.emotional + 1) * 50)} · 知 {Math.round((selectedValue.intellectual + 1) * 50)}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{rhythmNote} 体調や実際の出来事を診断する値ではありません。</p></div>
+          <label className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">予定の日付<input aria-label="カレンダーに登録する日付" type="date" value={eventIso} onChange={e => { if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) { setEventIso(e.target.value); const next = new Date(`${e.target.value}T12:00:00`); if (next.getFullYear() === year) setVisibleMonth(next.getMonth()); } }} className="rounded-md border border-primary/30 bg-background px-3 py-2 text-foreground" /></label>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="text-base text-foreground">{eventIso} · {label}</p><div className="flex flex-wrap gap-2"><Button variant="outline" asChild><a href={google} target="_blank" rel="noopener noreferrer"><CalendarDays className="size-4" />Google カレンダー<ExternalLink className="size-3" /></a></Button><Button variant="outline" onClick={download}><Download className="size-4" />iOS / .ics</Button></div></div>
+          <p className="mt-2 text-xs text-muted-foreground">選んだ1日分を確認してから登録します。自動同期ではありません。</p>
+        </TabsContent>
+      </Tabs>
     </Gate>
     <h4 className="mt-6 font-serif text-lg text-primary">8方位リアルタイム吉方位ナビ</h4>
     <Gate plan={plan} feature="helioDirections" onUpgrade={onUpgrade}>
