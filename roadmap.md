@@ -97,4 +97,4 @@
 - [x] Add optional partner name reading and gender, using gender only for the traditional Ming Gua direction formula.
 - [x] Remove the duplicate birth-color explainer from Plan Perks and clarify feng-shui terminology.
 - [x] Add a localized pre-profile introduction and reset consultation scrolling after the tab renders.
-- [ ] Verify the complete guest journey on desktop and mobile.
+- [x] Verify the complete guest journey on desktop and mobile, including a live 616-character grand reading.
