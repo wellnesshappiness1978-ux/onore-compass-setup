@@ -22,7 +22,7 @@ const titles: Record<Language, [string, string]> = {
 export default function GrandSummaryCard({ profile, language, plan, embedded = false }: { profile: UserProfile; language: Language; plan: Plan; embedded?: boolean }) {
   const generate = useServerFn(generateHomeReading);
   const { data, isPending, isError } = useQuery({
-    queryKey: ["home-reading-five-v7", profile, language],
+    queryKey: ["home-reading-five-v8", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
