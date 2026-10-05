@@ -1014,3 +1014,24 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas { font-family: var(--design-font-body, var(--font-sans)); }
 .design-canvas .font-serif, .design-canvas .design-title { font-family: var(--design-font-heading, var(--font-serif)); }
 .design-canvas .card-lux { background: var(--design-surface, var(--card)); }
+
+/* Keep every appearance in the official obsidian-and-jewel family. */
+.design-canvas[data-design] {
+  --background: oklch(0.105 0.012 305);
+  --card: oklch(0.18 0.025 302);
+  --popover: var(--card);
+  --secondary: oklch(0.24 0.04 306);
+  --muted: var(--secondary);
+  --accent: var(--secondary);
+  --primary: var(--gold-deep);
+  --gold-deep: oklch(0.75 0.13 85);
+  --gold-glow: oklch(0.92 0.08 90);
+  --ring: var(--primary);
+  --design-surface: linear-gradient(145deg, color-mix(in oklab, var(--card) 94%, var(--rose-glow)), color-mix(in oklab, var(--card) 94%, var(--amethyst)));
+}
+.design-canvas[data-design] .card-lux,
+.design-canvas[data-design] .design-daily-panel { background: var(--design-surface); }
+@media (max-width: 640px) {
+  .language-controls [role="group"] { display: none; }
+  .account-controls { max-width: calc(100vw - 10rem); }
+}
