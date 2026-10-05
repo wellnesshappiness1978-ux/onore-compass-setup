@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
 import { settingsTranslations, type SettingsTranslation, type PricingTier } from "@/lib/settings-translations";
@@ -508,20 +509,14 @@ export default function SettingsPanel({
           <p className="mb-2 flex items-center gap-2 text-sm">
             <Globe2 className="size-4 text-primary" /> {t.language}
           </p>
-          <div className="flex flex-wrap gap-2">
-            {languages.map((l) => (
-              <Button
-                key={l.code}
-                size="sm"
-                variant="outline"
-                aria-pressed={language === l.code}
-                onClick={() => onLanguageChange(l.code)}
-                className={`text-xs ${language === l.code ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
-              >
-                {l.flag} {l.label}
-              </Button>
-            ))}
-          </div>
+          <Select value={language} onValueChange={(value) => onLanguageChange(value as Language)}>
+            <SelectTrigger aria-label={t.language} className="h-12 border-primary/30 bg-background/40 text-foreground focus:ring-primary">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="border-primary/30 bg-popover text-popover-foreground">
+              {languages.map((item) => <SelectItem key={item.code} value={item.code}>{item.flag} {item.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="mt-5 space-y-3">

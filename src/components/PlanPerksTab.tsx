@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Check, Crown, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import BirthColorGuide from "./BirthColorGuide";
 import HelioCalendar from "./HelioCalendar";
 import FengShuiGuide from "./FengShuiGuide";
 import type { UserProfile } from "./Onboarding";
@@ -71,7 +70,6 @@ export default function PlanPerksTab({ profile, language, plan, go }: { profile:
         {active === "b2b-premium" && <p className="mt-4 text-sm leading-7 text-foreground">{t.premium}</p>}
         {active === "b2b" && <p className="mt-4 text-sm leading-7 text-muted-foreground">{t.gantt}</p>}
       </section>
-      {active === "standard" && <BirthColorGuide profile={profile} plan={plan} onUpgrade={upgrade} />}
       {active === "vip" && <FengShuiGuide profile={profile} date={new Date()} language={language} />}
       {active !== "vip" && <HelioCalendar date={new Date()} profile={profile} plan={plan} onUpgrade={upgrade} />}
     </div>

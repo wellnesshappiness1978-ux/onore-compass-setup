@@ -129,6 +129,8 @@ function TorisetsuPanel({
   const generate = useServerFn(generateHomeReading);
   const manualReading = useQuery({ queryKey: ["home-reading-five-v6", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
   const [partnerName, setPartnerName] = useState("");
+  const [partnerKana, setPartnerKana] = useState("");
+  const [partnerGender, setPartnerGender] = useState<UserProfile["gender"]>("undisclosed");
   const [partnerDate, setPartnerDate] = useState("");
   const [partnerTime, setPartnerTime] = useState("");
   const [partnerTimeUnknown, setPartnerTimeUnknown] = useState(false);
@@ -142,12 +144,12 @@ function TorisetsuPanel({
   const [used, setUsed] = useState(0);
   useEffect(() => { try { setUsed(Number(localStorage.getItem(quickUsageKey(profile.birthDate, plan))) || 0); } catch { setUsed(0); } }, [profile.birthDate, plan]);
   const remaining = quickCompatibilityLimit[plan] - used;
-  const partnerInput: PartnerInput = { name: partnerName, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
+  const partnerInput: PartnerInput = { name: partnerName, nameKana: partnerKana, gender: partnerGender, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
   const score = result?.score ?? 0;
   const advice = score >= 84 ? t.advice[2] : score >= 70 ? t.advice[1] : t.advice[0];
   const today = new Date().toLocaleDateString("en-CA");
-  useEffect(() => { setAnalyzed(false); }, [partnerName, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, profile]);
+  useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, profile]);
 
   return (
     <div>
@@ -255,6 +257,10 @@ function TorisetsuPanel({
                   onChange={(event) => setPartnerName(event.target.value)}
                   className={inputClass}
                 />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="text-sm text-primary">{t.partnerKana}<span className="text-muted-foreground"> ({t.optional})</span><input aria-label={t.partnerKana} className={`${inputClass} mt-2`} maxLength={60} value={partnerKana} onChange={(event) => setPartnerKana(event.target.value)} /></label>
+                <label className="text-sm text-primary">{t.partnerGender}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={t.partnerGender} className={`${inputClass} mt-2`} value={partnerGender} onChange={(event) => setPartnerGender(event.target.value as UserProfile["gender"])}><option value="undisclosed">{profileStorageCopy[language].undisclosed}</option><option value="female">{profileStorageCopy[language].female}</option><option value="male">{profileStorageCopy[language].male}</option><option value="other">{profileStorageCopy[language].other}</option></select></label>
               </div>
               <div>
                 <label
@@ -462,6 +468,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     });
     return () => cancelAnimationFrame(frame);
   }, [tab, teamEntry]);
+  useEffect(() => {
+    if (tab !== "consult") return;
+    const frame = requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+    return () => cancelAnimationFrame(frame);
+  }, [tab]);
   // Strict entitlement: the read-only membership row decides access. The switch may only preview equal or lower plans.
   const [selectedPlan, setPreviewPlan] = useState<Plan>("b2b-premium");
   const [serverPlan, setActualPlan] = useState<Plan>("free");
