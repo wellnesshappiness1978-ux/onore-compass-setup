@@ -236,7 +236,7 @@ function TorisetsuPanel({
             </h3>
              <p className="mt-2 text-sm text-muted-foreground">{q.hint}</p><p className="mt-2 text-xs text-primary">{q.remaining(remaining)}</p>
           </div>
-          <section className="card-lux mt-6 rounded-lg p-5 sm:p-7" aria-label={language === "ja" ? "クイック相性診断" : t.compatibility}>
+          <section className="card-lux mt-6 rounded-lg p-5 sm:p-7" aria-label={language === "ja" ? "アゴルメン相性診断" : t.compatibility}>
             <div className="space-y-5">
               <div>
                 <label
