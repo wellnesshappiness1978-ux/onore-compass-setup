@@ -1,8 +1,6 @@
 import DailyReminderPanel from "./DailyReminderPanel";
-import { AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
 import { ThemeSample } from "./ThemeSample";
-import HelioCalendar from "./HelioCalendar";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import {
   Bell,
   Building2,
@@ -10,22 +8,11 @@ import {
   Crown,
   Globe2,
   Gem,
-  HelpCircle,
   Lock,
   LockKeyhole,
-  Orbit,
   PenLine,
-  ScrollText,
-  Shield,
   Sparkles,
   Sprout,
-  Target,
-  Moon,
-  SlidersHorizontal,
-  AlertTriangle,
-  Lightbulb,
-  Rocket,
-  Users,
   User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,7 +21,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { languages, type Language } from "@/lib/translations";
 import { settingsTranslations, type SettingsTranslation, type PricingTier } from "@/lib/settings-translations";
-import TeamStudio from "@/components/team/TeamStudio";
 import DebugPlanSwitcher from "@/components/DebugPlanSwitcher";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
@@ -59,24 +45,6 @@ type Props = {
   signedIn?: boolean;
 };
 
-const SAMPLE_TEAM = ["M. Sato", "K. Tanaka", "Y. Suzuki", "R. Ito"];
-// Illustrative fixed values — not calculated from any birth data.
-const SAMPLE_MATRIX = [
-  [null, 86, 72, 64],
-  [86, null, 78, 81],
-  [72, 78, null, 69],
-  [64, 81, 69, null],
-];
-const SAMPLE_WEEK: ("push" | "hold" | "calm")[] = [
-  "push",
-  "hold",
-  "push",
-  "calm",
-  "push",
-  "hold",
-  "calm",
-];
-
 const card = "border-b border-primary/20 py-6";
 
 export default function SettingsPanel({
@@ -100,12 +68,10 @@ export default function SettingsPanel({
   const [yearly, setYearly] = useState(false);
   const [cardPlan, setCardPlan] = useState<PaidPlanId>("vip");
   const [upgradePlan, setUpgradePlan] = useState<string | null>(null);
-  const [b2b, setB2b] = useState(false);
   const [notifyTiming, setNotifyTiming] = useState(true);
   const [notifyBio, setNotifyBio] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [lockedMode, setLockedMode] = useState<DesignMode | null>(null);
-  const [aboutOpen, setAboutOpen] = useState(false);
 
   const tc = teamCopy[language];
   const lockedTheme = designModes.find(mode => mode.id === lockedMode);
@@ -150,11 +116,6 @@ export default function SettingsPanel({
     profile.birthTimeUnknown ? "--:--" : profile.birthTime || "--:--",
     profile.birthPlace || "—",
   ].join(" · ");
-  const days = SAMPLE_WEEK.map((_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    return new Intl.DateTimeFormat(language, { weekday: "short", day: "numeric" }).format(d);
-  });
 
   return (
     <div className="space-y-5">
@@ -247,22 +208,6 @@ export default function SettingsPanel({
             </div>
           ))}
         </div>
-      </section>
-
-      <section className={card}>
-        <div className="flex items-center gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
-            <Orbit className="size-5" strokeWidth={1.4} />
-          </span>
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-primary/70">{language === "ja" ? "地球暦" : "EARTH CALENDAR"}</p>
-            <h3 className="font-serif text-lg text-primary">{t.bioTitle}</h3>
-          </div>
-        </div>
-        <p className="mt-2 text-xs text-muted-foreground">{t.bioIntro}</p>
-
-        <HelioCalendar date={new Date()} profile={profile} plan={plan} onUpgrade={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth" })} />
-        <p className="mt-3 text-[11px] text-muted-foreground">{t.bioSample}</p>
       </section>
 
       {upgradeCards.length > 0 && <section id="membership-plans" className={card}>
@@ -405,96 +350,6 @@ export default function SettingsPanel({
         {!devOverrideEnabled && <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>}
       </section>}
 
-      {devOverrideEnabled && <p className="text-xs text-primary">開発テストの関係者編集はこの端末に保存します。ログイン中の本番データ・登録権限は変更しません。</p>}
-      <div id="team-studio-entry"><TeamStudio plan={plan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></div>
-
-      <section className={card}>
-        <h3 className="font-serif text-lg text-primary">{t.b2bTitle}</h3>
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-primary/15 bg-background/40 p-3 text-sm">
-          <span className={b2b ? "text-muted-foreground" : "text-primary"}>{t.personal}</span>
-          <Switch checked={b2b} onCheckedChange={value => { if (plan === "b2b" || plan === "b2b-premium") setB2b(value); else document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth" }); }} aria-label={t.b2b} />
-          <span className={`text-right ${b2b ? "text-primary" : "text-muted-foreground"}`}>
-            {t.b2b}
-          </span>
-        </div>
-
-        {b2b && (plan === "b2b" || plan === "b2b-premium") && (
-          <div className="mt-5 space-y-6">
-            <p className="text-[11px] text-muted-foreground">{t.b2bSample}</p>
-            <div>
-              <h4 className="mb-2 text-sm text-primary">{t.team}</h4>
-              <ul className="grid grid-cols-2 gap-2">
-                {SAMPLE_TEAM.map((name, i) => (
-                  <li
-                    key={name}
-                    className="rounded-lg border border-primary/15 bg-background/40 px-3 py-2"
-                  >
-                    <p className="text-sm">{name}</p>
-                    <p className="text-[11px] text-muted-foreground">{t.roles[i]}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="mb-2 text-sm text-primary">{t.matrix}</h4>
-              <div className="grid grid-cols-5 gap-1 text-center text-[11px]">
-                <span />
-                {SAMPLE_TEAM.map((n) => (
-                  <span key={n} className="truncate text-muted-foreground">
-                    {n.split(" ")[1]}
-                  </span>
-                ))}
-                {SAMPLE_MATRIX.map((row, r) => (
-                  <Fragment key={r}>
-                    <span className="truncate text-left text-muted-foreground">
-                      {SAMPLE_TEAM[r]?.split(" ")[1]}
-                    </span>
-                    {row.map((v, c) => (
-                      <span
-                        key={`${r}-${c}`}
-                        className="rounded-md border border-primary/10 py-2"
-                        style={{
-                          backgroundColor: v
-                            ? `color-mix(in oklab, var(--primary) ${Math.round((v - 50) * 1.2)}%, transparent)`
-                            : undefined,
-                        }}
-                      >
-                        {v ?? "—"}
-                      </span>
-                    ))}
-                  </Fragment>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="mb-2 text-sm text-primary">{t.roleMap}</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {t.roleAreas.map((area, i) => (
-                  <div key={area} className="rounded-xl border border-primary/20 bg-primary/5 p-3">
-                    <p className="text-[11px] text-muted-foreground">{area}</p>
-                    <p className="font-serif text-primary">{SAMPLE_TEAM[i]}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="mb-2 text-sm text-primary">{t.calendar}</h4>
-              <div className="grid grid-cols-7 gap-1 text-center">
-                {SAMPLE_WEEK.map((s, i) => (
-                  <div
-                    key={i}
-                    className={`rounded-lg border px-0.5 py-2 ${s === "push" ? "border-primary/50 bg-primary/15 text-primary" : "border-primary/10 text-muted-foreground"}`}
-                  >
-                    <p className="text-[10px]">{days[i]}</p>
-                    <p className="mt-1 text-[10px] font-medium">{t[s]}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
-
       <section className={card}>
         <h3 className="mb-3 font-serif text-lg text-primary">{t.account}</h3>
         <Button
@@ -539,42 +394,14 @@ export default function SettingsPanel({
               <Switch checked={value} onCheckedChange={set} aria-label={label} />
             </label>
           ))}
-          <p className="text-[11px] text-muted-foreground">{t.notifyNote}</p>
         </div>
         <DailyReminderPanel language={language} plan={plan} profile={profile} />
-
-        <div className="mt-5 divide-y divide-primary/10 border-t border-primary/10">
-          <Button variant="ghost" className="h-auto w-full justify-start gap-3 rounded-none py-3 text-left text-sm" onClick={() => setAboutOpen(true)}><Orbit className="size-4 text-primary" />{language === "ja" ? "アプリについて · アゴルメンの由来" : "About · The origin of Agolmen"}</Button>
-          {[
-            [t.terms, ScrollText],
-            [t.privacy, Shield],
-            [t.help, HelpCircle],
-          ].map(([label, Icon]) => {
-            const I = Icon as typeof Lock;
-            return (
-              <button
-                key={label as string}
-                onClick={() => window.dispatchEvent(new CustomEvent("onore-legal", { detail: label === t.terms ? "terms" : label === t.privacy ? "privacy" : "support" }))}
-                className="flex w-full items-center gap-3 py-3 text-left text-sm transition-colors hover:text-primary"
-              >
-                <I className="size-4 text-primary" /> {label as string}
-              </button>
-            );
-          })}
-        </div>
         {notice && (
           <p role="status" className="mt-2 text-xs text-muted-foreground">
             {notice}: {t.soon}
           </p>
         )}
       </section>
-      <Dialog open={aboutOpen} onOpenChange={setAboutOpen}>
-        <DialogContent className="agolmen-story-dialog max-w-lg overflow-hidden border-primary/40 bg-card text-foreground">
-          <div className="relative mx-auto size-40" aria-hidden="true"><SpiralLines className="absolute inset-0 size-full text-primary/70" /><AgolmenLogo className="absolute inset-[18%] size-[64%] object-contain" /></div>
-          <DialogTitle className="text-center font-serif text-2xl text-primary">{language === "ja" ? "アゴルメンの由来" : "The origin of Agolmen"}</DialogTitle>
-          <DialogDescription className="max-h-[50vh] overflow-y-auto text-center text-sm leading-8 text-foreground/80">{language === "ja" ? "「アゴルメン（Agolmen）」とは、古代より宇宙の絶対調和と生命の原点とされる「カタツムリやオウムガイの殻（黄金螺旋 / フィボナッチスパイラル）」に由来します。自然界が描く黄金比（1:1.618）の美しい殻は、外界の乱れから「自分の強固な軸・本質」を護る聖なる家であり、中心から無限へと開運の波動を広げる象徴です。" : "Agolmen takes its name from the shells of snails and nautiluses—the golden spiral, or Fibonacci spiral, long imagined as a symbol of cosmic harmony and the origin of life. The shell's golden ratio (1:1.618) represents a sacred home that protects one's inner axis and essence amid the outside world's turmoil, with a wave of good fortune spreading outward from its center."}</DialogDescription>
-        </DialogContent>
-      </Dialog>
       <Dialog open={lockedMode !== null} onOpenChange={(open) => { if (!open) setLockedMode(null); }}>
         <DialogContent className="theme-preview-dialog flex h-[min(92dvh,900px)] w-[min(100vw,760px)] max-w-none flex-col gap-0 overflow-hidden border-primary/30 bg-card p-0 text-foreground">
           {lockedTheme && <>
