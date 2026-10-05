@@ -115,7 +115,6 @@
 .agolmen-loading-art { isolation: isolate; }
 .agolmen-loading-aura { background: radial-gradient(circle, color-mix(in oklab, var(--amethyst) 60%, transparent), color-mix(in oklab, var(--rose-glow) 16%, transparent) 50%, transparent 75%); filter: blur(14px); animation: agolmen-gem 2.7s ease-in-out infinite alternate; }
 .agolmen-loading-logo { animation: agolmen-bloom 2.5s ease-in-out infinite alternate; filter: drop-shadow(0 0 12px var(--gold-glow)); }
-.agolmen-loading-logo::after { content: ""; }
 .agolmen-particle { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; border-radius: 50%; background: var(--gold-glow); box-shadow: 0 0 8px var(--primary), 0 0 18px var(--gold-glow); animation: agolmen-converge 2.8s ease-in infinite; animation-delay: calc(var(--i) * -.175s); }
 @keyframes agolmen-turn { to { transform: rotate(360deg); } }
 @keyframes agolmen-bloom { from { opacity: .6; transform: scale(.75) rotate(-9deg); } to { opacity: 1; transform: scale(1.06) rotate(8deg); } }
@@ -684,6 +683,18 @@
     repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px), color-mix(in oklab, var(--primary) 6%, transparent) calc(25% - 1px) 25%),
     linear-gradient(135deg, color-mix(in oklab, var(--celestial-ink) 65%, var(--background)), var(--background) 62%);
 }
+
+/* Jewel finish over each selected theme's own tokens and texture. */
+.design-canvas[data-design] {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse 48rem 24rem at 8% 5%, color-mix(in oklab, var(--rose-glow) 11%, transparent), transparent 74%),
+    radial-gradient(ellipse 38rem 30rem at 95% 24%, color-mix(in oklab, var(--amethyst) 15%, transparent), transparent 76%),
+    radial-gradient(ellipse 40rem 25rem at 40% 88%, color-mix(in oklab, var(--lavender-glow) 7%, transparent), transparent 77%),
+    var(--design-texture, linear-gradient(var(--background), var(--background)));
+}
+.design-canvas[data-design] .design-daily-panel,
+.design-canvas[data-design] .card-lux { background-image: linear-gradient(155deg, color-mix(in oklab, var(--rose-glow) 4%, transparent), transparent 40%, color-mix(in oklab, var(--amethyst) 8%, transparent)); }
 
 @keyframes unlock-burst {
   0% { opacity: 0; transform: scale(0.3); }

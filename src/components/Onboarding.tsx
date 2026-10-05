@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
-import { AgolmenLogo } from "./AgolmenSpiral";
+import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
 
 export type UserProfile = {
   nameKanji: string;
@@ -316,12 +316,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
               disabled={!stepValid || analyzing}
               className="h-14 w-full rounded-lg px-3 text-sm font-bold transition-all duration-300 sm:text-base disabled:opacity-35 disabled:shadow-none"
             >
-              {analyzing ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="inline-block size-4 animate-spin rounded-full border-2 border-primary-foreground/40 border-t-primary-foreground" />
-                   {signedIn ? storage.saving : t.analyzing}
-                </span>
-              ) : isLast ? (
+              {analyzing ? (signedIn ? storage.saving : t.analyzing) : isLast ? (
                  <><Sparkles className="size-4" aria-hidden="true" />{t.analyze}</>
               ) : (
                  t.next
@@ -334,6 +329,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
            {t.privacy}
         </p>
       </div>
+      {analyzing && <div className="fixed inset-0 z-[80] flex items-center justify-center bg-background/95 backdrop-blur-lg"><AgolmenLoading compact label={signedIn ? storage.saving : t.analyzing} /></div>}
     </div>
   );
 }
