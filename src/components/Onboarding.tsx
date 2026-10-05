@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
+import { AgolmenLogo } from "./AgolmenSpiral";
 
 export type UserProfile = {
   nameKanji: string;
@@ -116,10 +117,10 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
         {/* Brand */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full border border-primary/40 bg-primary/5 text-primary shadow-champagne">
-            <Compass className="size-6 stroke-[1.2]" aria-hidden="true" />
+            <AgolmenLogo className="size-12 object-contain" />
           </div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary/90">
-            Onore Compass
+            Agolmen's Compass
           </p>
           <h1 className="mt-2 font-serif text-3xl font-bold text-gradient-gold sm:text-4xl">{t.brand}</h1>
           <p className="mt-3 text-sm text-muted-foreground">

@@ -37,7 +37,7 @@ function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
         ctx.fillStyle = css.getPropertyValue("--gold-glow").trim() || "#F3E5AB";
         ctx.textAlign = "center";
         ctx.font = `${Math.round(width / 26)}px serif`;
-        ctx.fillText("ONORE COMPASS", width / 2, height * .16);
+        ctx.fillText("AGOLMEN'S COMPASS", width / 2, height * .16);
         ctx.font = `${Math.round(width / 55)}px sans-serif`;
         ctx.fillText("CELESTIAL MANDALA · ILLUSTRATIVE ART", width / 2, height * .83);
         const blob = await new Promise<Blob>((resolve, reject) => out.toBlob(b => b ? resolve(b) : reject(new Error("PNG unavailable")), "image/png"));

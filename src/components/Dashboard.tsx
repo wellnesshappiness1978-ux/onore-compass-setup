@@ -6,6 +6,7 @@ import GrandSummaryCard from "./GrandSummaryCard";
 import PlanPerksTab from "./PlanPerksTab";
 import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
+import { AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -514,6 +515,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     <>
     <div data-design={effectiveDesign} data-tier={previewPlan} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
+      <SpiralLines className="agolmen-background-spiral pointer-events-none absolute right-[-14rem] top-20 z-0 size-[min(88vw,44rem)] text-primary sm:right-[-8rem]" />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
           <div className="flex h-10 items-center justify-between pr-28 sm:pr-36">
@@ -551,9 +553,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             </div>
           </div>
           <div className="design-heading mt-2 text-center">
-            <p className="design-wordmark text-[9px] uppercase text-primary/70">ONORE COMPASS</p>
+            <AgolmenLogo className="mx-auto mb-1 size-16 object-contain drop-shadow-[0_0_12px_var(--gold-glow)]" />
+            <p className="design-wordmark text-[9px] uppercase text-primary/70">AGOLMEN'S COMPASS</p>
             <h1 className="design-title font-serif text-2xl font-bold text-gradient-gold sm:text-3xl">
-              {language === "ja" ? "自分を知るコンパス" : "Self Compass"}
+              {translations[language].brand}
             </h1>
             <p className="design-mode-caption mt-1 text-[10px] text-muted-foreground">{teamCopy[language].planNames[previewPlan]} · {devOverrideEnabled ? (language === "ja" ? "表示テスト" : "Preview") : (language === "ja" ? "現在のステータス" : "Current status")}</p>
           </div>

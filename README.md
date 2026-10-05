@@ -1,6 +1,6 @@
-# Onore Compass Setup
+# Agolmen's Compass Setup
 
-Build Step 1: Onboarding & User Profile Input Screen for "Onore Compass (オノレコンパス)".
+Build Step 1: Onboarding & User Profile Input Screen for "Agolmen's Compass (アゴルメンの羅針盤)".
 
 Design & UI:
 - Modern luxury dark mode (#0B132B navy, #F4D03F gold highlights).

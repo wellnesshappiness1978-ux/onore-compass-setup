@@ -21,7 +21,7 @@ export type ConsultationTranslation = {
 
 export const consultationTranslations: Record<Language, ConsultationTranslation> = {
   ja: {
-    title: "AIオノレ相談室",
+    title: "アゴルメン AI相談室",
     subtitle: "決断の輪郭を、静かに照らす",
     active: "稼働中",
     engine: "多層統合占術×動物占い クロス解析AI",
@@ -45,7 +45,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     error: "相談を受け取れませんでした。表示された内容を確認して、もう一度お試しください。",
   },
   en: {
-    title: "AI Onore Chamber",
+    title: "Agolmen AI Chamber",
     subtitle: "Bring quiet clarity to your next decision",
     active: "Online",
     engine: "multi-layer arts × animal horoscope reflective AI",
@@ -118,7 +118,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     error: "暫時無法完成諮詢。請查看提示後再試。",
   },
   ko: {
-    title: "AI 오노레 상담실",
+    title: "아골멘 AI 상담실",
     subtitle: "다음 결정을 차분히 비춰드립니다",
     active: "가동 중",
     engine: "다층 통합 점술×동물 운세 성찰형 AI",
@@ -142,7 +142,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     error: "상담을 완료하지 못했습니다. 안내를 확인하고 다시 시도하세요.",
   },
   es: {
-    title: "Sala AI Onore",
+    title: "Sala IA Agolmen",
     subtitle: "Ilumina con calma tu próxima decisión",
     active: "Activa",
     engine: "IA reflexiva · artes multicapa × horóscopo animal",
@@ -167,7 +167,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     error: "No se pudo completar la consulta. Revisa el aviso e inténtalo de nuevo.",
   },
   fr: {
-    title: "Salon AI Onore",
+    title: "Salon IA Agolmen",
     subtitle: "Éclairer calmement votre prochaine décision",
     active: "Actif",
     engine: "IA réflexive · arts multicouches × horoscope animal",

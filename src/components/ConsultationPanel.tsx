@@ -15,7 +15,7 @@ import {
   PromptInputSubmit,
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
-import { Shimmer } from "@/components/ai-elements/shimmer";
+import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
 import type { Plan } from "@/lib/design-modes";
@@ -122,7 +122,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
           className="mx-auto size-20 drop-shadow-[0_0_22px_var(--primary)]"
         />
         <p className="mt-3 text-[10px] uppercase tracking-[0.24em] text-primary/70">
-          {language === "ja" ? "AIオノレ相談室" : "SELF AI CHAMBER"}
+          {language === "ja" ? "アゴルメン AI相談室" : "AGOLMEN AI CHAMBER"}
         </p>
         <h2 className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
@@ -217,7 +217,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
                       loading="lazy"
                       className="size-8 drop-shadow-[0_0_8px_var(--primary)]"
                     />
-                    {language === "ja" ? "AIオノレ" : "AI ONORE"}
+                    {language === "ja" ? "アゴルメン AI" : "AGOLMEN AI"}
                   </div>
                 ) : null}
                 <MessageContent
@@ -238,17 +238,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
             ))}
             {status === "submitted" ? (
               <Message from="assistant">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={compassAvatar}
-                    alt=""
-                    width={816}
-                    height={816}
-                    loading="lazy"
-                    className="size-8 drop-shadow-[0_0_8px_var(--primary)]"
-                  />
-                  <Shimmer className="text-sm">{t.thinking}</Shimmer>
-                </div>
+                 <AgolmenLoading compact label={t.thinking} />
               </Message>
             ) : null}
             {error || notice ? (

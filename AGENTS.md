@@ -38,4 +38,4 @@
 - Legal content has shareable leaf pages and footer dialogs; support requests require authentication and owner-only RLS. Why: avoid invented legal identity and anonymous personal-data exposure.
 - Sales cards use isUpgradePlan; active tier is status. Tier CSS defaults are automatic. One Dashboard audio instance uses gesture-started ambient-piano; no overlapping players.
 - Home: SelfCoreCard → owner manual → guides → GrandSummaryCard; quick compatibility in consult tab; plan features in PlanPerksTab.
-- Themes are session-local, cumulative by tier in `design-modes.ts`, CSS-scoped; VIP ids end `-luxe`, Business/Premium start `business-`. Why: inherit tier styles.
+- Themes stay session-local and tier-scoped; VIP ends `-luxe`, Business starts `business-`. Shared shell branding leaves legacy storage/event/ICS IDs intact. Why: preserve previews and saved data.
