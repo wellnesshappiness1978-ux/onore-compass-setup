@@ -85,3 +85,8 @@
 - [x] Replace the temporary logo and favicon with the uploaded amethyst compass tile, without the source watermark.
 - [x] Apply the black marble, gold and rose/amethyst nebula palette to existing themes and dialogs.
 - [x] Update loading light, share cards and About story; verify desktop/mobile and 1080×1920 image rendering. Live share UI stays pending until its reading finishes.
+
+## V10 logo and 15-theme gallery
+- [x] Replace app/header/share logo and icons with a frame-free crop from the supplied v10 image.
+- [x] Replace the origin story with the supplied public-facing Japanese wording.
+- [x] Add 15 cumulative theme specimens, full-screen locked previews, legible white theme and staged visual treatments; verify guest selection and locked previews on desktop and mobile.
