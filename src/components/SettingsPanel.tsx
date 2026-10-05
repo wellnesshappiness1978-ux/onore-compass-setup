@@ -140,6 +140,19 @@ export default function SettingsPanel({
             </span>
           </div>
         </div>
+        <div className="mt-5 border-t border-primary/15 pt-4">
+          <label className="mb-2 flex items-center gap-2 text-sm" htmlFor="settings-language">
+            <Globe2 className="size-4 text-primary" /> {t.language}
+          </label>
+          <Select value={language} onValueChange={(value) => onLanguageChange(value as Language)}>
+            <SelectTrigger id="settings-language" aria-label={t.language} className="h-12 border-primary/30 bg-background/40 text-foreground focus:ring-primary">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="border-primary/30 bg-popover text-popover-foreground">
+              {languages.map((item) => <SelectItem key={item.code} value={item.code}>{item.flag} {item.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
         {devOverrideEnabled && <div className="mt-4 border-t border-primary/10 pt-3">
           <p className="mb-2 text-xs text-muted-foreground">{t.planTest}</p>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-5" role="radiogroup" aria-label={t.planTest}>
@@ -356,20 +369,6 @@ export default function SettingsPanel({
         >
           <PenLine className="size-4 text-primary" /> {t.editBirth}
         </Button>
-
-        <div className="mt-5">
-          <p className="mb-2 flex items-center gap-2 text-sm">
-            <Globe2 className="size-4 text-primary" /> {t.language}
-          </p>
-          <Select value={language} onValueChange={(value) => onLanguageChange(value as Language)}>
-            <SelectTrigger aria-label={t.language} className="h-12 border-primary/30 bg-background/40 text-foreground focus:ring-primary">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="border-primary/30 bg-popover text-popover-foreground">
-              {languages.map((item) => <SelectItem key={item.code} value={item.code}>{item.flag} {item.label}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
 
         <div className="mt-5 space-y-3">
           <p className="flex items-center gap-2 text-sm">
