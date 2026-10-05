@@ -75,7 +75,7 @@ export function ArtsGuide() {
             <span className="text-primary/80" style={{ fontSize: 9 }}>✧</span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-primary/50" />
           </div>
-          <p className="arts-rise text-primary" style={{ animationDelay: "0.75s" }}>オノレコンパスは、この15以上の分析ロジックを最新AIで統合し、あなたという存在を多次元で解き明かします。</p>
+          <p className="arts-rise text-primary" style={{ animationDelay: "0.75s" }}>アゴルメンの羅針盤は、この15以上の分析ロジックを最新AIで統合し、あなたという存在を多次元で解き明かします。</p>
         </div>
       </div>
       <div className="space-y-6 border-t border-primary/20 px-5 py-6">

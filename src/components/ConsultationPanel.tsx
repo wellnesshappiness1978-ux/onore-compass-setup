@@ -122,7 +122,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
           className="mx-auto size-20 drop-shadow-[0_0_22px_var(--primary)]"
         />
         <p className="mt-3 text-[10px] uppercase tracking-[0.24em] text-primary/70">
-          {language === "ja" ? "AIオノレ相談室" : "SELF AI CHAMBER"}
+          {language === "ja" ? "アゴルメン AI相談室" : "AGOLMEN AI CHAMBER"}
         </p>
         <h2 className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
@@ -217,7 +217,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
                       loading="lazy"
                       className="size-8 drop-shadow-[0_0_8px_var(--primary)]"
                     />
-                    {language === "ja" ? "AIオノレ" : "AI ONORE"}
+                    {language === "ja" ? "アゴルメン AI" : "AGOLMEN AI"}
                   </div>
                 ) : null}
                 <MessageContent

@@ -66,7 +66,7 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
   const rhythm = personal(profile.birthDate, selectedDate);
   const best = [...directionEnergy(profile.birthDate, selectedDate)].sort((a, b) => b.score - a.score)[0];
   const label = rhythm.total >= 60 ? "予定を整える日（参考）" : "ペースを見直す日（参考）";
-  const description = `オノレコンパスの参考指標。地球暦の天体位置は天文計算、日取りと方位は独自の参考値です。吉日・契約の成功を保証しません。方位: ${best?.dir ?? "—"}`;
+  const description = `アゴルメンの羅針盤の参考指標。地球暦の天体位置は天文計算、日取りと方位は独自の参考値です。吉日・契約の成功を保証しません。方位: ${best?.dir ?? "—"}`;
   const start = eventIso.replaceAll("-", "");
   const eventDate = new Date(`${eventIso}T12:00:00`);
   const endDate = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate() + 1);
@@ -75,7 +75,7 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
   const download = () => {
     const content = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Onore Compass//Reference Calendar//JA", "BEGIN:VEVENT", `UID:${start}-${profile.birthDate.replaceAll("-", "")}@onore-compass`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`, `DTSTART;VALUE=DATE:${start}`, `DTEND;VALUE=DATE:${end}`, `SUMMARY:${escapeIcs(label)}`, `DESCRIPTION:${escapeIcs(description)}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n") + "\r\n";
     const url = URL.createObjectURL(new Blob([content], { type: "text/calendar;charset=utf-8" }));
-    const link = document.createElement("a"); link.href = url; link.download = `onore-${eventIso}.ics`; link.click();
+    const link = document.createElement("a"); link.href = url; link.download = `agolmen-${eventIso}.ics`; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   const phase = helioPhase(profile.birthDate, date);

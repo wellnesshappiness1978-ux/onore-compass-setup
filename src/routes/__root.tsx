@@ -82,14 +82,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "オノレコンパス | 15の占術で自分を知る" },
+      { title: "アゴルメンの羅針盤 | 15の占術で自分を知る" },
       {
         name: "description",
         content:
           "生年月日・血液型・兄弟構成から、15の占術であなたの本質を解析します。",
       },
-      { name: "author", content: "Onore Compass" },
-      { property: "og:title", content: "オノレコンパス | 15の占術で自分を知る" },
+      { name: "author", content: "Agolmen's Compass" },
+      { property: "og:title", content: "アゴルメンの羅針盤 | 15の占術で自分を知る" },
       {
         property: "og:description",
         content: "生まれた瞬間の情報から、15の占術であなたの本質を解析します。",

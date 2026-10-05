@@ -11,7 +11,7 @@ export const languages = [
 export type Language = (typeof languages)[number]["code"];
 
 const ja = {
-  brand: "オノレコンパス", subtitle: "あなたの生まれた秘密を、15の占術で解き明かします",
+  brand: "アゴルメンの羅針盤", subtitle: "あなたの生まれた秘密を、15の占術で解き明かします",
   profileEntry: "出生プロフィールを入力", step: "STEP", steps: ["生年月日・時間", "出生地", "血液型・兄弟構成"],
   birthDate: "生年月日", birthTime: "出生時間", birthPlace: "出生地（都道府県）", bloodType: "血液型", siblingOrder: "兄弟構成",
   required: "必須", timeUnknown: "出生時間が不明", unknown: "不明", selectPlace: "都道府県を選択してください",
@@ -30,7 +30,7 @@ type Translation = typeof ja;
 export const translations: Record<Language, Translation> = {
   ja,
   en: {
-    brand: "Self Compass", subtitle: "Discover the secrets of your birth through 15 divination traditions",
+    brand: "Agolmen's Compass", subtitle: "Discover the secrets of your birth through 15 divination traditions",
     profileEntry: "Enter Birth Profile", step: "STEP", steps: ["Birth date & time", "Birth place", "Blood type & siblings"],
     birthDate: "Birth Date", birthTime: "Birth Time", birthPlace: "Birth Place (Prefecture)", bloodType: "Blood Type", siblingOrder: "Sibling Order",
     required: "Required", timeUnknown: "I don't know my birth time", unknown: "Unknown", selectPlace: "Select a prefecture",
@@ -45,7 +45,7 @@ export const translations: Record<Language, Translation> = {
     bloodSuffix: "",
   },
   "zh-CN": {
-    brand: "自我罗盘", subtitle: "通过多层统合占术，解读你出生的秘密",
+    brand: "阿戈尔曼的罗盘", subtitle: "通过多层统合占术，解读你出生的秘密",
     profileEntry: "填写出生资料", step: "步骤", steps: ["出生日期与时间", "出生地", "血型与排行"],
     birthDate: "出生日期", birthTime: "出生时间", birthPlace: "出生地（都道府县）", bloodType: "血型", siblingOrder: "兄弟姐妹排行",
     required: "必填", timeUnknown: "不知道出生时间", unknown: "未知", selectPlace: "请选择都道府县",
@@ -58,7 +58,7 @@ export const translations: Record<Language, Translation> = {
     bloodSuffix: "型",
   },
   "zh-TW": {
-    brand: "自我羅盤", subtitle: "透過多層統合占術，解讀你出生的秘密",
+    brand: "阿戈爾曼的羅盤", subtitle: "透過多層統合占術，解讀你出生的秘密",
     profileEntry: "填寫出生資料", step: "步驟", steps: ["出生日期與時間", "出生地", "血型與排行"],
     birthDate: "出生日期", birthTime: "出生時間", birthPlace: "出生地（都道府縣）", bloodType: "血型", siblingOrder: "兄弟姊妹排行",
     required: "必填", timeUnknown: "不知道出生時間", unknown: "未知", selectPlace: "請選擇都道府縣",
@@ -71,7 +71,7 @@ export const translations: Record<Language, Translation> = {
     bloodSuffix: "型",
   },
   ko: {
-    brand: "셀프 컴퍼스", subtitle: "다층 통합 점술로 탄생의 비밀을 발견하세요",
+    brand: "아골멘의 나침반", subtitle: "다층 통합 점술로 탄생의 비밀을 발견하세요",
     profileEntry: "출생 정보 입력", step: "단계", steps: ["생년월일·시간", "출생지", "혈액형·형제 순서"],
     birthDate: "생년월일", birthTime: "출생 시간", birthPlace: "출생지 (일본 현)", bloodType: "혈액형", siblingOrder: "형제 순서",
     required: "필수", timeUnknown: "출생 시간을 모릅니다", unknown: "모름", selectPlace: "현을 선택하세요",
@@ -84,7 +84,7 @@ export const translations: Record<Language, Translation> = {
     bloodSuffix: "형",
   },
   es: {
-    brand: "Brújula Interior", subtitle: "Descubre los secretos de tu nacimiento con artes adivinatorias multicapa",
+    brand: "La brújula de Agolmen", subtitle: "Descubre los secretos de tu nacimiento con artes adivinatorias multicapa",
     profileEntry: "Introduce tus datos de nacimiento", step: "PASO", steps: ["Fecha y hora", "Lugar de nacimiento", "Grupo sanguíneo y hermanos"],
     birthDate: "Fecha de nacimiento", birthTime: "Hora de nacimiento", birthPlace: "Lugar de nacimiento (prefectura)", bloodType: "Grupo sanguíneo", siblingOrder: "Orden entre hermanos",
     required: "Obligatorio", timeUnknown: "No sé mi hora de nacimiento", unknown: "Desconocida", selectPlace: "Selecciona una prefectura",
@@ -97,7 +97,7 @@ export const translations: Record<Language, Translation> = {
     bloodSuffix: "",
   },
   fr: {
-    brand: "Boussole Intérieure", subtitle: "Découvrez les secrets de votre naissance grâce à arts divinatoires multicouches",
+    brand: "La boussole d’Agolmen", subtitle: "Découvrez les secrets de votre naissance grâce à arts divinatoires multicouches",
     profileEntry: "Saisir votre profil de naissance", step: "ÉTAPE", steps: ["Date et heure", "Lieu de naissance", "Groupe sanguin et fratrie"],
     birthDate: "Date de naissance", birthTime: "Heure de naissance", birthPlace: "Lieu de naissance (préfecture)", bloodType: "Groupe sanguin", siblingOrder: "Rang dans la fratrie",
     required: "Obligatoire", timeUnknown: "Je ne connais pas mon heure de naissance", unknown: "Inconnue", selectPlace: "Choisir une préfecture",

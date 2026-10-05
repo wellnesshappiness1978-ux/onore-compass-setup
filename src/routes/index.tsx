@@ -15,16 +15,16 @@ import { type Language } from "@/lib/translations";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "オノレコンパス | 自分を知る・今日を整える" },
+      { title: "アゴルメンの羅針盤 | 自分を知る・今日を整える" },
       {
         name: "description",
         content:
-          "出生情報からの個別診断、毎日の参考ガイド、天体配置の曼陀羅アートとチーム分析を一つに。オノレコンパスで自分を知り、今日を整える。",
+          "出生情報からの個別診断、毎日の参考ガイド、天体配置の曼陀羅アートとチーム分析を一つに。アゴルメンの羅針盤で自分を知り、今日を整える。",
       },
-      { property: "og:title", content: "オノレコンパス | 自分を知る・今日を整える" },
+      { property: "og:title", content: "アゴルメンの羅針盤 | 自分を知る・今日を整える" },
       {
         property: "og:description",
-        content: "個別診断・毎日の参考ガイド・出生天体アート・チーム分析を一つにまとめたオノレコンパス。",
+        content: "個別診断・毎日の参考ガイド・出生天体アート・チーム分析を一つにまとめたアゴルメンの羅針盤。",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
