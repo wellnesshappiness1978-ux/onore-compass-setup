@@ -460,15 +460,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     window.addEventListener("onore-open", onEvt);
     return () => window.removeEventListener("onore-open", onEvt);
   }, []);
-  const [teamEntry, setTeamEntry] = useState(false);
-  useEffect(() => {
-    if (tab !== "settings" || !teamEntry) return;
-    const frame = requestAnimationFrame(() => {
-      document.getElementById("team-studio-entry")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      setTeamEntry(false);
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [tab, teamEntry]);
   useEffect(() => {
     if (tab !== "consult") return;
     const frame = requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
@@ -652,7 +643,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 onDesignModeChange={setDesignMode}
                 onLanguageChange={onLanguageChange}
                 onEdit={onEdit}
-                onVip={() => setModal("vip")}
                 signedIn={signedIn}
               />
             ) : (

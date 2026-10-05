@@ -8,7 +8,6 @@ import {
   Crown,
   Globe2,
   Gem,
-  Lock,
   LockKeyhole,
   PenLine,
   Sparkles,
@@ -33,7 +32,6 @@ type Props = {
   language: Language;
   onLanguageChange: (language: Language) => void;
   onEdit: () => void;
-  onVip: () => void;
   plan: Plan;
   actualPlan: Plan;
   debugAllowed: boolean;
@@ -52,7 +50,6 @@ export default function SettingsPanel({
   language,
   onLanguageChange,
   onEdit,
-  onVip,
   plan,
   actualPlan,
   debugAllowed,
