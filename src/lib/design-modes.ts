@@ -2,7 +2,7 @@ import type { Language } from "./translations";
 
 export type Plan = "free" | "standard" | "vip" | "b2b" | "b2b-premium";
 export type DesignMode = "classic" | "pure-white" | "masculine" | "feminine" | "masculine-luxe" | "feminine-luxe" | "business-night" | "business-day"
-  | "aura-gold-luxe" | "deepsea-luxe" | "shion-luxe" | "business-platinum" | "business-jade" | "business-diamond" | "business-orion" | "business-cosmos" | "business-emperor" | "business-geometry" | "business-dragon" | "business-zero";
+  | "aura-gold-luxe" | "deepsea-luxe" | "shion-luxe" | "business-platinum" | "business-jade" | "business-diamond" | "business-orion" | "business-cosmos" | "business-emperor" | "business-geometry" | "business-dragon" | "business-zero" | "deepsea-luxe" | "shion-luxe" | "business-jade" | "business-diamond" | "business-orion";
 
 export const designModes: { id: DesignMode; tier: Plan; icon: string }[] = [
   { id: "classic", tier: "free", icon: "✦" },

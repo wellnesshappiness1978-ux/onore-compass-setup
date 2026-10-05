@@ -37,5 +37,8 @@
 - Use HelioCalendar for both Home and My Page and BirthColorGuide for color output; remove independent fake panels. Why: duplicate render paths bypassed tier gates.
 - Legal content has shareable leaf pages and footer dialogs; support requests require authentication and owner-only RLS. Why: avoid invented legal identity and anonymous personal-data exposure.
 - Sales cards use isUpgradePlan; active tier is status. Tier CSS defaults are automatic. One Dashboard audio instance uses gesture-started ambient-piano; no overlapping players.
-- Home: SelfCoreCard → owner manual → guides → GrandSummaryCard; quick compatibility in consult tab; plan features in PlanPerksTab.
+- Home: owner manual → guides → SelfCoreCard (with final GrandSummaryCard immediately before plan proposals) → day compass; quick compatibility remains in consult tab. Why: the complete free personal diagnosis should lead directly to a non-billing plan preview.
 - Themes are session-local/tier-scoped (VIP `-luxe`, Business `business-`). Brand uses a cropped logo asset with local icons; keep legacy storage/event/ICS IDs. Why: avoid watermark and data loss.
+
+- Art has two VIP-gated illustrative renderers: the natal 3D mandala and deterministic birth-sky canvas; exports and device sharing stay client-side, labelled preview art. Why: no chart entitlement or direct social posting is implied.
+- The appearance picker offers 15 cumulative tier-gated designs; legacy theme IDs remain understood but are not offered. Why: existing session choices can safely fall back without adding billing entitlement.
