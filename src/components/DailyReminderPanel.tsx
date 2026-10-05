@@ -83,7 +83,7 @@ export default function DailyReminderPanel({ language, plan, profile }: { langua
   };
   const notify = (m: Template) => {
     try {
-      const n = new Notification(m.title, { body: m.body, icon: "/favicon.ico", tag: `onore-${m.open}` });
+      const n = new Notification(m.title, { body: m.body, icon: "/favicon.png", tag: `onore-${m.open}` });
       n.onclick = () => { openTarget(m.open); n.close(); };
     } catch { /* */ }
   };

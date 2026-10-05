@@ -6,6 +6,7 @@ import GrandSummaryCard from "./GrandSummaryCard";
 import PlanPerksTab from "./PlanPerksTab";
 import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
+import { AgolmenLogo } from "./AgolmenSpiral";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -551,9 +552,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             </div>
           </div>
           <div className="design-heading mt-2 text-center">
-            <p className="design-wordmark text-[9px] uppercase text-primary/70">ONORE COMPASS</p>
+            <AgolmenLogo className="mx-auto mb-1 size-16 object-contain drop-shadow-[0_0_12px_var(--gold-glow)]" />
+            <p className="design-wordmark text-[9px] uppercase text-primary/70">AGOLMEN'S COMPASS</p>
             <h1 className="design-title font-serif text-2xl font-bold text-gradient-gold sm:text-3xl">
-              {language === "ja" ? "自分を知るコンパス" : "Self Compass"}
+              {translations[language].brand}
             </h1>
             <p className="design-mode-caption mt-1 text-[10px] text-muted-foreground">{teamCopy[language].planNames[previewPlan]} · {devOverrideEnabled ? (language === "ja" ? "表示テスト" : "Preview") : (language === "ja" ? "現在のステータス" : "Current status")}</p>
           </div>

@@ -50,7 +50,7 @@ export default function ShareCardButton({ data, language, className, loading = f
     window.addEventListener("onore-share-card", handle);
     return () => window.removeEventListener("onore-share-card", handle);
   }, [data?.kind, autoOpen]);
-  const filename = `onore-insight-${language}-${format}.png`;
+  const filename = `agolmen-insight-${language}-${format}.png`;
   const ready = Boolean(url && blob && !rendering && !loading);
   const save = () => {
     if (!url) return;
@@ -76,7 +76,7 @@ export default function ShareCardButton({ data, language, className, loading = f
     <Button type="button" variant="champagne" className={className ?? "mt-6 h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto"} onClick={() => { setFormat("story"); setOpen(true); }}><Smartphone className="size-4 shrink-0" />{label ?? t.cta}</Button>
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="share-card-modal max-h-[92dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 p-5 sm:max-w-4xl sm:p-7">
-        <DialogHeader className="pr-6 text-left"><DialogDescription className="text-xs text-primary">SELF COMPASS · {t.description}</DialogDescription><DialogTitle className="font-serif text-xl leading-relaxed sm:text-2xl">{t.title}</DialogTitle></DialogHeader>
+         <DialogHeader className="pr-6 text-left"><DialogDescription className="text-xs text-primary">AGOLMEN'S COMPASS · {t.description}</DialogDescription><DialogTitle className="font-serif text-xl leading-relaxed sm:text-2xl">{t.title}</DialogTitle></DialogHeader>
         <div className="grid min-w-0 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
           <div className="min-w-0">
             <div role="radiogroup" aria-label={t.description} className="mb-3 grid grid-cols-2 gap-2">{(["story", "x"] as const).map(f => <Button key={f} type="button" role="radio" aria-checked={format === f} variant={format === f ? "default" : "outline"} size="sm" onClick={() => setFormat(f)}><Image className="size-4" />{t[f]}</Button>)}</div>

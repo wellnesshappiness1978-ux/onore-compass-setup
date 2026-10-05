@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, Heart, Orbit, Sparkles, Sprout } from "lucide-react";
 import { useState } from "react";
 import ShareCardButton from "./ShareCardButton";
+import { AgolmenLoading } from "./AgolmenSpiral";
 import { usePlan } from "./PlanProvider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -102,7 +103,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
     <section aria-label={t.title} className="min-w-0 overflow-hidden rounded-lg border border-primary/35 bg-card/75 shadow-champagne backdrop-blur-md">
       <header className="flex items-start gap-3 border-b border-primary/20 bg-primary/5 p-5 sm:p-8">
         <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/35 bg-primary/10 text-primary"><Compass className="size-5" aria-hidden="true" /></div>
-        <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">ONORE COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{t.title}</h2></div>
+        <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">AGOLMEN'S COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{t.title}</h2></div>
       </header>
       <div className="px-5 sm:px-8">
         {localLayers && <section aria-label="診断の根拠サマリー" className="border-b border-primary/20 py-4"><dl className="flex flex-wrap gap-x-5 gap-y-3">{[
@@ -126,7 +127,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         <details open className="border-t border-primary/20 py-5"><summary className="cursor-pointer font-serif text-lg text-primary">{language === "ja" ? "6大占術と詳しい分析" : "Six layers and detailed reading"}</summary>
         {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} />}
         <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜本命卦" : "Feng shui · Ming Gua"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性式" : "女性式"} · ${b.number}卦` : `${b.branch === "male" ? "Male" : "Female"} formula · Kua ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `生気 ${fengDirectionNames[b.shengQi]} · 天医 ${fengDirectionNames[b.tianYi]} · 延年 ${fengDirectionNames[b.yanNian]}` : `Sheng Qi ${b.shengQi} · Tian Yi ${b.tianYi} · Yan Nian ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "立春を境とする伝統的な方位の参考値。住まいごとの吉凶や効果を保証するものではありません。" : "Traditional solar-year direction reference, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "本命卦には生年月日と性別が必要です。マイページのプロフィールで入力してください。" : "Add birth date and gender in your profile to view Ming Gua."}</p>}</section>
-        {isPending ? <div role="status" className="flex min-h-40 items-center gap-3 text-sm text-muted-foreground"><Sparkles className="size-5 animate-pulse text-primary" />{t.loading}</div> : isError || !data ? (
+         {isPending ? <AgolmenLoading compact label={t.loading} /> : isError || !data ? (
           <div className="flex min-h-40 flex-col items-start justify-center gap-3" role="alert"><p className="text-sm text-muted-foreground">{t.error}</p><Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>
         ) : <>
           <div className="grid grid-cols-2 gap-x-4 gap-y-4 border-b border-primary/20 py-6 sm:grid-cols-5 sm:gap-5">
