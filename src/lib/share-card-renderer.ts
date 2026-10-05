@@ -1,11 +1,12 @@
 import type { Language } from "./translations";
+import logoUrl from "@/assets/agolmen-logo-orbit.png";
 
 export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility"; caution?: string; palette?: { label: string; code: string }[] };
 export type CardFormat = "story" | "x";
 export const shareCopy = {
-  ja: { cta: "鳥肌診断カードをSNSでシェア", title: "あなたの本質を、一枚に。", description: "鳥肌診断カード", essence: "あなたの本質", bias: "陥りがちな罠・思考バイアス", palette: "バースカラーパレット", roles: ["メイン", "サブ", "金運", "愛情", "健康", "内面"], reference: "自己理解のための参考解釈・参考色", search: "オノレコンパスで検索", hashtags: "#オノレコンパス #バースカラー #自己理解", name: "名前を載せる", privacy: "名前・出生情報は初期設定で非表示", save: "画像を保存", share: "端末でシェア", story: "縦型 9:16", x: "横型 16:9", note: "共有先は端末で選択します。Instagram・TikTokへの直接投稿は保証されません。画像共有に未対応の場合は保存し、各アプリで画像を選んでください。X・LINEの投稿画面には画像は自動添付されません。", saved: "画像を保存しました", shared: "端末の共有画面を開きました", error: "画像を作成・共有できませんでした。もう一度お試しください。", loading: "選択した言語の診断カードを作成中…", match: "相性スコア" },
-  en: { cta: "Share my insight card", title: "Your essence, in one image.", description: "Personal insight card", essence: "YOUR ESSENCE", bias: "Blind spots & thinking patterns", palette: "BIRTH COLOR PALETTE", roles: ["Main", "Secondary", "Money", "Love", "Health", "Inner"], reference: "Reflective interpretation & illustrative colors", search: "Search: Onore Compass", hashtags: "#OnoreCompass #BirthColor #SelfUnderstanding", name: "Include my name", privacy: "Name and birth details hidden by default", save: "Save image", share: "Share from device", story: "Portrait 9:16", x: "Landscape 16:9", note: "Choose a destination in your device's share sheet. Direct Instagram or TikTok posting is not guaranteed. If image sharing is unavailable, save and select the image in the app. X and LINE links do not attach images automatically.", saved: "Image saved", shared: "Device share sheet opened", error: "Could not create or share the image. Please try again.", loading: "Creating your card in the selected language…", match: "Match score" },
-  "zh-TW": { cta: "分享我的洞察診斷卡", title: "將你的本質，凝聚成一張圖。", description: "個人洞察診斷卡", essence: "你的本質", bias: "容易陷入的盲點・思考偏誤", palette: "誕生色調色盤", roles: ["主色", "副色", "財運", "愛情", "健康", "內在"], reference: "供自我理解的參考解讀與參考色", search: "搜尋：オノレコンパス", hashtags: "#オノレコンパス #誕生色 #自我理解", name: "顯示姓名", privacy: "預設隱藏姓名與出生資料", save: "儲存圖片", share: "裝置分享", story: "直式 9:16", x: "橫式 16:9", note: "請在裝置分享選單選擇目的地，不保證直接發佈至 Instagram 或 TikTok。若不支援圖片分享，請先儲存，再於各應用程式選取圖片。X 與 LINE 發文畫面不會自動附加圖片。", saved: "圖片已儲存", shared: "已開啟装置分享選單", error: "無法製作或分享圖片，請重試。", loading: "正在以所選語言製作診斷卡…", match: "相性分數" },
+  ja: { cta: "鳥肌診断カードをSNSでシェア", title: "あなたの本質を、一枚に。", description: "鳥肌診断カード", essence: "あなたの本質", bias: "陥りがちな罠・思考バイアス", palette: "バースカラーパレット", roles: ["メイン", "サブ", "金運", "愛情", "健康", "内面"], reference: "自己理解のための参考解釈・参考色", search: "アゴルメンの羅針盤で検索", hashtags: "#アゴルメンの羅針盤 #バースカラー #自己理解", name: "名前を載せる", privacy: "名前・出生情報は初期設定で非表示", save: "画像を保存", share: "端末でシェア", story: "縦型 9:16", x: "横型 16:9", note: "共有先は端末で選択します。Instagram・TikTokへの直接投稿は保証されません。画像共有に未対応の場合は保存し、各アプリで画像を選んでください。X・LINEの投稿画面には画像は自動添付されません。", saved: "画像を保存しました", shared: "端末の共有画面を開きました", error: "画像を作成・共有できませんでした。もう一度お試しください。", loading: "選択した言語の診断カードを作成中…", match: "相性スコア" },
+  en: { cta: "Share my insight card", title: "Your essence, in one image.", description: "Personal insight card", essence: "YOUR ESSENCE", bias: "Blind spots & thinking patterns", palette: "BIRTH COLOR PALETTE", roles: ["Main", "Secondary", "Money", "Love", "Health", "Inner"], reference: "Reflective interpretation & illustrative colors", search: "Search: Agolmen's Compass", hashtags: "#AgolmensCompass #BirthColor #SelfUnderstanding", name: "Include my name", privacy: "Name and birth details hidden by default", save: "Save image", share: "Share from device", story: "Portrait 9:16", x: "Landscape 16:9", note: "Choose a destination in your device's share sheet. Direct Instagram or TikTok posting is not guaranteed. If image sharing is unavailable, save and select the image in the app. X and LINE links do not attach images automatically.", saved: "Image saved", shared: "Device share sheet opened", error: "Could not create or share the image. Please try again.", loading: "Creating your card in the selected language…", match: "Match score" },
+  "zh-TW": { cta: "分享我的洞察診斷卡", title: "將你的本質，凝聚成一張圖。", description: "個人洞察診斷卡", essence: "你的本質", bias: "容易陷入的盲點・思考偏誤", palette: "誕生色調色盤", roles: ["主色", "副色", "財運", "愛情", "健康", "內在"], reference: "供自我理解的參考解讀與參考色", search: "搜尋：阿戈爾曼的羅盤", hashtags: "#阿戈爾曼的羅盤 #誕生色 #自我理解", name: "顯示姓名", privacy: "預設隱藏姓名與出生資料", save: "儲存圖片", share: "裝置分享", story: "直式 9:16", x: "橫式 16:9", note: "請在裝置分享選單選擇目的地，不保證直接發佈至 Instagram 或 TikTok。若不支援圖片分享，請先儲存，再於各應用程式選取圖片。X 與 LINE 發文畫面不會自動附加圖片。", saved: "圖片已儲存", shared: "已開啟装置分享選單", error: "無法製作或分享圖片，請重試。", loading: "正在以所選語言製作診斷卡…", match: "相性分數" },
 };
 export const cardCopy = (language: Language) => shareCopy[language === "ja" ? "ja" : language === "zh-TW" ? "zh-TW" : "en"];
 
@@ -30,7 +31,8 @@ function fittedText(ctx: CanvasRenderingContext2D, text: string, x: number, y: n
   });
 }
 
-export function renderShareCard(format: CardFormat, data: ShareCardData, language: Language): HTMLCanvasElement {
+export async function renderShareCard(format: CardFormat, data: ShareCardData, language: Language): Promise<HTMLCanvasElement> {
+  const logo = new Image(); logo.src = logoUrl; await logo.decode();
   const t = cardCopy(language), story = format === "story";
   const canvas = document.createElement("canvas"); canvas.width = story ? 1080 : 1200; canvas.height = story ? 1920 : 675;
   const ctx = canvas.getContext("2d"); if (!ctx) throw new Error(t.error);
@@ -52,9 +54,11 @@ export function renderShareCard(format: CardFormat, data: ShareCardData, languag
   const cx = story ? 540 : 320, cy = story ? 670 : 315;
   for (const radius of [180, 238, 290, 325]) { ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.stroke(); }
   for (let i = 0; i < 12; i++) { const angle = i * Math.PI / 6; ctx.beginPath(); ctx.moveTo(cx + Math.cos(angle) * 325, cy + Math.sin(angle) * 325); ctx.lineTo(cx + Math.cos(angle + Math.PI * 2 / 3) * 325, cy + Math.sin(angle + Math.PI * 2 / 3) * 325); ctx.stroke(); }
-  ctx.globalAlpha = .65; ctx.strokeRect(34, 34, w - 68, h - 68); ctx.globalAlpha = 1;
-  ctx.textAlign = "center"; ctx.fillStyle = gold; ctx.font = '500 34px "Noto Serif JP", serif'; ctx.fillText("✧ オノレコンパス ✧", w / 2, story ? 160 : 93);
-  ctx.font = '400 19px "Noto Sans JP", sans-serif'; ctx.fillText("SELF COMPASS", w / 2, story ? 205 : 125);
+   const spiralGradient = ctx.createLinearGradient(0, 0, w, h); spiralGradient.addColorStop(0, gold); spiralGradient.addColorStop(.5, paper); spiralGradient.addColorStop(1, gold);
+   ctx.strokeStyle = spiralGradient; ctx.globalAlpha = .65; ctx.strokeRect(34, 34, w - 68, h - 68); ctx.globalAlpha = .2; ctx.strokeRect(49, 49, w - 98, h - 98); ctx.globalAlpha = .42;
+   ctx.beginPath(); for (let i = 0; i < 450; i++) { const angle = i * .09, radius = 3 * Math.exp(.065 * angle); const sx = (story ? 575 : 300) + Math.cos(angle) * radius, sy = (story ? 640 : 340) + Math.sin(angle) * radius; if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy); } ctx.stroke(); ctx.globalAlpha = 1;
+   ctx.drawImage(logo, w / 2 - (story ? 65 : 33), story ? 75 : 38, story ? 130 : 66, story ? 130 : 66);
+   ctx.textAlign = "center"; ctx.fillStyle = gold; ctx.font = `500 ${story ? 34 : 25}px "Noto Serif JP", serif`; ctx.fillText(language === "ja" ? "アゴルメンの羅針盤" : language === "zh-TW" ? "阿戈爾曼的羅盤" : "Agolmen's Compass", w / 2, story ? 240 : 133, w - 150);
   ctx.textAlign = "left";
   const x = story ? 100 : 90, width = story ? 880 : 500;
   ctx.fillStyle = gold; ctx.font = '500 24px "Noto Sans JP", sans-serif'; ctx.fillText(data.kind === "identity" ? t.essence : t.match, x, story ? 338 : 204);

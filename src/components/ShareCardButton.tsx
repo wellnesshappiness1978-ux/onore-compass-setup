@@ -32,7 +32,8 @@ export default function ShareCardButton({ data, language, className, loading = f
         await document.fonts.ready;
         if (!active) return;
         const source = JSON.parse(payload) as ShareCardData;
-        const canvas = renderShareCard(format, { ...source, names: includeName ? source.names : [] }, language);
+         const canvas = await renderShareCard(format, { ...source, names: includeName ? source.names : [] }, language);
+         if (!active) return;
         canvas.toBlob((image) => {
           if (!active) return;
           if (!image) { setStatus(t.error); setRendering(false); return; }
