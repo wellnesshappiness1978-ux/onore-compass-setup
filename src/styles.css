@@ -693,8 +693,6 @@
     radial-gradient(ellipse 40rem 25rem at 40% 88%, color-mix(in oklab, var(--lavender-glow) 7%, transparent), transparent 77%),
     var(--design-texture, linear-gradient(var(--background), var(--background)));
 }
-.design-canvas[data-design] .design-daily-panel,
-.design-canvas[data-design] .card-lux { background-image: linear-gradient(155deg, color-mix(in oklab, var(--rose-glow) 4%, transparent), transparent 40%, color-mix(in oklab, var(--amethyst) 8%, transparent)); }
 
 @keyframes unlock-burst {
   0% { opacity: 0; transform: scale(0.3); }

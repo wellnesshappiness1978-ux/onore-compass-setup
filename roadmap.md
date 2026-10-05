@@ -78,6 +78,6 @@
 - [x] Refresh portrait/landscape share artwork and verify mobile, desktop, reduced-motion, and 1080×1920 image rendering. Native sharing depends on the device.
 
 ## Final logo and palette
-- [ ] Replace the temporary logo and favicon with the uploaded amethyst compass tile, without the source watermark.
-- [ ] Apply the black marble, gold and rose/amethyst nebula palette to existing themes and dialogs.
-- [ ] Update loading light, share cards and About story; verify desktop/mobile and image exports.
+- [x] Replace the temporary logo and favicon with the uploaded amethyst compass tile, without the source watermark.
+- [x] Apply the black marble, gold and rose/amethyst nebula palette to existing themes and dialogs.
+- [x] Update loading light, share cards and About story; verify desktop/mobile and 1080×1920 image rendering. Live share UI stays pending until its reading finishes.

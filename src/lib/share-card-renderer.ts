@@ -63,7 +63,7 @@ export async function renderShareCard(format: CardFormat, data: ShareCardData, l
    ctx.strokeStyle = spiralGradient; ctx.globalAlpha = .7; ctx.lineWidth = 2; ctx.strokeRect(34, 34, w - 68, h - 68); ctx.globalAlpha = .28; ctx.lineWidth = 1; ctx.strokeRect(49, 49, w - 98, h - 98); ctx.globalAlpha = .42;
    ctx.beginPath(); for (let i = 0; i < 450; i++) { const angle = i * .09, radius = 3 * Math.exp(.065 * angle); const sx = (story ? 575 : 300) + Math.cos(angle) * radius, sy = (story ? 640 : 340) + Math.sin(angle) * radius; if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy); } ctx.stroke(); ctx.globalAlpha = 1;
    ctx.drawImage(logo, w / 2 - (story ? 72 : 38), story ? 70 : 32, story ? 144 : 76, story ? 144 : 76);
-   ctx.textAlign = "center"; ctx.fillStyle = gold; ctx.font = `500 ${story ? 34 : 25}px "Noto Serif JP", serif`; ctx.fillText(language === "ja" ? "アゴルメンの羅針盤" : language === "zh-TW" ? "阿戈爾曼的羅盤" : "Agolmen's Compass", w / 2, story ? 240 : 136, w - 150);
+   ctx.textAlign = "center"; ctx.fillStyle = gold; ctx.font = `500 ${story ? 34 : 25}px "Noto Serif JP", serif`; ctx.fillText(language === "ja" ? "アゴルメンの羅針盤" : language === "zh-TW" ? "阿戈爾曼的羅盤" : "Agolmen's Compass", w / 2, story ? 265 : 151, w - 150);
   ctx.textAlign = "left";
   const x = story ? 100 : 90, width = story ? 880 : 500;
   ctx.fillStyle = gold; ctx.font = '500 24px "Noto Sans JP", sans-serif'; ctx.fillText(data.kind === "identity" ? t.essence : t.match, x, story ? 338 : 204);
