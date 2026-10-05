@@ -339,7 +339,7 @@ function BizCalendar({ t, members, ownerBirthDate, language }: { t: TeamCopy; me
   const google = (iso: string) => { const a = iso.replace(/-/g, ""); const n = new Date(iso); n.setUTCDate(n.getUTCDate() + 1); return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${a}/${ymd(n).replace(/-/g, "")}`; };
   const ics = (iso: string) => {
     const a = iso.replace(/-/g, ""); const n = new Date(iso); n.setUTCDate(n.getUTCDate() + 1);
-    const body = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Onore Compass//EN", "BEGIN:VEVENT", `UID:${a}-${purpose}@onore`, `DTSTART;VALUE=DATE:${a}`, `DTEND;VALUE=DATE:${ymd(n).replace(/-/g, "")}`, `SUMMARY:${title}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    const body = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Agolmen's Compass//EN", "BEGIN:VEVENT", `UID:${a}-${purpose}@agolmen-compass`, `DTSTART;VALUE=DATE:${a}`, `DTEND;VALUE=DATE:${ymd(n).replace(/-/g, "")}`, `SUMMARY:${title}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
     const url = URL.createObjectURL(new Blob([body], { type: "text/calendar" }));
     const link = document.createElement("a"); link.href = url; link.download = `agolmen-${a}.ics`; link.click(); URL.revokeObjectURL(url);
   };

@@ -73,6 +73,6 @@
 - [x] Verify signed-in saved-profile interaction, all 19 theme choices, quick comparison, and member-targeted AI consultation in the preview.
 
 ## Agolmen rebrand
-- [ ] Rename visible brand, metadata, logo and downloadable labels without migrating saved storage keys.
-- [ ] Add shell-spiral loading and theme backgrounds plus the About story dialog.
-- [ ] Refresh portrait/landscape share artwork and verify mobile, desktop, reduced-motion, and image export.
+- [x] Rename visible brand, metadata, logo and downloadable labels without migrating saved storage keys.
+- [x] Add shell-spiral loading and theme backgrounds plus the About story dialog.
+- [x] Refresh portrait/landscape share artwork and verify mobile, desktop, reduced-motion, and 1080×1920 image rendering. Native sharing depends on the device.

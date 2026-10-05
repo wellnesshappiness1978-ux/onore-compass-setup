@@ -73,7 +73,7 @@ export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date
   const end = localIso(endDate).replaceAll("-", "");
   const google = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(label)}&dates=${start}/${end}&details=${encodeURIComponent(description)}`;
   const download = () => {
-    const content = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Onore Compass//Reference Calendar//JA", "BEGIN:VEVENT", `UID:${start}-${profile.birthDate.replaceAll("-", "")}@onore-compass`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`, `DTSTART;VALUE=DATE:${start}`, `DTEND;VALUE=DATE:${end}`, `SUMMARY:${escapeIcs(label)}`, `DESCRIPTION:${escapeIcs(description)}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n") + "\r\n";
+    const content = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Agolmen's Compass//Reference Calendar//JA", "BEGIN:VEVENT", `UID:${start}-${profile.birthDate.replaceAll("-", "")}@agolmen-compass`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`, `DTSTART;VALUE=DATE:${start}`, `DTEND;VALUE=DATE:${end}`, `SUMMARY:${escapeIcs(label)}`, `DESCRIPTION:${escapeIcs(description)}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n") + "\r\n";
     const url = URL.createObjectURL(new Blob([content], { type: "text/calendar;charset=utf-8" }));
     const link = document.createElement("a"); link.href = url; link.download = `agolmen-${eventIso}.ics`; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
