@@ -1,0 +1,11 @@
+# UI and feature rules
+- Dashboard owns tabs and daily state; Home orders manual → guides → SelfCoreCard (GrandSummaryCard last, then plan proposals) → day compass. Compatibility lives in consultation. Why: complete free reading leads to an honest preview.
+- Torisetsu and compatibility are reference readings, not verified or paid entitlements. Why: do not overstate calculations.
+- Consultation is session-only; owner or local preview roster targets omit missing fields and keep per-person histories separate. Browser speech and one 528Hz ambient piano instance must not overlap. Why: prevent invented context and audio collision.
+- Keep nine-stars fixed grid illustrative and non-natal. VIP art uses two illustrative renderers (natal 3D mandala and deterministic birth-sky canvas); client-side exports/shares remain labelled previews. Why: neither chart nor payment is verified.
+- My Page paid cards use seven-language plan copy and settings prices; clicks switch preview plans only on test hosts and production stays informational until billing exists. Active tier is status, not a sales card (use isUpgradePlan). Why: no false payment path.
+- Appearance picker offers 15 cumulative tier-gated modes; legacy mode IDs remain recognized but hidden. Themes are session-local and tier-scoped. Why: retain old choices without granting access.
+- Share cards use the shared client canvas, localized readings, effective-plan palettes (Free main only), hidden names by default, and save fallback for native sharing. Why: protect identity and device compatibility.
+- Team roster uses owner-only rows when signed in and `onore-team` locally otherwise; team simulator uses deterministic pair scores and effective preview plan. Why: guest preview grants no writes.
+- Reuse HelioCalendar on Home/My Page and BirthColorGuide for color output rather than independent panels. Why: avoid tier-gate bypasses.
+- Dashboard has one gesture-started ambient-piano player. Why: no overlapping audio.
