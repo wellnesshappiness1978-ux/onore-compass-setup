@@ -98,3 +98,10 @@
 - [x] Remove the duplicate birth-color explainer from Plan Perks and clarify feng-shui terminology.
 - [x] Add a localized pre-profile introduction and reset consultation scrolling after the tab renders.
 - [x] Verify the complete guest journey on desktop and mobile, including a live 616-character grand reading.
+
+## 7-part UI, reading, earth-calendar and feng-shui refinement
+- [x] Keep one persistent seven-language selector in Settings and remove non-setting earth-calendar, team sample, and brand-story content from Settings.
+- [x] Strengthen profile-specific plain-language reading prompts and invalidate prior cached readings.
+- [x] Compact the earth-calendar into a month view with a separate selected-day detail tab while preserving plan gates and calendar export.
+- [x] Add a beginner annual-map guide and distinct five-element color, material, and placement advice for all eight directions.
+- [x] Preserve and verify the pre-profile introduction before personal-data fields.
