@@ -16,6 +16,7 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
+import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
 import type { Plan } from "@/lib/design-modes";
@@ -247,7 +248,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
                     loading="lazy"
                     className="size-8 drop-shadow-[0_0_8px_var(--primary)]"
                   />
-                  <Shimmer className="text-sm">{t.thinking}</Shimmer>
+                  <AgolmenLoading compact label={t.thinking} />
                 </div>
               </Message>
             ) : null}

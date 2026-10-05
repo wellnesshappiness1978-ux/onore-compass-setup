@@ -131,7 +131,7 @@ function Index() {
         </Button>
       </div>
       {error && <div role="alert" className="app-alert fixed left-4 right-4 z-50 mx-auto max-w-sm border border-destructive bg-background p-3 text-sm text-destructive">{error === "load" ? copy.loadError : copy.saveError}</div>}
-      {loading ? <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">{copy.loading}</div> : profile && !editing ? (
+      {loading ? <AgolmenLoading label={copy.loading} /> : profile && !editing ? (
         <Dashboard
           profile={profile}
           onEdit={() => setEditing(true)}
