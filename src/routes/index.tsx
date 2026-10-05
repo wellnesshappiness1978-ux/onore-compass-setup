@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import Onboarding, { type UserProfile } from "@/components/Onboarding";
 import Dashboard from "@/components/Dashboard";
+import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import LanguageSelector from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
