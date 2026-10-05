@@ -1115,7 +1115,7 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .theme-sample-lines span:nth-child(3) { width: 90%; }
 .theme-sample-actions { display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 5px; }
 .theme-sample-actions .theme-sample-cta { display: grid; place-items: center; background: var(--primary); color: var(--primary-foreground); width: 55px; height: 18px; min-height: 18px; padding: 0; border-radius: 3px; font-size: 10px; }
-.theme-sample-actions > span { width: 18px; height: 12px; border: 1px solid var(--primary); border-radius: 2px; }
+.theme-sample-actions > span:not(.theme-sample-cta) { width: 18px; height: 12px; border: 1px solid var(--primary); border-radius: 2px; }
 .theme-sample[data-tier="vip"] .theme-sample-cta, .theme-sample[data-tier="b2b"] .theme-sample-cta, .theme-sample[data-tier="b2b-premium"] .theme-sample-cta { background: linear-gradient(140deg, var(--gold-glow), var(--primary) 65%, var(--gold-deep)); box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 50%, transparent); }
 .theme-sample[data-tier="b2b"] .theme-sample-body, .theme-sample[data-tier="b2b-premium"] .theme-sample-body { backdrop-filter: blur(12px); border-image: linear-gradient(135deg, var(--primary), var(--nebula)) 1; }
 .theme-sample[data-tier="b2b-premium"] .theme-sample-sky { animation: premium-stars 16s ease-in-out infinite alternate; }
@@ -1129,6 +1129,6 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .theme-sample--large .theme-sample-lines span { height: 4px; }
 .theme-sample--large .theme-sample-actions { gap: 18px; margin-top: 25px; }
 .theme-sample--large .theme-sample-actions .theme-sample-cta { width: 130px; height: 40px; }
-.theme-sample--large .theme-sample-actions > span { width: 40px; height: 32px; }
+.theme-sample--large .theme-sample-actions > span:not(.theme-sample-cta) { width: 40px; height: 32px; }
 .theme-preview-dialog { border-radius: 6px; }
 @media (prefers-reduced-motion: reduce) { .design-canvas[data-design="masculine-luxe"]::before, .design-canvas[data-tier="b2b-premium"] .celestial-stars, .theme-sample-sky { animation: none !important; } }

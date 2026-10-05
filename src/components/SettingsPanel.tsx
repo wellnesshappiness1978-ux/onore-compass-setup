@@ -108,7 +108,7 @@ export default function SettingsPanel({
 
   const tc = teamCopy[language];
   const lockedTheme = designModes.find(mode => mode.id === lockedMode);
-  const lockedTierName = lockedTheme?.tier === "free" ? t.planFree : lockedTheme ? teamCopy[language].planNames[lockedTheme.tier] : "";
+  const lockedTierName = lockedTheme?.tier === "free" ? t.planFree : lockedTheme ? `${teamCopy[language].planNames[lockedTheme.tier]}${language === "ja" ? "プラン" : ""}` : "";
   const pc = planCardsCopy[language];
   const planTabName = (id: PaidPlanId) =>
     id === "standard" ? t.standard : id === "vip" ? "VIP" : id === "b2b" ? t.planB2b : tc.planNames["b2b-premium"];
