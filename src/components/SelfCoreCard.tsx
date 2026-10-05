@@ -89,7 +89,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-five-v7", profile, language],
+    queryKey: ["home-reading-five-v8", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
@@ -108,10 +108,10 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
       </header>
       <div className="px-5 sm:px-8">
         {localLayers && <section aria-label="診断の根拠サマリー" className="border-b border-primary/20 py-4"><dl className="flex flex-wrap gap-x-5 gap-y-3">{[
-          ["人格", localLayers.name ? `${localLayers.name.person}画` : "姓・名の区切りを設定"],
-          ["ライフパス", String(localLayers.numerology.lifePath)],
-          ["日干", localLayers.shichu.dayMaster], ["太陽 / 月", `${localLayers.western.sun} / ${localLayers.western.moon}`],
-          ["本命卦", gua?.branches[0] ? String(gua.branches[0].number) : "性別を設定"],
+          ["名前の中心数", localLayers.name ? `${localLayers.name.person}画` : "姓・名の区切りを設定"],
+          ["生年月日の基本数", String(localLayers.numerology.lifePath)],
+          ["生まれ日の性質", localLayers.shichu.dayMaster], ["外向き / 内面", `${localLayers.western.sun} / ${localLayers.western.moon}`],
+          ["生まれ持った方位タイプ", gua?.branches[0] ? String(gua.branches[0].number) : "性別を設定"],
         ].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-1 text-sm font-semibold text-primary">{value}</dd></div>)}</dl></section>}
         <section aria-label="自分を知る・今日のダイジェスト" className="py-6">
           <h3 className="font-serif text-xl text-primary">{language === "ja" ? "あなたの本質" : "Your essence"}</h3>

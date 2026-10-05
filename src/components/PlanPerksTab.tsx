@@ -3,6 +3,7 @@ import { Check, Crown, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HelioCalendar from "./HelioCalendar";
 import FengShuiGuide from "./FengShuiGuide";
+import TeamStudio from "@/components/team/TeamStudio";
 import type { UserProfile } from "./Onboarding";
 import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import { planOrder } from "@/lib/plans";
@@ -29,7 +30,7 @@ const ui = (language: Language) => {
   };
 };
 
-export default function PlanPerksTab({ profile, language, plan, go }: { profile: UserProfile; language: Language; plan: Plan; go: (target: PerkTarget) => void }) {
+export default function PlanPerksTab({ profile, language, plan, actualPlan, signedIn, go }: { profile: UserProfile; language: Language; plan: Plan; actualPlan: Plan; signedIn: boolean; go: (target: PerkTarget) => void }) {
   const copy = planCardsCopy[language];
   const t = ui(language);
   const initial = (copy.cards.find((c) => c.id === plan)?.id ?? "standard") as PaidPlanId;
@@ -64,7 +65,7 @@ export default function PlanPerksTab({ profile, language, plan, go }: { profile:
         </ul>
         <div className="mt-5 flex flex-wrap gap-2">
           {active === "vip" && <><Button variant="outline" onClick={() => go("mandala")}>{t.mandala}</Button><Button variant="outline" onClick={() => go("consult")}>{t.voice}</Button></>}
-          {(active === "b2b" || active === "b2b-premium") && <Button variant="outline" onClick={() => go("team")}>{t.team}</Button>}
+          {(active === "b2b" || active === "b2b-premium") && <Button variant="outline" onClick={() => document.getElementById("team-studio-entry")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.team}</Button>}
           {!unlocked && <Button variant="champagne" onClick={upgrade}>{t.plans}</Button>}
         </div>
         {active === "b2b-premium" && <p className="mt-4 text-sm leading-7 text-foreground">{t.premium}</p>}
@@ -72,6 +73,7 @@ export default function PlanPerksTab({ profile, language, plan, go }: { profile:
       </section>
       {active === "vip" && <FengShuiGuide profile={profile} date={new Date()} language={language} />}
       {active !== "vip" && <HelioCalendar date={new Date()} profile={profile} plan={plan} onUpgrade={upgrade} />}
+      {(active === "b2b" || active === "b2b-premium") && <div id="team-studio-entry" className="scroll-mt-6"><TeamStudio plan={plan} actualPlan={actualPlan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} /></div>}
     </div>
   );
 }

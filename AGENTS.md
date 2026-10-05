@@ -18,3 +18,4 @@
 - Preserve legacy storage, event, and ICS identifiers and use the cropped brand logo. Why: avoid lost data and watermarks.
 - Keep support authenticated with owner-only RLS and legal content in shareable leaf pages. Why: protect personal information and avoid invented legal identity.
 - Open-app reminders only until push and LINE identities are connected. Why: browser timers stop when the app closes.
+- Keep Settings limited to account, plan, notification, theme, and language controls; place earth-calendar and team reference experiences in Plan Perks. Why: settings should remain operational and scannable.
