@@ -76,3 +76,8 @@
 - [x] Rename visible brand, metadata, logo and downloadable labels without migrating saved storage keys.
 - [x] Add shell-spiral loading and theme backgrounds plus the About story dialog.
 - [x] Refresh portrait/landscape share artwork and verify mobile, desktop, reduced-motion, and 1080×1920 image rendering. Native sharing depends on the device.
+
+## Final logo and palette
+- [x] Replace the temporary logo and favicon with the uploaded amethyst compass tile, without the source watermark.
+- [x] Apply the black marble, gold and rose/amethyst nebula palette to existing themes and dialogs.
+- [x] Update loading light, share cards and About story; verify desktop/mobile and 1080×1920 image rendering. Live share UI stays pending until its reading finishes.
