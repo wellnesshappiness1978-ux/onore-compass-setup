@@ -8,11 +8,12 @@ import type { Language } from "@/lib/translations";
 
 const date = z.string().date().refine(v => v >= "1900-01-01" && v <= new Date().toISOString().slice(0, 10));
 export const partnerSchema = z.object({
-  name: z.string().trim().max(40), birthDate: date,
+  name: z.string().trim().max(40), nameKana: z.string().trim().max(60), birthDate: date,
   birthTime: z.union([z.literal(""), z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/)]),
   birthPlace: z.string().max(20), birthCity: z.string().trim().max(80),
   bloodType: z.enum(["", "A", "B", "O", "AB"]),
   siblingOrder: z.enum(["", "first", "middle", "last", "only"]),
+  gender: z.enum(["female", "male", "other", "undisclosed"]),
 });
 export type PartnerInput = z.infer<typeof partnerSchema>;
 type Owner = { name: string; birthDate: string; birthTime: string; birthTimeUnknown: boolean; birthPlace: string; birthCity: string; bloodType: string; siblingOrder: string; nameRomaji: string; gender: string };
@@ -36,7 +37,7 @@ export function analyzeCompatibility(owner: Owner, input: PartnerInput, language
   if (!a || !b) return null;
   const w = words[language];
   const pair = { birthDate: owner.birthDate, id: "owner", name: owner.name, gender: owner.gender, bloodType: owner.bloodType, role: "", skills: [] };
-  const other = { birthDate: partner.birthDate, id: "partner", name: partner.name, gender: "undisclosed", bloodType: partner.bloodType, role: "", skills: [] };
+  const other = { birthDate: partner.birthDate, id: "partner", name: partner.name, gender: partner.gender, bloodType: partner.bloodType, role: "", skills: [] };
   const rel = relation(pair, other);
   const score = pairScore(pair, other);
   const sky = [a.western.ascendant && b.western.ascendant ? `ASC ${a.western.ascendant} × ${b.western.ascendant}` : null, !a.western.moonUncertain && !b.western.moonUncertain ? `${a.western.moon} × ${b.western.moon}` : null].filter(Boolean).join(" / ");
@@ -45,12 +46,13 @@ export function analyzeCompatibility(owner: Owner, input: PartnerInput, language
   const nameA = getFiveElements({ nameKanji: owner.name, birthDate: owner.birthDate, bloodType: owner.bloodType });
   const nameB = getFiveElements({ nameKanji: partner.name, birthDate: partner.birthDate, bloodType: partner.bloodType });
   const kuaA = mingGua(owner.birthDate, owner.gender);
+  const kuaB = mingGua(partner.birthDate, partner.gender);
   const evidence = [
     `${w.labels[0]}: ${a.western.sun} / ${a.shichu.dayMaster} / ${a.animal.core ?? w.notAvailable} / ${lifePath(owner.birthDate)}`,
     `${w.labels[1]}: ${b.western.sun} / ${b.shichu.dayMaster} / ${b.animal.core ?? w.notAvailable} / ${lifePath(partner.birthDate)}`,
     `${w.labels[0]} ${a.name ? `${a.name.person}・${a.name.total}` : w.notAvailable} · ${w.labels[1]} ${b.name ? `${b.name.person}・${b.name.total}` : w.notAvailable}`,
-    `${nameA.eto ?? w.notAvailable} × ${nameB.eto ?? w.notAvailable} · ${w.labels[0]} ${kuaA?.branches.map(branch => branch.number).join("/") ?? w.notAvailable} / ${w.labels[1]} ${w.notAvailable}`,
-    `${w.labels[1]}: ${partner.birthTime && partner.birthPlace ? `${partner.birthTime} ${partner.birthPlace} ${partner.birthCity}` : w.notAvailable} · ${partner.bloodType || w.notAvailable} · ${partner.siblingOrder || w.notAvailable}`,
+    `${nameA.eto ?? w.notAvailable} × ${nameB.eto ?? w.notAvailable} · ${w.labels[0]} ${kuaA?.branches.map(branch => branch.number).join("/") ?? w.notAvailable} / ${w.labels[1]} ${kuaB?.branches.map(branch => branch.number).join("/") ?? w.notAvailable}`,
+    `${w.labels[1]}: ${partner.nameKana || w.notAvailable} · ${partner.birthTime && partner.birthPlace ? `${partner.birthTime} ${partner.birthPlace} ${partner.birthCity}` : w.notAvailable} · ${partner.bloodType || w.notAvailable} · ${partner.siblingOrder || w.notAvailable}`,
     `Moon / ASC: ${sky || w.notAvailable} · Animal reference: ${a.animal.referenceAnimals?.surface ?? w.notAvailable} × ${b.animal.referenceAnimals?.surface ?? w.notAvailable}`,
   ];
   const dynamic = rel === "same" ? w.same : rel === "generate" ? w.generation : rel === "control" ? w.control : w.neutral;

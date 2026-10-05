@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
+import { ArrowRight, CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
@@ -55,10 +55,21 @@ const chipIdle = "border-primary/15 bg-background/40 text-foreground hover:borde
 
 type Props = { onComplete: (profile: UserProfile) => Promise<void>; language: Language; signedIn: boolean; initialProfile?: UserProfile };
 
+const introCopy: Record<Language, { eyebrow: string; title: string; body: string; inputs: string; layers: string; portrait: string; note: string; cta: string }> = {
+  ja: { eyebrow: "入力前の30秒プレビュー", title: "なぜ、ひとつの占いだけで見ないのか？", body: "同じ誕生日でも、名前・生まれた時間・場所・家族の中での立場が重なると、見えてくる輪郭は変わります。アゴルメンは一つの答えに決めつけず、複数の視点が重なる部分と食い違う部分をAIで読み解きます。", inputs: "姓名・生年月日・出生時刻／場所", layers: "実装済みの姓名・数秘・天体・四柱・動物・風水", portrait: "あなたの本質・強み・迷いやすい構造", note: "15以上の占術知見を背景にした参考体験です。入力値から実際に算出できる項目だけを使い、未入力情報は推測しません。", cta: "プロフィール入力へ進む" },
+  en: { eyebrow: "30-second preview", title: "Why look through more than one lens?", body: "A birth date gains different contours when combined with a name, birth time, place and family context. Agolmen compares where several perspectives reinforce or challenge one another instead of forcing a single answer.", inputs: "Name · date · time · place", layers: "Name · numbers · sky · pillars · animal · directions", portrait: "Your nature · strengths · recurring friction", note: "A reflective experience informed by 15+ traditions. Only implemented calculations from supplied data are used; missing details are never guessed.", cta: "Enter my profile" },
+  "zh-CN": { eyebrow: "填写前30秒预览", title: "为什么不只看一种占术？", body: "即使生日相同，姓名、出生时间与地点、家庭排行相互叠加后，呈现的轮廓也会不同。阿戈尔曼用AI解读多种视角的重合与差异，而不是武断地给出唯一答案。", inputs: "姓名・生日・时间／地点", layers: "姓名・数字・天体・四柱・动物・方位", portrait: "本质・优势・反复卡住的结构", note: "这是以15种以上占术知识为背景的参考体验，只使用已实现且可由输入计算的项目，不猜测缺失信息。", cta: "开始填写资料" },
+  "zh-TW": { eyebrow: "填寫前30秒預覽", title: "為什麼不只看一種占術？", body: "即使生日相同，姓名、出生時間與地點、家庭排行互相疊加後，呈現的輪廓也會不同。阿戈爾曼用AI解讀多種視角的重合與差異，而不是武斷地給出唯一答案。", inputs: "姓名・生日・時間／地點", layers: "姓名・數字・天體・四柱・動物・方位", portrait: "本質・優勢・反覆卡住的結構", note: "這是以15種以上占術知識為背景的參考體驗，只使用已實作且可由輸入計算的項目，不猜測缺失資訊。", cta: "開始填寫資料" },
+  ko: { eyebrow: "입력 전 30초 미리보기", title: "왜 한 가지 점술만 보지 않을까요?", body: "같은 생일도 이름, 태어난 시간과 장소, 가족 안의 위치가 겹치면 다른 윤곽이 드러납니다. 아골멘은 하나의 답으로 단정하지 않고 여러 관점이 겹치거나 어긋나는 지점을 AI로 읽습니다.", inputs: "이름・생일・시간／장소", layers: "이름・숫자・천체・사주・동물・방위", portrait: "본질・강점・반복되는 막힘", note: "15가지 이상의 점술 지식을 배경으로 한 참고 체험입니다. 입력값으로 계산 가능한 구현 항목만 사용하며 누락 정보는 추측하지 않습니다.", cta: "프로필 입력하기" },
+  es: { eyebrow: "Vista previa de 30 segundos", title: "¿Por qué mirar con más de una lente?", body: "Una fecha adquiere otros matices al combinarse con el nombre, la hora, el lugar y el contexto familiar. Agolmen compara coincidencias y contrastes entre perspectivas sin imponer una sola respuesta.", inputs: "Nombre · fecha · hora · lugar", layers: "Nombre · números · cielo · pilares · animal · direcciones", portrait: "Esencia · fortalezas · fricciones recurrentes", note: "Experiencia reflexiva inspirada en más de 15 tradiciones. Solo usa cálculos implementados con los datos aportados; nunca inventa lo que falta.", cta: "Introducir mi perfil" },
+  fr: { eyebrow: "Aperçu en 30 secondes", title: "Pourquoi croiser plusieurs regards ?", body: "Une date prend d’autres contours avec le nom, l’heure, le lieu et le contexte familial. Agolmen compare les convergences et les écarts entre plusieurs perspectives sans imposer une réponse unique.", inputs: "Nom · date · heure · lieu", layers: "Nom · nombres · ciel · piliers · animal · directions", portrait: "Nature · forces · tensions récurrentes", note: "Expérience réflexive inspirée de plus de 15 traditions. Seuls les calculs disponibles à partir des données saisies sont utilisés ; rien n’est inventé.", cta: "Saisir mon profil" },
+};
+
 export default function Onboarding({ onComplete, language, signedIn, initialProfile }: Props) {
   const t = translations[language];
   const pt = profileTranslations[language];
   const storage = profileStorageCopy[language];
+  const [introVisible, setIntroVisible] = useState(!initialProfile);
   const [step, setStep] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
   const [saveError, setSaveError] = useState(false);
@@ -129,7 +140,16 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
         </div>
 
         {/* Card */}
-        <div className="card-lux rounded-2xl p-6 sm:p-8">
+        {introVisible ? <div className="card-lux rounded-lg p-6 sm:p-8">
+          <p className="text-xs text-primary">{introCopy[language].eyebrow}</p>
+          <h2 className="mt-2 font-serif text-2xl leading-snug text-gradient-gold">{introCopy[language].title}</h2>
+          <p className="mt-4 text-sm leading-7 text-foreground">{introCopy[language].body}</p>
+          <div className="mt-6 grid gap-3" aria-label={introCopy[language].title}>
+            {[introCopy[language].inputs, introCopy[language].layers, introCopy[language].portrait].map((line, index) => <div key={line} className="flex items-center gap-3 border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-primary/40 text-xs text-primary">{index + 1}</span><p className="text-sm leading-6 text-foreground">{line}</p>{index < 2 && <ArrowRight className="ml-auto size-4 shrink-0 text-primary" aria-hidden="true" />}</div>)}
+          </div>
+          <p className="mt-5 text-xs leading-6 text-muted-foreground">{introCopy[language].note}</p>
+          <Button type="button" variant="champagne" onClick={() => setIntroVisible(false)} className="mt-6 h-14 w-full whitespace-normal px-4 text-sm font-bold sm:text-base">{introCopy[language].cta}<ArrowRight className="size-4" aria-hidden="true" /></Button>
+        </div> : <div className="card-lux rounded-lg p-6 sm:p-8">
           <h2 className="mb-5 font-serif text-base font-semibold text-gradient-gold">{t.profileEntry}</h2>
           {/* Progress */}
           <div className="mb-7">
@@ -323,7 +343,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
               )}
             </Button>
           </div>
-        </div>
+        </div>}
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
            {t.privacy}

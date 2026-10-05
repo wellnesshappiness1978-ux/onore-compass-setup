@@ -5,7 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import Onboarding, { type UserProfile } from "@/components/Onboarding";
 import Dashboard from "@/components/Dashboard";
 import { AgolmenLoading } from "@/components/AgolmenSpiral";
-import LanguageSelector from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -46,7 +45,7 @@ function Index() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [language, setLanguage] = useState<Language>("ja");
-  useEffect(() => { const stored = localStorage.getItem("onore-language"); if (stored && ["ja","en","zh-TW","zh-CN","ko","es"].includes(stored)) setLanguage(stored as Language); }, []);
+  useEffect(() => { const stored = localStorage.getItem("onore-language"); if (stored && ["ja","en","zh-TW","zh-CN","ko","es","fr"].includes(stored)) setLanguage(stored as Language); }, []);
   const initialLanguageRender = useRef(true);
   useEffect(() => {
     if (initialLanguageRender.current) { initialLanguageRender.current = false; return; }
@@ -125,7 +124,6 @@ function Index() {
 
   return (
     <>
-      <LanguageSelector language={language} onChange={setLanguage} />
       <div className="account-controls fixed left-4 z-50 max-w-[calc(100vw-9rem)] sm:left-6">
         <Button variant="outline" className="h-10 max-w-full border-primary/40 bg-background/85 px-3 text-xs text-primary backdrop-blur-md" onClick={userId ? signOut : signIn}>
           {userId ? copy.signOut : copy.signIn}
