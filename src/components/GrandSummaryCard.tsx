@@ -19,7 +19,7 @@ const titles: Record<Language, [string, string]> = {
   fr: ["Lecture multicouche intégrale", "Partager cette lecture (créer une carte)"],
 };
 
-export default function GrandSummaryCard({ profile, language, plan }: { profile: UserProfile; language: Language; plan: Plan }) {
+export default function GrandSummaryCard({ profile, language, plan, embedded = false }: { profile: UserProfile; language: Language; plan: Plan; embedded?: boolean }) {
   const generate = useServerFn(generateHomeReading);
   const { data, isPending, isError } = useQuery({
     queryKey: ["home-reading-five-v5", profile, language],
@@ -33,7 +33,7 @@ export default function GrandSummaryCard({ profile, language, plan }: { profile:
   const text = data?.grandSummary || data?.synthesis;
   const colors = palette ? (plan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.love, palette.health, palette.mind]) : [];
   return (
-    <section id="grand-summary" aria-label={title} className="card-lux relative mt-8 overflow-hidden rounded-lg px-5 py-8 sm:px-10 sm:py-12">
+    <section id="grand-summary" aria-label={title} className={embedded ? "border-t border-primary/30 px-5 py-8 sm:px-8 sm:py-10" : "card-lux relative mt-8 overflow-hidden rounded-lg px-5 py-8 sm:px-10 sm:py-12"}>
       <div className="text-center">
         <Sparkles className="mx-auto size-6 text-primary" strokeWidth={1.2} aria-hidden="true" />
         <h2 className="mt-3 font-serif text-2xl text-gradient-gold sm:text-3xl">{title}</h2>

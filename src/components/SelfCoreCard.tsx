@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, Heart, Orbit, Sparkles, Sprout } from "lucide-react";
 import { useState } from "react";
 import ShareCardButton from "./ShareCardButton";
+import GrandSummaryCard from "./GrandSummaryCard";
 import { AgolmenLoading } from "./AgolmenSpiral";
 import { usePlan } from "./PlanProvider";
 import { Button } from "@/components/ui/button";
@@ -173,6 +174,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         </details>
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>
+      <GrandSummaryCard profile={profile} language={language} plan={activePlan} embedded />
       {upgradeCards.length > 0 && <footer className="border-t border-primary/25 bg-background/40 p-5 sm:p-8">
         <div className="flex items-center gap-3"><Sparkles className="size-5 text-primary" aria-hidden="true" /><div className="min-w-0"><h3 className="font-serif text-lg text-primary sm:text-xl">{p.sectionTitle}</h3><p className="mt-1 text-xs text-muted-foreground">{p.sectionSub}</p></div></div>
         <div className="mt-5 -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0">

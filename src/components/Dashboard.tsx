@@ -2,7 +2,6 @@ import { ArtsGuide } from "./ArtsGuide";
 import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
 import PersonPortrait from "./PersonPortrait";
 import SelfCoreCard from "./SelfCoreCard";
-import GrandSummaryCard from "./GrandSummaryCard";
 import PlanPerksTab from "./PlanPerksTab";
 import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
