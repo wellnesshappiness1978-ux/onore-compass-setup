@@ -1033,3 +1033,32 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
   .language-controls [role="group"] { display: none; }
   .account-controls { max-width: calc(100vw - 10rem); }
 }
+
+/* The Free white appearance is local to the canvas; navigation, controls and dialogs inherit readable semantic roles. */
+.design-canvas[data-design="pure-white"] {
+  color-scheme: light;
+  --background: oklch(.975 .006 95); --foreground: oklch(.22 .032 270);
+  --card: oklch(.995 .003 95); --card-foreground: var(--foreground);
+  --popover: var(--card); --popover-foreground: var(--foreground);
+  --secondary: oklch(.92 .016 270); --secondary-foreground: var(--foreground);
+  --muted: var(--secondary); --muted-foreground: oklch(.40 .03 270);
+  --accent: var(--secondary); --accent-foreground: var(--foreground);
+  --primary: oklch(.42 .095 267); --primary-foreground: oklch(.99 .003 95);
+  --gold-glow: oklch(.65 .11 85); --gold-deep: oklch(.42 .095 267);
+  --border: oklch(.72 .025 270); --input: var(--border); --ring: var(--primary);
+  --nebula: oklch(.3 .08 280); --celestial-ink: oklch(.25 .07 275);
+  --design-surface: var(--card); --design-line: color-mix(in oklab, var(--primary) 25%, transparent);
+  --design-texture: repeating-radial-gradient(circle at 50% 13rem, transparent 0 94px, color-mix(in oklab, var(--nebula) 8%, transparent) 95px 96px, transparent 97px 190px);
+  background-image: linear-gradient(170deg, var(--card), var(--background) 42%, color-mix(in oklab, var(--nebula) 8%, var(--background)));
+}
+.design-canvas[data-design="pure-white"] .celestial-stars { opacity: .16; }
+.design-canvas[data-design="pure-white"] .text-gradient-gold, .design-canvas[data-design="pure-white"] .arts-shimmer { background-image: linear-gradient(120deg, var(--primary), var(--nebula)); }
+.design-choice--pure-white { --preview-base: oklch(.975 .006 95); --preview-accent: oklch(.42 .095 267); --preview-glint: oklch(.65 .11 85); }
+.agolmen-loading-logo, .design-heading img { mask-image: radial-gradient(ellipse 53% 53% at center, black 64%, transparent 98%); filter: drop-shadow(0 0 7px var(--gold-glow)); }
+
+.agolmen-brand-logo { mask-image: radial-gradient(ellipse 53% 53% at center, black 64%, transparent 98%); }
+.design-choice--pure-white .design-choice-scene { background: linear-gradient(135deg, var(--preview-base), color-mix(in oklab, var(--preview-accent) 12%, var(--preview-base))); color: var(--preview-accent); }
+.design-choice--pure-white .design-choice-palette span:nth-child(1) { background: var(--preview-base); }
+.design-choice--pure-white .design-choice-palette span:nth-child(2) { background: var(--preview-accent); }
+.design-choice--pure-white .design-choice-palette span:nth-child(3) { background: var(--preview-glint); }
+.design-canvas[data-design="pure-white"] .card-lux, .design-canvas[data-design="pure-white"] .design-navigation { color: var(--foreground); }

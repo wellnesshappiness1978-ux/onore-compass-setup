@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, Heart, Orbit, Sparkles, Sprout } from "lucide-react";
 import { useState } from "react";
 import ShareCardButton from "./ShareCardButton";
+import GrandSummaryCard from "./GrandSummaryCard";
 import { AgolmenLoading } from "./AgolmenSpiral";
 import { usePlan } from "./PlanProvider";
 import { Button } from "@/components/ui/button";
@@ -88,7 +89,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-five-v5", profile, language],
+    queryKey: ["home-reading-five-v6", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
@@ -120,7 +121,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
             <article><h3 className="font-serif text-xl text-primary">{language === "ja" ? "個別診断" : "Personal reading"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data?.manualCore ?? t.loading}</p></article>
             <article><h3 className="font-serif text-xl text-primary">{language === "ja" ? "見落としやすい内面" : "An inner blind spot"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data?.caution ?? t.loading}</p><p className="mt-2 text-xs text-muted-foreground">{language === "ja" ? "参考の読み解きであり、実際の心情や未来の危険を判定しません。" : "A reflective interpretation, not a reading of private thoughts or future harm."}</p></article>
           </div>
-          {palette && <article className="mt-6 flex items-center gap-4 border-y border-primary/25 py-5"><span className="size-16 shrink-0 rounded-full border border-primary/30" style={{ backgroundColor: palette.main.code }} aria-hidden="true" /><div><h3 className="font-serif text-xl text-primary">{language === "ja" ? "今日の守護バースカラー" : "Your birth color today"}</h3><p className="mt-1 text-base text-foreground">{palette.main.name} · {palette.main.code}</p><p className="text-xs text-muted-foreground">{language === "ja" ? "変わらないメイン参考色を、今日の小物や装いに。保護効果を示すものではありません。" : "Your stable reference color for today's accessories; no protective effect is claimed."}</p></div></article>}
+          {palette && <article className="mt-6 flex items-center gap-4 border-y border-primary/25 py-5"><span className="size-16 shrink-0 rounded-full border border-primary/30" style={{ backgroundColor: palette.main.code }} aria-hidden="true" /><div><h3 className="font-serif text-xl text-primary">{language === "ja" ? "あなたの守護バースカラー" : "Your guardian birth color"}</h3><p className="mt-1 text-base text-foreground">{palette.main.name} · {palette.main.code}</p><p className="text-xs text-muted-foreground">{language === "ja" ? "変わらないメイン参考色を、今日の小物や装いに。保護効果を示すものではありません。" : "Your stable reference color for today's accessories; no protective effect is claimed."}</p></div></article>}
           {data && <details className="mt-5"><summary className="cursor-pointer text-primary">{language === "ja" ? "思考と内面の構造" : "Thought and inner patterns"}</summary>{[data.manualDecision, data.manualTiming].map((body, i) => <article key={i} className="border-t border-primary/20 py-5"><h3 className="font-serif text-xl text-primary">{coreSections[i + 1]}</h3><p className="mt-3 text-base leading-8 text-foreground">{body}</p></article>)}</details>}
           <ShareCardButton language={language} loading={isPending} data={data?.keySummary && data.caution ? { kicker: "", title: "", names: profile.nameKanji ? [profile.nameKanji] : [], lines: [data.keySummary], caution: data.caution, palette: palette ? (activePlan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.love, palette.health, palette.mind]).map((color, i) => ({ label: (language === "ja" ? ["メイン", "サブ", "金運", "愛情", "健康", "内面"] : language === "zh-TW" ? ["主色", "副色", "財運", "愛情", "健康", "內在"] : ["Main", "Secondary", "Money", "Love", "Health", "Inner"])[i] ?? "", code: color.code })) : [], score: localLayers?.numerology.lifePath ?? 0, kind: "identity" } : null} />
         </section>
@@ -173,6 +174,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         </details>
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>
+      <GrandSummaryCard profile={profile} language={language} plan={activePlan} embedded />
       {upgradeCards.length > 0 && <footer className="border-t border-primary/25 bg-background/40 p-5 sm:p-8">
         <div className="flex items-center gap-3"><Sparkles className="size-5 text-primary" aria-hidden="true" /><div className="min-w-0"><h3 className="font-serif text-lg text-primary sm:text-xl">{p.sectionTitle}</h3><p className="mt-1 text-xs text-muted-foreground">{p.sectionSub}</p></div></div>
         <div className="mt-5 -mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0">

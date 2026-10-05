@@ -32,5 +32,5 @@ export function AgolmenLoading({ label, compact = false }: { label: string; comp
 }
 
 export function AgolmenLogo({ className = "" }: { className?: string }) {
-  return <img src={logo} alt="" width={512} height={512} className={className} />;
+  return <img src={logo} alt="" width={512} height={512} className={`agolmen-brand-logo ${className}`} />;
 }

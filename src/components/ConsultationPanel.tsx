@@ -122,7 +122,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
           className="mx-auto size-20 drop-shadow-[0_0_22px_var(--primary)]"
         />
         <p className="mt-3 text-[10px] uppercase tracking-[0.24em] text-primary/70">
-          {language === "ja" ? "アゴルメン AI相談室" : "AGOLMEN AI CHAMBER"}
+          {language === "ja" ? "アゴルメン相談室" : "AGOLMEN AI CHAMBER"}
         </p>
         <h2 className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{t.title}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{t.subtitle}</p>
@@ -150,7 +150,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
           <div>
             <p className="text-sm font-semibold text-foreground">
               {unlimited
-                ? (isJa ? `${planNames[plan]}：AI相談は無制限` : `${planNames[plan]}: unlimited consultations`)
+                ? (isJa ? `${planNames[plan]}：アゴルメン相談室は無制限` : `${planNames[plan]}: unlimited consultations`)
                 : (isJa ? `本日あと ${remaining} 回（${planNames[plan]}・1日 ${limit} 回）` : `${remaining} left today (${planNames[plan]} · ${limit}/day)`)}
             </p>
             <p className="mt-0.5 text-[10px] text-muted-foreground">

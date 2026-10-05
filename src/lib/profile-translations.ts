@@ -9,11 +9,11 @@ type ProfileCopy = {
 };
 
 const ja: ProfileCopy = {
-  cardTitle: "個人データ", cardHint: "保存すると、トリセツとAI相談室の解析コンテキストがすぐに更新されます。",
+  cardTitle: "個人データ", cardHint: "保存すると、トリセツとアゴルメン相談室の解析コンテキストがすぐに更新されます。",
   nameKanji: "お名前（漢字）", nameKana: "よみがな（ひらがな）", nameRomaji: "ローマ字（アルファベット）",
   romajiHint: "数秘術の運命数（Destiny Number）の算出に使用します", birthDate: "生年月日（西暦）",
   birthTime: "出生時間（時・分）", timeUnknown: "出生時間は不明", prefecture: "出生地（都道府県）",
-  city: "出生市区町村", save: "保存して診断する", saved: "保存しました。トリセツとAI相談室に反映されています。",
+  city: "出生市区町村", save: "保存して診断する", saved: "保存しました。トリセツとアゴルメン相談室に反映されています。",
   romajiError: "ローマ字はアルファベットで入力してください", dateError: "生年月日を入力してください",
   optional: "任意", required: "必須", lensesTitle: "統合する占術レイヤー",
   lenses: ["本格姓名判断", "精密数秘術", "西洋占星術", "四柱推命", "4層動物占い"],

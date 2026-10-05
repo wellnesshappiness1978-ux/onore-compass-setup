@@ -21,7 +21,7 @@ export type ConsultationTranslation = {
 
 export const consultationTranslations: Record<Language, ConsultationTranslation> = {
   ja: {
-    title: "アゴルメン AI相談室",
+    title: "アゴルメン相談室",
     subtitle: "決断の輪郭を、静かに照らす",
     active: "稼働中",
     engine: "多層統合占術×動物占い クロス解析AI",
