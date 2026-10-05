@@ -75,7 +75,7 @@ export function ArtsGuide() {
             <span className="text-primary/80" style={{ fontSize: 9 }}>✧</span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-primary/50" />
           </div>
-          <div className="arts-rise border-t border-primary/25 pt-5 text-left" style={{ animationDelay: "0.75s" }}><h4 className="font-serif text-lg text-primary">アゴルメンの由来</h4><p className="mt-2 text-sm leading-8">妻アサミが夢で受け取った啓示から生まれた名前、アゴルメン。カタツムリの殻に重なる自然界の黄金螺旋は、自分軸を守りながら進む姿の象徴です。その殻は、いつでも帰れる強固な家でもあります。</p></div><p className="arts-rise text-primary" style={{ animationDelay: "0.85s" }}>アゴルメンの羅針盤は、この15以上の分析ロジックを最新AIで統合し、あなたという存在を多次元で解き明かします。</p>
+          <div className="arts-rise border-t border-primary/25 pt-5 text-left" style={{ animationDelay: "0.75s" }}><h4 className="font-serif text-lg text-primary">アゴルメンの由来</h4><p className="mt-2 text-sm leading-8">「アゴルメン（Agolmen）」とは、古代より宇宙の絶対調和と生命の原点とされる「カタツムリやオウムガイの殻（黄金螺旋 / フィボナッチスパイラル）」に由来します。自然界が描く黄金比（1:1.618）の美しい殻は、外界の乱れから「自分の強固な軸・本質」を護る聖なる家であり、中心から無限へと開運の波動を広げる象徴です。</p></div><p className="arts-rise text-primary" style={{ animationDelay: "0.85s" }}>アゴルメンの羅針盤は、この15以上の分析ロジックを最新AIで統合し、あなたという存在を多次元で解き明かします。</p>
         </div>
       </div>
       <div className="space-y-6 border-t border-primary/20 px-5 py-6">

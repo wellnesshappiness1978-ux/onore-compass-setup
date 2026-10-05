@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/agolmen-compass-tile.png.asset.json";
+import logoAsset from "@/assets/agolmen-v10-compass-final.png.asset.json";
 
 const logo = logoAsset.url;
 
