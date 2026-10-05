@@ -5,7 +5,7 @@ const logo = logoAsset.url;
 const points = Array.from({ length: 230 }, (_, i) => {
   const angle = i * 0.12;
   const radius = 2.5 * Math.exp(0.107 * angle);
-  return `${160 + Math.cos(angle) * radius},${160 + Math.sin(angle) * radius}`;
+  return `${(160 + Math.cos(angle) * radius).toFixed(4)},${(160 + Math.sin(angle) * radius).toFixed(4)}`;
 }).join(" ");
 
 export function SpiralLines({ className = "" }: { className?: string }) {
