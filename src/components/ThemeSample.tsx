@@ -1,5 +1,4 @@
 import { Compass, Sparkles } from "lucide-react";
-import { Button } from "./ui/button";
 import type { DesignMode, Plan } from "@/lib/design-modes";
 
 /** One miniature screen, fed by the same theme tokens as the actual dashboard. */
@@ -13,7 +12,7 @@ export function ThemeSample({ mode, tier, name, large = false }: { mode: DesignM
         <div className="theme-sample-dial"><Compass size={large ? 52 : 30} strokeWidth={1.2} aria-hidden="true" /></div>
         <div className="theme-sample-lines" aria-hidden="true"><span /><span /><span /></div>
       </div>
-      <div className="theme-sample-actions" aria-hidden="true"><Button type="button" tabIndex={-1} size="sm" variant="default">✦</Button><span /><span /></div>
+      <div className="theme-sample-actions" aria-hidden="true"><span className="theme-sample-cta">✦</span><span /><span /></div>
     </div>
   </div>;
 }
