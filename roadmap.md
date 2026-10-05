@@ -90,3 +90,11 @@
 - [x] Replace app/header/share logo and icons with a frame-free crop from the supplied v10 image.
 - [x] Replace the origin story with the supplied public-facing Japanese wording.
 - [x] Add 15 cumulative theme specimens, full-screen locked previews, legible white theme and staged visual treatments; verify guest selection and locked previews on desktop and mobile.
+
+## 8-part experience and reading refinement
+- [x] Centralize language selection in Settings as one seven-language dropdown.
+- [x] Expand the grand reading to a plain-language 500–800-character capstone and simplify consultation wording.
+- [x] Add optional partner name reading and gender, using gender only for the traditional Ming Gua direction formula.
+- [x] Remove the duplicate birth-color explainer from Plan Perks and clarify feng-shui terminology.
+- [x] Add a localized pre-profile introduction and reset consultation scrolling after the tab renders.
+- [ ] Verify the complete guest journey on desktop and mobile.
