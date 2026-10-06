@@ -674,7 +674,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               className={`flex h-14 min-w-0 flex-col gap-1 rounded-xl px-0.5 text-[9px] sm:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
             >
               <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} />
-              <span className="max-w-full whitespace-normal text-center leading-none"><span className="sm:hidden">{item.mobileLabel}</span><span className="hidden sm:inline">{item.label}</span></span>
+              <span className="max-w-full whitespace-normal text-center leading-none">{item.label}</span>
             </Button>
           ))}
         </div>

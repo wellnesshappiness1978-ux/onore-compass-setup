@@ -13,6 +13,8 @@ import {
   personal, roadmap, zodiacSigns, type Direction, type Phase,
 } from "@/lib/day-compass";
 import type { Element } from "@/lib/team-analysis";
+import ShareCardButton from "./ShareCardButton";
+import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 
 const ja = {
   hint: "盤面をなぞって回すと、1年365日の日付を指し示します。指の位置で8方位も切り替わります。",
@@ -142,6 +144,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
   const best = [...energy].sort((a, b) => b.score - a.score)[0]!;
   const current = energy.find((e) => e.dir === heading)!;
   const map = useMemo(() => (birth ? roadmap(birth, year) : null), [birth, year]);
+  const shareColor = birthColorSpectrum(profile)?.main;
   const fmt = new Intl.DateTimeFormat(language, { month: "long", day: "numeric", weekday: "short" });
 
   const Lock = ({ min, children }: { min: Plan; children: React.ReactNode }) =>
@@ -301,6 +304,8 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
             ) : <p className="text-xs text-muted-foreground">{c.needBirth}</p>}
           </Lock>
         </Card>
+
+        {me && <div className="md:col-span-2"><ShareCardButton language={language} autoOpen={false} label={language === "ja" ? "バイオリズムグラフをシェア" : "Share biorhythm"} data={{ kicker: c.personalTitle, title: fmt.format(date), score: Math.round(me.total), names: profile.nameKanji ? [profile.nameKanji] : [], lines: [c.body(Math.round((me.physical + 1) * 50), Math.round((me.emotional + 1) * 50), Math.round((me.intellectual + 1) * 50)), c.rel[me.rel]], kind: "biorhythm", palette: shareColor ? [{ label: language === "ja" ? "守護バースカラー" : "Guardian color", code: shareColor.code }] : [] }} /></div>}
 
         <Card icon={Navigation} title={c.dirTitle} tier="vip">
           <Lock min="vip">

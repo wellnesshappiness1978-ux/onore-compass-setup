@@ -1,5 +1,5 @@
 # UI and feature rules
-- Dashboard owns tabs and daily state; Home orders manual → guides → SelfCoreCard (GrandSummaryCard last, then plan proposals) → day compass. Compatibility lives in consultation. Why: complete free reading leads to an honest preview.
+- The app uses seven purpose tabs: Home explains logic; Traits shows jargon-free personal readings; Today holds daily guidance; Consult holds compatibility and chat; Art holds two natal artworks; Business holds team tools; Settings holds operations. Why: separate experience from methodology and keep workflows scannable.
 - Torisetsu and compatibility are reference readings, not verified or paid entitlements. Why: do not overstate calculations.
 - Consultation is session-only; owner or local preview roster targets omit missing fields and keep per-person histories separate. Browser speech and one 528Hz ambient piano instance must not overlap. Why: prevent invented context and audio collision.
 - Keep nine-stars fixed grid illustrative and non-natal. VIP art uses deterministic real-time renderers driven by six birth colors and natal sky data; client-side exports/shares remain labelled previews. Why: neither chart nor payment is verified.
