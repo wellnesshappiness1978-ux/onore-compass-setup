@@ -6,7 +6,7 @@ import type { ReturnTypeNatal } from "@/lib/natal-sky-types";
 import { GOLDEN_ANGLE, seededUnit, spiralPoint } from "@/lib/art-geometry";
 
 export type Capture = () => Promise<{ blob: Blob; width: number; height: number }>;
-type Props = { sky: ReturnTypeNatal; colors: string[]; element: string; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
+type Props = { colors: string[]; element: string; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
 
 function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
   const { gl, scene, camera } = useThree();
@@ -50,7 +50,7 @@ function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
   return null;
 }
 
-function Mandala({ sky, colors, element, progress, reduced }: Omit<Props, "onCapture">) {
+function Mandala({ colors, element, progress, reduced }: Omit<Props, "onCapture">) {
   const aura = useRef<THREE.Points>(null);
   const mandala = useRef<THREE.Group>(null);
   const main = colors[0] ?? "#D4AF37";
