@@ -23,11 +23,15 @@ export function AgolmenLoading({ label, compact = false }: { label: string; comp
   return <div className={`agolmen-loading flex flex-col items-center justify-center text-center ${compact ? "min-h-36" : "min-h-screen"}`} role="status" aria-live="polite">
     <div className={`agolmen-loading-art relative ${compact ? "size-24" : "size-48"}`} aria-hidden="true">
       <SpiralLines className="agolmen-loading-orbit absolute inset-0 size-full text-primary" />
+      <SpiralLines className="agolmen-loading-orbit-reverse absolute inset-[9%] size-[82%] text-primary" />
       {particles.map(i => <span key={i} className="agolmen-particle" style={{ "--i": i } as React.CSSProperties} />)}
+      {particles.slice(0, 8).map(i => <span key={`inner-${i}`} className="agolmen-particle agolmen-particle-inner" style={{ "--i": i } as React.CSSProperties} />)}
       <span className="agolmen-loading-aura absolute inset-[19%] rounded-full" />
+      <span className="agolmen-loading-core absolute inset-[34%] rounded-full" />
       <img src={logo} alt="" width={512} height={512} className="agolmen-loading-logo absolute inset-[16%] size-[68%] object-contain" />
     </div>
     <p className="mt-3 px-4 font-serif text-sm text-primary">{label}</p>
+    <span className="mt-2 h-px w-24 overflow-hidden bg-primary/20" aria-hidden="true"><span className="agolmen-loading-progress block h-full bg-primary" /></span>
   </div>;
 }
 
