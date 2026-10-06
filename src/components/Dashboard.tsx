@@ -462,8 +462,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   }, []);
   useEffect(() => {
     if (tab !== "consult") return;
+    window.scrollTo({ top: 0, behavior: "auto" });
     const frame = requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
-    return () => cancelAnimationFrame(frame);
+    const timer = window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 120);
+    return () => { cancelAnimationFrame(frame); window.clearTimeout(timer); };
   }, [tab]);
   // Strict entitlement: the read-only membership row decides access. The switch may only preview equal or lower plans.
   const [selectedPlan, setPreviewPlan] = useState<Plan>("b2b-premium");
@@ -667,7 +669,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               variant="ghost"
               onClick={() => {
                 setTab(item.id);
-                window.scrollTo({ top: 0, behavior: "smooth" });
+                window.scrollTo({ top: 0, behavior: item.id === "consult" ? "auto" : "smooth" });
               }}
               aria-current={tab === item.id ? "page" : undefined}
               className={`flex h-14 min-w-0 flex-col gap-1 rounded-xl px-0.5 text-[9px] sm:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
