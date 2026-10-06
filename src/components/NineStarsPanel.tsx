@@ -19,7 +19,6 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
   const t = nineStarsTranslations[language];
   const { birthDate, bloodType } = profile;
   const palette = birthColorSpectrum(profile);
-  const artColors = palette ? paletteColors(palette).map(color => color.code) : [colors.main, colors.sub];
   const sky = natalSky(birthDate, profile.birthTime, profile.birthTimeUnknown);
   const element = computeCoreLayers(profile)?.shichu.dayElement ?? "木";
   const symbols = getArtSymbols(birthDate);
@@ -29,6 +28,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
   const [mounted, setMounted] = useState(false);
   const [reduced, setReduced] = useState(false);
   const [colors, setColors] = useState({ main: "#D4AF37", sub: "#F3E5AB" });
+  const artColors = palette ? paletteColors(palette).map(color => color.code) : [colors.main, colors.sub];
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const capture = useRef<Capture | null>(null);
