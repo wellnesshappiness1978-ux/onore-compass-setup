@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Lightformer, Line } from "@react-three/drei";
+import { Line } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { ReturnTypeNatal } from "@/lib/natal-sky-types";
@@ -32,7 +32,7 @@ function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
         const out = document.createElement("canvas"); out.width = width; out.height = height;
         const ctx = out.getContext("2d"); if (!ctx) throw new Error("Canvas unavailable");
         const css = getComputedStyle(gl.domElement);
-        ctx.fillStyle = css.getPropertyValue("--art-void").trim() || "#050B18";
+        ctx.fillStyle = css.getPropertyValue("--card").trim() || "#15101f";
         ctx.fillRect(0, 0, width, height);
         ctx.drawImage(square, 0, (height - width) / 2, width, width);
         ctx.fillStyle = css.getPropertyValue("--gold-glow").trim() || "#F3E5AB";
@@ -40,7 +40,7 @@ function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
         ctx.font = `${Math.round(width / 26)}px serif`;
         ctx.fillText("AGOLMEN'S COMPASS", width / 2, height * .16);
         ctx.font = `${Math.round(width / 55)}px sans-serif`;
-        ctx.fillText("CELESTIAL MANDALA · ILLUSTRATIVE ART", width / 2, height * .83);
+        ctx.fillText("BIRTH COLOR MANDALA · ILLUSTRATIVE ART", width / 2, height * .83);
         const blob = await new Promise<Blob>((resolve, reject) => out.toBlob(b => b ? resolve(b) : reject(new Error("PNG unavailable")), "image/png"));
         return { blob, width, height };
       } finally { gl.setRenderTarget(null); target.dispose(); }
@@ -63,7 +63,7 @@ function Mandala({ sky, colors, element, progress, reduced }: Omit<Props, "onCap
       const [x, y] = spiralPoint(i, count, 5.35);
       pts[i * 3] = x;
       pts[i * 3 + 1] = y;
-      pts[i * 3 + 2] = (seededUnit(seed, i) - .5) * 1.8;
+      pts[i * 3 + 2] = (seededUnit(seed, i) - .5) * .45;
     }
     return pts;
   }, [seed]);
@@ -80,14 +80,12 @@ function Mandala({ sky, colors, element, progress, reduced }: Omit<Props, "onCap
   const ease = (t: number) => { const x = Math.min(1, Math.max(0, t)); return x * x * (3 - 2 * x); };
   const ring = ease((progress - 1.8) / 2.6);
   const flower = ease((progress - 4.4) / 2.6);
-  const planet = ease((progress - 2.7) / 3);
   const gold = "#F3E5AB"; // scene fallback; DOM tokens passed in from computed CSS
   return <>
-    <color attach="background" args={["#050B18"]} />
-    <ambientLight intensity={1.3} />
-    <directionalLight position={[3, 5, 8]} intensity={2.4} color={gold} />
-    <pointLight position={[-4, -2, 4]} intensity={2.2} color={sub} />
-    <Environment><Lightformer intensity={2} position={[0, 5, 5]} scale={[10, 10, 1]} /><Lightformer intensity={1} color={main} position={[-5, 1, 1]} rotation-y={Math.PI / 2} scale={[10, 1, 1]} /></Environment>
+    <color attach="background" args={["#15101f"]} />
+    <ambientLight intensity={1.8} />
+    <directionalLight position={[3, 5, 8]} intensity={2.2} color={gold} />
+    <pointLight position={[-4, -2, 4]} intensity={2.6} color={sub} />
     <group ref={mandala}>
       <points ref={aura} scale={.08 + ease(progress / 2.2) * .92}>
         <bufferGeometry><bufferAttribute attach="attributes-position" args={[particles, 3]} /></bufferGeometry>
@@ -135,29 +133,24 @@ function Mandala({ sky, colors, element, progress, reduced }: Omit<Props, "onCap
       <mesh scale={.55 + flower * .3}><icosahedronGeometry args={[.86, 3]} /><meshPhysicalMaterial color={main} metalness={.6} roughness={.15} emissive={main} emissiveIntensity={.3} clearcoat={1} /></mesh>
       <pointLight color={main} intensity={5 * flower} distance={8} />
       <mesh scale={1.1 + flower * .25}><torusGeometry args={[.85, .025, 8, 96]} /><meshBasicMaterial color={gold} /></mesh>
-      <group scale={planet}>
-        {sky.bodies.map((body) => <group key={`chart-${body.name}`}>
-          <Line points={[[0, 0, .25], body.chartPosition]} color={gold} lineWidth={.7} transparent opacity={.25} />
-          <mesh position={body.chartPosition}><octahedronGeometry args={[.075]} /><meshBasicMaterial color={main} /></mesh>
-        </group>)}
-        {sky.bodies.flatMap((a, i) => sky.bodies.slice(i + 1).map(b => {
-          const separation = Math.abs(a.longitude - b.longitude);
-          const angle = Math.min(separation, 360 - separation);
-          const harmony = [60, 120].some(target => Math.abs(angle - target) <= 6);
-          const tension = [90, 180].some(target => Math.abs(angle - target) <= 6);
-          return harmony || tension ? <Line key={`${a.name}-${b.name}`} points={[a.chartPosition, b.chartPosition]} color={harmony ? main : sub} lineWidth={1} transparent opacity={.6} /> : null;
-        }))}
-      </group>
-      {sky.bodies.map((body, i) => <group key={body.name} position={body.position} scale={planet}>
-        <mesh><sphereGeometry args={[i === 0 ? .16 : i === 1 ? .12 : .085 + i * .014, 20, 16]} /><meshStandardMaterial color={i % 2 ? sub : gold} emissive={i % 2 ? sub : gold} emissiveIntensity={.32} metalness={.48} roughness={.27} /></mesh>
-        <mesh rotation-x={i * .3}><torusGeometry args={[.21 + i * .015, .006, 4, 48]} /><meshBasicMaterial color={gold} transparent opacity={.55} /></mesh>
-      </group>)}
+      {Array.from({ length: 6 }, (_, ringIndex) => {
+        const count = 6 + ringIndex * 6;
+        const radius = .75 + ringIndex * .58;
+        return <group key={`color-ring-${ringIndex}`} scale={.1 + flower * .9}>{Array.from({ length: count }, (_, i) => {
+          const angle = i / count * Math.PI * 2 + ringIndex * GOLDEN_ANGLE;
+          const color = colors[(i + ringIndex) % colors.length] ?? main;
+          const point: [number, number, number] = [Math.cos(angle) * radius, Math.sin(angle) * radius, -.05 + ringIndex * .015];
+          const nextAngle = (i + 1) / count * Math.PI * 2 + ringIndex * GOLDEN_ANGLE;
+          const next: [number, number, number] = [Math.cos(nextAngle) * radius, Math.sin(nextAngle) * radius, -.05 + ringIndex * .015];
+          return <group key={i}><Line points={[point, next]} color={color} lineWidth={.7} transparent opacity={.48} /><mesh position={point} rotation-z={angle}><circleGeometry args={[.045 + ringIndex * .006, 6]} /><meshBasicMaterial color={color} transparent opacity={.82} /></mesh></group>;
+        })}</group>;
+      })}
     </group>
   </>;
 }
 
 export default function MandalaScene({ onCapture, ...props }: Props) {
-  return <Canvas aria-label="出生10天体の黄経と角度を重ねた固定カメラ曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
+  return <Canvas aria-label="6つのバースカラーによる光の幾何学曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
     <Mandala {...props} />
     <CaptureBridge onCapture={onCapture} />
   </Canvas>;

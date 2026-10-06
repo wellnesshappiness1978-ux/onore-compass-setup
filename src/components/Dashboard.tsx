@@ -585,7 +585,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               <SelfCoreCard experienceOnly profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => undefined} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} />
             ) : tab === "today" ? (
               <>
-                <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
+                {previewPlan !== "free" && <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>}
                 <section className="design-compass-section text-center" aria-label={t.today}>
                   <div className="flex items-center justify-center gap-3 text-primary/70">
                     <span className="h-px w-8 bg-primary/30" />
