@@ -14,7 +14,7 @@ const KEY = "onore-reminders";
 const DEFAULTS: Settings = { morning: false, morningTime: "08:00", night: false, nightTime: "21:00" };
 type Slot = "morning" | "night";
 type Tier = "free" | "vip" | "business";
-type Template = { title: string; body: string; open: "compass" | "mandala" };
+type Template = { title: string; body: string; open: "compass" | "art" };
 
 const rank = (p: Plan) => planOrder.indexOf(p);
 export const tierOf = (p: Plan): Tier => (rank(p) >= rank("b2b") ? "business" : rank(p) >= rank("vip") ? "vip" : "free");
@@ -28,8 +28,8 @@ const templates: Record<"ja" | "en", Record<Slot, Record<Tier, Template>>> = {
     },
     night: {
       free: { title: "🕊️ 今日1日のエネルギーリセット。心を調律する夜の時間", body: "今日の振り返りと、明日のバイオリズムの波を事前にチェックしておきましょう。", open: "compass" },
-      vip: { title: "🎨 528Hzの波動音響と曼陀羅アートで、心を深層リセット", body: "あなた専用の曼陀羅アートを開き、ソルフェジオBGMとともにリラックスタイムを過ごしましょう。", open: "mandala" },
-      business: { title: "🎨 528Hzの波動音響と曼陀羅アートで、心を深層リセット", body: "あなた専用の曼陀羅アートを開き、ソルフェジオBGMとともにリラックスタイムを過ごしましょう。", open: "mandala" },
+      vip: { title: "🎨 528Hzの波動音響と曼陀羅アートで、心を深層リセット", body: "あなた専用の曼陀羅アートを開き、ソルフェジオBGMとともにリラックスタイムを過ごしましょう。", open: "art" },
+      business: { title: "🎨 528Hzの波動音響と曼陀羅アートで、心を深層リセット", body: "あなた専用の曼陀羅アートを開き、ソルフェジオBGMとともにリラックスタイムを過ごしましょう。", open: "art" },
     },
   },
   en: {
@@ -40,15 +40,15 @@ const templates: Record<"ja" | "en", Record<Slot, Record<Tier, Template>>> = {
     },
     night: {
       free: { title: "🕊️ Reset today's energy — time to tune your heart", body: "Reflect on today and preview tomorrow's biorhythm wave.", open: "compass" },
-      vip: { title: "🎨 Deep reset with 528Hz sound and mandala art", body: "Open your mandala art and relax with Solfeggio music.", open: "mandala" },
-      business: { title: "🎨 Deep reset with 528Hz sound and mandala art", body: "Open your mandala art and relax with Solfeggio music.", open: "mandala" },
+      vip: { title: "🎨 Deep reset with 528Hz sound and mandala art", body: "Open your mandala art and relax with Solfeggio music.", open: "art" },
+      business: { title: "🎨 Deep reset with 528Hz sound and mandala art", body: "Open your mandala art and relax with Solfeggio music.", open: "art" },
     },
   },
 };
 
 const copy = {
-  ja: { title: "毎日のコンパス＆バイオリズム通知", sub: "朝8:00と夜21:00、あなたの会員ランクに合わせたお知らせ", morning: "朝の開運アクション", night: "夜のエネルギーリセット", test: "テスト通知", denied: "ブラウザの通知が許可されていません。端末の設定から許可してください。", unsupported: "この端末は通知に対応していません。", note: "※通知はこのアプリを開いている間に届きます（アプリを閉じている間のプッシュ配信は準備中）。タップするとコンパスまたは曼陀羅アート画面が開きます。文面はプラン表示テストに連動し、課金権限ではありません。", time: "時刻", preview: "届く文面", opens: { compass: "タップ → 今日のコンパス", mandala: "タップ → 曼陀羅アート＆ヒーリング音響" } },
-  en: { title: "Daily compass & biorhythm reminders", sub: "8:00 and 21:00 messages tailored to your plan", morning: "Morning lucky action", night: "Evening energy reset", test: "Test", denied: "Notifications are blocked. Allow them in your device settings.", unsupported: "This device doesn't support notifications.", note: "Reminders arrive while the app is open (background push coming soon). Tapping opens the compass or mandala art. Text follows the preview plan, not a paid entitlement.", time: "Time", preview: "Message", opens: { compass: "Tap → Today's compass", mandala: "Tap → Mandala art & healing sound" } },
+  ja: { title: "毎日のコンパス＆バイオリズム通知", sub: "朝8:00と夜21:00、あなたの会員ランクに合わせたお知らせ", morning: "朝の開運アクション", night: "夜のエネルギーリセット", test: "テスト通知", denied: "ブラウザの通知が許可されていません。端末の設定から許可してください。", unsupported: "この端末は通知に対応していません。", note: "※通知はこのアプリを開いている間に届きます（アプリを閉じている間のプッシュ配信は準備中）。タップするとコンパスまたはアート画面が開きます。文面はプラン表示テストに連動し、課金権限ではありません。", time: "時刻", preview: "届く文面", opens: { compass: "タップ → 今日のコンパス", art: "タップ → アート＆ヒーリング音響" } },
+  en: { title: "Daily compass & biorhythm reminders", sub: "8:00 and 21:00 messages tailored to your plan", morning: "Morning lucky action", night: "Evening energy reset", test: "Test", denied: "Notifications are blocked. Allow them in your device settings.", unsupported: "This device doesn't support notifications.", note: "Reminders arrive while the app is open (background push coming soon). Tapping opens the compass or art screen. Text follows the preview plan, not a paid entitlement.", time: "Time", preview: "Message", opens: { compass: "Tap → Today's compass", art: "Tap → Art & healing sound" } },
 };
 
 function openTarget(target: Template["open"]) {

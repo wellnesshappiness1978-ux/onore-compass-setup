@@ -1,3 +1,7 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+
 const groups = [
   ["天体・宇宙系", "西洋占星術（ホロスコープ/10天体）、インド占星術、紫微斗数、地球暦"],
   ["東洋・命理系", "四柱推命（陰陽五行）、算命学、九星気学、宿曜占星術、動物占い（60分類）"],
@@ -52,6 +56,7 @@ function IntroStars() {
 }
 
 export function ArtsGuide() {
+  const [selected, setSelected] = useState<(typeof methods)[number] | null>(null);
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-primary/30 bg-card/60 backdrop-blur">
       <div className="relative px-6 py-14 text-center">
@@ -93,19 +98,12 @@ export function ArtsGuide() {
         <div>
           <h4 className="font-serif text-lg text-primary">主要な分析手法と役割</h4>
           <div className="mt-3 space-y-2">
-            {methods.map(([title, role, result], i) => (
-              <details key={title} className="group rounded-2xl border border-border bg-background/40 p-4">
-                <summary className="cursor-pointer list-none font-serif text-foreground marker:hidden"><span className="mr-2 text-primary">{i + 1}.</span>{title}</summary>
-                <div className="mt-3 space-y-2 text-sm leading-7 text-muted-foreground">
-                  <p><span className="text-primary">特徴・役割：</span>{role}</p>
-                  <p><span className="text-primary">導き出すもの：</span>{result}</p>
-                </div>
-              </details>
-            ))}
+            {methods.map((method, i) => <Button key={method[0]} type="button" variant="outline" onClick={() => setSelected(method)} className="h-auto min-h-16 w-full justify-start whitespace-normal rounded-md border-primary/25 bg-background/40 p-4 text-left font-serif text-foreground"><span className="mr-2 text-primary">{i + 1}.</span>{method[0]}</Button>)}
           </div>
         </div>
         <p className="text-xs text-muted-foreground">アプリ内の結果は生年月日・氏名などから算出した参考値で、占術ごとの正式な鑑定をすべて実施したものではありません。</p>
       </div>
+      <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}><DialogContent className="max-w-lg border-primary/30 bg-card text-foreground">{selected && <><DialogTitle className="font-serif text-xl text-primary">{selected[0]}</DialogTitle><DialogDescription className="text-sm leading-7 text-muted-foreground">計算の背景と、このアプリで読み取る範囲</DialogDescription><div className="space-y-4"><div className="border-l-2 border-primary/50 bg-primary/5 p-4"><p className="text-xs text-primary">仕組み・背景</p><p className="mt-2 text-sm leading-7">{selected[1]}</p></div><div className="border-l-2 border-primary/25 p-4"><p className="text-xs text-primary">読み取る範囲</p><p className="mt-2 text-sm leading-7">{selected[2]}</p></div><p className="text-xs leading-6 text-muted-foreground">自己理解のための参考情報です。健康、利益、適性、未来の結果を確定するものではありません。</p></div></>}</DialogContent></Dialog>
     </section>
   );
 }

@@ -112,3 +112,8 @@
 - [x] Make all nine annual-map cells tappable with beginner themes, annual-star context and actions.
 - [x] Use a compact mobile consultation label and force the consultation page to the top after rendering.
 - [x] Rebuild both VIP artworks around the six birth colors, golden-ratio geometry and deterministic natal-sky data while preserving preview exports and sharing.
+## Seven-tab global restructure
+- [x] Reorganize existing experiences into seven main tabs.
+- [x] Separate user-facing readings from logic explanations.
+- [x] Add consistent sharing to major daily and rhythm results.
+- [x] Verify seven-language labels and mobile/desktop navigation; existing plan locks, chat, and art flows remain intact.

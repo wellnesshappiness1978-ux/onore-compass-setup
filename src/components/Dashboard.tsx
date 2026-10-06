@@ -1,8 +1,6 @@
 import { ArtsGuide } from "./ArtsGuide";
-import ProfileEditor, { NameAnalysisPreview } from "./ProfileEditor";
-import PersonPortrait from "./PersonPortrait";
+import ProfileEditor from "./ProfileEditor";
 import SelfCoreCard from "./SelfCoreCard";
-import PlanPerksTab from "./PlanPerksTab";
 import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
 import { AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
@@ -11,6 +9,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
+  Building2,
   CalendarDays,
   ChevronRight,
   Clock3,
@@ -33,6 +32,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import ConsultationPanel from "@/components/ConsultationPanel";
 import NineStarsPanel from "@/components/NineStarsPanel";
 import SettingsPanel from "@/components/SettingsPanel";
+import TeamStudio from "@/components/team/TeamStudio";
 import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/design-modes";
 import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
@@ -44,7 +44,6 @@ import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import DailyLifeGuide from "./DailyLifeGuide";
-import BirthColorGuide from "./BirthColorGuide";
 import SolfeggioPlayer from "./SolfeggioPlayer";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
@@ -65,7 +64,7 @@ type Props = {
   onLanguageChange: (language: Language) => void;
   signedIn?: boolean;
 };
-type Tab = "home" | "arts" | "consult" | "perks" | "mandala" | "settings";
+type Tab = "home" | "traits" | "today" | "consult" | "art" | "business" | "settings";
 
 function ProfileRows({ profile, language }: { profile: UserProfile; language: Language }) {
   const t = translations[language];
@@ -451,8 +450,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const [tab, setTab] = useState<Tab>("home");
   useEffect(() => {
     const open = (target: string | null) => {
-      if (target === "compass") { setTab("home"); setTimeout(() => document.getElementById("day-compass")?.scrollIntoView({ behavior: "smooth", block: "start" }), 250); }
-      else if (target === "mandala") { setTab("mandala"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      if (target === "compass") { setTab("today"); window.scrollTo({ top: 0 }); }
+      else if (target === "art") { setTab("art"); window.scrollTo({ top: 0, behavior: "smooth" }); }
     };
     const q = new URLSearchParams(window.location.search).get("open");
     if (q) { open(q); const url = new URL(window.location.href); url.searchParams.delete("open"); window.history.replaceState(window.history.state, "", url); }
@@ -480,9 +479,9 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   // Test preview only: plan cards switch the plan and jump to the newly unlocked feature.
   const selectTestPlan = (next: Plan) => {
     applyDevOverride(next);
-    if (next === "vip") setTab("mandala");
-    else if (next === "b2b" || next === "b2b-premium") setTab("settings");
-    else setTab("home");
+    if (next === "vip") setTab("art");
+    else if (next === "b2b" || next === "b2b-premium") setTab("business");
+    else setTab("traits");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const [debugAllowed, setDebugAllowed] = useState(false);
@@ -505,13 +504,17 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
   useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
-  const navigation: { id: Tab; label: string; mobileLabel?: string; icon: typeof Home }[] = [
-    { id: "home", label: t.home, icon: Home },
-    { id: "arts", label: t.arts, icon: Compass },
-    { id: "consult", label: t.consult, ...(language === "ja" ? { mobileLabel: "相談室" } : {}), icon: WandSparkles },
-    { id: "perks", label: language === "ja" ? "プラン特典" : language === "zh-TW" || language === "zh-CN" ? "方案特權" : language === "ko" ? "플랜 혜택" : language === "es" ? "Ventajas" : language === "fr" ? "Avantages" : "Perks", icon: Crown },
-    { id: "mandala", label: t.mandala, icon: Orbit },
-    { id: "settings", label: t.settings, icon: Settings2 },
+  
+  
+  
+    const navigation: { id: Tab; label: string; mobileLabel: string; icon: typeof Home }[] = [
+    { id: "home", label: t.home, mobileLabel: t.home, icon: Home },
+    { id: "traits", label: language === "ja" ? "あなたの特性" : t.traits, mobileLabel: t.traits, icon: Compass },
+    { id: "today", label: language === "ja" ? "今日の占い" : t.today, mobileLabel: t.today, icon: Clock3 },
+    { id: "consult", label: language === "ja" ? "相談" : t.consult, mobileLabel: language === "ja" ? "相談" : t.consult, icon: WandSparkles },
+    { id: "art", label: t.art, mobileLabel: t.art, icon: Palette },
+    { id: "business", label: t.business, mobileLabel: language === "ja" ? "仕事" : t.business, icon: Building2 },
+    { id: "settings", label: t.settings, mobileLabel: t.settings, icon: Settings2 },
   ];
 
 
@@ -569,27 +572,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
-          <>
-            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => document.getElementById("owner-manual")?.scrollIntoView({ behavior: "smooth", block: "start" })} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} /></div>
-            <div id="owner-manual" className="mb-8 scroll-mt-4"><TorisetsuPanel only="manual" plan={actualPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
-            <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
-            <section className="design-compass-section text-center" aria-label={t.today}>
-              <div className="flex items-center justify-center gap-3 text-primary/70">
-                <span className="h-px w-8 bg-primary/30" />
-                <Sparkles className="size-3" />
-                <span className="h-px w-8 bg-primary/30" />
-              </div>
-              <h2 className="mt-2 font-serif text-xl text-gradient-gold sm:text-2xl">{t.today}</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {new Intl.DateTimeFormat(language, {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                }).format(new Date())}
-              </p>
-              <DayCompass profile={profile} language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
-            </section>
-          </>
+          <ArtsGuide />
         ) : (
           <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
             <div className="mb-8 text-center">
@@ -598,34 +581,43 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 {navigation.find((n) => n.id === tab)?.label}
               </h2>
             </div>
-            {tab === "arts" ? (
+            {tab === "traits" ? (
+              <SelfCoreCard experienceOnly profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => undefined} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} />
+            ) : tab === "today" ? (
               <>
-                <ArtsGuide />
-                <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
-                <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
-                <NameAnalysisPreview profile={profile} language={language} />
-                <BirthColorGuide profile={profile} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+                <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
+                <section className="design-compass-section text-center" aria-label={t.today}>
+                  <div className="flex items-center justify-center gap-3 text-primary/70">
+                    <span className="h-px w-8 bg-primary/30" />
+                    <Sparkles className="size-3" />
+                    <span className="h-px w-8 bg-primary/30" />
+                  </div>
+                  <h2 className="mt-2 font-serif text-xl text-gradient-gold sm:text-2xl">{t.today}</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {new Intl.DateTimeFormat(language, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }).format(new Date())}
+                  </p>
+                  <DayCompass profile={profile} language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+                </section>
               </>
             ) : tab === "consult" ? (
               <>
-              <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
-              <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
-              <ConsultationPanel
-                profile={profile}
-                language={language}
-                plan={previewPlan}
-                actualPlan={serverPlan}
-                signedIn={signedIn}
-                onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-              />
+                <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+                <ConsultationPanel
+                  profile={profile}
+                  language={language}
+                  plan={previewPlan}
+                  actualPlan={serverPlan}
+                  signedIn={signedIn}
+                  onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                />
               </>
-            ) : tab === "perks" ? (
-              <PlanPerksTab profile={profile} language={language} plan={previewPlan} actualPlan={actualPlan} signedIn={signedIn && !devOverrideEnabled} go={(target) => {
-                if (target === "team") return;
-                if (target === "plans") { setTab("settings"); setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 250); return; }
-                setTab(target); window.scrollTo({ top: 0, behavior: "smooth" });
-              }} />
-            ) : tab === "mandala" ? (
+            ) : tab === "business" ? (
+              <TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} />
+            ) : tab === "art" ? (
               <NineStarsPanel language={language} profile={profile} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
             ) : tab === "settings" ? (
               <SettingsPanel
@@ -635,26 +627,17 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 actualPlan={actualPlan}
                 debugAllowed={debugAllowed}
                 devOverrideEnabled={devOverrideEnabled}
-                onDebugPlanChanged={(next) => { setActualPlan(next); setPreviewPlan(next); if (!canPreviewDesign(next, designMode)) setDesignMode("classic"); }}
-                onPlanChange={(next) => {
-                  if (devOverrideEnabled) { applyDevOverride(next); return; }
-                  setPreviewPlan(next);
-                  if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
-                }}
-                designMode={effectiveDesign}
+                onDebugPlanChanged={(p) => setActualPlan(p)}
+                onPlanChange={applyDevOverride}
+                designMode={designMode}
                 onDesignModeChange={setDesignMode}
-                onLanguageChange={onLanguageChange}
-                onEdit={onEdit}
                 signedIn={signedIn}
+                onLanguageChange={onLanguageChange}
+                onEdit={() => setModal("profile")}
               />
-            ) : (
-              <div className="border-y border-primary/15 py-12 text-center text-sm text-muted-foreground">
-                {t.comingFeature}
-              </div>
-            )}
+            ) : null}
           </section>
-        )}
-      </main>
+        )}      </main>
 
       {planOrder.indexOf(previewPlan) >= planOrder.indexOf("vip") && <SolfeggioPlayer language={language} compact />}
 
@@ -662,7 +645,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         className="design-navigation fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"
         aria-label={language === "ja" ? "メインナビゲーション" : "Main navigation"}
       >
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-7">
           {navigation.map((item) => (
             <Button
               key={item.id}
@@ -675,7 +658,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               className={`flex h-14 min-w-0 flex-col gap-1 rounded-xl px-0.5 text-[9px] sm:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
             >
               <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} />
-              <span className="max-w-full whitespace-normal text-center leading-none"><span className={item.mobileLabel ? "sm:hidden" : ""}>{item.mobileLabel ?? item.label}</span>{item.mobileLabel && <span className="hidden sm:inline">{item.label}</span>}</span>
+              <span className="max-w-full whitespace-normal text-center leading-none"><span className="sm:hidden">{item.mobileLabel}</span><span className="hidden sm:inline">{item.label}</span></span>
             </Button>
           ))}
         </div>

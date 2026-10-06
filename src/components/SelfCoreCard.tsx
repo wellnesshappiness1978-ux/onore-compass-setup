@@ -72,7 +72,7 @@ function CoreLayersPanel({ layers: c, profile }: { layers: CoreLayers; profile: 
 
 const planIcons: Record<HomePlanId, typeof Sprout> = { standard: Sprout, vip: Gem, b2b: Building2, "b2b-premium": Crown };
 
-export default function SelfCoreCard({ profile, language, onDiagnosis, onProfileChange, currentPlan, onSelectPlan }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; currentPlan?: Plan; onSelectPlan?: (plan: HomePlanId) => void }) {
+export default function SelfCoreCard({ profile, language, onDiagnosis, onProfileChange, currentPlan, onSelectPlan, experienceOnly = false }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; currentPlan?: Plan; onSelectPlan?: (plan: HomePlanId) => void; experienceOnly?: boolean }) {
   const { override, enabled } = usePlan();
   const activePlan = enabled && override ? override : currentPlan ?? "free";
   const palette = birthColorSpectrum(profile);
@@ -107,7 +107,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">AGOLMEN'S COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{t.title}</h2></div>
       </header>
       <div className="px-5 sm:px-8">
-        {localLayers && <section aria-label="診断の根拠サマリー" className="border-b border-primary/20 py-4"><dl className="flex flex-wrap gap-x-5 gap-y-3">{[
+        {!experienceOnly && localLayers && <section aria-label="診断の根拠サマリー" className="border-b border-primary/20 py-4"><dl className="flex flex-wrap gap-x-5 gap-y-3">{[
           ["名前の中心数", localLayers.name ? `${localLayers.name.person}画` : "姓・名の区切りを設定"],
           ["生年月日の基本数", String(localLayers.numerology.lifePath)],
           ["生まれ日の性質", localLayers.shichu.dayMaster], ["外向き / 内面", `${localLayers.western.sun} / ${localLayers.western.moon}`],
@@ -125,9 +125,9 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
           {data && <details className="mt-5"><summary className="cursor-pointer text-primary">{language === "ja" ? "思考と内面の構造" : "Thought and inner patterns"}</summary>{[data.manualDecision, data.manualTiming].map((body, i) => <article key={i} className="border-t border-primary/20 py-5"><h3 className="font-serif text-xl text-primary">{coreSections[i + 1]}</h3><p className="mt-3 text-base leading-8 text-foreground">{body}</p></article>)}</details>}
           <ShareCardButton language={language} loading={isPending} data={data?.keySummary && data.caution ? { kicker: "", title: "", names: profile.nameKanji ? [profile.nameKanji] : [], lines: [data.keySummary], caution: data.caution, palette: palette ? (activePlan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.love, palette.health, palette.mind]).map((color, i) => ({ label: (language === "ja" ? ["メイン", "サブ", "金運", "愛情", "健康", "内面"] : language === "zh-TW" ? ["主色", "副色", "財運", "愛情", "健康", "內在"] : ["Main", "Secondary", "Money", "Love", "Health", "Inner"])[i] ?? "", code: color.code })) : [], score: localLayers?.numerology.lifePath ?? 0, kind: "identity" } : null} />
         </section>
-        <details open className="border-t border-primary/20 py-5"><summary className="cursor-pointer font-serif text-lg text-primary">{language === "ja" ? "6大占術と詳しい分析" : "Six layers and detailed reading"}</summary>
+        <details open className="border-t border-primary/20 py-5"><summary className="cursor-pointer font-serif text-lg text-primary">{experienceOnly ? (language === "ja" ? "あなたを形づくる6つの視点" : "Six views shaping you") : (language === "ja" ? "6大占術と詳しい分析" : "Six layers and detailed reading")}</summary>
         {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} />}
-        <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜生まれ持った吉方位タイプ（本命卦）" : "Feng shui · Your birth direction type (Ming Gua)"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性" : "女性"}の計算式 · 方位タイプ ${b.number}` : `${b.branch === "male" ? "Male" : "Female"} calculation · Type ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `活動を広げる方角 ${fengDirectionNames[b.shengQi]} · 休息を整える方角 ${fengDirectionNames[b.tianYi]} · 関係を育てる方角 ${fengDirectionNames[b.yanNian]}` : `Expansion ${b.shengQi} · Restoration ${b.tianYi} · Relationships ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "プロフィールの性別区分と立春基準の生年から求める、伝統的な方位の参考値です。住まいごとの吉凶や効果を保証しません。" : "A traditional direction reference based on the profile's gender category and solar year, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "この方位タイプの算出には生年月日と性別の入力が必要です。マイページで設定できます。" : "Add birth date and gender in your profile to view this direction type."}</p>}</section>
+        {!experienceOnly && <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜生まれ持った吉方位タイプ（本命卦）" : "Feng shui · Your birth direction type (Ming Gua)"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性" : "女性"}の計算式 · 方位タイプ ${b.number}` : `${b.branch === "male" ? "Male" : "Female"} calculation · Type ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `活動を広げる方角 ${fengDirectionNames[b.shengQi]} · 休息を整える方角 ${fengDirectionNames[b.tianYi]} · 関係を育てる方角 ${fengDirectionNames[b.yanNian]}` : `Expansion ${b.shengQi} · Restoration ${b.tianYi} · Relationships ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "プロフィールの性別区分と立春基準の生年から求める、伝統的な方位の参考値です。住まいごとの吉凶や効果を保証しません。" : "A traditional direction reference based on the profile's gender category and solar year, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "この方位タイプの算出には生年月日と性別の入力が必要です。マイページで設定できます。" : "Add birth date and gender in your profile to view this direction type."}</p>}</section>}
          {isPending ? <AgolmenLoading compact label={t.loading} /> : isError || !data ? (
           <div className="flex min-h-40 flex-col items-start justify-center gap-3" role="alert"><p className="text-sm text-muted-foreground">{t.error}</p><Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>
         ) : <>
@@ -153,33 +153,31 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
             </div> : <p className="mt-3 text-sm text-muted-foreground">{f.nameNote}</p>}
           </section>
           {data.keySummary && <section aria-label="本質の交差点" className="my-6 rounded-lg border border-primary/50 bg-gradient-to-b from-primary/15 to-transparent p-5 sm:p-6"><p className="text-xs text-primary">{language === "ja" ? "複数の参考レイヤーが交差する人物像" : "A portrait across the reference layers"}</p><p className="mt-3 font-serif text-lg leading-9 text-foreground sm:text-xl">{data.keySummary}</p></section>}
-          <section aria-label={language === "ja" ? "6大占術の物語" : "Six-layer story"} className="my-6 border-y border-primary/25">
+          {experienceOnly && <section aria-label={language === "ja" ? "あなたを形づくる6つの視点" : "Six views shaping you"} className="my-6 border-y border-primary/25">
             {([
-              ["姓名判断", data.nameNature, data.nameGuide],
-              ["数秘術", data.numerologyNature, data.numerologyGuide],
-              ["西洋占星術", data.westernNature, data.westernGuide],
-              ["四柱推命", data.pillarsNature, data.pillarsGuide],
-              ["動物占い", data.animalNature, data.animalGuide],
-              ["風水・方位", data.fengNature, data.fengGuide],
-            ] as const).map(([title, nature, guide], index) => <article key={title} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9"><div className="flex items-center gap-3"><span className="font-serif text-xs text-primary/65">0{index + 1}</span><h3 className="font-serif text-xl text-primary">{title}</h3></div><div className="mt-5 grid gap-5 sm:grid-cols-2"><div><p className="text-xs text-primary">{language === "ja" ? "本質・特性" : "Nature"}</p><p className="mt-2 text-base leading-8 text-foreground">{nature}</p></div><div className="border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><p className="text-xs text-primary">{language === "ja" ? "今のあなたへの道標" : "Your guide"}</p><p className="mt-2 text-base leading-8 text-foreground">{guide}</p></div></div></article>)}
+              ["01", data.nameNature, data.nameGuide], ["02", data.numerologyNature, data.numerologyGuide],
+              ["03", data.westernNature, data.westernGuide], ["04", data.pillarsNature, data.pillarsGuide],
+              ["05", data.animalNature, data.animalGuide], ["06", data.fengNature, data.fengGuide],
+            ] as const).map(([title, nature, guide], index) => <article key={title} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9"><div className="flex items-center gap-3"><span className="font-serif text-xs text-primary/65">{title}</span><h3 className="font-serif text-xl text-primary">{language === "ja" ? ["人との関わり方", "選び方と進み方", "外に見せる顔と内側", "力の使い方", "決断の癖", "心地よい環境"][index] : ["How you connect", "How you choose", "Outer and inner self", "How you use energy", "Decision patterns", "Supportive spaces"][index]}</h3></div><div className="mt-5 grid gap-5 sm:grid-cols-2"><div><p className="text-xs text-primary">{language === "ja" ? "本質・特性" : "Nature"}</p><p className="mt-2 text-base leading-8 text-foreground">{nature}</p></div><div className="border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><p className="text-xs text-primary">{language === "ja" ? "今のあなたへの道標" : "Your guide"}</p><p className="mt-2 text-base leading-8 text-foreground">{guide}</p></div></div></article>)}
           </section>
-          {sections.map((text, i) => {
+          }
+          {!experienceOnly && sections.map((text, i) => {
             const Icon = icons[i] ?? Sparkles;
             return <article key={i} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9">
               <div className="flex items-start gap-3"><span className="pt-0.5 font-serif text-xs text-primary/70">0{i + 1}</span><Icon className="size-5 shrink-0 text-primary" aria-hidden="true" /><h3 className="min-w-0 break-words font-serif text-lg leading-snug text-primary sm:text-xl">{f.sections[i]}</h3></div>
               <p className={`mt-5 max-w-3xl whitespace-pre-line break-words text-foreground ${i === 0 ? "font-serif text-[1.0625rem] leading-[2.1] sm:text-xl sm:leading-[2.05]" : "text-sm leading-8 sm:text-base"}`}>{text}</p>
             </article>;
           })}
-            <article className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "見落としやすい内面" : "An inner blind spot"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data.caution}</p></article>
+            {!experienceOnly && <article className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "見落としやすい内面" : "An inner blind spot"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data.caution}</p></article>}
             <section aria-label={torisetsuTranslations[language].manual} className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{torisetsuTranslations[language].manualTitle}</h3><div className="mt-4 space-y-5">{[data.manualCore, data.manualDecision, data.manualTiming].map((body, i) => <article key={i}><h4 className="font-serif text-lg text-primary">{t.labels[i + 3]}</h4><p className="mt-2 text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
-            <section aria-label="深層ガイド" className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "占術別 深層ガイド" : "Deep guide by art"}</h3><div className="mt-4 space-y-6">{([
+            {!experienceOnly && <section aria-label="深層ガイド" className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "占術別 深層ガイド" : "Deep guide by art"}</h3><div className="mt-4 space-y-6">{([
               ["精密数秘術｜繰り返す試練と突破の才能", data.numerologyTrial],
               ["西洋占星術｜建前と本音・心の回復法", data.astroRecovery],
               ["四柱推命｜攻め時と空回りの罠", data.pillarsTiming],
               ["動物占い｜決断の癖とやる気スイッチ", data.animalSwitch],
               ["バースカラー｜日常での取り入れ方", activePlan === "free" ? "" : data.colorPractice],
               [`地球暦｜今のフェーズ${data.helio ? `「${data.helio.phase}」` : ""}`, data.helioGuide],
-            ] as const).filter(([, body]) => body).map(([title, body]) => <article key={title}><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
+            ] as const).filter(([, body]) => body).map(([title, body]) => <article key={title}><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{body}</p></article>)}</div></section>}
         </>}
         </details>
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
