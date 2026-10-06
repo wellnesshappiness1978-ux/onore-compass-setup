@@ -117,3 +117,10 @@
 - [x] Separate user-facing readings from logic explanations.
 - [x] Add consistent sharing to major daily and rhythm results.
 - [x] Verify seven-language labels and mobile/desktop navigation; existing plan locks, chat, and art flows remain intact.
+
+## Current latest-logo and experience update
+- [ ] Adopt the current latest official logo across the app, loading, icons, and share images.
+- [ ] Expand the two brand-story sections with equal headings and readable long-form copy.
+- [ ] Unify substantial loading states with the shared logo animation.
+- [ ] Order Today's content with unlocked items first and locked tiers in ascending order.
+- [ ] Fully separate the natal cosmic artwork from the non-celestial six-color mandala.
