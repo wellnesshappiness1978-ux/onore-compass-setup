@@ -508,7 +508,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const navigation: { id: Tab; label: string; mobileLabel?: string; icon: typeof Home }[] = [
     { id: "home", label: t.home, icon: Home },
     { id: "arts", label: t.arts, icon: Compass },
-    { id: "consult", label: t.consult, mobileLabel: language === "ja" ? "相談室" : undefined, icon: WandSparkles },
+    { id: "consult", label: t.consult, ...(language === "ja" ? { mobileLabel: "相談室" } : {}), icon: WandSparkles },
     { id: "perks", label: language === "ja" ? "プラン特典" : language === "zh-TW" || language === "zh-CN" ? "方案特權" : language === "ko" ? "플랜 혜택" : language === "es" ? "Ventajas" : language === "fr" ? "Avantages" : "Perks", icon: Crown },
     { id: "mandala", label: t.mandala, icon: Orbit },
     { id: "settings", label: t.settings, icon: Settings2 },
