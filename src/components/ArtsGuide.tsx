@@ -68,19 +68,18 @@ export function ArtsGuide() {
           <span className="text-primary/90" style={{ fontSize: 10 }}>✦</span>
           <span className="h-px w-14 bg-gradient-to-l from-transparent to-primary/60" />
         </div>
-        <h3 className="arts-rise relative mt-4 font-serif text-3xl tracking-wide" style={{ animationDelay: "0.15s", textShadow: "0 0 24px color-mix(in oklab, var(--gold-glow) 35%, transparent)" }}>
+        <h3 className="arts-rise relative mt-4 font-serif text-3xl" style={{ animationDelay: "0.15s", textShadow: "0 0 24px color-mix(in oklab, var(--gold-glow) 35%, transparent)" }}>
           <span className="arts-shimmer">星々の引力と生命の原点</span>
         </h3>
-        <div className="relative mx-auto mt-8 max-w-xl space-y-5 font-serif text-[15px] leading-8 text-foreground/90">
-          <p className="arts-rise" style={{ animationDelay: "0.3s" }}>私達すべての生命は、宇宙に浮かぶ星々が織りなす<span className="text-primary">引力</span>や<span className="text-primary">磁場</span>、天体の運行という大いなるエネルギーの影響を受けています。</p>
-          <p className="arts-rise" style={{ animationDelay: "0.45s" }}>あなたが<span className="text-primary">「いつ、どこで」</span>生まれたのか——その瞬間の宇宙の星々の配置とエネルギーこそが、あなたの生命の特性や感情の波、潜在能力の原点を形作っています。</p>
-          <p className="arts-rise" style={{ animationDelay: "0.6s" }}>世界の占星術や鑑定学は、太古よりこの<span className="text-primary">「星々と生命の共鳴法則」</span>を観察・体系化し、人が自らの天性を知り人生を豊かに航海するための知恵として活用してきたものです。</p>
+        <div className="relative mx-auto mt-8 max-w-2xl space-y-6 font-serif text-xl leading-[2.1] text-foreground/90 sm:text-2xl">
+          <p className="arts-rise" style={{ animationDelay: "0.3s" }}>私たちは、太陽や月、惑星が巡る大きな宇宙の中で生まれ、地球の季節や昼夜のリズムとともに歩んでいます。あなたが<span className="text-primary">「いつ、どこで」</span>生まれたのか。その瞬間の天体配置を一枚の設計図のように見つめることは、自分の中にある多様な傾向や可能性へ静かに光を当てる行為です。</p>
+          <p className="arts-rise" style={{ animationDelay: "0.45s" }}>古くから人々は星の巡りを観察し、人生を考えるための物語や暦を育ててきました。アゴルメンの羅針盤も、その知恵を未来や性格の断定ではなく、今の自分を見つめ直すための<span className="text-primary">象徴的な地図</span>として扱います。異なる視点を重ねることで、まだ言葉になっていない願い、選び方の癖、心が落ち着く方向を丁寧に映し出します。</p>
           <div className="flex items-center justify-center gap-3 pt-2" aria-hidden>
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-primary/50" />
             <span className="text-primary/80" style={{ fontSize: 9 }}>✧</span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-primary/50" />
           </div>
-          <div className="arts-rise border-t border-primary/25 pt-5 text-left" style={{ animationDelay: "0.75s" }}><h4 className="font-serif text-lg text-primary">アゴルメンの由来</h4><p className="mt-2 text-sm leading-8">「アゴルメン（Agolmen）」とは、古代より宇宙の絶対調和と生命の原点とされる「カタツムリやオウムガイの殻（黄金螺旋 / フィボナッチスパイラル）」に由来します。自然界が描く黄金比（1:1.618）の美しい殻は、外界の乱れから「自分の強固な軸・本質」を護る聖なる家であり、中心から無限へと開運の波動を広げる象徴です。</p></div><p className="arts-rise text-primary" style={{ animationDelay: "0.85s" }}>アゴルメンの羅針盤は、この15以上の分析ロジックを最新AIで統合し、あなたという存在を多次元で解き明かします。</p>
+          <div className="arts-rise border-t border-primary/25 pt-8 text-left" style={{ animationDelay: "0.75s" }}><h4 className="text-center font-serif text-3xl text-primary">アゴルメンの由来</h4><p className="mt-6">「アゴルメン（Agolmen）」という名には、カタツムリやオウムガイが背負う殻への敬意が込められています。殻に見られる黄金螺旋は、自然が長い時間をかけて育んだ美しいかたち。その中心は、外の騒がしさに流されず自分の本質へ戻る場所であり、殻そのものは大切な自分軸を護る家の象徴です。</p><p className="mt-5">中心から外へ途切れず広がる螺旋には、経験を重ねながら可能性をひらき、何度でも新しい方向へ進む姿を重ねています。羅針盤は答えを押しつけるものではなく、自分の内側にある方角を確かめるための道具。アゴルメンの羅針盤は、複数の伝統的な見立てと現代的な整理を重ね、あなたが自分らしい選択へ戻るための静かな案内役でありたいと願っています。</p></div><p className="arts-rise text-lg text-primary sm:text-xl" style={{ animationDelay: "0.85s" }}>15以上の分析視点を重ね、あなた自身の羅針盤を見つけるための参考情報を届けます。</p>
         </div>
       </div>
       <div className="space-y-6 border-t border-primary/20 px-5 py-6">

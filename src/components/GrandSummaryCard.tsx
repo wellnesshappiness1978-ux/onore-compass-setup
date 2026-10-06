@@ -8,6 +8,7 @@ import { homeReadingCopy } from "@/lib/home-reading-copy";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
+import { AgolmenLoading } from "./AgolmenSpiral";
 
 const titles: Record<Language, [string, string]> = {
   ja: ["多層総合診断", "この診断結果をSNSでシェア（鳥肌カード生成）"],
@@ -39,9 +40,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
         <h2 className="mt-3 font-serif text-2xl text-gradient-gold sm:text-3xl">{title}</h2>
         {language === "ja" && <p className="mt-2 text-sm text-primary/80">だからこそ、今のあなたに必要な道標</p>}
       </div>
-      <p className="mt-6 whitespace-pre-line font-serif text-xl leading-[2.1] text-foreground sm:text-[22px]" role={text ? undefined : "status"}>
-        {text ?? (isError ? copy.error : copy.loading)}
-      </p>
+      {isPending ? <AgolmenLoading compact label={copy.loading} /> : <p className="mt-6 whitespace-pre-line font-serif text-xl leading-[2.1] text-foreground sm:text-[22px]" role={text ? undefined : "status"}>{text ?? copy.error}</p>}
       <p className="mt-5 text-center text-[11px] text-muted-foreground">{copy.preview}</p>
       <ShareCardButton
         className="mt-6 h-auto min-h-12 w-full whitespace-normal px-4 py-3 text-base"

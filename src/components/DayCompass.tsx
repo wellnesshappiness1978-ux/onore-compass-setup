@@ -271,8 +271,6 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
         <Button size="sm" variant="ghost" className="mt-1 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => setAngle(0)}>{c.today}</Button>
       )}
       <p className="mt-1 text-[10px] text-muted-foreground/80">{c.preview}</p>
-      <HelioCalendar date={date} profile={profile} plan={plan} onUpgrade={onUpgrade} />
-
       <div className="mx-auto mt-6 grid max-w-4xl gap-4 md:grid-cols-2">
         <Card icon={Sparkles} title={c.dayTitle} tier="free">
           <p className="text-sm leading-7 text-foreground">{c.elDay[day.element]}</p>
@@ -291,7 +289,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
           </div>
         </Card>
 
-        <Card icon={Compass} title={c.personalTitle} tier="standard">
+        {rank(plan) >= rank("standard") && <Card icon={Compass} title={c.personalTitle} tier="standard">
           <Lock min="standard">
             {me ? (
               <div className="text-sm leading-7">
@@ -303,11 +301,11 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
               </div>
             ) : <p className="text-xs text-muted-foreground">{c.needBirth}</p>}
           </Lock>
-        </Card>
+        </Card>}
 
-        {me && <div className="md:col-span-2"><ShareCardButton language={language} autoOpen={false} label={language === "ja" ? "バイオリズムグラフをシェア" : "Share biorhythm"} data={{ kicker: c.personalTitle, title: fmt.format(date), score: Math.round(me.total), names: profile.nameKanji ? [profile.nameKanji] : [], lines: [c.body(Math.round((me.physical + 1) * 50), Math.round((me.emotional + 1) * 50), Math.round((me.intellectual + 1) * 50)), c.rel[me.rel]], kind: "biorhythm", palette: shareColor ? [{ label: language === "ja" ? "守護バースカラー" : "Guardian color", code: shareColor.code }] : [] }} /></div>}
+        {rank(plan) >= rank("standard") && me && <div className="md:col-span-2"><ShareCardButton language={language} autoOpen={false} label={language === "ja" ? "バイオリズムグラフをシェア" : "Share biorhythm"} data={{ kicker: c.personalTitle, title: fmt.format(date), score: Math.round(me.total), names: profile.nameKanji ? [profile.nameKanji] : [], lines: [c.body(Math.round((me.physical + 1) * 50), Math.round((me.emotional + 1) * 50), Math.round((me.intellectual + 1) * 50)), c.rel[me.rel]], kind: "biorhythm", palette: shareColor ? [{ label: language === "ja" ? "守護バースカラー" : "Guardian color", code: shareColor.code }] : [] }} /></div>}
 
-        <Card icon={Navigation} title={c.dirTitle} tier="vip">
+        {rank(plan) >= rank("vip") && <Card icon={Navigation} title={c.dirTitle} tier="vip">
           <Lock min="vip">
             <div className="grid grid-cols-4 gap-1.5">
               {energy.map((e) => (
@@ -325,9 +323,9 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
               <li>✨ {c.actions.intuition(c.dirs[heading])}</li>
             </ul>
           </Lock>
-        </Card>
+        </Card>}
 
-        <Card icon={UsersRound} title={c.staffTitle} tier="b2b">
+        {rank(plan) >= rank("b2b") && <Card icon={UsersRound} title={c.staffTitle} tier="b2b">
           <Lock min="b2b">
             <p className="text-sm leading-7 text-foreground">{c.staff[day.element]}</p>
             {me && <p className="mt-2 text-xs text-muted-foreground">{me.total < 45 ? c.lowTeam : me.total > 60 ? c.highTeam : ""}</p>}
@@ -339,9 +337,9 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
               })}
             </ul>
           </Lock>
-        </Card>
+        </Card>}
 
-        <div className="md:col-span-2">
+        {rank(plan) >= rank("b2b") && <div className="md:col-span-2">
           <Card icon={BriefcaseBusiness} title={c.bizTitle} tier="b2b">
             <Lock min="b2b">
               {map ? (
@@ -364,8 +362,18 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
               ) : <p className="text-xs text-muted-foreground">{c.needBirth}</p>}
             </Lock>
           </Card>
-        </div>
+        </div>}
       </div>
+      <HelioCalendar date={date} profile={profile} plan={plan} onUpgrade={onUpgrade} />
+      {rank(plan) < rank("b2b") && <section className="mx-auto mt-7 max-w-4xl border-t border-primary/25 pt-6 text-left" aria-label={language === "ja" ? "未開放の占い" : "Locked guidance"}>
+        <h3 className="mb-4 font-serif text-lg text-primary">{language === "ja" ? "未開放の占い" : "More guidance"}</h3>
+        <div className="grid gap-4 md:grid-cols-2">
+          {rank(plan) < rank("standard") && <Card icon={Compass} title={c.personalTitle} tier="standard"><Lock min="standard"><span /></Lock></Card>}
+          {rank(plan) < rank("vip") && <Card icon={Navigation} title={c.dirTitle} tier="vip"><Lock min="vip"><span /></Lock></Card>}
+          {rank(plan) < rank("b2b") && <Card icon={UsersRound} title={c.staffTitle} tier="b2b"><Lock min="b2b"><span /></Lock></Card>}
+          {rank(plan) < rank("b2b") && <Card icon={BriefcaseBusiness} title={c.bizTitle} tier="b2b"><Lock min="b2b"><span /></Lock></Card>}
+        </div>
+      </section>}
       <FengShuiGuide profile={profile} date={date} language={language} />
     </div>
   );

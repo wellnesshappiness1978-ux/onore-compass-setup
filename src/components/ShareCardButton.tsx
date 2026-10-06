@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Download, Image, Loader2, Send, Share2, Smartphone } from "lucide-react";
+import { Download, Image, Send, Share2, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import type { Language } from "@/lib/translations";
 import { cardCopy, renderShareCard, type CardFormat, type ShareCardData } from "@/lib/share-card-renderer";
+import { AgolmenLoading } from "./AgolmenSpiral";
 export type { ShareCardData } from "@/lib/share-card-renderer";
 
 export default function ShareCardButton({ data, language, className, loading = false, label, autoOpen = true }: { data: ShareCardData | null; language: Language; className?: string; loading?: boolean; label?: string; autoOpen?: boolean }) {
@@ -83,7 +84,7 @@ export default function ShareCardButton({ data, language, className, loading = f
             <div role="radiogroup" aria-label={t.description} className="mb-3 grid grid-cols-2 gap-2">{(["story", "x"] as const).map(f => <Button key={f} type="button" role="radio" aria-checked={format === f} variant={format === f ? "default" : "outline"} size="sm" onClick={() => setFormat(f)}><Image className="size-4" />{t[f]}</Button>)}</div>
             <div className={`relative mx-auto flex w-full items-center justify-center overflow-hidden border border-primary/25 bg-background ${format === "story" ? "aspect-[9/16] max-w-[330px]" : "aspect-video"}`}>
               {url && <img src={url} alt={t.description} className="h-full w-full object-contain" />}
-              {!url && <div role="status" className="flex flex-col items-center gap-3 px-5 text-center text-sm text-muted-foreground">{(rendering || loading) && <Loader2 className="size-6 animate-spin text-primary" />}{status || t.loading}</div>}
+              {!url && ((rendering || loading) ? <AgolmenLoading compact label={status || t.loading} /> : <div role="status" className="px-5 text-center text-sm text-muted-foreground">{status || t.loading}</div>)}
             </div>
             <p className="mt-2 text-center text-xs text-muted-foreground">{format === "story" ? "1080 × 1920" : "1200 × 675"} · PNG</p>
           </div>

@@ -1,10 +1,10 @@
 import * as A from "astronomy-engine";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarDays, ChevronLeft, ChevronRight, Crown, Download, ExternalLink, LockKeyhole, Orbit } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Download, ExternalLink, Orbit } from "lucide-react";
 import { helioPhase } from "@/lib/ai/helio-phase";
 import { biorhythm, type TeamMember } from "@/lib/team-analysis";
-import { canUse, minPlanFor, type ContentFeature } from "@/lib/plans";
+import { canUse, type ContentFeature } from "@/lib/plans";
 import type { Plan } from "@/lib/design-modes";
 import { supabase } from "@/integrations/supabase/client";
 import { listTeamMembers } from "@/lib/team-members.functions";
@@ -21,7 +21,6 @@ const bodies: [string, A.Body, number][] = [
 ];
 function escapeIcs(value: string) { return value.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/[,;]/g, (m) => `\\${m}`); }
 
-const planName: Record<Plan, string> = { free: "無料", standard: "有料", vip: "VIP", b2b: "ビジネス", "b2b-premium": "ビジネスプレミアム" };
 const phaseText = { 種まき: "新しく始める準備の時期。小さな試しを増やすと流れに乗りやすい目安です。", 育成: "続けて育てる時期。習慣と関係づくりに力を注ぐ目安です。", 収穫: "形にして届ける時期。発表・提案・仕上げに向く目安です。", 休息: "整えて手放す時期。振り返りと休養を優先する目安です。" } as const;
 const bizKinds: [string, [number, number, number]][] = [["契約", [0.2, 0.2, 0.6]], ["重要な商談", [0.3, 0.4, 0.3]], ["新プロジェクト立ち上げ", [0.5, 0.2, 0.3]], ["大型投資の判断", [0.1, 0.3, 0.6]]];
 const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
@@ -48,9 +47,9 @@ function yearlyMarks(values: number[]): Map<number, DayMark> {
 }
 const markLabel: Record<DayMark, string> = { high: "高い日", turn: "切替点", low: "低い日" };
 
-function Gate({ plan, feature, onUpgrade, children }: { plan: Plan; feature: ContentFeature; onUpgrade?: (() => void) | undefined; children: React.ReactNode }) {
+function Gate({ plan, feature, children }: { plan: Plan; feature: ContentFeature; onUpgrade?: (() => void) | undefined; children: React.ReactNode }) {
   if (canUse(plan, feature)) return <>{children}</>;
-  return <div className="mt-5 flex flex-col items-center gap-2 border border-dashed border-primary/30 p-5 text-center"><LockKeyhole className="size-5 text-primary" /><p className="text-sm text-foreground">{planName[minPlanFor(feature)]}プラン以上で開放</p>{onUpgrade && <Button size="sm" variant="outline" onClick={onUpgrade}><Crown className="size-3.5" />プランを見る</Button>}</div>;
+  return null;
 }
 
 export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date: Date; profile: UserProfile; plan: Plan; onUpgrade?: () => void }) {

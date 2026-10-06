@@ -17,6 +17,21 @@ function paint(canvas: HTMLCanvasElement, sky: ReturnTypeNatal, colors: string[]
   ctx.fillStyle = voidColor; ctx.fillRect(0, 0, w, h);
   const nebulae = [[.22, .31, .42, colors[3] ?? sub], [.76, .46, .5, colors[5] ?? main], [.43, .7, .46, colors[2] ?? gold]] as const;
   nebulae.forEach(([nx, ny, nr, color]) => { const cloud = ctx.createRadialGradient(w * nx, h * ny, 0, w * nx, h * ny, w * nr); cloud.addColorStop(0, color); cloud.addColorStop(.18, `${color}88`); cloud.addColorStop(.5, `${color}22`); cloud.addColorStop(1, "transparent"); ctx.globalAlpha = .36; ctx.fillStyle = cloud; ctx.fillRect(0, 0, w, h); });
+  // Deep-ocean ribbons give this natal piece a distinct, original cosmic-marine depth.
+  ctx.save(); ctx.globalCompositeOperation = "lighter";
+  for (let band = 0; band < 7; band++) {
+    const y0 = h * (.3 + band * .07);
+    const wave = ctx.createLinearGradient(0, y0, w, y0 + h * .1);
+    wave.addColorStop(0, "transparent"); wave.addColorStop(.45, colors[(band + 2) % colors.length] ?? sub); wave.addColorStop(1, "transparent");
+    ctx.strokeStyle = wave; ctx.globalAlpha = .08 + band * .012; ctx.lineWidth = Math.max(2, w * (.012 - band * .001));
+    ctx.beginPath();
+    for (let x = -w * .1; x <= w * 1.1; x += w / 90) {
+      const y = y0 + Math.sin(x / w * Math.PI * (2.1 + band * .13) + band) * h * (.035 + band * .006);
+      if (x < 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
   // Deterministic stars from the date-based planet positions, not a new reading.
   const seed = sky.bodies.reduce((n, b) => n + Math.round(b.longitude * 100), 0);
   for (let i = 0; i < 1280; i++) {
