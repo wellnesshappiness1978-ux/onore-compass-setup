@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import type { Language } from "@/lib/translations";
 
 const groups = [
   ["天体・宇宙系", "西洋占星術（ホロスコープ/10天体）、インド占星術、紫微斗数、地球暦"],
@@ -20,6 +21,11 @@ const methods = [
   ["血液型占い（血液型気質学・行動統計）", "A・B・O・ABの4パターンがもたらす気質傾向と行動傾向を掛け合わせた伝統的な見立てです（科学的に確立された性格判定ではありません）。", "感情の現れ方、対人関係での距離感の保ち方、無意識の警戒心やストレス反応のパターンを捉えます。"],
   ["本格風水学（環境力学・本命卦・玄空飛星九星風水）", "生年（立春区切り）と性別から本命卦（八卦）を求め、その年の飛星の巡りを重ねる東洋の環境学です。", "生気・天医・延年などの吉方位、部屋別のインテリア・色・植物、気の滞りを防ぐ配置の目安を示します（住まい固有の現地鑑定ではありません）。"],
 ];
+
+const localized = {
+  ja: { originTitle: "星々の引力と生命の原点", origin: "地球上のすべての生命は、潮の満ち引きや太陽エネルギーに象徴されるように、月・太陽・星々と関わる大きな自然の循環の中で生きています。古くから人々は、その重力や磁気、引力の巡りに心身のバイオリズムを重ね、誕生の瞬間の天体配置を潜在意識や運命の波を考える「生命の原点」として見つめてきました。アゴルメンの羅針盤は、天体の実位置と伝統的な暦を手がかりに、自分の状態を振り返り、よりよい航路を選ぶための象徴的な地図を届けます。これは天体が性格や未来を決定するという科学的主張ではなく、自然の周期から自分を見つめ直すための参考となる見立てです。", helio: "太陽からのエネルギーや星々の磁気・引力を、人間が自然の周期を考えるための象徴として読み解きます。企業を率いるリーダーも、商品を選ぶ消費者も、市場を動かす人々も、一人ひとり感情と生活のリズムを持つ人間です。地球暦は、その人間集団の心理と周期を整理し、事業の意思決定を考える参考視点を示します。成功を保証する予測ではありません。" },
+  en: { originTitle: "The stars and the origin of life", origin: "All life on Earth moves within vast natural cycles, symbolized by the tides and the Sun's energy. Across history, people have linked the motion, gravity and magnetism of the Moon, Sun and stars with bodily and emotional rhythms, viewing the sky at birth as an origin point for reflection. Agolmen's Compass combines calculated celestial positions with traditional calendars to offer a symbolic map for understanding your present state and choosing a better course. It does not claim that celestial bodies scientifically determine personality or the future; it is a reflective framework inspired by nature's cycles.", helio: "Helio Compass treats solar energy and celestial cycles as symbols for considering human rhythms. Leaders, customers and the people who move markets are all individuals with emotions and daily cycles. It organizes those shared patterns as one perspective for business decisions, not a guarantee of success." },
+} as const;
 
 const stars = [
   { top: "8%", left: "8%", size: 2, delay: "0s" },
@@ -55,8 +61,10 @@ function IntroStars() {
   );
 }
 
-export function ArtsGuide() {
+export function ArtsGuide({ language = "ja" }: { language?: Language }) {
   const [selected, setSelected] = useState<(typeof methods)[number] | null>(null);
+  const words = language === "ja" ? localized.ja : localized.en;
+  const shownMethods = methods.map((method) => method[0].startsWith("地球暦") ? [method[0], method[1], words.helio] : method);
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-primary/30 bg-card/60 backdrop-blur">
       <div className="relative px-6 py-14 text-center">
@@ -69,11 +77,10 @@ export function ArtsGuide() {
           <span className="h-px w-14 bg-gradient-to-l from-transparent to-primary/60" />
         </div>
         <h3 className="arts-rise relative mt-4 font-serif text-3xl" style={{ animationDelay: "0.15s", textShadow: "0 0 24px color-mix(in oklab, var(--gold-glow) 35%, transparent)" }}>
-          <span className="arts-shimmer">星々の引力と生命の原点</span>
+          <span className="arts-shimmer">{words.originTitle}</span>
         </h3>
         <div className="relative mx-auto mt-8 max-w-2xl space-y-6 font-serif text-xl leading-[2.1] text-foreground/90 sm:text-2xl">
-          <p className="arts-rise" style={{ animationDelay: "0.3s" }}>私たちは、太陽や月、惑星が巡る大きな宇宙の中で生まれ、地球の季節や昼夜のリズムとともに歩んでいます。あなたが<span className="text-primary">「いつ、どこで」</span>生まれたのか。その瞬間の天体配置を一枚の設計図のように見つめることは、自分の中にある多様な傾向や可能性へ静かに光を当てる行為です。</p>
-          <p className="arts-rise" style={{ animationDelay: "0.45s" }}>古くから人々は星の巡りを観察し、人生を考えるための物語や暦を育ててきました。アゴルメンの羅針盤も、その知恵を未来や性格の断定ではなく、今の自分を見つめ直すための<span className="text-primary">象徴的な地図</span>として扱います。異なる視点を重ねることで、まだ言葉になっていない願い、選び方の癖、心が落ち着く方向を丁寧に映し出します。</p>
+          <p className="arts-rise" style={{ animationDelay: "0.3s" }}>{words.origin}</p>
           <div className="flex items-center justify-center gap-3 pt-2" aria-hidden>
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-primary/50" />
             <span className="text-primary/80" style={{ fontSize: 9 }}>✧</span>
@@ -97,7 +104,7 @@ export function ArtsGuide() {
         <div>
           <h4 className="font-serif text-lg text-primary">主要な分析手法と役割</h4>
           <div className="mt-3 space-y-2">
-            {methods.map((method, i) => <Button key={method[0]} type="button" variant="outline" onClick={() => setSelected(method)} className="h-auto min-h-16 w-full justify-start whitespace-normal rounded-md border-primary/25 bg-background/40 p-4 text-left font-serif text-foreground"><span className="mr-2 text-primary">{i + 1}.</span>{method[0]}</Button>)}
+            {shownMethods.map((method, i) => <Button key={method[0]} type="button" variant="outline" onClick={() => setSelected(method)} className="h-auto min-h-16 w-full justify-start whitespace-normal rounded-md border-primary/25 bg-background/40 p-4 text-left font-serif text-foreground"><span className="mr-2 text-primary">{i + 1}.</span>{method[0]}</Button>)}
           </div>
         </div>
         <p className="text-xs text-muted-foreground">アプリ内の結果は生年月日・氏名などから算出した参考値で、占術ごとの正式な鑑定をすべて実施したものではありません。</p>

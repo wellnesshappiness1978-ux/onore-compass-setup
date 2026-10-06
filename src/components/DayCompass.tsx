@@ -15,9 +15,10 @@ import {
 import type { Element } from "@/lib/team-analysis";
 import ShareCardButton from "./ShareCardButton";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
+import { rokuyo } from "@/lib/calendar-traditions";
 
 const ja = {
-  hint: "盤面をなぞって回すと、1年365日の日付を指し示します。指の位置で8方位も切り替わります。",
+  hint: "盤面をなぞって前後100年の日付を巡れます。指の位置で8方位も切り替わります。",
   today: "今日に戻る", selected: "指し示した日", preview: "表示テスト · 参考値（正式な鑑定・課金ではありません）",
   dayTitle: "この日の特性", earthTitle: "地球の1年のなかの現在地", personalTitle: "あなたへの今日の心がけ",
   dirTitle: "吉方位・開運エネルギー", bizTitle: "企業の365日ロードマップ", staffTitle: "従業員サポート", navTitle: "ビジネス吉方位ナビ",
@@ -59,6 +60,7 @@ const ja = {
   lowTeam: "チーム全体の波が低めの日です。叱責は避け、負荷調整と労いを優先してください。",
   highTeam: "チームの波が高い日です。目標共有や難しい相談を持ちかけるのに適しています。",
   nav: { deal: "重要な商談", trip: "出張・移動", seat: "リーダーの席の向き" },
+  dateSearch: "日付を検索", previousYear: "前年", nextYear: "翌年", rokuyo: "六曜",
 };
 type Copy = typeof ja;
 const en: Copy = {
@@ -105,6 +107,7 @@ const en: Copy = {
   lowTeam: "Team energy is low. Avoid criticism; reduce load and show appreciation.",
   highTeam: "Team energy is high. Good for sharing goals or hard conversations.",
   nav: { deal: "Key negotiation", trip: "Business trip", seat: "Leader's seat facing" },
+  dateSearch: "Find a date", previousYear: "Previous year", nextYear: "Next year", rokuyo: "Rokuyo",
 };
 
 const polar = (deg: number, r: number) => {
@@ -119,7 +122,10 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
   const c = language === "ja" ? ja : en;
   const names = teamCopy[language].planNames;
   const now = useMemo(() => new Date(), []);
-  const year = now.getFullYear();
+  const minDate = useMemo(() => new Date(now.getFullYear() - 100, 0, 1), [now]);
+  const maxDate = useMemo(() => new Date(now.getFullYear() + 100, 11, 31), [now]);
+  const [selectedDate, setSelectedDate] = useState(() => new Date(now.getFullYear(), now.getMonth(), now.getDate()));
+  const year = selectedDate.getFullYear();
   const total = daysInYear(year);
   const todayIdx = dayOfYear(now);
   const [angle, setAngle] = useState(0);
@@ -127,11 +133,15 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
   const start = useRef<{ pointer: number; angle: number } | null>(null);
   const wheel = useRef<HTMLDivElement>(null);
 
+  const selectedIdx = dayOfYear(selectedDate);
   const offset = Math.round((angle / 360) * total);
-  const idx = (((todayIdx + offset) % total) + total) % total;
+  const idx = (((selectedIdx + offset) % total) + total) % total;
   const date = dateAt(year, idx);
   const day = dayProfile(date);
-  const localDeg = (d: number) => -((d - todayIdx) * 360) / total; // rotor-local angle of a day
+  const localDeg = (d: number) => -((d - selectedIdx) * 360) / total; // rotor-local angle of a day
+  const sixDay = rokuyo(date);
+  const clamp = (next: Date) => next < minDate ? minDate : next > maxDate ? maxDate : next;
+  const choose = (next: Date) => { const safe = clamp(next); setSelectedDate(safe); setAngle(0); };
 
   const screenDeg = (x: number, y: number) => {
     const r = wheel.current?.getBoundingClientRect();
@@ -180,7 +190,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
             e.preventDefault();
             const step = e.key === "ArrowRight" ? 1 : -1;
             if (e.shiftKey) setHeading(directions[(directions.indexOf(heading) + step + 8) % 8]!);
-            else setAngle((a) => a + (step * 360) / total);
+            else choose(new Date(date.getFullYear(), date.getMonth(), date.getDate() + step));
           }
         }}
         onPointerDown={(e) => {
@@ -199,7 +209,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
           setAngle(start.current.angle);
           setHeading(directionAt(p));
         }}
-        onPointerUp={() => { start.current = null; }}
+        onPointerUp={() => { if (offset) choose(date); start.current = null; }}
         onPointerCancel={() => { start.current = null; }}
       >
         <div className="compass-halo absolute inset-[3%] rounded-full" />
@@ -263,12 +273,18 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
           <span className="text-[10px] text-primary/80">{c.selected}</span>
           <strong className="font-serif text-xl text-gradient-gold sm:text-2xl">{fmt.format(date)}</strong>
           <span className="mt-1 text-[10px] text-muted-foreground">{c.el[day.element]} · {c.seasons[day.season]}</span>
+          {sixDay && <span className="text-[10px] text-primary">{c.rokuyo} · {sixDay.name}</span>}
           <span className="text-[10px] text-primary">{c.dirs[heading]} {current.score}</span>
         </div>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">{c.hint}</p>
-      {offset !== 0 && (
-        <Button size="sm" variant="ghost" className="mt-1 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => setAngle(0)}>{c.today}</Button>
+      <div className="mx-auto mt-4 flex max-w-md flex-wrap items-center justify-center gap-2">
+        <Button type="button" size="icon" variant="outline" aria-label={c.previousYear} disabled={year <= minDate.getFullYear()} onClick={() => choose(new Date(year - 1, date.getMonth(), date.getDate()))}>−</Button>
+        <label className="text-xs text-muted-foreground"><span className="sr-only">{c.dateSearch}</span><input type="date" aria-label={c.dateSearch} min={`${minDate.getFullYear()}-01-01`} max={`${maxDate.getFullYear()}-12-31`} value={day.iso} onChange={(event) => { if (event.target.value) choose(new Date(`${event.target.value}T12:00:00`)); }} className="h-9 rounded-md border border-input bg-background px-3 text-foreground" /></label>
+        <Button type="button" size="icon" variant="outline" aria-label={c.nextYear} disabled={year >= maxDate.getFullYear()} onClick={() => choose(new Date(year + 1, date.getMonth(), date.getDate()))}>＋</Button>
+      </div>
+      {(day.iso !== dayProfile(now).iso || offset !== 0) && (
+        <Button size="sm" variant="ghost" className="mt-1 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => choose(now)}>{c.today}</Button>
       )}
       <p className="mt-1 text-[10px] text-muted-foreground/80">{c.preview}</p>
       <div className="mx-auto mt-6 grid max-w-4xl gap-4 md:grid-cols-2">
