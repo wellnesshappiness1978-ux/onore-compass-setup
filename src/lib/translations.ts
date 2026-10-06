@@ -124,7 +124,7 @@ export const prefecturesRomanized = [
 
 export const dashboardTranslations: Record<Language, {
   home: string; traits: string; today: string; consult: string; art: string; business: string; settings: string;
-  today: string; theme: string; attack: string; energy: string; expansion: string;
+  theme: string; attack: string; energy: string; expansion: string;
   wheelHint: string; biorhythm: string; rhythmSubtitle: string; actionFocus: string;
   momentum: string; clarity: string; intuition: string; decision: string;
   decisionSubtitle: string; timing: string; timingResult: string; demo: string;
