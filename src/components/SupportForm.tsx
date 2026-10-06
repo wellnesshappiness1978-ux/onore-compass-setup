@@ -7,6 +7,7 @@ import { listMySupport, submitSupport } from "@/lib/support.functions";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import { AgolmenLoading } from "./AgolmenSpiral";
 
 export default function SupportForm() {
   const [signedIn, setSignedIn] = useState(false);
@@ -36,6 +37,7 @@ export default function SupportForm() {
       <label className="block text-sm text-foreground">お問い合わせ内容<Textarea required minLength={10} maxLength={4000} rows={5} value={message} onChange={event => setMessage(event.target.value)} className="mt-1" /></label>
       <p className="text-xs text-muted-foreground">パスワード、カード番号、他人の個人情報は入力しないでください。</p>
       <label className="flex items-start gap-2 text-sm"><input type="checkbox" required checked={consent} onChange={event => setConsent(event.target.checked)} className="mt-1 size-4 accent-primary" />お問い合わせ対応のため送信内容を保存することに同意します。</label>
+      {busy && <AgolmenLoading compact label="送信中…" />}
       <Button type="submit" disabled={!signedIn || !consent || busy} className="min-h-11"><Send className="size-4" />{busy ? "送信中…" : "お問い合わせを送信"}</Button>
       {status && <p role={failed ? "alert" : "status"} className={failed ? "text-sm text-destructive" : "text-sm text-primary"}>{status}</p>}
     </form>

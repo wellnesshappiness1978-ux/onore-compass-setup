@@ -3,7 +3,7 @@ import ProfileEditor from "./ProfileEditor";
 import SelfCoreCard from "./SelfCoreCard";
 import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
-import { AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
+import { AgolmenLoading, AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -203,7 +203,8 @@ function TorisetsuPanel({
             >
               ✧
             </div>
-            <div className="relative space-y-0">
+            {manualReading.isPending && <AgolmenLoading compact label={homeReadingCopy[language].loading} />}
+            {!manualReading.isPending && <div className="relative space-y-0">
               {[
                 { title: t.coreTitle, body: manualReading.data?.manualCore, symbol: "✦" },
                 { title: t.decisionTitle, body: manualReading.data?.manualDecision, symbol: "◇" },
@@ -226,7 +227,7 @@ function TorisetsuPanel({
                   </div>
                 </div>
               ))}
-            </div>
+            </div>}
           </section>
           <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
         </div>
