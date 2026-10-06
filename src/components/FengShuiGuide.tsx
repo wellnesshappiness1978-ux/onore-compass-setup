@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Compass, HelpCircle, Leaf, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -27,9 +27,24 @@ const directionAdvice: Record<string, { element: string; color: string; material
   NW: { element: "金", color: "白・金・淡い灰", materials: "金属、天然石、質感のよい時計", placement: "入口から見える場所を端正にし、背の高い家具を絞る" },
 };
 
+const directionThemes: Record<string, { ja: string; en: string; actionJa: string; actionEn: string }> = {
+  SE: { ja: "ご縁・交流", en: "Connections", actionJa: "風の通り道をつくり、連絡や相談を始める", actionEn: "Clear airflow and begin a conversation" },
+  S: { ja: "才能・情熱", en: "Talent & drive", actionJa: "照明を整え、発表や表現に集中する", actionEn: "Tune the lighting and focus on expression" },
+  SW: { ja: "信頼・育成", en: "Trust & care", actionJa: "二つ組の小物を整え、関係を丁寧に育てる", actionEn: "Arrange paired objects and tend relationships" },
+  E: { ja: "発展・始動", en: "Growth & start", actionJa: "朝の光を入れ、最初の一歩を決める", actionEn: "Let in morning light and choose a first step" },
+  C: { ja: "全体の基調", en: "Year's center", actionJa: "家の中心付近を軽く整え、優先順位を一つに絞る", actionEn: "Clear the center and choose one priority" },
+  W: { ja: "実り・金運", en: "Results & resources", actionJa: "作業面を空け、成果と支出を整理する", actionEn: "Clear the worktop and review results and spending" },
+  NE: { ja: "転換・学び", en: "Change & learning", actionJa: "入口と収納を整え、学び直すテーマを選ぶ", actionEn: "Order storage and choose a learning focus" },
+  N: { ja: "思考・充電", en: "Reflection & recharge", actionJa: "光と水回りを整え、静かな時間を確保する", actionEn: "Tune light and water areas, then reserve quiet time" },
+  NW: { ja: "支援・決断", en: "Support & decisions", actionJa: "入口から見える場所を端正にし、相談相手を決める", actionEn: "Refine the entry view and choose an adviser" },
+};
+
+const starMeanings = ["", "静けさと計画", "受容と土台", "始動と変化", "交流と拡張", "中心と再編", "責任と決断", "表現と実り", "蓄積と継続", "可視化と情熱"];
+
 export default function FengShuiGuide({ profile, date, language }: { profile: UserProfile; date: Date; language: Language }) {
   const gua = useMemo(() => mingGua(profile.birthDate, profile.gender), [profile.birthDate, profile.gender]);
   const annual = annualFlyingStars(date);
+  const [selected, setSelected] = useState<(typeof annual.palaces)[number] | null>(null);
   const ja = language === "ja";
   const t = copy[language];
   return <section aria-labelledby="feng-heading" className="mx-auto mt-8 max-w-4xl border-t border-primary/30 pt-6 text-left">
@@ -43,7 +58,8 @@ export default function FengShuiGuide({ profile, date, language }: { profile: Us
     {gua?.nearBoundary && <p className="mt-2 text-sm text-primary">{t.boundary}</p>}
     <div className="mt-6 flex flex-wrap items-center gap-2 text-primary"><Sparkles className="size-4" /><h4 className="font-serif text-lg">{t.annual(annual.year)}</h4><Dialog><DialogTrigger asChild><Button type="button" size="sm" variant="outline" className="ml-auto"><HelpCircle className="size-4" />{t.guide}</Button></DialogTrigger><DialogContent className="max-w-md border-primary/30 bg-card text-foreground"><DialogTitle className="font-serif text-xl text-primary">{t.guideTitle}</DialogTitle><DialogDescription className="sr-only">{t.guideTitle}</DialogDescription><ol className="space-y-3">{t.guideBody.map((body, index) => <li key={body} className="flex gap-3 text-sm leading-7"><span className="grid size-6 shrink-0 place-items-center rounded-full border border-primary/40 text-xs text-primary">{index + 1}</span><span>{body}</span></li>)}</ol></DialogContent></Dialog></div>
     <p className="mt-2 text-sm leading-7 text-muted-foreground">{t.annualNote}</p>
-    <div className="mt-3 grid grid-cols-3 gap-px border border-primary/30 bg-primary/20">{annual.palaces.map(p => <div key={p.dir} className="min-h-24 bg-background p-2 text-center sm:min-h-28"><span className="text-xs text-muted-foreground">{ja ? p.trigram : p.dir}</span><p className="font-serif text-2xl text-primary">{p.star}</p><p className="text-xs text-muted-foreground">{ja ? p.element : p.dir === "C" ? "Center" : p.dir}</p></div>)}</div>
+    <div className="mt-3 grid grid-cols-3 gap-px border border-primary/30 bg-primary/20">{annual.palaces.map(p => { const theme = directionThemes[p.dir]; const name = p.dir === "C" ? (ja ? "中央" : "Center") : ja ? fengDirectionNames[p.dir as keyof typeof fengDirectionNames] : p.dir; return <Button key={p.dir} type="button" variant="ghost" onClick={() => setSelected(p)} className="h-auto min-h-28 rounded-none bg-background p-2 text-center hover:bg-primary/10 sm:min-h-32"><span className="flex h-full flex-col items-center justify-center"><span className="text-xs text-muted-foreground">{name}｜{ja ? theme?.ja : theme?.en}</span><span className="mt-1 font-serif text-3xl text-primary">{p.star}</span><span className="text-xs text-muted-foreground">{ja ? `${p.trigram}・${p.element}` : `${p.element} element`}</span><span className="mt-1 text-[11px] text-primary/80">{ja ? "タップで見る" : "Tap for guide"}</span></span></Button>; })}</div>
+    <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}><DialogContent className="max-w-md border-primary/30 bg-card text-foreground">{selected && (() => { const theme = directionThemes[selected.dir]; const name = selected.dir === "C" ? (ja ? "中央" : "Center") : ja ? fengDirectionNames[selected.dir as keyof typeof fengDirectionNames] : selected.dir; const advice = directionAdvice[selected.dir]; return <><DialogTitle className="font-serif text-xl text-primary">{name}｜{ja ? theme?.ja : theme?.en}</DialogTitle><DialogDescription className="text-sm leading-7 text-muted-foreground">{ja ? `${annual.year}年は九星${selected.star}の「${starMeanings[selected.star]}」という見立てが、この方位に巡ります。住居固有の吉凶ではなく、暮らしを整える参考です。` : `In ${annual.year}, annual star ${selected.star} brings a traditional ${starMeanings[selected.star]} theme to this direction. This is a reflection aid, not a property verdict.`}</DialogDescription><div className="border-l-2 border-primary/60 bg-primary/5 p-4"><p className="text-xs text-primary">{ja ? "今年の開運アクション" : "Action for the year"}</p><p className="mt-2 text-sm leading-7">{ja ? theme?.actionJa : theme?.actionEn}</p></div>{advice && <dl className="grid gap-2 text-sm"><div><dt className="text-muted-foreground">{ja ? "相性のよい色" : "Color"}</dt><dd>{advice.color}</dd></div><div><dt className="text-muted-foreground">{ja ? "素材" : "Materials"}</dt><dd>{advice.materials}</dd></div><div><dt className="text-muted-foreground">{ja ? "配置" : "Placement"}</dt><dd>{advice.placement}</dd></div></dl>}</>; })()}</DialogContent></Dialog>
     <p className="mt-3 text-sm leading-7 text-muted-foreground">{t.rooms}</p>
     <div className="mt-3 grid gap-3 sm:grid-cols-2">{annual.palaces.filter(p => p.dir !== "C").map(p => { const advice = directionAdvice[p.dir]; return <article key={p.dir} className="border border-primary/20 bg-primary/5 p-4 text-sm leading-6"><div className="flex items-center gap-2"><Leaf className="size-4 shrink-0 text-primary" /><h5 className="font-serif text-lg text-primary">{ja ? fengDirectionNames[p.dir as keyof typeof fengDirectionNames] : p.dir}</h5><span className="ml-auto text-xs text-muted-foreground">{ja ? `五行：${advice?.element}` : `${p.element} element`}</span></div>{ja ? <dl className="mt-3 space-y-2"><div><dt className="inline text-muted-foreground">色：</dt><dd className="inline text-foreground">{advice?.color}</dd></div><div><dt className="inline text-muted-foreground">素材：</dt><dd className="inline text-foreground">{advice?.materials}</dd></div><div><dt className="inline text-muted-foreground">配置：</dt><dd className="inline text-foreground">{advice?.placement}</dd></div></dl> : <p className="mt-3 text-foreground">Use {p.color} accents, natural {p.element.toLowerCase()}-inspired materials and {p.plant}; keep light, airflow and pathways clear.</p>}</article>; })}</div>
   </section>;
