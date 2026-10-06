@@ -55,7 +55,7 @@ function Mandala({ sky, colors, element, progress, reduced }: Omit<Props, "onCap
   const mandala = useRef<THREE.Group>(null);
   const main = colors[0] ?? "#D4AF37";
   const sub = colors[1] ?? "#F3E5AB";
-  const seed = useMemo(() => sky.bodies.reduce((sum, body) => sum + Math.round(body.longitude * 10), 0), [sky]);
+  const seed = useMemo(() => colors.join("").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0), [colors]);
   const particles = useMemo(() => {
     const count = 1440;
     const pts = new Float32Array(count * 3);
