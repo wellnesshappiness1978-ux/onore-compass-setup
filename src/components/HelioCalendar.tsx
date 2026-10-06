@@ -50,7 +50,7 @@ const markLabel: Record<DayMark, string> = { high: "高い日", turn: "切替点
 
 function Gate({ plan, feature, onUpgrade, children }: { plan: Plan; feature: ContentFeature; onUpgrade?: (() => void) | undefined; children: React.ReactNode }) {
   if (canUse(plan, feature)) return <>{children}</>;
-  return <div className="mt-5 flex flex-col items-center gap-2 border border-dashed border-primary/30 p-5 text-center"><LockKeyhole className="size-5 text-primary" /><p className="text-sm text-foreground">{planName[minPlanFor(feature)]}プラン以上で開放</p>{onUpgrade && <Button size="sm" variant="outline" onClick={onUpgrade}><Crown className="size-3.5" />プランを見る</Button>}</div>;
+  return null;
 }
 
 export default function HelioCalendar({ date, profile, plan, onUpgrade }: { date: Date; profile: UserProfile; plan: Plan; onUpgrade?: () => void }) {
