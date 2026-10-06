@@ -3,7 +3,7 @@ import ProfileEditor from "./ProfileEditor";
 import SelfCoreCard from "./SelfCoreCard";
 import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
-import { AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
+import { AgolmenLoading, AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -33,6 +33,8 @@ import ConsultationPanel from "@/components/ConsultationPanel";
 import NineStarsPanel from "@/components/NineStarsPanel";
 import SettingsPanel from "@/components/SettingsPanel";
 import TeamStudio from "@/components/team/TeamStudio";
+import BusinessFeaturePreview from "@/components/BusinessFeaturePreview";
+import LanguageSelector from "@/components/LanguageSelector";
 import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/design-modes";
 import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
@@ -201,7 +203,8 @@ function TorisetsuPanel({
             >
               ✧
             </div>
-            <div className="relative space-y-0">
+            {manualReading.isPending && <AgolmenLoading compact label={homeReadingCopy[language].loading} />}
+            {!manualReading.isPending && <div className="relative space-y-0">
               {[
                 { title: t.coreTitle, body: manualReading.data?.manualCore, symbol: "✦" },
                 { title: t.decisionTitle, body: manualReading.data?.manualDecision, symbol: "◇" },
@@ -224,7 +227,7 @@ function TorisetsuPanel({
                   </div>
                 </div>
               ))}
-            </div>
+            </div>}
           </section>
           <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
         </div>
@@ -522,6 +525,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     <>
     <div data-design={effectiveDesign} data-tier={previewPlan} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
+      {tab === "home" && <LanguageSelector language={language} onChange={onLanguageChange} />}
       <SpiralLines className="agolmen-background-spiral pointer-events-none absolute right-[-14rem] top-20 z-0 size-[min(88vw,44rem)] text-primary sm:right-[-8rem]" />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
@@ -572,7 +576,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
-          <ArtsGuide />
+          <ArtsGuide language={language} />
         ) : (
           <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
             <div className="mb-8 text-center">
@@ -616,7 +620,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 />
               </>
             ) : tab === "business" ? (
-              <TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} />
+              <><BusinessFeaturePreview language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>
             ) : tab === "art" ? (
               <NineStarsPanel language={language} profile={profile} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
             ) : tab === "settings" ? (

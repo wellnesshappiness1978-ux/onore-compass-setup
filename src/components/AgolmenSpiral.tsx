@@ -22,6 +22,7 @@ const particles = Array.from({ length: 16 }, (_, i) => i);
 export function AgolmenLoading({ label, compact = false }: { label: string; compact?: boolean }) {
   return <div className={`agolmen-loading flex flex-col items-center justify-center text-center ${compact ? "min-h-36" : "min-h-screen"}`} role="status" aria-live="polite">
     <div className={`agolmen-loading-art relative ${compact ? "size-24" : "size-48"}`} aria-hidden="true">
+      <span className="agolmen-lotus absolute inset-[8%]" />
       <SpiralLines className="agolmen-loading-orbit absolute inset-0 size-full text-primary" />
       <SpiralLines className="agolmen-loading-orbit-reverse absolute inset-[9%] size-[82%] text-primary" />
       {particles.map(i => <span key={i} className="agolmen-particle" style={{ "--i": i } as React.CSSProperties} />)}
@@ -36,5 +37,5 @@ export function AgolmenLoading({ label, compact = false }: { label: string; comp
 }
 
 export function AgolmenLogo({ className = "" }: { className?: string }) {
-  return <img src={logo} alt="" width={512} height={512} className={`agolmen-brand-logo ${className}`} />;
+  return <span className={`agolmen-logo-aura relative inline-grid place-items-center ${className}`}><span className="agolmen-logo-lotus absolute inset-[-18%]" aria-hidden="true" /><img src={logo} alt="" width={512} height={512} className="agolmen-brand-logo relative size-full object-contain" /></span>;
 }

@@ -16,6 +16,7 @@ import { addTeamMember, deleteTeamMember, listTeamMembers } from "@/lib/team-mem
 import { analyzeCandidate, draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
 import ShareCardButton from "@/components/ShareCardButton";
 import GroupSimulator from "./GroupSimulator";
+import { AgolmenLoading } from "@/components/AgolmenSpiral";
 
 type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
 const LOCAL = "onore-team";
@@ -260,6 +261,7 @@ function Draft({ t, members, language, max }: { t: TeamCopy; members: TeamMember
   const byId = new Map(members.map((m) => [m.id, m]));
   return (
     <div className="space-y-3">
+      {busy && <AgolmenLoading compact label={t.generating} />}
       <div className={`${card} space-y-2`}>
         <label className="text-xs text-muted-foreground" htmlFor="draft-goal">{t.goal}</label>
         <textarea id="draft-goal" value={goal} maxLength={500} onChange={(e) => setGoal(e.target.value)} placeholder={t.goalPh} className="min-h-20 w-full rounded-md border border-input bg-background/60 p-2 text-sm" />
@@ -407,6 +409,7 @@ function OneOnOne({ t, members, language }: { t: TeamCopy; members: TeamMember[]
   const run = async () => { if (!m) return; setBusy(true); setError(false); try { const r = await gen({ data: { member: summary(m, t), language } }); setGuides((s) => ({ ...s, [`${id}:${language}`]: r })); } catch { setError(true); } finally { setBusy(false); } };
   return (
     <div className="space-y-3">
+      {busy && <AgolmenLoading compact label={t.generating} />}
       <div className="flex flex-wrap gap-2">
         <select aria-label={t.select} value={id} onChange={(e) => setId(e.target.value)} className="rounded-md border border-input bg-background/60 px-2 text-sm">{members.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>
         <Button size="sm" disabled={busy || !m} onClick={run}><Sparkles className="size-4" />{busy ? t.generating : t.generate}</Button>
@@ -442,6 +445,7 @@ function Recruit({ t, members, language }: { t: TeamCopy; members: TeamMember[];
   };
   return (
     <div className="space-y-3">
+      {busy && <AgolmenLoading compact label={c.busy} />}
       <div className={card}>
         <p className="font-serif text-primary">{c.title}</p>
         <p className="mt-1 text-xs text-muted-foreground">{c.sub}</p>

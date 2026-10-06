@@ -62,7 +62,7 @@
 - [x] Six-part quality revision: portrait-only Home, six layers, nine piano scores, annual date calendar, mandala reveal and global preview bar; verified in browser. Three animal layers remain explicitly original reference models, not official classifications.
 
 - [x] Add shareable essence/daily insight/birth-color cards, JP/EN/繁體 quick switch, Business team grouping, VIP consultation voice, and preview-plan gates.
-- [ ] Background 08:00 push and LINE delivery — blocked: Firebase Messaging connection was declined and LINE account/identity integration is unavailable; open-app reminders remain available.
+- [ ] Background 08:00 push delivery — blocked: a push provider is not connected; open-app reminders remain available.
 - [x] Verify live AI output, card save, and two-member team grouping through the signed-in preview; the voice control is present and starts, but audible speech cannot be confirmed in headless Chromium.
 - [x] Refine SNS card/modal: midnight portrait PNG, localized readings, tier-safe palettes and save/share fallback; verified guest 1080×1920 exports on all five plans, JP/EN/繁體 cards and mobile layout. Native app destination selection remains device-dependent.
 
@@ -124,3 +124,13 @@
 - [x] Unify substantial loading states with the shared logo animation.
 - [x] Order Today's content with unlocked items first and locked tiers in ascending order.
 - [x] Fully separate the natal cosmic artwork from the non-celestial six-color mandala.
+
+## Nine-part logo, calendar, art, business and language update
+- [x] Keep the approved v10 master logo and add lotus, rainbow and aqua-light presentation.
+- [x] Expand and localize the cosmic-origin and Helio Compass explanations.
+- [x] Standardize substantial loading states on the shared logo animation.
+- [x] Extend the Today compass across a ±100-year range and add rokuyo.
+- [x] Calculate honmei, getsumei and keisha from birth data and feed them into cosmic art.
+- [x] Add a complete read-only Business feature preview with plan guidance.
+- [x] Place the seven-language dropdown on the Home screen.
+- [x] Remove LINE login, linking and sharing references.

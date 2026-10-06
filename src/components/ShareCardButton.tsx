@@ -67,11 +67,11 @@ export default function ShareCardButton({ data, language, className, loading = f
     catch (error) { if (!(error instanceof DOMException && error.name === "AbortError")) setStatus(t.error); }
     finally { setSharing(false); }
   };
-  const post = (target: "x" | "line") => {
+  const post = () => {
     const appUrl = window.location.origin;
     // Never include opt-in names or the full private reading in a text-only post.
     const text = t.hashtags;
-    const href = target === "x" ? `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(appUrl)}` : `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(appUrl)}&text=${encodeURIComponent(text)}`;
+    const href = `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(appUrl)}`;
     window.open(href, "_blank", "noopener,noreferrer"); save();
   };
   return <>
@@ -91,7 +91,7 @@ export default function ShareCardButton({ data, language, className, loading = f
           <div className="flex min-w-0 flex-col gap-5 md:pt-1">
             <div className="border-b border-primary/20 pb-5"><label htmlFor="share-card-name" className="flex items-center justify-between gap-3 text-sm text-foreground">{t.name}<Switch id="share-card-name" checked={includeName} onCheckedChange={setIncludeName} /></label><p className="mt-2 text-xs leading-6 text-muted-foreground">{t.privacy}</p></div>
             <div className="grid gap-2"><Button disabled={!ready} onClick={save} className="min-h-12"><Download className="size-4" />{t.save}</Button><Button variant="outline" disabled={!ready || sharing} onClick={() => void share()} className="min-h-12"><Share2 className="size-4" />{t.share}</Button></div>
-            <div className="grid grid-cols-2 gap-2"><Button variant="outline" disabled={!ready || sharing} onClick={() => void share()} className="min-h-11"><Smartphone className="size-4" />Instagram</Button><Button variant="outline" disabled={!ready || sharing} onClick={() => void share()} className="min-h-11"><Smartphone className="size-4" />TikTok</Button><Button variant="outline" disabled={!ready} onClick={() => post("x")} className="min-h-11"><Send className="size-4" />X</Button><Button variant="outline" disabled={!ready} onClick={() => post("line")} className="min-h-11"><Send className="size-4" />LINE</Button></div>
+            <div className="grid grid-cols-3 gap-2"><Button variant="outline" disabled={!ready || sharing} onClick={() => void share()} className="min-h-11"><Smartphone className="size-4" />Instagram</Button><Button variant="outline" disabled={!ready || sharing} onClick={() => void share()} className="min-h-11"><Smartphone className="size-4" />TikTok</Button><Button variant="outline" disabled={!ready} onClick={post} className="min-h-11"><Send className="size-4" />X</Button></div>
             <p className="text-xs leading-6 text-muted-foreground">{t.note}</p>
             {status && <p role="status" className="border-t border-primary/20 pt-3 text-sm text-primary">{status}</p>}
           </div>

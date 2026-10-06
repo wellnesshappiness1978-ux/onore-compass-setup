@@ -134,8 +134,6 @@ export default function DailyReminderPanel({ language, plan, profile }: { langua
         })}
       </div>
       {msg && <p role="alert" className="mt-2 text-xs text-destructive">{msg}</p>}
-      <p className="mt-3 text-xs text-primary">{language === "ja" ? "LINE連携" : language === "zh-TW" ? "LINE 連動" : "LINE connection"}</p>
-      <p className="mt-1 text-xs leading-5 text-muted-foreground">{language === "ja" ? "LINE公式アカウント・本人連携が未設定のため、LINEへの自動通知はまだ届きません。" : language === "zh-TW" ? "尚未設定 LINE 官方帳號及個人連動，因此不會發送 LINE 通知。" : "LINE account and individual connection are not configured yet; LINE notifications are not sent."}</p>
       <p className="mt-2 text-[10px] leading-4 text-muted-foreground">{language === "ja" ? "通知はアプリを開いている間のみ届きます。閉じた状態へのプッシュ配信は通知サービス未接続のため利用できません。方位・色・攻守は参考情報です。" : language === "zh-TW" ? "目前僅於開啟應用程式時提醒。尚未連接背景推播服務；方向與色彩僅供參考。" : "Notifications work only while the app is open. Background push is not connected. Color, direction and timing are illustrative."}</p>
     </section>
   );
