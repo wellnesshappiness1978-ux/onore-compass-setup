@@ -11,7 +11,7 @@ import type { Language } from "@/lib/translations";
 import { AgolmenLoading } from "./AgolmenSpiral";
 
 const titles: Record<Language, [string, string]> = {
-  ja: ["多層総合診断", "この診断結果をSNSでシェア（鳥肌カード生成）"],
+  ja: ["多層総合診断", "あなたの診断カードをSNSでシェア"],
   en: ["Multi-layer grand reading", "Share this reading (create a card)"],
   "zh-CN": ["多层统合占术总评", "分享此解读（生成卡片）"],
   "zh-TW": ["多層統合占術總評", "分享此解讀（生成卡片）"],
