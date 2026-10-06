@@ -28,8 +28,8 @@ const templates: Record<"ja" | "en", Record<Slot, Record<Tier, Template>>> = {
     },
     night: {
       free: { title: "🕊️ 今日1日のエネルギーリセット。心を調律する夜の時間", body: "今日の振り返りと、明日のバイオリズムの波を事前にチェックしておきましょう。", open: "compass" },
-      vip: { title: "🎨 528Hzの波動音響と曼陀羅アートで、心を深層リセット", body: "あなた専用の曼陀羅アートを開き、ソルフェジオBGMとともにリラックスタイムを過ごしましょう。", open: "mandala" },
-      business: { title: "🎨 528Hzの波動音響と曼陀羅アートで、心を深層リセット", body: "あなた専用の曼陀羅アートを開き、ソルフェジオBGMとともにリラックスタイムを過ごしましょう。", open: "mandala" },
+      vip: { title: "🎨 528Hzの波動音響と曼陀羅アートで、心を深層リセット", body: "あなた専用の曼陀羅アートを開き、ソルフェジオBGMとともにリラックスタイムを過ごしましょう。", open: "art" },
+      business: { title: "🎨 528Hzの波動音響と曼陀羅アートで、心を深層リセット", body: "あなた専用の曼陀羅アートを開き、ソルフェジオBGMとともにリラックスタイムを過ごしましょう。", open: "art" },
     },
   },
   en: {
@@ -40,8 +40,8 @@ const templates: Record<"ja" | "en", Record<Slot, Record<Tier, Template>>> = {
     },
     night: {
       free: { title: "🕊️ Reset today's energy — time to tune your heart", body: "Reflect on today and preview tomorrow's biorhythm wave.", open: "compass" },
-      vip: { title: "🎨 Deep reset with 528Hz sound and mandala art", body: "Open your mandala art and relax with Solfeggio music.", open: "mandala" },
-      business: { title: "🎨 Deep reset with 528Hz sound and mandala art", body: "Open your mandala art and relax with Solfeggio music.", open: "mandala" },
+      vip: { title: "🎨 Deep reset with 528Hz sound and mandala art", body: "Open your mandala art and relax with Solfeggio music.", open: "art" },
+      business: { title: "🎨 Deep reset with 528Hz sound and mandala art", body: "Open your mandala art and relax with Solfeggio music.", open: "art" },
     },
   },
 };

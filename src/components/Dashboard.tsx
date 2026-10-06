@@ -66,7 +66,7 @@ type Props = {
   onLanguageChange: (language: Language) => void;
   signedIn?: boolean;
 };
-type Tab = "home" | "traits" | "today" | "consult" | "mandala" | "business" | "settings";
+type Tab = "home" | "traits" | "today" | "consult" | "art" | "business" | "settings";
 
 function ProfileRows({ profile, language }: { profile: UserProfile; language: Language }) {
   const t = translations[language];
@@ -453,7 +453,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   useEffect(() => {
     const open = (target: string | null) => {
       if (target === "compass") { setTab("today"); window.scrollTo({ top: 0 }); }
-      else if (target === "mandala") { setTab("art"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      else if (target === "art") { setTab("art"); window.scrollTo({ top: 0, behavior: "smooth" }); }
     };
     const q = new URLSearchParams(window.location.search).get("open");
     if (q) { open(q); const url = new URL(window.location.href); url.searchParams.delete("open"); window.history.replaceState(window.history.state, "", url); }
@@ -526,7 +526,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     { id: "traits", label: full[1], mobileLabel: short[1], icon: Compass },
     { id: "today", label: full[2], mobileLabel: short[2], icon: CalendarDays },
     { id: "consult", label: full[3], mobileLabel: short[3], icon: WandSparkles },
-    { id: "mandala", label: full[4], mobileLabel: short[4], icon: Orbit },
+    { id: "art", label: full[4], mobileLabel: short[4], icon: Orbit },
     { id: "business", label: full[5], mobileLabel: short[5], icon: Network },
     { id: "settings", label: full[6], mobileLabel: short[6], icon: Settings2 },
   ];
