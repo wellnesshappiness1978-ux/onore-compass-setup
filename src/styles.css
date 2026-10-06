@@ -79,6 +79,9 @@
   --art-emerald: oklch(0.73 0.14 168);
   --art-rose: oklch(0.83 0.095 11);
   --art-coral: oklch(0.8 0.14 44);
+  --aqua-glow: oklch(0.82 0.15 205);
+  --rainbow-rose: oklch(0.78 0.16 355);
+  --rainbow-violet: oklch(0.67 0.17 300);
   --birth-color-1: oklch(0.7 0.2 25);
   --birth-color-2: oklch(0.78 0.16 53);
   --birth-color-3: oklch(0.87 0.16 94);
@@ -114,6 +117,9 @@
 .agolmen-loading-orbit { animation: agolmen-turn 11s linear infinite; }
 .agolmen-loading-orbit-reverse { animation: agolmen-turn-reverse 7s linear infinite; opacity: .48; }
 .agolmen-loading-art { isolation: isolate; }
+.agolmen-lotus, .agolmen-logo-lotus { border-radius: 50%; background: repeating-conic-gradient(from 0deg, color-mix(in oklab, var(--aqua-glow) 36%, transparent) 0deg 8deg, color-mix(in oklab, var(--rainbow-violet) 26%, transparent) 9deg 17deg, transparent 18deg 30deg); mask-image: radial-gradient(circle, transparent 0 28%, black 31% 62%, transparent 76%); filter: blur(3px) drop-shadow(0 0 12px color-mix(in oklab, var(--aqua-glow) 55%, transparent)); animation: agolmen-lotus-turn 18s linear infinite, agolmen-gem 3.2s ease-in-out infinite alternate; }
+.agolmen-logo-aura { isolation: isolate; filter: drop-shadow(0 0 14px color-mix(in oklab, var(--aqua-glow) 45%, transparent)); }
+.agolmen-logo-lotus { opacity: .72; }
 .agolmen-loading-aura { background: radial-gradient(circle, color-mix(in oklab, var(--amethyst) 60%, transparent), color-mix(in oklab, var(--rose-glow) 16%, transparent) 50%, transparent 75%); filter: blur(14px); animation: agolmen-gem 2.7s ease-in-out infinite alternate; }
 .agolmen-loading-logo { animation: agolmen-bloom 2.5s ease-in-out infinite alternate; filter: drop-shadow(0 0 12px var(--gold-glow)); }
 .agolmen-particle { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; border-radius: 50%; background: var(--gold-glow); box-shadow: 0 0 8px var(--primary), 0 0 18px var(--gold-glow); animation: agolmen-converge 2.8s ease-in infinite; animation-delay: calc(var(--i) * -.175s); }
@@ -122,6 +128,7 @@
 .agolmen-loading-progress { width: 38%; animation: agolmen-scan 1.8s ease-in-out infinite; box-shadow: 0 0 8px var(--gold-glow); }
 @keyframes agolmen-turn { to { transform: rotate(360deg); } }
 @keyframes agolmen-turn-reverse { to { transform: rotate(-360deg); } }
+@keyframes agolmen-lotus-turn { to { transform: rotate(360deg); } }
 @keyframes agolmen-bloom { from { opacity: .6; transform: scale(.75) rotate(-9deg); } to { opacity: 1; transform: scale(1.06) rotate(8deg); } }
 @keyframes agolmen-gem { from { opacity: .35; transform: scale(.78); } to { opacity: .95; transform: scale(1.18); } }
 @keyframes agolmen-converge { 0% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg)) translateX(85px) scale(.3); } 25% { opacity: 1; } 85% { opacity: .85; } 100% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg + 280deg)) translateX(8px) scale(1.8); } }
@@ -129,7 +136,7 @@
 @keyframes agolmen-converge-small { 0% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg)) translateX(42px); } 25% { opacity: 1; } 100% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg + 280deg)) translateX(4px); } }
 @keyframes agolmen-core { from { opacity: .45; transform: scale(.72); } to { opacity: 1; transform: scale(1.18); } }
 @keyframes agolmen-scan { 0%,100% { transform: translateX(-80%); opacity: .25; } 50% { transform: translateX(165%); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .agolmen-loading-orbit, .agolmen-loading-orbit-reverse, .agolmen-loading-logo, .agolmen-loading-aura, .agolmen-loading-core, .agolmen-loading-progress, .agolmen-particle { animation: none; } .agolmen-particle { display: none; } }
+@media (prefers-reduced-motion: reduce) { .agolmen-loading-orbit, .agolmen-loading-orbit-reverse, .agolmen-loading-logo, .agolmen-loading-aura, .agolmen-loading-core, .agolmen-loading-progress, .agolmen-particle, .agolmen-lotus, .agolmen-logo-lotus { animation: none; } .agolmen-particle { display: none; } }
 
 .dark {
   --background: oklch(0.105 0.012 305);

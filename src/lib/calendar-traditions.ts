@@ -45,7 +45,7 @@ const palaceLayout = [
   ["兌", 7], ["艮", 8], ["坎", 1], ["乾", 6],
 ] as const;
 
-export function nineStarProfile(dateText: string, timeText = "", timeUnknown = true): NineStarProfile | null {
+export function nineStarProfile(dateText: string, timeText = "", timeUnknown = true, gender = "undisclosed"): NineStarProfile | null {
   const matched = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateText);
   if (!matched) return null;
   const year = Number(matched[1]), month = Number(matched[2]), day = Number(matched[3]);
@@ -76,7 +76,9 @@ export function nineStarProfile(dateText: string, timeText = "", timeUnknown = t
     return { direction, palace, star, starName: NINE_STAR_NAMES[star] };
   });
   const located = palaces.find((palace) => palace.star === honmei);
-  const keisha = located?.palace ?? 5;
+  const mirror: Record<number, number> = { 1: 9, 2: 6, 3: 4, 4: 3, 6: 2, 7: 8, 8: 7, 9: 1 };
+  const centerFive = gender === "female" ? 6 : 7;
+  const keisha = located?.palace === 5 ? (honmei === 5 ? centerFive : mirror[honmei] ?? 5) : located?.palace ?? 5;
   const nearest = starts.reduce((best, item) => Math.abs(item.date.getTime() - instant.getTime()) < Math.abs(best.date.getTime() - instant.getTime()) ? item : best, starts[0]);
   return {
     solarYear, solarMonth, honmei, getsumei, keisha,

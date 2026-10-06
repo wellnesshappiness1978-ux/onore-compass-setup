@@ -11,10 +11,7 @@ export default function LanguageSelector({ language, onChange }: Props) {
   const active = languages.find((item) => item.code === language) ?? languages[0];
 
   return (
-    <div className="language-controls fixed right-4 z-50 flex items-center gap-1 sm:right-6">
-      <div role="group" aria-label="JP / EN / 繁體字" className="flex rounded-lg border border-primary/30 bg-card/90 p-0.5 shadow-lg backdrop-blur-md">
-        {([ ["ja", "JP"], ["en", "EN"], ["zh-TW", "繁體字"] ] as const).map(([code, label]) => <Button key={code} type="button" size="sm" variant={language === code ? "default" : "ghost"} aria-pressed={language === code} onClick={() => onChange(code)} className="h-9 px-2 text-xs">{label}</Button>)}
-      </div>
+    <div className="language-controls fixed right-4 z-50 flex items-center sm:right-6">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" aria-label={`Language / 言語: ${active.label}`} className="h-10 gap-2 rounded-lg border-primary/30 bg-card/70 px-3 text-foreground shadow-lg backdrop-blur-md hover:border-primary/60 hover:bg-card focus-visible:ring-primary">
