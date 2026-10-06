@@ -10,6 +10,7 @@ import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import type { Capture } from "./MandalaScene";
 import CosmicAlchemyArtwork from "./CosmicAlchemyArtwork";
+import { paletteColors } from "@/lib/art-geometry";
 
 const MandalaScene = lazy(() => import("./MandalaScene"));
 type Props = { language: Language; onVip: () => void; profile: UserProfile; testUnlocked?: boolean };
@@ -18,6 +19,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
   const t = nineStarsTranslations[language];
   const { birthDate, bloodType } = profile;
   const palette = birthColorSpectrum(profile);
+  const artColors = palette ? paletteColors(palette).map(color => color.code) : [colors.main, colors.sub];
   const sky = natalSky(birthDate, profile.birthTime, profile.birthTimeUnknown);
   const element = computeCoreLayers(profile)?.shichu.dayElement ?? "木";
   const symbols = getArtSymbols(birthDate);
@@ -101,8 +103,8 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
     {testUnlocked && <p className="mx-auto mt-3 inline-block border border-primary/40 px-3 py-1 text-sm text-primary">{t.testNotice}</p>}
     <aside className="mt-6 border-y border-primary/35 py-5 text-left" aria-label="アートについて"><p className="font-serif text-lg leading-8 text-primary">{language === "ja" ? "出生日時の10天体配置と1,440色の参考バースカラーを重ねた、出生情報から描く参考アートです。曼陀羅では五行のモチーフも用います。" : "Ten natal celestial positions, an illustrative 1,440-color palette and traditional five-element motifs form your personal celestial artwork."}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{sky?.approximate ? "出生時刻が未登録のため日本時間12時の参考配置です。" : "登録時刻は日本時間として計算します。"}天体角度は天文計算、色・五行の共鳴は創作表現で、公式な色対応や効能を示すものではありません。</p></aside>
     <div className={`relative mx-auto mt-7 w-full max-w-[700px] overflow-hidden border-y border-primary/35 bg-background shadow-gold ${art === "cosmic" ? "aspect-[9/16] max-h-[700px]" : "aspect-square"}`} aria-label={art === "cosmic" ? "出生宇宙創生図" : language === "ja" ? "立体曼陀羅アート" : "3D mandala art"}>
-      {mounted && testUnlocked && sky && art === "cosmic" ? <CosmicAlchemyArtwork sky={sky} main={palette?.main.code ?? colors.main} sub={palette?.sub.code ?? colors.sub} onCapture={setCapture} /> : mounted && testUnlocked && sky ? <Suspense fallback={<div className="flex h-full items-center justify-center text-primary"><Sparkles className="size-7 animate-pulse" /></div>}>
-        <MandalaScene sky={sky} main={palette?.main.code ?? colors.main} sub={palette?.sub.code ?? colors.sub} element={element} progress={progress} reduced={reduced} onCapture={setCapture} />
+      {mounted && testUnlocked && sky && art === "cosmic" ? <CosmicAlchemyArtwork sky={sky} colors={artColors} onCapture={setCapture} /> : mounted && testUnlocked && sky ? <Suspense fallback={<div className="flex h-full items-center justify-center text-primary"><Sparkles className="size-7 animate-pulse" /></div>}>
+        <MandalaScene sky={sky} colors={artColors} element={element} progress={progress} reduced={reduced} onCapture={setCapture} />
       </Suspense> : <NineStarsArtwork main={colors.main} sub={colors.sub} bloodType={bloodType} birthDate={birthDate} language={language} />}
       {art === "mandala" && testUnlocked && sky && progress > 0 && progress < 7 && <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-background/70 px-5 py-4 text-primary" role="status"><p className="font-serif text-sm">{progress < 2 ? "光が集まる" : progress < 5 ? "星々と五行の環が巡る" : "曼陀羅が開花する"}</p><div className="mt-2 h-1 bg-primary/25"><div className="h-full bg-primary transition-[width] duration-100" style={{ width: `${progress / 7 * 100}%` }} /></div></div>}
       {!open && !playing && <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/65 p-4 backdrop-blur-[2px]">
