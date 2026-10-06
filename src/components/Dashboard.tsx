@@ -507,14 +507,14 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   
   
   
-    const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
-    { id: "home", label: t.home, icon: Home },
-    { id: "traits", label: t.traits, icon: Compass },
-    { id: "today", label: t.today, icon: Clock3 },
-    { id: "consult", label: t.consult, icon: WandSparkles },
-    { id: "art", label: t.art, icon: Palette },
-    { id: "business", label: t.business, icon: Building2 },
-    { id: "settings", label: t.settings, icon: Settings2 },
+    const navigation: { id: Tab; label: string; mobileLabel: string; icon: typeof Home }[] = [
+    { id: "home", label: t.home, mobileLabel: t.home, icon: Home },
+    { id: "traits", label: language === "ja" ? "あなたの特性" : t.traits, mobileLabel: t.traits, icon: Compass },
+    { id: "today", label: language === "ja" ? "今日の占い" : t.today, mobileLabel: t.today, icon: Clock3 },
+    { id: "consult", label: language === "ja" ? "相談" : t.consult, mobileLabel: language === "ja" ? "相談" : t.consult, icon: WandSparkles },
+    { id: "art", label: t.art, mobileLabel: t.art, icon: Palette },
+    { id: "business", label: t.business, mobileLabel: language === "ja" ? "仕事" : t.business, icon: Building2 },
+    { id: "settings", label: t.settings, mobileLabel: t.settings, icon: Settings2 },
   ];
 
 
@@ -617,7 +617,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </>
             ) : tab === "business" ? (
               <TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} />
-            ) : tab === "mandala" ? (
+            ) : tab === "art" ? (
               <NineStarsPanel language={language} profile={profile} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
             ) : tab === "settings" ? (
               <SettingsPanel
