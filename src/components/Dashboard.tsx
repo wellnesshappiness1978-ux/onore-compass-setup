@@ -503,10 +503,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
   useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
-  const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
+  const navigation: { id: Tab; label: string; mobileLabel?: string; icon: typeof Home }[] = [
     { id: "home", label: t.home, icon: Home },
     { id: "arts", label: t.arts, icon: Compass },
-    { id: "consult", label: t.consult, icon: WandSparkles },
+    { id: "consult", label: t.consult, mobileLabel: language === "ja" ? "相談室" : undefined, icon: WandSparkles },
     { id: "perks", label: language === "ja" ? "プラン特典" : language === "zh-TW" || language === "zh-CN" ? "方案特權" : language === "ko" ? "플랜 혜택" : language === "es" ? "Ventajas" : language === "fr" ? "Avantages" : "Perks", icon: Crown },
     { id: "mandala", label: t.mandala, icon: Orbit },
     { id: "settings", label: t.settings, icon: Settings2 },
@@ -673,7 +673,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               className={`flex h-14 min-w-0 flex-col gap-1 rounded-xl px-0.5 text-[9px] sm:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
             >
               <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} />
-              <span className="max-w-full truncate">{item.label}</span>
+              <span className="max-w-full whitespace-normal text-center leading-none"><span className={item.mobileLabel ? "sm:hidden" : ""}>{item.mobileLabel ?? item.label}</span>{item.mobileLabel && <span className="hidden sm:inline">{item.label}</span>}</span>
             </Button>
           ))}
         </div>
