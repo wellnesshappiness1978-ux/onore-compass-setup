@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createOpenAI } from "@ai-sdk/openai";
-import { generateText, Output } from "ai";
+import { streamText, Output } from "ai";
 import { z } from "zod";
 import { getFiveElements } from "./five-elements";
 import { computeCoreLayers, coreLayersPrompt } from "./core-layers";
@@ -37,6 +37,12 @@ const readingSchema = z.object({
   animalSwitch: z.string(),
   colorPractice: z.string(),
   helioGuide: z.string(),
+  nameNature: z.string(), nameGuide: z.string(),
+  numerologyNature: z.string(), numerologyGuide: z.string(),
+  westernNature: z.string(), westernGuide: z.string(),
+  pillarsNature: z.string(), pillarsGuide: z.string(),
+  animalNature: z.string(), animalGuide: z.string(),
+  fengNature: z.string(), fengGuide: z.string(),
 });
 
 export const generateHomeReading = createServerFn({ method: "POST" })
@@ -51,11 +57,19 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     const color = birthColorSpectrum(profile);
     const helio = helioPhase(profile.birthDate);
     const gua = mingGua(profile.birthDate, profile.gender ?? "undisclosed");
+    let runId: string | undefined;
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
       headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
+      fetch: async (input, init) => {
+        const headers = new Headers(init?.headers);
+        if (runId) headers.set("X-Lovable-AIG-Run-ID", runId);
+        const response = await fetch(input, { ...init, headers });
+        runId = runId ?? (response.headers.get("X-Lovable-AIG-Run-ID")?.trim() || undefined);
+        return response;
+      },
     });
-    const result = await generateText({
+    const result = streamText({
       model: provider.responses("openai/gpt-6-astra"),
       output: Output.object({ schema: readingSchema }),
       prompt: `Write a vivid, personal five-layer INTERPRETIVE reading in ${language}. Return exactly the fields in the schema; no headings in field values. This is available in FULL to every user including free users. No paywall or upsell in the reading.
@@ -93,6 +107,7 @@ FENG SHUI (traditional Ba Zhai reference, solar year from Li Chun): ${gua ? gua.
 PORTRAIT VOICE: sharply perceptive but never superior. BANNED in keySummary, grandSummary, synthesis, name, mind, instinct, strength, caution, manualCore, manualDecision and manualTiming: instructions or moral advice, 「〜しましょう」「〜してください」「〜に気をつけなさい」「〜すべき」「〜が大切」, warnings, generic praise or claims to know the person's actual private thoughts. Describe only what the traditional reference model suggests, grounded in available values. Never assert job, health, relationship or future facts.
 grandSummary: 500–800 Japanese characters (equivalent high-density depth in other languages). This is the capstone shown last on the home screen. Build a coherent portrait in four movements: the deep pattern beneath the outward style; latent abilities that emerge under specific conditions; the structural bottleneck that repeats in decisions or relationships; and a concrete key for making daily choices more congruent. Anchor each movement in a different intersection of the supplied name, birth date/time/place and profile context, so changing those inputs would materially change the portrait. Weave at least four available computed layers internally, but translate every specialist value into plain daily language instead of naming it. No preface or greeting. Practical reflection is welcome, but never claim access to private thoughts or facts about work, health, relationships or future outcomes.
 keySummary: about 100 Japanese characters, plain language with no technical parameter list. Opens with a portrait of the contrast between the outward face, hidden desire and unconscious decision pattern indicated by 2–3 computed layers. No action key or instruction.
+nameNature/nameGuide, numerologyNature/numerologyGuide, westernNature/westernGuide, pillarsNature/pillarsGuide, animalNature/animalGuide, fengNature/fengGuide: six complete chapters in that order. Each Nature field is 100–180 Japanese characters translating that layer's computed values into plain-language traits. Each Guide field is 80–150 Japanese characters giving one concrete, non-moralizing way to use that reading in work, relationships or decisions. Never use unavailable values. Feng fields are traditional directional reflection only. These chapters must each stand alone as 「本質・特性」 followed by 「今のあなたへの道標」 before the next chapter begins.
 numerologyTrial: about 120 chars. From life path and soul number: the trial pattern that repeats in their life and the specific talent that breaks through it, plus (a)(b)(c).
 astroRecovery: about 120 chars. Sun vs moon gap (建前 vs 本音) and a concrete recovery action when emotions are disturbed, plus (a)(b)(c). If moon is uncertain, say so in a few words.
 pillarsTiming: about 120 chars. From the five-element excess/lack and day master: where to spend energy (攻め時) and the trap where they spin their wheels (守り時), plus (a)(b)(c).
@@ -100,7 +115,7 @@ animalSwitch: about 120 chars. From the core animal character and its group: int
 colorPractice: about 120 chars. Daily ways to use the birth colors: one small item, one interior idea, one focus of attention, naming the color names.
 helioGuide: about 120 chars. State the phase explicitly and what to do in this phase this week/month, plus (a)(b)(c). Describe as an earth-calendar reflection, not verified luck.
 Do not mention any birth-color names, HEX codes, or color themes outside colorPractice; colorPractice is displayed behind a separate plan gate. Include a practical feng-shui environmental reflection in manualTiming when relevant: clearing a walkway before a task, adjusting glare at the desk, or choosing an entered Gua direction; never promise health, wealth or outcomes. Return only the structured object.`,
-      providerOptions: { openai: { store: false } },
+      providerOptions: { openai: { store: false, forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", include: ["reasoning.encrypted_content"] } },
     });
-    return { ...readingSchema.parse(result.output), elements, layers, helio };
+    return { ...readingSchema.parse(await result.output), elements, layers, helio };
   });

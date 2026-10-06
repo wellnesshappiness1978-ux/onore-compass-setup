@@ -128,7 +128,7 @@ function TorisetsuPanel({
   const q = quickCompatibilityCopy[language];
   const [mode, setMode] = useState<"manual" | "compatibility">(only ?? initialMode);
   const generate = useServerFn(generateHomeReading);
-  const manualReading = useQuery({ queryKey: ["home-reading-five-v8", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
+  const manualReading = useQuery({ queryKey: ["home-reading-six-v9", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
   const [partnerName, setPartnerName] = useState("");
   const [partnerKana, setPartnerKana] = useState("");
   const [partnerGender, setPartnerGender] = useState<UserProfile["gender"]>("undisclosed");
@@ -462,8 +462,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   }, []);
   useEffect(() => {
     if (tab !== "consult") return;
+    window.scrollTo({ top: 0, behavior: "auto" });
     const frame = requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
-    return () => cancelAnimationFrame(frame);
+    const timer = window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 120);
+    return () => { cancelAnimationFrame(frame); window.clearTimeout(timer); };
   }, [tab]);
   // Strict entitlement: the read-only membership row decides access. The switch may only preview equal or lower plans.
   const [selectedPlan, setPreviewPlan] = useState<Plan>("b2b-premium");
@@ -503,10 +505,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
   useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
-  const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
+  const navigation: { id: Tab; label: string; mobileLabel?: string; icon: typeof Home }[] = [
     { id: "home", label: t.home, icon: Home },
     { id: "arts", label: t.arts, icon: Compass },
-    { id: "consult", label: t.consult, icon: WandSparkles },
+    { id: "consult", label: t.consult, ...(language === "ja" ? { mobileLabel: "相談室" } : {}), icon: WandSparkles },
     { id: "perks", label: language === "ja" ? "プラン特典" : language === "zh-TW" || language === "zh-CN" ? "方案特權" : language === "ko" ? "플랜 혜택" : language === "es" ? "Ventajas" : language === "fr" ? "Avantages" : "Perks", icon: Crown },
     { id: "mandala", label: t.mandala, icon: Orbit },
     { id: "settings", label: t.settings, icon: Settings2 },
@@ -667,13 +669,13 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               variant="ghost"
               onClick={() => {
                 setTab(item.id);
-                window.scrollTo({ top: 0, behavior: "smooth" });
+                window.scrollTo({ top: 0, behavior: item.id === "consult" ? "auto" : "smooth" });
               }}
               aria-current={tab === item.id ? "page" : undefined}
               className={`flex h-14 min-w-0 flex-col gap-1 rounded-xl px-0.5 text-[9px] sm:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
             >
               <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} />
-              <span className="max-w-full truncate">{item.label}</span>
+              <span className="max-w-full whitespace-normal text-center leading-none"><span className={item.mobileLabel ? "sm:hidden" : ""}>{item.mobileLabel ?? item.label}</span>{item.mobileLabel && <span className="hidden sm:inline">{item.label}</span>}</span>
             </Button>
           ))}
         </div>

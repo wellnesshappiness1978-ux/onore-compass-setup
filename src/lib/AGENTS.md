@@ -6,5 +6,5 @@
 - HelioCalendar calculates heliocentric positions for selected dates, but calendar events are illustrative rhythms imported via user-confirmed Google/ICS only. Why: positions do not establish auspicious timing or automatic sync.
 - Birth colors map profile fields and solar longitude to illustrative 1440 slots, not measured frequencies or validated correspondences. Why: no established mapping.
 - Feng shui uses gender-specific Li Chun Ming Gua and a common annual chart; birthplace centroids affect timed ascendants only (credit Geolonia CC BY 4.0). Why: property-specific charts require facing and period.
-- Mandala uses 10 geocentric bodies with ecliptic longitudes/aspect lines, labels missing-time JST noon, and exports illustrative PNG only. Why: no verified entitlement.
+- VIP art derives repeatable golden-ratio geometry from six birth colors and 10 geocentric bodies, labels missing-time JST noon, and exports illustrative PNG only. Why: preserve data fidelity without implying verified effects or entitlement.
 - Team analysis uses deterministic scores; team AI drafts and 1on1 text never imply member writes for guests. Why: reference workflows remain reproducible.

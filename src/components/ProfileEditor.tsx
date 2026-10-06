@@ -6,6 +6,7 @@ import { prefecturesRomanized, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { getFiveElements } from "@/lib/ai/five-elements";
+import { finalizePersonalName, formatPersonalName } from "@/lib/name-format";
 
 const ROMAJI = /^[A-Za-z][A-Za-z\s'-]*$/;
 
@@ -35,7 +36,7 @@ export default function ProfileEditor({
     setError(null);
     setSaving(true);
     try {
-      await onSave({ ...draft, nameKanji: draft.nameKanji.trim().slice(0, 40), nameKana: draft.nameKana.trim().slice(0, 60), nameRomaji: draft.nameRomaji.trim().toUpperCase().slice(0, 60), birthCity: draft.birthCity.trim().slice(0, 80) });
+      await onSave({ ...draft, nameKanji: finalizePersonalName(draft.nameKanji).slice(0, 40), nameKana: finalizePersonalName(draft.nameKana).slice(0, 60), nameRomaji: finalizePersonalName(draft.nameRomaji, true).slice(0, 60), birthCity: draft.birthCity.trim().slice(0, 80) });
       setSaved(true);
     } catch { setError(storage.saveError); }
     finally { setSaving(false); }
@@ -51,11 +52,11 @@ export default function ProfileEditor({
       <p className="mt-3 text-xs text-muted-foreground">{t.cardHint}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div><label className={label} htmlFor="pe-kanji">{t.nameKanji}</label>
-          <input id="pe-kanji" className={inputClass} maxLength={40} placeholder="仁井田 大慈" value={draft.nameKanji} onChange={(e) => set("nameKanji", e.target.value)} /></div>
+          <input id="pe-kanji" className={inputClass} maxLength={40} placeholder="例：山田 太郎（※姓と名の間にスペース）" value={draft.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} /></div>
         <div><label className={label} htmlFor="pe-kana">{t.nameKana}</label>
-          <input id="pe-kana" className={inputClass} maxLength={60} placeholder="にいだ だいじ" value={draft.nameKana} onChange={(e) => set("nameKana", e.target.value)} /></div>
+          <input id="pe-kana" className={inputClass} maxLength={60} placeholder="例：やまだ たろう（※姓と名の間にスペース）" value={draft.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} /></div>
         <div className="sm:col-span-2"><label className={label} htmlFor="pe-romaji">{t.nameRomaji}</label>
-          <input id="pe-romaji" className={`${inputClass} uppercase`} maxLength={60} placeholder="NIIDA DAIJI" value={draft.nameRomaji} onChange={(e) => set("nameRomaji", e.target.value)} />
+          <input id="pe-romaji" className={`${inputClass} uppercase`} maxLength={60} placeholder="例：YAMADA TARO（※姓と名の間にスペース）" value={draft.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} />
           <p className="mt-1 text-[11px] text-muted-foreground">{t.romajiHint}</p></div>
         <div><label className={label} htmlFor="pe-gender">{storage.gender}</label>
           <select id="pe-gender" className={inputClass} value={draft.gender} onChange={(e) => set("gender", e.target.value as UserProfile["gender"])}><option value="undisclosed">{storage.undisclosed}</option><option value="female">{storage.female}</option><option value="male">{storage.male}</option><option value="other">{storage.other}</option></select></div>

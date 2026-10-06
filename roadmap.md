@@ -105,3 +105,10 @@
 - [x] Compact the earth-calendar into a month view with a separate selected-day detail tab while preserving plan gates and calendar export.
 - [x] Add a beginner annual-map guide and distinct five-element color, material, and placement advice for all eight directions.
 - [x] Preserve and verify the pre-profile introduction before personal-data fields.
+
+## 7-part loading, diagnosis, directions and art refinement
+- [x] Enrich the v10 logo loading state and normalize surname/given-name spacing without guessing an unseparated name.
+- [x] Reframe six reading layers as nature then practical guide, followed by the complete multi-layer summary and plan proposals.
+- [x] Make all nine annual-map cells tappable with beginner themes, annual-star context and actions.
+- [x] Use a compact mobile consultation label and force the consultation page to the top after rendering.
+- [x] Rebuild both VIP artworks around the six birth colors, golden-ratio geometry and deterministic natal-sky data while preserving preview exports and sharing.

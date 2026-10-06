@@ -89,7 +89,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-five-v8", profile, language],
+    queryKey: ["home-reading-six-v9", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
@@ -153,6 +153,16 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
             </div> : <p className="mt-3 text-sm text-muted-foreground">{f.nameNote}</p>}
           </section>
           {data.keySummary && <section aria-label="本質の交差点" className="my-6 rounded-lg border border-primary/50 bg-gradient-to-b from-primary/15 to-transparent p-5 sm:p-6"><p className="text-xs text-primary">{language === "ja" ? "複数の参考レイヤーが交差する人物像" : "A portrait across the reference layers"}</p><p className="mt-3 font-serif text-lg leading-9 text-foreground sm:text-xl">{data.keySummary}</p></section>}
+          <section aria-label={language === "ja" ? "6大占術の物語" : "Six-layer story"} className="my-6 border-y border-primary/25">
+            {([
+              ["姓名判断", data.nameNature, data.nameGuide],
+              ["数秘術", data.numerologyNature, data.numerologyGuide],
+              ["西洋占星術", data.westernNature, data.westernGuide],
+              ["四柱推命", data.pillarsNature, data.pillarsGuide],
+              ["動物占い", data.animalNature, data.animalGuide],
+              ["風水・方位", data.fengNature, data.fengGuide],
+            ] as const).map(([title, nature, guide], index) => <article key={title} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9"><div className="flex items-center gap-3"><span className="font-serif text-xs text-primary/65">0{index + 1}</span><h3 className="font-serif text-xl text-primary">{title}</h3></div><div className="mt-5 grid gap-5 sm:grid-cols-2"><div><p className="text-xs text-primary">{language === "ja" ? "本質・特性" : "Nature"}</p><p className="mt-2 text-base leading-8 text-foreground">{nature}</p></div><div className="border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><p className="text-xs text-primary">{language === "ja" ? "今のあなたへの道標" : "Your guide"}</p><p className="mt-2 text-base leading-8 text-foreground">{guide}</p></div></div></article>)}
+          </section>
           {sections.map((text, i) => {
             const Icon = icons[i] ?? Sparkles;
             return <article key={i} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9">

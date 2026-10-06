@@ -112,17 +112,24 @@
 .design-canvas[data-design$="-luxe"] .agolmen-background-spiral,
 .design-canvas[data-design^="business-"] .agolmen-background-spiral { opacity: .25; filter: drop-shadow(0 0 12px var(--gold-glow)); }
 .agolmen-loading-orbit { animation: agolmen-turn 11s linear infinite; }
+.agolmen-loading-orbit-reverse { animation: agolmen-turn-reverse 7s linear infinite; opacity: .48; }
 .agolmen-loading-art { isolation: isolate; }
 .agolmen-loading-aura { background: radial-gradient(circle, color-mix(in oklab, var(--amethyst) 60%, transparent), color-mix(in oklab, var(--rose-glow) 16%, transparent) 50%, transparent 75%); filter: blur(14px); animation: agolmen-gem 2.7s ease-in-out infinite alternate; }
 .agolmen-loading-logo { animation: agolmen-bloom 2.5s ease-in-out infinite alternate; filter: drop-shadow(0 0 12px var(--gold-glow)); }
 .agolmen-particle { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; border-radius: 50%; background: var(--gold-glow); box-shadow: 0 0 8px var(--primary), 0 0 18px var(--gold-glow); animation: agolmen-converge 2.8s ease-in infinite; animation-delay: calc(var(--i) * -.175s); }
+.agolmen-particle-inner { width: 2px; height: 2px; animation-duration: 2.1s; animation-direction: reverse; }
+.agolmen-loading-core { background: radial-gradient(circle, var(--gold-glow), color-mix(in oklab, var(--primary) 34%, transparent) 42%, transparent 72%); filter: blur(5px); animation: agolmen-core 1.8s ease-in-out infinite alternate; }
+.agolmen-loading-progress { width: 38%; animation: agolmen-scan 1.8s ease-in-out infinite; box-shadow: 0 0 8px var(--gold-glow); }
 @keyframes agolmen-turn { to { transform: rotate(360deg); } }
+@keyframes agolmen-turn-reverse { to { transform: rotate(-360deg); } }
 @keyframes agolmen-bloom { from { opacity: .6; transform: scale(.75) rotate(-9deg); } to { opacity: 1; transform: scale(1.06) rotate(8deg); } }
 @keyframes agolmen-gem { from { opacity: .35; transform: scale(.78); } to { opacity: .95; transform: scale(1.18); } }
 @keyframes agolmen-converge { 0% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg)) translateX(85px) scale(.3); } 25% { opacity: 1; } 85% { opacity: .85; } 100% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg + 280deg)) translateX(8px) scale(1.8); } }
 .agolmen-loading:has(.size-24) .agolmen-particle { animation-name: agolmen-converge-small; }
 @keyframes agolmen-converge-small { 0% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg)) translateX(42px); } 25% { opacity: 1; } 100% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg + 280deg)) translateX(4px); } }
-@media (prefers-reduced-motion: reduce) { .agolmen-loading-orbit, .agolmen-loading-logo, .agolmen-loading-aura, .agolmen-particle { animation: none; } .agolmen-particle { display: none; } }
+@keyframes agolmen-core { from { opacity: .45; transform: scale(.72); } to { opacity: 1; transform: scale(1.18); } }
+@keyframes agolmen-scan { 0%,100% { transform: translateX(-80%); opacity: .25; } 50% { transform: translateX(165%); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .agolmen-loading-orbit, .agolmen-loading-orbit-reverse, .agolmen-loading-logo, .agolmen-loading-aura, .agolmen-loading-core, .agolmen-loading-progress, .agolmen-particle { animation: none; } .agolmen-particle { display: none; } }
 
 .dark {
   --background: oklch(0.105 0.012 305);

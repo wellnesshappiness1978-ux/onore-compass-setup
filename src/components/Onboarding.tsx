@@ -5,6 +5,7 @@ import { prefecturesRomanized, translations, type Language } from "@/lib/transla
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
+import { finalizePersonalName, formatPersonalName } from "@/lib/name-format";
 
 export type UserProfile = {
   nameKanji: string;
@@ -107,7 +108,12 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
     setAnalyzing(true);
     setSaveError(false);
     try {
-      await onComplete(profile);
+      await onComplete({
+        ...profile,
+        nameKanji: finalizePersonalName(profile.nameKanji),
+        nameKana: finalizePersonalName(profile.nameKana),
+        nameRomaji: finalizePersonalName(profile.nameRomaji, true),
+      });
     } catch {
       setSaveError(true);
     } finally {
@@ -173,15 +179,15 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
               <div className="space-y-4">
                 <div>
                   <label htmlFor="name-kanji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKanji} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
-                  <input id="name-kanji" maxLength={40} placeholder="仁井田 大慈" value={profile.nameKanji} onChange={(e) => set("nameKanji", e.target.value)} className={inputClass} />
+                  <input id="name-kanji" maxLength={40} placeholder="例：山田 太郎（※姓と名の間にスペース）" value={profile.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} className={inputClass} />
                 </div>
                 <div>
                   <label htmlFor="name-kana" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKana} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
-                  <input id="name-kana" maxLength={60} placeholder="にいだ だいじ" value={profile.nameKana} onChange={(e) => set("nameKana", e.target.value)} className={inputClass} />
+                  <input id="name-kana" maxLength={60} placeholder="例：やまだ たろう（※姓と名の間にスペース）" value={profile.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} className={inputClass} />
                 </div>
                 <div>
                   <label htmlFor="name-romaji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameRomaji} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
-                  <input id="name-romaji" maxLength={60} placeholder="NIIDA DAIJI" value={profile.nameRomaji} onChange={(e) => set("nameRomaji", e.target.value.toUpperCase())} className={inputClass} />
+                  <input id="name-romaji" maxLength={60} placeholder="例：YAMADA TARO（※姓と名の間にスペース）" value={profile.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} className={inputClass} />
                   <p className="mt-1 text-xs text-muted-foreground">{pt.romajiHint}</p>
                 </div>
               </div>
