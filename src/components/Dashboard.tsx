@@ -10,6 +10,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
+  Building2,
   CalendarDays,
   ChevronRight,
   Clock3,
@@ -452,7 +453,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   useEffect(() => {
     const open = (target: string | null) => {
       if (target === "compass") { setTab("today"); window.scrollTo({ top: 0 }); }
-      else if (target === "mandala") { setTab("mandala"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      else if (target === "mandala") { setTab("art"); window.scrollTo({ top: 0, behavior: "smooth" }); }
     };
     const q = new URLSearchParams(window.location.search).get("open");
     if (q) { open(q); const url = new URL(window.location.href); url.searchParams.delete("open"); window.history.replaceState(window.history.state, "", url); }
@@ -480,7 +481,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   // Test preview only: plan cards switch the plan and jump to the newly unlocked feature.
   const selectTestPlan = (next: Plan) => {
     applyDevOverride(next);
-    if (next === "vip") setTab("mandala");
+    if (next === "vip") setTab("art");
     else if (next === "b2b" || next === "b2b-premium") setTab("business");
     else setTab("traits");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -585,7 +586,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
       <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
-          <ArtsGuide />
+          <>
+            <div className="mb-5"><SelfCoreCard profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => document.getElementById("owner-manual")?.scrollIntoView({ behavior: "smooth", block: "start" })} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} /></div>
+            <div id="owner-manual" className="mb-8 scroll-mt-4"><TorisetsuPanel only="manual" plan={actualPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+          </>
         ) : (
           <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
             <div className="mb-8 text-center">
@@ -596,27 +600,53 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             </div>
             {tab === "traits" ? (
               <>
-                <SelfCoreCard experienceOnly profile={profile} language={language} currentPlan={previewPlan} onDiagnosis={() => undefined} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} />
+                <ArtsGuide />
+                <div className="mb-6"><PersonPortrait profile={profile} language={language} /></div>
+                <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
+                <NameAnalysisPreview profile={profile} language={language} />
+                <BirthColorGuide profile={profile} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
               </>
             ) : tab === "today" ? (
-              <><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => setTab("settings")} /><DayCompass profile={profile} language={language} plan={previewPlan} onUpgrade={() => setTab("settings")} /></>
+              <>
+                <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>
+                <section className="design-compass-section text-center" aria-label={t.today}>
+                  <div className="flex items-center justify-center gap-3 text-primary/70">
+                    <span className="h-px w-8 bg-primary/30" />
+                    <Sparkles className="size-3" />
+                    <span className="h-px w-8 bg-primary/30" />
+                  </div>
+                  <h2 className="mt-2 font-serif text-xl text-gradient-gold sm:text-2xl">{t.today}</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {new Intl.DateTimeFormat(language, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }).format(new Date())}
+                  </p>
+                  <DayCompass profile={profile} language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+                </section>
+              </>
             ) : tab === "consult" ? (
               <>
-              <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
-              <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
-              <ConsultationPanel
-                profile={profile}
-                language={language}
-                plan={previewPlan}
-                actualPlan={serverPlan}
-                signedIn={signedIn}
-                onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-              />
+                <ProfileEditor profile={profile} language={language} onSave={onProfileChange} />
+                <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+                <ConsultationPanel
+                  profile={profile}
+                  language={language}
+                  plan={previewPlan}
+                  actualPlan={serverPlan}
+                  signedIn={signedIn}
+                  onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                />
               </>
-            ) : tab === "mandala" ? (
-              <NineStarsPanel language={language} profile={profile} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
             ) : tab === "business" ? (
-              <TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} />
+              <PlanPerksTab profile={profile} language={language} plan={previewPlan} actualPlan={actualPlan} signedIn={signedIn && !devOverrideEnabled} go={(target) => {
+                if (target === "team") return;
+                if (target === "plans") { setTab("settings"); setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 250); return; }
+                setTab(target as Tab); window.scrollTo({ top: 0, behavior: "smooth" });
+              }} />
+            ) : tab === "art" ? (
+              <NineStarsPanel language={language} profile={profile} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
             ) : tab === "settings" ? (
               <SettingsPanel
                 profile={profile}
@@ -625,26 +655,17 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 actualPlan={actualPlan}
                 debugAllowed={debugAllowed}
                 devOverrideEnabled={devOverrideEnabled}
-                onDebugPlanChanged={(next) => { setActualPlan(next); setPreviewPlan(next); if (!canPreviewDesign(next, designMode)) setDesignMode("classic"); }}
-                onPlanChange={(next) => {
-                  if (devOverrideEnabled) { applyDevOverride(next); return; }
-                  setPreviewPlan(next);
-                  if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
-                }}
-                designMode={effectiveDesign}
+                onDebugPlanChanged={(p) => setActualPlan(p)}
+                onPlanChange={applyDevOverride}
+                designMode={designMode}
                 onDesignModeChange={setDesignMode}
-                onLanguageChange={onLanguageChange}
-                onEdit={onEdit}
                 signedIn={signedIn}
+                onLanguageChange={onLanguageChange}
+                onEdit={() => setModal("profile")}
               />
-            ) : (
-              <div className="border-y border-primary/15 py-12 text-center text-sm text-muted-foreground">
-                {t.comingFeature}
-              </div>
-            )}
+            ) : null}
           </section>
-        )}
-      </main>
+        )}      </main>
 
       {planOrder.indexOf(previewPlan) >= planOrder.indexOf("vip") && <SolfeggioPlayer language={language} compact />}
 
