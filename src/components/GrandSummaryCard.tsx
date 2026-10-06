@@ -10,7 +10,7 @@ import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 
 const titles: Record<Language, [string, string]> = {
-  ja: ["総合多層占術診断", "この診断結果をSNSでシェア（鳥肌カード生成）"],
+  ja: ["多層総合診断", "この診断結果をSNSでシェア（鳥肌カード生成）"],
   en: ["Multi-layer grand reading", "Share this reading (create a card)"],
   "zh-CN": ["多层统合占术总评", "分享此解读（生成卡片）"],
   "zh-TW": ["多層統合占術總評", "分享此解讀（生成卡片）"],
@@ -22,7 +22,7 @@ const titles: Record<Language, [string, string]> = {
 export default function GrandSummaryCard({ profile, language, plan, embedded = false }: { profile: UserProfile; language: Language; plan: Plan; embedded?: boolean }) {
   const generate = useServerFn(generateHomeReading);
   const { data, isPending, isError } = useQuery({
-    queryKey: ["home-reading-five-v8", profile, language],
+    queryKey: ["home-reading-six-v9", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
@@ -37,6 +37,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
       <div className="text-center">
         <Sparkles className="mx-auto size-6 text-primary" strokeWidth={1.2} aria-hidden="true" />
         <h2 className="mt-3 font-serif text-2xl text-gradient-gold sm:text-3xl">{title}</h2>
+        {language === "ja" && <p className="mt-2 text-sm text-primary/80">だからこそ、今のあなたに必要な道標</p>}
       </div>
       <p className="mt-6 whitespace-pre-line font-serif text-xl leading-[2.1] text-foreground sm:text-[22px]" role={text ? undefined : "status"}>
         {text ?? (isError ? copy.error : copy.loading)}

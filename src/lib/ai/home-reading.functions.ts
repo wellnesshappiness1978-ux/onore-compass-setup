@@ -65,7 +65,7 @@ export const generateHomeReading = createServerFn({ method: "POST" })
         const headers = new Headers(init?.headers);
         if (runId) headers.set("X-Lovable-AIG-Run-ID", runId);
         const response = await fetch(input, { ...init, headers });
-        runId = runId ?? response.headers.get("X-Lovable-AIG-Run-ID")?.trim() || undefined;
+        runId = runId ?? (response.headers.get("X-Lovable-AIG-Run-ID")?.trim() || undefined);
         return response;
       },
     });
