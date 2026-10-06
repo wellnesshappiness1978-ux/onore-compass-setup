@@ -134,3 +134,10 @@
 - [x] Add a complete read-only Business feature preview with plan guidance.
 - [x] Place the seven-language dropdown on the Home screen.
 - [x] Remove LINE login, linking and sharing references.
+
+## Brand, reading and artwork refinement
+- [x] Replace the logo's extra ring treatment with tapered purple-and-gold light beams while retaining the approved master image.
+- [x] Add the requested golden-ratio origin story and standardize the Japanese diagnosis-card share wording.
+- [x] Separate the six personal-reading chapters by evidence, subject and sentence style to prevent repeated diagnoses.
+- [x] Rebuild the mandala around only the six birth colors, a dominant overall-color core and a subtle shell spiral.
+- [x] Expand the natal cosmic artwork and add deterministic shaded planetary surfaces with deeper marine light layers.
