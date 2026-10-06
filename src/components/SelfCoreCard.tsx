@@ -153,33 +153,31 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
             </div> : <p className="mt-3 text-sm text-muted-foreground">{f.nameNote}</p>}
           </section>
           {data.keySummary && <section aria-label="本質の交差点" className="my-6 rounded-lg border border-primary/50 bg-gradient-to-b from-primary/15 to-transparent p-5 sm:p-6"><p className="text-xs text-primary">{language === "ja" ? "複数の参考レイヤーが交差する人物像" : "A portrait across the reference layers"}</p><p className="mt-3 font-serif text-lg leading-9 text-foreground sm:text-xl">{data.keySummary}</p></section>}
-          <section aria-label={language === "ja" ? "6大占術の物語" : "Six-layer story"} className="my-6 border-y border-primary/25">
+          {experienceOnly && <section aria-label={language === "ja" ? "あなたを形づくる6つの視点" : "Six views shaping you"} className="my-6 border-y border-primary/25">
             {([
-              ["姓名判断", data.nameNature, data.nameGuide],
-              ["数秘術", data.numerologyNature, data.numerologyGuide],
-              ["西洋占星術", data.westernNature, data.westernGuide],
-              ["四柱推命", data.pillarsNature, data.pillarsGuide],
-              ["動物占い", data.animalNature, data.animalGuide],
-              ["風水・方位", data.fengNature, data.fengGuide],
-            ] as const).map(([title, nature, guide], index) => <article key={title} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9"><div className="flex items-center gap-3"><span className="font-serif text-xs text-primary/65">0{index + 1}</span><h3 className="font-serif text-xl text-primary">{title}</h3></div><div className="mt-5 grid gap-5 sm:grid-cols-2"><div><p className="text-xs text-primary">{language === "ja" ? "本質・特性" : "Nature"}</p><p className="mt-2 text-base leading-8 text-foreground">{nature}</p></div><div className="border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><p className="text-xs text-primary">{language === "ja" ? "今のあなたへの道標" : "Your guide"}</p><p className="mt-2 text-base leading-8 text-foreground">{guide}</p></div></div></article>)}
+              ["01", data.nameNature, data.nameGuide], ["02", data.numerologyNature, data.numerologyGuide],
+              ["03", data.westernNature, data.westernGuide], ["04", data.pillarsNature, data.pillarsGuide],
+              ["05", data.animalNature, data.animalGuide], ["06", data.fengNature, data.fengGuide],
+            ] as const).map(([title, nature, guide], index) => <article key={title} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9"><div className="flex items-center gap-3"><span className="font-serif text-xs text-primary/65">{title}</span><h3 className="font-serif text-xl text-primary">{language === "ja" ? ["人との関わり方", "選び方と進み方", "外に見せる顔と内側", "力の使い方", "決断の癖", "心地よい環境"][index] : ["How you connect", "How you choose", "Outer and inner self", "How you use energy", "Decision patterns", "Supportive spaces"][index]}</h3></div><div className="mt-5 grid gap-5 sm:grid-cols-2"><div><p className="text-xs text-primary">{language === "ja" ? "本質・特性" : "Nature"}</p><p className="mt-2 text-base leading-8 text-foreground">{nature}</p></div><div className="border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><p className="text-xs text-primary">{language === "ja" ? "今のあなたへの道標" : "Your guide"}</p><p className="mt-2 text-base leading-8 text-foreground">{guide}</p></div></div></article>)}
           </section>
-          {sections.map((text, i) => {
+          }
+          {!experienceOnly && sections.map((text, i) => {
             const Icon = icons[i] ?? Sparkles;
             return <article key={i} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9">
               <div className="flex items-start gap-3"><span className="pt-0.5 font-serif text-xs text-primary/70">0{i + 1}</span><Icon className="size-5 shrink-0 text-primary" aria-hidden="true" /><h3 className="min-w-0 break-words font-serif text-lg leading-snug text-primary sm:text-xl">{f.sections[i]}</h3></div>
               <p className={`mt-5 max-w-3xl whitespace-pre-line break-words text-foreground ${i === 0 ? "font-serif text-[1.0625rem] leading-[2.1] sm:text-xl sm:leading-[2.05]" : "text-sm leading-8 sm:text-base"}`}>{text}</p>
             </article>;
           })}
-            <article className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "見落としやすい内面" : "An inner blind spot"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data.caution}</p></article>
+            {!experienceOnly && <article className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "見落としやすい内面" : "An inner blind spot"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data.caution}</p></article>}
             <section aria-label={torisetsuTranslations[language].manual} className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{torisetsuTranslations[language].manualTitle}</h3><div className="mt-4 space-y-5">{[data.manualCore, data.manualDecision, data.manualTiming].map((body, i) => <article key={i}><h4 className="font-serif text-lg text-primary">{t.labels[i + 3]}</h4><p className="mt-2 text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
-            <section aria-label="深層ガイド" className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "占術別 深層ガイド" : "Deep guide by art"}</h3><div className="mt-4 space-y-6">{([
+            {!experienceOnly && <section aria-label="深層ガイド" className="border-t border-primary/25 py-7"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "占術別 深層ガイド" : "Deep guide by art"}</h3><div className="mt-4 space-y-6">{([
               ["精密数秘術｜繰り返す試練と突破の才能", data.numerologyTrial],
               ["西洋占星術｜建前と本音・心の回復法", data.astroRecovery],
               ["四柱推命｜攻め時と空回りの罠", data.pillarsTiming],
               ["動物占い｜決断の癖とやる気スイッチ", data.animalSwitch],
               ["バースカラー｜日常での取り入れ方", activePlan === "free" ? "" : data.colorPractice],
               [`地球暦｜今のフェーズ${data.helio ? `「${data.helio.phase}」` : ""}`, data.helioGuide],
-            ] as const).filter(([, body]) => body).map(([title, body]) => <article key={title}><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
+            ] as const).filter(([, body]) => body).map(([title, body]) => <article key={title}><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{body}</p></article>)}</div></section>}
         </>}
         </details>}
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>

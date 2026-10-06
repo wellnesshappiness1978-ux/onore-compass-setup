@@ -506,29 +506,17 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
   useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
-  const labels: Record<Language, [string, string, string, string, string, string, string]> = {
-    ja: ["ホーム", "あなたの特性", "今日の占い", "相談", "アート", "ビジネス", "設定"],
-    en: ["Home", "Your traits", "Today", "Consult", "Art", "Business", "Settings"],
-    "zh-CN": ["首页", "你的特质", "今日运势", "咨询", "艺术", "商务", "设置"],
-    "zh-TW": ["首頁", "你的特質", "今日運勢", "諮詢", "藝術", "商務", "設定"],
-    ko: ["홈", "나의 특성", "오늘의 운세", "상담", "아트", "비즈니스", "설정"],
-    es: ["Inicio", "Tus rasgos", "Hoy", "Consulta", "Arte", "Negocios", "Ajustes"],
-    fr: ["Accueil", "Vos traits", "Aujourd’hui", "Conseil", "Art", "Entreprise", "Réglages"],
-  };
-  const mobileLabels: Record<Language, [string, string, string, string, string, string, string]> = {
-    ja: ["ホーム", "特性", "今日", "相談", "アート", "仕事", "設定"], en: ["Home", "Traits", "Today", "Talk", "Art", "Work", "Set"],
-    "zh-CN": ["首页", "特质", "今日", "咨询", "艺术", "商务", "设置"], "zh-TW": ["首頁", "特質", "今日", "諮詢", "藝術", "商務", "設定"],
-    ko: ["홈", "특성", "오늘", "상담", "아트", "업무", "설정"], es: ["Inicio", "Rasgos", "Hoy", "Consulta", "Arte", "Trabajo", "Ajustes"], fr: ["Accueil", "Traits", "Jour", "Conseil", "Art", "Pro", "Réglages"],
-  };
-  const full = labels[language], short = mobileLabels[language];
-  const navigation: { id: Tab; label: string; mobileLabel: string; icon: typeof Home }[] = [
-    { id: "home", label: full[0], mobileLabel: short[0], icon: Home },
-    { id: "traits", label: full[1], mobileLabel: short[1], icon: Compass },
-    { id: "today", label: full[2], mobileLabel: short[2], icon: CalendarDays },
-    { id: "consult", label: full[3], mobileLabel: short[3], icon: WandSparkles },
-    { id: "art", label: full[4], mobileLabel: short[4], icon: Orbit },
-    { id: "business", label: full[5], mobileLabel: short[5], icon: Network },
-    { id: "settings", label: full[6], mobileLabel: short[6], icon: Settings2 },
+  
+  
+  
+    const navigation: { id: Tab; label: string; icon: typeof Home }[] = [
+    { id: "home", label: t.home, icon: Home },
+    { id: "traits", label: t.traits, icon: Compass },
+    { id: "today", label: t.today, icon: Clock3 },
+    { id: "consult", label: t.consult, icon: WandSparkles },
+    { id: "art", label: t.art, icon: Palette },
+    { id: "business", label: t.business, icon: Building2 },
+    { id: "settings", label: t.settings, icon: Settings2 },
   ];
 
 
