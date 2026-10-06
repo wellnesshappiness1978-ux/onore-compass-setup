@@ -3,9 +3,10 @@ import { Environment, Lightformer, Line } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { ReturnTypeNatal } from "@/lib/natal-sky-types";
+import { GOLDEN_ANGLE, seededUnit, spiralPoint } from "@/lib/art-geometry";
 
 export type Capture = () => Promise<{ blob: Blob; width: number; height: number }>;
-type Props = { sky: ReturnTypeNatal; main: string; sub: string; element: string; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
+type Props = { sky: ReturnTypeNatal; colors: string[]; element: string; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
 
 function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
   const { gl, scene, camera } = useThree();
@@ -49,24 +50,32 @@ function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
   return null;
 }
 
-function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "onCapture">) {
+function Mandala({ sky, colors, element, progress, reduced }: Omit<Props, "onCapture">) {
   const aura = useRef<THREE.Points>(null);
+  const mandala = useRef<THREE.Group>(null);
+  const main = colors[0] ?? "#D4AF37";
+  const sub = colors[1] ?? "#F3E5AB";
+  const seed = useMemo(() => sky.bodies.reduce((sum, body) => sum + Math.round(body.longitude * 10), 0), [sky]);
   const particles = useMemo(() => {
-    const pts = new Float32Array(1440 * 3);
-    for (let i = 0; i < 1440; i++) {
-      const theta = i * 2.39996;
-      const radius = 1.55 + (i % 127) / 127 * 3.7;
-      pts[i * 3] = Math.cos(theta) * radius;
-      pts[i * 3 + 1] = Math.sin(theta) * radius;
-      pts[i * 3 + 2] = ((i * 17) % 43) / 43 * 2 - 1;
+    const count = 1440;
+    const pts = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const [x, y] = spiralPoint(i, count, 5.35);
+      pts[i * 3] = x;
+      pts[i * 3 + 1] = y;
+      pts[i * 3 + 2] = (seededUnit(seed, i) - .5) * 1.8;
     }
     return pts;
-  }, []);
+  }, [seed]);
   useFrame((_, raw) => {
     if (reduced) return;
     const dt = Math.min(raw, .05);
     // Keep calculated planet directions fixed; only decorative particles move.
     if (aura.current) aura.current.rotation.z -= dt * .025;
+    if (mandala.current) {
+      mandala.current.rotation.z += dt * .006;
+      mandala.current.rotation.x = Math.sin(performance.now() * .00018) * .035;
+    }
   });
   const ease = (t: number) => { const x = Math.min(1, Math.max(0, t)); return x * x * (3 - 2 * x); };
   const ring = ease((progress - 1.8) / 2.6);
@@ -79,10 +88,14 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
     <directionalLight position={[3, 5, 8]} intensity={2.4} color={gold} />
     <pointLight position={[-4, -2, 4]} intensity={2.2} color={sub} />
     <Environment><Lightformer intensity={2} position={[0, 5, 5]} scale={[10, 10, 1]} /><Lightformer intensity={1} color={main} position={[-5, 1, 1]} rotation-y={Math.PI / 2} scale={[10, 1, 1]} /></Environment>
-    <group>
+    <group ref={mandala}>
       <points ref={aura} scale={.08 + ease(progress / 2.2) * .92}>
         <bufferGeometry><bufferAttribute attach="attributes-position" args={[particles, 3]} /></bufferGeometry>
         <pointsMaterial color={main} size={.02} transparent opacity={.85} sizeAttenuation depthWrite={false} />
+      </points>
+      <points scale={.82 + flower * .18} rotation-z={Math.PI / 7}>
+        <bufferGeometry><bufferAttribute attach="attributes-position" args={[particles, 3]} /></bufferGeometry>
+        <pointsMaterial color={sub} size={.009} transparent opacity={.42} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
       </points>
       {Array.from({ length: 5 }, (_, i) => <mesh key={`element-${i}`} scale={ring} rotation={[.15 * i, .12 * i, i * .19]}>
         <torusGeometry args={[2.7 + i * .32, .008 + (i === 0 ? .014 : 0), 6, 128]} />
@@ -97,8 +110,8 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
         {i % 3 === 0 && <mesh position={[0, 4.29, -.12]} rotation-z={Math.PI / 4}><planeGeometry args={[.065, .065]} /><meshBasicMaterial color={gold} transparent opacity={.88} side={THREE.DoubleSide} /></mesh>}
       </group>)}
       {Array.from({ length: 24 }, (_, i) => <group key={`petal-${i}`} rotation-z={i * Math.PI / 12} scale={.1 + flower * .9}>
-        <mesh position={[0, 2.65, -.17]} scale={[.5, 1.15, 1]}><torusGeometry args={[.48, .009, 5, 64]} /><meshBasicMaterial color={i % 2 ? main : gold} transparent opacity={.52} /></mesh>
-        <mesh position={[0, 3.12, -.15]} rotation-z={Math.PI / 4}><planeGeometry args={[.095, .095]} /><meshBasicMaterial color={sub} transparent opacity={.7} side={THREE.DoubleSide} /></mesh>
+        <mesh position={[0, 2.65, -.17]} scale={[.5, 1.15, 1]}><torusGeometry args={[.48, .009, 5, 64]} /><meshBasicMaterial color={colors[i % colors.length] ?? main} transparent opacity={.58} blending={THREE.AdditiveBlending} /></mesh>
+        <mesh position={[0, 3.12, -.15]} rotation-z={Math.PI / 4}><octahedronGeometry args={[.075]} /><meshBasicMaterial color={colors[(i + 1) % colors.length] ?? sub} transparent opacity={.82} /></mesh>
       </group>)}
       {Array.from({ length: 12 }, (_, i) => <group key={`inner-${i}`} rotation-z={i * Math.PI / 6} scale={.1 + flower * .9}>
         <mesh position={[0, 1.55, -.16]} scale={[.38, 1, 1]}><torusGeometry args={[.56, .012, 5, 64]} /><meshBasicMaterial color={gold} transparent opacity={.7} /></mesh>
@@ -118,7 +131,9 @@ function Mandala({ sky, main, sub, element, progress, reduced }: Omit<Props, "on
         <torusGeometry args={[3.7 + i * .12, .014, 5, 8]} />
         <meshBasicMaterial color={i === 1 ? main : gold} transparent opacity={.7} />
       </mesh>)}
+      {Array.from({ length: 89 }, (_, i) => { const angle = i * GOLDEN_ANGLE; const radius = .16 * Math.sqrt(i) * flower; return <mesh key={`golden-${i}`} position={[Math.cos(angle) * radius, Math.sin(angle) * radius, .08 + i * .001]} scale={.15 + flower * .85}><sphereGeometry args={[.018 + (i % 8 === 0 ? .015 : 0), 8, 8]} /><meshBasicMaterial color={colors[i % colors.length] ?? gold} transparent opacity={.35 + (i % 5) * .1} blending={THREE.AdditiveBlending} /></mesh>; })}
       <mesh scale={.55 + flower * .3}><icosahedronGeometry args={[.86, 3]} /><meshPhysicalMaterial color={main} metalness={.6} roughness={.15} emissive={main} emissiveIntensity={.3} clearcoat={1} /></mesh>
+      <pointLight color={main} intensity={5 * flower} distance={8} />
       <mesh scale={1.1 + flower * .25}><torusGeometry args={[.85, .025, 8, 96]} /><meshBasicMaterial color={gold} /></mesh>
       <group scale={planet}>
         {sky.bodies.map((body) => <group key={`chart-${body.name}`}>
