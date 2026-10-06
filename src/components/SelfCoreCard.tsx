@@ -181,7 +181,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
               [`地球暦｜今のフェーズ${data.helio ? `「${data.helio.phase}」` : ""}`, data.helioGuide],
             ] as const).filter(([, body]) => body).map(([title, body]) => <article key={title}><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{body}</p></article>)}</div></section>
         </>}
-        {!experienceOnly && </details>}
+        </details>}
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>
       <GrandSummaryCard profile={profile} language={language} plan={activePlan} embedded />
