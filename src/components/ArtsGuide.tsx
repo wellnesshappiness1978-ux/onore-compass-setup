@@ -64,7 +64,7 @@ function IntroStars() {
 export function ArtsGuide({ language = "ja" }: { language?: Language }) {
   const [selected, setSelected] = useState<(typeof methods)[number] | null>(null);
   const words = language === "ja" ? localized.ja : localized.en;
-  const shownMethods = methods.map((method) => method[0].startsWith("地球暦") ? [method[0], method[1], words.helio] : method);
+  const shownMethods: string[][] = methods.map((method) => method[0]?.startsWith("地球暦") ? [method[0] ?? "", method[1] ?? "", words.helio] : [...method]);
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-primary/30 bg-card/60 backdrop-blur">
       <div className="relative px-6 py-14 text-center">

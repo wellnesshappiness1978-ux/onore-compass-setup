@@ -64,7 +64,7 @@ export function nineStarProfile(dateText: string, timeText = "", timeUnknown = t
     ...monthlyBoundaries(year - 1).map(([m, lon]) => ({ month: m, date: solarTermStart(m === 1 ? year : year - 1, lon, m) })),
     ...monthlyBoundaries(year).map(([m, lon]) => ({ month: m, date: solarTermStart(m === 1 ? year + 1 : year, lon, m) })),
     ...monthlyBoundaries(year + 1).map(([m, lon]) => ({ month: m, date: solarTermStart(m === 1 ? year + 2 : year + 1, lon, m) })),
-  ].filter((entry): entry is { month: number; date: Date } => Boolean(entry.date)).sort((a, b) => a.date.getTime() - b.date.getTime());
+  ].filter((entry) => entry.date !== null).map((entry) => ({ month: Number(entry.month), date: entry.date as Date })).sort((a, b) => a.date.getTime() - b.date.getTime());
   let boundary = starts[0];
   if (!boundary) return null;
   for (const candidate of starts) if (candidate.date <= instant) boundary = candidate;
@@ -74,7 +74,7 @@ export function nineStarProfile(dateText: string, timeText = "", timeUnknown = t
   const getsumei = wrapNine(februaryCenter - (solarMonth - 1));
   const palaces = palaceLayout.map(([direction, palace]) => {
     const star = wrapNine(getsumei + palace - 5);
-    return { direction, palace, star, starName: NINE_STAR_NAMES[star] };
+    return { direction, palace, star, starName: NINE_STAR_NAMES[star] ?? "" };
   });
   const located = palaces.find((palace) => palace.star === honmei);
   const mirror: Record<number, number> = { 1: 9, 2: 6, 3: 4, 4: 3, 6: 2, 7: 8, 8: 7, 9: 1 };
@@ -83,7 +83,7 @@ export function nineStarProfile(dateText: string, timeText = "", timeUnknown = t
   const nearest = starts.reduce((best, item) => Math.abs(item.date.getTime() - instant.getTime()) < Math.abs(best.date.getTime() - instant.getTime()) ? item : best, boundary);
   return {
     solarYear, solarMonth, honmei, getsumei, keisha,
-    honmeiName: NINE_STAR_NAMES[honmei], getsumeiName: NINE_STAR_NAMES[getsumei], keishaName: NINE_STAR_NAMES[keisha],
+    honmeiName: NINE_STAR_NAMES[honmei] ?? "", getsumeiName: NINE_STAR_NAMES[getsumei] ?? "", keishaName: NINE_STAR_NAMES[keisha] ?? "",
     nearBoundary: Boolean(nearest && Math.abs(nearest.date.getTime() - instant.getTime()) < 86_400_000), palaces,
   };
 }
