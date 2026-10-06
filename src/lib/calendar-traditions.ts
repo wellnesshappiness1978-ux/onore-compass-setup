@@ -66,6 +66,7 @@ export function nineStarProfile(dateText: string, timeText = "", timeUnknown = t
     ...monthlyBoundaries(year + 1).map(([m, lon]) => ({ month: m, date: solarTermStart(m === 1 ? year + 2 : year + 1, lon, m) })),
   ].filter((entry): entry is { month: number; date: Date } => Boolean(entry.date)).sort((a, b) => a.date.getTime() - b.date.getTime());
   let boundary = starts[0];
+  if (!boundary) return null;
   for (const candidate of starts) if (candidate.date <= instant) boundary = candidate;
   if (!boundary) return null;
   const solarMonth = boundary.month === 1 ? 12 : boundary.month - 1;
@@ -79,7 +80,7 @@ export function nineStarProfile(dateText: string, timeText = "", timeUnknown = t
   const mirror: Record<number, number> = { 1: 9, 2: 6, 3: 4, 4: 3, 6: 2, 7: 8, 8: 7, 9: 1 };
   const centerFive = gender === "female" ? 6 : 7;
   const keisha = located?.palace === 5 ? (honmei === 5 ? centerFive : mirror[honmei] ?? 5) : located?.palace ?? 5;
-  const nearest = starts.reduce((best, item) => Math.abs(item.date.getTime() - instant.getTime()) < Math.abs(best.date.getTime() - instant.getTime()) ? item : best, starts[0]);
+  const nearest = starts.reduce((best, item) => Math.abs(item.date.getTime() - instant.getTime()) < Math.abs(best.date.getTime() - instant.getTime()) ? item : best, boundary);
   return {
     solarYear, solarMonth, honmei, getsumei, keisha,
     honmeiName: NINE_STAR_NAMES[honmei], getsumeiName: NINE_STAR_NAMES[getsumei], keishaName: NINE_STAR_NAMES[keisha],

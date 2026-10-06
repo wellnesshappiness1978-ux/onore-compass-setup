@@ -127,7 +127,6 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
   const [selectedDate, setSelectedDate] = useState(() => new Date(now.getFullYear(), now.getMonth(), now.getDate()));
   const year = selectedDate.getFullYear();
   const total = daysInYear(year);
-  const todayIdx = dayOfYear(now);
   const [angle, setAngle] = useState(0);
   const [heading, setHeading] = useState<Direction>("N");
   const start = useRef<{ pointer: number; angle: number } | null>(null);
@@ -209,7 +208,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
           setAngle(start.current.angle);
           setHeading(directionAt(p));
         }}
-        onPointerUp={() => { if (offset) choose(date); start.current = null; }}
+        onPointerUp={() => { if (offset) choose(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + offset)); start.current = null; }}
         onPointerCancel={() => { start.current = null; }}
       >
         <div className="compass-halo absolute inset-[3%] rounded-full" />

@@ -16,6 +16,7 @@ import { addTeamMember, deleteTeamMember, listTeamMembers } from "@/lib/team-mem
 import { analyzeCandidate, draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
 import ShareCardButton from "@/components/ShareCardButton";
 import GroupSimulator from "./GroupSimulator";
+import { AgolmenLoading } from "@/components/AgolmenSpiral";
 
 type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
 const LOCAL = "onore-team";
@@ -79,6 +80,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
       </div>
 
       <div className="mt-4">
+        {busy && <AgolmenLoading compact label={t.generating} />}
         {!unlocked && feature !== "roster" ? (
           <div className={`${card} text-center`}>
             <Lock className="mx-auto size-6 text-primary" />
