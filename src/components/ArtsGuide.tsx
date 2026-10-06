@@ -86,7 +86,7 @@ export function ArtsGuide({ language = "ja" }: { language?: Language }) {
             <span className="text-primary/80" style={{ fontSize: 9 }}>✧</span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-primary/50" />
           </div>
-          <div className="arts-rise border-t border-primary/25 pt-8 text-left" style={{ animationDelay: "0.75s" }}><h4 className="text-center font-serif text-3xl text-primary">アゴルメンの由来</h4><p className="mt-6">「アゴルメン（Agolmen）」という名には、カタツムリやオウムガイが背負う殻への敬意が込められています。殻に見られる黄金螺旋は、自然が長い時間をかけて育んだ美しいかたち。その中心は、外の騒がしさに流されず自分の本質へ戻る場所であり、殻そのものは大切な自分軸を護る家の象徴です。</p><p className="mt-5">中心から外へ途切れず広がる螺旋には、経験を重ねながら可能性をひらき、何度でも新しい方向へ進む姿を重ねています。羅針盤は答えを押しつけるものではなく、自分の内側にある方角を確かめるための道具。アゴルメンの羅針盤は、複数の伝統的な見立てと現代的な整理を重ね、あなたが自分らしい選択へ戻るための静かな案内役でありたいと願っています。</p></div><p className="arts-rise text-lg text-primary sm:text-xl" style={{ animationDelay: "0.85s" }}>15以上の分析視点を重ね、あなた自身の羅針盤を見つけるための参考情報を届けます。</p>
+          <div className="arts-rise border-t border-primary/25 pt-8 text-left" style={{ animationDelay: "0.75s" }}><h4 className="text-center font-serif text-3xl text-primary">アゴルメンの由来</h4><p className="mt-6">「アゴルメン」とは、宇宙の絶対調和とされる「カタツムリやオウムガイの殻（対数螺旋／フィボナッチスパイラル）」に由来します。自然界が描く「黄金比（1:1.618）」は、外界の乱れから自分の強固な軸を護る聖なる家であり、中心から外側へ無限に豊かさの波動を広げる発展の象徴です。</p><p className="mt-5">殻の中心は、周囲の声に揺らいだときも自分の本質へ戻る場所。そこから途切れず広がる螺旋は、経験を重ねるほど可能性が開き、新しい方向へ進み続ける生命の姿を映します。羅針盤は答えを押しつけるものではなく、自分の内側にある方角を確かめるための道具です。複数の伝統的な見立てと現代的な整理を重ね、自分らしい選択へ戻るための静かな案内役でありたいという願いを、この名に込めています。</p></div><p className="arts-rise text-lg text-primary sm:text-xl" style={{ animationDelay: "0.85s" }}>15以上の分析視点を重ね、あなた自身の羅針盤を見つけるための参考情報を届けます。</p>
         </div>
       </div>
       <div className="space-y-6 border-t border-primary/20 px-5 py-6">
