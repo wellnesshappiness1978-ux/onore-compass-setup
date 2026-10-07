@@ -2,8 +2,10 @@ import { useEffect, useRef, useCallback } from "react";
 import type { ReturnTypeNatal } from "@/lib/natal-sky-types";
 import type { Capture } from "./MandalaScene";
 import type { NineStarProfile } from "@/lib/calendar-traditions";
+import type { Language } from "@/lib/translations";
+import { artSpecialistCopy } from "@/lib/art-specialist-copy";
 
-type Props = { sky: ReturnTypeNatal; nine: NineStarProfile; colors: string[]; onCapture: (capture: Capture | null) => void };
+type Props = { sky: ReturnTypeNatal; nine: NineStarProfile; colors: string[]; language: Language; onCapture: (capture: Capture | null) => void };
 
 function paintPlanet(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string, gold: string, seed: number) {
   ctx.save();
@@ -95,7 +97,7 @@ function paint(canvas: HTMLCanvasElement, sky: ReturnTypeNatal, nine: NineStarPr
   ctx.fillText(sky.approximate ? "JST NOON REFERENCE" : "JST BIRTH TIME", cx, h * .89);
 }
 
-export default function CosmicAlchemyArtwork({ sky, nine, colors, onCapture }: Props) {
+export default function CosmicAlchemyArtwork({ sky, nine, colors, language, onCapture }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
   const capture = useCallback(async () => {
     const out = document.createElement("canvas"); out.width = 2160; out.height = 3840;
@@ -104,5 +106,5 @@ export default function CosmicAlchemyArtwork({ sky, nine, colors, onCapture }: P
     return { blob, width: out.width, height: out.height };
   }, [sky, nine, colors]);
   useEffect(() => { if (ref.current) paint(ref.current, sky, nine, colors); onCapture(capture); return () => onCapture(null); }, [sky, nine, colors, capture, onCapture]);
-  return <canvas ref={ref} width={900} height={1600} role="img" aria-label="出生宇宙創生図 · 出生10天体と九星計算を用いたパーソナルアート" className="block h-full w-full object-cover" />;
+  return <canvas ref={ref} width={900} height={1600} role="img" aria-label={artSpecialistCopy[language].cosmicDescription} className="block h-full w-full object-cover" />;
 }

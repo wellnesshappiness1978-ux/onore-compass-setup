@@ -1,20 +1,14 @@
 import type { Language } from "@/lib/translations";
 
 // Traditional fixed Lo Shu arrangement. This is NOT a computed natal nine-star chart.
-export const palaceGrid = [
-  { direction: "巽", star: "四緑木星", number: 4 }, { direction: "離", star: "九紫火星", number: 9 }, { direction: "坤", star: "二黒土星", number: 2 },
-  { direction: "震", star: "三碧木星", number: 3 }, { direction: "中宮", star: "五黄土星", number: 5 }, { direction: "兌", star: "七赤金星", number: 7 },
-  { direction: "艮", star: "八白土星", number: 8 }, { direction: "坎", star: "一白水星", number: 1 }, { direction: "乾", star: "六白金星", number: 6 },
-];
+export const palaceGrid = [4, 9, 2, 3, 5, 7, 8, 1, 6] as const;
 
 export const zodiacGlyphs = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"];
-export const zodiacNames = ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", "天秤座", "蠍座", "射手座", "山羊座", "水瓶座", "魚座"];
 const zodiacStarts = [120, 219, 321, 420, 521, 622, 723, 823, 923, 1024, 1123, 1222];
 const zodiacFor = (month: number, day: number) => {
   const value = month * 100 + day;
   return value < 120 ? 9 : zodiacStarts.reduce((idx, start, i) => value >= start ? (i + 9) % 12 : idx, 9);
 };
-export const animalNames = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
 
 export function getArtSymbols(date: string) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
@@ -73,20 +67,20 @@ export function NineStarsArtwork({ main, sub, bloodType, birthDate, language }: 
       <g transform="translate(220 220)">
         <rect width="360" height="360" fill="var(--art-void)" fillOpacity=".76" stroke="url(#veins)" strokeWidth="2"/>
         <path d="M120 0V360 M240 0V360 M0 120H360 M0 240H360" stroke="url(#veins)" opacity=".8"/>
-        {palaceGrid.map((cell, i) => {
+        {palaceGrid.map((number, i) => {
           const x = 60 + (i % 3) * 120;
           const y = 60 + Math.floor(i / 3) * 120;
-          return <g key={cell.number}>
+          return <g key={number}>
             <circle cx={x} cy={y} r={i === 4 ? 38 : 31} fill="none" stroke={i === 4 ? main : sub} strokeOpacity={i === 4 ? .8 : .35}/>
             <circle cx={x} cy={y} r="26" fill={i === 4 ? main : sub} fillOpacity=".07"/>
-            <text x={x} y={y + 10} textAnchor="middle" fill={i === 4 ? main : "var(--gold-glow)"} fontSize={i === 4 ? 34 : 30} fontFamily="serif">{cell.number}</text>
+            <text x={x} y={y + 10} textAnchor="middle" fill={i === 4 ? main : "var(--gold-glow)"} fontSize={i === 4 ? 34 : 30} fontFamily="serif">{number}</text>
             <circle cx={x - 39} cy={y - 39} r="1.5" fill="var(--gold-glow)"/>
           </g>;
         })}
       </g>
       <g fill="var(--gold-glow)" fontFamily="serif" textAnchor="middle">
         <text x="400" y="167" fontSize="24" opacity=".9">{symbols ? zodiacGlyphs[symbols.zodiac] : "✦"}</text>
-        <text x="400" y="656" fontSize="20" opacity=".9">{symbols ? animalNames[symbols.animal] : "✧"}</text>
+        <text x="400" y="656" fontSize="20" opacity=".9">{symbols ? symbols.animal + 1 : "✧"}</text>
         <text x="146" y="405" fontSize="15" opacity=".7">{bloodType || "✧"}</text>
         <text x="655" y="405" fontSize="15" opacity=".7">{birthDate ? String(lifeNumber).padStart(2, "0") : "✧"}</text>
         <text x="400" y="72" fontSize="11" letterSpacing="4" opacity=".7">{isJapanese ? "AGOLMEN · 天球図鑑" : "AGOLMEN · CELESTIAL ATLAS"}</text>
