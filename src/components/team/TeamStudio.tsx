@@ -24,7 +24,7 @@ const card = "rounded-2xl border border-primary/15 bg-background/40 p-4";
 const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "simulator", "draft", "catalog", "calendar", "balance", "oneOnOne", "recruit"];
 
 const summary = (m: TeamMember, t: TeamCopy) => ({
-  id: m.id, name: m.name, role: m.role, skills: m.skills, teamRole: t.roles[roleOf(m)],
+  id: m.id, name: m.name, role: m.role, skills: m.skills,
   relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", birthDate: m.birthDate,
   birthTime: m.birthTimeUnknown === false ? m.birthTime ?? "" : "", birthPlace: [m.birthPlace, m.birthCity].filter(Boolean).join(" "),
   gender: m.gender, bloodType: m.bloodType, teamRole: t.roles[roleOf(m)],
