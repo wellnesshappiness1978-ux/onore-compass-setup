@@ -379,7 +379,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
           </Card>
         </div>}
       </div>
-      <HelioCalendar date={date} profile={profile} plan={plan} onUpgrade={onUpgrade} />
+      <HelioCalendar date={date} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} />
       {rank(plan) < rank("b2b") && <section className="mx-auto mt-7 max-w-4xl border-t border-primary/25 pt-6 text-left" aria-label={language === "ja" ? "未開放の占い" : "Locked guidance"}>
         <h3 className="mb-4 font-serif text-lg text-primary">{language === "ja" ? "未開放の占い" : "More guidance"}</h3>
         <div className="grid gap-4 md:grid-cols-2">
