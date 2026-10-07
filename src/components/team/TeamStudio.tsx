@@ -60,8 +60,10 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     else persistLocal(members.filter((m) => m.id !== id));
   };
   const editMember = async (m: TeamMember) => {
-    if (!localMode) setMembers(members.map((item) => item.id === m.id ? await update({ data: m as never }) : item));
-    else persistLocal(members.map((item) => item.id === m.id ? m : item));
+    if (!localMode) {
+      const saved = await update({ data: m as never });
+      setMembers(members.map((item) => item.id === m.id ? saved : item));
+    } else persistLocal(members.map((item) => item.id === m.id ? m : item));
     return true;
   };
   const feature = tabFeatures[tab]!;
@@ -176,8 +178,8 @@ function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdi
         <label className="flex min-h-11 items-center gap-2 text-xs"><input type="checkbox" checked={form.birthTimeUnknown} onChange={(e) => setForm({ ...form, birthTimeUnknown: e.target.checked, birthTime: e.target.checked ? "" : form.birthTime })} />{x.timeUnknown}</label>
         <Input aria-label={x.place} placeholder={x.place} value={form.birthPlace} maxLength={80} onChange={(e) => setForm({ ...form, birthPlace: e.target.value })} />
         <Input aria-label={x.city} placeholder={x.city} value={form.birthCity} maxLength={80} onChange={(e) => setForm({ ...form, birthCity: e.target.value })} />
-        <select aria-label={x.gender} value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm">{["undisclosed", "female", "male", "other"].map((value, i) => <option key={value} value={value}>{x.genders[i]}</option>)}</select>
-        <select aria-label={x.blood} value={form.bloodType} onChange={(e) => setForm({ ...form, bloodType: e.target.value })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="">{x.blood}</option>{["A", "B", "O", "AB"].map(value => <option key={value} value={value}>{value}</option>)}</select>
+        <select aria-label={x.gender} value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as typeof form.gender })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm">{["undisclosed", "female", "male", "other"].map((value, i) => <option key={value} value={value}>{x.genders[i]}</option>)}</select>
+        <select aria-label={x.blood} value={form.bloodType} onChange={(e) => setForm({ ...form, bloodType: e.target.value as typeof form.bloodType })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="">{x.blood}</option>{["A", "B", "O", "AB"].map(value => <option key={value} value={value}>{value}</option>)}</select>
         <select aria-label={x.relationType} value={form.relationshipType} onChange={(e) => setForm({ ...form, relationshipType: e.target.value })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm">{["", "partner", "family", "friend", "business", "employee", "other"].map((value, i) => <option key={value} value={value}>{x.types[i]}</option>)}</select>
         <Input aria-label={x.relationship} placeholder={x.relationship} value={form.relationship} maxLength={60} onChange={(e) => setForm({ ...form, relationship: e.target.value })} />
         <Input aria-label={t.jobRole} placeholder={t.jobRole} value={form.role} maxLength={60} onChange={(e) => setForm({ ...form, role: e.target.value })} />
