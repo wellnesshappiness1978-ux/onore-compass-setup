@@ -1,4 +1,4 @@
-export const legalContent = {
+const ja = {
   disclaimer: { title: "免責事項", description: "アゴルメンの羅針盤の診断・天体・カラー・日取りに関する利用上の注意。", sections: [
     ["サービスの位置づけ", "本アプリは自己理解と意思決定の整理を支援するエンターテインメント・自己啓発ツールです。占術の解釈は科学的な性格診断ではなく、将来の出来事、健康、投資成果、人間関係の結果を保証しません。"],
     ["専門的判断", "医療・法律・投資・採用など重要な判断は、客観的な資料と適切な専門家への相談を優先してください。診断だけで治療を変更したり、投資や契約を決定したりしないでください。"],
@@ -22,4 +22,9 @@ export const legalContent = {
     ["削除・訂正と運営者情報", "プロフィールはアプリ内で修正できます。情報削除・開示の希望はお問い合わせの『個人情報』から申請してください。正式な運営者連絡先、保存期間、委託先・国際移転の詳細は確認待ちで、公開販売前に確定します。"],
   ] },
 } as const;
-export type LegalKey = keyof typeof legalContent;
+
+export type LegalKey = keyof typeof ja;
+type LegalEntry = { title: string; description: string; sections: readonly (readonly [string, string])[] };
+export type LocalizedLegalContent = Record<LegalKey, LegalEntry>;
+export const legalContent: LocalizedLegalContent = ja;
+export const legalContentByLanguage = { ja, en: ja, "zh-CN": ja, "zh-TW": ja, ko: ja, es: ja, fr: ja } as const;
