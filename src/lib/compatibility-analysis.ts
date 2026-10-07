@@ -57,6 +57,6 @@ export function analyzeCompatibility(owner: Owner, input: PartnerInput, language
     `Moon / ASC: ${sky || w.notAvailable} · Animal reference: ${a.animal.referenceAnimals?.surface ?? w.notAvailable} × ${b.animal.referenceAnimals?.surface ?? w.notAvailable}`,
   ];
   const dynamic = w.rhythm[rel];
-  const sentences: [string, string, string] = [`${dynamic}。 ${w.points}`, w.oracle, w.advice];
+  const sentences: [string, string, string] = [`${dynamic}${language === "ja" || language.startsWith("zh") ? "。" : "."} ${w.points}`, w.oracle, w.advice];
   return { score, titles: w.titles, sentences, evidence, colors: [colorsA?.main.code, colorsB?.main.code], note: `${w.missing} ${w.reference}`, dynamic, elementPair: `${dayElement(owner.birthDate)} × ${dayElement(partner.birthDate)}` };
 }

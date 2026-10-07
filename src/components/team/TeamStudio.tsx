@@ -25,6 +25,9 @@ const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "simulator", "dra
 
 const summary = (m: TeamMember, t: TeamCopy) => ({
   id: m.id, name: m.name, role: m.role, skills: m.skills, teamRole: t.roles[roleOf(m)],
+  relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", birthDate: m.birthDate,
+  birthTime: m.birthTimeUnknown === false ? m.birthTime ?? "" : "", birthPlace: [m.birthPlace, m.birthCity].filter(Boolean).join(" "),
+  gender: m.gender, bloodType: m.bloodType, teamRole: t.roles[roleOf(m)],
   element: dayElement(m.birthDate), lifePath: lifePath(m.birthDate), biorhythm: biorhythm(m.birthDate, todayIso()).total,
 });
 

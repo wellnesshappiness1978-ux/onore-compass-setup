@@ -1,11 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createOpenAI } from "@ai-sdk/openai";
-import { generateText, Output, streamText } from "ai";
+import { Output, streamText } from "ai";
 import { z } from "zod";
 
 const lang = z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]);
 const memberSummary = z.object({
   id: z.string().max(60), name: z.string().max(60), role: z.string().max(60), skills: z.array(z.string().max(30)).max(12),
+  relationship: z.string().max(60), relationshipType: z.string().max(30), birthDate: z.string().date(), birthTime: z.string().max(5), birthPlace: z.string().max(170), gender: z.string().max(20), bloodType: z.string().max(4),
   teamRole: z.string().max(30), element: z.string().max(10), lifePath: z.number().int(), biorhythm: z.number().int(),
 });
 
@@ -33,12 +34,13 @@ export const draftProjectTeam = createServerFn({ method: "POST" })
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("AI is unavailable");
     const fixed = data.fixedIds?.length ? `The user manually fixed this exact team; rank ONLY these ids and evaluate the combination: ${data.fixedIds.join(", ")}.` : `Select the best team (${data.headcount ? `exactly ${data.headcount} people` : "choose the optimal size"}) from the candidates and rank them best first.`;
-    const { output } = await generateText({
+    const result = streamText({
       model: provider(apiKey).responses("openai/gpt-6-astra"),
       output: Output.object({ schema: draftOut }),
       prompt: `${RULES}\n${outputLanguage(data.language)} Project goal: ${data.goal}\n${fixed}\nCandidates (JSON): ${JSON.stringify(data.members)}\nReturn ids exactly as given. Scores reflect fit for this goal considering role balance, element synergy and today's biorhythm. features = team combination character, evaluation = overall assessment, cautions = points to watch.`,
-      providerOptions: { openai: { store: false } },
+      providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", store: false, include: ["reasoning.encrypted_content"] } },
     });
+    const output = await result.output;
     const valid = new Set(data.members.map((m) => m.id));
     return { ...output, ranking: output.ranking.filter((r) => valid.has(r.id)) };
   });
@@ -50,13 +52,13 @@ export const generateOneOnOneGuide = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const apiKey = process.env["LOVABLE_API_KEY"];
     if (!apiKey) throw new Error("AI is unavailable");
-    const { output } = await generateText({
+    const result = streamText({
       model: provider(apiKey).responses("openai/gpt-6-astra"),
       output: Output.object({ schema: guideOut }),
-      prompt: `${RULES}\n${outputLanguage(data.language)} Write a short 1on1 management guide for a manager about this team member: ${JSON.stringify(data.member)}. praise = the kind of recognition most likely to motivate them (2-3 concrete phrasings). ngInstructions = instructions/approaches to avoid. lowMotivation = how to support them when motivation dips. Each 80-200 characters (or ~50 words), respectful, as gentle suggestions.`,
-      providerOptions: { openai: { store: false } },
+      prompt: `${RULES}\n${outputLanguage(data.language)} Use every available profile field but never infer a missing one. Write a short, personal 1on1 guide about this team member: ${JSON.stringify(data.member)}. praise = 2-3 concrete phrases. ngInstructions = approaches to avoid. lowMotivation = practical support when motivation dips. Keep each field concise and respectful.`,
+      providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", store: false, include: ["reasoning.encrypted_content"] } },
     });
-    return output;
+    return await result.output;
   });
 
 const recruitOut = z.object({
