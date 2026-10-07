@@ -48,7 +48,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
   }, [signedIn, plan, actualPlan, listMembers]);
   useEffect(() => { if (targetId !== "owner" && !members.some(m => m.id === targetId)) setTargetId("owner"); }, [members, targetId]);
   const target = members.find(m => m.id === targetId);
-  const targetProfile = target ? { ...profile, nameKanji: target.name, nameKana: target.nameKana ?? "", nameRomaji: "", birthDate: target.birthDate, birthTime: target.birthTime ?? "", birthTimeUnknown: target.birthTimeUnknown ?? true, birthPlace: target.birthPlace ?? "", birthCity: target.birthCity ?? "", bloodType: target.bloodType, siblingOrder: "", gender: target.gender as UserProfile["gender"] } : profile;
+  const targetProfile = target ? { ...profile, nameKanji: target.name, nameKana: target.nameKana ?? "", nameRomaji: "", birthDate: target.birthDate, birthTime: target.birthTime ?? "", birthTimeUnknown: target.birthTimeUnknown ?? true, birthPlace: target.birthPlace ?? "", birthCity: target.birthCity ?? "", bloodType: target.bloodType, siblingOrder: target.siblingOrder ?? "", gender: target.gender as UserProfile["gender"] } : profile;
   const targetLabel = target?.name ?? (language === "ja" ? "本人（登録オーナー）" : language === "zh-TW" ? "本人（帳戶擁有人）" : "You (owner)");
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
