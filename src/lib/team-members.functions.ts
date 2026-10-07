@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const memberInput = z.object({
+const memberBase = z.object({
   name: z.string().trim().min(1).max(60),
   nameKana: z.string().trim().max(60),
   birthDate: z.string().date().refine((value) => value >= "1900-01-01" && value <= new Date().toISOString().slice(0, 10)),
@@ -16,7 +16,9 @@ const memberInput = z.object({
   relationshipType: z.enum(["", "partner", "family", "friend", "business", "employee", "other"]),
   role: z.string().trim().max(60),
   skills: z.array(z.string().trim().min(1).max(30)).max(12),
-}).refine((value) => value.birthTimeUnknown || value.birthTime.length > 0, { path: ["birthTime"], message: "Birth time is required unless marked unknown" });
+});
+const knownTime = (value: z.infer<typeof memberBase>) => value.birthTimeUnknown || value.birthTime.length > 0;
+const memberInput = memberBase.refine(knownTime, { path: ["birthTime"], message: "Birth time is required unless marked unknown" });
 
 type Row = { id: string; name: string; name_kana: string; birth_date: string; birth_time: string | null; birth_time_unknown: boolean; birth_place: string; birth_city: string; gender: string; blood_type: string; relationship: string; relationship_type: string; role: string; skills: string[] };
 const columns = "id,name,name_kana,birth_date,birth_time,birth_time_unknown,birth_place,birth_city,gender,blood_type,relationship,relationship_type,role,skills";
@@ -46,7 +48,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
 
 export const updateTeamMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => memberInput.extend({ id: z.string().uuid() }).parse(input))
+  .inputValidator((input: unknown) => memberBase.extend({ id: z.string().uuid() }).refine(knownTime, { path: ["birthTime"], message: "Birth time is required unless marked unknown" }).parse(input))
   .handler(async ({ data, context }) => {
     const { id, ...member } = data;
     const { data: row, error } = await context.supabase.from("team_members").update({
