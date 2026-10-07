@@ -27,14 +27,23 @@ export function NineStarsArtwork({ main, sub, bloodType, birthDate, language }: 
   const symbols = getArtSymbols(birthDate);
   const lifeNumber = birthDate.replace(/\D/g, "").split("").reduce((sum, digit) => sum + Number(digit), 0);
   const motif = bloodType === "A" ? 3 : bloodType === "B" ? 5 : bloodType === "AB" ? 7 : 4;
-  const isJapanese = language === "ja";
+  const labels: Record<Language, { alt: string; atlas: string; reference: string }> = {
+    ja: { alt: "九星の伝統的な固定配置例を描いた装飾アート。出生時の配置ではありません", atlas: "AGOLMEN · 天球図鑑", reference: "九星固定配置 · 参考図" },
+    en: { alt: "Decorative traditional Nine Star reference grid, not a natal chart", atlas: "AGOLMEN · CELESTIAL ATLAS", reference: "NINE STAR REFERENCE · ILLUSTRATION" },
+    "zh-CN": { alt: "传统九星固定配置的装饰艺术，并非出生星盘", atlas: "AGOLMEN · 天球图鉴", reference: "九星固定配置 · 参考图" },
+    "zh-TW": { alt: "傳統九星固定配置的裝飾藝術，並非出生星盤", atlas: "AGOLMEN · 天球圖鑑", reference: "九星固定配置 · 參考圖" },
+    ko: { alt: "전통 구성의 고정 배치를 그린 장식 작품이며 출생 차트가 아닙니다", atlas: "AGOLMEN · 천구 도감", reference: "구성 고정 배치 · 참고 그림" },
+    es: { alt: "Arte decorativo con la disposición tradicional fija de las nueve estrellas; no es una carta natal", atlas: "AGOLMEN · ATLAS CELESTE", reference: "NUEVE ESTRELLAS · ILUSTRACIÓN" },
+    fr: { alt: "Œuvre décorative montrant la disposition traditionnelle fixe des neuf étoiles, et non un thème natal", atlas: "AGOLMEN · ATLAS CÉLESTE", reference: "NEUF ÉTOILES · ILLUSTRATION" },
+  };
+  const text = labels[language];
   const stars = Array.from({ length: 170 }, (_, i) => {
     const x = (i * 379 + (i * i * 13) % 103) % 800;
     const y = (i * 233 + (i * i * 17) % 127) % 800;
     return { x, y, size: i % 19 === 0 ? 1.8 : i % 4 === 0 ? 1.1 : .55 };
   });
   return (
-    <svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={isJapanese ? "九星の伝統的な固定配置例を描いた装飾アート。出生時の配置ではありません" : "Decorative traditional nine-star reference grid, not a natal chart"} className="block h-full w-full">
+    <svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={text.alt} className="block h-full w-full">
       <defs>
         <radialGradient id="sky"><stop stopColor="var(--art-midnight)"/><stop offset=".48" stopColor="var(--art-void)"/><stop offset="1" stopColor="var(--art-void)"/></radialGradient>
         <radialGradient id="auraA"><stop stopColor={main} stopOpacity=".9"/><stop offset="1" stopColor={main} stopOpacity="0"/></radialGradient>
@@ -83,8 +92,8 @@ export function NineStarsArtwork({ main, sub, bloodType, birthDate, language }: 
         <text x="400" y="656" fontSize="20" opacity=".9">{symbols ? symbols.animal + 1 : "✧"}</text>
         <text x="146" y="405" fontSize="15" opacity=".7">{bloodType || "✧"}</text>
         <text x="655" y="405" fontSize="15" opacity=".7">{birthDate ? String(lifeNumber).padStart(2, "0") : "✧"}</text>
-        <text x="400" y="72" fontSize="11" letterSpacing="4" opacity=".7">{isJapanese ? "AGOLMEN · 天球図鑑" : "AGOLMEN · CELESTIAL ATLAS"}</text>
-        <text x="400" y="746" fontSize="11" letterSpacing="2" opacity=".8">{isJapanese ? "九星固定配置 · 参考図" : "NINE STAR REFERENCE · ILLUSTRATION"}</text>
+        <text x="400" y="72" fontSize="11" letterSpacing="4" opacity=".7">{text.atlas}</text>
+        <text x="400" y="746" fontSize="11" letterSpacing="2" opacity=".8">{text.reference}</text>
       </g>
     </svg>
   );

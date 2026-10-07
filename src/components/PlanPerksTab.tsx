@@ -13,26 +13,19 @@ import type { Language } from "@/lib/translations";
 
 export type PerkTarget = "art" | "consult" | "team" | "plans";
 
-const ui = (language: Language) => {
-  const ja = language === "ja";
-  const zh = language === "zh-TW" || language === "zh-CN";
-  return {
-    title: ja ? "プラン特典" : zh ? "方案特權" : "Plan perks",
-    lead: ja ? "各プランの限定機能をここに集約しています。上位プランは下位プランの特典をすべて引き継ぎます。" : zh ? "此處匯集各方案的專屬功能。上位方案完整保留下位方案的特權。" : "Each plan's exclusive features in one place. Higher plans keep every benefit of the plans below.",
-    active: ja ? "ご利用可能" : zh ? "可使用" : "Available",
-    locked: ja ? "このプランで解放されます" : zh ? "升級此方案即可解鎖" : "Unlocked with this plan",
-    mandala: ja ? "3D曼陀羅アートを開く" : zh ? "開啟曼陀羅藝術" : "Open mandala art",
-    voice: ja ? "AIボイス相談室を開く" : zh ? "開啟AI語音諮詢" : "Open AI voice consultation",
-    team: ja ? "組織相性シミュレーターを開く" : zh ? "開啟組織相性模擬器" : "Open team simulator",
-    plans: ja ? "プランを比較する" : zh ? "比較方案" : "Compare plans",
-    gantt: ja ? "経営ガントチャートと勝負日アラートは、下の地球暦カレンダー内に表示されます（参考値）。" : zh ? "經營甘特圖與重點日提醒顯示於下方地球曆（參考值）。" : "The business Gantt chart and key-day alerts appear in the earth calendar below (reference values).",
-    premium: ja ? "全機能が上限なしで使え、100名までの組織分析と優先AI表示が加わります。" : zh ? "全部功能無上限，並加入最多100名的組織分析與優先AI標示。" : "Every feature without caps, plus 100-member team analysis and priority AI labeling.",
-  };
+const ui: Record<Language, { title: string; lead: string; active: string; locked: string; mandala: string; voice: string; team: string; plans: string; gantt: string; premium: string }> = {
+  ja: { title: "プラン特典", lead: "各プランの限定機能をここに集約しています。上位プランは下位プランの特典をすべて引き継ぎます。", active: "ご利用可能", locked: "このプランで解放されます", mandala: "3D曼陀羅アートを開く", voice: "AIボイス相談室を開く", team: "組織相性シミュレーターを開く", plans: "プランを比較する", gantt: "経営ガントチャートと勝負日アラートは、下の地球暦カレンダー内に表示されます（参考値）。", premium: "全機能が上限なしで使え、100名までの組織分析と優先AI表示が加わります。" },
+  en: { title: "Plan benefits", lead: "Each plan's exclusive features are gathered here. Higher plans include every benefit from lower plans.", active: "Available", locked: "Unlocks with this plan", mandala: "Open mandala art", voice: "Open AI voice consultation", team: "Open team simulator", plans: "Compare plans", gantt: "The business timeline and key-date alerts appear in the Earth Calendar below as reference values.", premium: "Use every feature without caps, with analysis for up to 100 people and priority AI labeling." },
+  "zh-CN": { title: "方案特权", lead: "各方案的专属功能集中于此。较高方案包含所有较低方案的权益。", active: "可使用", locked: "升级此方案即可解锁", mandala: "打开曼陀罗艺术", voice: "打开AI语音咨询", team: "打开团队模拟器", plans: "比较方案", gantt: "经营时间图与重点日期提醒显示在下方地球历中，仅供参考。", premium: "全部功能不限次数，并提供最多100人的组织分析与优先AI标识。" },
+  "zh-TW": { title: "方案特權", lead: "各方案的專屬功能集中於此。較高方案包含所有較低方案的權益。", active: "可使用", locked: "升級此方案即可解鎖", mandala: "開啟曼陀羅藝術", voice: "開啟AI語音諮詢", team: "開啟團隊模擬器", plans: "比較方案", gantt: "經營時間圖與重點日期提醒顯示於下方地球曆中，僅供參考。", premium: "全部功能不限次數，並提供最多100人的組織分析與優先AI標示。" },
+  ko: { title: "플랜 혜택", lead: "플랜별 전용 기능을 한곳에 모았습니다. 상위 플랜은 하위 플랜의 모든 혜택을 포함합니다.", active: "이용 가능", locked: "이 플랜에서 잠금 해제", mandala: "만다라 아트 열기", voice: "AI 음성 상담 열기", team: "팀 시뮬레이터 열기", plans: "플랜 비교", gantt: "경영 일정표와 주요 날짜 알림은 아래 지구력에 참고값으로 표시됩니다.", premium: "모든 기능을 제한 없이 이용하고 최대 100명의 조직 분석과 우선 AI 표시를 사용할 수 있습니다." },
+  es: { title: "Ventajas del plan", lead: "Aquí se reúnen las funciones exclusivas de cada plan. Los planes superiores incluyen todas las ventajas de los anteriores.", active: "Disponible", locked: "Se desbloquea con este plan", mandala: "Abrir arte mandala", voice: "Abrir consulta de voz con IA", team: "Abrir simulador de equipo", plans: "Comparar planes", gantt: "El cronograma de gestión y las alertas de fechas clave aparecen abajo en el Calendario terrestre como valores orientativos.", premium: "Todas las funciones sin límites, análisis de hasta 100 personas y prioridad en las funciones de IA." },
+  fr: { title: "Avantages du forfait", lead: "Les fonctions exclusives de chaque forfait sont regroupées ici. Les forfaits supérieurs incluent tous les avantages précédents.", active: "Disponible", locked: "Débloqué avec ce forfait", mandala: "Ouvrir l’art mandala", voice: "Ouvrir la consultation vocale IA", team: "Ouvrir le simulateur d’équipe", plans: "Comparer les forfaits", gantt: "Le calendrier de gestion et les alertes de dates clés figurent ci-dessous dans le Calendrier terrestre à titre indicatif.", premium: "Toutes les fonctions sans plafond, l’analyse de 100 personnes et la priorité des fonctions IA." },
 };
 
 export default function PlanPerksTab({ profile, language, plan, actualPlan, signedIn, go }: { profile: UserProfile; language: Language; plan: Plan; actualPlan: Plan; signedIn: boolean; go: (target: PerkTarget) => void }) {
   const copy = planCardsCopy[language];
-  const t = ui(language);
+  const t = ui[language];
   const initial = (copy.cards.find((c) => c.id === plan)?.id ?? "standard") as PaidPlanId;
   const [active, setActive] = useState<PaidPlanId>(initial);
   const card = copy.cards.find((c) => c.id === active) ?? copy.cards[0];

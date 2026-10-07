@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
 import { planOrder } from "@/lib/plans";
-import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
+import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
 import { directionEnergy, personal } from "@/lib/day-compass";
 import type { UserProfile } from "./Onboarding";
 
@@ -67,7 +67,8 @@ export default function DailyReminderPanel({ language, plan, profile }: { langua
   const directions = directionEnergy(profile.birthDate, new Date());
   const direction = [...directions].sort((a,b) => b.score - a.score)[0]?.dir ?? "N";
   const rhythm = personal(profile.birthDate, new Date());
-  const morning = { ...tpl.morning[tier], body: (language === "ja" ? `今日の参考色 ${color?.name ?? "—"} / 方位 ${direction} / ${rhythm.total >= 55 ? "攻め時" : "守り時"}（参考値）` : language === "zh-TW" ? `今日參考色 ${color?.name ?? "—"} / 方向 ${direction} / ${rhythm.total >= 55 ? "主動" : "沉穩"}（參考值）` : `Today's reference color ${color?.name ?? "—"} / direction ${direction} / ${rhythm.total >= 55 ? "active" : "reflective"} phase (reference)`) };
+  const colorName = color ? localizeBirthColorName(color.name, language) : "—";
+  const morning = { ...tpl.morning[tier], body: (language === "ja" ? `今日の参考色 ${colorName} / 方位 ${direction} / ${rhythm.total >= 55 ? "攻め時" : "守り時"}（参考値）` : language === "zh-TW" ? `今日參考色 ${colorName} / 方向 ${direction} / ${rhythm.total >= 55 ? "主動" : "沉穩"}（參考值）` : `Today's reference color ${colorName} / direction ${direction} / ${rhythm.total >= 55 ? "active" : "reflective"} phase (reference)`) };
   const messageFor = (slot: Slot) => slot === "morning" ? morning : tpl.night[tier];
 
   useEffect(() => { try { setS({ ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) ?? "{}") }); } catch { /* */ } }, []);

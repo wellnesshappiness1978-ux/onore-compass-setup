@@ -12,6 +12,8 @@ import { readMyProfile, saveMyProfile } from "@/lib/profile-storage.functions";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { type Language } from "@/lib/translations";
 
+const pageTitles: Record<Language, string> = { ja: "アゴルメンの羅針盤 | 自分を知る・今日を整える", en: "Agolmen's Compass | Know yourself, shape today", "zh-CN": "阿戈尔曼罗盘｜认识自己，调整今天", "zh-TW": "阿戈爾曼羅盤｜認識自己，調整今天", ko: "아골멘의 나침반 | 나를 알고 오늘을 정돈하다", es: "La brújula de Agolmen | Conócete y orienta tu día", fr: "La boussole d’Agolmen | Se connaître et orienter sa journée" };
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -50,6 +52,7 @@ function Index() {
   useEffect(() => {
     if (initialLanguageRender.current) { initialLanguageRender.current = false; return; }
     document.documentElement.lang = language;
+    document.title = pageTitles[language];
     localStorage.setItem("onore-language", language);
     window.dispatchEvent(new CustomEvent("onore-language-change", { detail: language }));
   }, [language]);

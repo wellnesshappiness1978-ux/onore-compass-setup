@@ -9,7 +9,6 @@ import type { Plan } from "@/lib/design-modes";
 import { supabase } from "@/integrations/supabase/client";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import { usePlan } from "./PlanProvider";
-import { fengDirectionNames } from "@/lib/feng-shui";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { dayProfile, directionEnergy, localIso, personal } from "@/lib/day-compass";
@@ -135,7 +134,7 @@ export default function HelioCalendar({ date, profile, plan, language, onUpgrade
           <TabsTrigger value="detail">{t.detail}</TabsTrigger>
         </TabsList>
         <TabsContent value="calendar" className="mt-4">
-          <div className="mx-auto max-w-md rounded-md border border-primary/25 bg-background/30 p-3" aria-label={`${year}年の日付カレンダー`}>
+          <div className="mx-auto max-w-md rounded-md border border-primary/25 bg-background/30 p-3" aria-label={`${year} · ${t.calendar}`}>
             <div className="flex items-center justify-between">
               <Button type="button" size="icon" variant="ghost" aria-label={t.previousMonth} onClick={() => setVisibleMonth(month => (month + 11) % 12)}><ChevronLeft className="size-4" /></Button>
               <h5 className="font-serif text-base text-primary">{new Intl.DateTimeFormat(language, { year: "numeric", month: "long" }).format(new Date(year, visibleMonth, 1))}</h5>
