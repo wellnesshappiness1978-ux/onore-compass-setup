@@ -165,6 +165,7 @@ export type Database = {
           relationship: string
           relationship_type: string
           role: string
+          sibling_order: string
           skills: string[]
           user_id: string
         }
@@ -183,6 +184,7 @@ export type Database = {
           relationship?: string
           relationship_type?: string
           role?: string
+          sibling_order?: string
           skills?: string[]
           user_id: string
         }
@@ -201,6 +203,7 @@ export type Database = {
           relationship?: string
           relationship_type?: string
           role?: string
+          sibling_order?: string
           skills?: string[]
           user_id?: string
         }

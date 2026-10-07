@@ -57,6 +57,13 @@
       "when": 1791356511222,
       "tag": "0007_expand_team_member_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791356904788,
+      "tag": "0008_add_team_member_sibling_order",
+      "breakpoints": true
     }
   ]
 }
