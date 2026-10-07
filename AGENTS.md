@@ -21,3 +21,4 @@
 - Keep Settings limited to account, plan, notification, theme, and language controls; place earth-calendar and team reference experiences in Plan Perks. Why: settings should remain operational and scannable.
 - Keep the birth-color mandala free of celestial motifs; reserve natal planets and sky geometry for the cosmic artwork. Why: the two artworks must remain visually and conceptually distinct.
 - Related-person records use one backward-compatible extended team-member shape across private storage, local preview, consultation and team tools. Why: detailed birth context must not be silently dropped between experiences.
+- Keep user-facing localization in typed seven-language dictionaries and translate stable domain IDs only at render time. Why: calculations and stored data must remain language-independent while every locale stays complete.

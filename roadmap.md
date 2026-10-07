@@ -143,7 +143,7 @@
 - [x] Expand the natal cosmic artwork and add deterministic shaded planetary surfaces with deeper marine light layers.
 
 ## Multilingual compatibility and related profiles
-- [ ] Complete seven-language UI, share, support and legal localization without English fallback leakage.
+- [ ] Complete seven-language UI, share, support and legal localization without English fallback leakage. (in progress: common typed translator, full-screen audit, specialist labels)
 - [x] Rebuild compatibility as three jargon-free stages in all seven languages.
 - [x] Add private detailed related-person profiles with editing and backward-compatible preview storage.
 - [x] Remove only the horizontal logo streak and verify the preserved aura.
