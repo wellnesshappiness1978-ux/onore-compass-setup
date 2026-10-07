@@ -15,8 +15,6 @@ export function rokuyo(date: Date) {
 
 const wrapNine = (value: number) => ((value - 1 + 900) % 9) + 1;
 const digitRoot = (value: number): number => value < 10 ? value : digitRoot(String(value).split("").reduce((sum, digit) => sum + Number(digit), 0));
-export const NINE_STAR_NAMES = ["", "一白水星", "二黒土星", "三碧木星", "四緑木星", "五黄土星", "六白金星", "七赤金星", "八白土星", "九紫火星"] as const;
-
 const solarTermStart = (year: number, longitude: number, month: number) => {
   const start = Date.UTC(year, month - 1, 1, 12);
   return A.SearchSunLongitude(longitude, (start - Date.UTC(2000, 0, 1, 12)) / 86_400_000, 12)?.date ?? null;
@@ -33,16 +31,13 @@ export type NineStarProfile = {
   honmei: number;
   getsumei: number;
   keisha: number;
-  honmeiName: string;
-  getsumeiName: string;
-  keishaName: string;
   nearBoundary: boolean;
-  palaces: { direction: string; palace: number; star: number; starName: string }[];
+  palaces: { direction: "SE" | "S" | "SW" | "E" | "C" | "W" | "NE" | "N" | "NW"; trigram: "son" | "ri" | "kon" | "shin" | "center" | "da" | "gon" | "kan" | "ken"; palace: number; star: number }[];
 };
 
 const palaceLayout = [
-  ["巽", 4], ["離", 9], ["坤", 2], ["震", 3], ["中宮", 5],
-  ["兌", 7], ["艮", 8], ["坎", 1], ["乾", 6],
+  ["SE", "son", 4], ["S", "ri", 9], ["SW", "kon", 2], ["E", "shin", 3], ["C", "center", 5],
+  ["W", "da", 7], ["NE", "gon", 8], ["N", "kan", 1], ["NW", "ken", 6],
 ] as const;
 
 export function nineStarProfile(dateText: string, timeText = "", timeUnknown = true, gender = "undisclosed"): NineStarProfile | null {
@@ -72,9 +67,9 @@ export function nineStarProfile(dateText: string, timeText = "", timeUnknown = t
   const solarMonth = boundary.month === 1 ? 12 : boundary.month - 1;
   const februaryCenter = [1, 4, 7].includes(honmei) ? 8 : [2, 5, 8].includes(honmei) ? 2 : 5;
   const getsumei = wrapNine(februaryCenter - (solarMonth - 1));
-  const palaces = palaceLayout.map(([direction, palace]) => {
+  const palaces = palaceLayout.map(([direction, trigram, palace]) => {
     const star = wrapNine(getsumei + palace - 5);
-    return { direction, palace, star, starName: NINE_STAR_NAMES[star] ?? "" };
+    return { direction, trigram, palace, star };
   });
   const located = palaces.find((palace) => palace.star === honmei);
   const mirror: Record<number, number> = { 1: 9, 2: 6, 3: 4, 4: 3, 6: 2, 7: 8, 8: 7, 9: 1 };
@@ -83,7 +78,6 @@ export function nineStarProfile(dateText: string, timeText = "", timeUnknown = t
   const nearest = starts.reduce((best, item) => Math.abs(item.date.getTime() - instant.getTime()) < Math.abs(best.date.getTime() - instant.getTime()) ? item : best, boundary);
   return {
     solarYear, solarMonth, honmei, getsumei, keisha,
-    honmeiName: NINE_STAR_NAMES[honmei] ?? "", getsumeiName: NINE_STAR_NAMES[getsumei] ?? "", keishaName: NINE_STAR_NAMES[keisha] ?? "",
     nearBoundary: Boolean(nearest && Math.abs(nearest.date.getTime() - instant.getTime()) < 86_400_000), palaces,
   };
 }

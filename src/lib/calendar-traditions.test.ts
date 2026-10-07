@@ -16,8 +16,9 @@ describe("traditional calendar helpers", () => {
     const result = nineStarProfile("1985-08-12", "10:30", false);
     expect(result?.palaces).toHaveLength(9);
     expect(new Set(result?.palaces.map((palace) => palace.star)).size).toBe(9);
-    expect(result?.honmeiName).toBeTruthy();
-    expect(result?.getsumeiName).toBeTruthy();
-    expect(result?.keishaName).toBeTruthy();
+    expect(result?.honmei).toBeGreaterThanOrEqual(1);
+    expect(result?.getsumei).toBeGreaterThanOrEqual(1);
+    expect(result?.keisha).toBeGreaterThanOrEqual(1);
+    expect(result?.palaces.every((palace) => /^[NSEWC]{1,2}$/.test(palace.direction))).toBe(true);
   });
 });
