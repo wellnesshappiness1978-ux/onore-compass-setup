@@ -72,7 +72,7 @@ export default function PlanPerksTab({ profile, language, plan, actualPlan, sign
         {active === "b2b" && <p className="mt-4 text-sm leading-7 text-muted-foreground">{t.gantt}</p>}
       </section>
       {active === "vip" && <FengShuiGuide profile={profile} date={new Date()} language={language} />}
-      {active !== "vip" && <HelioCalendar date={new Date()} profile={profile} plan={plan} onUpgrade={upgrade} />}
+      {active !== "vip" && <HelioCalendar date={new Date()} profile={profile} plan={plan} language={language} onUpgrade={upgrade} />}
       {(active === "b2b" || active === "b2b-premium") && <div id="team-studio-entry" className="scroll-mt-6"><TeamStudio plan={plan} actualPlan={actualPlan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} /></div>}
     </div>
   );

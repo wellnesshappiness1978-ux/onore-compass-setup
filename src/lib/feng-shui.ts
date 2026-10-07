@@ -4,17 +4,17 @@ import type { Direction } from "./day-compass";
 
 const wrap = (n: number) => ((n - 1 + 900) % 9) + 1;
 const digit = (n: number): number => n < 10 ? n : digit(String(n).split("").reduce((v, d) => v + Number(d), 0));
-const palaces: { dir: Direction | "C"; base: number; trigram: string; element: string; room: string; color: string; plant: string }[] = [
-  { dir: "SE", base: 4, trigram: "巽", element: "木", room: "仕事机", color: "緑", plant: "ポトス" },
-  { dir: "S", base: 9, trigram: "離", element: "火", room: "リビング", color: "珊瑚色", plant: "サンスベリア" },
-  { dir: "SW", base: 2, trigram: "坤", element: "土", room: "ダイニング", color: "黄", plant: "パキラ" },
-  { dir: "E", base: 3, trigram: "震", element: "木", room: "玄関", color: "緑", plant: "ポトス" },
-  { dir: "C", base: 5, trigram: "中宮", element: "土", room: "共有スペース", color: "黄", plant: "パキラ" },
-  { dir: "W", base: 7, trigram: "兌", element: "金", room: "書斎", color: "白", plant: "サンスベリア" },
-  { dir: "NE", base: 8, trigram: "艮", element: "土", room: "寝室", color: "黄", plant: "パキラ" },
-  { dir: "N", base: 1, trigram: "坎", element: "水", room: "浴室", color: "青", plant: "ポトス" },
-  { dir: "NW", base: 6, trigram: "乾", element: "金", room: "オフィス", color: "白", plant: "サンスベリア" },
-];
+const palaces = [
+  { dir: "SE", base: 4, trigram: "son", element: "wood", room: "desk", color: "green", plant: "pothos" },
+  { dir: "S", base: 9, trigram: "ri", element: "fire", room: "living", color: "coral", plant: "snakePlant" },
+  { dir: "SW", base: 2, trigram: "kon", element: "earth", room: "dining", color: "yellow", plant: "pachira" },
+  { dir: "E", base: 3, trigram: "shin", element: "wood", room: "entry", color: "green", plant: "pothos" },
+  { dir: "C", base: 5, trigram: "center", element: "earth", room: "shared", color: "yellow", plant: "pachira" },
+  { dir: "W", base: 7, trigram: "da", element: "metal", room: "study", color: "white", plant: "snakePlant" },
+  { dir: "NE", base: 8, trigram: "gon", element: "earth", room: "bedroom", color: "yellow", plant: "pachira" },
+  { dir: "N", base: 1, trigram: "kan", element: "water", room: "bath", color: "blue", plant: "pothos" },
+  { dir: "NW", base: 6, trigram: "ken", element: "metal", room: "office", color: "white", plant: "snakePlant" },
+] as const;
 const directionsByKua: Record<number, [Direction, Direction, Direction, Direction]> = {
   1: ["SE", "E", "S", "N"], 2: ["NE", "W", "NW", "SW"],
   3: ["S", "N", "SE", "E"], 4: ["N", "S", "E", "SE"],
@@ -45,7 +45,7 @@ export function mingGua(date: string, gender: string) {
   return { ...solar, branches: selected.map(branch => {
     const number = normalize(branch === "male" ? male : female, branch);
     const [shengQi, tianYi, yanNian, fuWei] = directionsByKua[number] ?? ["SE", "E", "S", "N"];
-    return { branch, number, group: [1, 3, 4, 9].includes(number) ? "東四命" : "西四命", shengQi, tianYi, yanNian, fuWei };
+    return { branch, number, group: [1, 3, 4, 9].includes(number) ? "east" : "west", shengQi, tianYi, yanNian, fuWei };
   }) };
 }
 

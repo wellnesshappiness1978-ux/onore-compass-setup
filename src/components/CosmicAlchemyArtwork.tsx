@@ -2,8 +2,10 @@ import { useEffect, useRef, useCallback } from "react";
 import type { ReturnTypeNatal } from "@/lib/natal-sky-types";
 import type { Capture } from "./MandalaScene";
 import type { NineStarProfile } from "@/lib/calendar-traditions";
+import type { Language } from "@/lib/translations";
+import { artSpecialistCopy } from "@/lib/art-specialist-copy";
 
-type Props = { sky: ReturnTypeNatal; nine: NineStarProfile; colors: string[]; onCapture: (capture: Capture | null) => void };
+type Props = { sky: ReturnTypeNatal; nine: NineStarProfile; colors: string[]; language: Language; onCapture: (capture: Capture | null) => void };
 
 function paintPlanet(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string, gold: string, seed: number) {
   ctx.save();
@@ -26,7 +28,7 @@ function paintPlanet(ctx: CanvasRenderingContext2D, x: number, y: number, radius
   ctx.restore();
 }
 
-function paint(canvas: HTMLCanvasElement, sky: ReturnTypeNatal, nine: NineStarProfile, colors: string[]) {
+function paint(canvas: HTMLCanvasElement, sky: ReturnTypeNatal, nine: NineStarProfile, colors: string[], language: Language) {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas unavailable");
   const { width: w, height: h } = canvas;
@@ -36,6 +38,7 @@ function paint(canvas: HTMLCanvasElement, sky: ReturnTypeNatal, nine: NineStarPr
   const sub = colors[1] ?? root.getPropertyValue("--gold-glow").trim();
   const voidColor = root.getPropertyValue("--art-void").trim() || "oklch(0.105 0.035 255)";
   const gold = root.getPropertyValue("--gold-glow").trim() || "oklch(0.96 0.055 92)";
+  const copy = artSpecialistCopy[language];
   ctx.fillStyle = voidColor; ctx.fillRect(0, 0, w, h);
   const nebulae = [[.22, .31, .42, colors[3] ?? sub], [.76, .46, .5, colors[5] ?? main], [.43, .7, .46, colors[2] ?? gold]] as const;
   nebulae.forEach(([nx, ny, nr, color]) => { const cloud = ctx.createRadialGradient(w * nx, h * ny, 0, w * nx, h * ny, w * nr); cloud.addColorStop(0, color); cloud.addColorStop(.18, `${color}88`); cloud.addColorStop(.5, `${color}22`); cloud.addColorStop(1, "transparent"); ctx.globalAlpha = .36; ctx.fillStyle = cloud; ctx.fillRect(0, 0, w, h); });
@@ -89,20 +92,20 @@ function paint(canvas: HTMLCanvasElement, sky: ReturnTypeNatal, nine: NineStarPr
   });
   ctx.globalAlpha = 1; ctx.textAlign = "center"; ctx.fillStyle = gold;
   ctx.font = `${Math.round(w * .06)}px serif`; ctx.fillText("AGOLMEN'S COMPASS", cx, h * .13);
-  ctx.font = `${Math.round(w * .039)}px serif`; ctx.fillText("COSMIC ALCHEMY", cx, h * .79);
-  ctx.font = `${Math.round(w * .019)}px sans-serif`; ctx.fillText("NATAL SKY · ILLUSTRATIVE ART", cx, h * .83);
-  ctx.fillText(`HONMEI ${nine.honmei} · GETSUMEI ${nine.getsumei} · KEISHA ${nine.keisha}`, cx, h * .86);
-  ctx.fillText(sky.approximate ? "JST NOON REFERENCE" : "JST BIRTH TIME", cx, h * .89);
+  ctx.font = `${Math.round(w * .039)}px serif`; ctx.fillText(copy.cosmic, cx, h * .79);
+  ctx.font = `${Math.round(w * .019)}px sans-serif`; ctx.fillText(copy.cosmicDescription, cx, h * .83);
+  ctx.fillText(`${copy.honmei} ${nine.honmei} · ${copy.getsumei} ${nine.getsumei} · ${copy.keisha} ${nine.keisha}`, cx, h * .86);
+  ctx.fillText(sky.approximate ? copy.noon : copy.registered, cx, h * .89);
 }
 
-export default function CosmicAlchemyArtwork({ sky, nine, colors, onCapture }: Props) {
+export default function CosmicAlchemyArtwork({ sky, nine, colors, language, onCapture }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
   const capture = useCallback(async () => {
     const out = document.createElement("canvas"); out.width = 2160; out.height = 3840;
-    paint(out, sky, nine, colors);
+    paint(out, sky, nine, colors, language);
     const blob = await new Promise<Blob>((resolve, reject) => out.toBlob(b => b ? resolve(b) : reject(new Error("PNG unavailable")), "image/png"));
     return { blob, width: out.width, height: out.height };
-  }, [sky, nine, colors]);
-  useEffect(() => { if (ref.current) paint(ref.current, sky, nine, colors); onCapture(capture); return () => onCapture(null); }, [sky, nine, colors, capture, onCapture]);
-  return <canvas ref={ref} width={900} height={1600} role="img" aria-label="出生宇宙創生図 · 出生10天体と九星計算を用いたパーソナルアート" className="block h-full w-full object-cover" />;
+  }, [sky, nine, colors, language]);
+  useEffect(() => { if (ref.current) paint(ref.current, sky, nine, colors, language); onCapture(capture); return () => onCapture(null); }, [sky, nine, colors, language, capture, onCapture]);
+  return <canvas ref={ref} width={900} height={1600} role="img" aria-label={artSpecialistCopy[language].cosmicDescription} className="block h-full w-full object-cover" />;
 }

@@ -51,6 +51,7 @@ function Index() {
     if (initialLanguageRender.current) { initialLanguageRender.current = false; return; }
     document.documentElement.lang = language;
     localStorage.setItem("onore-language", language);
+    window.dispatchEvent(new CustomEvent("onore-language-change", { detail: language }));
   }, [language]);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
