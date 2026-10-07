@@ -2,6 +2,18 @@
 import * as A from "astronomy-engine";
 type Birth = { birthDate: string; birthTime: string; birthTimeUnknown: boolean; birthPlace: string };
 const names = ["サンライズコーラル", "シャンパンローズ", "アンバーゴールド", "翡翠グリーン", "ターコイズ", "瑠璃ブルー", "アメジスト", "モーヴピンク"];
+const translatedNames = {
+  en: ["Sunrise Coral", "Champagne Rose", "Amber Gold", "Jade Green", "Turquoise", "Lapis Blue", "Amethyst", "Mauve Pink"],
+  "zh-CN": ["晨曦珊瑚", "香槟玫瑰", "琥珀金", "翡翠绿", "绿松石", "琉璃蓝", "紫水晶", "藕荷粉"],
+  "zh-TW": ["晨曦珊瑚", "香檳玫瑰", "琥珀金", "翡翠綠", "綠松石", "琉璃藍", "紫水晶", "藕荷粉"],
+  ko: ["선라이즈 코랄", "샴페인 로즈", "앰버 골드", "제이드 그린", "터쿼이즈", "라피스 블루", "아메시스트", "모브 핑크"],
+  es: ["Coral amanecer", "Rosa champán", "Oro ámbar", "Verde jade", "Turquesa", "Azul lapislázuli", "Amatista", "Rosa malva"],
+  fr: ["Corail levant", "Rose champagne", "Or ambré", "Vert jade", "Turquoise", "Bleu lapis", "Améthyste", "Rose mauve"],
+} as const;
+export const localizeBirthColorName = (name: string | undefined, language: keyof typeof translatedNames | "ja") => {
+  if (!name) return "—";
+  return language === "ja" ? name : translatedNames[language][Math.max(0, names.indexOf(name))] ?? name;
+};
 const hex = (h: number, s: number, l: number) => {
   const a = s * Math.min(l, 1 - l);
   const f = (n: number) => {

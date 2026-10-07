@@ -71,6 +71,15 @@ export default function SettingsPanel({
   const [lockedMode, setLockedMode] = useState<DesignMode | null>(null);
 
   const tc = teamCopy[language];
+  const previewModeNote: Record<Language, string> = {
+    ja: "開発モード：選んだプランの機能がこの端末で実際に解放されます（公開版では無効）。",
+    en: "Development mode: the selected plan is enabled on this device only and never applies to the published app.",
+    "zh-CN": "开发模式：所选方案仅在此设备启用，不会应用于正式发布版。",
+    "zh-TW": "開發模式：所選方案僅在此裝置啟用，不會套用至正式發布版。",
+    ko: "개발 모드: 선택한 플랜은 이 기기에서만 활성화되며 공개 앱에는 적용되지 않습니다.",
+    es: "Modo de desarrollo: el plan elegido solo se activa en este dispositivo y no afecta a la aplicación publicada.",
+    fr: "Mode développement : l’offre choisie est activée uniquement sur cet appareil et n’affecte pas l’application publiée.",
+  };
   const lockedTheme = designModes.find(mode => mode.id === lockedMode);
   const lockedTierName = lockedTheme?.tier === "free" ? t.planFree : lockedTheme ? `${teamCopy[language].planNames[lockedTheme.tier]}${language === "ja" ? "プラン" : ""}` : "";
   const pc = planCardsCopy[language];
@@ -172,12 +181,12 @@ export default function SettingsPanel({
             ))}
           </div>
           {devOverrideEnabled
-            ? <p className="mt-2 text-[11px] text-primary">開発モード：選んだプランの機能がこの端末で実際に解放されます（公開版では無効）。</p>
+            ? <p className="mt-2 text-[11px] text-primary">{previewModeNote[language]}</p>
             : <p className="mt-2 text-[11px] text-muted-foreground">{t.planTestNote}</p>}
         </div>}
       </section>
 
-      {signedIn && debugAllowed && <DebugPlanSwitcher plan={actualPlan} onChanged={onDebugPlanChanged} />}
+      {signedIn && debugAllowed && <DebugPlanSwitcher plan={actualPlan} language={language} onChanged={onDebugPlanChanged} />}
 
       <section className="border-y border-primary/20 py-6" aria-labelledby="design-heading">
         <div className="flex items-center gap-2">

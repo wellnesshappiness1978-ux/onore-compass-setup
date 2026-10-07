@@ -109,6 +109,14 @@ const en: Copy = {
   nav: { deal: "Key negotiation", trip: "Business trip", seat: "Leader's seat facing" },
   dateSearch: "Find a date", previousYear: "Previous year", nextYear: "Next year", rokuyo: "Rokuyo",
 };
+const translatedCopy: Record<Language, Copy> = {
+  ja, en,
+  "zh-CN": { ...en, hint: "转动圆盘，可查看前后100年中的任意日期；触碰位置也会切换八个方位。", today: "返回今天", selected: "所选日期", preview: "显示测试 · 参考值（并非正式鉴定或付费权限）", dayTitle: "这一天的特质", earthTitle: "地球一年中的当前位置", personalTitle: "今天给你的提醒", dirTitle: "吉方位能量", bizTitle: "企业365日路线图", staffTitle: "团队支持", navTitle: "商务方位指南", lockedFor: p => `${p}以上开放`, upgrade: "查看方案", needBirth: "填写生日后即可显示。", energy: "能量", dirs: { N: "北", NE: "东北", E: "东", SE: "东南", S: "南", SW: "西南", W: "西", NW: "西北" }, dateSearch: "查找日期", previousYear: "上一年", nextYear: "下一年", rokuyo: "六曜" },
+  "zh-TW": { ...en, hint: "轉動圓盤，可查看前後100年中的任意日期；觸碰位置也會切換八個方位。", today: "返回今天", selected: "所選日期", preview: "顯示測試 · 參考值（並非正式鑑定或付費權限）", dayTitle: "這一天的特質", earthTitle: "地球一年中的目前位置", personalTitle: "今天給你的提醒", dirTitle: "吉方位能量", bizTitle: "企業365日路線圖", staffTitle: "團隊支援", navTitle: "商務方位指南", lockedFor: p => `${p}以上開放`, upgrade: "查看方案", needBirth: "填寫生日後即可顯示。", energy: "能量", dirs: { N: "北", NE: "東北", E: "東", SE: "東南", S: "南", SW: "西南", W: "西", NW: "西北" }, dateSearch: "查找日期", previousYear: "上一年", nextYear: "下一年", rokuyo: "六曜" },
+  ko: { ...en, hint: "다이얼을 돌려 앞뒤 100년의 날짜를 살펴보세요. 손가락 위치에 따라 여덟 방위도 바뀝니다.", today: "오늘로 돌아가기", selected: "선택한 날짜", preview: "표시 테스트 · 참고값(정식 감정이나 유료 권한이 아님)", dayTitle: "이날의 특성", earthTitle: "지구의 한 해 속 현재 위치", personalTitle: "오늘의 마음가짐", dirTitle: "길방위 에너지", bizTitle: "기업 365일 로드맵", staffTitle: "팀 지원", navTitle: "비즈니스 방위 가이드", lockedFor: p => `${p} 이상에서 이용`, upgrade: "플랜 보기", needBirth: "생년월일을 입력하면 표시됩니다.", energy: "에너지", dirs: { N: "북", NE: "북동", E: "동", SE: "남동", S: "남", SW: "남서", W: "서", NW: "북서" }, dateSearch: "날짜 찾기", previousYear: "이전 해", nextYear: "다음 해", rokuyo: "육요" },
+  es: { ...en, hint: "Gira el dial para recorrer fechas de cien años antes o después. La posición también cambia las ocho direcciones.", today: "Volver a hoy", selected: "Fecha elegida", preview: "Prueba visual · valores orientativos (no es una lectura ni acceso de pago)", dayTitle: "Carácter del día", earthTitle: "Tu posición en el año terrestre", personalTitle: "Tu enfoque de hoy", dirTitle: "Energía de la dirección favorable", bizTitle: "Hoja de ruta empresarial de 365 días", staffTitle: "Apoyo al equipo", navTitle: "Guía de dirección empresarial", lockedFor: p => `Disponible con ${p} o superior`, upgrade: "Ver planes", needBirth: "Añade tu fecha de nacimiento para verlo.", energy: "Energía", dirs: { N: "N", NE: "NE", E: "E", SE: "SE", S: "S", SW: "SO", W: "O", NW: "NO" }, dateSearch: "Buscar fecha", previousYear: "Año anterior", nextYear: "Año siguiente", rokuyo: "Rokuyō" },
+  fr: { ...en, hint: "Tournez le cadran pour parcourir les dates sur cent ans avant ou après. La position change aussi les huit directions.", today: "Revenir à aujourd’hui", selected: "Date choisie", preview: "Test d’affichage · valeurs indicatives (ni consultation ni accès payant)", dayTitle: "Caractère du jour", earthTitle: "Votre position dans l’année terrestre", personalTitle: "Votre repère du jour", dirTitle: "Énergie de la direction favorable", bizTitle: "Feuille de route annuelle de l’entreprise", staffTitle: "Soutien de l’équipe", navTitle: "Guide des directions professionnelles", lockedFor: p => `Accessible avec ${p} ou plus`, upgrade: "Voir les offres", needBirth: "Ajoutez votre date de naissance pour l’afficher.", energy: "Énergie", dirs: { N: "N", NE: "NE", E: "E", SE: "SE", S: "S", SW: "SO", W: "O", NW: "NO" }, dateSearch: "Chercher une date", previousYear: "Année précédente", nextYear: "Année suivante", rokuyo: "Rokuyō" },
+};
 
 const polar = (deg: number, r: number) => {
   const a = ((deg - 90) * Math.PI) / 180;
@@ -119,7 +127,7 @@ const rank = (p: Plan) => planOrder.indexOf(p);
 type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void };
 
 export default function DayCompass({ profile, language, plan, onUpgrade }: Props) {
-  const c = language === "ja" ? ja : en;
+  const c = translatedCopy[language];
   const names = teamCopy[language].planNames;
   const now = useMemo(() => new Date(), []);
   const minDate = useMemo(() => new Date(now.getFullYear() - 100, 0, 1), [now]);

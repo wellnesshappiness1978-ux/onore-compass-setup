@@ -70,6 +70,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
   const t = translations[language];
   const pt = profileTranslations[language];
   const storage = profileStorageCopy[language];
+  const cityPlaceholder: Record<Language, string> = { ja: "横浜市 保土ケ谷区 和田町", en: "Yokohama, Hodogaya, Wadamachi", "zh-CN": "横滨市 保土谷区 和田町", "zh-TW": "橫濱市 保土谷區 和田町", ko: "요코하마시 호도가야구 와다마치", es: "Yokohama, Hodogaya, Wadamachi", fr: "Yokohama, Hodogaya, Wadamachi" };
   const [introVisible, setIntroVisible] = useState(!initialProfile);
   const [step, setStep] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
@@ -258,12 +259,12 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
                 </option>
                  {PREFECTURES.map((pref, index) => (
                   <option key={pref} value={pref}>
-                     {["en", "es", "fr"].includes(language) ? prefecturesRomanized[index] : pref}
+                     {language === "ja" ? pref : prefecturesRomanized[index]}
                   </option>
                 ))}
               </select>
               <label htmlFor="birth-city" className="mb-2 mt-5 block font-serif text-sm font-semibold text-primary">{pt.city} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
-              <input id="birth-city" maxLength={80} placeholder="横浜市 保土ケ谷区 和田町" value={profile.birthCity} onChange={(e) => set("birthCity", e.target.value)} className={inputClass} />
+              <input id="birth-city" maxLength={80} placeholder={cityPlaceholder[language]} value={profile.birthCity} onChange={(e) => set("birthCity", e.target.value)} className={inputClass} />
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                  {t.placeHint}
               </p>

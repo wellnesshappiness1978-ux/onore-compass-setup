@@ -114,7 +114,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
       {mounted && testUnlocked && sky && nine && art === "cosmic" ? <CosmicAlchemyArtwork sky={sky} nine={nine} colors={artColors} language={language} onCapture={setCapture} /> : mounted && testUnlocked && sky ? <Suspense fallback={<AgolmenLoading compact label={a.loading} />}>
         <MandalaScene colors={artColors} element={element} progress={progress} reduced={reduced} onCapture={setCapture} />
       </Suspense> : <NineStarsArtwork main={colors.main} sub={colors.sub} bloodType={bloodType} birthDate={birthDate} language={language} />}
-      {art === "mandala" && testUnlocked && sky && progress > 0 && progress < 7 && <div className="pointer-events-none absolute inset-0 grid place-items-center bg-background/70 backdrop-blur-[2px]"><AgolmenLoading compact label={progress < 2 ? a.loadingStages[0] : progress < 5 ? a.loadingStages[1] : a.loadingStages[2]} /></div>}
+      {art === "mandala" && testUnlocked && sky && progress > 0 && progress < 7 && <div className="pointer-events-none absolute inset-0 grid place-items-center bg-background/70 backdrop-blur-[2px]"><AgolmenLoading compact label={(progress < 2 ? a.loadingStages[0] : progress < 5 ? a.loadingStages[1] : a.loadingStages[2]) ?? a.loading} /></div>}
       {!open && !playing && <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/65 p-4 backdrop-blur-[2px]">
         <div className="flex size-12 items-center justify-center rounded-full border border-primary/50 bg-background/80 text-primary"><LockKeyhole className="size-5" /></div>
         <p className="mt-4 font-serif text-lg text-primary">{testUnlocked ? t.testUnlock : t.lock}</p>

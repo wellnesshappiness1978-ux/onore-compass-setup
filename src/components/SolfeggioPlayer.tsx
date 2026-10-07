@@ -5,7 +5,16 @@ import { createAmbientPiano, pianoTones, type AmbientPiano } from "@/lib/ambient
 import type { Language } from "@/lib/translations";
 
 export default function SolfeggioPlayer({ language, compact = false }: { language: Language; compact?: boolean }) {
-  const ja = language === "ja";
+  const labels: Record<Language, { region: string; stop: string; play: string; toggle: string; title: string; ambient: string; unmute: string; mute: string; settings: string; frequency: string; volume: string; bgmVolume: string; note: string; error: string }> = {
+    ja: { region: "アンビエントピアノ", stop: "BGMを停止", play: "BGMを再生", toggle: "再生・停止", title: "星音のピアノ", ambient: "アンビエント", unmute: "消音を解除", mute: "消音", settings: "音楽の設定", frequency: "周波数", volume: "音量", bgmVolume: "BGM音量", note: "周波数を基音にした創作音楽です。DNA修復・治療などの効果は保証しません。", error: "音声を開始できませんでした。再生を押して再試行してください。" },
+    en: { region: "Ambient piano", stop: "Stop music", play: "Play music", toggle: "Play or stop", title: "Celestial piano", ambient: "Ambient", unmute: "Unmute", mute: "Mute", settings: "Audio settings", frequency: "Frequency", volume: "Volume", bgmVolume: "Music volume", note: "Original music tuned to a reference frequency; no therapeutic or DNA-repair effects are claimed.", error: "Audio could not start. Try Play again." },
+    "zh-CN": { region: "氛围钢琴", stop: "停止音乐", play: "播放音乐", toggle: "播放或停止", title: "星音钢琴", ambient: "氛围音乐", unmute: "取消静音", mute: "静音", settings: "音乐设置", frequency: "频率", volume: "音量", bgmVolume: "背景音乐音量", note: "这是以参考频率为基音的原创音乐，不宣称具有治疗或DNA修复作用。", error: "无法播放音频，请再次尝试。" },
+    "zh-TW": { region: "氛圍鋼琴", stop: "停止音樂", play: "播放音樂", toggle: "播放或停止", title: "星音鋼琴", ambient: "氛圍音樂", unmute: "取消靜音", mute: "靜音", settings: "音樂設定", frequency: "頻率", volume: "音量", bgmVolume: "背景音樂音量", note: "這是以參考頻率為基音的原創音樂，不宣稱具有治療或DNA修復作用。", error: "無法播放音訊，請再次嘗試。" },
+    ko: { region: "앰비언트 피아노", stop: "음악 정지", play: "음악 재생", toggle: "재생 또는 정지", title: "별빛 피아노", ambient: "앰비언트", unmute: "음소거 해제", mute: "음소거", settings: "음악 설정", frequency: "주파수", volume: "음량", bgmVolume: "배경 음악 음량", note: "참고 주파수를 기본음으로 만든 창작 음악이며 치료나 DNA 회복 효과를 주장하지 않습니다.", error: "오디오를 시작하지 못했습니다. 다시 재생해 주세요." },
+    es: { region: "Piano ambiental", stop: "Detener música", play: "Reproducir música", toggle: "Reproducir o detener", title: "Piano celeste", ambient: "Ambiental", unmute: "Activar sonido", mute: "Silenciar", settings: "Ajustes de audio", frequency: "Frecuencia", volume: "Volumen", bgmVolume: "Volumen de la música", note: "Música original afinada con una frecuencia de referencia; no se atribuyen efectos terapéuticos ni de reparación del ADN.", error: "No se pudo iniciar el audio. Intenta reproducirlo de nuevo." },
+    fr: { region: "Piano d’ambiance", stop: "Arrêter la musique", play: "Lire la musique", toggle: "Lire ou arrêter", title: "Piano céleste", ambient: "Ambiance", unmute: "Rétablir le son", mute: "Couper le son", settings: "Réglages audio", frequency: "Fréquence", volume: "Volume", bgmVolume: "Volume de la musique", note: "Musique originale accordée sur une fréquence de référence, sans allégation thérapeutique ni réparation de l’ADN.", error: "Impossible de lancer le son. Réessayez." },
+  };
+  const text = labels[language];
   const [hz, setHz] = useState(528);
   const [playing, setPlaying] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -39,18 +48,18 @@ export default function SolfeggioPlayer({ language, compact = false }: { languag
     if (playing) { sequence.current += 1; void engine.current?.stop(); engine.current = null; setPlaying(false); }
     else void start(hz);
   };
-  return <section aria-label={ja ? "アンビエントピアノ" : "Ambient piano"} className={`audio-controller ${compact ? "audio-controller--compact" : ""}`}>
+  return <section aria-label={text.region} className={`audio-controller ${compact ? "audio-controller--compact" : ""}`}>
     <div className="flex items-center gap-3">
-      <Button size="icon" variant="default" onClick={toggle} disabled={busy} aria-label={playing ? (ja ? "BGMを停止" : "Stop BGM") : (ja ? "BGMを再生" : "Play BGM")} aria-pressed={playing} title={ja ? "再生・停止" : "Play / stop"} className="size-11 shrink-0 rounded-full">{playing ? <Pause /> : <Play />}</Button>
-      <div className="min-w-0 flex-1"><p className="flex items-center gap-2 font-serif text-sm text-primary"><Music2 className="size-4 shrink-0" />{ja ? "星音のピアノ" : "Celestial piano"}</p><p className="text-xs text-muted-foreground">{hz} Hz · {ja ? "アンビエント" : "Ambient"}</p></div>
-      <Button size="icon" variant="ghost" onClick={() => setMuted(!muted)} aria-label={muted ? (ja ? "消音を解除" : "Unmute") : (ja ? "消音" : "Mute")} aria-pressed={muted} title={ja ? "消音" : "Mute"}>{muted ? <VolumeX /> : <Volume2 />}</Button>
-      <Button size="icon" variant="ghost" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-label={ja ? "音楽の設定" : "Audio settings"} title={ja ? "音楽の設定" : "Audio settings"}>{expanded ? <ChevronDown /> : <ChevronUp />}</Button>
+      <Button size="icon" variant="default" onClick={toggle} disabled={busy} aria-label={playing ? text.stop : text.play} aria-pressed={playing} title={text.toggle} className="size-11 shrink-0 rounded-full">{playing ? <Pause /> : <Play />}</Button>
+      <div className="min-w-0 flex-1"><p className="flex items-center gap-2 font-serif text-sm text-primary"><Music2 className="size-4 shrink-0" />{text.title}</p><p className="text-xs text-muted-foreground">{hz} Hz · {text.ambient}</p></div>
+      <Button size="icon" variant="ghost" onClick={() => setMuted(!muted)} aria-label={muted ? text.unmute : text.mute} aria-pressed={muted} title={text.mute}>{muted ? <VolumeX /> : <Volume2 />}</Button>
+      <Button size="icon" variant="ghost" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-label={text.settings} title={text.settings}>{expanded ? <ChevronDown /> : <ChevronUp />}</Button>
     </div>
     {expanded && <div className="mt-3 border-t border-primary/20 pt-3">
-      <div role="group" aria-label={ja ? "周波数" : "Frequency"} className="grid grid-cols-3 gap-2">{pianoTones.map(f => <Button key={f} size="sm" variant={hz === f ? "default" : "outline"} aria-pressed={hz === f} disabled={busy} onClick={() => { setHz(f); if (playing) void start(f); }}>{f} Hz</Button>)}</div>
-      <label className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">{ja ? "音量" : "Volume"}<input aria-label={ja ? "BGM音量" : "BGM volume"} type="range" min={0} max={0.6} step={0.01} value={volume} onChange={e => setVolume(Number(e.target.value))} className="min-w-0 flex-1 accent-primary" /></label>
-      <p className="mt-2 text-xs leading-6 text-muted-foreground">{ja ? "周波数を基音にした創作音楽です。DNA修復・治療などの効果は保証しません。" : "Original music tuned to a reference frequency; no therapeutic or DNA-repair effects are claimed."}</p>
+      <div role="group" aria-label={text.frequency} className="grid grid-cols-3 gap-2">{pianoTones.map(f => <Button key={f} size="sm" variant={hz === f ? "default" : "outline"} aria-pressed={hz === f} disabled={busy} onClick={() => { setHz(f); if (playing) void start(f); }}>{f} Hz</Button>)}</div>
+      <label className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">{text.volume}<input aria-label={text.bgmVolume} type="range" min={0} max={0.6} step={0.01} value={volume} onChange={e => setVolume(Number(e.target.value))} className="min-w-0 flex-1 accent-primary" /></label>
+      <p className="mt-2 text-xs leading-6 text-muted-foreground">{text.note}</p>
     </div>}
-    {error && <p role="alert" className="mt-2 text-sm text-destructive">{ja ? "音声を開始できませんでした。再生を押して再試行してください。" : "Audio could not start. Try Play again."}</p>}
+    {error && <p role="alert" className="mt-2 text-sm text-destructive">{text.error}</p>}
   </section>;
 }
