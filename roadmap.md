@@ -141,3 +141,9 @@
 - [x] Separate the six personal-reading chapters by evidence, subject and sentence style to prevent repeated diagnoses.
 - [x] Rebuild the mandala around only the six birth colors, a dominant overall-color core and a subtle shell spiral.
 - [x] Expand the natal cosmic artwork and add deterministic shaded planetary surfaces with deeper marine light layers.
+
+## Multilingual compatibility and related profiles
+- [ ] Complete seven-language UI, share, support and legal localization without English fallback leakage.
+- [ ] Rebuild compatibility as three jargon-free stages in all seven languages.
+- [ ] Add private detailed related-person profiles with editing and backward-compatible preview storage.
+- [ ] Remove only the horizontal logo streak and verify the preserved aura.

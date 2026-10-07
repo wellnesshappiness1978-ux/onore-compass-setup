@@ -1,25 +1,57 @@
-export const legalContent = {
-  disclaimer: { title: "免責事項", description: "アゴルメンの羅針盤の診断・天体・カラー・日取りに関する利用上の注意。", sections: [
-    ["サービスの位置づけ", "本アプリは自己理解と意思決定の整理を支援するエンターテインメント・自己啓発ツールです。占術の解釈は科学的な性格診断ではなく、将来の出来事、健康、投資成果、人間関係の結果を保証しません。"],
-    ["専門的判断", "医療・法律・投資・採用など重要な判断は、客観的な資料と適切な専門家への相談を優先してください。診断だけで治療を変更したり、投資や契約を決定したりしないでください。"],
-    ["計算と表現の区別", "天体位置は天文計算を使用しますが、バイオリズム、吉方位、配色、曼陀羅の装飾は参考表現です。色や音が心身の周波数を測定・調整するとは主張しません。流派や出生情報の精度によって結果は異なります。"],
-  ] },
-  commerce: { title: "特定商取引法に基づく表記・キャンセルと返金", description: "アゴルメンの羅針盤の取引情報、契約・キャンセル・返金の案内。", sections: [
-    ["現在の販売状況", "現在は開発テスト段階で、アプリ内のプラン切替では契約・決済・請求は発生しません。表示料金はプラン案内です。販売開始時は支払い前に確定料金・税・支払方法・サービス開始時期を表示します。"],
-    ["販売事業者情報：確認待ち", "販売事業者名、代表者、所在地、電話番号、連絡先は運営者から未提供です。本ページは法務案のため、これらの情報と必要な表示事項が確定するまで有料販売を開始しません。"],
-    ["キャンセル・返金：正式条件の確認待ち", "現在は有料契約を受け付けていないため、アプリ内で解約・返金対象となる請求は発生しません。販売開始前に更新周期、解約期限と方法、利用停止日、返金条件を明示します。法令上認められる権利を制限するものではありません。"],
-  ] },
-  terms: { title: "利用規約", description: "アゴルメンの羅針盤の利用条件、禁止事項、画像共有に関する規約案。", sections: [
-    ["利用条件", "自己理解の参考として利用し、最終的な判断は利用者自身で行ってください。プレビューのプラン切替はテスト機能であり、有料会員資格の取得を意味しません。"],
-    ["禁止事項", "他人のアカウントへの不正アクセス、権限の偽装、嫌がらせ、違法な目的での利用、本人の同意を得ない個人情報の登録・公開を禁止します。関係者の情報は必要な同意を得て登録してください。"],
-    ["AI回答と画像の共有", "AIの回答には誤りが含まれる場合があります。生成画像を共有する際は参考アートであることを損なわず、本人や関係者の情報が含まれていないか確認してください。第三者の権利を侵害する投稿は禁止します。"],
-    ["規約案について", "サービスの運営主体・販売条件が確定した時点で正式な規約を整備します。現在の内容は法的な適合性を保証するものではなく、法令上の利用者の権利を排除しません。"],
-  ] },
-  privacy: { title: "プライバシーポリシー", description: "プロフィール、AI相談、端末保存、お問い合わせ情報の取り扱い。", sections: [
-    ["取り扱う情報と目的", "登録された氏名、生年月日、出生時間・出生地、性別などをプロフィール復元と参考分析に使用します。ログイン中のプロフィール・関係者情報は本人専用のアクセス制御で保存します。"],
-    ["端末保存とAI相談", "ゲストのプロフィール・関係者情報、テスト用プラン、利用回数と通知設定は端末内に保存されます。AIへの相談内容と関連プロフィールは回答生成のためAI提供サービスに送信されます。このアプリには相談履歴の継続保存機能はありませんが、提供サービス側のログ処理を含むため機密情報を入力しないでください。"],
-    ["お問い合わせと外部サービス", "ログイン中のお問い合わせは対応目的で本人専用に保存されます。Googleカレンダーへ登録する予定内容やSNSへの共有内容は、そのサービスへ利用者の操作により渡されます。診断や生年月日は公開前に必ず確認してください。"],
-    ["削除・訂正と運営者情報", "プロフィールはアプリ内で修正できます。情報削除・開示の希望はお問い合わせの『個人情報』から申請してください。正式な運営者連絡先、保存期間、委託先・国際移転の詳細は確認待ちで、公開販売前に確定します。"],
-  ] },
-} as const;
-export type LegalKey = keyof typeof legalContent;
+import type { Language } from "./translations";
+
+type LegalEntry = { title: string; description: string; sections: readonly (readonly [string, string])[] };
+export type LegalKey = "disclaimer" | "commerce" | "terms" | "privacy";
+export type LocalizedLegalContent = Record<LegalKey, LegalEntry>;
+
+const ja: LocalizedLegalContent = {
+  disclaimer: { title: "免責事項", description: "診断・天体・カラー・日取りに関する利用上の注意。", sections: [["サービスの位置づけ", "本アプリは自己理解と意思決定の整理を支援するエンターテインメント・自己啓発ツールです。占術の解釈は科学的な性格診断ではなく、将来、健康、投資、人間関係の結果を保証しません。"], ["重要な判断", "医療・法律・投資・採用などの判断では、客観的な資料と適切な専門家への相談を優先してください。"], ["計算と表現", "天体位置には天文計算を使いますが、バイオリズム、方位、配色、アートは参考表現です。色や音の治療効果は主張しません。"]] },
+  commerce: { title: "取引・キャンセル・返金", description: "販売状況と今後の契約条件について。", sections: [["現在の販売状況", "現在は開発テスト段階です。プラン切替で契約、決済、請求は発生しません。"], ["販売者情報", "販売事業者名、代表者、所在地、電話番号、連絡先は確認待ちです。必要事項が確定するまで有料販売を開始しません。"], ["キャンセルと返金", "現在は請求がないため、解約・返金対象もありません。販売開始前に更新周期、解約方法、利用停止日、返金条件を明示します。"]] },
+  terms: { title: "利用規約", description: "利用条件、禁止事項、画像共有に関する案内。", sections: [["利用条件", "自己理解の参考として利用し、最終判断はご自身で行ってください。プレビュー切替は有料資格を意味しません。"], ["禁止事項", "不正アクセス、権限の偽装、嫌がらせ、違法利用、同意のない個人情報の登録・公開を禁止します。"], ["AIと共有", "AI回答には誤りが含まれることがあります。画像共有前に個人情報と第三者の権利を確認してください。"]] },
+  privacy: { title: "プライバシーポリシー", description: "プロフィール、AI相談、端末保存、お問い合わせ情報の取り扱い。", sections: [["利用する情報", "氏名、生年月日、出生時刻・出生地、性別などをプロフィール復元と参考分析に使います。ログイン中の情報は本人専用に保存します。"], ["端末保存とAI", "ゲスト情報、プレビュー設定、利用回数、通知設定は端末に保存されます。相談内容と関連プロフィールは回答生成のためAIサービスへ送信されるため、機密情報は入力しないでください。"], ["訂正と削除", "プロフィールはアプリ内で修正できます。削除・開示はお問い合わせから申請できます。運営者情報、保存期間、委託先の詳細は公開販売前に確定します。"]] },
+};
+
+const en: LocalizedLegalContent = {
+  disclaimer: { title: "Disclaimer", description: "Important notes about readings, astronomy, colors and dates.", sections: [["Purpose", "This app is an entertainment and self-reflection tool. Its interpretations are not scientific personality assessments and do not guarantee future events, health, investment returns or relationship outcomes."], ["Important decisions", "For medical, legal, financial or hiring decisions, rely on objective evidence and qualified professionals."], ["Calculations and art", "Astronomical positions are calculated, while rhythms, directions, colors and artwork are reflective interpretations. No therapeutic effect is claimed for colors or sound."]] },
+  commerce: { title: "Transactions, cancellations and refunds", description: "Current sales status and future contract terms.", sections: [["Current status", "The app is in development testing. Switching preview plans creates no contract, payment or charge."], ["Seller details", "The legal seller name, representative, address, telephone number and contact details are pending. Paid sales will not begin until required information is confirmed."], ["Cancellation and refunds", "There are currently no charges to cancel or refund. Renewal, cancellation, access-end and refund terms will be shown before sales begin."]] },
+  terms: { title: "Terms of use", description: "Usage rules, prohibited conduct and image sharing.", sections: [["Using the service", "Use the app as a reflective aid and make final decisions yourself. Preview plan changes do not grant paid membership."], ["Prohibited conduct", "Unauthorized access, false privileges, harassment, illegal use, and storing or publishing another person’s data without consent are prohibited."], ["AI and sharing", "AI responses may be wrong. Before sharing images, check personal data and third-party rights."]] },
+  privacy: { title: "Privacy policy", description: "How profiles, AI conversations, device data and support requests are handled.", sections: [["Information used", "Names, birth details and related profile fields are used to restore profiles and provide reflective analysis. Signed-in data is stored with owner-only access."], ["Device storage and AI", "Guest profiles, preview settings, usage and reminders stay on the device. Consultation text and relevant profile data are sent to the AI service to generate answers; do not enter confidential information."], ["Correction and deletion", "Profiles can be edited in the app. Request deletion or access through Support. Operator details, retention periods and processors will be finalized before paid launch."]] },
+};
+
+const zhCN: LocalizedLegalContent = {
+  disclaimer: { title: "免责声明", description: "关于解读、天体、色彩和日期的使用说明。", sections: [["服务定位", "本应用是娱乐与自我理解工具，不属于科学人格测评，也不保证未来、健康、投资或人际关系结果。"], ["重要决定", "医疗、法律、投资和招聘等决定应以客观资料和专业人士意见为准。"], ["计算与艺术", "天体位置采用天文计算，节律、方位、色彩和艺术属于参考表达，不宣称色彩或声音具有治疗效果。"]] },
+  commerce: { title: "交易、取消与退款", description: "当前销售状态和未来合同条件。", sections: [["当前状态", "应用仍处于开发测试阶段。切换预览方案不会产生合同、付款或账单。"], ["销售者信息", "销售主体、负责人、地址、电话和联系方式尚待确认，信息齐备前不会开始收费。"], ["取消与退款", "目前没有可取消或退款的账单。正式销售前将明确续订、取消、停用和退款条件。"]] },
+  terms: { title: "使用条款", description: "使用条件、禁止行为与图片分享。", sections: [["使用条件", "请将本应用作为自我理解的参考，并自行作出最终决定。预览方案不代表付费资格。"], ["禁止行为", "禁止未经授权访问、伪造权限、骚扰、违法使用，以及未经同意保存或公开他人个人信息。"], ["AI与分享", "AI回答可能有误。分享图片前，请确认个人信息和第三方权利。"]] },
+  privacy: { title: "隐私政策", description: "个人资料、AI咨询、设备数据和客服信息的处理方式。", sections: [["使用的信息", "姓名、出生信息等用于恢复资料和生成参考分析。登录后的资料仅限本人访问。"], ["设备保存与AI", "访客资料、预览设置、使用次数和提醒保存在设备中。咨询内容及相关资料会发送给AI服务，请勿输入机密信息。"], ["更正与删除", "可在应用内修改资料，并通过客服申请查阅或删除。运营者、保存期限和受托方信息将在收费前确定。"]] },
+};
+
+const zhTW: LocalizedLegalContent = {
+  disclaimer: { title: "免責聲明", description: "關於解讀、天體、色彩與日期的使用說明。", sections: [["服務定位", "本應用為娛樂與自我理解工具，不是科學人格測驗，也不保證未來、健康、投資或人際關係結果。"], ["重要決定", "醫療、法律、投資與招募等決定，應以客觀資料及專業人士意見為準。"], ["計算與藝術", "天體位置採天文計算；節律、方位、色彩與藝術屬參考表現，不宣稱色彩或聲音具有療效。"]] },
+  commerce: { title: "交易、取消與退款", description: "目前銷售狀態與未來契約條件。", sections: [["目前狀態", "應用仍在開發測試。切換預覽方案不會產生契約、付款或帳單。"], ["銷售者資訊", "銷售主體、負責人、地址、電話與聯絡方式尚待確認，資料完成前不會開始收費。"], ["取消與退款", "目前沒有可取消或退款的費用。正式銷售前將說明續訂、取消、停用與退款條件。"]] },
+  terms: { title: "使用條款", description: "使用條件、禁止行為與圖片分享。", sections: [["使用條件", "請將本應用作為自我理解的參考，並自行作出最終決定。預覽方案不等於付費資格。"], ["禁止行為", "禁止未經授權存取、偽造權限、騷擾、違法使用，以及未經同意儲存或公開他人個資。"], ["AI與分享", "AI回答可能有誤。分享圖片前請確認個人資料與第三方權利。"]] },
+  privacy: { title: "隱私權政策", description: "個人資料、AI諮詢、裝置資料與客服資訊的處理方式。", sections: [["使用的資訊", "姓名與出生資訊用於還原個人檔案及產生參考分析。登入後資料僅限本人存取。"], ["裝置儲存與AI", "訪客資料、預覽設定、使用次數與提醒儲存在裝置中。諮詢內容及相關資料會傳送至AI服務，請勿輸入機密資訊。"], ["更正與刪除", "可在應用內修改資料，並透過客服申請查閱或刪除。營運者、保存期限及受託方資訊將於收費前確定。"]] },
+};
+
+const ko: LocalizedLegalContent = {
+  disclaimer: { title: "면책 고지", description: "해석, 천체, 색상과 날짜 이용 안내.", sections: [["서비스의 성격", "이 앱은 오락 및 자기이해 도구입니다. 과학적 성격검사가 아니며 미래, 건강, 투자 또는 관계의 결과를 보장하지 않습니다."], ["중요한 결정", "의료·법률·금융·채용 결정은 객관적 자료와 자격 있는 전문가의 조언을 우선하세요."], ["계산과 예술", "천체 위치는 계산하지만 리듬, 방향, 색상과 예술은 참고 표현입니다. 색이나 소리의 치료 효과를 주장하지 않습니다."]] },
+  commerce: { title: "거래·취소·환불", description: "현재 판매 상태와 향후 계약 조건.", sections: [["현재 상태", "현재 개발 테스트 중이며 미리보기 플랜 전환으로 계약, 결제 또는 청구가 발생하지 않습니다."], ["판매자 정보", "판매자, 대표자, 주소, 전화번호와 연락처는 확인 중입니다. 필수 정보가 확정되기 전에는 유료 판매를 시작하지 않습니다."], ["취소와 환불", "현재 취소하거나 환불할 청구가 없습니다. 판매 전에 갱신, 취소, 이용 종료와 환불 조건을 안내합니다."]] },
+  terms: { title: "이용약관", description: "이용 조건, 금지 행위와 이미지 공유.", sections: [["이용 조건", "자기이해의 참고로 사용하고 최종 결정은 직접 내리세요. 미리보기 플랜은 유료 자격이 아닙니다."], ["금지 행위", "무단 접근, 권한 위조, 괴롭힘, 불법 이용, 동의 없는 타인 정보 저장·공개를 금지합니다."], ["AI와 공유", "AI 답변에는 오류가 있을 수 있습니다. 이미지 공유 전 개인정보와 제3자의 권리를 확인하세요."]] },
+  privacy: { title: "개인정보 처리방침", description: "프로필, AI 상담, 기기 저장과 문의 정보 처리.", sections: [["이용 정보", "이름과 출생 정보는 프로필 복원 및 참고 분석에 사용됩니다. 로그인 데이터는 본인만 접근할 수 있게 저장됩니다."], ["기기 저장과 AI", "게스트 정보와 설정은 기기에 저장됩니다. 상담 내용과 관련 프로필은 답변 생성을 위해 AI 서비스에 전송되므로 기밀 정보는 입력하지 마세요."], ["수정과 삭제", "앱에서 프로필을 수정하고 고객지원에서 열람·삭제를 요청할 수 있습니다. 운영자와 보관기간 정보는 유료 출시 전에 확정됩니다."]] },
+};
+
+const es: LocalizedLegalContent = {
+  disclaimer: { title: "Aviso legal", description: "Notas sobre lecturas, astronomía, colores y fechas.", sections: [["Finalidad", "Esta aplicación es una herramienta de entretenimiento y reflexión. No es una evaluación científica ni garantiza resultados futuros, médicos, financieros o relacionales."], ["Decisiones importantes", "Para decisiones médicas, legales, financieras o laborales, prioriza datos objetivos y profesionales cualificados."], ["Cálculos y arte", "Las posiciones astronómicas se calculan; ritmos, direcciones, colores y arte son interpretaciones orientativas. No se atribuyen efectos terapéuticos al color o al sonido."]] },
+  commerce: { title: "Transacciones, cancelaciones y reembolsos", description: "Estado de venta y futuras condiciones.", sections: [["Estado actual", "La aplicación está en pruebas. Cambiar el plan de vista previa no crea contratos, pagos ni cargos."], ["Datos del vendedor", "La identidad legal, representante, dirección, teléfono y contacto están pendientes. No habrá ventas hasta completarlos."], ["Cancelación y reembolso", "Actualmente no existen cargos que cancelar o reembolsar. Las condiciones se mostrarán antes del lanzamiento de pago."]] },
+  terms: { title: "Condiciones de uso", description: "Normas de uso, conductas prohibidas y uso compartido.", sections: [["Uso del servicio", "Utiliza la aplicación como apoyo para reflexionar y toma tus propias decisiones. La vista previa no concede una suscripción de pago."], ["Conductas prohibidas", "Se prohíben accesos no autorizados, privilegios falsos, acoso, usos ilegales y guardar o publicar datos ajenos sin consentimiento."], ["IA y contenido compartido", "La IA puede equivocarse. Antes de compartir una imagen, revisa los datos personales y los derechos de terceros."]] },
+  privacy: { title: "Política de privacidad", description: "Tratamiento de perfiles, consultas, datos del dispositivo y soporte.", sections: [["Información utilizada", "El nombre y los datos de nacimiento permiten restaurar el perfil y generar análisis orientativos. Los datos de sesión son privados para su titular."], ["Dispositivo e IA", "Los datos de invitado y ajustes se guardan en el dispositivo. Las consultas y el perfil relacionado se envían al servicio de IA; no introduzcas información confidencial."], ["Corrección y eliminación", "Puedes editar el perfil y pedir acceso o eliminación a Soporte. Los datos del operador y plazos se confirmarán antes del lanzamiento de pago."]] },
+};
+
+const fr: LocalizedLegalContent = {
+  disclaimer: { title: "Avertissement", description: "Informations sur les lectures, l’astronomie, les couleurs et les dates.", sections: [["Finalité", "Cette application est un outil de divertissement et de réflexion. Elle ne constitue pas une évaluation scientifique et ne garantit aucun résultat futur, médical, financier ou relationnel."], ["Décisions importantes", "Pour les décisions médicales, juridiques, financières ou de recrutement, privilégiez les faits et l’avis de professionnels qualifiés."], ["Calculs et création", "Les positions astronomiques sont calculées ; rythmes, directions, couleurs et œuvres restent indicatifs. Aucun effet thérapeutique des couleurs ou du son n’est revendiqué."]] },
+  commerce: { title: "Transactions, annulations et remboursements", description: "État des ventes et futures conditions contractuelles.", sections: [["Situation actuelle", "L’application est en phase de test. Changer de formule d’aperçu ne crée ni contrat, ni paiement, ni facturation."], ["Informations vendeur", "L’entité juridique, son représentant, son adresse, son téléphone et ses coordonnées restent à confirmer. Aucune vente ne commencera avant leur publication."], ["Annulation et remboursement", "Il n’existe actuellement aucune somme à annuler ou rembourser. Les conditions seront affichées avant le lancement payant."]] },
+  terms: { title: "Conditions d’utilisation", description: "Règles d’usage, comportements interdits et partage d’images.", sections: [["Utilisation", "Utilisez l’application comme support de réflexion et prenez vous-même vos décisions finales. Les formules d’aperçu ne donnent aucun abonnement payant."], ["Comportements interdits", "Sont interdits : accès non autorisé, faux privilèges, harcèlement, usage illégal et conservation ou publication des données d’autrui sans consentement."], ["IA et partage", "Les réponses de l’IA peuvent comporter des erreurs. Avant tout partage, vérifiez les données personnelles et les droits des tiers."]] },
+  privacy: { title: "Politique de confidentialité", description: "Traitement des profils, consultations, données locales et demandes d’assistance.", sections: [["Données utilisées", "Le nom et les données de naissance servent à restaurer le profil et produire des analyses indicatives. Les données connectées restent accessibles à leur propriétaire."], ["Stockage local et IA", "Les données invité et réglages restent sur l’appareil. La consultation et le profil utile sont transmis au service d’IA ; n’y saisissez aucune information confidentielle."], ["Rectification et suppression", "Vous pouvez modifier le profil et demander accès ou suppression à l’assistance. L’opérateur et les durées de conservation seront précisés avant le lancement payant."]] },
+};
+
+export const legalContentByLanguage: Record<Language, LocalizedLegalContent> = { ja, en, "zh-CN": zhCN, "zh-TW": zhTW, ko, es, fr };
+export const legalContent = ja;

@@ -48,7 +48,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
   }, [signedIn, plan, actualPlan, listMembers]);
   useEffect(() => { if (targetId !== "owner" && !members.some(m => m.id === targetId)) setTargetId("owner"); }, [members, targetId]);
   const target = members.find(m => m.id === targetId);
-  const targetProfile = target ? { ...profile, nameKanji: target.name, nameKana: "", nameRomaji: "", birthDate: target.birthDate, birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", bloodType: target.bloodType, siblingOrder: "", gender: target.gender as UserProfile["gender"] } : profile;
+  const targetProfile = target ? { ...profile, nameKanji: target.name, nameKana: target.nameKana ?? "", nameRomaji: "", birthDate: target.birthDate, birthTime: target.birthTime ?? "", birthTimeUnknown: target.birthTimeUnknown ?? true, birthPlace: target.birthPlace ?? "", birthCity: target.birthCity ?? "", bloodType: target.bloodType, siblingOrder: target.siblingOrder ?? "", gender: target.gender as UserProfile["gender"] } : profile;
   const targetLabel = target?.name ?? (language === "ja" ? "本人（登録オーナー）" : language === "zh-TW" ? "本人（帳戶擁有人）" : "You (owner)");
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
@@ -142,7 +142,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
           <option value="owner">{language === "ja" ? "本人（登録オーナー）" : language === "zh-TW" ? "本人（帳戶擁有人）" : "You (owner)"}</option>
           {members.map(m => <option key={m.id} value={m.id}>{m.name} · {m.role || m.birthDate}</option>)}
         </select>
-        {target && <p className="mt-2 text-xs text-muted-foreground">{target.birthDate} · {language === "ja" ? "出生時間・出生地は未登録" : "Birth time and place not recorded"}</p>}
+        {target && <p className="mt-2 text-xs text-muted-foreground">{target.birthDate}{target.birthTimeUnknown === false && target.birthTime ? ` · ${target.birthTime}` : ""}{target.birthPlace ? ` · ${target.birthPlace}${target.birthCity ? ` ${target.birthCity}` : ""}` : ""}</p>}
       </div>
       <div className="mt-6 grid gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
         <div className="flex items-center gap-3">

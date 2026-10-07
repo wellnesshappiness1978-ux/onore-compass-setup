@@ -151,35 +151,59 @@ export type Database = {
       }
       team_members: {
         Row: {
+          birth_city: string
           birth_date: string
+          birth_place: string
+          birth_time: string | null
+          birth_time_unknown: boolean
           blood_type: string
           created_at: string
           gender: string
           id: string
           name: string
+          name_kana: string
+          relationship: string
+          relationship_type: string
           role: string
+          sibling_order: string
           skills: string[]
           user_id: string
         }
         Insert: {
+          birth_city?: string
           birth_date: string
+          birth_place?: string
+          birth_time?: string | null
+          birth_time_unknown?: boolean
           blood_type?: string
           created_at?: string
           gender?: string
           id?: string
           name: string
+          name_kana?: string
+          relationship?: string
+          relationship_type?: string
           role?: string
+          sibling_order?: string
           skills?: string[]
           user_id: string
         }
         Update: {
+          birth_city?: string
           birth_date?: string
+          birth_place?: string
+          birth_time?: string | null
+          birth_time_unknown?: boolean
           blood_type?: string
           created_at?: string
           gender?: string
           id?: string
           name?: string
+          name_kana?: string
+          relationship?: string
+          relationship_type?: string
           role?: string
+          sibling_order?: string
           skills?: string[]
           user_id?: string
         }

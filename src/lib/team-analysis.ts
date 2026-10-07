@@ -4,9 +4,17 @@
 export type TeamMember = {
   id: string;
   name: string;
+  nameKana?: string;
   birthDate: string; // YYYY-MM-DD
+  birthTime?: string;
+  birthTimeUnknown?: boolean;
+  birthPlace?: string;
+  birthCity?: string;
+  siblingOrder?: string;
   gender: string;
   bloodType: string;
+  relationship?: string;
+  relationshipType?: string;
   role: string;
   skills: string[];
 };

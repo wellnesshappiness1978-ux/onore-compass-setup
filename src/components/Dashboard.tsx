@@ -407,8 +407,8 @@ function TorisetsuPanel({
                 </p>
               </div>
               <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
-               <div className="mt-6 grid gap-3 text-left sm:grid-cols-2">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-4"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-7 text-foreground">{result.sentences[i]}</p>{i === 3 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
-               <div className="mt-4 rounded-md border border-primary/15 p-4 text-left text-xs leading-6 text-muted-foreground"><p>{result.elementPair} · {result.dynamic}</p>{result.evidence.map((line,i) => <p key={i}>{line}</p>)}<p className="mt-2">{result.note}</p></div>
+                <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-5"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
+               <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
               <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
             </section>
           ) : null}
