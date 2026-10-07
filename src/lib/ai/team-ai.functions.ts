@@ -7,7 +7,7 @@ import { createLovableAiGatewayRunIdFetch } from "./run-id.server.ts";
 const lang = z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]);
 const memberSummary = z.object({
   id: z.string().max(60), name: z.string().max(60), role: z.string().max(60), skills: z.array(z.string().max(30)).max(12),
-  relationship: z.string().max(60), relationshipType: z.string().max(30), birthDate: z.string().date(), birthTime: z.string().max(5), birthPlace: z.string().max(170), gender: z.string().max(20), bloodType: z.string().max(4),
+  relationship: z.string().max(60), relationshipType: z.string().max(30), birthDate: z.string().date(), birthTime: z.string().max(5), birthPlace: z.string().max(170), siblingOrder: z.string().max(40), gender: z.string().max(20), bloodType: z.string().max(4),
   teamRole: z.string().max(30), element: z.string().max(10), lifePath: z.number().int(), biorhythm: z.number().int(),
 });
 

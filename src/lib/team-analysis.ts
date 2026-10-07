@@ -10,6 +10,7 @@ export type TeamMember = {
   birthTimeUnknown?: boolean;
   birthPlace?: string;
   birthCity?: string;
+  siblingOrder?: string;
   gender: string;
   bloodType: string;
   relationship?: string;
