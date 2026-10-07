@@ -12,7 +12,7 @@ export function SpiralLines({ className = "" }: { className?: string }) {
   return <svg className={className} viewBox="0 0 320 320" fill="none" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
     <circle cx="160" cy="160" r="145" stroke="currentColor" strokeWidth=".35" opacity=".38" />
     <circle cx="160" cy="160" r="119" stroke="currentColor" strokeWidth=".35" opacity=".26" />
-    <path d="M160 8v304M8 160h304M54 54l212 212M266 54 54 266" stroke="currentColor" strokeWidth=".35" opacity=".23" />
+    <path d="M160 8v304M54 54l212 212M266 54 54 266" stroke="currentColor" strokeWidth=".35" opacity=".23" />
     <polyline points={points} stroke="currentColor" strokeWidth="1.1" opacity=".75" strokeLinecap="round" strokeLinejoin="round" />
   </svg>;
 }
