@@ -144,6 +144,6 @@
 
 ## Multilingual compatibility and related profiles
 - [ ] Complete seven-language UI, share, support and legal localization without English fallback leakage.
-- [ ] Rebuild compatibility as three jargon-free stages in all seven languages.
-- [ ] Add private detailed related-person profiles with editing and backward-compatible preview storage.
-- [ ] Remove only the horizontal logo streak and verify the preserved aura.
+- [x] Rebuild compatibility as three jargon-free stages in all seven languages.
+- [x] Add private detailed related-person profiles with editing and backward-compatible preview storage.
+- [x] Remove only the horizontal logo streak and verify the preserved aura.
