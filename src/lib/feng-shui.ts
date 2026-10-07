@@ -15,7 +15,6 @@ const palaces = [
   { dir: "N", base: 1, trigram: "kan", element: "water", room: "bath", color: "blue", plant: "pothos" },
   { dir: "NW", base: 6, trigram: "ken", element: "metal", room: "office", color: "white", plant: "snakePlant" },
 ] as const;
-];
 const directionsByKua: Record<number, [Direction, Direction, Direction, Direction]> = {
   1: ["SE", "E", "S", "N"], 2: ["NE", "W", "NW", "SW"],
   3: ["S", "N", "SE", "E"], 4: ["N", "S", "E", "SE"],
