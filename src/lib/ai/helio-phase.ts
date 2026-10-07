@@ -2,7 +2,7 @@
 // Real heliocentric longitudes; the four-phase mapping is a reflective convention, not a verified timing system.
 import * as A from "astronomy-engine";
 
-export type HelioPhase = { phase: "種まき" | "育成" | "収穫" | "休息"; degrees: number };
+export type HelioPhase = { phase: "seed" | "grow" | "harvest" | "rest"; degrees: number };
 
 const earthLon = (d: Date) => {
   const v = A.HelioVector(A.Body.Earth, d);
@@ -14,6 +14,6 @@ export function helioPhase(birthDate: string, now = new Date()): HelioPhase | nu
   const birth = new Date(`${birthDate}T03:00:00Z`);
   if (Number.isNaN(birth.getTime())) return null;
   const degrees = Math.round((earthLon(now) - earthLon(birth) + 360) % 360);
-  const phase = degrees < 90 ? "種まき" : degrees < 180 ? "育成" : degrees < 270 ? "収穫" : "休息";
+  const phase = degrees < 90 ? "seed" : degrees < 180 ? "grow" : degrees < 270 ? "harvest" : "rest";
   return { phase, degrees };
 }
