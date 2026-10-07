@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createOpenAI } from "@ai-sdk/openai";
 import { Output, streamText } from "ai";
 import { z } from "zod";
+import { createLovableAiGatewayRunIdFetch } from "./run-id.server.ts";
 
 const lang = z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]);
 const memberSummary = z.object({
@@ -13,6 +14,7 @@ const memberSummary = z.object({
 const provider = (apiKey: string) => createOpenAI({
   baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
   headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
+  fetch: createLovableAiGatewayRunIdFetch().fetch,
 });
 const RULES = "All inputs are illustrative reference values derived from birth dates (numerology life path, day-stem element, sine biorhythm). They are NOT verified divination nor evidence of ability. Do not claim certainty, guaranteed outcomes, or health effects. Be warm, practical, and avoid jargon. Never judge people as good or bad hires.";
 const outputLanguage = (language: z.infer<typeof lang>) => language === "ja"
@@ -77,8 +79,8 @@ export const analyzeCandidate = createServerFn({ method: "POST" })
     const result = streamText({
       model: provider(apiKey).responses("openai/gpt-6-astra"),
       output: Output.object({ schema: recruitOut }),
-      prompt: `${RULES}\n${outputLanguage(data.language)} This is a hiring-interview reflection aid. It must NEVER be used as a pass/fail criterion; say the decision rests on skills, experience and the interview itself. Candidate (reference values): ${JSON.stringify(data.candidate)}. Reference compatibility with existing members: ${JSON.stringify(data.pairs)}.\nteamFit = how they may mesh with the current team, naming 1-3 members with high reference scores. rolePrediction = the role they may naturally take in the organisation. motivation = how to sustain their motivation after joining (praise style, environment). onboarding = first-90-days support tips for the manager. Each 100-200 Japanese characters (or ~60 words), warm and concrete.`,
-      providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", store: false, include: ["reasoning.encrypted_content"] } },
+      prompt: `${RULES}\n${outputLanguage(data.language)} This is a hiring-interview reflection aid. It must NEVER be used as a pass/fail criterion; say the decision rests on skills, experience and the interview itself. Candidate (reference values): ${JSON.stringify(data.candidate)}. Reference compatibility with existing members: ${JSON.stringify(data.pairs)}.\nteamFit = how they may mesh with the current team, naming 1-3 members with high reference scores. rolePrediction = the role they may naturally take in the organisation. motivation = how to sustain their motivation after joining (praise style, environment). onboarding = first-90-days support tips for the manager. Keep every field concise, warm and concrete in the requested language.`,
+      providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", store: false, include: ["reasoning.encrypted_content"] } },
     });
     return await result.output;
   });
