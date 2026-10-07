@@ -13,7 +13,7 @@ import type { Language } from "@/lib/translations";
 
 export default function SupportForm({ language: languageProp }: { language?: Language }) {
   const [language, setLanguage] = useState<Language>(languageProp ?? "ja");
-  useEffect(() => { if (!languageProp) setLanguage(storedLanguage()); }, [languageProp]);
+  useEffect(() => { setLanguage(languageProp ?? storedLanguage()); }, [languageProp]);
   const t = supportCopy[language];
   const [signedIn, setSignedIn] = useState(false);
   const [category, setCategory] = useState<"bug" | "account" | "privacy" | "other">("bug");
