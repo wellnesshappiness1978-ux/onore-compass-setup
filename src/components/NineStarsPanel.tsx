@@ -14,7 +14,8 @@ import { paletteColors } from "@/lib/art-geometry";
 import { AgolmenLoading } from "./AgolmenSpiral";
 import { nineStarProfile } from "@/lib/calendar-traditions";
 import { artSpecialistCopy } from "@/lib/art-specialist-copy";
-import { directionLabels, nineStarName, trigramLabel } from "@/lib/ui-i18n";
+import { nineStarName, trigramLabel } from "@/lib/ui-i18n";
+import { helioCopy } from "@/lib/helio-copy";
 
 const MandalaScene = lazy(() => import("./MandalaScene"));
 type Props = { language: Language; onVip: () => void; profile: UserProfile; testUnlocked?: boolean };
