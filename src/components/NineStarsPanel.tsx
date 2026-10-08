@@ -3,7 +3,6 @@ import { Copy, Crown, Download, Expand, LockKeyhole, Play, Share2, X } from "luc
 import { Button } from "@/components/ui/button";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { natalSky } from "@/lib/natal-sky";
-import { computeCoreLayers } from "@/lib/ai/core-layers";
 import { nineStarsTranslations } from "@/lib/nine-stars-translations";
 import { getArtSymbols, NineStarsArtwork, zodiacGlyphs } from "./NineStarsArtwork";
 import type { Language } from "@/lib/translations";
@@ -27,7 +26,6 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
   const palette = birthColorSpectrum(profile);
   const sky = natalSky(birthDate, profile.birthTime, profile.birthTimeUnknown);
   const nine = nineStarProfile(birthDate, profile.birthTime, profile.birthTimeUnknown, profile.gender);
-  const element = computeCoreLayers(profile)?.shichu.dayElement ?? "木";
   const symbols = getArtSymbols(birthDate);
   const [art, setArt] = useState<"mandala" | "cosmic">("mandala");
   const [progress, setProgress] = useState(0);

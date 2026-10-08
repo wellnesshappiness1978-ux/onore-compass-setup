@@ -53,7 +53,7 @@ function DotRing({ count, radius, dot, colors, offset = 0, opacity = .9 }: { cou
   return <group>{Array.from({ length: count }, (_, i) => {
     const angle = i / count * Math.PI * 2 + offset;
     const pulse = i % 6 === 0 ? 1.45 : i % 3 === 0 ? 1.18 : 1;
-    return <mesh key={i} position={[Math.cos(angle) * radius, Math.sin(angle) * radius, .02]}><circleGeometry args={[dot * pulse, 10]} /><meshBasicMaterial color={colors[i % colors.length]} transparent opacity={opacity} blending={THREE.AdditiveBlending} /></mesh>;
+    return <mesh key={i} position={[Math.cos(angle) * radius, Math.sin(angle) * radius, .02]}><circleGeometry args={[dot * pulse, 10]} /><meshBasicMaterial color={colors[i % colors.length] ?? "#D4AF37"} transparent opacity={opacity} blending={THREE.AdditiveBlending} /></mesh>;
   })}</group>;
 }
 
