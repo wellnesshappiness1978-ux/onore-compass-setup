@@ -6,57 +6,320 @@ import { mingGua } from "@/lib/feng-shui";
 import { dayElement, lifePath, pairScore, relation } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
 
-const date = z.string().date().refine(v => v >= "1900-01-01" && v <= new Date().toISOString().slice(0, 10));
+const date = z
+  .string()
+  .date()
+  .refine((v) => v >= "1900-01-01" && v <= new Date().toISOString().slice(0, 10));
 export const partnerSchema = z.object({
-  name: z.string().trim().max(40), nameKana: z.string().trim().max(60), birthDate: date,
+  name: z.string().trim().max(40),
+  nameKana: z.string().trim().max(60),
+  birthDate: date,
   birthTime: z.union([z.literal(""), z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/)]),
-  birthPlace: z.string().max(20), birthCity: z.string().trim().max(80),
+  birthPlace: z.string().max(20),
+  birthCity: z.string().trim().max(80),
   bloodType: z.enum(["", "A", "B", "O", "AB"]),
   siblingOrder: z.enum(["", "first", "middle", "last", "only"]),
   gender: z.enum(["female", "male", "other", "undisclosed"]),
 });
 export type PartnerInput = z.infer<typeof partnerSchema>;
-type Owner = { name: string; birthDate: string; birthTime: string; birthTimeUnknown: boolean; birthPlace: string; birthCity: string; bloodType: string; siblingOrder: string; nameRomaji: string; gender: string };
+type Owner = {
+  name: string;
+  birthDate: string;
+  birthTime: string;
+  birthTimeUnknown: boolean;
+  birthPlace: string;
+  birthCity: string;
+  bloodType: string;
+  siblingOrder: string;
+  nameRomaji: string;
+  gender: string;
+};
 
-type CompatibilityWords = { titles: [string, string, string, string]; labels: [string, string]; rhythm: Record<"same" | "generate" | "control" | "neutral", string>; points: string; future: string; synthesis: string; advice: string; notAvailable: string; missing: string; reference: string };
+type CompatibilityWords = {
+  titles: [string, string, string, string];
+  labels: [string, string];
+  rhythm: Record<"same" | "generate" | "control" | "neutral", string>;
+  points: string;
+  future: string;
+  synthesis: string;
+  advice: string;
+  notAvailable: string;
+  missing: string;
+  reference: string;
+};
 const words: Record<Language, CompatibilityWords> = {
-  ja: { titles: ["お２人の特性と基本的な相性", "お二人の将来性", "多層占術総合診断", "注意点とアドバイス"], labels: ["本人", "相手"], rhythm: { same: "歩調をそろえやすい", generate: "互いの得意を自然に引き出しやすい", control: "違いが刺激にも摩擦にもなりやすい", neutral: "役割を決めるほど協力しやすい" }, points: "二人の関係には、最初から同じ考え方をすることよりも、違う入口から同じ目的へ近づける強さがあります。片方が直感で動き始める時、もう片方は状況を確かめて道筋を整えようとします。そのため、出会ったばかりの頃はテンポの違いを感じても、互いの役割が見えるほど安心と信頼が育ちやすい組み合わせです。あなたが自然に差し出す気遣いと、相手が大切にしている自由や納得の時間は、競い合うものではありません。言葉にする順番を整えれば、一方の発想がもう一方の現実感によって形になり、暮らしでも仕事でも補い合えます。ただし、親しさから「説明しなくても分かるはず」と考えると、沈黙を同意と受け取ったり、慎重さを消極性と見誤ったりしやすくなります。大切なのは、結論だけでなく、そこへ至った気持ちを短く添えることです。嬉しかったこと、今は一人で考えたいこと、手伝ってほしいことを小さな段階で共有してください。二人は、相手を自分と同じ型に変えるより、違いを役割として尊重した時に、本来の温かさと力が最も自然に現れます。日々の小さな約束を守り、感謝を具体的な言葉にするほど、素のままでいられる居場所を一緒につくれる関係です。", future: "この先の二人は、時間とともに違いが消えるのではなく、違いの扱い方が上手になることで関係を深めていけます。短期的には予定や連絡の頻度、決断の速さで揺れやすい一方、共通の目標を一つ決めると協力の形がはっきりします。数か月先を考える時は、大きな約束より、月に一度これからの予定と負担を話す時間を持つことが有効です。環境が変わる時ほど、片方だけが我慢して合わせないこと。互いが守りたい時間と一緒に育てたいことを言葉にできれば、関係は刺激的な段階から、安心して挑戦を支え合える段階へ進みます。未来は決められた結論ではなく、二人が選ぶ会話と行動によって広がります。", synthesis: "利用できる出生情報と姓名の読み、数の傾向、生まれた時の空、東洋の暦、行動パターン、方位の考え方、色の組み合わせを重ねると、二人の結びつきは「同じであること」より「違いを循環させること」に特徴があります。考えを外へ出しながら整理する人と、内側で確かめてから言葉にする人では、返事の速さが違います。しかし、それは関心の差とは限りません。家庭では、予定、休息、お金、家事のように曖昧さが負担になりやすいことを先に分けて話すと、穏やかさが続きます。仕事や共同作業では、可能性を広げる役と、期限や品質を守る役を固定せず、その時に余裕がある側が引き受ける仕組みが合います。気持ちの面では、励ますことが愛情になる時と、ただ聞くことが愛情になる時があります。相手が求めている方を確認せずに善意を急ぐと、助けた側にも助けられた側にも疲れが残ります。「提案してよい？」「今日は聞くだけにする？」という短い確認が、二人の空気を大きく整えます。また、外では強く振る舞う人ほど、家では判断を休みたいことがあります。沈黙や一人の時間を拒絶と決めつけず、戻る時刻や次に話す時間だけ共有すると安心できます。節目には、過去の正しさを競うより、今後やめること、続けること、新しく試すことを一つずつ決めてください。二人の絆は、劇的な出来事だけで強まるのではありません。小さな約束を守る、相手の努力を具体的に伝える、意見が違っても人格まで否定しない、という日々の積み重ねが土台になります。算出できた複数の視点はいずれも、違いを弱点ではなく役割へ変えられる可能性を示します。ただし、入力のない情報は補わず、相手の感情や未来を断定するものでもありません。結果を答え合わせにせず、二人に合う対話を見つけるための鏡として使うことで、この関係の長所が現実の選択へつながります。", advice: "最も注意したいのは、片方が早く結論を出したい時に、もう片方が感情や背景を整理している場面です。返事の遅さを無関心と決めつけたり、強い言い方を本心のすべてと受け取ったりすると、必要以上に溝が広がります。話し合いの前に「今日は決めたいのか、まず聞いてほしいのか」を確認してください。予定を変える時は理由と新しい時刻を同時に伝え、負担を頼む時は内容と期限を具体的にします。感情が高ぶったら、その場で勝敗をつけず、再開する時刻を決めて一度離れること。二人の黄金ルールは、意図を推測せず、希望・期限・不安を短い言葉で確かめることです。診断より実際の言葉と行動を優先してください。", notAvailable: "未算出", missing: "入力されていない出生時間・出生地・性別や、対応情報のない姓名データは推測していません。", reference: "算出済み情報を組み合わせた自己理解の参考であり、相手の気持ち・性格・未来を判定するものではありません。" },
-  en: { titles: ["Your traits and essential compatibility", "Your future together", "Multi-layer relationship reading", "Watch-outs and practical advice"], labels: ["You", "Partner"], rhythm: { same: "you can settle into a shared pace", generate: "you tend to draw out each other's strengths", control: "your differences can create both spark and friction", neutral: "clear roles make cooperation easier" }, points: "Comparing pace, decision style and preferred distance suggests a pairing that can turn differences into useful role-sharing.", future: "This connection works best when you do not force the same starting point. One person may begin with ideas while the other looks for a workable finish; together, that can create momentum. At home, name plans and quiet time instead of assuming them. At work, decide who opens possibilities and who closes details. Small unspoken discomfort grows quickly, while an early, simple check-in turns attraction into trust.", synthesis: "Looking across the available name, date, sky, calendar, direction, action-pattern and color references, this bond grows through complementary roles rather than identical habits. One person may think aloud while the other needs quiet before responding; a slower answer is not necessarily lower interest. Shared plans work best when responsibilities, rest, money and timing are spoken about before they become assumptions. In practical projects, alternate who opens possibilities and who protects deadlines instead of fixing those roles forever. Emotionally, ask whether encouragement, advice or simple listening is wanted. A brief check-in can prevent good intentions from becoming pressure. Treat silence as a need for space, not rejection, while agreeing when to reconnect. At turning points, decide one thing to stop, one to continue and one to try. The calculated references suggest that difference can become a useful division of strengths. They do not determine feelings or the future; use this reading as a mirror for better conversations and let real words and actions remain the final guide.", advice: "Friction is most likely when one person wants a conclusion while the other is still sorting feelings or context. Ask, “Do we need a decision today, or do you want me to listen first?” When plans change, share both the reason and the new deadline. Divide tasks by strengths, not habit. Your golden rule is to ask directly about hopes, timing and concerns instead of guessing intent.", notAvailable: "Not calculated", missing: "Missing birth time, place, gender, or unsupported name data is never guessed.", reference: "A reflective comparison of available calculated inputs, not a test of feelings, character, or future outcomes." },
-  "zh-CN": { titles: ["两人的特质与基本相性", "两人的未来可能", "多层综合相性解读", "注意点与建议"], labels: ["本人", "对方"], rhythm: { same: "容易找到共同节奏", generate: "容易自然激发彼此所长", control: "差异既会带来火花，也可能产生摩擦", neutral: "先明确分工会更容易合作" }, points: "从行动速度、整理想法的顺序与安心距离来看，两人能把差异转化为互补分工。", future: "这段关系不必从同一个起点出发，反而适合各自从擅长之处走向同一个目标。一方负责打开可能，另一方负责把事情落实，力量就会叠加。生活中请把安排与独处时间说清楚，工作中先决定谁提出方向、谁收拢细节。不要把沉默当成默契；越早说出小小的不适，越能把吸引力变成信任。", synthesis: "这段关系不必从同一个起点出发，反而适合各自从擅长之处走向同一个目标。一方负责打开可能，另一方负责把事情落实，力量就会叠加。生活中请把安排与独处时间说清楚，工作中先决定谁提出方向、谁收拢细节。不要把沉默当成默契；越早说出小小的不适，越能把吸引力变成信任。, advice: "最容易错位的时刻，是一方急于下结论，另一方还在整理感受与背景。先问：“今天需要决定，还是你希望我先听？”计划变化时，同时说明原因和新的期限；分工按优势而不是习惯决定。两人的黄金规则是，不猜测意图，直接确认期待、时间与担忧。", notAvailable: "未计算", missing: "未填写的出生时间、地点、性别及无法确认的姓名信息均不作推测。", reference: "这是基于已计算信息的自我理解参考，不能判断对方的感情、性格或未来。" },
-  "zh-TW": { titles: ["兩人的特質與基本相性", "兩人的未來可能", "多層綜合相性解讀", "注意點與建議"], labels: ["本人", "對方"], rhythm: { same: "容易找到共同節奏", generate: "容易自然引出彼此所長", control: "差異既會帶來火花，也可能產生摩擦", neutral: "先明確分工會更容易合作" }, points: "從行動速度、整理想法的順序與安心距離來看，兩人能把差異轉化為互補分工。", future: "這段關係不必從同一個起點出發，反而適合各自從擅長之處走向同一個目標。一方負責打開可能，另一方負責把事情落實，力量就會疊加。生活中請把安排與獨處時間說清楚，工作中先決定誰提出方向、誰收攏細節。不要把沉默當成默契；越早說出小小的不適，越能把吸引力變成信任。", synthesis: "這段關係不必從同一個起點出發，反而適合各自從擅長之處走向同一個目標。一方負責打開可能，另一方負責把事情落實，力量就會疊加。生活中請把安排與獨處時間說清楚，工作中先決定誰提出方向、誰收攏細節。不要把沉默當成默契；越早說出小小的不適，越能把吸引力變成信任。, advice: "最容易錯位的時刻，是一方急著下結論，另一方仍在整理感受與背景。先問：「今天需要決定，還是你希望我先聽？」計畫變動時，同時說明原因和新的期限；分工依優勢而不是習慣決定。兩人的黃金規則是，不猜測意圖，直接確認期待、時間與擔憂。", notAvailable: "未算出", missing: "未填寫的出生時間、地點、性別及無法確認的姓名資訊均不作推測。", reference: "這是依已算出資訊整理的自我理解參考，不能判斷對方的感情、性格或未來。" },
-  ko: { titles: ["두 사람의 특성과 기본 궁합", "두 사람의 미래 가능성", "다층 종합 궁합", "주의점과 실천 조언"], labels: ["본인", "상대"], rhythm: { same: "함께 속도를 맞추기 쉽습니다", generate: "서로의 강점을 자연스럽게 끌어내기 쉽습니다", control: "차이가 자극과 마찰로 모두 작용하기 쉽습니다", neutral: "역할을 정할수록 협력이 쉬워집니다" }, points: "행동 속도, 생각을 정리하는 순서, 편안한 거리감을 비교하면 두 사람은 차이를 역할 분담으로 바꾸기 좋은 조합입니다.", future: "두 사람은 같은 출발점을 고집하기보다 각자의 강점에서 하나의 목표로 향할 때 힘이 겹칩니다. 생활에서는 일정과 혼자 쉬는 시간을 말로 확인하고, 일에서는 가능성을 여는 사람과 마무리하는 사람을 먼저 정하세요. 말하지 않아도 알 것이라고 넘기지 말고 작은 불편을 일찍 나누면, 끌림이 오래가는 신뢰로 자랍니다.", synthesis: "두 사람은 같은 출발점을 고집하기보다 각자의 강점에서 하나의 목표로 향할 때 힘이 겹칩니다. 생활에서는 일정과 혼자 쉬는 시간을 말로 확인하고, 일에서는 가능성을 여는 사람과 마무리하는 사람을 먼저 정하세요. 말하지 않아도 알 것이라고 넘기지 말고 작은 불편을 일찍 나누면, 끌림이 오래가는 신뢰로 자랍니다., advice: "한 사람은 결론을 서두르고 다른 사람은 감정과 배경을 정리할 때 엇갈리기 쉽습니다. 먼저 “오늘 결정할까, 아니면 내가 먼저 들어줄까?”라고 물어보세요. 일정 변경에는 이유와 새 기한을 함께 전하고, 역할은 습관이 아니라 강점으로 나누세요. 황금 규칙은 의도를 짐작하지 않고 바람·기한·걱정을 직접 확인하는 것입니다.", notAvailable: "계산되지 않음", missing: "입력하지 않은 출생 시간·장소·성별과 확인되지 않는 이름 정보는 추측하지 않습니다.", reference: "계산 가능한 정보를 조합한 자기이해용 참고이며 감정·성격·미래를 판정하지 않습니다." },
-  es: { titles: ["Rasgos y compatibilidad esencial", "Vuestro futuro", "Lectura integral por capas", "Alertas y consejos prácticos"], labels: ["Tú", "La otra persona"], rhythm: { same: "os resulta fácil acompasaros", generate: "tendéis a potenciar las fortalezas del otro", control: "las diferencias pueden crear chispa y fricción", neutral: "cooperáis mejor cuando definís funciones" }, points: "Al comparar ritmo, forma de decidir y distancia cómoda, aparece una relación capaz de convertir las diferencias en un reparto útil de papeles.", future: "Esta relación funciona mejor cuando no os obligáis a empezar desde el mismo lugar. Una persona puede abrir posibilidades y la otra convertirlas en algo concreto. En casa, conviene expresar los planes y el tiempo de descanso; en el trabajo, decidir quién propone y quién cierra detalles. No deis por hecho que el silencio significa acuerdo: compartir pronto una pequeña incomodidad transforma la atracción en confianza.", synthesis: "Esta relación funciona mejor cuando no os obligáis a empezar desde el mismo lugar. Una persona puede abrir posibilidades y la otra convertirlas en algo concreto. En casa, conviene expresar los planes y el tiempo de descanso; en el trabajo, decidir quién propone y quién cierra detalles. No deis por hecho que el silencio significa acuerdo: compartir pronto una pequeña incomodidad transforma la atracción en confianza., advice: "El roce surge cuando una persona busca una conclusión y la otra aún ordena emociones o contexto. Preguntad: «¿Tenemos que decidir hoy o prefieres que primero te escuche?». Si cambia un plan, explicad el motivo y la nueva fecha. Repartid tareas por fortalezas. La regla de oro es confirmar directamente deseos, plazos y preocupaciones, sin adivinar intenciones.", notAvailable: "Sin calcular", missing: "Nunca se inventan la hora, el lugar, el género ni datos del nombre que no estén disponibles.", reference: "Comparación orientativa de datos calculados disponibles; no determina sentimientos, personalidad ni futuro." },
-  fr: { titles: ["Vos traits et votre compatibilité essentielle", "Votre avenir ensemble", "Lecture relationnelle multicouche", "Points de vigilance et conseils"], labels: ["Vous", "L’autre personne"], rhythm: { same: "vous trouvez facilement un rythme commun", generate: "vous avez tendance à révéler les forces de l’autre", control: "vos différences peuvent créer élan et friction", neutral: "des rôles clairs facilitent la coopération" }, points: "Le rythme, la façon de décider et la distance rassurante montrent un duo capable de transformer ses différences en rôles complémentaires.", future: "Ce lien gagne en force lorsque vous n’exigez pas le même point de départ. L’un peut ouvrir des possibilités et l’autre les rendre concrètes. À la maison, dites clairement les projets et les besoins de calme ; au travail, décidez qui propose et qui finalise. Ne prenez pas le silence pour un accord : exprimer tôt un petit malaise permet à l’attirance de devenir confiance.", synthesis: "Ce lien gagne en force lorsque vous n’exigez pas le même point de départ. L’un peut ouvrir des possibilités et l’autre les rendre concrètes. À la maison, dites clairement les projets et les besoins de calme ; au travail, décidez qui propose et qui finalise. Ne prenez pas le silence pour un accord : exprimer tôt un petit malaise permet à l’attirance de devenir confiance., advice: "La friction apparaît surtout lorsque l’un veut conclure et que l’autre trie encore ses émotions ou le contexte. Demandez : « Faut-il décider aujourd’hui, ou veux-tu d’abord que je t’écoute ? » En cas de changement, donnez la raison et la nouvelle échéance. Répartissez les tâches selon les forces. Votre règle d’or : vérifier directement attentes, délais et inquiétudes sans deviner les intentions.", notAvailable: "Non calculé", missing: "L’heure, le lieu, le genre et les données de nom absents ne sont jamais inventés.", reference: "Comparaison de réflexion fondée sur les données calculables, sans prédire émotions, personnalité ni avenir." },
+  ja: {
+    titles: [
+      "お２人の特性と基本的な相性",
+      "お二人の将来性",
+      "多層占術総合診断",
+      "注意点とアドバイス",
+    ],
+    labels: ["本人", "相手"],
+    rhythm: {
+      same: "歩調をそろえやすい",
+      generate: "互いの得意を自然に引き出しやすい",
+      control: "違いが刺激にも摩擦にもなりやすい",
+      neutral: "役割を決めるほど協力しやすい",
+    },
+    points:
+      "二人の関係には、最初から同じ考え方をすることよりも、違う入口から同じ目的へ近づける強さがあります。片方が直感で動き始める時、もう片方は状況を確かめて道筋を整えようとします。そのため、出会ったばかりの頃はテンポの違いを感じても、互いの役割が見えるほど安心と信頼が育ちやすい組み合わせです。あなたが自然に差し出す気遣いと、相手が大切にしている自由や納得の時間は、競い合うものではありません。言葉にする順番を整えれば、一方の発想がもう一方の現実感によって形になり、暮らしでも仕事でも補い合えます。ただし、親しさから「説明しなくても分かるはず」と考えると、沈黙を同意と受け取ったり、慎重さを消極性と見誤ったりしやすくなります。大切なのは、結論だけでなく、そこへ至った気持ちを短く添えることです。嬉しかったこと、今は一人で考えたいこと、手伝ってほしいことを小さな段階で共有してください。二人は、相手を自分と同じ型に変えるより、違いを役割として尊重した時に、本来の温かさと力が最も自然に現れます。日々の小さな約束を守り、感謝を具体的な言葉にするほど、素のままでいられる居場所を一緒につくれる関係です。",
+    future:
+      "この先の二人は、時間とともに違いが消えるのではなく、違いの扱い方が上手になることで関係を深めていけます。短期的には予定や連絡の頻度、決断の速さで揺れやすい一方、共通の目標を一つ決めると協力の形がはっきりします。数か月先を考える時は、大きな約束より、月に一度これからの予定と負担を話す時間を持つことが有効です。環境が変わる時ほど、片方だけが我慢して合わせないこと。互いが守りたい時間と一緒に育てたいことを言葉にできれば、関係は刺激的な段階から、安心して挑戦を支え合える段階へ進みます。未来は決められた結論ではなく、二人が選ぶ会話と行動によって広がります。",
+    synthesis:
+      "利用できる出生情報と姓名の読み、数の傾向、生まれた時の空、東洋の暦、行動パターン、方位の考え方、色の組み合わせを重ねると、二人の結びつきは「同じであること」より「違いを循環させること」に特徴があります。考えを外へ出しながら整理する人と、内側で確かめてから言葉にする人では、返事の速さが違います。しかし、それは関心の差とは限りません。家庭では、予定、休息、お金、家事のように曖昧さが負担になりやすいことを先に分けて話すと、穏やかさが続きます。仕事や共同作業では、可能性を広げる役と、期限や品質を守る役を固定せず、その時に余裕がある側が引き受ける仕組みが合います。気持ちの面では、励ますことが愛情になる時と、ただ聞くことが愛情になる時があります。相手が求めている方を確認せずに善意を急ぐと、助けた側にも助けられた側にも疲れが残ります。「提案してよい？」「今日は聞くだけにする？」という短い確認が、二人の空気を大きく整えます。また、外では強く振る舞う人ほど、家では判断を休みたいことがあります。沈黙や一人の時間を拒絶と決めつけず、戻る時刻や次に話す時間だけ共有すると安心できます。節目には、過去の正しさを競うより、今後やめること、続けること、新しく試すことを一つずつ決めてください。二人の絆は、劇的な出来事だけで強まるのではありません。小さな約束を守る、相手の努力を具体的に伝える、意見が違っても人格まで否定しない、という日々の積み重ねが土台になります。算出できた複数の視点はいずれも、違いを弱点ではなく役割へ変えられる可能性を示します。ただし、入力のない情報は補わず、相手の感情や未来を断定するものでもありません。結果を答え合わせにせず、二人に合う対話を見つけるための鏡として使うことで、この関係の長所が現実の選択へつながります。",
+    advice:
+      "最も注意したいのは、片方が早く結論を出したい時に、もう片方が感情や背景を整理している場面です。返事の遅さを無関心と決めつけたり、強い言い方を本心のすべてと受け取ったりすると、必要以上に溝が広がります。話し合いの前に「今日は決めたいのか、まず聞いてほしいのか」を確認してください。予定を変える時は理由と新しい時刻を同時に伝え、負担を頼む時は内容と期限を具体的にします。感情が高ぶったら、その場で勝敗をつけず、再開する時刻を決めて一度離れること。二人の黄金ルールは、意図を推測せず、希望・期限・不安を短い言葉で確かめることです。診断より実際の言葉と行動を優先してください。",
+    notAvailable: "未算出",
+    missing:
+      "入力されていない出生時間・出生地・性別や、対応情報のない姓名データは推測していません。",
+    reference:
+      "算出済み情報を組み合わせた自己理解の参考であり、相手の気持ち・性格・未来を判定するものではありません。",
+  },
+  en: {
+    titles: [
+      "Your traits and essential compatibility",
+      "Your future together",
+      "Multi-layer relationship reading",
+      "Watch-outs and practical advice",
+    ],
+    labels: ["You", "Partner"],
+    rhythm: {
+      same: "you can settle into a shared pace",
+      generate: "you tend to draw out each other's strengths",
+      control: "your differences can create both spark and friction",
+      neutral: "clear roles make cooperation easier",
+    },
+    points:
+      "Comparing pace, decision style and preferred distance suggests a pairing that can turn differences into useful role-sharing.",
+    future:
+      "This connection works best when you do not force the same starting point. One person may begin with ideas while the other looks for a workable finish; together, that can create momentum. At home, name plans and quiet time instead of assuming them. At work, decide who opens possibilities and who closes details. Small unspoken discomfort grows quickly, while an early, simple check-in turns attraction into trust.",
+    synthesis:
+      "Looking across the available name, date, sky, calendar, direction, action-pattern and color references, this bond grows through complementary roles rather than identical habits. One person may think aloud while the other needs quiet before responding; a slower answer is not necessarily lower interest. Shared plans work best when responsibilities, rest, money and timing are spoken about before they become assumptions. In practical projects, alternate who opens possibilities and who protects deadlines instead of fixing those roles forever. Emotionally, ask whether encouragement, advice or simple listening is wanted. A brief check-in can prevent good intentions from becoming pressure. Treat silence as a need for space, not rejection, while agreeing when to reconnect. At turning points, decide one thing to stop, one to continue and one to try. The calculated references suggest that difference can become a useful division of strengths. They do not determine feelings or the future; use this reading as a mirror for better conversations and let real words and actions remain the final guide.",
+    advice:
+      "Friction is most likely when one person wants a conclusion while the other is still sorting feelings or context. Ask, “Do we need a decision today, or do you want me to listen first?” When plans change, share both the reason and the new deadline. Divide tasks by strengths, not habit. Your golden rule is to ask directly about hopes, timing and concerns instead of guessing intent.",
+    notAvailable: "Not calculated",
+    missing: "Missing birth time, place, gender, or unsupported name data is never guessed.",
+    reference:
+      "A reflective comparison of available calculated inputs, not a test of feelings, character, or future outcomes.",
+  },
+  "zh-CN": {
+    titles: ["两人的特质与基本相性", "两人的未来可能", "多层综合相性解读", "注意点与建议"],
+    labels: ["本人", "对方"],
+    rhythm: {
+      same: "容易找到共同节奏",
+      generate: "容易自然激发彼此所长",
+      control: "差异既会带来火花，也可能产生摩擦",
+      neutral: "先明确分工会更容易合作",
+    },
+    points: "从行动速度、整理想法的顺序与安心距离来看，两人能把差异转化为互补分工。",
+    future:
+      "这段关系不必从同一个起点出发，反而适合各自从擅长之处走向同一个目标。一方负责打开可能，另一方负责把事情落实，力量就会叠加。生活中请把安排与独处时间说清楚，工作中先决定谁提出方向、谁收拢细节。不要把沉默当成默契；越早说出小小的不适，越能把吸引力变成信任。",
+    synthesis:
+      "这段关系不必从同一个起点出发，反而适合各自从擅长之处走向同一个目标。一方负责打开可能，另一方负责把事情落实，力量就会叠加。生活中请把安排与独处时间说清楚，工作中先决定谁提出方向、谁收拢细节。不要把沉默当成默契；越早说出小小的不适，越能把吸引力变成信任。",
+    advice:
+      "最容易错位的时刻，是一方急于下结论，另一方还在整理感受与背景。先问：“今天需要决定，还是你希望我先听？”计划变化时，同时说明原因和新的期限；分工按优势而不是习惯决定。两人的黄金规则是，不猜测意图，直接确认期待、时间与担忧。",
+    notAvailable: "未计算",
+    missing: "未填写的出生时间、地点、性别及无法确认的姓名信息均不作推测。",
+    reference: "这是基于已计算信息的自我理解参考，不能判断对方的感情、性格或未来。",
+  },
+  "zh-TW": {
+    titles: ["兩人的特質與基本相性", "兩人的未來可能", "多層綜合相性解讀", "注意點與建議"],
+    labels: ["本人", "對方"],
+    rhythm: {
+      same: "容易找到共同節奏",
+      generate: "容易自然引出彼此所長",
+      control: "差異既會帶來火花，也可能產生摩擦",
+      neutral: "先明確分工會更容易合作",
+    },
+    points: "從行動速度、整理想法的順序與安心距離來看，兩人能把差異轉化為互補分工。",
+    future:
+      "這段關係不必從同一個起點出發，反而適合各自從擅長之處走向同一個目標。一方負責打開可能，另一方負責把事情落實，力量就會疊加。生活中請把安排與獨處時間說清楚，工作中先決定誰提出方向、誰收攏細節。不要把沉默當成默契；越早說出小小的不適，越能把吸引力變成信任。",
+    synthesis:
+      "這段關係不必從同一個起點出發，反而適合各自從擅長之處走向同一個目標。一方負責打開可能，另一方負責把事情落實，力量就會疊加。生活中請把安排與獨處時間說清楚，工作中先決定誰提出方向、誰收攏細節。不要把沉默當成默契；越早說出小小的不適，越能把吸引力變成信任。",
+    advice:
+      "最容易錯位的時刻，是一方急著下結論，另一方仍在整理感受與背景。先問：「今天需要決定，還是你希望我先聽？」計畫變動時，同時說明原因和新的期限；分工依優勢而不是習慣決定。兩人的黃金規則是，不猜測意圖，直接確認期待、時間與擔憂。",
+    notAvailable: "未算出",
+    missing: "未填寫的出生時間、地點、性別及無法確認的姓名資訊均不作推測。",
+    reference: "這是依已算出資訊整理的自我理解參考，不能判斷對方的感情、性格或未來。",
+  },
+  ko: {
+    titles: [
+      "두 사람의 특성과 기본 궁합",
+      "두 사람의 미래 가능성",
+      "다층 종합 궁합",
+      "주의점과 실천 조언",
+    ],
+    labels: ["본인", "상대"],
+    rhythm: {
+      same: "함께 속도를 맞추기 쉽습니다",
+      generate: "서로의 강점을 자연스럽게 끌어내기 쉽습니다",
+      control: "차이가 자극과 마찰로 모두 작용하기 쉽습니다",
+      neutral: "역할을 정할수록 협력이 쉬워집니다",
+    },
+    points:
+      "행동 속도, 생각을 정리하는 순서, 편안한 거리감을 비교하면 두 사람은 차이를 역할 분담으로 바꾸기 좋은 조합입니다.",
+    future:
+      "두 사람은 같은 출발점을 고집하기보다 각자의 강점에서 하나의 목표로 향할 때 힘이 겹칩니다. 생활에서는 일정과 혼자 쉬는 시간을 말로 확인하고, 일에서는 가능성을 여는 사람과 마무리하는 사람을 먼저 정하세요. 말하지 않아도 알 것이라고 넘기지 말고 작은 불편을 일찍 나누면, 끌림이 오래가는 신뢰로 자랍니다.",
+    synthesis:
+      "두 사람은 같은 출발점을 고집하기보다 각자의 강점에서 하나의 목표로 향할 때 힘이 겹칩니다. 생활에서는 일정과 혼자 쉬는 시간을 말로 확인하고, 일에서는 가능성을 여는 사람과 마무리하는 사람을 먼저 정하세요. 말하지 않아도 알 것이라고 넘기지 말고 작은 불편을 일찍 나누면, 끌림이 오래가는 신뢰로 자랍니다.",
+    advice:
+      "한 사람은 결론을 서두르고 다른 사람은 감정과 배경을 정리할 때 엇갈리기 쉽습니다. 먼저 “오늘 결정할까, 아니면 내가 먼저 들어줄까?”라고 물어보세요. 일정 변경에는 이유와 새 기한을 함께 전하고, 역할은 습관이 아니라 강점으로 나누세요. 황금 규칙은 의도를 짐작하지 않고 바람·기한·걱정을 직접 확인하는 것입니다.",
+    notAvailable: "계산되지 않음",
+    missing: "입력하지 않은 출생 시간·장소·성별과 확인되지 않는 이름 정보는 추측하지 않습니다.",
+    reference: "계산 가능한 정보를 조합한 자기이해용 참고이며 감정·성격·미래를 판정하지 않습니다.",
+  },
+  es: {
+    titles: [
+      "Rasgos y compatibilidad esencial",
+      "Vuestro futuro",
+      "Lectura integral por capas",
+      "Alertas y consejos prácticos",
+    ],
+    labels: ["Tú", "La otra persona"],
+    rhythm: {
+      same: "os resulta fácil acompasaros",
+      generate: "tendéis a potenciar las fortalezas del otro",
+      control: "las diferencias pueden crear chispa y fricción",
+      neutral: "cooperáis mejor cuando definís funciones",
+    },
+    points:
+      "Al comparar ritmo, forma de decidir y distancia cómoda, aparece una relación capaz de convertir las diferencias en un reparto útil de papeles.",
+    future:
+      "Esta relación funciona mejor cuando no os obligáis a empezar desde el mismo lugar. Una persona puede abrir posibilidades y la otra convertirlas en algo concreto. En casa, conviene expresar los planes y el tiempo de descanso; en el trabajo, decidir quién propone y quién cierra detalles. No deis por hecho que el silencio significa acuerdo: compartir pronto una pequeña incomodidad transforma la atracción en confianza.",
+    synthesis:
+      "Esta relación funciona mejor cuando no os obligáis a empezar desde el mismo lugar. Una persona puede abrir posibilidades y la otra convertirlas en algo concreto. En casa, conviene expresar los planes y el tiempo de descanso; en el trabajo, decidir quién propone y quién cierra detalles. No deis por hecho que el silencio significa acuerdo: compartir pronto una pequeña incomodidad transforma la atracción en confianza.",
+    advice:
+      "El roce surge cuando una persona busca una conclusión y la otra aún ordena emociones o contexto. Preguntad: «¿Tenemos que decidir hoy o prefieres que primero te escuche?». Si cambia un plan, explicad el motivo y la nueva fecha. Repartid tareas por fortalezas. La regla de oro es confirmar directamente deseos, plazos y preocupaciones, sin adivinar intenciones.",
+    notAvailable: "Sin calcular",
+    missing:
+      "Nunca se inventan la hora, el lugar, el género ni datos del nombre que no estén disponibles.",
+    reference:
+      "Comparación orientativa de datos calculados disponibles; no determina sentimientos, personalidad ni futuro.",
+  },
+  fr: {
+    titles: [
+      "Vos traits et votre compatibilité essentielle",
+      "Votre avenir ensemble",
+      "Lecture relationnelle multicouche",
+      "Points de vigilance et conseils",
+    ],
+    labels: ["Vous", "L’autre personne"],
+    rhythm: {
+      same: "vous trouvez facilement un rythme commun",
+      generate: "vous avez tendance à révéler les forces de l’autre",
+      control: "vos différences peuvent créer élan et friction",
+      neutral: "des rôles clairs facilitent la coopération",
+    },
+    points:
+      "Le rythme, la façon de décider et la distance rassurante montrent un duo capable de transformer ses différences en rôles complémentaires.",
+    future:
+      "Ce lien gagne en force lorsque vous n’exigez pas le même point de départ. L’un peut ouvrir des possibilités et l’autre les rendre concrètes. À la maison, dites clairement les projets et les besoins de calme ; au travail, décidez qui propose et qui finalise. Ne prenez pas le silence pour un accord : exprimer tôt un petit malaise permet à l’attirance de devenir confiance.",
+    synthesis:
+      "Ce lien gagne en force lorsque vous n’exigez pas le même point de départ. L’un peut ouvrir des possibilités et l’autre les rendre concrètes. À la maison, dites clairement les projets et les besoins de calme ; au travail, décidez qui propose et qui finalise. Ne prenez pas le silence pour un accord : exprimer tôt un petit malaise permet à l’attirance de devenir confiance.",
+    advice:
+      "La friction apparaît surtout lorsque l’un veut conclure et que l’autre trie encore ses émotions ou le contexte. Demandez : « Faut-il décider aujourd’hui, ou veux-tu d’abord que je t’écoute ? » En cas de changement, donnez la raison et la nouvelle échéance. Répartissez les tâches selon les forces. Votre règle d’or : vérifier directement attentes, délais et inquiétudes sans deviner les intentions.",
+    notAvailable: "Non calculé",
+    missing: "L’heure, le lieu, le genre et les données de nom absents ne sont jamais inventés.",
+    reference:
+      "Comparaison de réflexion fondée sur les données calculables, sans prédire émotions, personnalité ni avenir.",
+  },
 };
 
 export function analyzeCompatibility(owner: Owner, input: PartnerInput, language: Language) {
   const parsed = partnerSchema.safeParse(input);
   if (!parsed.success || !date.safeParse(owner.birthDate).success) return null;
   const partner = parsed.data;
-  const a = computeCoreLayers({ ...owner, nameKanji: owner.name, birthTime: owner.birthTime, birthTimeUnknown: owner.birthTimeUnknown });
-  const b = computeCoreLayers({ nameKanji: partner.name, nameRomaji: "", birthDate: partner.birthDate, birthTime: partner.birthTime, birthTimeUnknown: !partner.birthTime, bloodType: partner.bloodType, birthPlace: partner.birthPlace, birthCity: partner.birthCity });
+  const a = computeCoreLayers({
+    ...owner,
+    nameKanji: owner.name,
+    birthTime: owner.birthTime,
+    birthTimeUnknown: owner.birthTimeUnknown,
+  });
+  const b = computeCoreLayers({
+    nameKanji: partner.name,
+    nameRomaji: "",
+    birthDate: partner.birthDate,
+    birthTime: partner.birthTime,
+    birthTimeUnknown: !partner.birthTime,
+    bloodType: partner.bloodType,
+    birthPlace: partner.birthPlace,
+    birthCity: partner.birthCity,
+  });
   if (!a || !b) return null;
   const w = words[language];
-  const pair = { birthDate: owner.birthDate, id: "owner", name: owner.name, gender: owner.gender, bloodType: owner.bloodType, role: "", skills: [] };
-  const other = { birthDate: partner.birthDate, id: "partner", name: partner.name, gender: partner.gender, bloodType: partner.bloodType, role: "", skills: [] };
+  const pair = {
+    birthDate: owner.birthDate,
+    id: "owner",
+    name: owner.name,
+    gender: owner.gender,
+    bloodType: owner.bloodType,
+    role: "",
+    skills: [],
+  };
+  const other = {
+    birthDate: partner.birthDate,
+    id: "partner",
+    name: partner.name,
+    gender: partner.gender,
+    bloodType: partner.bloodType,
+    role: "",
+    skills: [],
+  };
   const rel = relation(pair, other);
   const score = pairScore(pair, other);
-  const sky = [a.western.ascendant && b.western.ascendant ? `ASC ${a.western.ascendant} × ${b.western.ascendant}` : null, !a.western.moonUncertain && !b.western.moonUncertain ? `${a.western.moon} × ${b.western.moon}` : null].filter(Boolean).join(" / ");
+  const sky = [
+    a.western.ascendant && b.western.ascendant
+      ? `ASC ${a.western.ascendant} × ${b.western.ascendant}`
+      : null,
+    !a.western.moonUncertain && !b.western.moonUncertain
+      ? `${a.western.moon} × ${b.western.moon}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" / ");
   const colorsA = birthColorSpectrum({ ...owner, birthPlace: owner.birthPlace });
-  const colorsB = birthColorSpectrum({ birthDate: partner.birthDate, birthTime: partner.birthTime, birthTimeUnknown: !partner.birthTime, birthPlace: partner.birthPlace });
-  const nameA = getFiveElements({ nameKanji: owner.name, birthDate: owner.birthDate, bloodType: owner.bloodType });
-  const nameB = getFiveElements({ nameKanji: partner.name, birthDate: partner.birthDate, bloodType: partner.bloodType });
+  const colorsB = birthColorSpectrum({
+    birthDate: partner.birthDate,
+    birthTime: partner.birthTime,
+    birthTimeUnknown: !partner.birthTime,
+    birthPlace: partner.birthPlace,
+  });
+  const nameA = getFiveElements({
+    nameKanji: owner.name,
+    birthDate: owner.birthDate,
+    bloodType: owner.bloodType,
+  });
+  const nameB = getFiveElements({
+    nameKanji: partner.name,
+    birthDate: partner.birthDate,
+    bloodType: partner.bloodType,
+  });
   const kuaA = mingGua(owner.birthDate, owner.gender);
   const kuaB = mingGua(partner.birthDate, partner.gender);
   const evidence = [
     `${w.labels[0]}: ${a.western.sun} / ${a.shichu.dayMaster} / ${a.animal.core ?? w.notAvailable} / ${lifePath(owner.birthDate)}`,
     `${w.labels[1]}: ${b.western.sun} / ${b.shichu.dayMaster} / ${b.animal.core ?? w.notAvailable} / ${lifePath(partner.birthDate)}`,
     `${w.labels[0]} ${a.name ? `${a.name.person}・${a.name.total}` : w.notAvailable} · ${w.labels[1]} ${b.name ? `${b.name.person}・${b.name.total}` : w.notAvailable}`,
-    `${nameA.eto ?? w.notAvailable} × ${nameB.eto ?? w.notAvailable} · ${w.labels[0]} ${kuaA?.branches.map(branch => branch.number).join("/") ?? w.notAvailable} / ${w.labels[1]} ${kuaB?.branches.map(branch => branch.number).join("/") ?? w.notAvailable}`,
+    `${nameA.eto ?? w.notAvailable} × ${nameB.eto ?? w.notAvailable} · ${w.labels[0]} ${kuaA?.branches.map((branch) => branch.number).join("/") ?? w.notAvailable} / ${w.labels[1]} ${kuaB?.branches.map((branch) => branch.number).join("/") ?? w.notAvailable}`,
     `${w.labels[1]}: ${partner.nameKana || w.notAvailable} · ${partner.birthTime && partner.birthPlace ? `${partner.birthTime} ${partner.birthPlace} ${partner.birthCity}` : w.notAvailable} · ${partner.bloodType || w.notAvailable} · ${partner.siblingOrder || w.notAvailable}`,
     `Moon / ASC: ${sky || w.notAvailable} · Animal reference: ${a.animal.referenceAnimals?.surface ?? w.notAvailable} × ${b.animal.referenceAnimals?.surface ?? w.notAvailable}`,
   ];
   const dynamic = w.rhythm[rel];
-  const sentences: [string, string, string, string] = [`${dynamic}${language === "ja" || language.startsWith("zh") ? "。" : "."} ${w.points}`, w.future, w.synthesis, w.advice];
-  return { score, titles: w.titles, sentences, evidence, colors: [colorsA?.main.code, colorsB?.main.code], note: `${w.missing} ${w.reference}`, dynamic, elementPair: `${dayElement(owner.birthDate)} × ${dayElement(partner.birthDate)}` };
+  const sentences: [string, string, string, string] = [
+    `${dynamic}${language === "ja" || language.startsWith("zh") ? "。" : "."} ${w.points}`,
+    w.future,
+    w.synthesis,
+    w.advice,
+  ];
+  return {
+    score,
+    titles: w.titles,
+    sentences,
+    evidence,
+    colors: [colorsA?.main.code, colorsB?.main.code],
+    note: `${w.missing} ${w.reference}`,
+    dynamic,
+    elementPair: `${dayElement(owner.birthDate)} × ${dayElement(partner.birthDate)}`,
+  };
 }
