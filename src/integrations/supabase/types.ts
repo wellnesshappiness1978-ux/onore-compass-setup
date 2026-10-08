@@ -76,6 +76,7 @@ export type Database = {
           birth_time: string | null
           birth_time_unknown: boolean
           blood_type: string
+          design_mode: string
           gender: string
           name_kana: string
           name_kanji: string
@@ -92,6 +93,7 @@ export type Database = {
           birth_time?: string | null
           birth_time_unknown?: boolean
           blood_type?: string
+          design_mode?: string
           gender?: string
           name_kana?: string
           name_kanji?: string
@@ -108,6 +110,7 @@ export type Database = {
           birth_time?: string | null
           birth_time_unknown?: boolean
           blood_type?: string
+          design_mode?: string
           gender?: string
           name_kana?: string
           name_kanji?: string
