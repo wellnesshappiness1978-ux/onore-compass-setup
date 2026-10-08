@@ -4,7 +4,7 @@ import { birthColorSpectrum } from "./birth-color-spectrum";
 
 describe("birth-color mandala geometry", () => {
   it("creates a repeatable overall plus six-color palette", () => {
-    const profile = { birthDate: "1990-05-18", birthTime: "08:30", birthPlace: "Tokyo" };
+    const profile = { birthDate: "1990-05-18", birthTime: "08:30", birthTimeUnknown: false, birthPlace: "Tokyo" };
     const first = birthColorSpectrum(profile);
     const second = birthColorSpectrum(profile);
     expect(first).toEqual(second);
