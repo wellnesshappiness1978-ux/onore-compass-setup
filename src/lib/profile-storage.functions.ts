@@ -2,9 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const designModes = ["classic", "pure-white", "masculine", "feminine", "masculine-luxe", "feminine-luxe", "aura-gold-luxe", "business-night", "business-day", "business-platinum", "business-cosmos", "business-emperor", "business-geometry", "business-dragon", "business-zero"] as const;
-const designModeSchema = z.enum(designModes);
-
 const profileSchema = z.object({
   nameKanji: z.string().max(40),
   nameKana: z.string().max(60),
@@ -62,24 +59,6 @@ export const saveMyProfile = createServerFn({ method: "POST" })
       profile_version: crypto.randomUUID(),
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
-    if (error) throw error;
-    return { ok: true };
-  });
-
-export const readMyDesignMode = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.from("profiles").select("design_mode").eq("user_id", context.userId).maybeSingle();
-    if (error) throw error;
-    const parsed = designModeSchema.safeParse(data?.design_mode);
-    return parsed.success ? parsed.data : null;
-  });
-
-export const saveMyDesignMode = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator((input: unknown) => designModeSchema.parse(input))
-  .handler(async ({ context, data }) => {
-    const { error } = await context.supabase.from("profiles").update({ design_mode: data, updated_at: new Date().toISOString() }).eq("user_id", context.userId);
     if (error) throw error;
     return { ok: true };
   });
