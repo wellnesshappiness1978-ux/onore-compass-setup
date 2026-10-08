@@ -155,6 +155,6 @@
 - [x] Verify title size across plans, logo animation/reduced motion, and the complete compatibility input/result flow.
 
 ## Compatibility output rules
-- [ ] Restrict section one to individual traits and positive relationship strengths.
-- [ ] Connect selected relationship and optional concern to the overall reading; refine warm final advice and exact heading.
-- [ ] Verify branch lengths, content rules and the complete input/result flow.
+- [x] Restrict section one to individual traits and positive relationship strengths.
+- [x] Connect selected relationship and optional concern to the overall reading; refine warm final advice and exact heading.
+- [x] Verify branch lengths and content rules with 10 passing tests; verify romance/question and hierarchy/work result flows in browser (496/848/313 characters, no runtime errors).
