@@ -42,6 +42,7 @@ import { quickUsageKey } from "@/lib/quick-compatibility";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
+import { readMyDesignMode, saveMyDesignMode } from "@/lib/profile-storage.functions";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
@@ -151,6 +152,24 @@ function TorisetsuPanel({
   const score = result?.score ?? 0;
   const advice = score >= 84 ? t.advice[2] : score >= 70 ? t.advice[1] : t.advice[0];
   const today = new Date().toLocaleDateString("en-CA");
+  const sectionPlans: Plan[] = ["free", "standard", "vip", "b2b"];
+  const sectionPlanNames: Record<Plan, string> = {
+    free: language === "ja" ? "Free" : "Free",
+    standard: language === "ja" ? "Standard" : "Standard",
+    vip: "VIP",
+    b2b: language === "ja" ? "Business" : "Business",
+    "b2b-premium": language === "ja" ? "Business Premium" : "Business Premium",
+  };
+  const lockedSectionCopy: Record<Language, (tier: string) => string> = {
+    ja: (tier) => `${tier}プランで全文が開放されます`,
+    en: (tier) => `The ${tier} plan unlocks this full reading`,
+    "zh-CN": (tier) => `${tier}方案可解锁完整内容`,
+    "zh-TW": (tier) => `${tier}方案可解鎖完整內容`,
+    ko: (tier) => `${tier} 플랜에서 전체 내용을 볼 수 있습니다`,
+    es: (tier) => `El plan ${tier} desbloquea la lectura completa`,
+    fr: (tier) => `L’offre ${tier} débloque la lecture complète`,
+  };
+  const viewPlans: Record<Language, string> = { ja: "プランを見る", en: "View plans", "zh-CN": "查看方案", "zh-TW": "查看方案", ko: "플랜 보기", es: "Ver planes", fr: "Voir les offres" };
   useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, profile]);
 
   return (
@@ -407,39 +426,18 @@ function TorisetsuPanel({
                 </p>
               </div>
               <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
-                <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-5"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
+                <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => {
+                  const requiredPlan = sectionPlans[i] ?? "b2b";
+                  const unlocked = planOrder.indexOf(plan) >= planOrder.indexOf(requiredPlan);
+                  return <article key={title} className="relative overflow-hidden rounded-md border border-primary/25 bg-card/50 p-5">
+                    <div className="flex items-start justify-between gap-3"><h4 className="font-serif text-lg text-primary">{title}</h4>{!unlocked && <LockKeyhole className="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />}</div>
+                    {unlocked ? <><p className="mt-2 text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</> : <div className="mt-4 rounded-md border border-primary/15 bg-background/60 p-4 text-center"><p className="text-sm text-muted-foreground">{lockedSectionCopy[language](sectionPlanNames[requiredPlan])}</p><Button type="button" variant="outline" className="mt-3" onClick={onVip}><Crown className="size-4" aria-hidden="true" />{viewPlans[language]}</Button></div>}
+                  </article>;
+                })}</div>
                <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
               <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
             </section>
           ) : null}
-          {plan === "free" && <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
-            <div className="select-none space-y-3 opacity-20 blur-[2px]" aria-hidden="true">
-              <div className="mx-auto h-3 w-3/4 rounded-full bg-primary/40" />
-              <div className="mx-auto h-3 w-full rounded-full bg-foreground/30" />
-              <div className="mx-auto h-3 w-5/6 rounded-full bg-foreground/30" />
-              <div className="grid grid-cols-2 gap-3 pt-5">
-                <div className="h-16 rounded-md border border-primary/20" />
-                <div className="h-16 rounded-md border border-primary/20" />
-              </div>
-            </div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/55 px-6 backdrop-blur-sm">
-              <span className="flex size-11 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
-                <LockKeyhole className="size-5" />
-              </span>
-              <h4 className="mt-3 font-serif text-lg text-foreground">{t.lockedTitle}</h4>
-              <p className="mt-2 max-w-md text-xs leading-5 text-muted-foreground">
-                {t.lockedBody}
-              </p>
-              <Button
-                variant="champagne"
-                onClick={onVip}
-                className="mt-5 min-h-10 whitespace-normal px-5"
-              >
-                <Crown className="size-4" />
-                {t.unlock}
-              </Button>
-            </div>
-          </section>}
           <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
         </div>
       )}
@@ -476,7 +474,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const applyDevOverride = (next: Plan) => {
     selectPlan(next);
     setPreviewPlan(next);
-    if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
   };
   const actualPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : serverPlan;
   // Test preview only: plan cards switch the plan and jump to the newly unlocked feature.
@@ -502,10 +499,32 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     return () => { active = false; };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
-  useEffect(() => { try { const saved = sessionStorage.getItem("onore-design"); if (saved && designCopy.ja.names[saved as DesignMode] && canPreviewDesign(previewPlan, saved as DesignMode)) setDesignMode(saved as DesignMode); } catch { /* private browsing */ } }, []);
-  useEffect(() => { try { sessionStorage.setItem("onore-design", designMode); } catch { /* private browsing */ } }, [designMode]);
+  const readDesignMode = useServerFn(readMyDesignMode);
+  const saveDesignMode = useServerFn(saveMyDesignMode);
+  const designLoaded = useRef(false);
+  useEffect(() => {
+    let active = true;
+    const restore = async () => {
+      let stored: string | null = null;
+      try { stored = localStorage.getItem("onore-design"); } catch { /* private browsing */ }
+      if (signedIn) {
+        try {
+          const cloudMode = await readDesignMode();
+          stored = cloudMode === "classic" && stored && stored !== "classic" ? stored : cloudMode ?? stored;
+        } catch { /* Keep the device preference if cloud sync is unavailable. */ }
+      }
+      if (active && stored && designCopy.ja.names[stored as DesignMode]) setDesignMode(stored as DesignMode);
+      designLoaded.current = true;
+    };
+    void restore();
+    return () => { active = false; };
+  }, [signedIn, readDesignMode]);
+  useEffect(() => {
+    if (!designLoaded.current) return;
+    try { localStorage.setItem("onore-design", designMode); } catch { /* private browsing */ }
+    if (signedIn) void saveDesignMode({ data: designMode }).catch(() => undefined);
+  }, [designMode, signedIn, saveDesignMode]);
   const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
-  useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   
   
