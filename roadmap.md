@@ -186,4 +186,4 @@
 ## Birth-color mandala five-fortune gemstone overhaul
 - [x] Replace translucent washes with dense opaque seven-color geometry.
 - [x] Add a faceted gemstone core and distinct rendering systems for all five intentions.
-- [ ] Verify all five artworks, fullscreen, reduced motion, mobile, and saved output.
+- [x] Verify all five artworks, fullscreen, reduced motion, mobile, and saved output.
