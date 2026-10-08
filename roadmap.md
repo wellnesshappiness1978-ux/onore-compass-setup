@@ -172,3 +172,8 @@
 ## Birth-color mandala oil-paint refinement
 - [x] Add procedural impasto texture, layered sacred geometry, abstract light particles, and gold-leaf shimmer while preserving the seven-color system and non-celestial identity.
 - [x] Verify desktop/mobile rendering, reduced motion, full-screen view, and exported wallpaper quality.
+
+## Birth-color mandala divine-crystal refinement
+- [ ] Replace every dark or unpainted area with a seven-color full-canvas aura.
+- [ ] Add divine rays, abstract sparkles, hexagons, octagons, crystal rosettes, and layered Fibonacci geometry.
+- [ ] Verify desktop/mobile, reduced motion, full-screen view, and exported wallpaper quality.
