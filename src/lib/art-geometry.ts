@@ -22,6 +22,34 @@ export function colorsForIntention(colors: string[], intention: MandalaIntention
   return intentionOrder[intention].map(index => colors[index % colors.length] ?? colors[0]).filter((color): color is string => Boolean(color));
 }
 
+export function vividHexColor(value: string) {
+  const match = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(value);
+  if (!match) return value;
+  const rgb = match.slice(1).map(channel => Number.parseInt(channel ?? "00", 16) / 255);
+  const [red = 0, green = 0, blue = 0] = rgb;
+  const max = Math.max(red, green, blue);
+  const min = Math.min(red, green, blue);
+  const lightness = (max + min) / 2;
+  const delta = max - min;
+  let hue = 0;
+  if (delta > 0) {
+    if (max === red) hue = ((green - blue) / delta) % 6;
+    else if (max === green) hue = (blue - red) / delta + 2;
+    else hue = (red - green) / delta + 4;
+    hue /= 6;
+    if (hue < 0) hue += 1;
+  }
+  const saturation = delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1));
+  const vividSaturation = Math.max(.82, saturation);
+  const vividLightness = Math.min(.58, Math.max(.42, lightness));
+  const chroma = (1 - Math.abs(2 * vividLightness - 1)) * vividSaturation;
+  const segment = hue * 6;
+  const x = chroma * (1 - Math.abs(segment % 2 - 1));
+  const candidates = segment < 1 ? [chroma, x, 0] : segment < 2 ? [x, chroma, 0] : segment < 3 ? [0, chroma, x] : segment < 4 ? [0, x, chroma] : segment < 5 ? [x, 0, chroma] : [chroma, 0, x];
+  const offset = vividLightness - chroma / 2;
+  return `#${candidates.map(channel => Math.round((channel + offset) * 255).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+}
+
 export function logarithmicSpiralPoint(index: number, count: number, radius = 1, turns = 3.25) {
   const t = count <= 1 ? 0 : index / (count - 1);
   const angle = turns * Math.PI * 2 * t;

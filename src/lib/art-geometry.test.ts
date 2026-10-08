@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { colorsForIntention, crystalRosettePoints, goldLeafTransform, layeredSpiralPoint, logarithmicSpiralPoint, paletteColors, radialRayTransform, regularPolygonPoints, sparkleTransform } from "./art-geometry";
+import { colorsForIntention, crystalRosettePoints, goldLeafTransform, layeredSpiralPoint, logarithmicSpiralPoint, paletteColors, radialRayTransform, regularPolygonPoints, sparkleTransform, vividHexColor } from "./art-geometry";
 import { birthColorSpectrum } from "./birth-color-spectrum";
 
 describe("birth-color mandala geometry", () => {
@@ -50,5 +50,12 @@ describe("birth-color mandala geometry", () => {
     const sparkle = sparkleTransform(812, 20, 5.5);
     expect(sparkle).toEqual(sparkleTransform(812, 20, 5.5));
     expect(Math.hypot(sparkle.x, sparkle.y)).toBeLessThanOrEqual(5.5);
+  });
+
+  it("strengthens pale birth colors into stable vivid display colors", () => {
+    expect(vividHexColor("#D8BFC8")).toBe(vividHexColor("#D8BFC8"));
+    expect(vividHexColor("#D8BFC8")).toMatch(/^#[0-9A-F]{6}$/);
+    expect(vividHexColor("#D8BFC8")).not.toBe("#D8BFC8");
+    expect(vividHexColor("not-a-color")).toBe("not-a-color");
   });
 });
