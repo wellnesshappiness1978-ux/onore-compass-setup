@@ -188,3 +188,8 @@
 - [x] Deep black backdrop with faint specks
 - [x] Opaque impasto bands, dots, golden spirals using all six birth colors
 - [x] Faceted gemstone core with halo and flares
+
+## Birth-color mandala simple SVG reset
+- [x] Remove heavy effects (texture, gem, stars, rays)
+- [x] SVG rings: core overall color, six birth colors with thin geometry and dots
+- [x] Keep fullscreen, PNG save, reduced motion

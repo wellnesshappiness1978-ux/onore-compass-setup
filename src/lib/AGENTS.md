@@ -8,4 +8,4 @@
 - Feng shui uses gender-specific Li Chun Ming Gua and a common annual chart; birthplace centroids affect timed ascendants only (credit Geolonia CC BY 4.0). Why: property-specific charts require facing and period.
 - VIP art derives repeatable golden-ratio geometry from seven birth colors and 10 geocentric bodies, labels missing-time JST noon, and exports illustrative PNG only. Why: preserve data fidelity without implying verified effects or entitlement.
 - Team analysis uses deterministic scores; team AI drafts and 1on1 text never imply member writes for guests. Why: reference workflows remain reproducible.
-- Birth-color mandala is one overall-fortune masterpiece (no intention branching): opaque impasto bands, faceted gem core, faint background specks only; planets/galaxies stay in the cosmic artwork. Why: keep the two artworks distinct.
+- Birth-color mandala is a lightweight SVG: overall color at the core, six birth colors in rings, colors used unmodified, no celestial, gem or texture effects. Why: calm, stable rendering on every device and distinct from the cosmic artwork.
