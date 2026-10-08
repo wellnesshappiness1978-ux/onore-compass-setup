@@ -41,3 +41,22 @@ export function spiralPoint(index: number, count: number, radius = 1) {
   const angle = index * GOLDEN_ANGLE;
   return [Math.cos(angle) * r, Math.sin(angle) * r] as const;
 }
+
+export function layeredSpiralPoint(index: number, count: number, arm: number, arms = 6, radius = 1) {
+  const t = count <= 1 ? 0 : index / (count - 1);
+  const angle = t * Math.PI * 7.5 + arm * Math.PI * 2 / arms;
+  const r = (.18 + Math.pow(t, .76) * .82) * radius;
+  const ripple = 1 + Math.sin(t * Math.PI * 16 + arm * 1.7) * .018;
+  return [Math.cos(angle) * r * ripple, Math.sin(angle) * r * ripple] as const;
+}
+
+export function goldLeafTransform(seed: number, index: number, radius = 1) {
+  const angle = seededUnit(seed + 11, index) * Math.PI * 2;
+  const distance = (.18 + Math.sqrt(seededUnit(seed + 29, index)) * .82) * radius;
+  return {
+    x: Math.cos(angle) * distance,
+    y: Math.sin(angle) * distance,
+    rotation: seededUnit(seed + 47, index) * Math.PI * 2,
+    scale: .55 + seededUnit(seed + 71, index) * 1.15,
+  };
+}
