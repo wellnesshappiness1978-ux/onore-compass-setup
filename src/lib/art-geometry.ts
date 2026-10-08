@@ -126,36 +126,27 @@ export function sparkleTransform(seed: number, index: number, radius = 1) {
     scale: .45 + seededUnit(seed + 317, index) * 1.4,
   };
 }
-/** Lathe profile (radius, height) for a brilliant-cut gem: pavilion apex → girdle → crown → table. */
-export function brilliantCutProfile(radius = 1) {
-  return [
-    [0, -radius * .86], [radius * .98, -radius * .02], [radius, 0], [radius * .98, radius * .04],
-    [radius * .62, radius * .34], [0, radius * .34],
-  ] as [number, number][];
-}
 
-/** Deterministic faint background specks kept outside the mandala radius. */
-export function starfieldPoints(seed: number, count: number, inner: number, outer: number) {
-  return Array.from({ length: Math.max(0, count) }, (_, index) => {
-    const angle = seededUnit(seed + 401, index) * Math.PI * 2;
-    const distance = Math.sqrt(inner * inner + seededUnit(seed + 409, index) * (outer * outer - inner * inner));
-    return { x: Math.cos(angle) * distance, y: Math.sin(angle) * distance, brightness: .25 + seededUnit(seed + 419, index) * .45 };
-  });
-}
+export type MandalaMotif = "hexagon" | "octagon" | "circles" | "petals";
+const MOTIFS: MandalaMotif[] = ["hexagon", "petals", "octagon", "circles", "hexagon", "petals"];
 
-/** Ribbon outline for a brush band with organic width variation. Returns left/right edges. */
-export function brushBandEdges(points: [number, number][], width: number, seed: number) {
-  return points.map((point, index) => {
-    const prev = points[Math.max(0, index - 1)] ?? point;
-    const next = points[Math.min(points.length - 1, index + 1)] ?? point;
-    const dx = next[0] - prev[0];
-    const dy = next[1] - prev[1];
-    const length = Math.hypot(dx, dy) || 1;
-    const t = points.length <= 1 ? 0 : index / (points.length - 1);
-    const taper = Math.sin(Math.PI * Math.min(1, Math.max(0, t))) * .45 + .55;
-    const w = width * taper * (.8 + seededUnit(seed, index) * .4) / 2;
-    const nx = -dy / length * w;
-    const ny = dx / length * w;
-    return { left: [point[0] + nx, point[1] + ny] as [number, number], right: [point[0] - nx, point[1] - ny] as [number, number] };
-  });
+/** Assign the overall color to the core and six birth colors to rings, inner to outer (colors unmodified). */
+export function simpleMandalaRings(colors: string[], radius = 480) {
+  const core = colors[0] ?? "#FFD21C";
+  const birth = Array.from({ length: 6 }, (_, i) => colors[i + 1] ?? core);
+  const coreRadius = radius * .16;
+  const step = (radius - coreRadius) / 6;
+  return {
+    core,
+    coreRadius,
+    rings: birth.map((color, i) => ({
+      color,
+      innerColor: i === 0 ? core : birth[i - 1] ?? core,
+      inner: coreRadius + i * step,
+      outer: coreRadius + (i + 1) * step,
+      motif: MOTIFS[i] ?? "hexagon",
+      symmetry: [6, 8, 8, 12, 12, 16][i] ?? 12,
+      dots: 24 + i * 12,
+    })),
+  };
 }

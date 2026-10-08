@@ -59,22 +59,14 @@ describe("birth-color mandala geometry", () => {
     expect(vividHexColor("not-a-color")).toBe("not-a-color");
   });
 });
-import { brilliantCutProfile, brushBandEdges, starfieldPoints } from "./art-geometry";
-describe("masterpiece helpers", () => {
-  it("builds a gem profile from apex to table", () => {
-    const p = brilliantCutProfile(2);
-    expect(p[0]).toEqual([0, -1.72]);
-    expect(p.at(-1)?.[0]).toBe(0);
-  });
-  it("keeps stars outside the mandala and is deterministic", () => {
-    const a = starfieldPoints(7, 50, 5.5, 9);
-    expect(a).toEqual(starfieldPoints(7, 50, 5.5, 9));
-    a.forEach(s => { const r = Math.hypot(s.x, s.y); expect(r).toBeGreaterThanOrEqual(5.5 - 1e-9); expect(r).toBeLessThanOrEqual(9 + 1e-9); expect(s.brightness).toBeLessThanOrEqual(.7); });
-  });
-  it("produces positive-width brush edges", () => {
-    const e = brushBandEdges([[0, 0], [1, 0], [2, 0]], .2, 3);
-    expect(e).toHaveLength(3);
-    expect(e[1]!.left[1]).toBeGreaterThan(0);
-    expect(e[1]!.right[1]).toBeLessThan(0);
+import { simpleMandalaRings } from "./art-geometry";
+describe("simple mandala", () => {
+  it("uses only the seven given colors, core first", () => {
+    const c = ["#111111", "#222222", "#333333", "#444444", "#555555", "#666666", "#777777"];
+    const m = simpleMandalaRings(c, 500);
+    expect(m.core).toBe("#111111");
+    expect(m.rings.map(r => r.color)).toEqual(c.slice(1));
+    expect(m.rings[0]!.innerColor).toBe("#111111");
+    expect(m.rings.at(-1)!.outer).toBeCloseTo(500);
   });
 });
