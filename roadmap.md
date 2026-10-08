@@ -181,4 +181,4 @@
 ## Birth-color mandala vivid-black refinement
 - [x] Replace pastel aura treatment with deterministic high-saturation versions of all seven birth colors.
 - [x] Adopt an intentional lacquer-black background while keeping celestial objects and stardust out of the mandala.
-- [ ] Verify dense geometry, full-screen viewing, reduced motion, mobile rendering, and exported wallpaper quality.
+- [x] Verify dense geometry, full-screen viewing, reduced motion, mobile rendering, and exported wallpaper quality.
