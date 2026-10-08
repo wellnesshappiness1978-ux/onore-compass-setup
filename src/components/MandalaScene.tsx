@@ -165,7 +165,7 @@ function BrushBand({ points, width, color, z, seed, bump }: { points: [number, n
   }, [points, seed, width, z]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   return <mesh geometry={geometry}>
-    <meshStandardMaterial color={color} roughness={.42} metalness={.08} bumpMap={bump} bumpScale={.06} side={THREE.DoubleSide} />
+    <meshStandardMaterial color={color} roughness={.42} metalness={.08} bumpMap={bump} envMapIntensity={.2} bumpScale={.06} side={THREE.DoubleSide} />
   </mesh>;
 }
 
@@ -173,12 +173,12 @@ function PaintedRings({ palette, bump }: { palette: string[]; bump: THREE.Textur
   const birth = palette.slice(1, 7);
   const rings = useMemo(() => Array.from({ length: 14 }, (_, i) => {
     const inner = 1.05 + i * .3;
-    return { inner, outer: inner + .34, color: shade(pickColor(birth, i), i % 2 ? -.38 : .04), z: -.4 + i * .002 };
+    return { inner, outer: inner + .34, color: shade(pickColor(birth, i), i % 2 ? -.45 : 0), z: -.4 + i * .002 };
   }), [birth]);
   return <>
     {rings.map((ring, i) => <mesh key={i} position-z={ring.z} rotation-z={i * GOLDEN_ANGLE}>
       <ringGeometry args={[ring.inner, ring.outer, 180, 1]} />
-      <meshStandardMaterial color={ring.color} roughness={.55} bumpMap={bump} bumpScale={.09} />
+      <meshStandardMaterial color={ring.color} roughness={.55} envMapIntensity={.2} bumpMap={bump} bumpScale={.09} />
     </mesh>)}
     <mesh position-z={-.41}><circleGeometry args={[1.1, 96]} /><meshStandardMaterial color={shade(pickColor(palette, 0), -.5)} roughness={.5} bumpMap={bump} bumpScale={.08} /></mesh>
   </>;
@@ -194,7 +194,7 @@ function DotPaint({ palette, bump }: { palette: string[]; bump: THREE.Texture | 
       const count = Math.round(radius * 2 * Math.PI / .19);
       for (let i = 0; i < count; i++) {
         const angle = i / count * Math.PI * 2 + ring * .13;
-        list.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, s: ring % 3 === 0 ? .075 : .055, c: shade(pickColor(birth, ring + 3), ring % 2 ? .35 : -.1) });
+        list.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, s: ring % 3 === 0 ? .075 : .055, c: shade(pickColor(birth, ring + 3), ring % 2 ? .12 : -.25) });
       }
     }
     return list;
@@ -214,7 +214,7 @@ function DotPaint({ palette, bump }: { palette: string[]; bump: THREE.Texture | 
   }, [dots, dummy]);
   return <instancedMesh ref={mesh} args={[undefined, undefined, dots.length]}>
     <sphereGeometry args={[1, 12, 8]} />
-    <meshStandardMaterial roughness={.35} bumpMap={bump} bumpScale={.02} />
+    <meshStandardMaterial roughness={.35} envMapIntensity={.25} bumpMap={bump} bumpScale={.02} />
   </instancedMesh>;
 }
 
@@ -234,9 +234,9 @@ function SacredBands({ palette, bump }: { palette: string[]; bump: THREE.Texture
     return [x, y] as [number, number];
   }).slice(20), []);
   return <>
-    {rosettes.map((pts, i) => <BrushBand key={`r${i}`} points={pts} width={.07} color={shade(pickColor(birth, i + 2), .25)} z={-.12 + i * .004} seed={40 + i} bump={bump} />)}
-    {polygons.map((pts, i) => <BrushBand key={`p${i}`} points={pts} width={.13} color={shade(pickColor(birth, i), i % 2 ? .3 : -.15)} z={-.06 + i * .004} seed={10 + i} bump={bump} />)}
-    {spirals.map((pts, i) => <BrushBand key={`s${i}`} points={pts} width={.09} color={shade(pickColor(birth, i + 1), .18)} z={0 + i * .003} seed={60 + i} bump={bump} />)}
+    {rosettes.map((pts, i) => <BrushBand key={`r${i}`} points={pts} width={.07} color={shade(pickColor(birth, i + 2), .08)} z={-.12 + i * .004} seed={40 + i} bump={bump} />)}
+    {polygons.map((pts, i) => <BrushBand key={`p${i}`} points={pts} width={.13} color={shade(pickColor(birth, i), i % 2 ? .1 : -.3)} z={-.06 + i * .004} seed={10 + i} bump={bump} />)}
+    {spirals.map((pts, i) => <BrushBand key={`s${i}`} points={pts} width={.09} color={shade(pickColor(birth, i + 1), 0)} z={0 + i * .003} seed={60 + i} bump={bump} />)}
     <BrushBand points={golden} width={.16} color={shade(GOLD_LIGHT, .1)} z={.05} seed={90} bump={bump} />
     <BrushBand points={golden.map(([x, y]) => [-x, -y] as [number, number])} width={.16} color={shade(GOLD_LIGHT, .1)} z={.051} seed={91} bump={bump} />
   </>;
@@ -271,14 +271,14 @@ function GemCore({ color, reveal, reduced }: { color: string; reveal: number; re
   });
   const tint = vividHexColor(color);
   return <group position-z={.5} scale={.3 + reveal * .7}>
-    <mesh position-z={-.1} scale={4.2}><planeGeometry /><meshBasicMaterial map={halo} color={shade(tint, .3)} transparent opacity={.55} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
+    <mesh position-z={-.1} scale={4.2}><planeGeometry /><meshBasicMaterial map={halo} color={shade(tint, .3)} transparent opacity={.32} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
     {Array.from({ length: 16 }, (_, i) => <mesh key={i} rotation-z={i / 16 * Math.PI * 2} position-z={-.08}>
       <planeGeometry args={[i % 2 ? 3.2 : 4.4, .018]} />
       <meshBasicMaterial color={shade(tint, .55)} transparent opacity={.4} blending={THREE.AdditiveBlending} depthWrite={false} />
     </mesh>)}
-    <mesh ref={gem} rotation-x={Math.PI / 2}>
+    <mesh ref={gem} rotation-x={Math.PI / 2 - .5} scale={1.25}>
       <latheGeometry args={[points, 16]} />
-      <meshPhysicalMaterial color={tint} flatShading metalness={.05} roughness={.04} transmission={.35} thickness={1.2} ior={2.4} clearcoat={1} clearcoatRoughness={.02} iridescence={.6} envMapIntensity={2.4} emissive={tint} emissiveIntensity={.18} />
+      <meshPhysicalMaterial color={tint} flatShading metalness={.05} roughness={.04} transmission={.1} thickness={1.2} ior={2.4} clearcoat={1} clearcoatRoughness={.02} iridescence={.6} envMapIntensity={2.4} emissive={tint} emissiveIntensity={.08} />
     </mesh>
     <group ref={flares} position-z={.4}>
       {Array.from({ length: 6 }, (_, i) => {
@@ -312,8 +312,8 @@ function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture">) {
       <Lightformer intensity={3} color={pickColor(palette, 0)} position={[-4, -2, 3]} scale={[3, 3, 1]} />
       <Lightformer intensity={2.5} position={[4, -1, 2]} scale={[2, 5, 1]} />
     </Environment>
-    <ambientLight intensity={.55} />
-    <directionalLight position={[-4, 5, 6]} intensity={2.6} />
+    <ambientLight intensity={.3} />
+    <directionalLight position={[-4, 5, 6]} intensity={1.8} />
     <directionalLight position={[5, -3, 4]} intensity={.8} color={pickColor(palette, 0)} />
     <Starfield seed={seed} reduced={reduced} />
     <group ref={mandala} scale={.2 + reveal * .8}>
