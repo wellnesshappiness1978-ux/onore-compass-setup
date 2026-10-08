@@ -38,7 +38,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/design-modes";
 import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
-import { quickUsageKey } from "@/lib/quick-compatibility";
+import { useDailyUsage } from "@/hooks/use-daily-usage";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
 import { compatibilityContextCopy, readingThemes, relationshipKinds, type ReadingTheme } from "@/lib/compatibility-context";
 import { profileTranslations } from "@/lib/profile-translations";
@@ -117,6 +117,7 @@ function TorisetsuPanel({
   initialMode = "manual",
   plan,
   only,
+  serverCounted = false,
 }: {
   profile: UserProfile;
   language: Language;
@@ -124,6 +125,7 @@ function TorisetsuPanel({
   initialMode?: "manual" | "compatibility";
   plan: Plan;
   only?: "manual" | "compatibility";
+  serverCounted?: boolean;
 }) {
   const t = torisetsuTranslations[language];
   const base = translations[language];
@@ -147,9 +149,8 @@ function TorisetsuPanel({
   const [readingTheme, setReadingTheme] = useState<ReadingTheme>("connection");
   const [concern, setConcern] = useState("");
   const contextCopy = compatibilityContextCopy[language];
-  const [used, setUsed] = useState(0);
-  useEffect(() => { try { setUsed(Number(localStorage.getItem(quickUsageKey(profile.birthDate, plan))) || 0); } catch { setUsed(0); } }, [profile.birthDate, plan]);
-  const remaining = quickCompatibilityLimit[plan] - used;
+  const usage = useDailyUsage("compatibility", plan, serverCounted);
+  const remaining = usage.remaining;
   const partnerInput: PartnerInput = { name: partnerName, nameKana: partnerKana, gender: partnerGender, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
   const score = result?.score ?? 0;
@@ -384,7 +385,7 @@ function TorisetsuPanel({
                 type="button"
                 variant="champagne"
                 disabled={!canAnalyze || remaining <= 0}
-                onClick={() => { if (!canAnalyze || remaining <= 0) return; const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language, { relationship: relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern }); if (!analysis) return; setResult(analysis); const next = used + 1; try { localStorage.setItem(quickUsageKey(profile.birthDate, plan), String(next)); } catch { /* private browsing */ } setUsed(next); setAnalyzed(true); }}
+                onClick={async () => { if (!canAnalyze || remaining <= 0) return; const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language, { relationship: relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern }); if (!analysis) return; if (!(await usage.consume())) return; setResult(analysis); setAnalyzed(true); }}
                 className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
               >
                 <Sparkles className="size-4 shrink-0" aria-hidden="true" />
@@ -392,7 +393,7 @@ function TorisetsuPanel({
               </Button>
             </div>
           </section>
-           {remaining <= 0 && !analyzed && <p role="status" className="mt-3 text-center text-sm text-primary">{q.refresh}</p>}
+           {remaining <= 0 && !analyzed && <div role="status" className="mt-3 text-center"><p className="text-sm text-primary">{q.refresh}</p>{plan !== "b2b-premium" && <Button type="button" variant="champagne" onClick={onVip} className="mt-3 text-xs">{q.limit} →</Button>}</div>}
           {analyzed && result ? (
             <section className="py-8 text-center" aria-live="polite">
               {partnerName ? (
@@ -617,7 +618,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </>
             ) : tab === "consult" ? (
               <>
-                <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+                <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
                 <ConsultationPanel
                   profile={profile}
                   language={language}

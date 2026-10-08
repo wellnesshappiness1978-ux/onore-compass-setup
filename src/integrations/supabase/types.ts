@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_usage: {
+        Row: {
+          feature: string
+          updated_at: string
+          usage_day: string
+          used: number
+          user_id: string
+        }
+        Insert: {
+          feature: string
+          updated_at?: string
+          usage_day: string
+          used?: number
+          user_id: string
+        }
+        Update: {
+          feature?: string
+          updated_at?: string
+          usage_day?: string
+          used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       divination_results: {
         Row: {
           art_id: string
@@ -235,6 +259,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_daily_usage: {
+        Args: { p_day: string; p_feature: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

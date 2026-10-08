@@ -1,7 +1,7 @@
 import type { Plan } from "./design-modes";
 
 /** A per-device preview allowance; this is not a server-enforced entitlement. */
-export const quickCompatibilityLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 10, b2b: 30, "b2b-premium": Infinity };
+export const quickCompatibilityLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 10, b2b: 30, "b2b-premium": Infinity }; // keep equal to dailyUsageLimit
 export const localDay = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 export const quickUsageKey = (birthDate: string, plan: Plan) => `onore-quick-compat:${birthDate}:${plan}:${localDay()}`;
 export const quickReading = (mine: string, theirs: string) => {

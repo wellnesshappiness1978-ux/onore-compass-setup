@@ -35,8 +35,9 @@ export const hasFeature = (plan: Plan, feature: TeamFeature) => rank(plan) >= ra
 export const requiredPlanFor = (feature: TeamFeature) => featureMin[feature];
 /** Smallest plan whose member limit fits `count`. */
 export const planForCount = (count: number): Plan | null => planOrder.find((p) => memberLimit[p] >= count) ?? null;
-/** Daily AI consultation caps per plan (Infinity = unlimited). Display-test counter until billing exists. */
-export const consultationDailyLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 10, b2b: 30, "b2b-premium": Infinity };
+/** Shared daily cap for consultation and compatibility (Infinity = unlimited); the database function mirrors it. */
+export const dailyUsageLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 10, b2b: 30, "b2b-premium": Infinity };
+export const consultationDailyLimit = dailyUsageLimit;
 export { quickCompatibilityLimit };
 export const nextPlan = (plan: Plan): Plan | null => planOrder[rank(plan) + 1] ?? null;
 /** Minimum plan for birth-color and earth-calendar sections. */

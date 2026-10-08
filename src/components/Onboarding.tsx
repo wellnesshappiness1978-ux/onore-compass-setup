@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import LanguageSelector from "./LanguageSelector";
 import { ArrowRight, CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
@@ -54,19 +55,19 @@ const chipBase =
 const chipSelected = "border-primary/80 bg-primary/15 text-primary shadow-champagne";
 const chipIdle = "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5";
 
-type Props = { onComplete: (profile: UserProfile) => Promise<void>; language: Language; signedIn: boolean; initialProfile?: UserProfile };
+type Props = { onComplete: (profile: UserProfile) => Promise<void>; language: Language; signedIn: boolean; initialProfile?: UserProfile; onLanguageChange?: (language: Language) => void };
 
 const introCopy: Record<Language, { eyebrow: string; title: string; body: string; inputs: string; layers: string; portrait: string; note: string; cta: string }> = {
-  ja: { eyebrow: "入力前の30秒プレビュー", title: "なぜ、ひとつの占いだけで見ないのか？", body: "同じ誕生日でも、名前・生まれた時間・場所・家族の中での立場が重なると、見えてくる輪郭は変わります。アゴルメンは一つの答えに決めつけず、複数の視点が重なる部分と食い違う部分をAIで読み解きます。", inputs: "姓名・生年月日・出生時刻／場所", layers: "名前・数字・星・暦・動物・方位の6つの視点", portrait: "あなたの本質・強み・迷いやすい構造", note: "15以上の占術知見を背景に、入力値から実際に算出できる6つの視点を統合する参考体験です。未入力情報は推測しません。", cta: "プロフィール入力へ進む" },
+  ja: { eyebrow: "入力前の30秒プレビュー", title: "なぜ、ひとつの占いだけで見ないのか？", body: "同じ誕生日でも、名前・生まれた時間・場所・家族の中での立場が重なると、見えてくる輪郭は変わります。アゴルメンは一つの答えに決めつけず、複数の視点が重なる部分と食い違う部分を最新AIで読み解きます。", inputs: "姓名・生年月日・出生時刻／場所", layers: "名前・数字・星・暦・動物・方位の6つの視点", portrait: "あなたの本質・強み・迷いやすい構造", note: "15以上の占術知見を背景に、入力値から実際に算出できる6つの視点を統合する参考体験です。未入力情報は推測しません。", cta: "プロフィール入力へ進む" },
   en: { eyebrow: "30-second preview", title: "Why look through more than one lens?", body: "A birth date gains different contours when combined with a name, birth time, place and family context. Agolmen compares where several perspectives reinforce or challenge one another instead of forcing a single answer.", inputs: "Name · date · time · place", layers: "Name · numbers · sky · pillars · animal · directions", portrait: "Your nature · strengths · recurring friction", note: "A reflective experience informed by 15+ traditions. Only implemented calculations from supplied data are used; missing details are never guessed.", cta: "Enter my profile" },
-  "zh-CN": { eyebrow: "填写前30秒预览", title: "为什么不只看一种占术？", body: "即使生日相同，姓名、出生时间与地点、家庭排行相互叠加后，呈现的轮廓也会不同。阿戈尔曼用AI解读多种视角的重合与差异，而不是武断地给出唯一答案。", inputs: "姓名・生日・时间／地点", layers: "姓名・数字・天体・四柱・动物・方位", portrait: "本质・优势・反复卡住的结构", note: "这是以15种以上占术知识为背景的参考体验，只使用已实现且可由输入计算的项目，不猜测缺失信息。", cta: "开始填写资料" },
-  "zh-TW": { eyebrow: "填寫前30秒預覽", title: "為什麼不只看一種占術？", body: "即使生日相同，姓名、出生時間與地點、家庭排行互相疊加後，呈現的輪廓也會不同。阿戈爾曼用AI解讀多種視角的重合與差異，而不是武斷地給出唯一答案。", inputs: "姓名・生日・時間／地點", layers: "姓名・數字・天體・四柱・動物・方位", portrait: "本質・優勢・反覆卡住的結構", note: "這是以15種以上占術知識為背景的參考體驗，只使用已實作且可由輸入計算的項目，不猜測缺失資訊。", cta: "開始填寫資料" },
+  "zh-CN": { eyebrow: "填写前30秒预览", title: "为什么不只看一种占术？", body: "即使生日相同，姓名、出生时间与地点、家庭排行相互叠加后，呈现的轮廓也会不同。阿戈尔曼用最新AI解读多种视角的重合与差异，而不是武断地给出唯一答案。", inputs: "姓名・生日・时间／地点", layers: "姓名・数字・天体・四柱・动物・方位", portrait: "本质・优势・反复卡住的结构", note: "这是以15种以上占术知识为背景的参考体验，只使用已实现且可由输入计算的项目，不猜测缺失信息。", cta: "开始填写资料" },
+  "zh-TW": { eyebrow: "填寫前30秒預覽", title: "為什麼不只看一種占術？", body: "即使生日相同，姓名、出生時間與地點、家庭排行互相疊加後，呈現的輪廓也會不同。阿戈爾曼用最新AI解讀多種視角的重合與差異，而不是武斷地給出唯一答案。", inputs: "姓名・生日・時間／地點", layers: "姓名・數字・天體・四柱・動物・方位", portrait: "本質・優勢・反覆卡住的結構", note: "這是以15種以上占術知識為背景的參考體驗，只使用已實作且可由輸入計算的項目，不猜測缺失資訊。", cta: "開始填寫資料" },
   ko: { eyebrow: "입력 전 30초 미리보기", title: "왜 한 가지 점술만 보지 않을까요?", body: "같은 생일도 이름, 태어난 시간과 장소, 가족 안의 위치가 겹치면 다른 윤곽이 드러납니다. 아골멘은 하나의 답으로 단정하지 않고 여러 관점이 겹치거나 어긋나는 지점을 AI로 읽습니다.", inputs: "이름・생일・시간／장소", layers: "이름・숫자・천체・사주・동물・방위", portrait: "본질・강점・반복되는 막힘", note: "15가지 이상의 점술 지식을 배경으로 한 참고 체험입니다. 입력값으로 계산 가능한 구현 항목만 사용하며 누락 정보는 추측하지 않습니다.", cta: "프로필 입력하기" },
   es: { eyebrow: "Vista previa de 30 segundos", title: "¿Por qué mirar con más de una lente?", body: "Una fecha adquiere otros matices al combinarse con el nombre, la hora, el lugar y el contexto familiar. Agolmen compara coincidencias y contrastes entre perspectivas sin imponer una sola respuesta.", inputs: "Nombre · fecha · hora · lugar", layers: "Nombre · números · cielo · pilares · animal · direcciones", portrait: "Esencia · fortalezas · fricciones recurrentes", note: "Experiencia reflexiva inspirada en más de 15 tradiciones. Solo usa cálculos implementados con los datos aportados; nunca inventa lo que falta.", cta: "Introducir mi perfil" },
   fr: { eyebrow: "Aperçu en 30 secondes", title: "Pourquoi croiser plusieurs regards ?", body: "Une date prend d’autres contours avec le nom, l’heure, le lieu et le contexte familial. Agolmen compare les convergences et les écarts entre plusieurs perspectives sans imposer une réponse unique.", inputs: "Nom · date · heure · lieu", layers: "Nom · nombres · ciel · piliers · animal · directions", portrait: "Nature · forces · tensions récurrentes", note: "Expérience réflexive inspirée de plus de 15 traditions. Seuls les calculs disponibles à partir des données saisies sont utilisés ; rien n’est inventé.", cta: "Saisir mon profil" },
 };
 
-export default function Onboarding({ onComplete, language, signedIn, initialProfile }: Props) {
+export default function Onboarding({ onComplete, language, signedIn, initialProfile, onLanguageChange }: Props) {
   const t = translations[language];
   const pt = profileTranslations[language];
   const storage = profileStorageCopy[language];
@@ -89,11 +90,24 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
     siblingOrder: "",
   });
 
+  const [genderChosen, setGenderChosen] = useState(Boolean(initialProfile));
+  useEffect(() => { window.scrollTo(0, 0); }, [introVisible, step]);
+  const ph: Record<Language, [string, string, string]> = {
+    ja: ["例：山田 太郎（※姓と名の間にスペース）", "例：やまだ たろう（※ひらがな・姓と名の間にスペース）", "例：YAMADA TARO（※姓と名の間にスペース）"],
+    en: ["e.g. 山田 太郎 or your name in your own script", "e.g. やまだ たろう (hiragana reading)", "e.g. YAMADA TARO (space between names)"],
+    "zh-CN": ["例：山田 太郎（姓与名之间留空格）", "例：やまだ たろう（平假名读音）", "例：YAMADA TARO（姓与名之间留空格）"],
+    "zh-TW": ["例：山田 太郎（姓與名之間留空格）", "例：やまだ たろう（平假名讀音）", "例：YAMADA TARO（姓與名之間留空格）"],
+    ko: ["예: 山田 太郎 (성과 이름 사이 띄어쓰기)", "예: やまだ たろう (히라가나 읽기)", "예: YAMADA TARO (성과 이름 사이 띄어쓰기)"],
+    es: ["p. ej. 山田 太郎 (espacio entre apellido y nombre)", "p. ej. やまだ たろう (lectura en hiragana)", "p. ej. YAMADA TARO (espacio entre apellido y nombre)"],
+    fr: ["ex. 山田 太郎 (espace entre nom et prénom)", "ex. やまだ たろう (lecture en hiragana)", "ex. YAMADA TARO (espace entre nom et prénom)"],
+  };
+  const optionalLabel: Record<Language, string> = { ja: "任意", en: "Optional", "zh-CN": "选填", "zh-TW": "選填", ko: "선택", es: "Opcional", fr: "Facultatif" };
+  const genderPrompt: Record<Language, string> = { ja: "選択してください", en: "Please choose", "zh-CN": "请选择", "zh-TW": "請選擇", ko: "선택해 주세요", es: "Selecciona una opción", fr: "Veuillez choisir" };
   const set = <K extends keyof UserProfile>(key: K, value: UserProfile[K]) =>
     setProfile((p) => ({ ...p, [key]: value }));
 
   const stepValid = [
-    /^[A-Za-z][A-Za-z\s'-]*$/.test(profile.nameRomaji.trim()) && profile.birthDate !== "" && (profile.birthTimeUnknown || profile.birthTime !== ""),
+    profile.nameKanji.trim() !== "" && /^[\u3041-\u309F\u30FC\s]+$/.test(profile.nameKana.trim()) && /^[A-Za-z][A-Za-z\s'-]*$/.test(profile.nameRomaji.trim()) && genderChosen && profile.birthDate !== "",
     profile.birthPlace !== "",
     profile.bloodType !== "" && profile.siblingOrder !== "",
   ][step];
@@ -114,6 +128,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
         nameKanji: finalizePersonalName(profile.nameKanji),
         nameKana: finalizePersonalName(profile.nameKana),
         nameRomaji: finalizePersonalName(profile.nameRomaji, true),
+        birthTimeUnknown: profile.birthTimeUnknown || profile.birthTime === "",
       });
     } catch {
       setSaveError(true);
@@ -124,6 +139,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
 
   return (
     <div className="celestial-scene relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-4 py-10 sm:py-14">
+      {onLanguageChange && <LanguageSelector language={language} onChange={onLanguageChange} />}
       <div aria-hidden="true" className="celestial-stars" />
       <div aria-hidden="true" className="celestial-orbit -left-64 -top-64 sm:-left-52 sm:-top-72" />
       <div aria-hidden="true" className="celestial-orbit -bottom-80 -right-72 sm:-right-52" />
@@ -179,22 +195,23 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
             <div className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="name-kanji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKanji} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
-                  <input id="name-kanji" maxLength={40} placeholder="例：山田 太郎（※姓と名の間にスペース）" value={profile.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} className={inputClass} />
+                  <label htmlFor="name-kanji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKanji} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
+                  <input id="name-kanji" maxLength={40} placeholder={ph[language][0]} value={profile.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} className={inputClass} />
                 </div>
                 <div>
-                  <label htmlFor="name-kana" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKana} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
-                  <input id="name-kana" maxLength={60} placeholder="例：やまだ たろう（※姓と名の間にスペース）" value={profile.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} className={inputClass} />
+                  <label htmlFor="name-kana" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKana} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
+                  <input id="name-kana" maxLength={60} placeholder={ph[language][1]} value={profile.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} className={inputClass} />
                 </div>
                 <div>
                   <label htmlFor="name-romaji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameRomaji} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
-                  <input id="name-romaji" maxLength={60} placeholder="例：YAMADA TARO（※姓と名の間にスペース）" value={profile.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} className={inputClass} />
+                  <input id="name-romaji" maxLength={60} placeholder={ph[language][2]} value={profile.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} className={inputClass} />
                   <p className="mt-1 text-xs text-muted-foreground">{pt.romajiHint}</p>
                 </div>
               </div>
               <div>
-                <label htmlFor="gender" className="mb-2 block font-serif text-sm font-semibold text-primary">{storage.gender}</label>
-                <select id="gender" value={profile.gender} onChange={(e) => set("gender", e.target.value as UserProfile["gender"])} className={inputClass}>
+                <label htmlFor="gender" className="mb-2 block font-serif text-sm font-semibold text-primary">{storage.gender} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
+                <select id="gender" value={genderChosen ? profile.gender : ""} onChange={(e) => { if (!e.target.value) return; setGenderChosen(true); set("gender", e.target.value as UserProfile["gender"]); }} className={inputClass}>
+                  {!genderChosen && <option value="" disabled>{genderPrompt[language]}</option>}
                   <option value="undisclosed">{storage.undisclosed}</option><option value="female">{storage.female}</option><option value="male">{storage.male}</option><option value="other">{storage.other}</option>
                 </select>
               </div>
@@ -215,7 +232,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
               <div>
                 <label htmlFor="birth-time" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <Clock3 className="size-4 stroke-[1.4]" aria-hidden="true" />
-                  {t.birthTime}
+                  {t.birthTime} <span className="text-xs font-normal text-primary/70">{optionalLabel[language]}</span>
                 </label>
                 <input
                   id="birth-time"
