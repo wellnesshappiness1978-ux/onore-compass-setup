@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import LanguageSelector from "./LanguageSelector";
 import { ArrowRight, CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
@@ -54,7 +55,7 @@ const chipBase =
 const chipSelected = "border-primary/80 bg-primary/15 text-primary shadow-champagne";
 const chipIdle = "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5";
 
-type Props = { onComplete: (profile: UserProfile) => Promise<void>; language: Language; signedIn: boolean; initialProfile?: UserProfile };
+type Props = { onComplete: (profile: UserProfile) => Promise<void>; language: Language; signedIn: boolean; initialProfile?: UserProfile; onLanguageChange?: (language: Language) => void };
 
 const introCopy: Record<Language, { eyebrow: string; title: string; body: string; inputs: string; layers: string; portrait: string; note: string; cta: string }> = {
   ja: { eyebrow: "入力前の30秒プレビュー", title: "なぜ、ひとつの占いだけで見ないのか？", body: "同じ誕生日でも、名前・生まれた時間・場所・家族の中での立場が重なると、見えてくる輪郭は変わります。アゴルメンは一つの答えに決めつけず、複数の視点が重なる部分と食い違う部分を最新AIで読み解きます。", inputs: "姓名・生年月日・出生時刻／場所", layers: "名前・数字・星・暦・動物・方位の6つの視点", portrait: "あなたの本質・強み・迷いやすい構造", note: "15以上の占術知見を背景に、入力値から実際に算出できる6つの視点を統合する参考体験です。未入力情報は推測しません。", cta: "プロフィール入力へ進む" },

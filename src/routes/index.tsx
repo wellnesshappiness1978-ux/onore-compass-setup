@@ -144,7 +144,7 @@ function Index() {
           signedIn={Boolean(userId)}
         />
       ) : (
-        <Onboarding key={userId ?? "guest"} {...(profile ? { initialProfile: profile } : {})} onComplete={saveProfile} language={language} signedIn={Boolean(userId)} />
+        <Onboarding key={userId ?? "guest"} {...(profile ? { initialProfile: profile } : {})} onComplete={saveProfile} language={language} onLanguageChange={setLanguage} signedIn={Boolean(userId)} />
       )}
     </>
   );
