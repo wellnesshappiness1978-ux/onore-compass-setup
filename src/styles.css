@@ -119,25 +119,34 @@
 .agolmen-loading-orbit { animation: agolmen-turn 11s linear infinite; }
 .agolmen-loading-orbit-reverse { animation: agolmen-turn-reverse 7s linear infinite; opacity: .48; }
 .agolmen-loading-art { isolation: isolate; }
-.agolmen-light-beams { z-index: -1; border-radius: 50%; background: repeating-conic-gradient(from 8deg, color-mix(in oklab, var(--beam-purple) 82%, transparent) 0deg 2.9deg, transparent 3.7deg 7.3deg, color-mix(in oklab, var(--beam-gold) 86%, transparent) 7.8deg 10.7deg, transparent 11.5deg 18.8deg); mask-image: radial-gradient(circle, transparent 0 23%, black 31%, color-mix(in oklab, black 62%, transparent) 61%, transparent 82%), conic-gradient(from 0deg, black 0 68deg, transparent 76deg 104deg, black 112deg 248deg, transparent 256deg 284deg, black 292deg 360deg); mask-composite: intersect; filter: blur(.75px) drop-shadow(0 0 18px color-mix(in oklab, var(--beam-purple) 62%, transparent)) drop-shadow(0 0 11px color-mix(in oklab, var(--beam-gold) 48%, transparent)); opacity: .88; animation: agolmen-gem 4s ease-in-out infinite alternate; }
+.agolmen-radiance { z-index: -1; pointer-events: none; overflow: visible; animation: agolmen-radiance-breathe 5.2s ease-in-out infinite alternate; }
+.agolmen-ray { position: absolute; left: 50%; top: 50%; width: var(--ray-length); height: var(--ray-thickness); transform: translateY(-50%) rotate(var(--ray-angle)); transform-origin: left center; opacity: var(--ray-opacity); border-radius: 999px; background: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--beam-gold) 78%, transparent) 8%, color-mix(in oklab, var(--beam-purple) 66%, transparent) 28%, color-mix(in oklab, var(--beam-aqua) 38%, transparent) 54%, transparent 100%); filter: blur(1.2px); animation: agolmen-ray-shimmer 3.8s ease-in-out var(--ray-delay) infinite alternate; }
+.agolmen-ray-1 { background: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--beam-purple) 72%, transparent) 10%, color-mix(in oklab, var(--rose-glow) 52%, transparent) 40%, transparent 100%); filter: blur(2px); }
+.agolmen-ray-2 { background: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--beam-aqua) 64%, transparent) 12%, color-mix(in oklab, var(--beam-gold) 48%, transparent) 46%, transparent 100%); filter: blur(.8px); }
+.agolmen-ray-3 { background: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--rose-glow) 68%, transparent) 9%, color-mix(in oklab, var(--beam-purple) 46%, transparent) 50%, transparent 100%); filter: blur(2.8px); }
+.agolmen-aura { position: absolute; left: 50%; top: 50%; border-radius: 50%; transform: translate(-50%, -50%); filter: blur(28px); }
+.agolmen-aura-rose { width: 58%; height: 46%; background: color-mix(in oklab, var(--rose-glow) 26%, transparent); transform: translate(-58%, -55%) rotate(18deg); }
+.agolmen-aura-purple { width: 68%; height: 61%; background: color-mix(in oklab, var(--beam-purple) 30%, transparent); transform: translate(-43%, -47%) rotate(-13deg); filter: blur(36px); }
+.agolmen-aura-aqua { width: 43%; height: 66%; background: color-mix(in oklab, var(--beam-aqua) 18%, transparent); transform: translate(-66%, -42%) rotate(31deg); filter: blur(32px); }
+.agolmen-aura-gold { width: 52%; height: 54%; background: color-mix(in oklab, var(--beam-gold) 25%, transparent); transform: translate(-43%, -59%) rotate(-24deg); filter: blur(30px); }
 .agolmen-logo-aura { isolation: isolate; filter: drop-shadow(0 0 12px color-mix(in oklab, var(--beam-gold) 32%, transparent)); }
 .agolmen-loading-aura { background: radial-gradient(circle, color-mix(in oklab, var(--beam-gold) 52%, transparent), color-mix(in oklab, var(--beam-purple) 28%, transparent) 50%, transparent 75%); filter: blur(14px); animation: agolmen-gem 2.7s ease-in-out infinite alternate; }
 .agolmen-loading-logo { animation: agolmen-bloom 2.5s ease-in-out infinite alternate; filter: drop-shadow(0 0 12px var(--gold-glow)); }
 .agolmen-particle { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; border-radius: 50%; background: var(--gold-glow); box-shadow: 0 0 8px var(--primary), 0 0 18px var(--gold-glow); animation: agolmen-converge 2.8s ease-in infinite; animation-delay: calc(var(--i) * -.175s); }
 .agolmen-particle-inner { width: 2px; height: 2px; animation-duration: 2.1s; animation-direction: reverse; }
 .agolmen-loading-core { background: radial-gradient(circle, var(--gold-glow), color-mix(in oklab, var(--primary) 34%, transparent) 42%, transparent 72%); filter: blur(5px); animation: agolmen-core 1.8s ease-in-out infinite alternate; }
-.agolmen-loading-progress { width: 38%; animation: agolmen-scan 1.8s ease-in-out infinite; box-shadow: 0 0 8px var(--gold-glow); }
 @keyframes agolmen-turn { to { transform: rotate(360deg); } }
 @keyframes agolmen-turn-reverse { to { transform: rotate(-360deg); } }
 @keyframes agolmen-lotus-turn { to { transform: rotate(360deg); } }
 @keyframes agolmen-bloom { from { opacity: .6; transform: scale(.75) rotate(-9deg); } to { opacity: 1; transform: scale(1.06) rotate(8deg); } }
 @keyframes agolmen-gem { from { opacity: .35; transform: scale(.78); } to { opacity: .95; transform: scale(1.18); } }
+@keyframes agolmen-radiance-breathe { from { opacity: .72; transform: scale(.94) rotate(-1.5deg); } to { opacity: 1; transform: scale(1.035) rotate(1.5deg); } }
+@keyframes agolmen-ray-shimmer { from { opacity: calc(var(--ray-opacity) * .72); } to { opacity: var(--ray-opacity); } }
 @keyframes agolmen-converge { 0% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg)) translateX(85px) scale(.3); } 25% { opacity: 1; } 85% { opacity: .85; } 100% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg + 280deg)) translateX(8px) scale(1.8); } }
 .agolmen-loading:has(.size-24) .agolmen-particle { animation-name: agolmen-converge-small; }
 @keyframes agolmen-converge-small { 0% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg)) translateX(42px); } 25% { opacity: 1; } 100% { opacity: 0; transform: rotate(calc(var(--i) * 137.5deg + 280deg)) translateX(4px); } }
 @keyframes agolmen-core { from { opacity: .45; transform: scale(.72); } to { opacity: 1; transform: scale(1.18); } }
-@keyframes agolmen-scan { 0%,100% { transform: translateX(-80%); opacity: .25; } 50% { transform: translateX(165%); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .agolmen-loading-orbit, .agolmen-loading-orbit-reverse, .agolmen-loading-logo, .agolmen-loading-aura, .agolmen-loading-core, .agolmen-loading-progress, .agolmen-particle, .agolmen-light-beams { animation: none; } .agolmen-particle { display: none; } }
+@media (prefers-reduced-motion: reduce) { .agolmen-loading-orbit, .agolmen-loading-orbit-reverse, .agolmen-loading-logo, .agolmen-loading-aura, .agolmen-loading-core, .agolmen-particle, .agolmen-radiance, .agolmen-ray { animation: none; } .agolmen-particle { display: none; } }
 
 .dark {
   --background: oklch(0.105 0.012 305);

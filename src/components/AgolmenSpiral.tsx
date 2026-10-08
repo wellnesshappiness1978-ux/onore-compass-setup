@@ -19,10 +19,41 @@ export function SpiralLines({ className = "" }: { className?: string }) {
 
 const particles = Array.from({ length: 16 }, (_, i) => i);
 
+const rays = [
+  [24, "45%", "1.8px", .62], [39, "36%", "3.2px", .46], [55, "49%", "2.4px", .72],
+  [71, "40%", "4.5px", .38], [84, "52%", "2px", .68], [101, "43%", "3.6px", .52],
+  [119, "48%", "1.6px", .7], [137, "38%", "4px", .4], [153, "51%", "2.7px", .58],
+  [205, "42%", "3px", .5], [222, "50%", "1.7px", .72], [238, "37%", "4.3px", .39],
+  [254, "47%", "2.2px", .66], [271, "41%", "3.5px", .47], [288, "53%", "1.9px", .7],
+  [306, "39%", "4.1px", .41], [322, "48%", "2.5px", .63], [337, "35%", "3.3px", .44],
+] as const;
+
+function SacredRadiance() {
+  return <span className="agolmen-radiance absolute inset-[-92%]" aria-hidden="true">
+    <span className="agolmen-aura agolmen-aura-rose" />
+    <span className="agolmen-aura agolmen-aura-purple" />
+    <span className="agolmen-aura agolmen-aura-aqua" />
+    <span className="agolmen-aura agolmen-aura-gold" />
+    {rays.map(([angle, length, thickness, opacity], index) => (
+      <span
+        key={angle}
+        className={`agolmen-ray agolmen-ray-${index % 4}`}
+        style={{
+          "--ray-angle": `${angle}deg`,
+          "--ray-length": length,
+          "--ray-thickness": thickness,
+          "--ray-opacity": opacity,
+          "--ray-delay": `${(index % 6) * -.47}s`,
+        } as React.CSSProperties}
+      />
+    ))}
+  </span>;
+}
+
 export function AgolmenLoading({ label, compact = false }: { label: string; compact?: boolean }) {
   return <div className={`agolmen-loading flex flex-col items-center justify-center text-center ${compact ? "min-h-36" : "min-h-screen"}`} role="status" aria-live="polite">
     <div className={`agolmen-loading-art relative ${compact ? "size-24" : "size-48"}`} aria-hidden="true">
-      <span className="agolmen-light-beams absolute inset-[-28%]" />
+      <SacredRadiance />
       <SpiralLines className="agolmen-loading-orbit absolute inset-0 size-full text-primary" />
       <SpiralLines className="agolmen-loading-orbit-reverse absolute inset-[9%] size-[82%] text-primary" />
       {particles.map(i => <span key={i} className="agolmen-particle" style={{ "--i": i } as React.CSSProperties} />)}
@@ -32,10 +63,9 @@ export function AgolmenLoading({ label, compact = false }: { label: string; comp
       <img src={logo} alt="" width={512} height={512} className="agolmen-loading-logo absolute inset-[16%] size-[68%] object-contain" />
     </div>
     <p className="mt-3 px-4 font-serif text-sm text-primary">{label}</p>
-    <span className="mt-2 h-px w-24 overflow-hidden bg-primary/20" aria-hidden="true"><span className="agolmen-loading-progress block h-full bg-primary" /></span>
   </div>;
 }
 
 export function AgolmenLogo({ className = "" }: { className?: string }) {
-  return <span className={`agolmen-logo-aura relative inline-grid place-items-center ${className}`}><span className="agolmen-light-beams absolute inset-[-42%]" aria-hidden="true" /><img src={logo} alt="" width={512} height={512} className="agolmen-brand-logo relative size-full object-contain" /></span>;
+  return <span className={`agolmen-logo-aura relative inline-grid place-items-center ${className}`}><SacredRadiance /><img src={logo} alt="" width={512} height={512} className="agolmen-brand-logo relative size-full object-contain" /></span>;
 }
