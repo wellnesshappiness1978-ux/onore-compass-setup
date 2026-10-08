@@ -393,7 +393,7 @@ function TorisetsuPanel({
               </Button>
             </div>
           </section>
-           {remaining <= 0 && !analyzed && <p role="status" className="mt-3 text-center text-sm text-primary">{q.refresh}</p>}
+           {remaining <= 0 && !analyzed && <div role="status" className="mt-3 text-center"><p className="text-sm text-primary">{q.refresh}</p>{plan !== "b2b-premium" && <Button type="button" variant="champagne" onClick={onVip} className="mt-3 text-xs">{q.limit} →</Button>}</div>}
           {analyzed && result ? (
             <section className="py-8 text-center" aria-live="polite">
               {partnerName ? (
