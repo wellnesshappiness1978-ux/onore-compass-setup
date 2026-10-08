@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Line } from "@react-three/drei";
+import { Environment, Lightformer, Line } from "@react-three/drei";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import {
@@ -229,6 +229,7 @@ function IntentionPattern({ intention, palette, progress }: { intention: Mandala
 
 function GemstoneCore({ intention, main, reveal, reduced }: { intention: MandalaIntention; main: string; reveal: number; reduced: boolean }) {
   const style = MANDALA_STYLES[intention];
+  const gemColor = intention === "overall" ? main : style.accent;
   const gem = useRef<THREE.Group>(null);
   const facets = style.gem === "diamond" ? 16 : style.gem === "citrine" ? 12 : style.gem === "sapphire" ? 10 : style.gem === "ruby" ? 14 : 12;
   useFrame((state, rawDelta) => {
@@ -239,13 +240,13 @@ function GemstoneCore({ intention, main, reveal, reduced }: { intention: Mandala
     gem.current.rotation.y = Math.sin(state.clock.elapsedTime * .3) * .08;
   });
   return <group ref={gem} position-z={.48} scale={(.18 + reveal * .82) * (intention === "overall" ? 1.05 : .96)}>
-    <mesh rotation={[.2, 0, Math.PI / facets]}>
+    <mesh rotation={[Math.PI / 2, 0, Math.PI / facets]}>
       <cylinderGeometry args={[.7, 1.02, .55, facets, 1, false]} />
-      <meshPhysicalMaterial color={main} emissive={main} emissiveIntensity={.45} metalness={.28} roughness={.08} clearcoat={1} clearcoatRoughness={.03} flatShading />
+      <meshPhysicalMaterial color={gemColor} emissive={gemColor} emissiveIntensity={.32} metalness={.34} roughness={.06} clearcoat={1} clearcoatRoughness={.02} flatShading />
     </mesh>
-    <mesh position-z={.29} rotation-z={Math.PI / facets}>
+    <mesh position-z={.47} rotation={[Math.PI / 2, 0, Math.PI / facets]}>
       <coneGeometry args={[.72, .42, facets]} />
-      <meshPhysicalMaterial color={style.accent} emissive={main} emissiveIntensity={.62} metalness={.45} roughness={.06} clearcoat={1} flatShading />
+      <meshPhysicalMaterial color={style.accent} emissive={gemColor} emissiveIntensity={.5} metalness={.45} roughness={.04} clearcoat={1} flatShading />
     </mesh>
     {Array.from({ length: facets }, (_, index) => {
       const angle = index / facets * Math.PI * 2;
@@ -280,6 +281,11 @@ function Mandala({ colors, intention, progress, reduced }: Omit<Props, "onCaptur
     <directionalLight position={[4, 6, 8]} intensity={4.2} color={style.accent} />
     <directionalLight position={[-5, -2, 6]} intensity={3.4} color={style.secondaryAccent} />
     <pointLight position={[0, 0, 6]} intensity={2.5} color={main} />
+    <Environment>
+      <Lightformer intensity={3.5} color={style.accent} position={[0, 3, 5]} scale={[7, 2, 1]} />
+      <Lightformer intensity={2.5} color={style.secondaryAccent} position={[-4, -1, 3]} rotation-y={Math.PI / 2} scale={[6, 2, 1]} />
+      <Lightformer intensity={2} color="#FFFFFF" position={[4, 0, 4]} rotation-y={-Math.PI / 2} scale={[4, 1, 1]} />
+    </Environment>
     <AuraBackdrop palette={palette} accent={style.accent} reduced={reduced} />
     <RayField seed={seed} intention={intention} progress={reveal} />
     <group ref={mandala}>
