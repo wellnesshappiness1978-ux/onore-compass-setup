@@ -2,7 +2,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Line } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { GOLDEN_ANGLE, colorsForIntention, logarithmicSpiralPoint, seededUnit, spiralPoint, type MandalaIntention } from "@/lib/art-geometry";
+import { GOLDEN_ANGLE, logarithmicSpiralPoint, seededUnit, spiralPoint, type MandalaIntention } from "@/lib/art-geometry";
 
 export type Capture = () => Promise<{ blob: Blob; width: number; height: number }>;
 type Props = { colors: string[]; intention: MandalaIntention; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
@@ -63,7 +63,7 @@ function Mandala({ colors, intention, progress, reduced }: Omit<Props, "onCaptur
   const main = colors[0] ?? "#D4AF37";
   const sub = colors[1] ?? "#F3E5AB";
   const seed = useMemo(() => colors.join("").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0), [colors]);
-  const palette = useMemo(() => colorsForIntention(colors.length > 0 ? colors.slice(0, 7) : ["#D4AF37"], intention), [colors, intention]);
+  const palette = useMemo(() => colors.length > 0 ? colors.slice(0, 7) : ["#D4AF37"], [colors]);
   const spiral = useMemo(() => Array.from({ length: 320 }, (_, i) => { const [x, y] = logarithmicSpiralPoint(i, 320, 5.25, 3.35); return [x, y, .16] as [number, number, number]; }), []);
   const particles = useMemo(() => {
     const count = 1440;
