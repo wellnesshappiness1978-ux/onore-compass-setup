@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
 import type { Plan } from "@/lib/design-modes";
 import { consultationDailyLimit, nextPlan, planOrder } from "@/lib/plans";
+import { useDailyUsage, msUntilMidnight } from "@/hooks/use-daily-usage";
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
@@ -32,8 +33,7 @@ import type { TeamMember } from "@/lib/team-analysis";
 
 type Props = { profile: UserProfile; language: Language; plan: Plan; actualPlan: Plan; signedIn: boolean; onVip: () => void };
 
-const dayKey = () => { const d = new Date(); return `onore-consult-${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
-const untilMidnight = () => { const n = new Date(); const m = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1); return m.getTime() - n.getTime(); };
+const untilMidnight = msUntilMidnight;
 const hms = (ms: number) => { const s = Math.max(0, Math.floor(ms / 1000)); return [s / 3600, (s % 3600) / 60, s % 60].map((v) => String(Math.floor(v)).padStart(2, "0")).join(":"); };
 
 export default function ConsultationPanel({ profile, language, plan, actualPlan, signedIn, onVip }: Props) {
@@ -54,17 +54,13 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
   const planNames = teamCopy[language].planNames;
   const isJa = language === "ja";
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const limit = consultationDailyLimit[plan];
-  const unlimited = !Number.isFinite(limit);
-  const [used, setUsed] = useState(0);
+  const usage = useDailyUsage("consultation", plan, signedIn && plan === actualPlan);
+  const { limit, unlimited, remaining } = usage;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
-    const read = () => setUsed(Number(localStorage.getItem(dayKey()) ?? 0) || 0);
-    read();
-    const id = window.setInterval(() => { setCountdown(untilMidnight()); read(); }, 1000);
+    const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
     return () => window.clearInterval(id);
   }, []);
-  const remaining = unlimited ? Infinity : Math.max(0, limit - used);
   const upgradeTo = nextPlan(plan);
   const [notice, setNotice] = useState<string | null>(null);
   const initialMessages = useMemo<UIMessage[]>(
@@ -89,7 +85,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
     textareaRef.current?.focus();
   }, []);
 
-  const submit = (text: string) => {
+  const submit = async (text: string) => {
     const prompt = text.trim();
     if (!prompt) {
       setNotice(t.empty);
@@ -102,10 +98,9 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
     }
     setNotice(null);
     clearError();
-    if (!unlimited) {
-      const next = used + 1;
-      localStorage.setItem(dayKey(), String(next));
-      setUsed(next);
+    if (!(await usage.consume())) {
+      setNotice(t.limit);
+      return;
     }
     void sendMessage({ text: prompt });
     requestAnimationFrame(() => textareaRef.current?.focus());
@@ -192,7 +187,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
               type="button"
               variant="outline"
               disabled={busy || remaining <= 0}
-              onClick={() => submit(prompt)}
+              onClick={() => void submit(prompt)}
               className="h-auto min-w-60 snap-start justify-between whitespace-normal rounded-lg border-primary/20 bg-card/55 px-4 py-3 text-left text-xs leading-5 text-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
             >
               <span>{prompt}</span>
@@ -255,7 +250,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
 
         <div className="border-t border-primary/15 bg-background/70 p-3 backdrop-blur-xl sm:p-4">
           <PromptInput
-            onSubmit={({ text }) => submit(text)}
+            onSubmit={({ text }) => void submit(text)}
             className="rounded-lg border-primary/30 bg-card/80 shadow-champagne"
           >
             <PromptInputTextarea
