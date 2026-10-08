@@ -1078,9 +1078,12 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas[data-design="pure-white"] .celestial-stars { opacity: .16; }
 .design-canvas[data-design="pure-white"] .text-gradient-gold, .design-canvas[data-design="pure-white"] .arts-shimmer { background-image: linear-gradient(120deg, var(--primary), var(--nebula)); }
 .design-choice--pure-white { --preview-base: oklch(.975 .006 95); --preview-accent: oklch(.42 .095 267); --preview-glint: oklch(.65 .11 85); }
-.agolmen-loading-logo, .design-heading img { mask-image: radial-gradient(ellipse 53% 53% at center, black 64%, transparent 98%); filter: drop-shadow(0 0 7px var(--gold-glow)); }
-
-.agolmen-brand-logo { mask-image: radial-gradient(ellipse 53% 53% at center, black 64%, transparent 98%); }
+.agolmen-loading-logo, .design-heading img, .agolmen-brand-logo {
+  border-radius: 50%;
+  clip-path: circle(43% at center);
+  mask-image: radial-gradient(circle at center, black 0 91%, transparent 100%);
+  filter: none;
+}
 .design-choice--pure-white .design-choice-scene { background: linear-gradient(135deg, var(--preview-base), color-mix(in oklab, var(--preview-accent) 12%, var(--preview-base))); color: var(--preview-accent); }
 .design-choice--pure-white .design-choice-palette span:nth-child(1) { background: var(--preview-base); }
 .design-choice--pure-white .design-choice-palette span:nth-child(2) { background: var(--preview-accent); }
