@@ -153,3 +153,9 @@
 - [x] Rebuild the birth-color mandala as deterministic pointillist and faceted golden-ratio geometry using only its six assigned colors.
 - [x] Rebuild the natal cosmic creation around a central Sun and all ten calculated bodies with distinct generated textures and marine-nebula depth.
 - [x] Verify signed-in VIP rendering, theme previews, reduced motion, runtime diagnostics and a clean build.
+
+## Emergency restoration, theme persistence and compatibility tiers
+- [x] Restore the uncropped master-logo treatment while preserving the removed horizontal streak and radial aura.
+- [x] Match theme specimens to live colors, materials and fonts; preserve the preferred mode locally and privately for signed-in users without bypassing plan access.
+- [x] Replace the deep compatibility result with four progressively unlocked sections for Free, Standard, VIP and Business.
+- [ ] Verify logo, theme restore and all four compatibility tiers on desktop and mobile.

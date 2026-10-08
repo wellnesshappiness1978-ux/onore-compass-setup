@@ -160,6 +160,16 @@ function TorisetsuPanel({
     b2b: language === "ja" ? "Business" : "Business",
     "b2b-premium": language === "ja" ? "Business Premium" : "Business Premium",
   };
+  const lockedSectionCopy: Record<Language, (tier: string) => string> = {
+    ja: (tier) => `${tier}プランで全文が開放されます`,
+    en: (tier) => `The ${tier} plan unlocks this full reading`,
+    "zh-CN": (tier) => `${tier}方案可解锁完整内容`,
+    "zh-TW": (tier) => `${tier}方案可解鎖完整內容`,
+    ko: (tier) => `${tier} 플랜에서 전체 내용을 볼 수 있습니다`,
+    es: (tier) => `El plan ${tier} desbloquea la lectura completa`,
+    fr: (tier) => `L’offre ${tier} débloque la lecture complète`,
+  };
+  const viewPlans: Record<Language, string> = { ja: "プランを見る", en: "View plans", "zh-CN": "查看方案", "zh-TW": "查看方案", ko: "플랜 보기", es: "Ver planes", fr: "Voir les offres" };
   useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, profile]);
 
   return (
@@ -421,7 +431,7 @@ function TorisetsuPanel({
                   const unlocked = planOrder.indexOf(plan) >= planOrder.indexOf(requiredPlan);
                   return <article key={title} className="relative overflow-hidden rounded-md border border-primary/25 bg-card/50 p-5">
                     <div className="flex items-start justify-between gap-3"><h4 className="font-serif text-lg text-primary">{title}</h4>{!unlocked && <LockKeyhole className="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />}</div>
-                    {unlocked ? <><p className="mt-2 text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</> : <div className="mt-4 rounded-md border border-primary/15 bg-background/60 p-4 text-center"><p className="text-sm text-muted-foreground">{language === "ja" ? `${sectionPlanNames[requiredPlan]}プランで全文が開放されます` : `${sectionPlanNames[requiredPlan]} plan unlocks this full reading`}</p><Button type="button" variant="outline" className="mt-3" onClick={onVip}><Crown className="size-4" aria-hidden="true" />{language === "ja" ? "プランを見る" : "View plans"}</Button></div>}
+                    {unlocked ? <><p className="mt-2 text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</> : <div className="mt-4 rounded-md border border-primary/15 bg-background/60 p-4 text-center"><p className="text-sm text-muted-foreground">{lockedSectionCopy[language](sectionPlanNames[requiredPlan])}</p><Button type="button" variant="outline" className="mt-3" onClick={onVip}><Crown className="size-4" aria-hidden="true" />{viewPlans[language]}</Button></div>}
                   </article>;
                 })}</div>
                <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
@@ -498,7 +508,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       let stored: string | null = null;
       try { stored = localStorage.getItem("onore-design"); } catch { /* private browsing */ }
       if (signedIn) {
-        try { stored = (await readDesignMode()) ?? stored; } catch { /* Keep the device preference if cloud sync is unavailable. */ }
+        try {
+          const cloudMode = await readDesignMode();
+          stored = cloudMode === "classic" && stored && stored !== "classic" ? stored : cloudMode ?? stored;
+        } catch { /* Keep the device preference if cloud sync is unavailable. */ }
       }
       if (active && stored && designCopy.ja.names[stored as DesignMode]) setDesignMode(stored as DesignMode);
       designLoaded.current = true;
