@@ -26,6 +26,7 @@ import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan }
 import { isUpgradePlan, memberLimit, planOrder } from "@/lib/plans";
 import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
+import { profileUiCopy } from "@/lib/profile-ui-copy";
 
 type Props = {
   profile: UserProfile;
@@ -62,6 +63,7 @@ export default function SettingsPanel({
 }: Props) {
   const t = settingsTranslations[language];
   const dc = designCopy[language];
+  const profileUi = profileUiCopy[language];
   const [yearly, setYearly] = useState(false);
   const [cardPlan, setCardPlan] = useState<PaidPlanId>("vip");
   const [upgradePlan, setUpgradePlan] = useState<string | null>(null);
@@ -81,7 +83,7 @@ export default function SettingsPanel({
     fr: "Mode développement : l’offre choisie est activée uniquement sur cet appareil et n’affecte pas l’application publiée.",
   };
   const lockedTheme = designModes.find(mode => mode.id === lockedMode);
-  const lockedTierName = lockedTheme?.tier === "free" ? t.planFree : lockedTheme ? `${teamCopy[language].planNames[lockedTheme.tier]}${language === "ja" ? "プラン" : ""}` : "";
+  const lockedTierName = lockedTheme?.tier === "free" ? t.planFree : lockedTheme ? teamCopy[language].planNames[lockedTheme.tier] : "";
   const pc = planCardsCopy[language];
   const planTabName = (id: PaidPlanId) =>
     id === "standard" ? t.standard : id === "vip" ? "VIP" : id === "b2b" ? t.planB2b : tc.planNames["b2b-premium"];
@@ -360,7 +362,7 @@ export default function SettingsPanel({
                 className={`mt-5 h-10 w-full text-sm ${isVip ? "shadow-champagne-strong" : ""}`}
                 variant={isVip ? "default" : "outline"}
               >
-                <Sparkles className="size-4" /> {devOverrideEnabled && plan === item.id ? "利用中" : pc.unlockCta}
+                <Sparkles className="size-4" /> {devOverrideEnabled && plan === item.id ? profileUi.settings.active : pc.unlockCta}
               </Button>
             </div>
           );
@@ -384,8 +386,8 @@ export default function SettingsPanel({
             <Bell className="size-4 text-primary" /> {t.notifications}
           </p>
           <label className="flex items-center justify-between gap-3 rounded-md border border-primary/20 px-3 py-2.5 text-sm">
-            <span>{language === "ja" ? "毎朝8時のプッシュ通知" : language === "zh-TW" ? "每日早上8點推播通知" : "8 AM push notifications"}</span>
-            <Switch checked={false} disabled aria-label={language === "ja" ? "毎朝8時のプッシュ通知（配信サービス未接続）" : "8 AM push notifications (delivery unavailable)"} />
+            <span>{profileUi.settings.morningPush}</span>
+            <Switch checked={false} disabled aria-label={profileUi.settings.morningPushUnavailable} />
           </label>
           {[
             [t.notifyTiming, notifyTiming, setNotifyTiming] as const,
@@ -414,7 +416,7 @@ export default function SettingsPanel({
               <ThemeSample mode={lockedTheme.id} tier={lockedTheme.tier} name={dc.names[lockedTheme.id]} large />
               <div className="px-5 py-5 text-center">
                 <DialogTitle className="font-serif text-xl text-primary">{dc.names[lockedTheme.id]}</DialogTitle>
-                <DialogDescription className="mt-2 text-sm leading-6 text-muted-foreground">{language === "ja" ? `このデザインは${lockedTierName}で解放されます。` : dc.locked(lockedTierName)}</DialogDescription>
+                <DialogDescription className="mt-2 text-sm leading-6 text-muted-foreground">{profileUi.settings.themeLocked(lockedTierName)}</DialogDescription>
               </div>
             </div>
             <div className="flex shrink-0 justify-center gap-2 border-t border-primary/20 bg-card px-5 py-4">

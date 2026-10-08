@@ -17,6 +17,7 @@ import { analyzeCandidate, draftProjectTeam, generateOneOnOneGuide } from "@/lib
 import ShareCardButton from "@/components/ShareCardButton";
 import GroupSimulator from "./GroupSimulator";
 import { AgolmenLoading } from "@/components/AgolmenSpiral";
+import { profileUiCopy } from "@/lib/profile-ui-copy";
 
 type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
 const LOCAL = "onore-team";
@@ -33,6 +34,7 @@ const summary = (m: TeamMember, t: TeamCopy) => ({
 
 export default function TeamStudio({ plan, actualPlan, language, signedIn, ownerBirthDate }: Props) {
   const t = teamCopy[language];
+  const profileUi = profileUiCopy[language];
   const [tab, setTab] = useState(0);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [limitDialog, setLimitDialog] = useState<Plan | "max" | null>(null);
@@ -82,7 +84,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
       {plan === "b2b-premium" && <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-primary"><Crown className="size-3" />{t.priority}</p>}
 
       <div role="tablist" className="mt-4 flex gap-1 overflow-x-auto pb-1">
-        {tabFeatures.map((featureName, i) => { const label = featureName === "simulator" ? (language === "ja" ? "組織相性シミュレーター" : language === "zh-TW" ? "團隊相性模擬" : "Team simulator") : t.tabs[i > 2 ? i - 1 : i]; return (
+        {tabFeatures.map((featureName, i) => { const label = featureName === "simulator" ? profileUi.team.simulator : t.tabs[i > 2 ? i - 1 : i]; return (
           <button key={label} role="tab" aria-selected={tab === i} onClick={() => setTab(i)}
             className={`flex shrink-0 items-center gap-1 rounded-full border px-3 py-1.5 text-xs ${tab === i ? "border-primary bg-primary/20 text-primary" : "border-primary/20 text-muted-foreground"}`}>
             {!hasFeature(plan, tabFeatures[i]!) && i !== 0 && <Lock className="size-3" />}{label}
@@ -228,6 +230,7 @@ function MemberPicker({ t, members, selected, setSelected, max }: { t: TeamCopy;
 }
 
 function Diagnosis({ t, members, max, language }: { t: TeamCopy; members: TeamMember[]; max: number; language: Language }) {
+  const ui = profileUiCopy[language].team;
   const [selected, setSelected] = useState<string[]>(() => members.slice(0, max).map((m) => m.id));
   const team = members.filter((m) => selected.includes(m.id));
   const d = useMemo(() => teamDiagnosis(team), [team]);
@@ -242,7 +245,7 @@ function Diagnosis({ t, members, max, language }: { t: TeamCopy; members: TeamMe
             <div><p className="font-serif text-primary">{t.balance}</p><p className="text-xs text-muted-foreground">{team.length} · {[...new Set(team.map(roleOf))].map((r) => t.roles[r]).join(" / ")}</p></div>
           </div>
           <div className="flex justify-center">
-            <ShareCardButton language={language} data={{ kicker: language === "ja" ? "チーム相性診断" : "Team chemistry", title: [...new Set(team.map(roleOf))].map((r) => t.roles[r]).join(" / "), score: d.total, names: team.slice(0, 5).map((m) => m.name), lines: [t.balance] }} />
+            <ShareCardButton language={language} data={{ kicker: ui.shareKicker, title: [...new Set(team.map(roleOf))].map((r) => t.roles[r]).join(" / "), score: d.total, names: team.slice(0, 5).map((m) => m.name), lines: [t.balance] }} />
           </div>
           <div className={`${card} relative aspect-square max-w-md`}>
             <div className="absolute inset-4 border-l border-t border-primary/10" style={{ left: "50%", top: "50%" }} />
@@ -267,10 +270,10 @@ function Diagnosis({ t, members, max, language }: { t: TeamCopy; members: TeamMe
             <div className={card}><p className="mb-2 text-sm text-primary">{t.synergy}</p><ul className="space-y-1 text-xs">{d.synergies.length ? d.synergies.map((p) => <li key={p.a.id + p.b.id}>{p.a.name} × {p.b.name} <span className="text-primary">{p.score}</span></li>) : <li className="text-muted-foreground">{t.none}</li>}</ul></div>
             <div className={card}><p className="mb-2 text-sm text-destructive">{t.conflict}</p><ul className="space-y-1 text-xs">{d.conflicts.length ? d.conflicts.map((p) => <li key={p.a.id + p.b.id}>{p.a.name} × {p.b.name} <span className="text-destructive">{p.score}</span></li>) : <li className="text-muted-foreground">{t.none}</li>}</ul></div>
           </div>
-          <section aria-label={language === "ja" ? "相性と組織最適化マトリクス" : "Team compatibility matrix"} className="border-y border-primary/25 py-5">
-            <h3 className="font-serif text-xl text-primary">{language === "ja" ? "相性＆組織最適化マトリクス" : "Compatibility & organization matrix"}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{language === "ja" ? "80以上は協働候補、65未満は役割・連絡方法を先に確認する参考値。採用・評価・利益を保証する指標ではありません。" : "Reference scores: 80+ for collaboration exploration, below 65 for discussing roles first. Not a hiring or performance measure."}</p>
-            <div className="mt-4 overflow-auto"><table className="w-full border-collapse text-sm"><thead><tr><th scope="col" className="p-3 text-left text-primary">{language === "ja" ? "関係者" : "Member"}</th>{team.map(m => <th key={m.id} scope="col" className="min-w-24 p-3 text-primary">{m.name}</th>)}</tr></thead><tbody>{team.map(a => <tr key={a.id} className="border-t border-primary/15"><th scope="row" className="whitespace-nowrap p-3 text-left font-normal">{a.name}</th>{team.map(b => { const score = a.id === b.id ? null : pairScore(a, b); return <td key={b.id} className={`p-3 text-center ${score === null ? "text-muted-foreground" : score >= 80 ? "bg-primary/20 text-primary" : score < 65 ? "bg-destructive/10 text-foreground" : "text-foreground"}`}>{score ?? "—"}</td>; })}</tr>)}</tbody></table></div>
+          <section aria-label={ui.matrixLabel} className="border-y border-primary/25 py-5">
+            <h3 className="font-serif text-xl text-primary">{ui.matrixTitle}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{ui.matrixNote}</p>
+            <div className="mt-4 overflow-auto"><table className="w-full border-collapse text-sm"><thead><tr><th scope="col" className="p-3 text-left text-primary">{ui.member}</th>{team.map(m => <th key={m.id} scope="col" className="min-w-24 p-3 text-primary">{m.name}</th>)}</tr></thead><tbody>{team.map(a => <tr key={a.id} className="border-t border-primary/15"><th scope="row" className="whitespace-nowrap p-3 text-left font-normal">{a.name}</th>{team.map(b => { const score = a.id === b.id ? null : pairScore(a, b); return <td key={b.id} className={`p-3 text-center ${score === null ? "text-muted-foreground" : score >= 80 ? "bg-primary/20 text-primary" : score < 65 ? "bg-destructive/10 text-foreground" : "text-foreground"}`}>{score ?? "—"}</td>; })}</tr>)}</tbody></table></div>
           </section>
         </>
       )}
@@ -457,13 +460,8 @@ function OneOnOne({ t, members, language }: { t: TeamCopy; members: TeamMember[]
   );
 }
 
-const recruitCopy = {
-  ja: { title: "採用面接AIフィットネス診断", sub: "応募者の生年月日から、既存チームとの相性・役割予測・定着のヒントを参考表示します。", name: "応募者名（任意）", birth: "生年月日", run: "AI分析する", busy: "分析中…", fit: "既存チームとの相性", role: "組織内での役割予測", mot: "入社後のモチベーション維持", onb: "最初の90日のサポート", avg: "チーム平均相性", top: "相性の高いメンバー", note: "※生年月日から算出した参考値です。合否判断には使用せず、スキル・経験・面接内容で判断してください。応募者情報は保存されません。" },
-  en: { title: "Hiring interview AI fit report", sub: "Reference view of team chemistry, likely role and retention tips from a candidate's birth date.", name: "Candidate name (optional)", birth: "Birth date", run: "Analyze with AI", busy: "Analyzing…", fit: "Fit with current team", role: "Predicted role", mot: "Sustaining motivation", onb: "First 90 days support", avg: "Avg. team fit", top: "Best-matched members", note: "Reference values from birth dates. Never use for pass/fail; decide on skills, experience and the interview. Candidate data is not saved." },
-};
-
 function Recruit({ t, members, language }: { t: TeamCopy; members: TeamMember[]; language: Language }) {
-  const c = language === "ja" ? recruitCopy.ja : recruitCopy.en;
+  const c = profileUiCopy[language].team.recruit;
   const run = useServerFn(analyzeCandidate);
   const [name, setName] = useState("");
   const [birth, setBirth] = useState("");
@@ -495,13 +493,13 @@ function Recruit({ t, members, language }: { t: TeamCopy; members: TeamMember[];
         <div className={`${card} flex items-center gap-4`}>
           <div className="grid size-16 shrink-0 place-items-center rounded-full border-2 border-primary text-xl font-semibold text-primary">{avg}</div>
           <div className="min-w-0 text-xs">
-            <p className="text-primary">{c.avg} · <RoleBadge role={roleOf(cand)} t={t} /></p>
+            <p className="text-primary">{c.average} · <RoleBadge role={roleOf(cand)} t={t} /></p>
             <p className="mt-1 text-muted-foreground">{c.top}: {pairs.slice(0, 3).map((p) => `${p.m.name} ${p.score}`).join(" / ")}</p>
           </div>
         </div>
       )}
       {error && <p role="alert" className="text-sm text-destructive">{t.aiError}</p>}
-      {report && <div className="grid gap-3 sm:grid-cols-2">{([[c.fit, report.teamFit], [c.role, report.rolePrediction], [c.mot, report.motivation], [c.onb, report.onboarding]] as const).map(([h, b]) => <div key={h} className={card}><p className="text-sm text-primary">{h}</p><p className="mt-1 text-xs leading-6">{b}</p></div>)}</div>}
+      {report && <div className="grid gap-3 sm:grid-cols-2">{([[c.fit, report.teamFit], [c.role, report.rolePrediction], [c.motivation, report.motivation], [c.onboarding, report.onboarding]] as const).map(([h, b]) => <div key={h} className={card}><p className="text-sm text-primary">{h}</p><p className="mt-1 text-xs leading-6">{b}</p></div>)}</div>}
       <p className="text-[10px] leading-4 text-muted-foreground">{c.note}</p>
     </div>
   );
