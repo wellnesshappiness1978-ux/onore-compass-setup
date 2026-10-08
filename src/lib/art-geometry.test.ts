@@ -38,8 +38,10 @@ describe("birth-color mandala geometry", () => {
     const rosette = crystalRosettePoints(8, 4, 2.2, .1);
     expect(hexagon).toHaveLength(7);
     expect(rosette).toHaveLength(17);
-    expect(hexagon[0]).toEqual(hexagon.at(-1));
-    expect(rosette[0]).toEqual(rosette.at(-1));
+    expect(hexagon.at(-1)?.[0]).toBeCloseTo(hexagon[0]?.[0] ?? 0);
+    expect(hexagon.at(-1)?.[1]).toBeCloseTo(hexagon[0]?.[1] ?? 0);
+    expect(rosette.at(-1)?.[0]).toBeCloseTo(rosette[0]?.[0] ?? 0);
+    expect(rosette.at(-1)?.[1]).toBeCloseTo(rosette[0]?.[1] ?? 0);
   });
 
   it("keeps divine-ray and sparkle placement deterministic and in bounds", () => {

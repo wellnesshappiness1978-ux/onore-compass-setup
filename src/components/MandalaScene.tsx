@@ -20,6 +20,11 @@ export type Capture = () => Promise<{ blob: Blob; width: number; height: number 
 type Props = { colors: string[]; intention: MandalaIntention; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
 
 const FALLBACK_PALETTE = ["#F5C85B", "#F7A8D0", "#79D7F2", "#A5D96A", "#BDA5F4", "#FF9D76", "#FFF0A8"];
+const GOLD_LIGHT = "#FFF0A8";
+
+function pickColor(palette: string[], index: number, fallback = GOLD_LIGHT) {
+  return palette[index % Math.max(1, palette.length)] ?? fallback;
+}
 
 function CaptureBridge({ colors, onCapture }: { colors: string[]; onCapture: Props["onCapture"] }) {
   const { gl, scene, camera } = useThree();
@@ -62,7 +67,7 @@ function CaptureBridge({ colors, onCapture }: { colors: string[]; onCapture: Pro
         ctx.fillStyle = halo;
         ctx.fillRect(0, 0, width, height);
         ctx.drawImage(square, 0, (height - width) / 2, width, width);
-        ctx.fillStyle = palette[6] ?? FALLBACK_PALETTE[6];
+        ctx.fillStyle = pickColor(palette, 6);
         ctx.textAlign = "center";
         ctx.font = `${Math.round(width / 26)}px serif`;
         ctx.fillText("AGOLMEN'S COMPASS", width / 2, height * .16);
@@ -113,15 +118,16 @@ const BACKDROP_FRAGMENT = `
 function AuraBackdrop({ palette, reduced }: { palette: string[]; reduced: boolean }) {
   const material = useRef<THREE.ShaderMaterial>(null);
   const uniforms = useMemo(() => ({
-    uColors: { value: Array.from({ length: 7 }, (_, index) => new THREE.Color(palette[index % palette.length] ?? FALLBACK_PALETTE[index])) },
+    uColors: { value: Array.from({ length: 7 }, (_, index) => new THREE.Color(pickColor(palette, index, FALLBACK_PALETTE[index] ?? GOLD_LIGHT))) },
     uTime: { value: 0 },
   }), [palette]);
   useEffect(() => {
     const values = uniforms.uColors.value as THREE.Color[];
-    values.forEach((color, index) => color.set(palette[index % palette.length] ?? FALLBACK_PALETTE[index]));
+    values.forEach((color, index) => color.set(pickColor(palette, index, FALLBACK_PALETTE[index] ?? GOLD_LIGHT)));
   }, [palette, uniforms]);
   useFrame((state) => {
-    if (material.current && !reduced) material.current.uniforms.uTime.value = state.clock.elapsedTime;
+    const timeUniform = material.current?.uniforms["uTime"];
+    if (timeUniform && !reduced) timeUniform.value = state.clock.elapsedTime;
   });
   return <mesh position={[0, 0, -1.2]} scale={[1.25, 1.25, 1]}>
     <planeGeometry args={[12.8, 12.8, 1, 1]} />
@@ -167,8 +173,8 @@ function SparkleField({ seed, palette, reduced }: { seed: number; palette: strin
       dummy.scale.set(size, size * (i % 5 === 0 ? 2.8 : 1), 1);
       dummy.updateMatrix();
       mesh.current.setMatrixAt(i, dummy.matrix);
-      color.set(palette[i % palette.length] ?? FALLBACK_PALETTE[i % FALLBACK_PALETTE.length]);
-      color.lerp(new THREE.Color(FALLBACK_PALETTE[6]), .28);
+      color.set(pickColor(palette, i, FALLBACK_PALETTE[i % FALLBACK_PALETTE.length] ?? GOLD_LIGHT));
+      color.lerp(new THREE.Color(GOLD_LIGHT), .28);
       mesh.current.setColorAt(i, color);
     }
     mesh.current.instanceMatrix.needsUpdate = true;
@@ -204,7 +210,7 @@ function GoldLeafField({ seed, count, radius, progress }: { seed: number; count:
   }, [count, dummy, radius, seed]);
   return <instancedMesh ref={mesh} args={[undefined, undefined, count]} scale={Math.max(.01, progress)}>
     <planeGeometry args={[1, 1]} />
-    <meshBasicMaterial color={FALLBACK_PALETTE[6]} transparent opacity={.76} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+    <meshBasicMaterial color={GOLD_LIGHT} transparent opacity={.76} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
   </instancedMesh>;
 }
 
@@ -220,7 +226,7 @@ function DotField({ palette, progress }: { palette: string[]; progress: number }
       for (let index = 0; index < count; index++) {
         const angle = index / count * Math.PI * 2 + ring * GOLDEN_ANGLE;
         points.push(Math.cos(angle) * radius, Math.sin(angle) * radius, .04 + ring * .008);
-        color.set(palette[(index + ring) % palette.length] ?? FALLBACK_PALETTE[0]);
+        color.set(pickColor(palette, index + ring, "#F5C85B"));
         pointColors.push(color.r, color.g, color.b);
         pointSizes.push(index % 9 === 0 ? .062 : .035);
       }
@@ -251,12 +257,12 @@ function SacredGeometry({ palette, progress }: { palette: string[]; progress: nu
     return [x, y, .15 + arm * .008] as [number, number, number];
   })), []);
   return <group scale={Math.max(.02, progress)}>
-    {layers.map((layer, index) => <Line key={`polygon-${layer.radius}`} points={regularPolygonPoints(layer.sides, layer.radius, layer.phase, -.14 + index * .025)} color={palette[layer.color % palette.length] ?? FALLBACK_PALETTE[layer.color]} lineWidth={index % 2 ? 1.2 : 1.8} transparent opacity={.62} />)}
-    {[1.55, 2.32, 3.12, 4.05, 4.86].map((radius, index) => <Line key={`rosette-${radius}`} points={crystalRosettePoints(12 + index * 2, radius, radius * (.52 + index * .03), index * .07, .02 + index * .018)} color={palette[(index + 2) % palette.length] ?? FALLBACK_PALETTE[index]} lineWidth={index % 2 ? .9 : 1.35} transparent opacity={.48 + index * .05} />)}
-    {spirals.map((points, index) => <Line key={`spiral-${index}`} points={points} color={palette[index % palette.length] ?? FALLBACK_PALETTE[index]} lineWidth={index % 2 ? .85 : 1.25} transparent opacity={.5} />)}
+    {layers.map((layer, index) => <Line key={`polygon-${layer.radius}`} points={regularPolygonPoints(layer.sides, layer.radius, layer.phase, -.14 + index * .025)} color={pickColor(palette, layer.color, FALLBACK_PALETTE[layer.color] ?? GOLD_LIGHT)} lineWidth={index % 2 ? 1.2 : 1.8} transparent opacity={.62} />)}
+    {[1.55, 2.32, 3.12, 4.05, 4.86].map((radius, index) => <Line key={`rosette-${radius}`} points={crystalRosettePoints(12 + index * 2, radius, radius * (.52 + index * .03), index * .07, .02 + index * .018)} color={pickColor(palette, index + 2, FALLBACK_PALETTE[index] ?? GOLD_LIGHT)} lineWidth={index % 2 ? .9 : 1.35} transparent opacity={.48 + index * .05} />)}
+    {spirals.map((points, index) => <Line key={`spiral-${index}`} points={points} color={pickColor(palette, index, FALLBACK_PALETTE[index] ?? GOLD_LIGHT)} lineWidth={index % 2 ? .85 : 1.25} transparent opacity={.5} />)}
     {Array.from({ length: 24 }, (_, index) => {
       const angle = index / 24 * Math.PI * 2;
-      return <Line key={`crystal-${index}`} points={[[Math.cos(angle) * .74, Math.sin(angle) * .74, .2], [Math.cos(angle + .08) * 3.1, Math.sin(angle + .08) * 3.1, .21], [Math.cos(angle) * 5.12, Math.sin(angle) * 5.12, .2]]} color={palette[index % palette.length] ?? FALLBACK_PALETTE[0]} lineWidth={index % 3 === 0 ? 1.35 : .72} transparent opacity={index % 3 === 0 ? .62 : .36} />;
+      return <Line key={`crystal-${index}`} points={[[Math.cos(angle) * .74, Math.sin(angle) * .74, .2], [Math.cos(angle + .08) * 3.1, Math.sin(angle + .08) * 3.1, .21], [Math.cos(angle) * 5.12, Math.sin(angle) * 5.12, .2]]} color={pickColor(palette, index, "#F5C85B")} lineWidth={index % 3 === 0 ? 1.35 : .72} transparent opacity={index % 3 === 0 ? .62 : .36} />;
     })}
   </group>;
 }
@@ -264,9 +270,9 @@ function SacredGeometry({ palette, progress }: { palette: string[]; progress: nu
 function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture" | "intention">) {
   const mandala = useRef<THREE.Group>(null);
   const counter = useRef<THREE.Group>(null);
-  const palette = useMemo(() => colors.length ? Array.from({ length: 7 }, (_, index) => colors[index % colors.length] ?? FALLBACK_PALETTE[index]) : FALLBACK_PALETTE, [colors]);
-  const main = palette[0] ?? FALLBACK_PALETTE[0];
-  const sub = palette[1] ?? FALLBACK_PALETTE[1];
+  const palette = useMemo<string[]>(() => colors.length ? Array.from({ length: 7 }, (_, index) => pickColor(colors, index, FALLBACK_PALETTE[index] ?? GOLD_LIGHT)) : [...FALLBACK_PALETTE], [colors]);
+  const main = pickColor(palette, 0, "#F5C85B");
+  const sub = pickColor(palette, 1, "#F7A8D0");
   const seed = useMemo(() => palette.join("").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0), [palette]);
   const goldenSpiral = useMemo(() => Array.from({ length: 260 }, (_, index) => {
     const [x, y] = logarithmicSpiralPoint(index, 260, 5.3, 3.5);
@@ -285,29 +291,29 @@ function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture" | "inten
   const ease = (value: number) => { const x = Math.min(1, Math.max(0, value)); return x * x * (3 - 2 * x); };
   const reveal = ease(progress / 6.4);
   return <>
-    <color attach="background" args={[palette[6] ?? FALLBACK_PALETTE[6]]} />
+    <color attach="background" args={[pickColor(palette, 6)]} />
     <ambientLight intensity={1.25} />
     <directionalLight position={[3.5, 5.5, 8]} intensity={2.5} color={main} />
     <directionalLight position={[-5, -2, 5]} intensity={1.8} color={sub} />
     <AuraBackdrop palette={palette} reduced={reduced} />
-    <RayField seed={seed} color={palette[6] ?? FALLBACK_PALETTE[6]} progress={reveal} />
+    <RayField seed={seed} color={pickColor(palette, 6)} progress={reveal} />
     <group ref={mandala}>
       {[5.4, 4.82, 4.22, 3.62, 3.02, 2.42, 1.82].map((radius, index) => <mesh key={`wash-${radius}`} position={[0, 0, -.48 + index * .025]} rotation-z={index * GOLDEN_ANGLE} scale={[1 + index % 2 * .025, 1 - index % 3 * .018, 1]}>
         <ringGeometry args={[Math.max(.1, radius - .72), radius, 128]} />
-        <meshBasicMaterial color={palette[index] ?? main} transparent opacity={.16 + index * .012} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+        <meshBasicMaterial color={pickColor(palette, index, main)} transparent opacity={.16 + index * .012} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>)}
       <DotField palette={palette} progress={reveal} />
       <SacredGeometry palette={palette} progress={reveal} />
-      <Line points={goldenSpiral} color={palette[2] ?? main} lineWidth={1.75} transparent opacity={.72} />
-      <Line points={goldenSpiral.map(([x, y, z]) => [-x, y, z + .01] as [number, number, number])} color={palette[4] ?? sub} lineWidth={1.25} transparent opacity={.58} />
+      <Line points={goldenSpiral} color={pickColor(palette, 2, main)} lineWidth={1.75} transparent opacity={.72} />
+      <Line points={goldenSpiral.map(([x, y, z]) => [-x, y, z + .01] as [number, number, number])} color={pickColor(palette, 4, sub)} lineWidth={1.25} transparent opacity={.58} />
       <GoldLeafField seed={seed} count={128} radius={5.28} progress={reveal} />
       <SparkleField seed={seed} palette={palette} reduced={reduced} />
       <group ref={counter}>
-        {[1.34, 1.06, .8].map((radius, index) => <Line key={`core-rosette-${radius}`} points={crystalRosettePoints(12 + index * 4, radius, radius * .54, index * .11, .32 + index * .02)} color={palette[(index + 3) % palette.length] ?? main} lineWidth={2.1 - index * .35} transparent opacity={.82} />)}
+        {[1.34, 1.06, .8].map((radius, index) => <Line key={`core-rosette-${radius}`} points={crystalRosettePoints(12 + index * 4, radius, radius * .54, index * .11, .32 + index * .02)} color={pickColor(palette, index + 3, main)} lineWidth={2.1 - index * .35} transparent opacity={.82} />)}
       </group>
-      <mesh position-z={.26} scale={.25 + reveal * .75}><circleGeometry args={[.82, 96]} /><meshPhysicalMaterial color={palette[3] ?? sub} emissive={palette[3] ?? sub} emissiveIntensity={.22} roughness={.42} clearcoat={.65} transparent opacity={.72} /></mesh>
+      <mesh position-z={.26} scale={.25 + reveal * .75}><circleGeometry args={[.82, 96]} /><meshPhysicalMaterial color={pickColor(palette, 3, sub)} emissive={pickColor(palette, 3, sub)} emissiveIntensity={.22} roughness={.42} clearcoat={.65} transparent opacity={.72} /></mesh>
       <mesh position-z={.34} scale={.25 + reveal * .75}><circleGeometry args={[.6, 96]} /><meshPhysicalMaterial color={main} emissive={main} emissiveIntensity={.5} roughness={.22} clearcoat={1} clearcoatRoughness={.12} /></mesh>
-      <mesh position-z={.37} scale={.25 + reveal * .75}><ringGeometry args={[.68, .78, 96]} /><meshBasicMaterial color={palette[6] ?? FALLBACK_PALETTE[6]} transparent opacity={.9} blending={THREE.AdditiveBlending} /></mesh>
+      <mesh position-z={.37} scale={.25 + reveal * .75}><ringGeometry args={[.68, .78, 96]} /><meshBasicMaterial color={pickColor(palette, 6)} transparent opacity={.9} blending={THREE.AdditiveBlending} /></mesh>
       <pointLight color={main} intensity={4.2 * reveal} distance={7} />
     </group>
   </>;
