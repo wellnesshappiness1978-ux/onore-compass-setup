@@ -7,6 +7,7 @@ import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
 import { finalizePersonalName, formatPersonalName } from "@/lib/name-format";
+import { localizePrefecture, profileUiCopy } from "@/lib/profile-ui-copy";
 
 export type UserProfile = {
   nameKanji: string;
@@ -32,19 +33,9 @@ export const PREFECTURES = [
   "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県",
 ];
 
-const BLOOD_TYPES = [
-  { value: "A", label: "A型" },
-  { value: "B", label: "B型" },
-  { value: "O", label: "O型" },
-  { value: "AB", label: "AB型" },
-];
+const BLOOD_TYPES = ["A", "B", "O", "AB"] as const;
 
-const SIBLING_ORDERS = [
-  { value: "first", label: "長子" },
-  { value: "middle", label: "中子" },
-  { value: "last", label: "末っ子" },
-  { value: "only", label: "一人っ子" },
-];
+const SIBLING_ORDERS = ["first", "middle", "last", "only"] as const;
 
 export const inputClass =
   "field-luminous w-full rounded-lg border border-primary/15 bg-background/45 px-4 py-3 text-base text-foreground outline-none transition-all duration-300 placeholder:text-muted-foreground focus:border-primary/70 disabled:cursor-not-allowed disabled:opacity-40";
@@ -57,21 +48,11 @@ const chipIdle = "border-primary/15 bg-background/40 text-foreground hover:borde
 
 type Props = { onComplete: (profile: UserProfile) => Promise<void>; language: Language; signedIn: boolean; initialProfile?: UserProfile; onLanguageChange?: (language: Language) => void };
 
-const introCopy: Record<Language, { eyebrow: string; title: string; body: string; inputs: string; layers: string; portrait: string; note: string; cta: string }> = {
-  ja: { eyebrow: "入力前の30秒プレビュー", title: "なぜ、ひとつの占いだけで見ないのか？", body: "同じ誕生日でも、名前・生まれた時間・場所・家族の中での立場が重なると、見えてくる輪郭は変わります。アゴルメンは一つの答えに決めつけず、複数の視点が重なる部分と食い違う部分を最新AIで読み解きます。", inputs: "姓名・生年月日・出生時刻／場所", layers: "名前・数字・星・暦・動物・方位の6つの視点", portrait: "あなたの本質・強み・迷いやすい構造", note: "15以上の占術知見を背景に、入力値から実際に算出できる6つの視点を統合する参考体験です。未入力情報は推測しません。", cta: "プロフィール入力へ進む" },
-  en: { eyebrow: "30-second preview", title: "Why look through more than one lens?", body: "A birth date gains different contours when combined with a name, birth time, place and family context. Agolmen compares where several perspectives reinforce or challenge one another instead of forcing a single answer.", inputs: "Name · date · time · place", layers: "Name · numbers · sky · pillars · animal · directions", portrait: "Your nature · strengths · recurring friction", note: "A reflective experience informed by 15+ traditions. Only implemented calculations from supplied data are used; missing details are never guessed.", cta: "Enter my profile" },
-  "zh-CN": { eyebrow: "填写前30秒预览", title: "为什么不只看一种占术？", body: "即使生日相同，姓名、出生时间与地点、家庭排行相互叠加后，呈现的轮廓也会不同。阿戈尔曼用最新AI解读多种视角的重合与差异，而不是武断地给出唯一答案。", inputs: "姓名・生日・时间／地点", layers: "姓名・数字・天体・四柱・动物・方位", portrait: "本质・优势・反复卡住的结构", note: "这是以15种以上占术知识为背景的参考体验，只使用已实现且可由输入计算的项目，不猜测缺失信息。", cta: "开始填写资料" },
-  "zh-TW": { eyebrow: "填寫前30秒預覽", title: "為什麼不只看一種占術？", body: "即使生日相同，姓名、出生時間與地點、家庭排行互相疊加後，呈現的輪廓也會不同。阿戈爾曼用最新AI解讀多種視角的重合與差異，而不是武斷地給出唯一答案。", inputs: "姓名・生日・時間／地點", layers: "姓名・數字・天體・四柱・動物・方位", portrait: "本質・優勢・反覆卡住的結構", note: "這是以15種以上占術知識為背景的參考體驗，只使用已實作且可由輸入計算的項目，不猜測缺失資訊。", cta: "開始填寫資料" },
-  ko: { eyebrow: "입력 전 30초 미리보기", title: "왜 한 가지 점술만 보지 않을까요?", body: "같은 생일도 이름, 태어난 시간과 장소, 가족 안의 위치가 겹치면 다른 윤곽이 드러납니다. 아골멘은 하나의 답으로 단정하지 않고 여러 관점이 겹치거나 어긋나는 지점을 AI로 읽습니다.", inputs: "이름・생일・시간／장소", layers: "이름・숫자・천체・사주・동물・방위", portrait: "본질・강점・반복되는 막힘", note: "15가지 이상의 점술 지식을 배경으로 한 참고 체험입니다. 입력값으로 계산 가능한 구현 항목만 사용하며 누락 정보는 추측하지 않습니다.", cta: "프로필 입력하기" },
-  es: { eyebrow: "Vista previa de 30 segundos", title: "¿Por qué mirar con más de una lente?", body: "Una fecha adquiere otros matices al combinarse con el nombre, la hora, el lugar y el contexto familiar. Agolmen compara coincidencias y contrastes entre perspectivas sin imponer una sola respuesta.", inputs: "Nombre · fecha · hora · lugar", layers: "Nombre · números · cielo · pilares · animal · direcciones", portrait: "Esencia · fortalezas · fricciones recurrentes", note: "Experiencia reflexiva inspirada en más de 15 tradiciones. Solo usa cálculos implementados con los datos aportados; nunca inventa lo que falta.", cta: "Introducir mi perfil" },
-  fr: { eyebrow: "Aperçu en 30 secondes", title: "Pourquoi croiser plusieurs regards ?", body: "Une date prend d’autres contours avec le nom, l’heure, le lieu et le contexte familial. Agolmen compare les convergences et les écarts entre plusieurs perspectives sans imposer une réponse unique.", inputs: "Nom · date · heure · lieu", layers: "Nom · nombres · ciel · piliers · animal · directions", portrait: "Nature · forces · tensions récurrentes", note: "Expérience réflexive inspirée de plus de 15 traditions. Seuls les calculs disponibles à partir des données saisies sont utilisés ; rien n’est inventé.", cta: "Saisir mon profil" },
-};
-
 export default function Onboarding({ onComplete, language, signedIn, initialProfile, onLanguageChange }: Props) {
   const t = translations[language];
   const pt = profileTranslations[language];
   const storage = profileStorageCopy[language];
-  const cityPlaceholder: Record<Language, string> = { ja: "横浜市 保土ケ谷区 和田町", en: "Yokohama, Hodogaya, Wadamachi", "zh-CN": "横滨市 保土谷区 和田町", "zh-TW": "橫濱市 保土谷區 和田町", ko: "요코하마시 호도가야구 와다마치", es: "Yokohama, Hodogaya, Wadamachi", fr: "Yokohama, Hodogaya, Wadamachi" };
+  const ui = profileUiCopy[language];
   const [introVisible, setIntroVisible] = useState(!initialProfile);
   const [step, setStep] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
@@ -92,17 +73,6 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
 
   const [genderChosen, setGenderChosen] = useState(Boolean(initialProfile));
   useEffect(() => { window.scrollTo(0, 0); }, [introVisible, step]);
-  const ph: Record<Language, [string, string, string]> = {
-    ja: ["例：山田 太郎（※姓と名の間にスペース）", "例：やまだ たろう（※ひらがな・姓と名の間にスペース）", "例：YAMADA TARO（※姓と名の間にスペース）"],
-    en: ["e.g. 山田 太郎 or your name in your own script", "e.g. やまだ たろう (hiragana reading)", "e.g. YAMADA TARO (space between names)"],
-    "zh-CN": ["例：山田 太郎（姓与名之间留空格）", "例：やまだ たろう（平假名读音）", "例：YAMADA TARO（姓与名之间留空格）"],
-    "zh-TW": ["例：山田 太郎（姓與名之間留空格）", "例：やまだ たろう（平假名讀音）", "例：YAMADA TARO（姓與名之間留空格）"],
-    ko: ["예: 山田 太郎 (성과 이름 사이 띄어쓰기)", "예: やまだ たろう (히라가나 읽기)", "예: YAMADA TARO (성과 이름 사이 띄어쓰기)"],
-    es: ["p. ej. 山田 太郎 (espacio entre apellido y nombre)", "p. ej. やまだ たろう (lectura en hiragana)", "p. ej. YAMADA TARO (espacio entre apellido y nombre)"],
-    fr: ["ex. 山田 太郎 (espace entre nom et prénom)", "ex. やまだ たろう (lecture en hiragana)", "ex. YAMADA TARO (espace entre nom et prénom)"],
-  };
-  const optionalLabel: Record<Language, string> = { ja: "任意", en: "Optional", "zh-CN": "选填", "zh-TW": "選填", ko: "선택", es: "Opcional", fr: "Facultatif" };
-  const genderPrompt: Record<Language, string> = { ja: "選択してください", en: "Please choose", "zh-CN": "请选择", "zh-TW": "請選擇", ko: "선택해 주세요", es: "Selecciona una opción", fr: "Veuillez choisir" };
   const set = <K extends keyof UserProfile>(key: K, value: UserProfile[K]) =>
     setProfile((p) => ({ ...p, [key]: value }));
 
@@ -164,14 +134,14 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
 
         {/* Card */}
         {introVisible ? <div className="card-lux rounded-lg p-6 sm:p-8">
-          <p className="text-xs text-primary">{introCopy[language].eyebrow}</p>
-          <h2 className="mt-2 font-serif text-2xl leading-snug text-gradient-gold">{introCopy[language].title}</h2>
-          <p className="mt-4 text-sm leading-7 text-foreground">{introCopy[language].body}</p>
-          <div className="mt-6 grid gap-3" aria-label={introCopy[language].title}>
-            {[introCopy[language].inputs, introCopy[language].layers, introCopy[language].portrait].map((line, index) => <div key={line} className="flex items-center gap-3 border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-primary/40 text-xs text-primary">{index + 1}</span><p className="text-sm leading-6 text-foreground">{line}</p>{index < 2 && <ArrowRight className="ml-auto size-4 shrink-0 text-primary" aria-hidden="true" />}</div>)}
+          <p className="text-xs text-primary">{ui.intro.eyebrow}</p>
+          <h2 className="mt-2 font-serif text-2xl leading-snug text-gradient-gold">{ui.intro.title}</h2>
+          <p className="mt-4 text-sm leading-7 text-foreground">{ui.intro.body}</p>
+          <div className="mt-6 grid gap-3" aria-label={ui.intro.title}>
+            {[ui.intro.inputs, ui.intro.layers, ui.intro.portrait].map((line, index) => <div key={line} className="flex items-center gap-3 border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-primary/40 text-xs text-primary">{index + 1}</span><p className="text-sm leading-6 text-foreground">{line}</p>{index < 2 && <ArrowRight className="ml-auto size-4 shrink-0 text-primary" aria-hidden="true" />}</div>)}
           </div>
-          <p className="mt-5 text-xs leading-6 text-muted-foreground">{introCopy[language].note}</p>
-          <Button type="button" variant="champagne" onClick={() => setIntroVisible(false)} className="mt-6 h-14 w-full whitespace-normal px-4 text-sm font-bold sm:text-base">{introCopy[language].cta}<ArrowRight className="size-4" aria-hidden="true" /></Button>
+          <p className="mt-5 text-xs leading-6 text-muted-foreground">{ui.intro.note}</p>
+          <Button type="button" variant="champagne" onClick={() => setIntroVisible(false)} className="mt-6 h-14 w-full whitespace-normal px-4 text-sm font-bold sm:text-base">{ui.intro.cta}<ArrowRight className="size-4" aria-hidden="true" /></Button>
         </div> : <div className="card-lux rounded-lg p-6 sm:p-8">
           <h2 className="mb-5 font-serif text-base font-semibold text-gradient-gold">{t.profileEntry}</h2>
           {/* Progress */}
@@ -196,22 +166,24 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
               <div className="space-y-4">
                 <div>
                   <label htmlFor="name-kanji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKanji} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
-                  <input id="name-kanji" maxLength={40} placeholder={ph[language][0]} value={profile.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} className={inputClass} />
+                  <input id="name-kanji" maxLength={40} placeholder={ui.placeholders.nameKanji} value={profile.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} className={inputClass} />
                 </div>
                 <div>
                   <label htmlFor="name-kana" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKana} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
-                  <input id="name-kana" maxLength={60} placeholder={ph[language][1]} value={profile.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} className={inputClass} />
+                  <input id="name-kana" maxLength={60} placeholder={ui.placeholders.nameKana} value={profile.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} className={inputClass} />
+                  {profile.nameKana && !/^[\u3041-\u309F\u30FC\s]+$/.test(profile.nameKana.trim()) && <p role="alert" className="mt-1 text-xs text-destructive">{ui.kanaError}</p>}
                 </div>
                 <div>
                   <label htmlFor="name-romaji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameRomaji} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
-                  <input id="name-romaji" maxLength={60} placeholder={ph[language][2]} value={profile.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} className={inputClass} />
+                  <input id="name-romaji" maxLength={60} placeholder={ui.placeholders.nameRomaji} value={profile.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} className={inputClass} />
+                  {profile.nameRomaji && !/^[A-Za-z][A-Za-z\s'-]*$/.test(profile.nameRomaji.trim()) && <p role="alert" className="mt-1 text-xs text-destructive">{pt.romajiError}</p>}
                   <p className="mt-1 text-xs text-muted-foreground">{pt.romajiHint}</p>
                 </div>
               </div>
               <div>
                 <label htmlFor="gender" className="mb-2 block font-serif text-sm font-semibold text-primary">{storage.gender} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
                 <select id="gender" value={genderChosen ? profile.gender : ""} onChange={(e) => { if (!e.target.value) return; setGenderChosen(true); set("gender", e.target.value as UserProfile["gender"]); }} className={inputClass}>
-                  {!genderChosen && <option value="" disabled>{genderPrompt[language]}</option>}
+                  {!genderChosen && <option value="" disabled>{ui.selectGender}</option>}
                   <option value="undisclosed">{storage.undisclosed}</option><option value="female">{storage.female}</option><option value="male">{storage.male}</option><option value="other">{storage.other}</option>
                 </select>
               </div>
@@ -232,7 +204,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
               <div>
                 <label htmlFor="birth-time" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <Clock3 className="size-4 stroke-[1.4]" aria-hidden="true" />
-                  {t.birthTime} <span className="text-xs font-normal text-primary/70">{optionalLabel[language]}</span>
+                  {t.birthTime} <span className="text-xs font-normal text-primary/70">{pt.optional}</span>
                 </label>
                 <input
                   id="birth-time"
@@ -276,12 +248,12 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
                 </option>
                  {PREFECTURES.map((pref, index) => (
                   <option key={pref} value={pref}>
-                     {language === "ja" ? pref : prefecturesRomanized[index]}
+                     {localizePrefecture(language, index, pref, prefecturesRomanized[index] ?? pref)}
                   </option>
                 ))}
               </select>
               <label htmlFor="birth-city" className="mb-2 mt-5 block font-serif text-sm font-semibold text-primary">{pt.city} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
-              <input id="birth-city" maxLength={80} placeholder={cityPlaceholder[language]} value={profile.birthCity} onChange={(e) => set("birthCity", e.target.value)} className={inputClass} />
+              <input id="birth-city" maxLength={80} placeholder={ui.placeholders.city} value={profile.birthCity} onChange={(e) => set("birthCity", e.target.value)} className={inputClass} />
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                  {t.placeHint}
               </p>
@@ -299,16 +271,16 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
                 <div className="grid grid-cols-4 gap-2">
                   {BLOOD_TYPES.map((bt) => (
                     <Button
-                      key={bt.value}
+                      key={bt}
                       type="button"
                       variant="outline"
-                      onClick={() => set("bloodType", bt.value)}
-                      aria-pressed={profile.bloodType === bt.value}
+                      onClick={() => set("bloodType", bt)}
+                      aria-pressed={profile.bloodType === bt}
                       className={`${chipBase} ${
-                        profile.bloodType === bt.value ? chipSelected : chipIdle
+                        profile.bloodType === bt ? chipSelected : chipIdle
                       }`}
                     >
-                       {language === "ja" ? bt.label : bt.value}
+                       {bt}{t.bloodSuffix}
                     </Button>
                   ))}
                 </div>
@@ -321,13 +293,13 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
                 <div className="grid grid-cols-2 gap-2">
                   {SIBLING_ORDERS.map((s) => (
                     <Button
-                      key={s.value}
+                      key={s}
                       type="button"
                       variant="outline"
-                       onClick={() => set("siblingOrder", s.value)}
-                       aria-pressed={profile.siblingOrder === s.value}
+                       onClick={() => set("siblingOrder", s)}
+                       aria-pressed={profile.siblingOrder === s}
                       className={`${chipBase} ${
-                         profile.siblingOrder === s.value ? chipSelected : chipIdle
+                         profile.siblingOrder === s ? chipSelected : chipIdle
                       }`}
                     >
                        {t.siblings[SIBLING_ORDERS.indexOf(s)]}

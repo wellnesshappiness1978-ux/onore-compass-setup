@@ -22,4 +22,5 @@
 - Keep the birth-color mandala free of celestial motifs; reserve natal planets and sky geometry for the cosmic artwork. Why: the two artworks must remain visually and conceptually distinct.
 - Related-person records use one backward-compatible extended team-member shape across private storage, local preview, consultation and team tools. Why: detailed birth context must not be silently dropped between experiences.
 - Keep user-facing localization in typed seven-language dictionaries and translate stable domain IDs only at render time. Why: calculations and stored data must remain language-independent while every locale stays complete.
+- Keep profile, settings-profile, and related-person copy in the typed profile UI dictionary; persisted prefecture IDs remain Japanese while labels localize at render time. Why: language switching must never alter saved data or leak fallback copy.
 - Keep Japanese compatibility prose in a pure signal-driven builder, with typed relationship/theme context and concern-topic matching; leave unknown comparisons unset. Why: content boundaries and topic relevance can be tested without inventing missing birth context.

@@ -7,6 +7,9 @@ const labels = {
   ja: { title: "組織相性シミュレーター", pool: "未配置", groups: ["プロジェクト A", "プロジェクト B", "プロジェクト C"], synergy: "相乗効果", complement: "補完関係", friction: "摩擦に注意", note: "五行・生年月日を用いた参考モデル。実際の成果や人事適性を保証しません。", move: "移動先", score: "参考スコア" },
   en: { title: "Team chemistry simulator", pool: "Unassigned", groups: ["Project A", "Project B", "Project C"], synergy: "Synergy", complement: "Complementary", friction: "Potential friction", note: "Illustrative birth-date and five-element model; not a hiring or performance prediction.", move: "Move to", score: "Reference score" },
   zh: { title: "團隊相性模擬器", pool: "未分配", groups: ["專案 A", "專案 B", "專案 C"], synergy: "協同效應", complement: "互補關係", friction: "留意摩擦", note: "依生日與五行建立的參考模型，不預測實際成果或人事適性。", move: "移至", score: "參考分數" },
+  ko: { title: "팀 궁합 시뮬레이터", pool: "미배치", groups: ["프로젝트 A", "프로젝트 B", "프로젝트 C"], synergy: "시너지", complement: "상호 보완", friction: "마찰 주의", note: "생년월일과 오행을 활용한 참고 모델이며 실제 성과나 인사 적합성을 예측하지 않습니다.", move: "이동", score: "참고 점수" },
+  es: { title: "Simulador de compatibilidad de equipo", pool: "Sin asignar", groups: ["Proyecto A", "Proyecto B", "Proyecto C"], synergy: "Sinergia", complement: "Complemento", friction: "Posible fricción", note: "Modelo orientativo basado en fecha de nacimiento y cinco elementos; no predice rendimiento ni idoneidad laboral.", move: "Mover a", score: "Puntuación orientativa" },
+  fr: { title: "Simulateur de compatibilité d’équipe", pool: "Non affecté", groups: ["Projet A", "Projet B", "Projet C"], synergy: "Synergie", complement: "Complémentarité", friction: "Friction possible", note: "Modèle indicatif fondé sur la date de naissance et les cinq éléments ; il ne prédit ni performance ni aptitude professionnelle.", move: "Déplacer vers", score: "Score indicatif" },
 };
 const colors = { synergy: "text-emerald-300 border-emerald-400/40 bg-emerald-500/10", complement: "text-sky-300 border-sky-400/40 bg-sky-500/10", friction: "text-rose-300 border-rose-400/40 bg-rose-500/10" };
 const classify = (a: TeamMember, b: TeamMember): "synergy" | "complement" | "friction" => {
@@ -14,7 +17,7 @@ const classify = (a: TeamMember, b: TeamMember): "synergy" | "complement" | "fri
   return rel === "control" || score < 60 ? "friction" : rel === "generate" && score >= 75 ? "synergy" : "complement";
 };
 export default function GroupSimulator({ members, language }: { members: TeamMember[]; language: Language }) {
-  const t = language === "ja" ? labels.ja : language === "zh-TW" || language === "zh-CN" ? labels.zh : labels.en;
+  const t = language === "ja" ? labels.ja : language === "zh-TW" || language === "zh-CN" ? labels.zh : language === "ko" ? labels.ko : language === "es" ? labels.es : language === "fr" ? labels.fr : labels.en;
   const [placed, setPlaced] = useState<Record<string, number>>({});
   const [selected, setSelected] = useState<string | null>(null);
   useEffect(() => setPlaced(prev => Object.fromEntries(Object.entries(prev).filter(([id]) => members.some(m => m.id === id)))), [members]);

@@ -158,3 +158,7 @@
 - [x] Restrict section one to individual traits and positive relationship strengths.
 - [x] Connect selected relationship and optional concern to the overall reading; refine warm final advice and exact heading.
 - [x] Verify branch lengths and content rules with 10 passing tests; verify romance/question and hierarchy/work result flows in browser (496/848/313 characters, no runtime errors).
+
+## Profile localization
+- [x] Move onboarding and saved-profile placeholders, validation copy, settings-profile labels, and related-person fallback copy into a complete seven-language dictionary.
+- [x] Verify profile dictionaries and prefecture labels by test; verify English, Spanish, French, and Korean onboarding live with localized placeholders, preserved input, and no console errors. Settings and related-person copy use the same complete seven-language dictionary.

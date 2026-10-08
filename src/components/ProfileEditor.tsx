@@ -7,6 +7,7 @@ import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { getFiveElements } from "@/lib/ai/five-elements";
 import { finalizePersonalName, formatPersonalName } from "@/lib/name-format";
+import { localizePrefecture, profileUiCopy } from "@/lib/profile-ui-copy";
 
 const ROMAJI = /^[A-Za-z][A-Za-z\s'-]*$/;
 
@@ -20,8 +21,9 @@ export default function ProfileEditor({
 }: { profile: UserProfile; language: Language; onSave: (p: UserProfile) => Promise<void> }) {
   const t = profileTranslations[language];
   const storage = profileStorageCopy[language];
+  const ui = profileUiCopy[language];
   const [draft, setDraft] = useState<UserProfile>(profile);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<"required" | "kana" | "romaji" | "save" | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const set = <K extends keyof UserProfile>(k: K, v: UserProfile[K]) => {
@@ -31,14 +33,15 @@ export default function ProfileEditor({
   const label = "mb-1.5 block text-xs font-semibold text-primary";
 
   const save = async () => {
-    if (!draft.birthDate) return setError(t.dateError);
-    if (draft.nameRomaji.trim() && !ROMAJI.test(draft.nameRomaji.trim())) return setError(t.romajiError);
+    if (!draft.nameKanji.trim() || !draft.nameKana.trim() || !draft.nameRomaji.trim() || !draft.birthDate) return setError("required");
+    if (!/^[\u3041-\u309F\u30FC\s]+$/.test(draft.nameKana.trim())) return setError("kana");
+    if (!ROMAJI.test(draft.nameRomaji.trim())) return setError("romaji");
     setError(null);
     setSaving(true);
     try {
       await onSave({ ...draft, nameKanji: finalizePersonalName(draft.nameKanji).slice(0, 40), nameKana: finalizePersonalName(draft.nameKana).slice(0, 60), nameRomaji: finalizePersonalName(draft.nameRomaji, true).slice(0, 60), birthCity: draft.birthCity.trim().slice(0, 80) });
       setSaved(true);
-    } catch { setError(storage.saveError); }
+    } catch { setError("save"); }
     finally { setSaving(false); }
   };
 
@@ -52,11 +55,11 @@ export default function ProfileEditor({
       <p className="mt-3 text-xs text-muted-foreground">{t.cardHint}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div><label className={label} htmlFor="pe-kanji">{t.nameKanji}</label>
-          <input id="pe-kanji" className={inputClass} maxLength={40} placeholder="例：山田 太郎（※姓と名の間にスペース）" value={draft.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} /></div>
+          <input id="pe-kanji" className={inputClass} maxLength={40} placeholder={ui.placeholders.nameKanji} value={draft.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} /></div>
         <div><label className={label} htmlFor="pe-kana">{t.nameKana}</label>
-          <input id="pe-kana" className={inputClass} maxLength={60} placeholder="例：やまだ たろう（※姓と名の間にスペース）" value={draft.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} /></div>
+          <input id="pe-kana" className={inputClass} maxLength={60} placeholder={ui.placeholders.nameKana} value={draft.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} /></div>
         <div className="sm:col-span-2"><label className={label} htmlFor="pe-romaji">{t.nameRomaji}</label>
-          <input id="pe-romaji" className={`${inputClass} uppercase`} maxLength={60} placeholder="例：YAMADA TARO（※姓と名の間にスペース）" value={draft.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} />
+          <input id="pe-romaji" className={`${inputClass} uppercase`} maxLength={60} placeholder={ui.placeholders.nameRomaji} value={draft.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} />
           <p className="mt-1 text-[11px] text-muted-foreground">{t.romajiHint}</p></div>
         <div><label className={label} htmlFor="pe-gender">{storage.gender}</label>
           <select id="pe-gender" className={inputClass} value={draft.gender} onChange={(e) => set("gender", e.target.value as UserProfile["gender"])}><option value="undisclosed">{storage.undisclosed}</option><option value="female">{storage.female}</option><option value="male">{storage.male}</option><option value="other">{storage.other}</option></select></div>
@@ -70,12 +73,12 @@ export default function ProfileEditor({
         <div><label className={label} htmlFor="pe-pref">{t.prefecture}</label>
           <select id="pe-pref" className={inputClass} value={draft.birthPlace} onChange={(e) => set("birthPlace", e.target.value)}>
             <option value="">—</option>
-            {PREFECTURES.map((p, i) => <option key={p} value={p}>{["en", "es", "fr"].includes(language) ? prefecturesRomanized[i] : p}</option>)}
+            {PREFECTURES.map((p, i) => <option key={p} value={p}>{localizePrefecture(language, i, p, prefecturesRomanized[i] ?? p)}</option>)}
           </select></div>
         <div><label className={label} htmlFor="pe-city">{t.city}</label>
-          <input id="pe-city" className={inputClass} maxLength={80} placeholder="横浜市 保土ケ谷区 和田町" value={draft.birthCity} onChange={(e) => set("birthCity", e.target.value)} /></div>
+          <input id="pe-city" className={inputClass} maxLength={80} placeholder={ui.placeholders.city} value={draft.birthCity} onChange={(e) => set("birthCity", e.target.value)} /></div>
       </div>
-      {error && <p role="alert" className="mt-3 text-xs text-destructive">{error}</p>}
+      {error && <p role="alert" className="mt-3 text-xs text-destructive">{error === "required" ? ui.requiredFieldsError : error === "kana" ? ui.kanaError : error === "romaji" ? t.romajiError : storage.saveError}</p>}
       {saved && <p role="status" className="mt-3 flex items-center gap-1 text-xs text-primary"><Check className="size-3.5" />{t.saved}</p>}
        <Button type="button" variant="champagne" onClick={save} disabled={saving} className="mt-4 h-12 w-full rounded-lg font-bold">{saving ? storage.saving : t.save}</Button>
     </details>
