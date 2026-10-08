@@ -84,7 +84,7 @@ function GoldLeafField({ seed, count, radius, texture, progress }: { seed: numbe
       const leaf = goldLeafTransform(seed, i, radius);
       dummy.position.set(leaf.x, leaf.y, .2 + seededUnit(seed + 93, i) * .18);
       dummy.rotation.set(seededUnit(seed, i) * .45, seededUnit(seed + 5, i) * .45, leaf.rotation);
-      dummy.scale.set(.025 * leaf.scale * (1 + i % 3), .07 * leaf.scale, .45);
+      dummy.scale.set(.018 * leaf.scale * (1 + i % 3), .052 * leaf.scale, .45);
       dummy.updateMatrix();
       mesh.current.setMatrixAt(i, dummy.matrix);
     }
@@ -92,7 +92,7 @@ function GoldLeafField({ seed, count, radius, texture, progress }: { seed: numbe
   }, [count, dummy, radius, seed]);
   return <instancedMesh ref={mesh} args={[undefined, undefined, count]} scale={Math.max(.01, progress)}>
     <circleGeometry args={[1, 5]} />
-    <meshPhysicalMaterial color="#D4AF37" emissive="#F3E5AB" emissiveIntensity={.2} metalness={.92} roughness={.2} clearcoat={1} clearcoatRoughness={.16} bumpMap={texture} bumpScale={.09} side={THREE.DoubleSide} />
+    <meshBasicMaterial color="#F3E5AB" transparent opacity={.78} side={THREE.DoubleSide} />
   </instancedMesh>;
 }
 
@@ -156,9 +156,9 @@ function Mandala({ colors, intention, progress, reduced }: Omit<Props, "onCaptur
         <circleGeometry args={[5.48, 160]} />
         <meshStandardMaterial color="#09080d" bumpMap={texture} bumpScale={.2} roughness={.88} metalness={.02} />
       </mesh>
-      {[5.08, 4.58, 3.96, 3.34, 2.72, 2.1, 1.48].map((radius, i) => <mesh key={`paint-wash-${radius}`} position={[0, 0, -.38 + i * .025]}>
+      {[5.08, 4.58, 3.96, 3.34, 2.72, 2.1, 1.48].map((radius, i) => <mesh key={`paint-wash-${radius}`} position={[0, 0, -.38 + i * .025]} rotation-z={i * GOLDEN_ANGLE} scale={[1 + (i % 3) * .018, 1 - (i % 2) * .025, 1]}>
         <ringGeometry args={[Math.max(.1, radius - .65), radius, 128]} />
-        <meshStandardMaterial color={palette[i % palette.length] ?? main} emissive={palette[i % palette.length] ?? main} emissiveIntensity={.04} bumpMap={texture} bumpScale={.14} roughness={.74} metalness={.03} transparent opacity={.11 + i * .012} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={palette[i % palette.length] ?? main} emissive={palette[i % palette.length] ?? main} emissiveIntensity={.025} bumpMap={texture} bumpScale={.18} roughness={.8} metalness={.02} transparent opacity={.052 + i * .008} side={THREE.DoubleSide} />
       </mesh>)}
       <points ref={aura} scale={.08 + ease(progress / 2.2) * .92}>
         <bufferGeometry><bufferAttribute attach="attributes-position" args={[particles, 3]} /></bufferGeometry>
@@ -177,10 +177,12 @@ function Mandala({ colors, intention, progress, reduced }: Omit<Props, "onCaptur
       {Array.from({ length: 6 }, (_, arm) => <ImpastoSpiral key={`impasto-${arm}`} arm={arm} colors={palette} texture={texture} progress={flower} />)}
       <group scale={.12 + flower * .88}><Line points={spiral} color={palette[2] ?? main} lineWidth={1.45} transparent opacity={.55} /><Line points={spiral.map(([x, y, z]) => [-x, y, z + .01] as [number, number, number])} color={palette[4] ?? sub} lineWidth={1.1} transparent opacity={.48} /></group>
       {[.82, 1.18, 1.55, 2.08, 2.48, 2.92, 3.42, 3.94, 4.48, 4.92].map((radius, index) => <DotRing key={radius} count={24 + index * 10} radius={radius} dot={.034 - index * .0015} colors={palette} texture={texture} offset={index * GOLDEN_ANGLE} opacity={.96 - index * .045} />)}
-      <GoldLeafField seed={seed} count={168} radius={5.05} texture={texture} progress={flower} />
-      <mesh scale={.16 + flower * .84} position-z={.32}><circleGeometry args={[.58, 96]} /><meshPhysicalMaterial color={main} emissive={main} emissiveIntensity={.28} bumpMap={texture} bumpScale={.18} roughness={.3} metalness={.12} clearcoat={.72} clearcoatRoughness={.22} /></mesh>
-      <mesh scale={.2 + flower * .8} position-z={.34}><ringGeometry args={[.59, .73, 96]} /><meshPhysicalMaterial color="#D4AF37" emissive={sub} emissiveIntensity={.2} metalness={.88} roughness={.22} clearcoat={1} /></mesh>
-      <mesh scale={.2 + flower * .8} position-z={.36}><ringGeometry args={[.73, .79, 96]} /><meshBasicMaterial color={sub} transparent opacity={.56} blending={THREE.AdditiveBlending} /></mesh>
+      <GoldLeafField seed={seed} count={92} radius={5.05} texture={texture} progress={flower} />
+      <mesh scale={.16 + flower * .84} position-z={.3}><circleGeometry args={[.68, 96]} /><meshStandardMaterial color={palette[3] ?? sub} bumpMap={texture} bumpScale={.22} roughness={.64} transparent opacity={.82} /></mesh>
+      <mesh scale={.16 + flower * .84} position-z={.33}><circleGeometry args={[.57, 96]} /><meshStandardMaterial color={palette[1] ?? sub} emissive={palette[1] ?? sub} emissiveIntensity={.12} bumpMap={texture} bumpScale={.2} roughness={.5} transparent opacity={.84} /></mesh>
+      <mesh scale={.16 + flower * .84} position-z={.36}><circleGeometry args={[.45, 96]} /><meshPhysicalMaterial color={main} emissive={main} emissiveIntensity={.25} bumpMap={texture} bumpScale={.2} roughness={.32} metalness={.08} clearcoat={.68} clearcoatRoughness={.2} /></mesh>
+      <mesh scale={.2 + flower * .8} position-z={.39}><ringGeometry args={[.68, .745, 96]} /><meshBasicMaterial color="#D4AF37" transparent opacity={.88} /></mesh>
+      <mesh scale={.2 + flower * .8} position-z={.41}><ringGeometry args={[.75, .79, 96]} /><meshBasicMaterial color={sub} transparent opacity={.52} blending={THREE.AdditiveBlending} /></mesh>
       <pointLight color={main} intensity={3.4 * flower} distance={5} />
     </group>
   </>;
