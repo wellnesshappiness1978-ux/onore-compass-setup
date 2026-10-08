@@ -165,7 +165,7 @@ function BrushBand({ points, width, color, z, seed, bump }: { points: [number, n
   }, [points, seed, width, z]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   return <mesh geometry={geometry}>
-    <meshStandardMaterial color={color} roughness={.42} metalness={.08} bumpMap={bump ?? undefined} bumpScale={.06} side={THREE.DoubleSide} />
+    <meshStandardMaterial color={color} roughness={.42} metalness={.08} bumpMap={bump} bumpScale={.06} side={THREE.DoubleSide} />
   </mesh>;
 }
 
@@ -178,9 +178,9 @@ function PaintedRings({ palette, bump }: { palette: string[]; bump: THREE.Textur
   return <>
     {rings.map((ring, i) => <mesh key={i} position-z={ring.z} rotation-z={i * GOLDEN_ANGLE}>
       <ringGeometry args={[ring.inner, ring.outer, 180, 1]} />
-      <meshStandardMaterial color={ring.color} roughness={.55} bumpMap={bump ?? undefined} bumpScale={.09} />
+      <meshStandardMaterial color={ring.color} roughness={.55} bumpMap={bump} bumpScale={.09} />
     </mesh>)}
-    <mesh position-z={-.41}><circleGeometry args={[1.1, 96]} /><meshStandardMaterial color={shade(pickColor(palette, 0), -.5)} roughness={.5} bumpMap={bump ?? undefined} bumpScale={.08} /></mesh>
+    <mesh position-z={-.41}><circleGeometry args={[1.1, 96]} /><meshStandardMaterial color={shade(pickColor(palette, 0), -.5)} roughness={.5} bumpMap={bump} bumpScale={.08} /></mesh>
   </>;
 }
 
@@ -214,7 +214,7 @@ function DotPaint({ palette, bump }: { palette: string[]; bump: THREE.Texture | 
   }, [dots, dummy]);
   return <instancedMesh ref={mesh} args={[undefined, undefined, dots.length]}>
     <sphereGeometry args={[1, 12, 8]} />
-    <meshStandardMaterial roughness={.35} bumpMap={bump ?? undefined} bumpScale={.02} />
+    <meshStandardMaterial roughness={.35} bumpMap={bump} bumpScale={.02} />
   </instancedMesh>;
 }
 
@@ -271,7 +271,7 @@ function GemCore({ color, reveal, reduced }: { color: string; reveal: number; re
   });
   const tint = vividHexColor(color);
   return <group position-z={.5} scale={.3 + reveal * .7}>
-    <mesh position-z={-.1} scale={4.2}><planeGeometry /><meshBasicMaterial map={halo ?? undefined} color={shade(tint, .3)} transparent opacity={.55} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
+    <mesh position-z={-.1} scale={4.2}><planeGeometry /><meshBasicMaterial map={halo} color={shade(tint, .3)} transparent opacity={.55} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
     {Array.from({ length: 16 }, (_, i) => <mesh key={i} rotation-z={i / 16 * Math.PI * 2} position-z={-.08}>
       <planeGeometry args={[i % 2 ? 3.2 : 4.4, .018]} />
       <meshBasicMaterial color={shade(tint, .55)} transparent opacity={.4} blending={THREE.AdditiveBlending} depthWrite={false} />
