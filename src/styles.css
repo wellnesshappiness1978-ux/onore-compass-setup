@@ -246,8 +246,7 @@
   background-image:
     radial-gradient(ellipse 40rem 28rem at 15% 9%, color-mix(in oklab, var(--rose-glow) 14%, transparent), transparent 75%),
     radial-gradient(ellipse 35rem 24rem at 86% 80%, color-mix(in oklab, var(--amethyst) 19%, transparent), transparent 78%),
-    radial-gradient(ellipse 22rem 17rem at 70% 25%, color-mix(in oklab, var(--lavender-glow) 10%, transparent), transparent 75%),
-    repeating-linear-gradient(128deg, transparent 0 14rem, color-mix(in oklab, var(--gold-glow) 2%, transparent) calc(14rem + 1px) calc(14rem + 2px), transparent calc(14rem + 3px) 28rem);
+    radial-gradient(ellipse 22rem 17rem at 70% 25%, color-mix(in oklab, var(--lavender-glow) 10%, transparent), transparent 75%);
 }
 
 .celestial-stars {
