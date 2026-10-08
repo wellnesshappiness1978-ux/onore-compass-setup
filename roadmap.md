@@ -153,3 +153,8 @@
 - [x] Restore slowly animated radial purple/gold aura and outward light particles; preserve the logo and horizontal-streak removal.
 - [x] Update Japanese compatibility headings and approximately 500/800/300-character readings with calculated comparisons.
 - [x] Verify title size across plans, logo animation/reduced motion, and the complete compatibility input/result flow.
+
+## Compatibility output rules
+- [ ] Restrict section one to individual traits and positive relationship strengths.
+- [ ] Connect selected relationship and optional concern to the overall reading; refine warm final advice and exact heading.
+- [ ] Verify branch lengths, content rules and the complete input/result flow.
