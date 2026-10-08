@@ -129,7 +129,7 @@
 .agolmen-aura-purple { width: 68%; height: 61%; background: color-mix(in oklab, var(--beam-purple) 30%, transparent); transform: translate(-43%, -47%) rotate(-13deg); filter: blur(36px); }
 .agolmen-aura-aqua { width: 43%; height: 66%; background: color-mix(in oklab, var(--beam-aqua) 18%, transparent); transform: translate(-66%, -42%) rotate(31deg); filter: blur(32px); }
 .agolmen-aura-gold { width: 52%; height: 54%; background: color-mix(in oklab, var(--beam-gold) 25%, transparent); transform: translate(-43%, -59%) rotate(-24deg); filter: blur(30px); }
-.agolmen-logo-aura { isolation: isolate; filter: drop-shadow(0 0 12px color-mix(in oklab, var(--beam-gold) 32%, transparent)); }
+.agolmen-logo-aura { isolation: isolate; }
 .agolmen-loading-aura { background: radial-gradient(circle, color-mix(in oklab, var(--beam-gold) 52%, transparent), color-mix(in oklab, var(--beam-purple) 28%, transparent) 50%, transparent 75%); filter: blur(14px); animation: agolmen-gem 2.7s ease-in-out infinite alternate; }
 .agolmen-loading-logo { animation: agolmen-bloom 2.5s ease-in-out infinite alternate; filter: drop-shadow(0 0 12px var(--gold-glow)); }
 .agolmen-particle { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; border-radius: 50%; background: var(--gold-glow); box-shadow: 0 0 8px var(--primary), 0 0 18px var(--gold-glow); animation: agolmen-converge 2.8s ease-in infinite; animation-delay: calc(var(--i) * -.175s); }
@@ -1116,7 +1116,7 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas[data-tier="b2b-premium"] .design-header { background-image: radial-gradient(ellipse at 20% 40%, color-mix(in oklab, var(--nebula) 38%, transparent), transparent 65%), radial-gradient(ellipse at 80% 20%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 60%); }
 @keyframes premium-stars { to { transform: translateY(-32px) scale(1.035); opacity: 1; } }
 .design-canvas[data-tier="b2b-premium"] .design-main .bg-primary { box-shadow: 0 0 30px color-mix(in oklab, var(--primary) 48%, transparent), inset 0 1px 0 var(--gold-glow); }
-.agolmen-brand-logo, .agolmen-loading-logo { mask-image: radial-gradient(circle at center, black 0 62%, color-mix(in oklab, black 78%, transparent) 70%, transparent 88%); filter: drop-shadow(0 0 18px color-mix(in oklab, var(--beam-gold) 46%, transparent)) drop-shadow(0 0 32px color-mix(in oklab, var(--beam-purple) 48%, transparent)); }
+.agolmen-brand-logo, .agolmen-loading-logo { mask-image: radial-gradient(circle at center, black 0 50%, color-mix(in oklab, black 72%, transparent) 59%, transparent 72%); filter: none; }
 .design-heading { background-image: radial-gradient(ellipse 130px 95px at 50% 48px, color-mix(in oklab, var(--rose-glow) 17%, transparent), transparent 90%), radial-gradient(ellipse 180px 120px at 50% 48px, color-mix(in oklab, var(--amethyst) 18%, transparent), transparent 95%); }
 .agolmen-loading-art { background-image: radial-gradient(circle, color-mix(in oklab, var(--beam-gold) 22%, transparent), color-mix(in oklab, var(--beam-purple) 20%, transparent) 45%, transparent 72%); }
 
