@@ -111,6 +111,7 @@ const BACKDROP_FRAGMENT = `
     color = mix(color, uColors[6], wave * 0.1);
     color += vec3(0.14 + brush) * (1.0 - smoothstep(0.0, 1.45, r));
     color = mix(color, vec3(1.0), 0.12 + 0.12 * pow(max(0.0, 1.0 - r), 3.0));
+    color = pow(max(color, vec3(0.035)), vec3(0.72));
     gl_FragColor = vec4(color, 1.0);
   }
 `;
