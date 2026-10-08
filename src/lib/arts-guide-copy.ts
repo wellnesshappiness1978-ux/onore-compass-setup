@@ -113,4 +113,4 @@ const baseArtsGuideCopy: Record<Language, ArtsGuideCopy> = {
 };
 export const artsGuideCopy = Object.fromEntries(
   (Object.keys(baseArtsGuideCopy) as Language[]).map((language) => [language, { ...baseArtsGuideCopy[language], methods: artsLogics(language) }]),
-) as Record<Language, ArtsGuideCopy>;
+) as unknown as Record<Language, ArtsGuideCopy>;
