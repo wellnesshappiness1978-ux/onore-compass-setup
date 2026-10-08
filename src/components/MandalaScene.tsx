@@ -1,24 +1,22 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Line } from "@react-three/drei";
+import { Environment, Lightformer } from "@react-three/drei";
 import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import {
+  brilliantCutProfile,
+  brushBandEdges,
   crystalRosettePoints,
   GOLDEN_ANGLE,
-  goldLeafTransform,
   layeredSpiralPoint,
   logarithmicSpiralPoint,
-  radialRayTransform,
   regularPolygonPoints,
   seededUnit,
-  sparkleTransform,
-  spiralPoint,
+  starfieldPoints,
   vividHexColor,
-  type MandalaIntention,
 } from "@/lib/art-geometry";
 
 export type Capture = () => Promise<{ blob: Blob; width: number; height: number }>;
-type Props = { colors: string[]; intention: MandalaIntention; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
+type Props = { colors: string[]; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
 
 const FALLBACK_PALETTE = ["#FFD21C", "#FF168F", "#00CFFF", "#62E000", "#9238FF", "#FF4A16", "#FFB800"];
 const GOLD_LIGHT = "#FFD21C";
@@ -28,13 +26,17 @@ function pickColor(palette: string[], index: number, fallback = GOLD_LIGHT) {
   return palette[index % Math.max(1, palette.length)] ?? fallback;
 }
 
-function CaptureBridge({ colors, onCapture }: { colors: string[]; onCapture: Props["onCapture"] }) {
+function shade(hex: string, amount: number) {
+  const c = new THREE.Color(hex);
+  return amount >= 0 ? c.lerp(new THREE.Color("#ffffff"), amount) : c.multiplyScalar(1 + amount);
+}
+
+function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
   const { gl, scene, camera } = useThree();
   useEffect(() => {
     onCapture(async () => {
-      const max = Math.min(gl.capabilities.maxTextureSize, 3840);
-      const size = max >= 2048 ? 2048 : 1024;
-      const target = new THREE.WebGLRenderTarget(size, size, { samples: 0 });
+      const size = gl.capabilities.maxTextureSize >= 2048 ? 2048 : 1024;
+      const target = new THREE.WebGLRenderTarget(size, size, { samples: 4 });
       try {
         const pixels = new Uint8Array(size * size * 4);
         gl.setRenderTarget(target);
@@ -49,7 +51,6 @@ function CaptureBridge({ colors, onCapture }: { colors: string[]; onCapture: Pro
         const image = cx.createImageData(size, size);
         for (let y = 0; y < size; y++) image.data.set(pixels.subarray((size - y - 1) * size * 4, (size - y) * size * 4), y * size * 4);
         cx.putImageData(image, 0, 0);
-
         const width = size === 2048 ? 2160 : 1080;
         const height = size === 2048 ? 3840 : 1920;
         const out = document.createElement("canvas");
@@ -57,23 +58,19 @@ function CaptureBridge({ colors, onCapture }: { colors: string[]; onCapture: Pro
         out.height = height;
         const ctx = out.getContext("2d");
         if (!ctx) throw new Error("Canvas unavailable");
-        const palette = colors.length ? colors : FALLBACK_PALETTE;
         ctx.fillStyle = COSMIC_BLACK;
         ctx.fillRect(0, 0, width, height);
-        const halo = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, height * .62);
-        halo.addColorStop(0, `${palette[0] ?? FALLBACK_PALETTE[0]}B8`);
-        halo.addColorStop(.3, `${palette[1] ?? FALLBACK_PALETTE[1]}54`);
-        halo.addColorStop(.64, `${palette[4] ?? FALLBACK_PALETTE[4]}22`);
-        halo.addColorStop(1, `${COSMIC_BLACK}00`);
-        ctx.fillStyle = halo;
-        ctx.fillRect(0, 0, width, height);
+        for (let i = 0; i < 420; i++) {
+          ctx.fillStyle = `rgba(255,255,255,${(.12 + seededUnit(5, i) * .35).toFixed(2)})`;
+          ctx.fillRect(seededUnit(9, i) * width, seededUnit(13, i) * height, 2, 2);
+        }
         ctx.drawImage(square, 0, (height - width) / 2, width, width);
-        ctx.fillStyle = pickColor(palette, 6);
+        ctx.fillStyle = GOLD_LIGHT;
         ctx.textAlign = "center";
         ctx.font = `${Math.round(width / 26)}px serif`;
         ctx.fillText("AGOLMEN'S COMPASS", width / 2, height * .16);
         ctx.font = `${Math.round(width / 55)}px sans-serif`;
-        ctx.fillText("BIRTH COLOR MANDALA · ILLUSTRATIVE ART", width / 2, height * .83);
+        ctx.fillText("BIRTH COLOR MANDALA · OVERALL FORTUNE · ILLUSTRATIVE ART", width / 2, height * .83);
         const blob = await new Promise<Blob>((resolve, reject) => out.toBlob(value => value ? resolve(value) : reject(new Error("PNG unavailable")), "image/png"));
         return { blob, width, height };
       } finally {
@@ -82,248 +79,255 @@ function CaptureBridge({ colors, onCapture }: { colors: string[]; onCapture: Pro
       }
     });
     return () => onCapture(null);
-  }, [camera, colors, gl, onCapture, scene]);
+  }, [camera, gl, onCapture, scene]);
   return null;
 }
 
-const BACKDROP_VERTEX = `
-  varying vec2 vUv;
-  void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
-`;
-
-const BACKDROP_FRAGMENT = `
-  precision highp float;
-  varying vec2 vUv;
-  uniform vec3 uColors[7];
-  uniform float uTime;
-  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
-  void main() {
-    vec2 p = vUv * 2.0 - 1.0;
-    float r = length(p);
-    float a = atan(p.y, p.x) / 6.2831853 + 0.5;
-    float sector = a * 6.0;
-    int i = int(floor(sector));
-    float f = smoothstep(0.0, 1.0, fract(sector));
-    vec3 angular = mix(uColors[i], uColors[(i + 1) % 6], f);
-    float wave = sin(r * 38.0 - uTime * 0.16 + a * 24.0) * 0.5 + 0.5;
-    float grain = hash(floor(vUv * 260.0)) * 0.008;
-    float aura = pow(max(0.0, 1.0 - r / 1.36), 2.15);
-    float filament = smoothstep(0.76, 1.0, wave) * aura * 0.12;
-    vec3 black = vec3(0.001, 0.0015, 0.006);
-    vec3 color = black + angular * (aura * 0.28 + filament);
-    color += uColors[0] * pow(max(0.0, 1.0 - r * 1.7), 4.0) * 0.3;
-    color += vec3(grain) * aura;
-    gl_FragColor = vec4(color, 1.0);
+/** Procedural impasto bump map: overlapping curved brush strokes with ridged edges. */
+function makeImpastoTexture(seed: number) {
+  if (typeof document === "undefined") return null;
+  const size = 512;
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.fillStyle = "#808080";
+  ctx.fillRect(0, 0, size, size);
+  for (let i = 0; i < 900; i++) {
+    const x = seededUnit(seed + 1, i) * size;
+    const y = seededUnit(seed + 2, i) * size;
+    const angle = seededUnit(seed + 3, i) * Math.PI;
+    const length = 18 + seededUnit(seed + 4, i) * 46;
+    const width = 3 + seededUnit(seed + 5, i) * 9;
+    const tone = Math.round(70 + seededUnit(seed + 6, i) * 120);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.lineCap = "round";
+    ctx.strokeStyle = `rgb(${tone},${tone},${tone})`;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(-length / 2, 0);
+    ctx.quadraticCurveTo(0, (seededUnit(seed + 7, i) - .5) * 14, length / 2, 0);
+    ctx.stroke();
+    ctx.strokeStyle = `rgba(255,255,255,.35)`;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(-length / 2, -width / 2);
+    ctx.lineTo(length / 2, -width / 2);
+    ctx.stroke();
+    ctx.restore();
   }
-`;
-
-function AuraBackdrop({ palette, reduced }: { palette: string[]; reduced: boolean }) {
-  const material = useRef<THREE.ShaderMaterial>(null);
-  const uniforms = useMemo(() => ({
-    uColors: { value: Array.from({ length: 7 }, (_, index) => new THREE.Color(pickColor(palette, index, FALLBACK_PALETTE[index] ?? GOLD_LIGHT))) },
-    uTime: { value: 0 },
-  }), [palette]);
-  useEffect(() => {
-    const values = uniforms.uColors.value as THREE.Color[];
-    values.forEach((color, index) => color.set(pickColor(palette, index, FALLBACK_PALETTE[index] ?? GOLD_LIGHT)));
-  }, [palette, uniforms]);
-  useFrame((state) => {
-    const timeUniform = material.current?.uniforms["uTime"];
-    if (timeUniform && !reduced) timeUniform.value = state.clock.elapsedTime;
-  });
-  return <mesh position={[0, 0, -1.2]} scale={[1.25, 1.25, 1]}>
-    <planeGeometry args={[12.8, 12.8, 1, 1]} />
-    <shaderMaterial ref={material} uniforms={uniforms} vertexShader={BACKDROP_VERTEX} fragmentShader={BACKDROP_FRAGMENT} depthWrite={false} />
-  </mesh>;
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(3, 3);
+  return texture;
 }
 
-function RayField({ seed, color, progress }: { seed: number; color: string; progress: number }) {
-  const mesh = useRef<THREE.InstancedMesh>(null);
-  const count = 96;
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  useLayoutEffect(() => {
-    if (!mesh.current) return;
-    for (let i = 0; i < count; i++) {
-      const ray = radialRayTransform(seed, i, count, 6.5);
-      dummy.position.set(Math.cos(ray.angle) * ray.length * .48, Math.sin(ray.angle) * ray.length * .48, -.66 + i % 3 * .012);
-      dummy.rotation.set(0, 0, ray.angle - Math.PI / 2);
-      dummy.scale.set(ray.width * (i % 4 === 0 ? 1.7 : .72), ray.length, 1);
-      dummy.updateMatrix();
-      mesh.current.setMatrixAt(i, dummy.matrix);
-    }
-    mesh.current.instanceMatrix.needsUpdate = true;
-  }, [dummy, seed]);
-  return <instancedMesh ref={mesh} args={[undefined, undefined, count]} scale={Math.max(.02, progress)}>
-    <planeGeometry args={[1, 1]} />
-    <meshBasicMaterial color={color} transparent opacity={.32} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
-  </instancedMesh>;
-}
-
-function SparkleField({ seed, palette, reduced }: { seed: number; palette: string[]; reduced: boolean }) {
-  const group = useRef<THREE.Group>(null);
-  const mesh = useRef<THREE.InstancedMesh>(null);
-  const count = 120;
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  const color = useMemo(() => new THREE.Color(), []);
-  useLayoutEffect(() => {
-    if (!mesh.current) return;
-    for (let i = 0; i < count; i++) {
-      const sparkle = sparkleTransform(seed, i, 5.75);
-      dummy.position.set(sparkle.x, sparkle.y, .28 + i % 7 * .009);
-      dummy.rotation.set(0, 0, sparkle.rotation);
-      const size = .01 * sparkle.scale * (i % 13 === 0 ? 1.8 : 1);
-      dummy.scale.set(size * .46, size * 2.6, 1);
-      dummy.updateMatrix();
-      mesh.current.setMatrixAt(i, dummy.matrix);
-      color.set(pickColor(palette, i, FALLBACK_PALETTE[i % FALLBACK_PALETTE.length] ?? GOLD_LIGHT));
-      color.set(GOLD_LIGHT);
-      mesh.current.setColorAt(i, color);
-    }
-    mesh.current.instanceMatrix.needsUpdate = true;
-    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
-  }, [color, dummy, palette, seed]);
-  useFrame((state, rawDelta) => {
-    if (!group.current || reduced) return;
-    const delta = Math.min(rawDelta, .05);
-    group.current.rotation.z -= delta * .008;
-    const pulse = .96 + Math.sin(state.clock.elapsedTime * .65) * .04;
-    group.current.scale.setScalar(pulse);
-  });
-  return <group ref={group}><instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-    <planeGeometry args={[1, 1]} />
-    <meshBasicMaterial vertexColors transparent opacity={.68} blending={THREE.AdditiveBlending} depthWrite={false} />
-  </instancedMesh></group>;
-}
-
-function GoldLeafField({ seed, count, radius, progress }: { seed: number; count: number; radius: number; progress: number }) {
-  const mesh = useRef<THREE.InstancedMesh>(null);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  useLayoutEffect(() => {
-    if (!mesh.current) return;
-    for (let i = 0; i < count; i++) {
-      const leaf = goldLeafTransform(seed, i, radius);
-      dummy.position.set(leaf.x, leaf.y, .19 + seededUnit(seed + 93, i) * .12);
-      dummy.rotation.set(0, 0, leaf.rotation);
-      dummy.scale.set(.008 * leaf.scale * (1 + i % 3), .032 * leaf.scale, 1);
-      dummy.updateMatrix();
-      mesh.current.setMatrixAt(i, dummy.matrix);
-    }
-    mesh.current.instanceMatrix.needsUpdate = true;
-  }, [count, dummy, radius, seed]);
-  return <instancedMesh ref={mesh} args={[undefined, undefined, count]} scale={Math.max(.01, progress)}>
-    <planeGeometry args={[1, 1]} />
-    <meshBasicMaterial color={GOLD_LIGHT} transparent opacity={.76} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
-  </instancedMesh>;
-}
-
-function DotField({ palette, progress }: { palette: string[]; progress: number }) {
-  const { positions, colors, sizes } = useMemo(() => {
-    const points: number[] = [];
-    const pointColors: number[] = [];
-    const pointSizes: number[] = [];
-    const color = new THREE.Color();
-    for (let ring = 0; ring < 18; ring++) {
-      const radius = .54 + ring * .278;
-      const count = 34 + ring * 7;
-      for (let index = 0; index < count; index++) {
-        const angle = index / count * Math.PI * 2 + ring * GOLDEN_ANGLE;
-        points.push(Math.cos(angle) * radius, Math.sin(angle) * radius, .04 + ring * .008);
-        color.set(pickColor(palette, index + ring, "#F5C85B"));
-        pointColors.push(color.r, color.g, color.b);
-        pointSizes.push(index % 11 === 0 ? .054 : .026);
-      }
-    }
-    return { positions: new Float32Array(points), colors: new Float32Array(pointColors), sizes: new Float32Array(pointSizes) };
-  }, [palette]);
-  return <points scale={Math.max(.02, progress)}>
+function Starfield({ seed, reduced }: { seed: number; reduced: boolean }) {
+  const material = useRef<THREE.PointsMaterial>(null);
+  const { positions, colors } = useMemo(() => {
+    const stars = starfieldPoints(seed, 520, 5.7, 13);
+    const p = new Float32Array(stars.length * 3);
+    const c = new Float32Array(stars.length * 3);
+    stars.forEach((s, i) => { p.set([s.x, s.y, -2], i * 3); c.set([s.brightness, s.brightness, s.brightness * 1.05], i * 3); });
+    return { positions: p, colors: c };
+  }, [seed]);
+  useFrame(state => { if (material.current && !reduced) material.current.opacity = .7 + Math.sin(state.clock.elapsedTime * .6) * .12; });
+  return <points>
     <bufferGeometry>
       <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       <bufferAttribute attach="attributes-color" args={[colors, 3]} />
-      <bufferAttribute attach="attributes-size" args={[sizes, 1]} />
     </bufferGeometry>
-    <pointsMaterial vertexColors size={.052} transparent opacity={.96} sizeAttenuation blending={THREE.AdditiveBlending} depthWrite={false} />
+    <pointsMaterial ref={material} vertexColors size={.035} transparent opacity={.75} sizeAttenuation depthWrite={false} />
   </points>;
 }
 
-function SacredGeometry({ palette, progress }: { palette: string[]; progress: number }) {
-  const layers = useMemo(() => [
-    { sides: 6, radius: 2.05, phase: 0, color: 1 },
-    { sides: 8, radius: 2.62, phase: Math.PI / 8, color: 2 },
-    { sides: 6, radius: 3.24, phase: Math.PI / 6, color: 3 },
-    { sides: 8, radius: 3.86, phase: 0, color: 4 },
-    { sides: 6, radius: 4.48, phase: Math.PI / 12, color: 5 },
-    { sides: 8, radius: 5.02, phase: Math.PI / 16, color: 6 },
-  ], []);
-  const spirals = useMemo(() => Array.from({ length: 6 }, (_, arm) => Array.from({ length: 180 }, (_, index) => {
-    const [x, y] = layeredSpiralPoint(index, 180, arm, 6, 5.25);
-    return [x, y, .15 + arm * .008] as [number, number, number];
+/** Thick painted ribbon along a polyline. */
+function BrushBand({ points, width, color, z, seed, bump }: { points: [number, number][]; width: number; color: THREE.Color | string; z: number; seed: number; bump: THREE.Texture | null }) {
+  const geometry = useMemo(() => {
+    const edges = brushBandEdges(points, width, seed);
+    const vertices: number[] = [];
+    const uvs: number[] = [];
+    const index: number[] = [];
+    edges.forEach((edge, i) => {
+      const t = i / Math.max(1, edges.length - 1);
+      vertices.push(edge.left[0], edge.left[1], z, edge.right[0], edge.right[1], z);
+      uvs.push(t * 6, 0, t * 6, 1);
+      if (i > 0) { const a = (i - 1) * 2; index.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+    });
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+    g.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+    g.setIndex(index);
+    g.computeVertexNormals();
+    return g;
+  }, [points, seed, width, z]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return <mesh geometry={geometry}>
+    <meshStandardMaterial color={color} roughness={.42} metalness={.08} bumpMap={bump ?? undefined} bumpScale={.06} side={THREE.DoubleSide} />
+  </mesh>;
+}
+
+function PaintedRings({ palette, bump }: { palette: string[]; bump: THREE.Texture | null }) {
+  const birth = palette.slice(1, 7);
+  const rings = useMemo(() => Array.from({ length: 14 }, (_, i) => {
+    const inner = 1.05 + i * .3;
+    return { inner, outer: inner + .34, color: shade(pickColor(birth, i), i % 2 ? -.38 : .04), z: -.4 + i * .002 };
+  }), [birth]);
+  return <>
+    {rings.map((ring, i) => <mesh key={i} position-z={ring.z} rotation-z={i * GOLDEN_ANGLE}>
+      <ringGeometry args={[ring.inner, ring.outer, 180, 1]} />
+      <meshStandardMaterial color={ring.color} roughness={.55} bumpMap={bump ?? undefined} bumpScale={.09} />
+    </mesh>)}
+    <mesh position-z={-.41}><circleGeometry args={[1.1, 96]} /><meshStandardMaterial color={shade(pickColor(palette, 0), -.5)} roughness={.5} bumpMap={bump ?? undefined} bumpScale={.08} /></mesh>
+  </>;
+}
+
+function DotPaint({ palette, bump }: { palette: string[]; bump: THREE.Texture | null }) {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const birth = palette.slice(1, 7);
+  const dots = useMemo(() => {
+    const list: { x: number; y: number; s: number; c: THREE.Color }[] = [];
+    for (let ring = 0; ring < 14; ring++) {
+      const radius = 1.22 + ring * .3;
+      const count = Math.round(radius * 2 * Math.PI / .19);
+      for (let i = 0; i < count; i++) {
+        const angle = i / count * Math.PI * 2 + ring * .13;
+        list.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius, s: ring % 3 === 0 ? .075 : .055, c: shade(pickColor(birth, ring + 3), ring % 2 ? .35 : -.1) });
+      }
+    }
+    return list;
+  }, [birth]);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  useLayoutEffect(() => {
+    if (!mesh.current) return;
+    dots.forEach((d, i) => {
+      dummy.position.set(d.x, d.y, -.2);
+      dummy.scale.setScalar(d.s);
+      dummy.updateMatrix();
+      mesh.current!.setMatrixAt(i, dummy.matrix);
+      mesh.current!.setColorAt(i, d.c);
+    });
+    mesh.current.instanceMatrix.needsUpdate = true;
+    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
+  }, [dots, dummy]);
+  return <instancedMesh ref={mesh} args={[undefined, undefined, dots.length]}>
+    <sphereGeometry args={[1, 12, 8]} />
+    <meshStandardMaterial roughness={.35} bumpMap={bump ?? undefined} bumpScale={.02} />
+  </instancedMesh>;
+}
+
+function SacredBands({ palette, bump }: { palette: string[]; bump: THREE.Texture | null }) {
+  const birth = palette.slice(1, 7);
+  const polygons = useMemo(() => [
+    { sides: 6, r: 1.6, phase: 0 }, { sides: 8, r: 2.3, phase: Math.PI / 8 }, { sides: 6, r: 3.0, phase: Math.PI / 6 },
+    { sides: 8, r: 3.7, phase: 0 }, { sides: 12, r: 4.4, phase: Math.PI / 12 }, { sides: 8, r: 5.05, phase: Math.PI / 16 },
+  ].map(p => regularPolygonPoints(p.sides, p.r, p.phase).map(([x, y]) => [x, y] as [number, number])), []);
+  const rosettes = useMemo(() => [1.9, 2.65, 3.35, 4.1, 4.75].map((r, i) => crystalRosettePoints(12 + i * 4, r, r * .82, i * .1).map(([x, y]) => [x, y] as [number, number])), []);
+  const spirals = useMemo(() => Array.from({ length: 6 }, (_, arm) => Array.from({ length: 120 }, (_, i) => {
+    const [x, y] = layeredSpiralPoint(i, 120, arm, 6, 5.1);
+    return [x, y] as [number, number];
   })), []);
-  return <group scale={Math.max(.02, progress)}>
-    {layers.map((layer, index) => <Line key={`polygon-${layer.radius}`} points={regularPolygonPoints(layer.sides, layer.radius, layer.phase, -.14 + index * .025)} color={pickColor(palette, layer.color, FALLBACK_PALETTE[layer.color] ?? GOLD_LIGHT)} lineWidth={index % 2 ? 1.35 : 2} transparent opacity={.78} />)}
-    {[1.28, 1.72, 2.18, 2.72, 3.3, 3.88, 4.44, 4.96].map((radius, index) => <Line key={`rosette-${radius}`} points={crystalRosettePoints(12 + index * 2, radius, radius * (.46 + index * .025), index * .09, .02 + index * .014)} color={pickColor(palette, index + 2, FALLBACK_PALETTE[index % 7] ?? GOLD_LIGHT)} lineWidth={index % 2 ? .85 : 1.3} transparent opacity={.58 + index * .025} />)}
-    {spirals.map((points, index) => <Line key={`spiral-${index}`} points={points} color={pickColor(palette, index, FALLBACK_PALETTE[index] ?? GOLD_LIGHT)} lineWidth={index % 2 ? .85 : 1.25} transparent opacity={.5} />)}
-    {Array.from({ length: 48 }, (_, index) => {
-      const angle = index / 48 * Math.PI * 2;
-      return <Line key={`crystal-${index}`} points={[[Math.cos(angle) * .74, Math.sin(angle) * .74, .2], [Math.cos(angle + .08) * 3.1, Math.sin(angle + .08) * 3.1, .21], [Math.cos(angle) * 5.12, Math.sin(angle) * 5.12, .2]]} color={pickColor(palette, index, "#F5C85B")} lineWidth={index % 3 === 0 ? 1.35 : .72} transparent opacity={index % 3 === 0 ? .62 : .36} />;
-    })}
+  const golden = useMemo(() => Array.from({ length: 200 }, (_, i) => {
+    const [x, y] = logarithmicSpiralPoint(i, 200, 5.2, 3.5);
+    return [x, y] as [number, number];
+  }).slice(20), []);
+  return <>
+    {rosettes.map((pts, i) => <BrushBand key={`r${i}`} points={pts} width={.07} color={shade(pickColor(birth, i + 2), .25)} z={-.12 + i * .004} seed={40 + i} bump={bump} />)}
+    {polygons.map((pts, i) => <BrushBand key={`p${i}`} points={pts} width={.13} color={shade(pickColor(birth, i), i % 2 ? .3 : -.15)} z={-.06 + i * .004} seed={10 + i} bump={bump} />)}
+    {spirals.map((pts, i) => <BrushBand key={`s${i}`} points={pts} width={.09} color={shade(pickColor(birth, i + 1), .18)} z={0 + i * .003} seed={60 + i} bump={bump} />)}
+    <BrushBand points={golden} width={.16} color={shade(GOLD_LIGHT, .1)} z={.05} seed={90} bump={bump} />
+    <BrushBand points={golden.map(([x, y]) => [-x, -y] as [number, number])} width={.16} color={shade(GOLD_LIGHT, .1)} z={.051} seed={91} bump={bump} />
+  </>;
+}
+
+function GemCore({ color, reveal, reduced }: { color: string; reveal: number; reduced: boolean }) {
+  const gem = useRef<THREE.Mesh>(null);
+  const flares = useRef<THREE.Group>(null);
+  const points = useMemo(() => brilliantCutProfile(.82).map(([r, h]) => new THREE.Vector2(r, h)), []);
+  const halo = useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const ctx = c.getContext("2d");
+    if (!ctx) return null;
+    const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    g.addColorStop(0, "rgba(255,255,255,1)");
+    g.addColorStop(.25, "rgba(255,255,255,.35)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(c);
+  }, []);
+  useFrame(state => {
+    if (reduced) return;
+    const t = state.clock.elapsedTime;
+    if (gem.current) gem.current.rotation.y = t * .25;
+    flares.current?.children.forEach((child, i) => {
+      const s = Math.max(0, Math.sin(t * 1.3 + i * 1.7)) ** 6;
+      child.scale.set(.05 + s * .9, .012 + s * .03, 1);
+    });
+  });
+  const tint = vividHexColor(color);
+  return <group position-z={.5} scale={.3 + reveal * .7}>
+    <mesh position-z={-.1} scale={4.2}><planeGeometry /><meshBasicMaterial map={halo ?? undefined} color={shade(tint, .3)} transparent opacity={.55} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh>
+    {Array.from({ length: 16 }, (_, i) => <mesh key={i} rotation-z={i / 16 * Math.PI * 2} position-z={-.08}>
+      <planeGeometry args={[i % 2 ? 3.2 : 4.4, .018]} />
+      <meshBasicMaterial color={shade(tint, .55)} transparent opacity={.4} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </mesh>)}
+    <mesh ref={gem} rotation-x={Math.PI / 2}>
+      <latheGeometry args={[points, 16]} />
+      <meshPhysicalMaterial color={tint} flatShading metalness={.05} roughness={.04} transmission={.35} thickness={1.2} ior={2.4} clearcoat={1} clearcoatRoughness={.02} iridescence={.6} envMapIntensity={2.4} emissive={tint} emissiveIntensity={.18} />
+    </mesh>
+    <group ref={flares} position-z={.4}>
+      {Array.from({ length: 6 }, (_, i) => {
+        const a = i / 6 * Math.PI * 2;
+        return <mesh key={i} position={[Math.cos(a) * .5, Math.sin(a) * .5, 0]} rotation-z={i % 2 ? Math.PI / 4 : 0} scale={[.05, .012, 1]}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial color="#ffffff" transparent opacity={.9} blending={THREE.AdditiveBlending} depthWrite={false} />
+        </mesh>;
+      })}
+    </group>
   </group>;
 }
 
-function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture" | "intention">) {
+function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture">) {
   const mandala = useRef<THREE.Group>(null);
-  const counter = useRef<THREE.Group>(null);
-  const palette = useMemo<string[]>(() => colors.length ? Array.from({ length: 7 }, (_, index) => vividHexColor(pickColor(colors, index, FALLBACK_PALETTE[index] ?? GOLD_LIGHT))) : [...FALLBACK_PALETTE], [colors]);
-  const main = pickColor(palette, 0, "#F5C85B");
-  const sub = pickColor(palette, 1, "#F7A8D0");
-  const seed = useMemo(() => palette.join("").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0), [palette]);
-  const goldenSpiral = useMemo(() => Array.from({ length: 260 }, (_, index) => {
-    const [x, y] = logarithmicSpiralPoint(index, 260, 5.3, 3.5);
-    return [x, y, .23] as [number, number, number];
-  }), []);
+  const palette = useMemo<string[]>(() => Array.from({ length: 7 }, (_, i) => vividHexColor(colors.length ? pickColor(colors, i, FALLBACK_PALETTE[i]) : FALLBACK_PALETTE[i] ?? GOLD_LIGHT)), [colors]);
+  const seed = useMemo(() => palette.join("").split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0), [palette]);
+  const bump = useMemo(() => makeImpastoTexture(seed), [seed]);
+  useEffect(() => () => bump?.dispose(), [bump]);
   useFrame((state, rawDelta) => {
-    if (reduced) return;
-    const delta = Math.min(rawDelta, .05);
-    if (mandala.current) {
-      mandala.current.rotation.z += delta * .0028;
-      const breath = 1 + Math.sin(state.clock.elapsedTime * .42) * .008;
-      mandala.current.scale.setScalar(breath);
-    }
-    if (counter.current) counter.current.rotation.z -= delta * .0052;
+    if (reduced || !mandala.current) return;
+    mandala.current.rotation.z += Math.min(rawDelta, .05) * .01;
+    mandala.current.scale.setScalar(1 + Math.sin(state.clock.elapsedTime * .4) * .006);
   });
-  const ease = (value: number) => { const x = Math.min(1, Math.max(0, value)); return x * x * (3 - 2 * x); };
-  const reveal = ease(progress / 6.4);
+  const x = Math.min(1, Math.max(0, progress / 6.4));
+  const reveal = x * x * (3 - 2 * x);
   return <>
     <color attach="background" args={[COSMIC_BLACK]} />
-    <ambientLight intensity={.5} />
-    <directionalLight position={[3.5, 5.5, 8]} intensity={3.2} color={main} />
-    <directionalLight position={[-5, -2, 5]} intensity={2.2} color={sub} />
-    <AuraBackdrop palette={palette} reduced={reduced} />
-    <RayField seed={seed} color={pickColor(palette, 6)} progress={reveal} />
-    <group ref={mandala}>
-      {[5.4, 4.78, 4.18, 3.6, 3.04, 2.5, 1.98].map((radius, index) => <mesh key={`wash-${radius}`} position={[0, 0, -.48 + index * .025]} rotation-z={index * GOLDEN_ANGLE} scale={[1 + index % 2 * .025, 1 - index % 3 * .018, 1]}>
-        <ringGeometry args={[Math.max(.1, radius - .32), radius, 160]} />
-        <meshBasicMaterial color={pickColor(palette, index, main)} transparent opacity={.24 + index * .012} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
-      </mesh>)}
-      <DotField palette={palette} progress={reveal} />
-      <SacredGeometry palette={palette} progress={reveal} />
-      <Line points={goldenSpiral} color={pickColor(palette, 2, main)} lineWidth={1.75} transparent opacity={.72} />
-      <Line points={goldenSpiral.map(([x, y, z]) => [-x, y, z + .01] as [number, number, number])} color={pickColor(palette, 4, sub)} lineWidth={1.25} transparent opacity={.58} />
-      <GoldLeafField seed={seed} count={92} radius={5.28} progress={reveal} />
-      <SparkleField seed={seed} palette={palette} reduced={reduced} />
-      <group ref={counter}>
-        {[1.34, 1.06, .8].map((radius, index) => <Line key={`core-rosette-${radius}`} points={crystalRosettePoints(12 + index * 4, radius, radius * .54, index * .11, .32 + index * .02)} color={pickColor(palette, index + 3, main)} lineWidth={2.1 - index * .35} transparent opacity={.82} />)}
-      </group>
-      <mesh position-z={.26} scale={.25 + reveal * .75}><circleGeometry args={[.82, 96]} /><meshPhysicalMaterial color={main} emissive={main} emissiveIntensity={.72} roughness={.36} clearcoat={.8} transparent opacity={.84} /></mesh>
-      <mesh position-z={.34} scale={.25 + reveal * .75}><circleGeometry args={[.6, 96]} /><meshPhysicalMaterial color={main} emissive={main} emissiveIntensity={1.05} roughness={.18} clearcoat={1} clearcoatRoughness={.08} /></mesh>
-      <mesh position-z={.37} scale={.25 + reveal * .75}><ringGeometry args={[.68, .78, 96]} /><meshBasicMaterial color={pickColor(palette, 6)} transparent opacity={.9} blending={THREE.AdditiveBlending} /></mesh>
-      <pointLight color={main} intensity={4.2 * reveal} distance={7} />
+    <Environment resolution={128}>
+      <Lightformer intensity={4} position={[0, 4, 4]} scale={[6, 2, 1]} />
+      <Lightformer intensity={3} color={palette[0]} position={[-4, -2, 3]} scale={[3, 3, 1]} />
+      <Lightformer intensity={2.5} position={[4, -1, 2]} scale={[2, 5, 1]} />
+    </Environment>
+    <ambientLight intensity={.55} />
+    <directionalLight position={[-4, 5, 6]} intensity={2.6} />
+    <directionalLight position={[5, -3, 4]} intensity={.8} color={palette[0]} />
+    <Starfield seed={seed} reduced={reduced} />
+    <group ref={mandala} scale={.2 + reveal * .8}>
+      <PaintedRings palette={palette} bump={bump} />
+      <DotPaint palette={palette} bump={bump} />
+      <SacredBands palette={palette} bump={bump} />
     </group>
+    <GemCore color={pickColor(palette, 0)} reveal={reveal} reduced={reduced} />
   </>;
 }
 
 export default function MandalaScene({ onCapture, ...props }: Props) {
-  return <Canvas aria-label="7つのバースカラーによる神彩結晶の幾何学曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true, preserveDrawingBuffer: true }}>
+  return <Canvas aria-label="総合運のバースカラー曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true, preserveDrawingBuffer: true }}>
     <Mandala {...props} />
-    <CaptureBridge colors={props.colors} onCapture={onCapture} />
+    <CaptureBridge onCapture={onCapture} />
   </Canvas>;
 }
