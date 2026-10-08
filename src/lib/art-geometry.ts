@@ -60,3 +60,41 @@ export function goldLeafTransform(seed: number, index: number, radius = 1) {
     scale: .55 + seededUnit(seed + 71, index) * 1.15,
   };
 }
+
+export function regularPolygonPoints(sides: number, radius: number, phase = 0, z = 0) {
+  const safeSides = Math.max(3, Math.floor(sides));
+  return Array.from({ length: safeSides + 1 }, (_, index) => {
+    const angle = phase + index / safeSides * Math.PI * 2;
+    return [Math.cos(angle) * radius, Math.sin(angle) * radius, z] as [number, number, number];
+  });
+}
+
+export function crystalRosettePoints(petals: number, outerRadius: number, innerRadius: number, phase = 0, z = 0) {
+  const safePetals = Math.max(3, Math.floor(petals));
+  return Array.from({ length: safePetals * 2 + 1 }, (_, index) => {
+    const radius = index % 2 === 0 ? outerRadius : innerRadius;
+    const angle = phase + index / (safePetals * 2) * Math.PI * 2;
+    return [Math.cos(angle) * radius, Math.sin(angle) * radius, z] as [number, number, number];
+  });
+}
+
+export function radialRayTransform(seed: number, index: number, count: number, radius = 1) {
+  const safeCount = Math.max(1, count);
+  const angle = index / safeCount * Math.PI * 2 + (seededUnit(seed + 211, index) - .5) * .035;
+  return {
+    angle,
+    length: radius * (.76 + seededUnit(seed + 223, index) * .24),
+    width: .012 + seededUnit(seed + 227, index) * .026,
+  };
+}
+
+export function sparkleTransform(seed: number, index: number, radius = 1) {
+  const angle = seededUnit(seed + 307, index) * Math.PI * 2;
+  const distance = Math.sqrt(seededUnit(seed + 311, index)) * radius;
+  return {
+    x: Math.cos(angle) * distance,
+    y: Math.sin(angle) * distance,
+    rotation: seededUnit(seed + 313, index) * Math.PI * 2,
+    scale: .45 + seededUnit(seed + 317, index) * 1.4,
+  };
+}

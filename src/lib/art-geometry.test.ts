@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { colorsForIntention, goldLeafTransform, layeredSpiralPoint, logarithmicSpiralPoint, paletteColors } from "./art-geometry";
+import { colorsForIntention, crystalRosettePoints, goldLeafTransform, layeredSpiralPoint, logarithmicSpiralPoint, paletteColors, radialRayTransform, regularPolygonPoints, sparkleTransform } from "./art-geometry";
 import { birthColorSpectrum } from "./birth-color-spectrum";
 
 describe("birth-color mandala geometry", () => {
@@ -31,5 +31,24 @@ describe("birth-color mandala geometry", () => {
     expect(layeredSpiralPoint(12, 40, 2, 6, 5)).not.toEqual(layeredSpiralPoint(12, 40, 3, 6, 5));
     expect(goldLeafTransform(812, 9, 5)).toEqual(goldLeafTransform(812, 9, 5));
     expect(Math.hypot(goldLeafTransform(812, 9, 5).x, goldLeafTransform(812, 9, 5).y)).toBeLessThanOrEqual(5);
+  });
+
+  it("builds closed polygon and crystalline-rosette paths", () => {
+    const hexagon = regularPolygonPoints(6, 4, .2);
+    const rosette = crystalRosettePoints(8, 4, 2.2, .1);
+    expect(hexagon).toHaveLength(7);
+    expect(rosette).toHaveLength(17);
+    expect(hexagon.at(-1)?.[0]).toBeCloseTo(hexagon[0]?.[0] ?? 0);
+    expect(hexagon.at(-1)?.[1]).toBeCloseTo(hexagon[0]?.[1] ?? 0);
+    expect(rosette.at(-1)?.[0]).toBeCloseTo(rosette[0]?.[0] ?? 0);
+    expect(rosette.at(-1)?.[1]).toBeCloseTo(rosette[0]?.[1] ?? 0);
+  });
+
+  it("keeps divine-ray and sparkle placement deterministic and in bounds", () => {
+    expect(radialRayTransform(812, 4, 32, 5)).toEqual(radialRayTransform(812, 4, 32, 5));
+    expect(radialRayTransform(812, 4, 32, 5).length).toBeLessThanOrEqual(5);
+    const sparkle = sparkleTransform(812, 20, 5.5);
+    expect(sparkle).toEqual(sparkleTransform(812, 20, 5.5));
+    expect(Math.hypot(sparkle.x, sparkle.y)).toBeLessThanOrEqual(5.5);
   });
 });
