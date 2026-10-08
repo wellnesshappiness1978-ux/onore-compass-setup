@@ -309,12 +309,12 @@ function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture">) {
     <color attach="background" args={[COSMIC_BLACK]} />
     <Environment resolution={128}>
       <Lightformer intensity={4} position={[0, 4, 4]} scale={[6, 2, 1]} />
-      <Lightformer intensity={3} color={palette[0]} position={[-4, -2, 3]} scale={[3, 3, 1]} />
+      <Lightformer intensity={3} color={pickColor(palette, 0)} position={[-4, -2, 3]} scale={[3, 3, 1]} />
       <Lightformer intensity={2.5} position={[4, -1, 2]} scale={[2, 5, 1]} />
     </Environment>
     <ambientLight intensity={.55} />
     <directionalLight position={[-4, 5, 6]} intensity={2.6} />
-    <directionalLight position={[5, -3, 4]} intensity={.8} color={palette[0]} />
+    <directionalLight position={[5, -3, 4]} intensity={.8} color={pickColor(palette, 0)} />
     <Starfield seed={seed} reduced={reduced} />
     <group ref={mandala} scale={.2 + reveal * .8}>
       <PaintedRings palette={palette} bump={bump} />
