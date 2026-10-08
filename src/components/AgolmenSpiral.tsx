@@ -34,6 +34,7 @@ function SacredRadiance() {
     <span className="agolmen-aura agolmen-aura-purple" />
     <span className="agolmen-aura agolmen-aura-aqua" />
     <span className="agolmen-aura agolmen-aura-gold" />
+    {particles.slice(0, 8).map(i => <span key={`radiant-${i}`} className="agolmen-logo-particle" style={{ "--i": i } as React.CSSProperties} />)}
     {rays.map(([angle, length, thickness, opacity], index) => (
       <span
         key={angle}

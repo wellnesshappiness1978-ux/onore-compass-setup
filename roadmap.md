@@ -147,3 +147,9 @@
 - [x] Rebuild compatibility as three jargon-free stages in all seven languages.
 - [x] Add private detailed related-person profiles with editing and backward-compatible preview storage.
 - [x] Remove only the horizontal logo streak and verify the preserved aura.
+
+## Targeted top display and three-section compatibility update
+- [x] Unify the top title size across all plans without changing themes or artwork.
+- [x] Restore slowly animated radial purple/gold aura and outward light particles; preserve the logo and horizontal-streak removal.
+- [x] Update Japanese compatibility headings and approximately 500/800/300-character readings with calculated comparisons.
+- [x] Verify title size across plans, logo animation/reduced motion, and the complete compatibility input/result flow.
