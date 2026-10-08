@@ -158,4 +158,4 @@
 - [x] Restore the uncropped master-logo treatment while preserving the removed horizontal streak and radial aura.
 - [x] Match theme specimens to live colors, materials and fonts; preserve the preferred mode locally and privately for signed-in users without bypassing plan access.
 - [x] Replace the deep compatibility result with four progressively unlocked sections for Free, Standard, VIP and Business.
-- [ ] Verify logo, theme restore and all four compatibility tiers on desktop and mobile.
+- [x] Verify logo, theme restore and all four compatibility tiers on desktop and mobile.
