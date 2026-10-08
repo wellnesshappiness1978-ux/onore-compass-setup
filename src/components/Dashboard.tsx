@@ -152,6 +152,14 @@ function TorisetsuPanel({
   const score = result?.score ?? 0;
   const advice = score >= 84 ? t.advice[2] : score >= 70 ? t.advice[1] : t.advice[0];
   const today = new Date().toLocaleDateString("en-CA");
+  const sectionPlans: Plan[] = ["free", "standard", "vip", "b2b"];
+  const sectionPlanNames: Record<Plan, string> = {
+    free: language === "ja" ? "Free" : "Free",
+    standard: language === "ja" ? "Standard" : "Standard",
+    vip: "VIP",
+    b2b: language === "ja" ? "Business" : "Business",
+    "b2b-premium": language === "ja" ? "Business Premium" : "Business Premium",
+  };
   useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, profile]);
 
   return (
@@ -408,39 +416,18 @@ function TorisetsuPanel({
                 </p>
               </div>
               <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
-                <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-5"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
+                <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => {
+                  const requiredPlan = sectionPlans[i] ?? "b2b";
+                  const unlocked = planOrder.indexOf(plan) >= planOrder.indexOf(requiredPlan);
+                  return <article key={title} className="relative overflow-hidden rounded-md border border-primary/25 bg-card/50 p-5">
+                    <div className="flex items-start justify-between gap-3"><h4 className="font-serif text-lg text-primary">{title}</h4>{!unlocked && <LockKeyhole className="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />}</div>
+                    {unlocked ? <><p className="mt-2 text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</> : <div className="mt-4 rounded-md border border-primary/15 bg-background/60 p-4 text-center"><p className="text-sm text-muted-foreground">{language === "ja" ? `${sectionPlanNames[requiredPlan]}プランで全文が開放されます` : `${sectionPlanNames[requiredPlan]} plan unlocks this full reading`}</p><Button type="button" variant="outline" className="mt-3" onClick={onVip}><Crown className="size-4" aria-hidden="true" />{language === "ja" ? "プランを見る" : "View plans"}</Button></div>}
+                  </article>;
+                })}</div>
                <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
               <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
             </section>
           ) : null}
-          {plan === "free" && <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
-            <div className="select-none space-y-3 opacity-20 blur-[2px]" aria-hidden="true">
-              <div className="mx-auto h-3 w-3/4 rounded-full bg-primary/40" />
-              <div className="mx-auto h-3 w-full rounded-full bg-foreground/30" />
-              <div className="mx-auto h-3 w-5/6 rounded-full bg-foreground/30" />
-              <div className="grid grid-cols-2 gap-3 pt-5">
-                <div className="h-16 rounded-md border border-primary/20" />
-                <div className="h-16 rounded-md border border-primary/20" />
-              </div>
-            </div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/55 px-6 backdrop-blur-sm">
-              <span className="flex size-11 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
-                <LockKeyhole className="size-5" />
-              </span>
-              <h4 className="mt-3 font-serif text-lg text-foreground">{t.lockedTitle}</h4>
-              <p className="mt-2 max-w-md text-xs leading-5 text-muted-foreground">
-                {t.lockedBody}
-              </p>
-              <Button
-                variant="champagne"
-                onClick={onVip}
-                className="mt-5 min-h-10 whitespace-normal px-5"
-              >
-                <Crown className="size-4" />
-                {t.unlock}
-              </Button>
-            </div>
-          </section>}
           <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
         </div>
       )}
