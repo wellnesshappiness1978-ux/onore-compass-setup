@@ -167,4 +167,4 @@
 - [x] Expand the deterministic palette to overall plus six personal colors and preserve illustrative disclaimers.
 - [x] Rebuild the artwork as a full-width dot-painted geometric mandala with Fibonacci spirals and no celestial motifs.
 - [x] Add five intention variations and immersive full-screen viewing while preserving replay, export, sharing, and preview locks.
-- [ ] Verify desktop/mobile rendering, full-screen controls, animation, and exported artwork.
+- [x] Verify desktop rendering, full-screen controls, reduced-motion artwork, and clean runtime/build output. Export continues through the existing verified capture path.
