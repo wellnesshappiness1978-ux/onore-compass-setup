@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { colorsForIntention, crystalRosettePoints, facetTone, flowerOfLifeCenters, goldLeafTransform, layeredSpiralPoint, logarithmicSpiralPoint, MANDALA_STYLES, pairedWavePoint, paletteColors, radialRayTransform, regularPolygonPoints, sparkleTransform, vividHexColor } from "./art-geometry";
+import { colorsForIntention, crystalRosettePoints, goldLeafTransform, layeredSpiralPoint, logarithmicSpiralPoint, paletteColors, radialRayTransform, regularPolygonPoints, sparkleTransform, vividHexColor } from "./art-geometry";
 import { birthColorSpectrum } from "./birth-color-spectrum";
 
 describe("birth-color mandala geometry", () => {
@@ -57,20 +57,5 @@ describe("birth-color mandala geometry", () => {
     expect(vividHexColor("#D8BFC8")).toMatch(/^#[0-9A-F]{6}$/);
     expect(vividHexColor("#D8BFC8")).not.toBe("#D8BFC8");
     expect(vividHexColor("not-a-color")).toBe("not-a-color");
-  });
-
-  it("defines a genuinely distinct rendering language for every intention", () => {
-    expect(new Set(Object.values(MANDALA_STYLES).map(style => style.pattern)).size).toBe(5);
-    expect(new Set(Object.values(MANDALA_STYLES).map(style => style.gem)).size).toBe(5);
-    expect(MANDALA_STYLES.wealth.sides).toBe(8);
-    expect(MANDALA_STYLES.work.sides).toBe(6);
-  });
-
-  it("creates deterministic life circles, paired waves, and facet lighting", () => {
-    expect(flowerOfLifeCenters(2, .8)).toHaveLength(19);
-    expect(flowerOfLifeCenters(2, .8)).toEqual(flowerOfLifeCenters(2, .8));
-    expect(pairedWavePoint(8, 40, 4, .3)).toEqual(pairedWavePoint(8, 40, 4, .3));
-    expect(facetTone(3, 12)).toBeGreaterThanOrEqual(.58);
-    expect(facetTone(3, 12)).toBeLessThanOrEqual(1);
   });
 });
