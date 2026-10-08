@@ -230,7 +230,7 @@ function SacredBands({ palette, bump }: { palette: string[]; bump: THREE.Texture
     return [x, y] as [number, number];
   })), []);
   const golden = useMemo(() => Array.from({ length: 200 }, (_, i) => {
-    const [x, y] = logarithmicSpiralPoint(i, 200, 5.2, 3.5);
+    const [x, y] = logarithmicSpiralPoint(i, 200, 4.7, 3.5);
     return [x, y] as [number, number];
   }).slice(20), []);
   return <>

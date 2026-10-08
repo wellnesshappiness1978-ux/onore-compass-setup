@@ -182,3 +182,9 @@
 - [x] Replace pastel aura treatment with deterministic high-saturation versions of all seven birth colors.
 - [x] Adopt an intentional lacquer-black background while keeping celestial objects and stardust out of the mandala.
 - [x] Verify dense geometry, full-screen viewing, reduced motion, mobile rendering, and exported wallpaper quality.
+
+## Birth-color mandala overall masterpiece
+- [x] Remove fortune-genre switching
+- [x] Deep black backdrop with faint specks
+- [x] Opaque impasto bands, dots, golden spirals using all six birth colors
+- [x] Faceted gemstone core with halo and flares
