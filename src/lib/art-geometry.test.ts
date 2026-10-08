@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { colorsForIntention, logarithmicSpiralPoint, paletteColors } from "./art-geometry";
+import { colorsForIntention, goldLeafTransform, layeredSpiralPoint, logarithmicSpiralPoint, paletteColors } from "./art-geometry";
 import { birthColorSpectrum } from "./birth-color-spectrum";
 
 describe("birth-color mandala geometry", () => {
@@ -24,5 +24,12 @@ describe("birth-color mandala geometry", () => {
     expect(radii[0]).toBeCloseTo(0);
     expect(radii.at(-1)).toBeCloseTo(5);
     expect(radii.every((radius, index) => index === 0 || radius >= (radii[index - 1] ?? 0))).toBe(true);
+  });
+
+  it("creates repeatable layered spiral arms and gold-leaf placement", () => {
+    expect(layeredSpiralPoint(12, 40, 2, 6, 5)).toEqual(layeredSpiralPoint(12, 40, 2, 6, 5));
+    expect(layeredSpiralPoint(12, 40, 2, 6, 5)).not.toEqual(layeredSpiralPoint(12, 40, 3, 6, 5));
+    expect(goldLeafTransform(812, 9, 5)).toEqual(goldLeafTransform(812, 9, 5));
+    expect(Math.hypot(goldLeafTransform(812, 9, 5).x, goldLeafTransform(812, 9, 5).y)).toBeLessThanOrEqual(5);
   });
 });

@@ -168,3 +168,7 @@
 - [x] Rebuild the artwork as a full-width dot-painted geometric mandala with Fibonacci spirals and no celestial motifs.
 - [x] Add five intention variations and immersive full-screen viewing while preserving replay, export, sharing, and preview locks.
 - [x] Verify desktop rendering, full-screen controls, reduced-motion artwork, and clean runtime/build output. Export continues through the existing verified capture path.
+
+## Birth-color mandala oil-paint refinement
+- [x] Add procedural impasto texture, layered sacred geometry, abstract light particles, and gold-leaf shimmer while preserving the seven-color system and non-celestial identity.
+- [x] Verify desktop/mobile rendering, reduced motion, full-screen view, and exported wallpaper quality.
