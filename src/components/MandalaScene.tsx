@@ -326,7 +326,7 @@ function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture">) {
 }
 
 export default function MandalaScene({ onCapture, ...props }: Props) {
-  return <Canvas aria-label="総合運のバースカラー曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true, preserveDrawingBuffer: true }}>
+  return <Canvas flat aria-label="総合運のバースカラー曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true, preserveDrawingBuffer: true }}>
     <Mandala {...props} />
     <CaptureBridge onCapture={onCapture} />
   </Canvas>;
