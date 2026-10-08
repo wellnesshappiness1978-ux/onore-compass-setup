@@ -976,11 +976,11 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
   --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
   --design-surface: linear-gradient(135deg, oklch(0.20 0.01 270), oklch(0.13 0.01 270));
 }
-.design-canvas[data-design="aura-gold-luxe"], .theme-sample[data-design="aura-gold-luxe"] {
+.design-canvas[data-design="aura-gold-luxe"], .design-canvas[data-design="deepsea-luxe"], .design-canvas[data-design="shion-luxe"] {
   background-image: radial-gradient(circle at 50% 260px, color-mix(in oklab, var(--gold-glow) 24%, transparent), transparent 420px), linear-gradient(160deg, var(--celestial-ink), var(--background) 65%);
 }
 .design-canvas[data-tier="b2b-premium"][data-design^="business-"] .card-lux { box-shadow: 0 0 32px color-mix(in oklab, var(--primary) 22%, transparent); }
-.design-canvas[data-design="business-cosmos"], .design-canvas[data-design="business-geometry"], .design-canvas[data-design="business-zero"], .theme-sample[data-design="business-cosmos"], .theme-sample[data-design="business-geometry"], .theme-sample[data-design="business-zero"] {
+.design-canvas[data-design="business-cosmos"], .design-canvas[data-design="business-geometry"], .design-canvas[data-design="business-zero"] {
   background-image: repeating-conic-gradient(from 0deg at 50% 300px, color-mix(in oklab, var(--primary) 5%, transparent) 0deg 1deg, transparent 1deg 12deg), radial-gradient(circle at 50% 300px, color-mix(in oklab, var(--nebula) 60%, transparent), transparent 480px), var(--background);
 }
 .design-canvas[data-design="business-cosmos"] .celestial-stars, .design-canvas[data-design="business-zero"] .celestial-stars { opacity: .85; }
@@ -1078,8 +1078,10 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas[data-design="pure-white"] .text-gradient-gold, .design-canvas[data-design="pure-white"] .arts-shimmer { background-image: linear-gradient(120deg, var(--primary), var(--nebula)); }
 .design-choice--pure-white { --preview-base: oklch(.975 .006 95); --preview-accent: oklch(.42 .095 267); --preview-glint: oklch(.65 .11 85); }
 .agolmen-loading-logo, .design-heading img, .agolmen-brand-logo {
-  mask-image: radial-gradient(ellipse 53% 53% at center, black 64%, transparent 98%);
-  filter: drop-shadow(0 0 9px var(--beam-gold)) drop-shadow(0 0 22px var(--beam-purple));
+  border-radius: 50%;
+  clip-path: circle(43% at center);
+  mask-image: radial-gradient(circle at center, black 0 91%, transparent 100%);
+  filter: none;
 }
 .design-choice--pure-white .design-choice-scene { background: linear-gradient(135deg, var(--preview-base), color-mix(in oklab, var(--preview-accent) 12%, var(--preview-base))); color: var(--preview-accent); }
 .design-choice--pure-white .design-choice-palette span:nth-child(1) { background: var(--preview-base); }
@@ -1116,14 +1118,14 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas[data-tier="b2b-premium"] .design-header { background-image: radial-gradient(ellipse at 20% 40%, color-mix(in oklab, var(--nebula) 38%, transparent), transparent 65%), radial-gradient(ellipse at 80% 20%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 60%); }
 @keyframes premium-stars { to { transform: translateY(-32px) scale(1.035); opacity: 1; } }
 .design-canvas[data-tier="b2b-premium"] .design-main .bg-primary { box-shadow: 0 0 30px color-mix(in oklab, var(--primary) 48%, transparent), inset 0 1px 0 var(--gold-glow); }
-.agolmen-brand-logo, .agolmen-loading-logo { mask-image: radial-gradient(ellipse 53% 53% at center, black 64%, transparent 98%); filter: drop-shadow(0 0 9px var(--beam-gold)) drop-shadow(0 0 22px var(--beam-purple)); }
+.agolmen-brand-logo, .agolmen-loading-logo { border-radius: 50%; clip-path: circle(43% at center); mask-image: radial-gradient(circle at center, black 0 91%, transparent 100%); filter: none; }
 .design-heading { background-image: radial-gradient(ellipse 130px 95px at 50% 48px, color-mix(in oklab, var(--rose-glow) 17%, transparent), transparent 90%), radial-gradient(ellipse 180px 120px at 50% 48px, color-mix(in oklab, var(--amethyst) 18%, transparent), transparent 95%); }
 .agolmen-loading-art { background-image: radial-gradient(circle, color-mix(in oklab, var(--beam-gold) 22%, transparent), color-mix(in oklab, var(--beam-purple) 20%, transparent) 45%, transparent 72%); }
 
 /* Screen specimens deliberately inherit precisely the dashboard's palette variables. */
 .theme-choice { border-color: color-mix(in oklab, var(--primary) 25%, var(--border)); background: var(--card); }
 .theme-choice:hover { border-color: var(--primary); }
-.theme-sample { position: relative; isolation: isolate; width: 100%; height: 154px; overflow: hidden; padding: 8px 10px; color: var(--foreground); background: var(--background); font-family: var(--design-font-body, "Noto Sans JP", sans-serif); border-bottom: 1px solid color-mix(in oklab, var(--primary) 36%, transparent); }
+.theme-sample { position: relative; isolation: isolate; width: 100%; height: 154px; overflow: hidden; padding: 8px 10px; color: var(--foreground); background: var(--background); font-family: "Karla", "Noto Sans JP", sans-serif; border-bottom: 1px solid color-mix(in oklab, var(--primary) 36%, transparent); }
 .theme-sample-sky { position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(ellipse at 70% 5%, color-mix(in oklab, var(--nebula) 50%, transparent), transparent 72%), var(--design-texture); }
 .theme-sample-sky::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle, var(--gold-glow) 1px, transparent 1.5px); background-size: 37px 39px; opacity: .3; }
 .theme-sample-top { position: relative; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid color-mix(in oklab, var(--primary) 45%, transparent); padding-bottom: 3px; color: var(--primary); font-family: "Cormorant Garamond", serif; font-size: 10px; }
@@ -1156,45 +1158,3 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .theme-sample--large .theme-sample-actions > span:not(.theme-sample-cta) { width: 40px; height: 32px; }
 .theme-preview-dialog { border-radius: 6px; }
 @media (prefers-reduced-motion: reduce) { .design-canvas[data-design="masculine-luxe"]::before, .design-canvas[data-tier="b2b-premium"] .celestial-stars, .theme-sample-sky { animation: none !important; } }
-
-/* 2026 tier signatures: all 15 retained modes share one escalating material system. */
-.design-canvas[data-tier="free"], .theme-sample[data-tier="free"] {
-  --design-font-body: "Noto Sans JP", sans-serif; --design-font-heading: "Noto Sans JP", sans-serif;
-  --background: oklch(.145 .045 250); --card: oklch(.205 .047 247); --foreground: oklch(.95 .018 205);
-  --primary: oklch(.82 .14 202); --gold-glow: oklch(.91 .08 201); --gold-deep: oklch(.63 .12 205); --nebula: oklch(.40 .11 230);
-  --design-texture: radial-gradient(circle at 50% 8%, color-mix(in oklab, var(--primary) 15%, transparent), transparent 42%);
-}
-.design-canvas[data-tier="standard"], .theme-sample[data-tier="standard"] {
-  --design-font-body: "Karla", "Noto Sans JP", sans-serif; --design-font-heading: "Noto Serif JP", serif;
-  --background: oklch(.115 .052 242); --card: oklch(.19 .06 235); --foreground: oklch(.97 .018 175);
-  --primary: oklch(.79 .15 165); --gold-glow: oklch(.92 .07 190); --gold-deep: oklch(.60 .14 225); --nebula: oklch(.39 .15 240);
-  --design-texture: linear-gradient(135deg, transparent 0 45%, color-mix(in oklab, var(--primary) 11%, transparent) 46% 47%, transparent 48%), radial-gradient(ellipse at 18% 7%, color-mix(in oklab, var(--gold-glow) 22%, transparent), transparent 47%);
-}
-.design-canvas[data-tier="vip"], .theme-sample[data-tier="vip"] {
-  --design-font-body: "Karla", "Noto Sans JP", sans-serif; --design-font-heading: "Cormorant Garamond", "Noto Serif JP", serif;
-  --background: oklch(.075 .018 300); --card: oklch(.145 .042 300); --foreground: oklch(.965 .016 88);
-  --primary: oklch(.86 .15 88); --gold-glow: oklch(.97 .075 94); --gold-deep: oklch(.66 .14 80); --nebula: oklch(.37 .17 307);
-  --design-texture: repeating-conic-gradient(from 10deg at 50% 17rem, color-mix(in oklab, var(--primary) 7%, transparent) 0deg 1deg, transparent 1deg 18deg), radial-gradient(circle at 50% 17rem, color-mix(in oklab, var(--nebula) 40%, transparent), transparent 29rem);
-}
-.design-canvas[data-tier="b2b"], .theme-sample[data-tier="b2b"] {
-  --design-font-body: "Karla", "Noto Sans JP", sans-serif; --design-font-heading: "Cinzel", "Noto Serif JP", serif;
-  --background: oklch(.085 .038 275); --card: oklch(.16 .043 273); --foreground: oklch(.975 .012 95);
-  --primary: oklch(.89 .105 87); --gold-glow: oklch(.98 .04 95); --gold-deep: oklch(.69 .10 82); --nebula: oklch(.38 .14 292);
-  --design-texture: radial-gradient(ellipse at 18% 12%, color-mix(in oklab, var(--nebula) 48%, transparent), transparent 42%), radial-gradient(ellipse at 84% 38%, color-mix(in oklab, var(--primary) 17%, transparent), transparent 50%);
-}
-.design-canvas[data-tier="b2b-premium"], .theme-sample[data-tier="b2b-premium"] {
-  --design-font-body: "Karla", "Noto Sans JP", sans-serif; --design-font-heading: "Cinzel", "Noto Serif JP", serif;
-  --background: oklch(.07 .025 270); --card: oklch(.145 .034 270); --foreground: oklch(.985 .008 95);
-  --primary: oklch(.93 .065 93); --gold-glow: oklch(.99 .025 98); --gold-deep: oklch(.74 .09 84); --nebula: oklch(.44 .15 300);
-  --design-texture: repeating-conic-gradient(from 0deg at 50% 17rem, color-mix(in oklab, var(--gold-glow) 8%, transparent) 0deg .7deg, transparent .7deg 12deg), radial-gradient(ellipse at 50% 17rem, color-mix(in oklab, var(--nebula) 55%, transparent), transparent 31rem);
-}
-.design-canvas[data-tier="standard"]::before { animation: crystal-refraction 12s ease-in-out infinite alternate; }
-.design-canvas[data-tier="vip"] .card-lux { border-color: color-mix(in oklab, var(--primary) 65%, transparent); box-shadow: inset 0 1px var(--gold-glow), 0 0 28px color-mix(in oklab, var(--primary) 22%, transparent); }
-.design-canvas:where([data-tier="b2b"],[data-tier="b2b-premium"]) .card-lux { border: 1px solid var(--gold-glow); outline: 1px solid color-mix(in oklab, var(--nebula) 48%, transparent); outline-offset: -5px; box-shadow: inset 0 0 24px color-mix(in oklab, var(--gold-glow) 8%, transparent), 0 20px 50px color-mix(in oklab, var(--background) 85%, transparent); }
-.design-canvas[data-tier="b2b-premium"]::before { animation: premium-material-drift 20s ease-in-out infinite alternate; }
-.theme-sample[data-tier="standard"] .theme-sample-sky { animation: crystal-refraction 9s ease-in-out infinite alternate; }
-.theme-sample[data-tier="vip"] .theme-sample-body { box-shadow: inset 0 0 13px color-mix(in oklab, var(--primary) 24%, transparent), 0 0 14px color-mix(in oklab, var(--primary) 28%, transparent); }
-.theme-sample:where([data-tier="b2b"],[data-tier="b2b-premium"]) .theme-sample-body { outline: 1px solid color-mix(in oklab, var(--gold-glow) 48%, transparent); outline-offset: -4px; }
-@keyframes crystal-refraction { from { opacity: .72; filter: brightness(.92); } to { opacity: 1; filter: brightness(1.15); } }
-@keyframes premium-material-drift { from { transform: translateY(0) rotate(0); opacity: .72; } to { transform: translateY(-22px) rotate(.6deg); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .design-canvas[data-tier="standard"]::before, .design-canvas[data-tier="b2b-premium"]::before, .theme-sample[data-tier="standard"] .theme-sample-sky { animation: none !important; } }
