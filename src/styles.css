@@ -1116,7 +1116,7 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas[data-tier="b2b-premium"] .design-header { background-image: radial-gradient(ellipse at 20% 40%, color-mix(in oklab, var(--nebula) 38%, transparent), transparent 65%), radial-gradient(ellipse at 80% 20%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 60%); }
 @keyframes premium-stars { to { transform: translateY(-32px) scale(1.035); opacity: 1; } }
 .design-canvas[data-tier="b2b-premium"] .design-main .bg-primary { box-shadow: 0 0 30px color-mix(in oklab, var(--primary) 48%, transparent), inset 0 1px 0 var(--gold-glow); }
-.agolmen-brand-logo, .agolmen-loading-logo { border-radius: 50%; clip-path: circle(49% at center); mask-image: radial-gradient(circle at center, black 0 88%, transparent 100%); filter: none; }
+.agolmen-brand-logo, .agolmen-loading-logo { border-radius: 50%; clip-path: circle(43% at center); mask-image: radial-gradient(circle at center, black 0 91%, transparent 100%); filter: none; }
 .design-heading { background-image: radial-gradient(ellipse 130px 95px at 50% 48px, color-mix(in oklab, var(--rose-glow) 17%, transparent), transparent 90%), radial-gradient(ellipse 180px 120px at 50% 48px, color-mix(in oklab, var(--amethyst) 18%, transparent), transparent 95%); }
 .agolmen-loading-art { background-image: radial-gradient(circle, color-mix(in oklab, var(--beam-gold) 22%, transparent), color-mix(in oklab, var(--beam-purple) 20%, transparent) 45%, transparent 72%); }
 
