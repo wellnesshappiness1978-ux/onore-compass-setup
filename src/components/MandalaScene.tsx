@@ -2,10 +2,10 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Line } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { GOLDEN_ANGLE, seededUnit, spiralPoint } from "@/lib/art-geometry";
+import { GOLDEN_ANGLE, colorsForIntention, logarithmicSpiralPoint, seededUnit, spiralPoint, type MandalaIntention } from "@/lib/art-geometry";
 
 export type Capture = () => Promise<{ blob: Blob; width: number; height: number }>;
-type Props = { colors: string[]; element: string; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
+type Props = { colors: string[]; intention: MandalaIntention; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
 
 function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
   const { gl, scene, camera } = useThree();
@@ -49,18 +49,22 @@ function CaptureBridge({ onCapture }: { onCapture: Props["onCapture"] }) {
   return null;
 }
 
-function Mandala({ colors, element, progress, reduced }: Omit<Props, "onCapture">) {
+function DotRing({ count, radius, dot, colors, offset = 0, opacity = .9 }: { count: number; radius: number; dot: number; colors: string[]; offset?: number; opacity?: number }) {
+  return <group>{Array.from({ length: count }, (_, i) => {
+    const angle = i / count * Math.PI * 2 + offset;
+    const pulse = i % 6 === 0 ? 1.45 : i % 3 === 0 ? 1.18 : 1;
+    return <mesh key={i} position={[Math.cos(angle) * radius, Math.sin(angle) * radius, .02]}><circleGeometry args={[dot * pulse, 10]} /><meshBasicMaterial color={colors[i % colors.length]} transparent opacity={opacity} blending={THREE.AdditiveBlending} /></mesh>;
+  })}</group>;
+}
+
+function Mandala({ colors, intention, progress, reduced }: Omit<Props, "onCapture">) {
   const aura = useRef<THREE.Points>(null);
   const mandala = useRef<THREE.Group>(null);
   const main = colors[0] ?? "#D4AF37";
   const sub = colors[1] ?? "#F3E5AB";
   const seed = useMemo(() => colors.join("").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0), [colors]);
-  const palette = colors.length > 0 ? colors.slice(0, 6) : ["#D4AF37"];
-  const shell = useMemo(() => Array.from({ length: 240 }, (_, i) => {
-    const angle = i * .09;
-    const radius = .075 * Math.exp(.155 * angle);
-    return [Math.cos(angle) * radius - .34, Math.sin(angle) * radius * .84, .18] as [number, number, number];
-  }), []);
+  const palette = useMemo(() => colorsForIntention(colors.length > 0 ? colors.slice(0, 7) : ["#D4AF37"], intention), [colors, intention]);
+  const spiral = useMemo(() => Array.from({ length: 320 }, (_, i) => { const [x, y] = logarithmicSpiralPoint(i, 320, 5.25, 3.35); return [x, y, .16] as [number, number, number]; }), []);
   const particles = useMemo(() => {
     const count = 1440;
     const pts = new Float32Array(count * 3);
@@ -68,7 +72,7 @@ function Mandala({ colors, element, progress, reduced }: Omit<Props, "onCapture"
       const [x, y] = spiralPoint(i, count, 5.35);
       pts[i * 3] = x;
       pts[i * 3 + 1] = y;
-      pts[i * 3 + 2] = (seededUnit(seed, i) - .5) * .45;
+      pts[i * 3 + 2] = (seededUnit(seed, i) - .5) * .12;
     }
     return pts;
   }, [seed]);
@@ -86,7 +90,7 @@ function Mandala({ colors, element, progress, reduced }: Omit<Props, "onCapture"
   const ring = ease((progress - 1.8) / 2.6);
   const flower = ease((progress - 4.4) / 2.6);
   return <>
-    <color attach="background" args={["#15101f"]} />
+    <color attach="background" args={["#09080d"]} />
     <ambientLight intensity={1.8} />
     <directionalLight position={[3, 5, 8]} intensity={2.2} color={main} />
     <pointLight position={[-4, -2, 4]} intensity={2.6} color={sub} />
@@ -99,63 +103,23 @@ function Mandala({ colors, element, progress, reduced }: Omit<Props, "onCapture"
         <bufferGeometry><bufferAttribute attach="attributes-position" args={[particles, 3]} /></bufferGeometry>
         <pointsMaterial color={sub} size={.009} transparent opacity={.42} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
       </points>
-      {Array.from({ length: 5 }, (_, i) => <mesh key={`element-${i}`} scale={ring} rotation={[.15 * i, .12 * i, i * .19]}>
-        <torusGeometry args={[2.7 + i * .32, .008 + (i === 0 ? .014 : 0), 6, 128]} />
-        <meshBasicMaterial color={palette[(i + 1) % palette.length] ?? main} transparent opacity={element === ["木", "火", "土", "金", "水"][i] ? .9 : .37} />
-      </mesh>)}
-      {Array.from({ length: 8 }, (_, i) => <mesh key={`facet-${i}`} rotation-z={i * Math.PI / 4 + (1 - ring) * .3} scale={.08 + ring * .92}>
-        <torusGeometry args={[3.16 + i % 2 * .14, .005, 3, 8]} />
-        <meshBasicMaterial color={palette[(i + 2) % palette.length] ?? main} transparent opacity={i % 2 ? .28 : .44} />
-      </mesh>)}
-      {Array.from({ length: 36 }, (_, i) => <group key={`ray-${i}`} rotation-z={i * Math.PI / 18} scale={.1 + flower * .9}>
-        <mesh position={[0, 3.98, -.12]}><boxGeometry args={[.012, i % 3 === 0 ? .34 : .16, .01]} /><meshBasicMaterial color={palette[i % palette.length] ?? main} transparent opacity={i % 3 ? .45 : .8} /></mesh>
-        {i % 3 === 0 && <mesh position={[0, 4.29, -.12]} rotation-z={Math.PI / 4}><planeGeometry args={[.065, .065]} /><meshBasicMaterial color={palette[(i + 3) % palette.length] ?? main} transparent opacity={.88} side={THREE.DoubleSide} /></mesh>}
+      {Array.from({ length: 48 }, (_, i) => <group key={`petal-${i}`} rotation-z={i * Math.PI / 24} scale={.08 + flower * .92}>
+        <mesh position={[0, 3.34, -.12]} scale={[.42, 1.48, 1]}><torusGeometry args={[.64, .009, 5, 80]} /><meshBasicMaterial color={palette[(i + 2) % palette.length] ?? main} transparent opacity={i % 2 ? .33 : .61} blending={THREE.AdditiveBlending} /></mesh>
+        <mesh position={[0, 4.08, -.1]} scale={[.3, .78, 1]}><torusGeometry args={[.42, .008, 5, 56]} /><meshBasicMaterial color={palette[(i + 4) % palette.length] ?? sub} transparent opacity={.55} /></mesh>
       </group>)}
-      {Array.from({ length: 24 }, (_, i) => <group key={`petal-${i}`} rotation-z={i * Math.PI / 12} scale={.1 + flower * .9}>
-        <mesh position={[0, 2.65, -.17]} scale={[.5, 1.15, 1]}><torusGeometry args={[.48, .009, 5, 64]} /><meshBasicMaterial color={colors[i % colors.length] ?? main} transparent opacity={.58} blending={THREE.AdditiveBlending} /></mesh>
-        <mesh position={[0, 3.12, -.15]} rotation-z={Math.PI / 4}><octahedronGeometry args={[.075]} /><meshBasicMaterial color={colors[(i + 1) % colors.length] ?? sub} transparent opacity={.82} /></mesh>
-      </group>)}
-      {Array.from({ length: 12 }, (_, i) => <group key={`inner-${i}`} rotation-z={i * Math.PI / 6} scale={.1 + flower * .9}>
-        <mesh position={[0, 1.55, -.16]} scale={[.38, 1, 1]}><torusGeometry args={[.56, .012, 5, 64]} /><meshBasicMaterial color={palette[i % palette.length] ?? main} transparent opacity={.7} /></mesh>
-      </group>)}
-      {Array.from({ length: 19 }, (_, i) => {
-        const outer = i >= 7;
-        const n = outer ? 12 : 6;
-        const k = outer ? i - 7 : i - 1;
-        const a = (k / n) * Math.PI * 2;
-        const radius = outer ? 2.03 : 1.03;
-        return <mesh key={`flower-${i}`} position={i === 0 ? [0, 0, -.23] : [Math.cos(a) * radius, Math.sin(a) * radius, -.23]} scale={.1 + flower * .9}>
-          <torusGeometry args={[outer ? 1.05 : 1.03, outer ? .008 : .012, 5, 96]} />
-          <meshBasicMaterial color={palette[i % palette.length] ?? main} transparent opacity={outer ? .38 : .7} side={THREE.DoubleSide} />
-        </mesh>;
-      })}
-      {Array.from({ length: 3 }, (_, i) => <mesh key={`oct-${i}`} rotation-z={i * Math.PI / 12} scale={.1 + flower * .9}>
-        <torusGeometry args={[3.7 + i * .12, .014, 5, 8]} />
-        <meshBasicMaterial color={palette[(i + 4) % palette.length] ?? main} transparent opacity={.7} />
-      </mesh>)}
-      {Array.from({ length: 89 }, (_, i) => { const angle = i * GOLDEN_ANGLE; const radius = .16 * Math.sqrt(i) * flower; return <mesh key={`golden-${i}`} position={[Math.cos(angle) * radius, Math.sin(angle) * radius, .08 + i * .001]} scale={.15 + flower * .85}><sphereGeometry args={[.018 + (i % 8 === 0 ? .015 : 0), 8, 8]} /><meshBasicMaterial color={palette[i % palette.length] ?? main} transparent opacity={.35 + (i % 5) * .1} blending={THREE.AdditiveBlending} /></mesh>; })}
-      <group scale={.18 + flower * .82} rotation-z={-.48}><Line points={shell} color={palette[4 % palette.length] ?? main} lineWidth={1.05} transparent opacity={.22} /><Line points={shell.map(([x, y, z]) => [x * 1.035, y * 1.035, z + .01] as [number, number, number])} color={palette[2 % palette.length] ?? sub} lineWidth={.45} transparent opacity={.32} /></group>
-      <mesh scale={.55 + flower * .3}><icosahedronGeometry args={[.86, 3]} /><meshPhysicalMaterial color={main} metalness={.6} roughness={.15} emissive={main} emissiveIntensity={.3} clearcoat={1} /></mesh>
-      <pointLight color={main} intensity={5 * flower} distance={8} />
-      <mesh scale={1.1 + flower * .25}><torusGeometry args={[.85, .025, 8, 96]} /><meshBasicMaterial color={main} /></mesh>
-      {Array.from({ length: 6 }, (_, ringIndex) => {
-        const count = 6 + ringIndex * 6;
-        const radius = .75 + ringIndex * .58;
-        return <group key={`color-ring-${ringIndex}`} scale={.1 + flower * .9}>{Array.from({ length: count }, (_, i) => {
-          const angle = i / count * Math.PI * 2 + ringIndex * GOLDEN_ANGLE;
-          const color = colors[(i + ringIndex) % colors.length] ?? main;
-          const point: [number, number, number] = [Math.cos(angle) * radius, Math.sin(angle) * radius, -.05 + ringIndex * .015];
-          const nextAngle = (i + 1) / count * Math.PI * 2 + ringIndex * GOLDEN_ANGLE;
-          const next: [number, number, number] = [Math.cos(nextAngle) * radius, Math.sin(nextAngle) * radius, -.05 + ringIndex * .015];
-          return <group key={i}><Line points={[point, next]} color={color} lineWidth={.7} transparent opacity={.48} /><mesh position={point} rotation-z={angle}><circleGeometry args={[.045 + ringIndex * .006, 6]} /><meshBasicMaterial color={color} transparent opacity={.82} /></mesh></group>;
-        })}</group>;
-      })}
+      {Array.from({ length: 24 }, (_, i) => <group key={`inner-${i}`} rotation-z={i * Math.PI / 12} scale={.1 + flower * .9}><mesh position={[0, 1.85, -.16]} scale={[.38, 1.18, 1]}><torusGeometry args={[.59, .011, 5, 72]} /><meshBasicMaterial color={palette[i % palette.length] ?? main} transparent opacity={.68} /></mesh></group>)}
+      {Array.from({ length: 233 }, (_, i) => { const angle = i * GOLDEN_ANGLE; const radius = .115 * Math.sqrt(i) * flower; return <mesh key={`golden-${i}`} position={[Math.cos(angle) * radius, Math.sin(angle) * radius, .08]}><circleGeometry args={[.016 + (i % 13 === 0 ? .019 : 0), 8]} /><meshBasicMaterial color={palette[i % palette.length] ?? main} transparent opacity={.45 + (i % 4) * .12} blending={THREE.AdditiveBlending} /></mesh>; })}
+      <group scale={.12 + flower * .88}><Line points={spiral} color={palette[2] ?? main} lineWidth={1} transparent opacity={.42} /><Line points={spiral.map(([x, y, z]) => [-x, y, z + .01] as [number, number, number])} color={palette[4] ?? sub} lineWidth={.7} transparent opacity={.34} /></group>
+      {[.82, 1.18, 1.55, 2.38, 2.82, 3.78, 4.72].map((radius, index) => <DotRing key={radius} count={24 + index * 12} radius={radius} dot={.032 - index * .0017} colors={palette} offset={index * GOLDEN_ANGLE} opacity={.94 - index * .06} />)}
+      <mesh scale={.16 + flower * .84}><circleGeometry args={[.52, 64]} /><meshBasicMaterial color={main} transparent opacity={.96} blending={THREE.AdditiveBlending} /></mesh>
+      <mesh scale={.2 + flower * .8}><ringGeometry args={[.54, .68, 72]} /><meshBasicMaterial color={sub} transparent opacity={.86} blending={THREE.AdditiveBlending} /></mesh>
+      <pointLight color={main} intensity={3.4 * flower} distance={5} />
     </group>
   </>;
 }
 
 export default function MandalaScene({ onCapture, ...props }: Props) {
-  return <Canvas aria-label="6つのバースカラーによる光の幾何学曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
+  return <Canvas aria-label="7つのバースカラーによる光の幾何学曼陀羅" camera={{ position: [0, 0, 12], fov: 55 }} dpr={[1, 1.5]} gl={{ antialias: true }}>
     <Mandala {...props} />
     <CaptureBridge onCapture={onCapture} />
   </Canvas>;
