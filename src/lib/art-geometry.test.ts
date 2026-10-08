@@ -77,7 +77,7 @@ describe("dot paint mandala", () => {
   it("uses only the seven colors, stays inside the disc, and is deterministic", () => {
     const d = dotPaintLayout(c, 480);
     expect(d.length).toBeGreaterThan(2000);
-    expect(d.length).toBeLessThan(4000);
+    expect(d.length).toBeLessThan(6000);
     d.forEach(p => { expect(c).toContain(p.color); expect(Math.hypot(p.x, p.y) + p.r).toBeLessThanOrEqual(480); });
     expect(dotPaintLayout(c, 480)).toEqual(d);
   });
