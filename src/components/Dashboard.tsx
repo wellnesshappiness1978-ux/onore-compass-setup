@@ -42,6 +42,7 @@ import { quickUsageKey } from "@/lib/quick-compatibility";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
+import { readMyDesignMode, saveMyDesignMode } from "@/lib/profile-storage.functions";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
@@ -476,7 +477,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const applyDevOverride = (next: Plan) => {
     selectPlan(next);
     setPreviewPlan(next);
-    if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
   };
   const actualPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : serverPlan;
   // Test preview only: plan cards switch the plan and jump to the newly unlocked feature.
@@ -502,10 +502,29 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     return () => { active = false; };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
-  useEffect(() => { try { const saved = sessionStorage.getItem("onore-design"); if (saved && designCopy.ja.names[saved as DesignMode] && canPreviewDesign(previewPlan, saved as DesignMode)) setDesignMode(saved as DesignMode); } catch { /* private browsing */ } }, []);
-  useEffect(() => { try { sessionStorage.setItem("onore-design", designMode); } catch { /* private browsing */ } }, [designMode]);
+  const readDesignMode = useServerFn(readMyDesignMode);
+  const saveDesignMode = useServerFn(saveMyDesignMode);
+  const designLoaded = useRef(false);
+  useEffect(() => {
+    let active = true;
+    const restore = async () => {
+      let stored: string | null = null;
+      try { stored = localStorage.getItem("onore-design"); } catch { /* private browsing */ }
+      if (signedIn) {
+        try { stored = (await readDesignMode()) ?? stored; } catch { /* Keep the device preference if cloud sync is unavailable. */ }
+      }
+      if (active && stored && designCopy.ja.names[stored as DesignMode]) setDesignMode(stored as DesignMode);
+      designLoaded.current = true;
+    };
+    void restore();
+    return () => { active = false; };
+  }, [signedIn, readDesignMode]);
+  useEffect(() => {
+    if (!designLoaded.current) return;
+    try { localStorage.setItem("onore-design", designMode); } catch { /* private browsing */ }
+    if (signedIn) void saveDesignMode({ data: designMode }).catch(() => undefined);
+  }, [designMode, signedIn, saveDesignMode]);
   const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
-  useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   
   

@@ -976,11 +976,11 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
   --design-line: color-mix(in oklab, var(--primary) 42%, transparent);
   --design-surface: linear-gradient(135deg, oklch(0.20 0.01 270), oklch(0.13 0.01 270));
 }
-.design-canvas[data-design="aura-gold-luxe"], .design-canvas[data-design="deepsea-luxe"], .design-canvas[data-design="shion-luxe"] {
+.design-canvas[data-design="aura-gold-luxe"], .theme-sample[data-design="aura-gold-luxe"] {
   background-image: radial-gradient(circle at 50% 260px, color-mix(in oklab, var(--gold-glow) 24%, transparent), transparent 420px), linear-gradient(160deg, var(--celestial-ink), var(--background) 65%);
 }
 .design-canvas[data-tier="b2b-premium"][data-design^="business-"] .card-lux { box-shadow: 0 0 32px color-mix(in oklab, var(--primary) 22%, transparent); }
-.design-canvas[data-design="business-cosmos"], .design-canvas[data-design="business-geometry"], .design-canvas[data-design="business-zero"] {
+.design-canvas[data-design="business-cosmos"], .design-canvas[data-design="business-geometry"], .design-canvas[data-design="business-zero"], .theme-sample[data-design="business-cosmos"], .theme-sample[data-design="business-geometry"], .theme-sample[data-design="business-zero"] {
   background-image: repeating-conic-gradient(from 0deg at 50% 300px, color-mix(in oklab, var(--primary) 5%, transparent) 0deg 1deg, transparent 1deg 12deg), radial-gradient(circle at 50% 300px, color-mix(in oklab, var(--nebula) 60%, transparent), transparent 480px), var(--background);
 }
 .design-canvas[data-design="business-cosmos"] .celestial-stars, .design-canvas[data-design="business-zero"] .celestial-stars { opacity: .85; }
@@ -1078,10 +1078,8 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas[data-design="pure-white"] .text-gradient-gold, .design-canvas[data-design="pure-white"] .arts-shimmer { background-image: linear-gradient(120deg, var(--primary), var(--nebula)); }
 .design-choice--pure-white { --preview-base: oklch(.975 .006 95); --preview-accent: oklch(.42 .095 267); --preview-glint: oklch(.65 .11 85); }
 .agolmen-loading-logo, .design-heading img, .agolmen-brand-logo {
-  border-radius: 50%;
-  clip-path: circle(43% at center);
-  mask-image: radial-gradient(circle at center, black 0 91%, transparent 100%);
-  filter: none;
+  mask-image: radial-gradient(ellipse 53% 53% at center, black 64%, transparent 98%);
+  filter: drop-shadow(0 0 9px var(--beam-gold)) drop-shadow(0 0 22px var(--beam-purple));
 }
 .design-choice--pure-white .design-choice-scene { background: linear-gradient(135deg, var(--preview-base), color-mix(in oklab, var(--preview-accent) 12%, var(--preview-base))); color: var(--preview-accent); }
 .design-choice--pure-white .design-choice-palette span:nth-child(1) { background: var(--preview-base); }
@@ -1118,14 +1116,14 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas[data-tier="b2b-premium"] .design-header { background-image: radial-gradient(ellipse at 20% 40%, color-mix(in oklab, var(--nebula) 38%, transparent), transparent 65%), radial-gradient(ellipse at 80% 20%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 60%); }
 @keyframes premium-stars { to { transform: translateY(-32px) scale(1.035); opacity: 1; } }
 .design-canvas[data-tier="b2b-premium"] .design-main .bg-primary { box-shadow: 0 0 30px color-mix(in oklab, var(--primary) 48%, transparent), inset 0 1px 0 var(--gold-glow); }
-.agolmen-brand-logo, .agolmen-loading-logo { border-radius: 50%; clip-path: circle(43% at center); mask-image: radial-gradient(circle at center, black 0 91%, transparent 100%); filter: none; }
+.agolmen-brand-logo, .agolmen-loading-logo { mask-image: radial-gradient(ellipse 53% 53% at center, black 64%, transparent 98%); filter: drop-shadow(0 0 9px var(--beam-gold)) drop-shadow(0 0 22px var(--beam-purple)); }
 .design-heading { background-image: radial-gradient(ellipse 130px 95px at 50% 48px, color-mix(in oklab, var(--rose-glow) 17%, transparent), transparent 90%), radial-gradient(ellipse 180px 120px at 50% 48px, color-mix(in oklab, var(--amethyst) 18%, transparent), transparent 95%); }
 .agolmen-loading-art { background-image: radial-gradient(circle, color-mix(in oklab, var(--beam-gold) 22%, transparent), color-mix(in oklab, var(--beam-purple) 20%, transparent) 45%, transparent 72%); }
 
 /* Screen specimens deliberately inherit precisely the dashboard's palette variables. */
 .theme-choice { border-color: color-mix(in oklab, var(--primary) 25%, var(--border)); background: var(--card); }
 .theme-choice:hover { border-color: var(--primary); }
-.theme-sample { position: relative; isolation: isolate; width: 100%; height: 154px; overflow: hidden; padding: 8px 10px; color: var(--foreground); background: var(--background); font-family: "Karla", "Noto Sans JP", sans-serif; border-bottom: 1px solid color-mix(in oklab, var(--primary) 36%, transparent); }
+.theme-sample { position: relative; isolation: isolate; width: 100%; height: 154px; overflow: hidden; padding: 8px 10px; color: var(--foreground); background: var(--background); font-family: var(--design-font-body, "Noto Sans JP", sans-serif); border-bottom: 1px solid color-mix(in oklab, var(--primary) 36%, transparent); }
 .theme-sample-sky { position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(ellipse at 70% 5%, color-mix(in oklab, var(--nebula) 50%, transparent), transparent 72%), var(--design-texture); }
 .theme-sample-sky::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle, var(--gold-glow) 1px, transparent 1.5px); background-size: 37px 39px; opacity: .3; }
 .theme-sample-top { position: relative; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid color-mix(in oklab, var(--primary) 45%, transparent); padding-bottom: 3px; color: var(--primary); font-family: "Cormorant Garamond", serif; font-size: 10px; }

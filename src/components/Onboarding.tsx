@@ -134,7 +134,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
       <div className="relative z-10 w-full max-w-md">
         {/* Brand */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex size-20 items-center justify-center text-primary">
+          <div className="shadow-champagne mx-auto mb-4 flex size-20 items-center justify-center text-primary">
             <AgolmenLogo className="size-20 object-contain" />
           </div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary/90">
