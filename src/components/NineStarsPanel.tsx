@@ -1,16 +1,15 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { Copy, Crown, Download, LockKeyhole, Play, Share2 } from "lucide-react";
+import { Copy, Crown, Download, Expand, LockKeyhole, Play, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { natalSky } from "@/lib/natal-sky";
-import { computeCoreLayers } from "@/lib/ai/core-layers";
 import { nineStarsTranslations } from "@/lib/nine-stars-translations";
 import { getArtSymbols, NineStarsArtwork, zodiacGlyphs } from "./NineStarsArtwork";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import type { Capture } from "./MandalaScene";
 import CosmicAlchemyArtwork from "./CosmicAlchemyArtwork";
-import { paletteColors } from "@/lib/art-geometry";
+import { colorsForIntention, paletteColors, type MandalaIntention } from "@/lib/art-geometry";
 import { AgolmenLoading } from "./AgolmenSpiral";
 import { nineStarProfile } from "@/lib/calendar-traditions";
 import { artSpecialistCopy } from "@/lib/art-specialist-copy";
@@ -27,7 +26,6 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
   const palette = birthColorSpectrum(profile);
   const sky = natalSky(birthDate, profile.birthTime, profile.birthTimeUnknown);
   const nine = nineStarProfile(birthDate, profile.birthTime, profile.birthTimeUnknown, profile.gender);
-  const element = computeCoreLayers(profile)?.shichu.dayElement ?? "木";
   const symbols = getArtSymbols(birthDate);
   const [art, setArt] = useState<"mandala" | "cosmic">("mandala");
   const [progress, setProgress] = useState(0);
@@ -38,8 +36,11 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
   const artColors = palette ? paletteColors(palette).map(color => color.code) : [colors.main, colors.sub];
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [intention, setIntention] = useState<MandalaIntention>("overall");
+  const [fullscreen, setFullscreen] = useState(false);
   const capture = useRef<Capture | null>(null);
   const setCapture = useCallback((fn: Capture | null) => { capture.current = fn; }, []);
+  const displayedColors = colorsForIntention(artColors, intention);
   useEffect(() => {
     setMounted(true);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -109,10 +110,11 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
     <p className="mt-3 text-sm leading-7 text-muted-foreground">{palette && testUnlocked ? art === "mandala" ? a.mandalaDescription : a.cosmicDescription : t.fallback}</p>
     {testUnlocked && <p className="mx-auto mt-3 inline-block border border-primary/40 px-3 py-1 text-sm text-primary">{t.testNotice}</p>}
     <aside className="mt-6 border-y border-primary/35 py-5 text-left" aria-label={a.about}><p className="font-serif text-lg leading-8 text-primary">{art === "mandala" ? a.mandalaAbout : a.cosmicAbout}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{art === "cosmic" && (sky?.approximate ? a.approximate : a.exactTime)} {a.artDisclaimer}</p></aside>
-    {palette && testUnlocked && <div className="mx-auto mt-5 grid max-w-[620px] grid-cols-3 gap-2 sm:grid-cols-6" aria-label={a.palette}>{paletteColors(palette).map((color, index) => <div key={`${color.slot}-${index}`} className="min-w-0"><span className="mx-auto block size-8 rounded-full border border-primary/30" style={{ backgroundColor: color.code }} /><span className="mt-1 block truncate text-[11px] text-muted-foreground">{a.paletteSlots[index]}</span></div>)}</div>}
-    <div className={`relative mx-auto mt-7 aspect-[9/16] w-full overflow-hidden border-y border-primary/35 bg-background shadow-gold ${art === "cosmic" ? "max-w-[760px] sm:max-h-[1120px]" : "max-h-[760px] max-w-[430px]"}`} aria-label={art === "cosmic" ? a.cosmic : a.mandalaAlt}>
+    {palette && testUnlocked && <div className="mx-auto mt-5 grid max-w-[720px] grid-cols-4 gap-2 sm:grid-cols-7" aria-label={a.palette}>{paletteColors(palette).map((color, index) => <div key={`${color.slot}-${index}`} className="min-w-0"><span className="mx-auto block size-8 rounded-full border border-primary/30" style={{ backgroundColor: color.code }} /><span className="mt-1 block truncate text-[11px] text-muted-foreground">{a.paletteSlots[index]}</span></div>)}</div>}
+    {art === "mandala" && testUnlocked && <div className="mt-6"><p className="mb-3 text-xs text-muted-foreground">{a.intentionLabel}</p><div className="flex flex-wrap justify-center gap-2">{(Object.keys(a.intentions) as MandalaIntention[]).map(id => <Button key={id} size="sm" variant={intention === id ? "default" : "outline"} aria-pressed={intention === id} onClick={() => setIntention(id)}>{a.intentions[id]}</Button>)}</div></div>}
+    <div className={`relative mx-auto mt-7 w-full overflow-hidden border-y border-primary/35 bg-background shadow-gold ${art === "cosmic" ? "aspect-[9/16] max-w-[760px] sm:max-h-[1120px]" : "aspect-square max-w-[920px]"}`} aria-label={art === "cosmic" ? a.cosmic : a.mandalaAlt}>
       {mounted && testUnlocked && sky && nine && art === "cosmic" ? <CosmicAlchemyArtwork sky={sky} nine={nine} colors={artColors} language={language} onCapture={setCapture} /> : mounted && testUnlocked && sky ? <Suspense fallback={<AgolmenLoading compact label={a.loading} />}>
-        <MandalaScene colors={artColors} element={element} progress={progress} reduced={reduced} onCapture={setCapture} />
+        <MandalaScene colors={displayedColors} intention={intention} progress={progress} reduced={reduced} onCapture={setCapture} />
       </Suspense> : <NineStarsArtwork main={colors.main} sub={colors.sub} bloodType={bloodType} birthDate={birthDate} language={language} />}
       {art === "mandala" && testUnlocked && sky && progress > 0 && progress < 7 && <div className="pointer-events-none absolute inset-0 grid place-items-center bg-background/70 backdrop-blur-[2px]"><AgolmenLoading compact label={(progress < 2 ? a.loadingStages[0] : progress < 5 ? a.loadingStages[1] : a.loadingStages[2]) ?? a.loading} /></div>}
       {!open && !playing && <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/65 p-4 backdrop-blur-[2px]">
@@ -121,7 +123,8 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
         <Button variant="champagne" onClick={testUnlocked && sky ? start : onVip} className="mt-5 h-auto max-w-[300px] whitespace-normal px-4 py-3 text-center text-sm leading-6"><Crown className="size-4 shrink-0" />{testUnlocked && sky ? t.viewPreview : t.unlock}</Button>
       </div>}
     </div>
-    {open && art === "mandala" && <div className="mt-3 flex flex-wrap justify-center gap-2"><Button variant="ghost" size="sm" onClick={start}><Play className="size-4" />{t.replay}</Button></div>}
+    {open && art === "mandala" && <div className="mt-3 flex flex-wrap justify-center gap-2"><Button variant="ghost" size="sm" onClick={start}><Play className="size-4" />{t.replay}</Button><Button variant="outline" size="sm" onClick={() => setFullscreen(true)}><Expand className="size-4" />{a.fullscreen}</Button></div>}
+    {fullscreen && art === "mandala" && <div className="fixed inset-0 z-[120] bg-background" role="dialog" aria-modal="true" aria-label={a.mandalaAlt}><Button variant="outline" size="icon" onClick={() => setFullscreen(false)} aria-label={a.closeFullscreen} title={a.closeFullscreen} className="absolute right-4 top-14 z-10 sm:top-16"><X /></Button><div className="h-full w-full"><Suspense fallback={<AgolmenLoading label={a.loading} />}><MandalaScene colors={displayedColors} intention={intention} progress={7} reduced={reduced} onCapture={() => undefined} /></Suspense></div></div>}
     {testUnlocked && sky && nine && <details className="mt-5 border-y border-primary/20 py-4 text-left"><summary className="cursor-pointer text-primary">{a.valuesTitle(sky.approximate ? a.noon : a.registered)}</summary><dl className="mt-3 grid grid-cols-3 gap-3"><div><dt className="text-xs text-muted-foreground">{a.honmei}</dt><dd className="text-primary">{nineStarName(language, nine.honmei)}</dd></div><div><dt className="text-xs text-muted-foreground">{a.getsumei}</dt><dd className="text-primary">{nineStarName(language, nine.getsumei)}</dd></div><div><dt className="text-xs text-muted-foreground">{a.keisha}</dt><dd className="text-primary">{nineStarName(language, nine.keisha)}</dd></div></dl><p className="mt-3 text-sm leading-6 text-muted-foreground">{a.calculation}{nine.nearBoundary ? ` ${a.boundary}` : ""}</p><dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-5">{sky.bodies.map((b, index) => <div key={b.name}><dt className="text-sm text-muted-foreground">{Object.values(helioCopy[language].planets)[index] ?? b.name}</dt><dd className="text-primary">{b.longitude.toFixed(2)}°</dd></div>)}</dl></details>}
     <p className="mx-auto mt-7 max-w-2xl text-sm leading-7 text-muted-foreground">{a.planetDisclaimer(Boolean(sky?.approximate))} {t.gridDisclaimer}</p>
     <div className="mx-auto mt-7 max-w-[640px] border-y border-primary/25 py-5 text-left"><div className="flex items-baseline justify-between gap-4"><h4 className="font-serif text-xl text-primary">{t.gridTitle}</h4><span className="text-xs text-muted-foreground">{nine ? `${nine.solarYear} · ${nine.solarMonth}` : t.gridQualifier}</span></div>
