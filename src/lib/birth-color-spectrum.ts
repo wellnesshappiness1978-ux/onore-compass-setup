@@ -46,5 +46,5 @@ export function birthColorSpectrum(p: Birth) {
   const seed = [...`${p.birthDate}|${p.birthPlace || "東京都"}`].reduce((v, ch) => (v * 31 + ch.charCodeAt(0)) % 1440, 0);
   const base = (seed + minute + sunSlot) % 1440;
   const color = (index: number) => palette[(index + 1440) % 1440] ?? { slot: 1, name: "参考色", code: hex(0, 0.57, 0.51) };
-  return { main: color(base), sub: color(base + 215), money: color(base + 360), love: color(base + 600), health: color(base + 840), mind: color(base + 487), provisional: !hasTime, placeDefault: !p.birthPlace };
+  return { main: color(base), sub: color(base + 215), money: color(base + 360), work: color(base + 1013), love: color(base + 600), health: color(base + 840), mind: color(base + 487), provisional: !hasTime, placeDefault: !p.birthPlace };
 }
