@@ -5,6 +5,14 @@ export const relationshipKinds: RelationshipKind[] = ["business", "hierarchy", "
 export type ReadingTheme = "connection" | "communication" | "future" | "work" | "distance";
 export const readingThemes: ReadingTheme[] = ["connection", "communication", "future", "work", "distance"];
 export type CompatibilityContext = { relationship?: RelationshipKind; theme?: ReadingTheme; concern?: string };
+export function resolveReadingTheme(context: CompatibilityContext): ReadingTheme {
+  const concern = context.concern?.trim() ?? "";
+  if (/連絡|返信|返事|距離|会え|contact|reply|distance|联系|聯繫|연락|distancia/i.test(concern)) return "distance";
+  if (/仕事|職場|上司|部下|協力|work|boss|工作|직장|trabajo|travail/i.test(concern)) return "work";
+  if (/将来|結婚|未来|これから|future|marriage|结婚|結婚|미래|futuro|avenir/i.test(concern)) return "future";
+  if (/会話|気持ち|喧嘩|けんか|話|communication|argument|沟通|溝通|대화|comunicación/i.test(concern)) return "communication";
+  return context.theme ?? "connection";
+}
 type ContextCopy = { theme: string; concern: string; optional: string; themes: Record<ReadingTheme, string>; focus: string; reflections: Record<ReadingTheme, string> };
 export const compatibilityContextCopy: Record<Language, ContextCopy> = {
   ja: { theme: "知りたいテーマ", concern: "今のお悩み・質問", optional: "任意", themes: { connection: "二人の可能性", communication: "会話・気持ちの伝え方", future: "これからの関係", work: "仕事・協力", distance: "距離感・連絡" }, focus: "今回のテーマ", reflections: { connection: "", communication: "", future: "", work: "", distance: "" } },
