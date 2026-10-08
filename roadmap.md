@@ -193,3 +193,7 @@
 - [x] Remove heavy effects (texture, gem, stars, rays)
 - [x] SVG rings: core overall color, six birth colors with thin geometry and dots
 - [x] Keep fullscreen, PNG save, reduced motion
+
+## Birth-color mandala dot-painting style
+- [x] Dot-painted eye core, radial petals, teardrops, peacock scales, wave lace edge
+- [x] Band-by-band reveal, slow rotation, reduced motion still

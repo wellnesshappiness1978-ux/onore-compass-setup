@@ -150,3 +150,76 @@ export function simpleMandalaRings(colors: string[], radius = 480) {
     })),
   };
 }
+
+export type PaintDot = { x: number; y: number; r: number; color: string; band: number };
+
+/** Deterministic hand-painted dot mandala layout using only the overall color and six birth colors. */
+export function dotPaintLayout(colors: string[], radius = 480): PaintDot[] {
+  const core = colors[0] ?? "#FFD21C";
+  const b = Array.from({ length: 6 }, (_, i) => colors[i + 1] ?? core);
+  const k = radius / 480;
+  const dots: PaintDot[] = [];
+  const add = (x: number, y: number, r: number, color: string, band: number) => dots.push({ x: x * k, y: y * k, r: r * k, color, band });
+  const polar = (rad: number, a: number) => [Math.cos(a) * rad, Math.sin(a) * rad] as const;
+  const ring = (rad: number, size: number, band: number, c1: string, c2 = c1, offset = 0) => {
+    const n = Math.max(6, Math.round((Math.PI * 2 * rad) / (size * 2.7)));
+    for (let i = 0; i < n; i++) { const [x, y] = polar(rad, (i + offset) / n * Math.PI * 2); add(x, y, size, i % 2 ? c2 : c1, band); }
+  };
+  // 0: eye core
+  add(0, 0, 15, core, 0);
+  add(0, 0, 6, b[0]!, 0);
+  ring(24, 4.2, 0, b[0]!);
+  ring(33, 3.4, 0, core, b[1]!);
+  ring(42, 3, 0, b[0]!);
+  // 1: slender radial petals
+  for (let p = 0; p < 24; p++) {
+    const a = p / 24 * Math.PI * 2;
+    for (let j = 0; j < 7; j++) { const [x, y] = polar(54 + j * 8.5, a); add(x, y, 4.4 - j * .4, j % 2 ? b[0]! : core, 1); }
+  }
+  ring(118, 3.2, 1, b[1]!, core, .5);
+  // 2: teardrop petals
+  for (let p = 0; p < 12; p++) {
+    const a = p / 12 * Math.PI * 2;
+    for (let s = 0; s <= 22; s++) {
+      const t = s / 22 * Math.PI * 2;
+      const along = 128 + (1 - Math.cos(t)) / 2 * 76;
+      const side = Math.sin(t) * Math.sin(t / 2) * .22;
+      const [x, y] = polar(along, a + side);
+      add(x, y, 3.2, b[1]!, 2);
+    }
+    for (let j = 0; j < 6; j++) { const [x, y] = polar(140 + j * 10, a); add(x, y, 5 - j * .55, j % 2 ? b[2]! : core, 2); }
+    const [x, y] = polar(205, a + Math.PI / 12); add(x, y, 5, b[2]!, 2);
+  }
+  // 3: dot rows
+  [214, 226, 238, 250].forEach((rad, i) => ring(rad, 3.6 - i * .2, 3, i % 2 ? b[3]! : b[2]!, i % 2 ? b[2]! : b[3]!, i * .5));
+  // 4: peacock scales
+  for (let p = 0; p < 16; p++) {
+    const a = (p + .5) / 16 * Math.PI * 2;
+    for (let s = 0; s <= 26; s++) {
+      const t = s / 26 * Math.PI;
+      const along = 262 + Math.sin(t) * 118;
+      const side = (s / 26 - .5) * (Math.PI * 2 / 16) * .92;
+      const [x, y] = polar(along, a + side * (1 - Math.sin(t) * .25));
+      add(x, y, 3.3, b[4]!, 4);
+    }
+    const [cx, cy] = polar(328, a);
+    add(cx, cy, 9, b[3]!, 4);
+    add(cx, cy, 3.5, core, 4);
+    for (const [rr, n, size, c] of [[16, 10, 3.2, b[4]!], [26, 16, 2.8, b[3]!]] as const) {
+      for (let i = 0; i < n; i++) { const t = i / n * Math.PI * 2; add(cx + Math.cos(t) * rr, cy + Math.sin(t) * rr, size, c, 4); }
+    }
+    for (let j = 0; j < 4; j++) { const [x, y] = polar(272 + j * 7, a); add(x, y, 3 - j * .35, b[4]!, 4); }
+  }
+  // 5: dot rows + wave lace edge
+  ring(392, 3.2, 5, b[5]!, b[4]!);
+  ring(403, 2.6, 5, b[4]!, b[5]!, .5);
+  for (let s = 0; s < 32 * 14; s++) {
+    const a = s / (32 * 14) * Math.PI * 2;
+    const wave = Math.abs(Math.sin(a * 16));
+    const [x1, y1] = polar(414 + wave * 48, a); add(x1, y1, 2.9, b[5]!, 5);
+    if (s % 2 === 0) { const [x2, y2] = polar(414 + wave * 30, a); add(x2, y2, 2.3, b[4]!, 5); }
+  }
+  for (let p = 0; p < 32; p++) { const [x, y] = polar(466, (p + .5) / 32 * Math.PI * 2 - Math.PI / 32 + Math.PI / 32); add(x, y, 4.5, core, 5); }
+  ring(474, 2, 5, b[5]!);
+  return dots;
+}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { regularPolygonPoints, simpleMandalaRings, type MandalaMotif } from "@/lib/art-geometry";
+import { dotPaintLayout } from "@/lib/art-geometry";
 
 export type Capture = () => Promise<{ blob: Blob; width: number; height: number }>;
 type Props = { colors: string[]; progress: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
@@ -8,40 +8,11 @@ const R = 480;
 const BG_INNER = "#0B132B";
 const BG_OUTER = "#020309";
 
-function ringPath(inner: number, outer: number) {
-  return `M ${outer} 0 A ${outer} ${outer} 0 1 0 ${-outer} 0 A ${outer} ${outer} 0 1 0 ${outer} 0 Z M ${inner} 0 A ${inner} ${inner} 0 1 1 ${-inner} 0 A ${inner} ${inner} 0 1 1 ${inner} 0 Z`;
-}
-
-function polyPoints(sides: number, radius: number, phase: number) {
-  return regularPolygonPoints(sides, radius, phase).map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
-}
-
-function Motif({ motif, inner, outer, symmetry, color }: { motif: MandalaMotif; inner: number; outer: number; symmetry: number; color: string }) {
-  const mid = (inner + outer) / 2;
-  const span = outer - inner;
-  const items = Array.from({ length: symmetry }, (_, i) => (i / symmetry) * 360);
-  if (motif === "hexagon" || motif === "octagon") {
-    const sides = motif === "hexagon" ? 6 : 8;
-    return <g fill="none" stroke={color} strokeWidth={1.1} strokeOpacity={.9}>
-      <polygon points={polyPoints(sides, outer - span * .12, 0)} />
-      <polygon points={polyPoints(sides, outer - span * .12, Math.PI / sides)} />
-      {items.map(a => <line key={a} x1={0} y1={-inner - span * .1} x2={0} y2={-outer + span * .1} transform={`rotate(${a})`} strokeOpacity={.55} />)}
-    </g>;
-  }
-  if (motif === "circles") {
-    return <g fill="none" stroke={color} strokeWidth={1} strokeOpacity={.85}>
-      {items.map(a => <circle key={a} cx={0} cy={-mid} r={span * .42} transform={`rotate(${a})`} />)}
-    </g>;
-  }
-  return <g fill="none" stroke={color} strokeWidth={1.1} strokeOpacity={.9}>
-    {items.map(a => <path key={a} d={`M 0 ${-inner - span * .08} Q ${span * .34} ${-mid} 0 ${-outer + span * .08} Q ${-span * .34} ${-mid} 0 ${-inner - span * .08} Z`} transform={`rotate(${a})`} />)}
-  </g>;
-}
-
 export default function MandalaScene({ colors, progress, reduced, onCapture }: Props) {
   const svg = useRef<SVGSVGElement>(null);
-  const mandala = useMemo(() => simpleMandalaRings(colors, R), [colors]);
-  const reveal = Math.min(1, Math.max(0, progress / 1.2));
+  const dots = useMemo(() => dotPaintLayout(colors, R), [colors]);
+  const core = colors[0] ?? "#FFD21C";
+  const reveal = Math.min(1, Math.max(0, progress / 1.5));
 
   const capture = useCallback<Capture>(async () => {
     const node = svg.current;
@@ -63,7 +34,7 @@ export default function MandalaScene({ colors, progress, reduced, onCapture }: P
       bg.addColorStop(0, BG_INNER); bg.addColorStop(1, BG_OUTER);
       ctx.fillStyle = bg; ctx.fillRect(0, 0, width, height);
       ctx.drawImage(image, 0, (height - width) / 2, width, width);
-      ctx.fillStyle = mandala.core;
+      ctx.fillStyle = core;
       ctx.textAlign = "center";
       ctx.font = `${Math.round(width / 26)}px serif`;
       ctx.fillText("AGOLMEN'S COMPASS", width / 2, height * .16);
@@ -74,7 +45,7 @@ export default function MandalaScene({ colors, progress, reduced, onCapture }: P
     } finally {
       URL.revokeObjectURL(url);
     }
-  }, [mandala.core]);
+  }, [core]);
 
   useEffect(() => { onCapture(capture); return () => onCapture(null); }, [capture, onCapture]);
 
@@ -82,34 +53,22 @@ export default function MandalaScene({ colors, progress, reduced, onCapture }: P
     <style>{"@keyframes mandala-spin{to{transform:rotate(360deg)}}"}</style>
     <svg ref={svg} viewBox="-500 -500 1000 1000" role="img" aria-label="バースカラー曼陀羅" className="h-full w-full" preserveAspectRatio="xMidYMid meet">
       <defs>
-        {mandala.rings.map((ring, i) => <radialGradient key={i} id={`mandala-ring-${i}`} gradientUnits="userSpaceOnUse" cx={0} cy={0} r={ring.outer}>
-          <stop offset={ring.inner / ring.outer} stopColor={ring.innerColor} />
-          <stop offset={1} stopColor={ring.color} />
-        </radialGradient>)}
-        <radialGradient id="mandala-core" gradientUnits="userSpaceOnUse" cx={0} cy={0} r={mandala.coreRadius}>
-          <stop offset={0} stopColor={mandala.core} stopOpacity={.95} />
-          <stop offset={1} stopColor={mandala.core} stopOpacity={.35} />
+        <radialGradient id="dot-gloss" cx=".35" cy=".3" r=".7">
+          <stop offset="0" stopColor="#ffffff" stopOpacity=".55" />
+          <stop offset=".45" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="1" stopColor="#000000" stopOpacity=".28" />
         </radialGradient>
       </defs>
-      <g style={{ opacity: reveal, transform: `scale(${.85 + reveal * .15})`, transition: reduced ? undefined : "opacity 1s ease, transform 1s ease" }}>
-        <g data-spin="" style={reduced ? undefined : { animation: "mandala-spin 240s linear infinite", transformOrigin: "0 0" }}>
-          {mandala.rings.map((ring, i) => {
-            const mid = (ring.inner + ring.outer) / 2;
-            return <g key={i}>
-              <path d={ringPath(ring.inner, ring.outer)} fill={`url(#mandala-ring-${i})`} fillRule="evenodd" fillOpacity={.16} />
-              <circle r={ring.outer} fill="none" stroke={ring.color} strokeWidth={.8} strokeOpacity={.7} />
-              <Motif motif={ring.motif} inner={ring.inner} outer={ring.outer} symmetry={ring.symmetry} color={ring.color} />
-              {Array.from({ length: ring.dots }, (_, d) => {
-                const a = (d / ring.dots) * Math.PI * 2 + (i % 2 ? Math.PI / ring.dots : 0);
-                const r = d % 2 ? ring.outer - 6 : mid;
-                return <circle key={d} cx={Math.cos(a) * r} cy={Math.sin(a) * r} r={d % 2 ? 2.2 : 3.2} fill={d % 2 ? ring.color : ring.innerColor} />;
-              })}
-            </g>;
-          })}
-          <circle r={mandala.coreRadius} fill="url(#mandala-core)" />
-          <Motif motif="petals" inner={mandala.coreRadius * .2} outer={mandala.coreRadius * .95} symmetry={8} color={mandala.core} />
-          <circle r={mandala.coreRadius * .18} fill={mandala.core} />
-        </g>
+      <g data-spin="" style={reduced ? undefined : { animation: "mandala-spin 300s linear infinite", transformOrigin: "0 0" }}>
+        {[0, 1, 2, 3, 4, 5].map(band => {
+          const shown = reduced || reveal >= band / 6 + .02;
+          return <g key={band} style={{ opacity: shown ? 1 : 0, transition: reduced ? undefined : "opacity .45s ease" }}>
+            {dots.filter(d => d.band === band).map((d, i) => <g key={i}>
+              <circle cx={d.x} cy={d.y} r={d.r} fill={d.color} />
+              <circle cx={d.x} cy={d.y} r={d.r} fill="url(#dot-gloss)" />
+            </g>)}
+          </g>;
+        })}
       </g>
     </svg>
   </div>;
