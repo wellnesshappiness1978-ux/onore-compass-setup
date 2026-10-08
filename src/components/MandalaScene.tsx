@@ -49,7 +49,10 @@ function Diamond({ color, scale = 1 }: { color: string; scale?: number }) {
 
 function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture" | "element">) {
   const work = useRef<THREE.Group>(null);
-  const palette = useMemo(() => Array.from({ length: 6 }, (_, i) => colors[i] ?? colors[0] ?? "#D4AF37"), [colors]);
+  const palette = useMemo<[string, string, string, string, string, string]>(() => {
+    const fallback = colors[0] ?? "#D4AF37";
+    return [colors[0] ?? fallback, colors[1] ?? fallback, colors[2] ?? fallback, colors[3] ?? fallback, colors[4] ?? fallback, colors[5] ?? fallback];
+  }, [colors]);
   const main = palette[0];
   const seed = useMemo(() => palette.join("").split("").reduce((n, c) => n + c.charCodeAt(0), 0), [palette]);
   const bloom = Math.min(1, Math.max(0, progress / 7));

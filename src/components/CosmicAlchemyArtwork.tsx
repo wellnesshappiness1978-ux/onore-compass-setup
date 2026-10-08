@@ -9,16 +9,17 @@ type Props = { sky: ReturnTypeNatal; nine: NineStarProfile; colors: string[]; la
 type PlanetStyle = { radius: number; base: string; light: string; kind: "sun" | "rock" | "cloud" | "earth" | "mars" | "gas" | "ring" | "ice" | "moon" };
 const styles: PlanetStyle[] = [
   { radius: .095, base: "#f59e0b", light: "#fff7c2", kind: "sun" },
-  { radius: .018, base: "#77736d", light: "#d7d0c3", kind: "rock" },
-  { radius: .029, base: "#b96f32", light: "#ffe0a3", kind: "cloud" },
-  { radius: .032, base: "#176da5", light: "#8de7ff", kind: "earth" },
+  { radius: .026, base: "#77736d", light: "#e8e2d8", kind: "moon" },
+  { radius: .018, base: "#716b62", light: "#d7d0c3", kind: "rock" },
+  { radius: .032, base: "#b96f32", light: "#ffe0a3", kind: "cloud" },
   { radius: .025, base: "#a83f22", light: "#ffb27b", kind: "mars" },
   { radius: .054, base: "#a77a55", light: "#ffe0b6", kind: "gas" },
   { radius: .047, base: "#ad9472", light: "#fff0bd", kind: "ring" },
   { radius: .036, base: "#77c6d8", light: "#d9fcff", kind: "ring" },
   { radius: .035, base: "#315eae", light: "#a9d9ff", kind: "ice" },
-  { radius: .015, base: "#706b68", light: "#d7d2cd", kind: "moon" },
+  { radius: .015, base: "#706b68", light: "#d7d2cd", kind: "rock" },
 ];
+const fallbackPlanet: PlanetStyle = { radius: .018, base: "#77736d", light: "#d7d0c3", kind: "rock" };
 
 const seeded = (seed: number) => { const value = Math.sin(seed * 91.73) * 43758.5453; return value - Math.floor(value); };
 
@@ -46,7 +47,7 @@ function drawSun(ctx: CanvasRenderingContext2D, x: number, y: number, radius: nu
   ctx.save(); ctx.globalCompositeOperation="lighter";
   for(let i=0;i<96;i++){const a=i/96*Math.PI*2, len=radius*(1.25+seeded(seed+i)*1.1);const g=ctx.createLinearGradient(x+Math.cos(a)*radius*.8,y+Math.sin(a)*radius*.8,x+Math.cos(a)*len,y+Math.sin(a)*len);g.addColorStop(0,"rgba(255,210,72,.32)");g.addColorStop(1,"rgba(255,210,72,0)");ctx.strokeStyle=g;ctx.lineWidth=Math.max(1,radius*(.01+seeded(seed+i*7)*.035));ctx.beginPath();ctx.moveTo(x+Math.cos(a)*radius*.75,y+Math.sin(a)*radius*.75);ctx.lineTo(x+Math.cos(a)*len,y+Math.sin(a)*len);ctx.stroke();}
   const halo=ctx.createRadialGradient(x,y,radius*.2,x,y,radius*2.7);halo.addColorStop(0,"rgba(255,255,224,.95)");halo.addColorStop(.22,"rgba(255,198,52,.75)");halo.addColorStop(.58,"rgba(255,122,18,.22)");halo.addColorStop(1,"rgba(255,122,18,0)");ctx.fillStyle=halo;ctx.fillRect(x-radius*2.8,y-radius*2.8,radius*5.6,radius*5.6);ctx.restore();
-  drawPlanet(ctx,x,y,radius,styles[0],seed);
+  drawPlanet(ctx,x,y,radius,styles[0] ?? fallbackPlanet,seed);
 }
 
 function paint(canvas: HTMLCanvasElement, sky: ReturnTypeNatal, nine: NineStarProfile, colors: string[], language: Language) {
@@ -60,11 +61,11 @@ function paint(canvas: HTMLCanvasElement, sky: ReturnTypeNatal, nine: NineStarPr
   ctx.save();ctx.globalCompositeOperation="lighter";
   for(let band=0;band<18;band++){const y0=h*(.12+band*.048),g=ctx.createLinearGradient(0,y0,w,y0+h*.08);g.addColorStop(0,"transparent");g.addColorStop(.5,colors[(band+2)%Math.max(colors.length,1)]??gold);g.addColorStop(1,"transparent");ctx.strokeStyle=g;ctx.globalAlpha=.028+band*.004;ctx.lineWidth=Math.max(1,w*(.012-band*.00045));ctx.beginPath();for(let x=-w*.1;x<=w*1.1;x+=w/100){const y=y0+Math.sin(x/w*Math.PI*(2.3+band*.11)+band*.8)*h*(.018+band*.002);if(x<0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();}ctx.restore();
   for(let i=0;i<1800;i++){const x=seeded(seed+i*3)*w,y=seeded(seed+i*7)*h,a=.1+seeded(seed+i*11)*.62;ctx.globalAlpha=a;ctx.fillStyle=i%19===0?(colors[i%Math.max(colors.length,1)]??gold):gold;ctx.beginPath();ctx.arc(x,y,(i%29===0?1.6:.42)*w/900,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
-  const sun=sky.bodies[0], sunAngle=((sun?.longitude??0)-90)*Math.PI/180, sunX=cx+Math.cos(sunAngle)*unit*.018, sunY=cy+Math.sin(sunAngle)*unit*.014;
+  const sunX=cx, sunY=cy;
   // Nine Star rings are calculated: star number controls tilt, color and eccentricity.
   nine.palaces.forEach((palace,i)=>{const rr=unit*(.12+i*.035);ctx.strokeStyle=palace.star===nine.honmei?gold:(colors[(palace.star+nine.keisha)%Math.max(colors.length,1)]??gold);ctx.globalAlpha=.12+palace.star*.018;ctx.lineWidth=Math.max(1,w/1000);ctx.beginPath();ctx.ellipse(cx,cy,rr,rr*(.64+(palace.star%3)*.045),(palace.star%2?-.22:.22)+nine.keisha*.012,0,Math.PI*2);ctx.stroke();});ctx.globalAlpha=1;
   const bodies=sky.bodies.slice(1);
-  bodies.forEach((body,i)=>{const orbit=unit*(.13+i*.038),a=(body.longitude-90)*Math.PI/180;ctx.strokeStyle=colors[(i+1)%Math.max(colors.length,1)]??gold;ctx.globalAlpha=.14;ctx.lineWidth=Math.max(1,w/1200);ctx.beginPath();ctx.ellipse(cx,cy,orbit,orbit*.72,0,0,Math.PI*2);ctx.stroke();const x=cx+Math.cos(a)*orbit,y=cy+Math.sin(a)*orbit*.72;ctx.globalAlpha=.28;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke();const style=styles[i+1]??styles[1];drawPlanet(ctx,x,y,Math.max(w*.008,w*style.radius),style,seed+i*47);});
+  bodies.forEach((body,i)=>{const orbit=unit*(.13+i*.038),a=(body.longitude-90)*Math.PI/180;ctx.strokeStyle=colors[(i+1)%Math.max(colors.length,1)]??gold;ctx.globalAlpha=.14;ctx.lineWidth=Math.max(1,w/1200);ctx.beginPath();ctx.ellipse(cx,cy,orbit,orbit*.72,0,0,Math.PI*2);ctx.stroke();const x=cx+Math.cos(a)*orbit,y=cy+Math.sin(a)*orbit*.72;ctx.globalAlpha=.28;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke();const style=styles[i+1]??fallbackPlanet;drawPlanet(ctx,x,y,Math.max(w*.008,w*style.radius),style,seed+i*47);});
   drawSun(ctx,sunX,sunY,w*.07,seed);
   ctx.globalAlpha=1;ctx.textAlign="center";ctx.fillStyle=gold;ctx.font=`${Math.round(w*.052)}px serif`;ctx.fillText("AGOLMEN'S COMPASS",cx,h*.1);ctx.font=`${Math.round(w*.034)}px serif`;ctx.fillText(copy.cosmic,cx,h*.79);ctx.font=`${Math.round(w*.017)}px sans-serif`;ctx.fillText(copy.cosmicDescription,cx,h*.83);ctx.fillText(`${copy.honmei} ${nine.honmei} · ${copy.getsumei} ${nine.getsumei} · ${copy.keisha} ${nine.keisha}`,cx,h*.86);ctx.fillText(sky.approximate?copy.noon:copy.registered,cx,h*.89);
 }
