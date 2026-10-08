@@ -171,4 +171,4 @@
 
 ## Birth-color mandala oil-paint refinement
 - [x] Add procedural impasto texture, layered sacred geometry, abstract light particles, and gold-leaf shimmer while preserving the seven-color system and non-celestial identity.
-- [ ] Verify desktop/mobile rendering, reduced motion, full-screen view, and exported wallpaper quality.
+- [x] Verify desktop/mobile rendering, reduced motion, full-screen view, and exported wallpaper quality.
