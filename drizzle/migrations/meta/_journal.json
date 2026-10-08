@@ -71,6 +71,13 @@
       "when": 1791437299638,
       "tag": "0009_add_profile_design_mode",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791445286200,
+      "tag": "0010_daily_usage",
+      "breakpoints": true
     }
   ]
 }
