@@ -149,7 +149,6 @@ function TorisetsuPanel({
   const partnerInput: PartnerInput = { name: partnerName, nameKana: partnerKana, gender: partnerGender, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
   const score = result?.score ?? 0;
-  const advice = score >= 84 ? t.advice[2] : score >= 70 ? t.advice[1] : t.advice[0];
   const today = new Date().toLocaleDateString("en-CA");
   useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, profile]);
 
@@ -406,7 +405,6 @@ function TorisetsuPanel({
                   {t.coreDynamics[relation ?? 0]}
                 </p>
               </div>
-              <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-foreground">{advice}</p>
                 <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-5"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
                <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
               <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
@@ -566,7 +564,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
           <div className="design-heading mt-2 text-center">
             <AgolmenLogo className="mx-auto mb-1 size-20 object-contain drop-shadow-[0_0_12px_var(--gold-glow)]" />
             <p className="design-wordmark text-[9px] uppercase text-primary/70">AGOLMEN'S COMPASS</p>
-            <h1 className="design-title font-serif text-2xl font-bold text-gradient-gold sm:text-3xl">
+            <h1 className="design-title font-serif font-bold text-gradient-gold">
               {translations[language].brand}
             </h1>
             <p className="design-mode-caption mt-1 text-[10px] text-muted-foreground">{teamCopy[language].planNames[previewPlan]} · {devOverrideEnabled ? (language === "ja" ? "表示テスト" : "Preview") : (language === "ja" ? "現在のステータス" : "Current status")}</p>
