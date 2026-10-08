@@ -40,6 +40,7 @@ import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions"
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { quickUsageKey } from "@/lib/quick-compatibility";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
+import { compatibilityContextCopy, readingThemes, relationshipKinds, type ReadingTheme } from "@/lib/compatibility-context";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
@@ -143,6 +144,9 @@ function TorisetsuPanel({
   const [result, setResult] = useState<ReturnType<typeof analyzeCompatibility>>(null);
   const [relation, setRelation] = useState<number | null>(null);
   const [analyzed, setAnalyzed] = useState(false);
+  const [readingTheme, setReadingTheme] = useState<ReadingTheme>("connection");
+  const [concern, setConcern] = useState("");
+  const contextCopy = compatibilityContextCopy[language];
   const [used, setUsed] = useState(0);
   useEffect(() => { try { setUsed(Number(localStorage.getItem(quickUsageKey(profile.birthDate, plan))) || 0); } catch { setUsed(0); } }, [profile.birthDate, plan]);
   const remaining = quickCompatibilityLimit[plan] - used;
@@ -150,7 +154,7 @@ function TorisetsuPanel({
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
   const score = result?.score ?? 0;
   const today = new Date().toLocaleDateString("en-CA");
-  useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, profile]);
+  useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, readingTheme, concern, profile, language]);
 
   return (
     <div>
@@ -370,11 +374,17 @@ function TorisetsuPanel({
                   ))}
                 </div>
               </div>
+              <div className="space-y-4">
+                <label htmlFor="compatibility-theme" className="block text-sm text-primary">{contextCopy.theme}</label>
+                <select id="compatibility-theme" className={inputClass} value={readingTheme} onChange={event => setReadingTheme(event.target.value as ReadingTheme)}>{readingThemes.map(theme => <option key={theme} value={theme}>{contextCopy.themes[theme]}</option>)}</select>
+                <label htmlFor="compatibility-concern" className="block text-sm text-primary">{contextCopy.concern} <span className="text-muted-foreground">({contextCopy.optional})</span></label>
+                <textarea id="compatibility-concern" className={`${inputClass} min-h-24 resize-y`} maxLength={80} value={concern} onChange={event => setConcern(event.target.value)} />
+              </div>
               <Button
                 type="button"
                 variant="champagne"
                 disabled={!canAnalyze || remaining <= 0}
-                onClick={() => { if (!canAnalyze || remaining <= 0) return; const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language); if (!analysis) return; setResult(analysis); const next = used + 1; try { localStorage.setItem(quickUsageKey(profile.birthDate, plan), String(next)); } catch { /* private browsing */ } setUsed(next); setAnalyzed(true); }}
+                onClick={() => { if (!canAnalyze || remaining <= 0) return; const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language, { relationship: relation === null ? undefined : relationshipKinds[relation], theme: readingTheme, concern }); if (!analysis) return; setResult(analysis); const next = used + 1; try { localStorage.setItem(quickUsageKey(profile.birthDate, plan), String(next)); } catch { /* private browsing */ } setUsed(next); setAnalyzed(true); }}
                 className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
               >
                 <Sparkles className="size-4 shrink-0" aria-hidden="true" />
@@ -405,7 +415,7 @@ function TorisetsuPanel({
                   {t.coreDynamics[relation ?? 0]}
                 </p>
               </div>
-                <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-5"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
+                <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-5"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
                <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
               <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
             </section>

@@ -14,18 +14,6 @@ export type RelationshipSignals = {
 
 // Reflective prose follows calculated comparisons, never inferred missing inputs.
 export function compatibilityReadingJa(s: RelationshipSignals, context: CompatibilityContext = {}): [string, string, string] {
-  const outlook = s.sameOutlook
-    ? "物事を見る入口が近く、何を大切にしたいかを共有しやすい二人です。意見が合う安心感はある一方、同じ所を見落としやすいため、迷った時には別の見方も探してください。"
-    : "物事を見る入口には違いがあり、自分にはない着眼点が相手の魅力になり得ます。ただし、良いと思う理由まで同じとは限りません。結論だけでなく、そこへ至った背景を聞くほど理解が深まります。";
-  const energy = s.sameEnergy
-    ? "力の使い方には共通点が見られます。勢いが重なると協力しやすい反面、疲れた時も一緒に余裕を失いやすいので、どちらかが休む合図を出せる関係が支えになります。"
-    : "力を発揮する場面には違いが見られます。片方が動きたい時にもう片方が立ち止まっても、やる気の差と決めつけず、任せたい部分と確認したい部分を分けると協力が生まれます。";
-  const motivation = s.sameMotivation
-    ? "人生で重視する方向が近く、目標を言葉にすると共通の足場を作りやすい組み合わせです。"
-    : "人生で重視する方向には違いがあり、同じ目標でも達成したい理由を確かめることが大切です。";
-  const names = s.namesAvailable
-    ? "名前から得られる対外的な印象も合わせて見ると、人前の姿だけで相手を理解したつもりにならず、二人きりで何に気を使うかを聞くことが役立ちます。"
-    : "名前に関する対応情報がそろわない部分は判断を加えていません。人前の印象と親しい場面の姿は、実際の会話で確かめてください。";
   const emotion = s.sameEmotion === null
     ? "出生時間が不明などの理由で、細かな感情の傾向は比較を保留しています。安心する言葉や、疲れた時に望む接し方は本人に聞いて確かめるのが確実です。"
     : s.sameEmotion
