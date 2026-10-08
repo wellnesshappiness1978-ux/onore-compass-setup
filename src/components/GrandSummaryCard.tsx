@@ -32,7 +32,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
   const [title, share] = titles[language];
   const palette = birthColorSpectrum(profile);
   const text = data?.grandSummary || data?.synthesis;
-  const colors = palette ? (plan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.love, palette.health, palette.mind]) : [];
+  const colors = palette ? (plan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.work, palette.love, palette.health, palette.mind]) : [];
   return (
     <section id="grand-summary" aria-label={title} className={embedded ? "border-t border-primary/30 px-5 py-8 sm:px-8 sm:py-10" : "card-lux relative mt-8 overflow-hidden rounded-lg px-5 py-8 sm:px-10 sm:py-12"}>
       <div className="text-center">

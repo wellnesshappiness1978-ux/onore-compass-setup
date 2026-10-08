@@ -162,3 +162,9 @@
 ## Profile localization
 - [x] Move onboarding and saved-profile placeholders, validation copy, settings-profile labels, and related-person fallback copy into a complete seven-language dictionary.
 - [x] Verify profile dictionaries and prefecture labels by test; verify English, Spanish, French, and Korean onboarding live with localized placeholders, preserved input, and no console errors. Settings and related-person copy use the same complete seven-language dictionary.
+
+## Birth-color mandala rebuild
+- [x] Expand the deterministic palette to overall plus six personal colors and preserve illustrative disclaimers.
+- [ ] Rebuild the artwork as a full-width dot-painted geometric mandala with Fibonacci spirals and no celestial motifs.
+- [ ] Add five intention variations and immersive full-screen viewing while preserving replay, export, sharing, and preview locks.
+- [ ] Verify desktop/mobile rendering, full-screen controls, animation, and exported artwork.
