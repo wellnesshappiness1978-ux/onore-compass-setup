@@ -513,7 +513,7 @@
   opacity: var(--design-texture-opacity, 1);
 }
 .design-canvas .design-wordmark { letter-spacing: .22em; font-family: "Cormorant Garamond", serif; font-size: 12px; }
-.design-canvas .design-title { font-family: "Cormorant Garamond", "Noto Serif JP", serif; font-size: clamp(30px, 3rem, 46px); font-weight: 600; line-height: 1.1; }
+.design-canvas .design-title { font-family: "Cormorant Garamond", "Noto Serif JP", serif; font-size: 28px; font-weight: 600; line-height: 1.5; }
 .design-canvas .design-mode-caption { max-width: min(85vw, 32rem); margin-inline: auto; line-height: 1.5; }
 .design-canvas .design-header { border-bottom-color: var(--design-line); }
 .design-canvas .design-daily-panel,
@@ -614,8 +614,6 @@
   --design-orbit-border: 1px solid color-mix(in oklab, var(--primary) 42%, transparent);
   --design-inner-opacity: .7; --design-compass-spacing: 12px; --design-stroke: 2px;
 }
-.design-canvas[data-tier="vip"] .design-title,
-.design-canvas[data-tier="b2b"] .design-title { font-size: 46px; line-height: 1.05; }
 .design-canvas[data-design$="luxe"] .design-daily-panel { box-shadow: inset 0 1px 0 color-mix(in oklab, var(--gold-glow) 32%, transparent), 0 18px 42px color-mix(in oklab, var(--background) 70%, transparent); }
 .design-canvas[data-design$="luxe"] .design-header { border-bottom-width: 2px; }
 .design-canvas[data-design$="luxe"] .design-navigation { border-width: 2px; box-shadow: 0 0 25px color-mix(in oklab, var(--primary) 23%, transparent); }
@@ -674,11 +672,6 @@
 .design-choice--feminine-luxe .design-choice-scene::before { border-width: 2px; box-shadow: inset 0 0 15px color-mix(in oklab, var(--preview-accent) 25%, transparent); }
 .design-choice--business-night .design-choice-scene::before,
 .design-choice--business-day .design-choice-scene::before { border-width: 2px; border-radius: 0; }
-@media (max-width: 420px) {
-  .design-canvas .design-title { font-size: 34px; }
-  .design-canvas[data-tier="vip"] .design-title,
-  .design-canvas[data-tier="b2b"] .design-title { font-size: 38px; }
-}
 @media (prefers-reduced-motion: reduce) {
   .design-canvas *, .design-canvas *::before, .design-canvas *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
@@ -789,7 +782,6 @@ html[data-test-preview="true"] { --preview-bar-height: 104px; }
 .account-controls, .language-controls { top: calc(var(--preview-bar-height) + 16px); }
 .app-alert { top: calc(var(--preview-bar-height) + 80px); }
 .design-header { padding-top: 56px; }
-.design-canvas .design-title { font-size: 28px; line-height: 1.5; }
 .design-canvas p, .design-canvas li { overflow-wrap: anywhere; }
 html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 
@@ -1119,7 +1111,14 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 @keyframes premium-stars { to { transform: translateY(-32px) scale(1.035); opacity: 1; } }
 .design-canvas[data-tier="b2b-premium"] .design-main .bg-primary { box-shadow: 0 0 30px color-mix(in oklab, var(--primary) 48%, transparent), inset 0 1px 0 var(--gold-glow); }
 .agolmen-brand-logo, .agolmen-loading-logo { border-radius: 50%; clip-path: circle(43% at center); mask-image: radial-gradient(circle at center, black 0 91%, transparent 100%); filter: none; }
-.design-heading { background-image: radial-gradient(ellipse 130px 95px at 50% 48px, color-mix(in oklab, var(--rose-glow) 17%, transparent), transparent 90%), radial-gradient(ellipse 180px 120px at 50% 48px, color-mix(in oklab, var(--amethyst) 18%, transparent), transparent 95%); }
+.agolmen-logo-aura .agolmen-aura { animation: agolmen-aura-drift 9s ease-in-out infinite alternate; }
+.agolmen-logo-aura .agolmen-aura-purple { animation-delay: -4s; }
+.agolmen-logo-aura .agolmen-aura-gold { animation-delay: -7s; }
+.agolmen-logo-aura .agolmen-aura-aqua { animation-delay: -2s; }
+.agolmen-logo-particle { position: absolute; left: 50%; top: 50%; width: 2px; height: 2px; border-radius: 50%; background: var(--beam-gold); box-shadow: 0 0 6px var(--beam-purple), 0 0 10px var(--beam-gold); opacity: 0; pointer-events: none; animation: agolmen-outward-spark 6s ease-out infinite; animation-delay: calc(var(--i) * -.75s); }
+@keyframes agolmen-aura-drift { from { opacity: .55; rotate: -7deg; scale: .92; } to { opacity: 1; rotate: 7deg; scale: 1.12; } }
+@keyframes agolmen-outward-spark { 0% { opacity: 0; transform: rotate(calc(55deg + var(--i) * 31deg)) translateX(8px) scale(.5); } 30% { opacity: .85; } 100% { opacity: 0; transform: rotate(calc(55deg + var(--i) * 31deg)) translateX(90px) scale(.2); } }
+@media (prefers-reduced-motion: reduce) { .agolmen-logo-aura .agolmen-aura, .agolmen-logo-particle { animation: none; } .agolmen-logo-particle { display: none; } }
 .agolmen-loading-art { background-image: radial-gradient(circle, color-mix(in oklab, var(--beam-gold) 22%, transparent), color-mix(in oklab, var(--beam-purple) 20%, transparent) 45%, transparent 72%); }
 
 /* Screen specimens deliberately inherit precisely the dashboard's palette variables. */
