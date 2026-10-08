@@ -11,7 +11,7 @@ describe("three-section compatibility reading", () => {
     expect(result?.titles).toEqual(["各占術での相性ポイント", "総合診断", "お二人の注意点とアドバイス"]);
     for (const same of [true, false]) for (const emotion of [true, false, null]) for (const behavior of [true, false, null]) {
       const readings = compatibilityReadingJa({ rhythm: "違いが刺激にも摩擦にもなりやすい", sameOutlook: same, sameEnergy: same, sameMotivation: same, sameEmotion: emotion, namesAvailable: same, sameBehavior: behavior });
-      const ranges = [[450, 550], [730, 880], [270, 340]];
+      const ranges = [[450, 550], [730, 880], [270, 340]] as const;
       readings.forEach((text, i) => {
         const range = ranges[i];
         if (!range) return;

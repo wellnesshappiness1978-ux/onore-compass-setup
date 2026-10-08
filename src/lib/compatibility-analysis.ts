@@ -66,6 +66,6 @@ export function analyzeCompatibility(owner: Owner, input: PartnerInput, language
     sameEmotion: a.western.moonUncertain || b.western.moonUncertain ? null : a.western.moonElement === b.western.moonElement,
     namesAvailable: Boolean(a.name && b.name),
     sameBehavior: a.animal.core && b.animal.core ? a.animal.group === b.animal.group : null,
-  }) : [`${dynamic}${language === "ja" || language.startsWith("zh") ? "。" : "."} ${w.points}`, w.oracle, w.advice];
+  }) : [`${dynamic}${language.startsWith("zh") ? "。" : "."} ${w.points}`, w.oracle, w.advice];
   return { score, titles: w.titles, sentences, evidence, colors: [colorsA?.main.code, colorsB?.main.code], note: `${w.missing} ${w.reference}`, dynamic, elementPair: `${dayElement(owner.birthDate)} × ${dayElement(partner.birthDate)}` };
 }
