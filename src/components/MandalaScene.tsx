@@ -54,6 +54,7 @@ function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture" | "eleme
     return [colors[0] ?? fallback, colors[1] ?? fallback, colors[2] ?? fallback, colors[3] ?? fallback, colors[4] ?? fallback, colors[5] ?? fallback];
   }, [colors]);
   const main = palette[0];
+  const paletteAt = (index: number) => palette[index % palette.length] ?? main;
   const seed = useMemo(() => palette.join("").split("").reduce((n, c) => n + c.charCodeAt(0), 0), [palette]);
   const bloom = Math.min(1, Math.max(0, progress / 7));
   const ease = bloom * bloom * (3 - 2 * bloom);
@@ -87,7 +88,7 @@ function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture" | "eleme
       {/* A nearly hidden nautilus proportion system, never a literal shell illustration. */}
       <group rotation-z={-.42} scale={1.06}>
         <Line points={shell} color={palette[2]} lineWidth={.55} transparent opacity={.14} />
-        {[.42, .58, .78, 1].map((s, i) => <Line key={s} points={shell.map(([x,y,z]) => [x*s, y*s, z - i*.002] as [number,number,number])} color={palette[(i + 3) % 6]} lineWidth={.28} transparent opacity={.09} />)}
+        {[.42, .58, .78, 1].map((s, i) => <Line key={s} points={shell.map(([x,y,z]) => [x*s, y*s, z - i*.002] as [number,number,number])} color={paletteAt(i + 3)} lineWidth={.28} transparent opacity={.09} />)}
       </group>
 
       {/* Dot-painted concentric fields. */}
@@ -98,7 +99,7 @@ function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture" | "eleme
             const a = i / count * Math.PI * 2;
             const size = .028 + (ring % 4 === 0 ? .026 : 0) + seededUnit(seed + ring, i) * .012;
             return <mesh key={i} position={point(radius, a, -.18 + ring * .008)} rotation-z={a + Math.PI / 4}>
-              <circleGeometry args={[size, 10]} /><meshBasicMaterial color={palette[(ring + i) % 6]} transparent opacity={.5 + (i % 5) * .08} blending={THREE.AdditiveBlending} />
+              <circleGeometry args={[size, 10]} /><meshBasicMaterial color={paletteAt(ring + i)} transparent opacity={.5 + (i % 5) * .08} blending={THREE.AdditiveBlending} />
             </mesh>;
           })}
         </group>;
@@ -115,8 +116,8 @@ function Mandala({ colors, progress, reduced }: Omit<Props, "onCapture" | "eleme
             const tip = point(radius + length, a, p[2]);
             const right = point(radius - length * .58, a + Math.PI / count * .78, p[2]);
             return <group key={i}>
-              <Line points={[left, tip, right]} color={palette[(i + layer) % 6]} lineWidth={layer < 2 ? 1.1 : .65} transparent opacity={.34 + layer * .07} />
-              <mesh position={tip} rotation-z={a + Math.PI / 4}><Diamond color={palette[(i + layer + 2) % 6]} scale={layer < 2 ? .8 : .55} /></mesh>
+              <Line points={[left, tip, right]} color={paletteAt(i + layer)} lineWidth={layer < 2 ? 1.1 : .65} transparent opacity={.34 + layer * .07} />
+              <mesh position={tip} rotation-z={a + Math.PI / 4}><Diamond color={paletteAt(i + layer + 2)} scale={layer < 2 ? .8 : .55} /></mesh>
             </group>;
           })}
         </group>;
