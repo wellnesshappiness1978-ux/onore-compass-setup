@@ -25,11 +25,10 @@ export function mandalaSeed(colors: MandalaColor[]) {
   return hash >>> 0;
 }
 
-export function mandalaPrompt(colors: MandalaColor[]) {
-  const fallback = { name: "アンバーゴールド", code: "#F4D03F" };
-  const overall = birthColorKeyword(colors[0] ?? fallback);
-  const birthColors = Array.from({ length: 6 }, (_, index) => birthColorKeyword(colors[index + 1] ?? colors[0] ?? fallback));
-  return `sacred geometry mandala, deep cosmic black space background, centered around a luminous ${overall} gemstone core, radiating intricate patterns utilizing vivid birth colors [${birthColors.join(", ")}], hyper-detailed dot painting, golden ratio fibonacci spiral, sparkling gold dust, 8k resolution, masterpiece spiritual art`;
+export const MANDALA_PROMPT = "sacred geometry mandala, cosmic black background, vivid colors, glowing gemstone core, 8k art";
+
+export function mandalaPrompt(_colors?: MandalaColor[]) {
+  return MANDALA_PROMPT;
 }
 
 export function mandalaImageUrl(colors: MandalaColor[], variation = 0) {

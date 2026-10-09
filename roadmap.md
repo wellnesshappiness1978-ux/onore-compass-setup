@@ -5,7 +5,7 @@
 - [x] Add the interactive compatibility preview and clearly separated VIP-locked detail.
 - [x] Verify Step 3 through the complete onboarding flow on desktop and mobile.
 - [x] Extend the compatibility form with name, birth time/place, and relationship category; verify score, core dynamic, and advice on CTA click.
-- [ ] Build the AI Onore consultation screen with quick questions, live streaming chat, free-use counter, and VIP preview.
+- [x] Build the AI Onore consultation screen with quick questions, live streaming chat, free-use counter, and VIP preview.
 - [ ] Verify consultation responses, error states, and mobile/desktop layouts.
 - [x] Add the Step 5 nine-stars art preview with a VIP lock; labelled illustrative wallpaper can be saved in test-unlocked mode, not as a verified paid chart.
 - [x] Verify the locked art and CTA on mobile and desktop.
