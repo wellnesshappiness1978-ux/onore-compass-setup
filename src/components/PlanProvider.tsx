@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Plan } from "@/lib/design-modes";
-import { isTestPreview, parsePlan, planQuery } from "@/lib/preview-plan";
+import { isTestPreview, localizedPlanLabels, parsePlan, planQuery, switchedNotice } from "@/lib/preview-plan";
+import { toast } from "sonner";
+import { storedLanguage } from "@/lib/support-copy";
 
 type PlanState = { enabled: boolean; override: Plan | null; selectPlan: (plan: Plan) => void };
 const Context = createContext<PlanState>({ enabled: false, override: null, selectPlan: () => undefined });
@@ -37,6 +39,8 @@ export default function PlanProvider({ children }: { children: ReactNode }) {
   const selectPlan = (next: Plan) => {
     if (!enabled) return;
     setOverride(next);
+    const lang = storedLanguage();
+    toast.success(switchedNotice[lang](localizedPlanLabels[lang][next]));
     try { localStorage.setItem("devPlanOverride", next); } catch { /* URL fallback. */ }
     const url = new URL(window.location.href); url.searchParams.set("plan", planQuery[next]);
     window.history.replaceState(window.history.state, "", url);

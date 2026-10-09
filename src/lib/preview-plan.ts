@@ -16,5 +16,9 @@ export function parsePlan(value: string | null): Plan | null {
   return Object.entries(planQuery).find(([id, query]) => value === id || value === query)?.[0] as Plan | undefined ?? null;
 }
 export function isTestPreview(host: string): boolean {
-  return import.meta.env.DEV || host === "localhost" || /^id-preview--[a-f0-9-]+\.lovable\.app$/.test(host) || /^project--[a-f0-9-]+-dev\.lovable\.app$/.test(host);
-}
+  return import.meta.env.DEV || host === "localhost" || /^id-preview--[a-f0-9-]+\.lovable\.app$/.test(host) || /^project--[a-f0-9-]+-dev\.lovable\.app$/.test(host) || /^preview--[a-z0-9-]+\.lovable\.app$/.test(host) || /^[a-f0-9-]+\.lovableproject\.com$/.test(host);
+}export const switchedNotice: Record<Language, (plan: string) => string> = {
+  ja: p => `${p}プランに切り替えました（動作確認テストモード）`, en: p => `Switched to ${p} (test mode)`,
+  "zh-CN": p => `已切换到${p}方案（测试模式）`, "zh-TW": p => `已切換到${p}方案（測試模式）`, ko: p => `${p} 플랜으로 전환했습니다 (테스트 모드)`,
+  es: p => `Cambiado al plan ${p} (modo de prueba)`, fr: p => `Offre ${p} activée (mode test)`,
+};
