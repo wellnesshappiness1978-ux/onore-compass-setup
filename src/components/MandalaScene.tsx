@@ -6,6 +6,7 @@ import { AgolmenLoading } from "./AgolmenSpiral";
 
 export type Capture = () => Promise<{ blob: Blob; width: number; height: number }>;
 type Props = { colors: MandalaColor[]; language: Language; variation: number; reduced: boolean; onCapture: (capture: Capture | null) => void };
+const ignoreCapture = () => undefined;
 
 export default function MandalaScene({ colors, language, variation, reduced, onCapture }: Props) {
   const copy = artSpecialistCopy[language];
@@ -30,3 +31,5 @@ export default function MandalaScene({ colors, language, variation, reduced, onC
     {failed && <div role="alert" className="absolute inset-0 grid place-items-center bg-art-void p-8 text-center text-sm leading-7 text-destructive">{copy.imageError}</div>}
   </div>;
 }
+
+export { ignoreCapture };
