@@ -13,14 +13,14 @@ const colors: MandalaColor[] = [
 
 describe("AI mandala image", () => {
   it("maps Japanese color names to English jewel keywords with the exact color", () => {
-    expect(birthColorKeyword(colors[0]!)).toBe("shining imperial amber gold (#A17A21)");
+    expect(birthColorKeyword(colors[0]!)).toBe("shining imperial amber gold");
     expect(birthColorKeyword(colors[5]!)).toContain("deep sapphire lapis blue");
   });
 
   it("builds a deterministic prompt and seed without personal data", () => {
     expect(mandalaSeed(colors)).toBe(mandalaSeed(colors));
     expect(mandalaPrompt(colors)).toContain("golden ratio fibonacci spiral");
-    expect(mandalaPrompt(colors)).toContain("#A17A21");
+    expect(mandalaPrompt(colors)).toContain("vivid ruby coral red");
   });
 
   it("encodes the prompt and changes only the seed for regeneration", () => {

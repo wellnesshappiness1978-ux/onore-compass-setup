@@ -12,7 +12,7 @@ const colorMap: Record<string, string> = {
 };
 
 export function birthColorKeyword(color: MandalaColor) {
-  return `${colorMap[color.name] ?? "luminous jewel tone"} (${color.code})`;
+  return colorMap[color.name] ?? "luminous jewel tone";
 }
 
 export function mandalaSeed(colors: MandalaColor[]) {
