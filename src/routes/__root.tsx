@@ -11,6 +11,7 @@ import {
 import { useEffect, useState, type ReactNode } from "react";
 import PlanProvider from "@/components/PlanProvider";
 import PreviewPlanBar from "@/components/PreviewPlanBar";
+import { Toaster } from "@/components/ui/sonner";
 import LegalFooter from "@/components/LegalFooter";
 import { Button } from "@/components/ui/button";
 
@@ -172,6 +173,7 @@ function RootComponent() {
       <PlanProvider>
         <PreviewPlanBar />
         <div className="app-content"><Outlet /></div>
+        <Toaster position="top-center" />
         <LegalFooter />
       </PlanProvider>
     </QueryClientProvider>
