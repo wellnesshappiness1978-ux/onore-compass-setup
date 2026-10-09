@@ -17,7 +17,7 @@ describe("preview plan and gates", () => {
     expect(canUse("standard", "helioBusiness")).toBe(false);
     expect(canUse("vip", "helioDirections")).toBe(true);
     expect(canUse("b2b", "helioBusiness")).toBe(true);
-    expect(planOrder.map(plan => memberLimit[plan])).toEqual([0, 2, 5, 30, 100]);
+    expect(planOrder.map(plan => memberLimit[plan])).toEqual([0, 3, 10, 30, 100]);
     expect(planOrder.map(plan => consultationDailyLimit[plan])).toEqual([1, 3, 10, 30, Infinity]);
   });
 });
