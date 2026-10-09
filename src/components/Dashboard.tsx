@@ -47,7 +47,6 @@ import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import DailyLifeGuide from "./DailyLifeGuide";
-import SolfeggioPlayer from "./SolfeggioPlayer";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
@@ -132,7 +131,7 @@ function TorisetsuPanel({
   const q = quickCompatibilityCopy[language];
   const [mode, setMode] = useState<"manual" | "compatibility">(only ?? initialMode);
   const generate = useServerFn(generateHomeReading);
-  const manualReading = useQuery({ queryKey: ["home-reading-six-v9", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
+  const manualReading = useQuery({ queryKey: ["home-reading-six-v10", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
   const [partnerName, setPartnerName] = useState("");
   const [partnerKana, setPartnerKana] = useState("");
   const [partnerGender, setPartnerGender] = useState<UserProfile["gender"]>("undisclosed");
@@ -651,8 +650,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             ) : null}
           </section>
         )}      </main>
-
-      {planOrder.indexOf(previewPlan) >= planOrder.indexOf("vip") && <SolfeggioPlayer language={language} compact />}
 
       <nav
         className="design-navigation fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"
