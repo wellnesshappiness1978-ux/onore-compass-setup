@@ -197,3 +197,8 @@
 ## Birth-color mandala dot-painting style
 - [x] Dot-painted eye core, radial petals, teardrops, peacock scales, wave lace edge
 - [x] Band-by-band reveal, slow rotation, reduced motion still
+
+## Birth-color mandala AI generation
+- [x] Replace the local SVG artwork with a deterministic Pollinations.ai URL driven by seven mapped birth colors only.
+- [x] Add localized loading, failure, fade-in, regeneration, full-screen, download, and share behavior without API keys.
+- [ ] Verify live generation, regeneration, full-screen viewing, and Blob download on desktop and mobile.
