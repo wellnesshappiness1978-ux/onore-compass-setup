@@ -8,7 +8,7 @@ import { nineStarsTranslations } from "@/lib/nine-stars-translations";
 import { getArtSymbols, NineStarsArtwork, zodiacGlyphs } from "./NineStarsArtwork";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
-import { ignoreCapture, type Capture } from "./MandalaScene";
+import type { Capture } from "./MandalaScene";
 import CosmicAlchemyArtwork from "./CosmicAlchemyArtwork";
 import { paletteColors } from "@/lib/art-geometry";
 import { AgolmenLoading } from "./AgolmenSpiral";
@@ -41,6 +41,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
   const [captureReady, setCaptureReady] = useState(false);
   const capture = useRef<Capture | null>(null);
   const setCapture = useCallback((fn: Capture | null) => { capture.current = fn; setCaptureReady(Boolean(fn)); }, []);
+  const ignoreCapture = useCallback(() => undefined, []);
   const displayedColors = paletteEntries.map(color => ({ name: color.name ?? "参考色", code: color.code }));
   useEffect(() => {
     setMounted(true);
