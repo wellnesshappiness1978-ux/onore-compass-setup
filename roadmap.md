@@ -214,4 +214,4 @@
 - [x] Rename the two upper plan labels to Family and Family Premium in all seven languages while preserving internal IDs.
 - [x] Rename the related-person roster to Family and align visible registration counts to 0/3/10/30/100.
 - [x] Update the signed-out introduction in all seven languages and align the database-enforced Family limits.
-- [ ] Verify the signed-out introduction, five preview plans, Family roster limits and upgrade dialog on desktop and mobile.
+- [x] Verify the signed-out introduction, five preview plans, Family roster limits and plan guidance on desktop and mobile.
