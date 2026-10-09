@@ -3,7 +3,7 @@ import { ThemeSample } from "./ThemeSample";
 import { useState } from "react";
 import {
   Bell,
-  Building2,
+  HeartHandshake,
   Check,
   Crown,
   Globe2,
@@ -91,17 +91,17 @@ export default function SettingsPanel({
   const planIcon: Record<PaidPlanId, typeof Crown> = {
     standard: Sprout,
     vip: Gem,
-    b2b: Building2,
+    b2b: HeartHandshake,
     "b2b-premium": Crown,
   };
   const premiumFeatures: Record<Language, string[]> = {
-    ja: ["関係者を最大100人登録", "100人規模の組織コンサル全7タブ", "AI回答の優先生成（提供準備中）", "ビジネスプランの全機能"],
-    en: ["Register up to 100 members", "All seven organization tools for 100 people", "Priority AI generation (coming soon)", "Everything in Business"],
-    "zh-CN": ["最多登记100人", "100人规模的全部7项组织咨询功能", "优先生成AI回答（准备中）", "包含商务方案所有功能"],
-    "zh-TW": ["最多登錄100人", "100人規模的全部7項組織顧問功能", "優先生成AI回答（準備中）", "包含商務方案所有功能"],
-    ko: ["최대 100명 등록", "100명 규모의 조직 컨설팅 7개 탭 전체", "AI 답변 우선 생성 (준비 중)", "비즈니스 플랜의 모든 기능"],
-    es: ["Registra hasta 100 personas", "Las siete herramientas de organización para 100 personas", "Generación prioritaria de IA (próximamente)", "Todas las funciones de Empresa"],
-    fr: ["Enregistrez jusqu’à 100 personnes", "Les sept outils de conseil pour 100 personnes", "Génération IA prioritaire (à venir)", "Toutes les fonctions Entreprise"],
+    ja: ["ファミリーを最大100人登録", "100人規模の組織コンサル全7タブ", "AI回答の優先生成（提供準備中）", "ビジネスプランの全機能"],
+    en: ["Register up to 100 family members", "All seven organization tools for 100 people", "Priority AI generation (coming soon)", "Everything in Family"],
+    "zh-CN": ["最多登记100位家人", "100人规模的全部7项组织咨询功能", "优先生成AI回答（准备中）", "包含家庭方案所有功能"],
+    "zh-TW": ["最多登錄100位家人", "100人規模的全部7項組織顧問功能", "優先生成AI回答（準備中）", "包含家庭方案所有功能"],
+    ko: ["패밀리 최대 100명 등록", "100명 규모의 조직 컨설팅 7개 탭 전체", "AI 답변 우선 생성 (준비 중)", "패밀리 플랜의 모든 기능"],
+    es: ["Registra hasta 100 familiares", "Las siete herramientas de organización para 100 personas", "Generación prioritaria de IA (próximamente)", "Todas las funciones de Familia"],
+    fr: ["Enregistrez jusqu’à 100 proches", "Les sept outils de conseil pour 100 personnes", "Génération IA prioritaire (à venir)", "Toutes les fonctions Famille"],
   };
   const premiumTier: PricingTier = {
     id: "b2b-premium", name: tc.planNames["b2b-premium"], priceMonthly: "¥8,888", priceYearly: "¥88,880",
@@ -142,7 +142,7 @@ export default function SettingsPanel({
               className={`mt-2 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs ${plan === "free" ? "border-border text-muted-foreground" : "border-primary/60 bg-primary/15 text-primary shadow-[0_0_16px_var(--gold-glow)]"}`}
             >
               {plan === "b2b" ? (
-                <Building2 className="size-3" />
+                <HeartHandshake className="size-3" />
               ) : plan === "standard" ? (
                 <Sparkles className="size-3" />
               ) : (
