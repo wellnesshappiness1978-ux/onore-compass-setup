@@ -18,7 +18,7 @@ import type { UserProfile } from "./Onboarding";
 import { splittableName } from "@/lib/ai/five-elements";
 import { isUpgradePlan } from "@/lib/plans";
 import type { Plan } from "@/lib/design-modes";
-import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
+import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 import BirthColorGuide from "./BirthColorGuide";
 
