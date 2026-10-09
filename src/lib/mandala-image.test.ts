@@ -28,7 +28,7 @@ describe("AI mandala image", () => {
     const regenerated = mandalaImageUrl(colors, 1);
     expect(first).toContain("width=1024&height=1024&nologo=true&seed=");
     expect(first).not.toContain(" ");
-    expect(regenerated.split("?seed=")[0]).toBe(first.split("?seed=")[0]);
+    expect(regenerated.split("&seed=")[0]).toBe(first.split("&seed=")[0]);
     expect(regenerated).not.toBe(first);
   });
 });
