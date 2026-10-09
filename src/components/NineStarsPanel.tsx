@@ -38,9 +38,10 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
   const [busy, setBusy] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [variation, setVariation] = useState(0);
+  const [captureReady, setCaptureReady] = useState(false);
   const capture = useRef<Capture | null>(null);
-  const setCapture = useCallback((fn: Capture | null) => { capture.current = fn; }, []);
-  const displayedColors = paletteEntries;
+  const setCapture = useCallback((fn: Capture | null) => { capture.current = fn; setCaptureReady(Boolean(fn)); }, []);
+  const displayedColors = paletteEntries.map(color => ({ name: color.name ?? "参考色", code: color.code }));
   useEffect(() => {
     setMounted(true);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -65,7 +66,8 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
     try {
       const { blob, width, height } = await createWallpaper();
       const url = URL.createObjectURL(blob);
-       const link = document.createElement("a"); link.href = url; link.download = `agolmen-${art === "cosmic" ? "cosmic-alchemy" : "birth-color-mandala"}-preview.png`;
+      const extension = blob.type === "image/jpeg" ? "jpg" : "png";
+      const link = document.createElement("a"); link.href = url; link.download = `agolmen-${art === "cosmic" ? "cosmic-alchemy" : "birth-color-mandala"}-preview.${extension}`;
       document.body.append(link); link.click(); link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 10000);
       setStatus(`${t.saved} · ${width} × ${height}`);
@@ -76,7 +78,8 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
     setBusy(true);
     try {
       const { blob } = await createWallpaper();
-       const file = new File([blob], `agolmen-${art === "cosmic" ? "cosmic-alchemy" : "birth-color-mandala"}-preview.png`, { type: "image/png" });
+      const extension = blob.type === "image/jpeg" ? "jpg" : "png";
+      const file = new File([blob], `agolmen-${art === "cosmic" ? "cosmic-alchemy" : "birth-color-mandala"}-preview.${extension}`, { type: blob.type });
       if (navigator.canShare?.({ files: [file] }) && navigator.share) { await navigator.share({ files: [file], title: art === "cosmic" ? a.cosmic : a.mandala, text: t.shareText }); setStatus(t.shared); }
       else if (navigator.clipboard?.write && typeof ClipboardItem !== "undefined") { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); setStatus(t.imageCopied); }
       else setStatus(t.shareFallback);
@@ -118,7 +121,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
       {symbols && <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground"><span>{t.zodiac}: <strong className="font-normal text-foreground">{zodiacGlyphs[symbols.zodiac]} {a.zodiacNames[symbols.zodiac]}</strong></span><span>{t.animal}: <strong className="font-normal text-foreground">{a.animalNames[symbols.animal]}</strong></span></div>}
       <p className="mt-2 text-sm leading-6 text-muted-foreground">{t.symbolDisclaimer}</p>
     </div>
-    <div className="mt-6 flex flex-wrap justify-center gap-2"><Button variant="outline" onClick={download} disabled={!open || busy || !capture.current} className="min-h-11 border-primary/40 text-primary"><Download />{art === "mandala" ? a.downloadWallpaper : t.downloadPreview}</Button><Button variant="outline" onClick={shareImage} disabled={!open || busy || !capture.current} className="min-h-11 border-primary/40 text-primary"><Share2 />{t.shareImage}</Button><Button variant="ghost" onClick={copyLink} className="min-h-11 text-muted-foreground"><Copy />{t.copyLink}</Button></div>
+    <div className="mt-6 flex flex-wrap justify-center gap-2"><Button variant="outline" onClick={download} disabled={!open || busy || !captureReady} className="min-h-11 border-primary/40 text-primary"><Download />{art === "mandala" ? a.downloadWallpaper : t.downloadPreview}</Button><Button variant="outline" onClick={shareImage} disabled={!open || busy || !captureReady} className="min-h-11 border-primary/40 text-primary"><Share2 />{t.shareImage}</Button><Button variant="ghost" onClick={copyLink} className="min-h-11 text-muted-foreground"><Copy />{t.copyLink}</Button></div>
     <p className="mt-3 text-sm leading-6 text-muted-foreground">{t.shareNote}</p><p role="status" aria-live="polite" className="mt-2 min-h-6 text-sm text-primary">{status}</p>
   </section>;
 }
