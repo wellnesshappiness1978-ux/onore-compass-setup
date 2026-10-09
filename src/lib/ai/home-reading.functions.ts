@@ -7,6 +7,7 @@ import { computeCoreLayers, coreLayersPrompt } from "./core-layers";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { helioPhase } from "./helio-phase";
 import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
+import { distinctTraitChapters, supportiveWritingVoice } from "./writing-voice";
 
 const profileSchema = z.object({
   nameKanji: z.string().max(40), nameKana: z.string().max(60), nameRomaji: z.string().max(60),
@@ -74,6 +75,10 @@ export const generateHomeReading = createServerFn({ method: "POST" })
       output: Output.object({ schema: readingSchema }),
       prompt: `Write a vivid, personal five-layer INTERPRETIVE reading in ${language}. Return exactly the fields in the schema; no headings in field values. This is available in FULL to every user including free users. No paywall or upsell in the reading.
 
+SHARED VOICE:
+${supportiveWritingVoice}
+${distinctTraitChapters}
+
 Use ONLY these precomputed inputs (not unverified chart placements or invented stroke counts):
 Name character grid: ${elements.name ? `天格 ${elements.name.sky}(${elements.name.luck.sky}) / 人格 ${elements.name.person}(${elements.name.luck.person}) / 地格 ${elements.name.earth}(${elements.name.luck.earth}) / 外格 ${elements.name.outer}(${elements.name.luck.outer}) / 総格 ${elements.name.total}(${elements.name.luck.total}); luck labels follow one common 81-number convention (modern Unihan stroke convention; surname/given name separated by a space)` : "not computable: needs a two-part, space-separated name with supported kanji or kana characters"}.
 Western sun sign: ${elements.zodiac ?? "unknown"}${elements.zodiacBoundary ? " (near sign boundary; date-only conventional sign, exact astronomical sign unverified)" : ""}.
@@ -87,7 +92,7 @@ ${core}
 CROSS-ANALYSIS (required): In synthesis and strength, contrast the 表の顔 list with the 本音・潜在 list and use the [クロス解析] verdicts (一致 / ギャップ) explicitly: 日干×太陽, 人格×ソウル数, 動物×月星座. Weave in 通変星, 十二運星, 五行の最多/欠如, ライフパス, and 月・水星・金星 where they sharpen the portrait. The animal surface/hope/hidden values are an original +1/+2/+3 day reference model, NOT official animal layers; do not infer personality from them. The ascendant uses birthplace representative coordinates only when available and birth time is known. Geocentric planets and Ba Zhai directions are not birthplace-dependent. Treat these as traditional divination lenses, not scientific facts.
 BANNED hedges: "〜な面もあります", "人それぞれ", "〜かもしれません", "場合によっては", and any sentence that would fit anyone.
 
-STYLE (strict): Write in direct, warm everyday language. Use the exact computed values internally as evidence, but keep specialist labels and raw parameter lists OUT of the prose: the interface displays them separately. Translate them into recognizable patterns in daily decisions, work, study, family and relationships. Make the portrait uniquely traceable to this exact combination of inputs: identify a specific tension between two calculated layers, the condition that brings out the person's strength, and the recurring point where their decisions stall. ABSOLUTELY FORBIDDEN in every output language: unexplained divination jargon or translated equivalents of 通変星, 命格, 日干, 十二運, 天格, 地格, 五行, ハウス or アスペクト; analogies, metaphors, examples or hypotheticals; preambles; generic praise that fits anyone. Start each field with the conclusion. Short, strong sentences.
+STYLE (strict): Write in direct, warm everyday language at the reader's eye level. Use the exact computed values internally as evidence, but keep specialist labels and raw parameter lists OUT of the prose: the interface displays them separately. Translate them into recognizable patterns in daily decisions, work, study, family and relationships. Make the portrait uniquely traceable to this exact combination of inputs: identify a specific tension between two calculated layers, the condition that brings out the person's strength, and the recurring point where their decisions stall. ABSOLUTELY FORBIDDEN in every output language: unexplained divination jargon or translated equivalents of 通変星, 命格, 日干, 十二運, 天格, 地格, 五行, ハウス or アスペクト; metaphors, abstract spiritual wording, preambles; generic praise that fits anyone. Start each field with a clear observation. Keep sentences short without sounding severe.
 Guardrails: do not invent values; if a lens is unavailable, say in one short sentence which one was not computed and use the rest (never claim all five were combined when not). Do not state facts about their job, relationships, health, or future events; no guaranteed outcomes or verified multi-layer claims. Blood type is described only as a traditional lens (never as science) — phrase its part as "血液型の見立てでは〜". No disclaimers or methodology inside passages; the interface states limits separately.
 
 synthesis: about 150 Japanese characters (equivalent depth in other languages). Declare their core personality and fundamental desire where the available axes intersect. Translate every source value into everyday behavior; never cite a method name, symbol, number, sign, element or fortune label. Portrait, not advice.

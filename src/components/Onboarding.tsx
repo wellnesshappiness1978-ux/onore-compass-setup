@@ -138,7 +138,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
           <h2 className="mt-2 font-serif text-2xl leading-snug text-gradient-gold">{ui.intro.title}</h2>
           <p className="mt-4 text-sm leading-7 text-foreground">{ui.intro.body}</p>
           <div className="mt-6 grid gap-3" aria-label={ui.intro.title}>
-            {[ui.intro.inputs, ui.intro.layers, ui.intro.portrait].map((line, index) => <div key={line} className="flex items-center gap-3 border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-primary/40 text-xs text-primary">{index + 1}</span><p className="text-sm leading-6 text-foreground">{line}</p>{index < 2 && <ArrowRight className="ml-auto size-4 shrink-0 text-primary" aria-hidden="true" />}</div>)}
+            {[ui.intro.inputs, ui.intro.layers, ui.intro.portrait].map((line, index) => <div key={line} className="flex items-center gap-3 border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><span className="flex size-7 shrink-0 items-center justify-center rounded-full border border-primary/40 text-xs text-primary">{index + 1}</span><p className="text-sm leading-6 text-foreground">{line}</p></div>)}
           </div>
           <p className="mt-5 text-xs leading-6 text-muted-foreground">{ui.intro.note}</p>
           <Button type="button" variant="champagne" onClick={() => setIntroVisible(false)} className="mt-6 h-14 w-full whitespace-normal px-4 text-sm font-bold sm:text-base">{ui.intro.cta}<ArrowRight className="size-4" aria-hidden="true" /></Button>

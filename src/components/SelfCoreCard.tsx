@@ -18,8 +18,9 @@ import type { UserProfile } from "./Onboarding";
 import { splittableName } from "@/lib/ai/five-elements";
 import { isUpgradePlan } from "@/lib/plans";
 import type { Plan } from "@/lib/design-modes";
-import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
+import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
+import BirthColorGuide from "./BirthColorGuide";
 
 const layerCopy: Record<Language, { title: string; choose: string; names: string[]; summaries: string[]; surface: string; inner: string; moreTime: string; birthplace: string; regional: string; prefectural: string; source: string }> = {
   ja: { title: "6大占術レイヤー", choose: "占術レイヤーを選択", names: ["本格姓名判断", "精密数秘術", "西洋占星術", "四柱推命", "動物占い・独自4層参考", "本格風水学"], summaries: ["名前の五運と社会面を確認します。", "生年月日とローマ字名の数を確認します。", "出生時の天体配置を確認します。", "生年月日時の暦と要素の配分を確認します。", "生年月日の60日周期を確認します。", "生年と性別区分から方位タイプを確認します。"], surface: "表の顔", inner: "本音・潜在", moreTime: "※出生時間を設定するとさらに精密度が向上します", birthplace: "出生地", regional: "市区町村", prefectural: "都道府県", source: "代表座標をアセンダントに使用。位置データ" },
@@ -101,7 +102,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-six-v9", profile, language],
+    queryKey: ["home-reading-six-v10", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
@@ -133,7 +134,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
             <article><h3 className="font-serif text-xl text-primary">{language === "ja" ? "個別診断" : "Personal reading"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data?.manualCore ?? t.loading}</p></article>
             <article><h3 className="font-serif text-xl text-primary">{language === "ja" ? "見落としやすい内面" : "An inner blind spot"}</h3><p className="mt-3 text-base leading-8 text-foreground">{data?.caution ?? t.loading}</p><p className="mt-2 text-xs text-muted-foreground">{language === "ja" ? "参考の読み解きであり、実際の心情や未来の危険を判定しません。" : "A reflective interpretation, not a reading of private thoughts or future harm."}</p></article>
           </div>}
-          {palette && <article className="mt-6 flex items-center gap-4 border-y border-primary/25 py-5"><span className="size-16 shrink-0 rounded-full border border-primary/30" style={{ backgroundColor: palette.main.code }} aria-hidden="true" /><div><h3 className="font-serif text-xl text-primary">{language === "ja" ? "あなたの守護バースカラー" : "Your guardian birth color"}</h3><p className="mt-1 text-base text-foreground">{localizeBirthColorName(palette.main.name, language)} · {palette.main.code}</p><p className="text-xs text-muted-foreground">{language === "ja" ? "変わらないメイン参考色を、今日の小物や装いに。保護効果を示すものではありません。" : "Your stable reference color for today's accessories; no protective effect is claimed."}</p></div></article>}
+          {palette && <div className="mt-6"><BirthColorGuide profile={profile} plan={activePlan} language={language} /></div>}
           {data && <details className="mt-5"><summary className="cursor-pointer text-primary">{language === "ja" ? "思考と内面の構造" : "Thought and inner patterns"}</summary>{[data.manualDecision, data.manualTiming].map((body, i) => <article key={i} className="border-t border-primary/20 py-5"><h3 className="font-serif text-xl text-primary">{coreSections[i + 1]}</h3><p className="mt-3 text-base leading-8 text-foreground">{body}</p></article>)}</details>}
           <ShareCardButton language={language} loading={isPending} data={data?.keySummary && data.caution ? { kicker: "", title: "", names: profile.nameKanji ? [profile.nameKanji] : [], lines: [data.keySummary], caution: data.caution, palette: palette ? (activePlan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.love, palette.health, palette.mind]).map((color, i) => ({ label: (language === "ja" ? ["メイン", "サブ", "金運", "愛情", "健康", "内面"] : language === "zh-TW" ? ["主色", "副色", "財運", "愛情", "健康", "內在"] : ["Main", "Secondary", "Money", "Love", "Health", "Inner"])[i] ?? "", code: color.code })) : [], score: localLayers?.numerology.lifePath ?? 0, kind: "identity" } : null} />
         </section>
@@ -170,7 +171,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
               ["01", data.nameNature, data.nameGuide], ["02", data.numerologyNature, data.numerologyGuide],
               ["03", data.westernNature, data.westernGuide], ["04", data.pillarsNature, data.pillarsGuide],
               ["05", data.animalNature, data.animalGuide], ["06", data.fengNature, data.fengGuide],
-            ] as const).map(([title, nature, guide], index) => <article key={title} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9"><div className="flex items-center gap-3"><span className="font-serif text-xs text-primary/65">{title}</span><h3 className="font-serif text-xl text-primary">{language === "ja" ? ["人との関わり方", "選び方と進み方", "外に見せる顔と内側", "力の使い方", "決断の癖", "心地よい環境"][index] : ["How you connect", "How you choose", "Outer and inner self", "How you use energy", "Decision patterns", "Supportive spaces"][index]}</h3></div><div className="mt-5 grid gap-5 sm:grid-cols-2"><div><p className="text-xs text-primary">{language === "ja" ? "本質・特性" : "Nature"}</p><p className="mt-2 text-base leading-8 text-foreground">{nature}</p></div><div className="border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><p className="text-xs text-primary">{language === "ja" ? "今のあなたへの道標" : "Your guide"}</p><p className="mt-2 text-base leading-8 text-foreground">{guide}</p></div></div></article>)}
+            ] as const).map(([title, nature, guide], index) => <article key={title} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9"><div className="flex items-center gap-3"><span className="font-serif text-xs text-primary/65">{title}</span><h3 className="font-serif text-xl text-primary">{language === "ja" ? ["人から見える強み", "心が大切にするもの", "伝え方と人との距離", "行動と休息のリズム", "決断するときの癖", "心地よさを支える環境"][index] : ["Visible strengths", "What your heart values", "Communication and closeness", "Action and rest rhythm", "Decision patterns", "Supportive spaces"][index]}</h3></div><div className="mt-5 grid gap-5 sm:grid-cols-2"><div><p className="text-xs text-primary">{language === "ja" ? "本質・特性" : "Nature"}</p><p className="mt-2 text-base leading-8 text-foreground">{nature}</p></div><div className="border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><p className="text-xs text-primary">{language === "ja" ? "今のあなたへの道標" : "Your guide"}</p><p className="mt-2 text-base leading-8 text-foreground">{guide}</p></div></div></article>)}
           </section>
           }
           {!experienceOnly && sections.map((text, i) => {

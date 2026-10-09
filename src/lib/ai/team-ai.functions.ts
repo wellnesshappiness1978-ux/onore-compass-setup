@@ -3,6 +3,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { Output, streamText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayRunIdFetch } from "./run-id.server.ts";
+import { supportiveWritingVoice } from "./writing-voice.ts";
 
 const lang = z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]);
 const memberSummary = z.object({
@@ -16,7 +17,7 @@ const provider = (apiKey: string) => createOpenAI({
   headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
   fetch: createLovableAiGatewayRunIdFetch().fetch,
 });
-const RULES = "All inputs are illustrative reference values derived from birth dates (numerology life path, day-stem element, sine biorhythm). They are NOT verified divination nor evidence of ability. Do not claim certainty, guaranteed outcomes, or health effects. Be warm, practical, and avoid jargon. Never judge people as good or bad hires.";
+const RULES = `All inputs are illustrative reference values derived from birth dates (numerology life path, day-stem element, sine biorhythm). They are NOT verified divination nor evidence of ability. Do not claim certainty, guaranteed outcomes, or health effects. Never judge people as good or bad hires. ${supportiveWritingVoice}`;
 const outputLanguage = (language: z.infer<typeof lang>) => language === "ja"
   ? "Write every user-visible sentence entirely in natural Japanese. Do not use English headings, labels, or explanatory phrases."
   : `Write in language ${language}.`;

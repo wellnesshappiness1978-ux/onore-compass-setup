@@ -27,6 +27,7 @@ import { isUpgradePlan, memberLimit, planOrder } from "@/lib/plans";
 import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
+import SolfeggioPlayer from "./SolfeggioPlayer";
 
 type Props = {
   profile: UserProfile;
@@ -189,6 +190,8 @@ export default function SettingsPanel({
       </section>
 
       {signedIn && debugAllowed && <DebugPlanSwitcher plan={actualPlan} language={language} onChanged={onDebugPlanChanged} />}
+
+      {planOrder.indexOf(plan) >= planOrder.indexOf("vip") && <section className={card}><SolfeggioPlayer language={language} /></section>}
 
       <section className="border-y border-primary/20 py-6" aria-labelledby="design-heading">
         <div className="flex items-center gap-2">

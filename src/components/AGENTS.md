@@ -9,3 +9,4 @@
 - Team roster uses owner-only rows when signed in and `onore-team` locally otherwise; team simulator uses deterministic pair scores and effective preview plan. Why: guest preview grants no writes.
 - Reuse HelioCalendar on Home/My Page and BirthColorGuide for color output rather than independent panels. Why: avoid tier-gate bypasses.
 - Dashboard has one gesture-started ambient-piano player. Why: no overlapping audio.
+- The ambient-piano player renders only inside Settings for VIP and above. Why: keep mobile workflows clear while preserving one gesture-started audio instance.
