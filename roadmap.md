@@ -208,4 +208,4 @@
 - [x] Align home, consultation and team AI writing with a warm, plain-language shared voice and reduce repeated trait passages.
 - [x] Add seven tappable birth-color cards with localized detail dialogs and existing plan gates.
 - [x] Move Celestial Piano from the persistent overlay into Settings only.
-- [ ] Verify the updated signed-out, Traits and Settings flows on desktop and mobile.
+- [x] Verify the updated signed-out, Traits and Settings flows on desktop and mobile.
