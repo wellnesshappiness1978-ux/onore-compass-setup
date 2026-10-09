@@ -6,7 +6,7 @@
 - My Page paid cards use seven-language plan copy and settings prices; clicks switch preview plans only on test hosts and production stays informational until billing exists. Active tier is status, not a sales card (use isUpgradePlan). Why: no false payment path.
 - Appearance picker offers 15 cumulative tier-gated modes with a shared-token screen specimen for every mode and a locked full-screen preview; existing mode IDs and the session key persist. Themes are session-local and tier-scoped. Why: preview the actual palette without changing entitlements or saved choices.
 - Share cards use the shared client canvas, localized readings, effective-plan palettes (Free main only), hidden names by default, and save fallback for native sharing. Why: protect identity and device compatibility.
-- Team roster uses owner-only rows when signed in and `onore-team` locally otherwise; team simulator uses deterministic pair scores and effective preview plan. Why: guest preview grants no writes.
+- Family roster uses owner-only `team_members` rows when signed in and `onore-team` locally otherwise; team simulator uses deterministic pair scores and effective preview plan. Why: keep legacy storage compatible while guest preview grants no writes.
 - Reuse HelioCalendar on Home/My Page and BirthColorGuide for color output rather than independent panels. Why: avoid tier-gate bypasses.
 - Dashboard has one gesture-started ambient-piano player. Why: no overlapping audio.
 - The ambient-piano player renders only inside Settings for VIP and above. Why: keep mobile workflows clear while preserving one gesture-started audio instance.

@@ -95,7 +95,7 @@ export default function SettingsPanel({
     "b2b-premium": Crown,
   };
   const premiumFeatures: Record<Language, string[]> = {
-    ja: ["ファミリーを最大100人登録", "100人規模の組織コンサル全7タブ", "AI回答の優先生成（提供準備中）", "ビジネスプランの全機能"],
+    ja: ["ファミリーを最大100人登録", "100人規模の組織コンサル全7タブ", "AI回答の優先生成（提供準備中）", "ファミリープランの全機能"],
     en: ["Register up to 100 family members", "All seven organization tools for 100 people", "Priority AI generation (coming soon)", "Everything in Family"],
     "zh-CN": ["最多登记100位家人", "100人规模的全部7项组织咨询功能", "优先生成AI回答（准备中）", "包含家庭方案所有功能"],
     "zh-TW": ["最多登錄100位家人", "100人規模的全部7項組織顧問功能", "優先生成AI回答（準備中）", "包含家庭方案所有功能"],
