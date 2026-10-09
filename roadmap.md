@@ -25,7 +25,7 @@
 - [x] Combine Home traits and diagnosis into one card with six AI-generated reflection fields, mobile layout, and clear illustrative labeling.
 - [x] Give the Home portrait its own longer, larger-type reflective passage; separate the three practical prompts into an action section in all seven languages.
 - [x] Rename three app designs, add seven-language nine-stars copy, and tint the locked illustrative wheel with two birth-date colors.
-- [x] Plan member limits (0/2/5/30/100), Business Premium ¥8,888, team studio (diagnosis, AI draft, catalog, calendar, balance, 1on1)
+- [x] Plan Family limits (0/3/10/30/100), Family Premium ¥8,888, team studio (diagnosis, AI draft, catalog, calendar, balance, 1on1)
 - [ ] Signed-in team save test — blocked until first Google sign-in
 - [x] Add ornate nine-stars reference grid, date/color motifs, and labelled preview PNG export/device image sharing without claiming a verified natal chart or paid membership.
 - [x] Remove Japanese-locale English leakage from Business Premium, team talent cards, plan controls, and team AI responses.
@@ -209,3 +209,9 @@
 - [x] Add seven tappable birth-color cards with localized detail dialogs and existing plan gates.
 - [x] Move Celestial Piano from the persistent overlay into Settings only.
 - [x] Verify the updated signed-out, Traits and Settings flows on desktop and mobile.
+
+## Family plan and registration update
+- [x] Rename the two upper plan labels to Family and Family Premium in all seven languages while preserving internal IDs.
+- [x] Rename the related-person roster to Family and align visible registration counts to 0/3/10/30/100.
+- [x] Update the signed-out introduction in all seven languages and align the database-enforced Family limits.
+- [x] Verify the signed-out introduction, five preview plans, Family roster limits and plan guidance on desktop and mobile.

@@ -9,12 +9,12 @@ export const isUpgradePlan = (current: Plan, candidate: Plan) => rank(candidate)
 /** The one membership catalogue used by pricing and preview gates. Paid access remains a preview. */
 export const membership = {
   free: { memberLimit: 0, capabilities: ["personalReading", "basicColors", "mandalaPreview"] },
-  standard: { memberLimit: 2, capabilities: ["compatibility", "detailedManual", "sixColorGenres"] },
-  vip: { memberLimit: 5, capabilities: ["mandalaHd", "wallpaper", "imageSharing", "unlimitedConsultation", "calendarExport"] },
+  standard: { memberLimit: 3, capabilities: ["compatibility", "detailedManual", "sixColorGenres"] },
+  vip: { memberLimit: 10, capabilities: ["mandalaHd", "wallpaper", "imageSharing", "unlimitedConsultation", "calendarExport"] },
   b2b: { memberLimit: 30, capabilities: ["sevenTeamTools"] },
   "b2b-premium": { memberLimit: 100, capabilities: ["fullHundredMemberTeam", "priorityAi"] },
 } as const satisfies Record<Plan, { memberLimit: number; capabilities: readonly string[] }>;
-/** Registered-member (関係者) limits per plan; the database mirrors these caps for writes. */
+/** Registered-family limits per plan; the database mirrors these caps for writes. */
 export const memberLimit: Record<Plan, number> = Object.fromEntries(
   Object.entries(membership).map(([plan, value]) => [plan, value.memberLimit]),
 ) as Record<Plan, number>;

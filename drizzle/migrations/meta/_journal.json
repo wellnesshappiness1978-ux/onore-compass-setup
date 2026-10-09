@@ -78,6 +78,13 @@
       "when": 1791445286200,
       "tag": "0010_daily_usage",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791558172724,
+      "tag": "0011_update_family_member_plan_limits",
+      "breakpoints": true
     }
   ]
 }

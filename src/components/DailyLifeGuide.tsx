@@ -17,18 +17,18 @@ const ja = {
   title: "今日の生活ガイド", sub: "毎日更新・生年月日と今日の暦から算出した参考値",
   food: "開運フード", shop: "買い物", health: "健康アドバイス", dir: "吉方位",
   lock: "スタンダードプラン以上で毎日の生活ガイドが開きます", upgrade: "プランを見る",
-  relTitle: "クイック人間関係ガイド", relSub: "関係者を選ぶと、今日の声かけとNG対応がすぐ分かります",
-  say: "今日掛けるべき言葉", ng: "NGな対応", empty: "関係者がまだ登録されていません（マイページのチームから登録）",
-  relLock: "スタンダードプラン以上で関係者ガイドが使えます",
+  relTitle: "クイック人間関係ガイド", relSub: "ファミリーを選ぶと、今日の声かけとNG対応がすぐ分かります",
+  say: "今日掛けるべき言葉", ng: "NGな対応", empty: "ファミリーがまだ登録されていません（マイページのチームから登録）",
+  relLock: "スタンダードプラン以上でファミリーガイドが使えます",
   dirs: { N: "北", NE: "北東", E: "東", SE: "南東", S: "南", SW: "南西", W: "西", NW: "北西" } as Record<string, string>,
 };
 const en = {
   title: "Today's Life Guide", sub: "Updated daily · reference values from your birth date and today's calendar",
   food: "Lucky food", shop: "Shopping", health: "Health tip", dir: "Lucky direction",
   lock: "Unlocks with Standard plan or higher", upgrade: "View plans",
-  relTitle: "Quick Relationship Guide", relSub: "Pick a person to see today's words to say and what to avoid",
-  say: "Words to say today", ng: "Avoid", empty: "No people registered yet (add them in My Page › Team)",
-  relLock: "Relationship guide unlocks with Standard plan or higher",
+  relTitle: "Quick Relationship Guide", relSub: "Pick a family member to see today's words to say and what to avoid",
+  say: "Words to say today", ng: "Avoid", empty: "No family registered yet (add them in My Page › Team)",
+  relLock: "Family guide unlocks with Standard plan or higher",
   dirs: { N: "N", NE: "NE", E: "E", SE: "SE", S: "S", SW: "SW", W: "W", NW: "NW" } as Record<string, string>,
 };
 
