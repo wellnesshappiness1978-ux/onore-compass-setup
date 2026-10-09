@@ -201,4 +201,4 @@
 ## Birth-color mandala AI generation
 - [x] Replace the local SVG artwork with a deterministic Pollinations.ai URL driven by seven mapped birth colors only.
 - [x] Add localized loading, failure, fade-in, regeneration, full-screen, download, and share behavior without API keys.
-- [ ] Verify live generation, regeneration, full-screen viewing, and Blob download on desktop and mobile.
+- [ ] Verify live generation, regeneration, full-screen viewing, and Blob download on desktop and mobile — blocked because Pollinations.ai currently returns HTTP 402 for the requested dynamic prompt; no alternate service or prompt was substituted.
