@@ -16,6 +16,7 @@ describe("profile UI localization", () => {
       expect(copy.kanaError).toBeTruthy();
       expect(copy.requiredFieldsError).toBeTruthy();
       expect(copy.intro.cta).toBeTruthy();
+      expect(copy.intro.body.length).toBeGreaterThan(180);
       expect(copy.settings.morningPush).toBeTruthy();
       expect(copy.team.recruit.title).toBeTruthy();
     }

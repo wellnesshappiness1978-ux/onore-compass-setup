@@ -204,8 +204,8 @@
 - [ ] Verify live generation, regeneration, full-screen viewing, and Blob download on desktop and mobile — blocked because Pollinations.ai currently returns HTTP 402 for the requested dynamic prompt; no alternate service or prompt was substituted.
 
 ## Copy, traits, birth colors and audio placement
-- [ ] Replace the signed-out introduction in seven languages and remove decorative input-row arrows.
-- [ ] Align home, consultation and team AI writing with a warm, plain-language shared voice and reduce repeated trait passages.
-- [ ] Add seven tappable birth-color cards with localized detail dialogs and existing plan gates.
-- [ ] Move Celestial Piano from the persistent overlay into Settings only.
+- [x] Replace the signed-out introduction in seven languages and remove decorative input-row arrows.
+- [x] Align home, consultation and team AI writing with a warm, plain-language shared voice and reduce repeated trait passages.
+- [x] Add seven tappable birth-color cards with localized detail dialogs and existing plan gates.
+- [x] Move Celestial Piano from the persistent overlay into Settings only.
 - [ ] Verify the updated signed-out, Traits and Settings flows on desktop and mobile.
