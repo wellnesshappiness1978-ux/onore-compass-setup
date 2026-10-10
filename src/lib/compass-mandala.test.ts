@@ -43,6 +43,7 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("<image");
     expect((plate.match(/<polygon/g) ?? [])).toHaveLength(32);
     expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? [])).toHaveLength(72);
+    expect((plate.match(/stroke-linecap="round" stroke-dasharray=/g) ?? []).length).toBeGreaterThan(140);
     expect((plate.match(/filter="url\(#fineGold\)"/g) ?? []).length).toBeGreaterThan(20);
   });
   it("keeps still and exported compositions identical while regeneration changes the paintwork", () => {
