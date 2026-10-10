@@ -29,8 +29,9 @@ describe("compass mandala layout", () => {
     expect(plate).toContain("midGold");
     expect(plate).toContain("leafGold");
     expect(plate).toContain("data-core-gemstone=\"#A17A21\"");
-    expect(plate).toContain('data-refracted-light="18"');
-    expect(plate).toContain("gemFlash");
+    expect(plate).toContain('data-refracted-light="12"');
+    expect(plate).toContain('data-gem-cut="rose"');
+    expect(plate).toContain('data-gem-facets="14"');
     expect(plate).toContain("platinumRay");
     expect(plate).toContain("stroke-dasharray");
     const paintScales = [...plate.matchAll(/id="pigment\d"[\s\S]*?<feDisplacementMap[^>]+scale="([\d.]+)"/g)].map(match => Number(match[1]));
@@ -43,7 +44,7 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("<image");
     expect(plate).not.toContain('data-compass-engraving=');
     expect(plate).toContain('data-gem-setting="inset"');
-    expect(plate).toContain('data-gem-radius-ratio="0.55"');
+    expect(plate).toContain('data-gem-radius-ratio="0.44"');
     expect(plate).not.toContain('data-gem-light-seat=');
     expect(plate).not.toContain('data-gem-dark-seat=');
     expect(plate).toContain('data-color-role="health"');
@@ -53,7 +54,8 @@ describe("compass mandala layout", () => {
     expect(plate).toContain('data-color-role="sub" data-color-emphasis="supporting"');
     expect(plate).toContain('data-color-role="mind" data-color-emphasis="supporting"');
     expect([...plate.matchAll(/data-four-color-flow="([^"]+)"/g)].map(match => match[1])).toEqual(["health", "love", "work", "wealth"]);
-    expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(7);
+    expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(5);
+    expect((plate.match(/data-gem-inclusion=/g) ?? [])).toHaveLength(17);
     expect(plate).toContain('filter="url(#gemstoneRealism)"');
     const gem = plate.slice(plate.indexOf('<g data-core-gemstone='));
     expect(gem).not.toContain("<circle");
