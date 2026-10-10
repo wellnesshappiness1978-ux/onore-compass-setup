@@ -260,7 +260,7 @@ export function compassMandalaLayout(colors: string[], variation = 0, radius = 4
     const len = i % 4 === 0 ? compassR : i % 2 === 0 ? compassR * .72 : compassR * .5;
     const w = Math.PI / 16;
     const tip = [Math.cos(a) * len, Math.sin(a) * len];
-    const side = (s: number) => [Math.cos(a + s * w) * len * .22, Math.sin(a + s * w) * len * .22];
+    const side = (s: number) => [Math.cos(a + s * w * 1.6) * len * .34, Math.sin(a + s * w * 1.6) * len * .34];
     const [lx, ly] = side(-1), [rx, ry] = side(1);
     blades.push({ points: `0,0 ${f(lx!)},${f(ly!)} ${f(tip[0]!)},${f(tip[1]!)}`, light: true });
     blades.push({ points: `0,0 ${f(rx!)},${f(ry!)} ${f(tip[0]!)},${f(tip[1]!)}`, light: false });
