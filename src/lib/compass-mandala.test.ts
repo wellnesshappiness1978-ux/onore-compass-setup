@@ -24,6 +24,10 @@ describe("compass mandala layout", () => {
     expect(plate).toContain("mix-blend-mode:color");
     expect(plate).toContain("fractalNoise");
     expect(plate).toContain("roughGold");
+    expect(plate).toContain("fineGold");
+    expect(plate).toContain("agedGold");
+    expect(plate).toContain("midGold");
+    expect(plate).toContain("leafGold");
     expect(plate).toContain("stroke-dasharray");
     const paintScales = [...plate.matchAll(/id="pigment\d"[\s\S]*?<feDisplacementMap[^>]+scale="([\d.]+)"/g)].map(match => Number(match[1]));
     expect(paintScales).toHaveLength(6);
@@ -33,6 +37,8 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("<rect");
     expect(plate).not.toContain("image.pollinations");
     expect(plate).not.toContain("<image");
+    expect((plate.match(/<polygon/g) ?? [])).toHaveLength(32);
+    expect((plate.match(/filter="url\(#fineGold\)"/g) ?? []).length).toBeGreaterThan(20);
   });
   it("keeps still and exported compositions identical while regeneration changes the paintwork", () => {
     expect(buildMandalaColorPlate(colors, 0, true)).toBe(buildMandalaColorPlate(colors, 0, false));
