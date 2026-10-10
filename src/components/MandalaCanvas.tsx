@@ -16,7 +16,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
   // Visual hierarchy: overall gemstone, then health → love → work → wealth.
   // Sub and mind remain as restrained bridge colors in the two outer layers.
   const visualCodes = [codes[0], codes[5], codes[4], codes[3], codes[2], codes[1], codes[6]].filter((code): code is string => Boolean(code));
-  const { core, compassR, blades, layers, particles, workSeed } = compassMandalaLayout(visualCodes, variation);
+  const { core, compassR, layers, particles, workSeed } = compassMandalaLayout(visualCodes, variation);
   const unit = (salt: number) => {
     const x = Math.sin((workSeed + salt) * 12.9898) * 43758.5453;
     return x - Math.floor(x);
@@ -47,24 +47,28 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const skew = (unit(4200 + i) - .5) * s;
     return `<path d="M${(p.x - s).toFixed(1)} ${(p.y + skew).toFixed(1)}l${(s * 1.2).toFixed(1)} ${(-s * .9).toFixed(1)}l${(s * .85).toFixed(1)} ${(s * 1.1).toFixed(1)}l${(-s * 1.35).toFixed(1)} ${(s * .48).toFixed(1)}Z" fill="url(#leafGold)" fill-opacity="${(.34 + unit(4300 + i) * .34).toFixed(2)}" filter="url(#fineGold)"/>`;
   }).join("");
-  const gemRadius = compassR * .275;
-  const rays = Array.from({ length: 72 }, (_, i) => {
-    const a = i / 72 * Math.PI * 2 + unit(5000 + i) * .016;
-    const start = gemRadius * (.9 + unit(5100 + i) * .34);
-    const length = 128 + unit(5200 + i) * 292;
-    const half = (.0025 + unit(5300 + i) * .007) * (i % 6 === 0 ? 1.8 : 1);
-    const point = (r: number, da = 0) => `${(Math.cos(a + da) * r).toFixed(1)},${(Math.sin(a + da) * r).toFixed(1)}`;
-    const fill = i % 9 === 0 ? "url(#platinumRay)" : "url(#goldRay)";
-    return `<path d="M${point(start, -half)} L${point(length)} L${point(start, half)} Z" fill="${fill}" fill-opacity="${(i % 9 === 0 ? .62 : .32 + unit(5400 + i) * .24).toFixed(2)}" filter="url(#rayTexture)"/>`;
+  const gemRadius = compassR * .55;
+  const refractedLight = Array.from({ length: 18 }, (_, i) => {
+    const a = i / 18 * Math.PI * 2 + (unit(5000 + i) - .5) * .18;
+    const start = gemRadius * (.72 + unit(5100 + i) * .22);
+    const end = gemRadius * (1.28 + unit(5200 + i) * 2.55);
+    const bend = (unit(5300 + i) - .5) * .32;
+    const width = .004 + unit(5400 + i) * .014;
+    const point = (r: number, da = 0) => `${(Math.cos(a + da) * r).toFixed(1)} ${(Math.sin(a + da) * r).toFixed(1)}`;
+    const color = i % 5 === 0 ? "url(#platinumRay)" : i % 3 === 0 ? "url(#coreRay)" : "url(#goldRay)";
+    return `<path d="M${point(start, -width)} Q${point((start + end) * .52, bend)} ${point(end)} Q${point((start + end) * .5, bend * .72)} ${point(start, width)}Z" fill="${color}" fill-opacity="${(.22 + unit(5500 + i) * .38).toFixed(2)}" filter="url(#rayTexture)"/>`;
   }).join("");
-  const rayThreads = Array.from({ length: 144 }, (_, i) => {
-    const a = i / 144 * Math.PI * 2 + (unit(6000 + i) - .5) * .012;
-    const start = gemRadius * (.84 + unit(6100 + i) * .4);
-    const end = 172 + unit(6200 + i) * 278;
-    const x1 = Math.cos(a) * start, y1 = Math.sin(a) * start;
-    const x2 = Math.cos(a) * end, y2 = Math.sin(a) * end;
-    const stroke = i % 12 === 0 ? "url(#platinumRay)" : "url(#goldRay)";
-    return `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)}L${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${stroke}" stroke-opacity="${(i % 12 === 0 ? .82 : .35 + unit(6300 + i) * .32).toFixed(2)}" stroke-width="${(i % 12 === 0 ? .75 : .18 + unit(6400 + i) * .42).toFixed(2)}" stroke-linecap="round" stroke-dasharray="${i % 5 ? "160 8 32 5" : "210 4 16 3"}" filter="url(#rayTexture)"/>`;
+  const lightFilaments = Array.from({ length: 36 }, (_, i) => {
+    const a = i / 36 * Math.PI * 2 + (unit(6000 + i) - .5) * .21;
+    const start = gemRadius * (.78 + unit(6100 + i) * .24);
+    const end = gemRadius * (1.15 + unit(6200 + i) * 2.25);
+    const bend = (unit(6300 + i) - .5) * 54;
+    const sx = Math.cos(a) * start, sy = Math.sin(a) * start;
+    const ex = Math.cos(a) * end, ey = Math.sin(a) * end;
+    const mx = Math.cos(a) * ((start + end) / 2) - Math.sin(a) * bend;
+    const my = Math.sin(a) * ((start + end) / 2) + Math.cos(a) * bend;
+    const stroke = i % 7 === 0 ? "url(#platinumRay)" : i % 4 === 0 ? "url(#coreRay)" : "url(#goldRay)";
+    return `<path d="M${sx.toFixed(1)} ${sy.toFixed(1)}Q${mx.toFixed(1)} ${my.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="${stroke}" stroke-opacity="${(.2 + unit(6400 + i) * .46).toFixed(2)}" stroke-width="${(.16 + unit(6500 + i) * .48).toFixed(2)}" stroke-linecap="round" filter="url(#rayTexture)"/>`;
   }).join("");
   const filigreeRosettes = layers.map((l, i) => `<g opacity="${(.35 + i * .035).toFixed(2)}"><path d="${l.facetPath}" fill="none" stroke="#F5DEA0" stroke-width="${(.3 + i * .045).toFixed(2)}" stroke-dasharray="1 2 7 3" filter="url(#fineGold)"/><path d="${l.innerPath}" fill="none" stroke="url(#leafGold)" stroke-width="${(.48 + i * .055).toFixed(2)}" stroke-dasharray="19 3 2 4" filter="url(#roughGold)"/></g>`).join("");
   const crownJewels = Array.from({ length: 64 }, (_, i) => {
@@ -74,8 +78,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const s = i % 8 === 0 ? 4.6 : 1.5 + unit(6700 + i) * 1.8;
     return `<path d="M${x.toFixed(1)} ${(y - s).toFixed(1)}L${(x + s * .62).toFixed(1)} ${y.toFixed(1)}L${x.toFixed(1)} ${(y + s).toFixed(1)}L${(x - s * .62).toFixed(1)} ${y.toFixed(1)}Z" fill="${i % 8 === 0 ? "#FFF4BF" : "url(#leafGold)"}" fill-opacity="${i % 8 === 0 ? ".88" : ".58"}" stroke="#7B551D" stroke-width=".35" filter="url(#fineGold)"/>`;
   }).join("");
-  const compassEngraving = blades.map((blade, i) => `<polygon points="${blade.points}" fill="none" stroke="${i % 4 ? "url(#agedGold)" : "url(#leafGold)"}" stroke-opacity="${blade.light ? ".7" : ".48"}" stroke-width="${blade.light ? ".78" : ".5"}" stroke-linejoin="round" stroke-dasharray="${i % 3 ? "8 2 1 3" : "13 3 2 2"}" filter="url(#roughGold)"/>`).join("");
-  // A prominent hand-set gemstone, enlarged to three times the miniature footprint without a circular bezel.
+  // A large hand-set gemstone whose faceted edge is defined by reflected color, never a dark bezel.
   const gemPoint = (i: number, scale = 1) => {
     const a = -Math.PI / 2 + Math.PI / 8 + i * Math.PI / 4;
     return `${(Math.cos(a) * gemRadius * .86 * scale).toFixed(1)},${(Math.sin(a) * gemRadius * 1.08 * scale).toFixed(1)}`;
@@ -96,31 +99,38 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
   ].map(({ role, color }, group) => {
     const petals = Array.from({ length: 4 }, (_, petal) => {
       const a = -Math.PI / 2 + (group + petal * 4) / 16 * Math.PI * 2;
-      const inner = gemRadius * .68;
-      const outer = 76 + group * 5;
-      const half = .205 + group * .006;
+      const inner = gemRadius * .18;
+      const outer = gemRadius * (1.48 + group * .19);
+      const half = .27 + group * .012;
       const p = (r: number, da = 0) => `${(Math.cos(a + da) * r).toFixed(1)} ${(Math.sin(a + da) * r).toFixed(1)}`;
-      return `<path d="M${p(inner, -half)}Q${p(outer * .58, -half * .5)} ${p(outer)}Q${p(outer * .58, half * .5)} ${p(inner, half)}Z" fill="${color}" fill-opacity="${(.78 - group * .07).toFixed(2)}" stroke="${color}" stroke-opacity=".9" stroke-width="1.1" filter="url(#flowPaint)"/>`;
+      return `<path d="M${p(inner, -half)}Q${p(outer * .56, -half * .42)} ${p(outer)}Q${p(outer * .61, half * .48)} ${p(inner, half)}Z" fill="${color}" fill-opacity="${(.86 - group * .06).toFixed(2)}" stroke="${color}" stroke-opacity=".72" stroke-width=".7" filter="url(#flowPaint)"/>`;
     }).join("");
     return `<g data-four-color-flow="${role}">${petals}</g>`;
   }).join("");
-  const gemstoneSparkles = [0, 1, 2, 3].map((i) => {
-    const a = -.92 + i * 1.67;
-    const r = gemRadius * (.34 + (i % 2) * .28);
+  const gemstoneSparkles = Array.from({ length: 7 }, (_, i) => {
+    const a = -.92 + i * .93 + unit(6800 + i) * .16;
+    const r = gemRadius * (.24 + unit(6900 + i) * .52);
     const x = Math.cos(a) * r;
     const y = Math.sin(a) * r;
-    const s = i === 0 ? 5.8 : 2.5 + i * .55;
-    return `<path data-gem-sparkle="true" d="M${x.toFixed(1)} ${(y-s).toFixed(1)}L${(x+s*.24).toFixed(1)} ${(y-s*.24).toFixed(1)}L${(x+s).toFixed(1)} ${y.toFixed(1)}L${(x+s*.24).toFixed(1)} ${(y+s*.24).toFixed(1)}L${x.toFixed(1)} ${(y+s).toFixed(1)}L${(x-s*.24).toFixed(1)} ${(y+s*.24).toFixed(1)}L${(x-s).toFixed(1)} ${y.toFixed(1)}L${(x-s*.24).toFixed(1)} ${(y-s*.24).toFixed(1)}Z" fill="#FFFFFF" fill-opacity="${i === 0 ? ".98" : ".84"}" filter="url(#gemSparkle)"/>`;
+    const s = i === 0 ? 9.2 : 2.8 + unit(7000 + i) * 4.8;
+    return `<path data-gem-sparkle="true" d="M${x.toFixed(1)} ${(y-s).toFixed(1)}C${(x+s*.12).toFixed(1)} ${(y-s*.25).toFixed(1)} ${(x+s*.25).toFixed(1)} ${(y-s*.12).toFixed(1)} ${(x+s).toFixed(1)} ${y.toFixed(1)}C${(x+s*.25).toFixed(1)} ${(y+s*.12).toFixed(1)} ${(x+s*.12).toFixed(1)} ${(y+s*.25).toFixed(1)} ${x.toFixed(1)} ${(y+s).toFixed(1)}C${(x-s*.12).toFixed(1)} ${(y+s*.25).toFixed(1)} ${(x-s*.25).toFixed(1)} ${(y+s*.12).toFixed(1)} ${(x-s).toFixed(1)} ${y.toFixed(1)}C${(x-s*.25).toFixed(1)} ${(y-s*.12).toFixed(1)} ${(x-s*.12).toFixed(1)} ${(y-s*.25).toFixed(1)} ${x.toFixed(1)} ${(y-s).toFixed(1)}Z" fill="#FFFFFF" fill-opacity="${i === 0 ? ".98" : ".86"}" filter="url(#gemSparkle)"/>`;
   }).join("");
-  const birthSparkles = Array.from({ length: 350 }, (_, i) => {
+  const birthSparkles = Array.from({ length: 420 }, (_, i) => {
     const a = unit(7100 + i) * Math.PI * 2;
     const r = Math.sqrt(unit(7500 + i)) * 452;
     if (r < gemRadius * 1.5) return "";
     const x = Math.cos(a) * r, y = Math.sin(a) * r;
     const color = codes[i % 7] ?? core;
-    const size = i % 11 === 0 ? 4.2 + unit(7900 + i) * 2.8 : 1 + unit(7900 + i) * 1.65;
-    const flare = i % 11 === 0 ? `<path d="M${x.toFixed(2)} ${(y - size * 3.4).toFixed(2)}Q${x.toFixed(2)} ${y.toFixed(2)} ${(x + size * 2.1).toFixed(2)} ${y.toFixed(2)}Q${x.toFixed(2)} ${y.toFixed(2)} ${x.toFixed(2)} ${(y + size * 3.4).toFixed(2)}Q${x.toFixed(2)} ${y.toFixed(2)} ${(x - size * 2.1).toFixed(2)} ${y.toFixed(2)}Q${x.toFixed(2)} ${y.toFixed(2)} ${x.toFixed(2)} ${(y - size * 3.4).toFixed(2)}Z" fill="${color}"/>` : "";
-    return `<g data-sparkle-color="${color}" opacity="${(.76 + unit(8300 + i) * .24).toFixed(2)}"><g filter="url(#sparkleBloom)"><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${size.toFixed(2)}" fill="${color}"/>${flare}</g><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(size * .38).toFixed(2)}" fill="#FFFFFF" fill-opacity=".98"/></g>`;
+    const scaleTier = i % 29 === 0 ? 6.4 + unit(7900 + i) * 4.8 : i % 9 === 0 ? 3.2 + unit(7900 + i) * 3.2 : i % 3 === 0 ? 1.25 + unit(7900 + i) * 2 : .35 + unit(7900 + i) * .95;
+    const form = i % 4 === 0 ? "halo" : i % 4 === 1 ? "diamond" : i % 4 === 2 ? "flare" : "pinpoint";
+    const shape = form === "halo"
+      ? `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${scaleTier.toFixed(2)}" fill="none" stroke="${color}" stroke-width="${(scaleTier * .38).toFixed(2)}"/><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(scaleTier * .28).toFixed(2)}" fill="#FFFFFF"/>`
+      : form === "diamond"
+        ? `<path d="M${x.toFixed(2)} ${(y-scaleTier*1.7).toFixed(2)}L${(x+scaleTier*.72).toFixed(2)} ${y.toFixed(2)}L${x.toFixed(2)} ${(y+scaleTier*1.7).toFixed(2)}L${(x-scaleTier*.72).toFixed(2)} ${y.toFixed(2)}Z" fill="${color}"/><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(scaleTier*.18).toFixed(2)}" fill="#FFFFFF"/>`
+        : form === "flare"
+          ? `<path d="M${x.toFixed(2)} ${(y-scaleTier*3.2).toFixed(2)}Q${x.toFixed(2)} ${y.toFixed(2)} ${(x+scaleTier*1.8).toFixed(2)} ${y.toFixed(2)}Q${x.toFixed(2)} ${y.toFixed(2)} ${x.toFixed(2)} ${(y+scaleTier*3.2).toFixed(2)}Q${x.toFixed(2)} ${y.toFixed(2)} ${(x-scaleTier*1.8).toFixed(2)} ${y.toFixed(2)}Q${x.toFixed(2)} ${y.toFixed(2)} ${x.toFixed(2)} ${(y-scaleTier*3.2).toFixed(2)}Z" fill="${color}"/><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(scaleTier*.22).toFixed(2)}" fill="#FFFFFF"/>`
+          : `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${scaleTier.toFixed(2)}" fill="${color}"/><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(scaleTier*.3).toFixed(2)}" fill="#FFFFFF"/>`;
+    return `<g data-sparkle-color="${color}" data-sparkle-form="${form}" opacity="${(.7 + unit(8300 + i) * .3).toFixed(2)}" filter="url(#sparkleBloom)">${shape}</g>`;
   }).join("");
   const cosmicStars = Array.from({ length: 220 }, (_, i) => {
     const a = unit(9000 + i) * Math.PI * 2;
