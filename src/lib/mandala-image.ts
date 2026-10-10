@@ -22,16 +22,24 @@ export function mandalaSeed(colors: MandalaColor[]) {
     hash ^= source.charCodeAt(index);
     hash = Math.imul(hash, 16777619);
   }
-  return hash >>> 0;
+  return (hash >>> 0) % 2147483647;
 }
 
-export const MANDALA_PROMPT = "sacred geometry mandala, cosmic black background, vivid colors, glowing gemstone core, 8k art";
+export function mandalaPrompt(colors: MandalaColor[]) {
+  const [overall, ...outer] = colors;
+  const overallColor = overall ? `${birthColorKeyword(overall)} ${overall.code}` : "luminous jewel tone";
+  const outerColors = outer.map(color => `${birthColorKeyword(color)} ${color.code}`).join(", ");
 
-export function mandalaPrompt(_colors?: MandalaColor[]) {
-  return MANDALA_PROMPT;
+  return [
+    "masterpiece oil painting of a sacred geometry mandala",
+    "rich impasto texture, expressive brushstrokes, fine art",
+    `glowing gemstone core in ${overallColor}`,
+    `six radial birth colors glowing harmoniously: ${outerColors}`,
+    "intricate mystical ornate details, cosmic black background, 8k art",
+  ].join(", ");
 }
 
 export function mandalaImageUrl(colors: MandalaColor[], variation = 0) {
-  const seed = (mandalaSeed(colors) + variation * 104729) >>> 0;
+  const seed = (mandalaSeed(colors) + variation * 104729) % 2147483647;
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(mandalaPrompt(colors))}?width=1024&height=1024&nologo=true&seed=${seed}`;
 }
