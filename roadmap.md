@@ -221,3 +221,8 @@
 - [x] Replace uniform translucent geometry, neon glow, jewelry rows, and independent rotation with natural-pigment washes, dry-brush detail, pointillism, and distressed gold mud.
 - [x] Preserve exact seven-color identity, deterministic regeneration, offline rendering, and matching live/export compositions.
 - [x] Verify desktop, mobile, full-screen, regeneration, reduced motion, PNG export, tests, and clean diagnostics.
+
+## Birth-color mandala luminous handcraft refinement
+- [x] Add hand-drawn petal veins, broken double contours, lace-like linework, and controlled density without covering the oil-paint texture.
+- [x] Add aged gold, mid gold, bright gold leaf, deterministic foil flecks, and engraved compass detail without neon glow.
+- [ ] Verify desktop, mobile, full-screen, regeneration, matching 2048 PNG export, tests, and clean diagnostics.
