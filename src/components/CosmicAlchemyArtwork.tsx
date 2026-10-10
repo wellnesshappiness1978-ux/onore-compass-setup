@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 import type { ReturnTypeNatal } from "@/lib/natal-sky-types";
-import type { Capture } from "./MandalaScene";
+import type { Capture } from "./MandalaCanvas";
 import type { NineStarProfile } from "@/lib/calendar-traditions";
 import type { Language } from "@/lib/translations";
 import { artSpecialistCopy } from "@/lib/art-specialist-copy";
