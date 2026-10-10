@@ -239,4 +239,4 @@
 - [x] Double the center gemstone, remove its black edge and circular backing, replace uniform rays with fine refracted light, and scatter varied seven-color sparkles; verify all display and export views.
 
 ## Birth-color mandala octagonal oil-diamond refinement
-- [ ] Repaint the overall-color center as a precise octagonal diamond with layered crown and pavilion facets, oil-paint grain, restrained spectral reflections, and no circular setting or prongs; verify display and export views.
+- [x] Repaint the overall-color center as a precise octagonal diamond with layered crown and pavilion facets, oil-paint grain, restrained spectral reflections, and no circular setting or prongs; verify display and export views.

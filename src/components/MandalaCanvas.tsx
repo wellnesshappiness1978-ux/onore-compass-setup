@@ -81,7 +81,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
   // A hand-painted octagonal diamond whose edge is defined by reflected color, never a dark bezel.
   const gemPoint = (i: number, scale = 1) => {
     const a = -Math.PI / 2 + Math.PI / 8 + i * Math.PI / 4;
-    return `${(Math.cos(a) * gemRadius * .94 * scale).toFixed(1)},${(Math.sin(a) * gemRadius * 1.02 * scale).toFixed(1)}`;
+    return `${(Math.cos(a) * gemRadius * scale).toFixed(1)},${(Math.sin(a) * gemRadius * scale).toFixed(1)}`;
   };
   const gemOutline = Array.from({ length: 8 }, (_, i) => gemPoint(i)).join(" ");
   const gemCrown = Array.from({ length: 8 }, (_, i) => gemPoint(i, .7)).join(" ");
@@ -116,12 +116,12 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     }).join("");
     return `<g data-four-color-flow="${role}">${petals}</g>`;
   }).join("");
-  const gemstoneSparkles = Array.from({ length: 7 }, (_, i) => {
-    const a = -.92 + i * .93 + unit(6800 + i) * .16;
+  const gemstoneSparkles = Array.from({ length: 4 }, (_, i) => {
+    const a = -.92 + i * 1.57 + unit(6800 + i) * .12;
     const r = gemRadius * (.24 + unit(6900 + i) * .52);
     const x = Math.cos(a) * r;
     const y = Math.sin(a) * r;
-    const s = i === 0 ? 9.2 : 2.8 + unit(7000 + i) * 4.8;
+    const s = i === 0 ? 6.8 : 2.1 + unit(7000 + i) * 2.8;
     return `<path data-gem-sparkle="true" d="M${x.toFixed(1)} ${(y-s).toFixed(1)}C${(x+s*.12).toFixed(1)} ${(y-s*.25).toFixed(1)} ${(x+s*.25).toFixed(1)} ${(y-s*.12).toFixed(1)} ${(x+s).toFixed(1)} ${y.toFixed(1)}C${(x+s*.25).toFixed(1)} ${(y+s*.12).toFixed(1)} ${(x+s*.12).toFixed(1)} ${(y+s*.25).toFixed(1)} ${x.toFixed(1)} ${(y+s).toFixed(1)}C${(x-s*.12).toFixed(1)} ${(y+s*.25).toFixed(1)} ${(x-s*.25).toFixed(1)} ${(y+s*.12).toFixed(1)} ${(x-s).toFixed(1)} ${y.toFixed(1)}C${(x-s*.25).toFixed(1)} ${(y-s*.12).toFixed(1)} ${(x-s*.12).toFixed(1)} ${(y-s*.25).toFixed(1)} ${x.toFixed(1)} ${(y-s).toFixed(1)}Z" fill="#FFFFFF" fill-opacity="${i === 0 ? ".98" : ".86"}" filter="url(#gemSparkle)"/>`;
   }).join("");
   const birthSparkles = Array.from({ length: 420 }, (_, i) => {

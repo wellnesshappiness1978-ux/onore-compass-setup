@@ -54,7 +54,7 @@ describe("compass mandala layout", () => {
     expect(plate).toContain('data-color-role="sub" data-color-emphasis="supporting"');
     expect(plate).toContain('data-color-role="mind" data-color-emphasis="supporting"');
     expect([...plate.matchAll(/data-four-color-flow="([^"]+)"/g)].map(match => match[1])).toEqual(["health", "love", "work", "wealth"]);
-    expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(7);
+    expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(4);
     expect((plate.match(/data-gem-facet="crown"/g) ?? [])).toHaveLength(8);
     expect((plate.match(/data-gem-facet="pavilion"/g) ?? [])).toHaveLength(8);
     expect((plate.match(/data-gem-oil-stroke=/g) ?? [])).toHaveLength(22);
