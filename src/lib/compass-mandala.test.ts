@@ -29,9 +29,8 @@ describe("compass mandala layout", () => {
     expect(plate).toContain("midGold");
     expect(plate).toContain("leafGold");
     expect(plate).toContain("data-core-gemstone=\"#A17A21\"");
-    expect(plate).toContain('data-refracted-light="12"');
-    expect(plate).toContain('data-gem-cut="octagonal-brilliant"');
-    expect(plate).toContain('data-gem-facets="24"');
+    expect(plate).toContain('data-refracted-light="18"');
+    expect(plate).toContain("gemFlash");
     expect(plate).toContain("platinumRay");
     expect(plate).toContain("stroke-dasharray");
     const paintScales = [...plate.matchAll(/id="pigment\d"[\s\S]*?<feDisplacementMap[^>]+scale="([\d.]+)"/g)].map(match => Number(match[1]));
@@ -44,7 +43,7 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("<image");
     expect(plate).not.toContain('data-compass-engraving=');
     expect(plate).toContain('data-gem-setting="inset"');
-    expect(plate).toContain('data-gem-radius-ratio="0.58"');
+    expect(plate).toContain('data-gem-radius-ratio="0.55"');
     expect(plate).not.toContain('data-gem-light-seat=');
     expect(plate).not.toContain('data-gem-dark-seat=');
     expect(plate).toContain('data-color-role="health"');
@@ -54,17 +53,10 @@ describe("compass mandala layout", () => {
     expect(plate).toContain('data-color-role="sub" data-color-emphasis="supporting"');
     expect(plate).toContain('data-color-role="mind" data-color-emphasis="supporting"');
     expect([...plate.matchAll(/data-four-color-flow="([^"]+)"/g)].map(match => match[1])).toEqual(["health", "love", "work", "wealth"]);
-    expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(5);
-    expect(plate).toContain('data-gem-vertices="8"');
-    expect((plate.match(/data-diamond-pavilion=/g) ?? [])).toHaveLength(8);
-    expect((plate.match(/data-diamond-crown=/g) ?? [])).toHaveLength(8);
-    expect((plate.match(/data-diamond-star=/g) ?? [])).toHaveLength(8);
-    expect(plate).toContain('data-diamond-table="true"');
-    expect(plate).toContain('data-color-continuum="soft"');
-    expect(plate).toContain('filter="url(#diamondRealism)"');
+    expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(7);
+    expect(plate).toContain('filter="url(#gemstoneRealism)"');
     const gem = plate.slice(plate.indexOf('<g data-core-gemstone='));
     expect(gem).not.toContain("<circle");
-    expect(gem).not.toContain("data-gem-inclusion");
     expect(plate).toContain('gradientUnits="userSpaceOnUse"');
     colors.forEach(color => expect(plate).toContain(`data-sparkle-color="${color}"`));
     expect((plate.match(/data-sparkle-color=/g) ?? []).length).toBeGreaterThan(380);
@@ -75,7 +67,7 @@ describe("compass mandala layout", () => {
     expect((plate.match(/data-agolmen-shell="nautilus"/g) ?? [])).toHaveLength(5);
     expect(plate).toContain("starBloom");
     expect(plate).toContain("shellRelief");
-    expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? [])).toHaveLength(36);
+    expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? []).length).toBeGreaterThan(40);
     expect((plate.match(/filter="url\(#fineGold\)"/g) ?? []).length).toBeGreaterThan(20);
   });
   it("keeps still and exported compositions identical while regeneration changes the paintwork", () => {

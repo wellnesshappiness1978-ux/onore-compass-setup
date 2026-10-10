@@ -237,10 +237,3 @@
 
 ## Birth-color mandala gemstone-light artistry refinement
 - [x] Double the center gemstone, remove its black edge and circular backing, replace uniform rays with fine refracted light, and scatter varied seven-color sparkles; verify all display and export views.
-
-## Birth-color mandala star-core rose cut
-- [x] Replace the regular gold-heavy center with a smaller asymmetric overall-color rose-cut gemstone, natural inclusions, hand-polished facets, and restrained refraction; verify every view and export.
-
-
-## Birth-color mandala octagonal diamond refinement
-- [x] Replace the rose-cut center with a precision overall-color octagonal brilliant and blend all surrounding birth colors into a seamless radial transition; verify every view and export.
