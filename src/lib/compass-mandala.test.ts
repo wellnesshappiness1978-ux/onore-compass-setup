@@ -22,9 +22,20 @@ describe("compass mandala layout", () => {
     const plate = buildMandalaColorPlate(colors, 0, false);
     colors.forEach(color => expect(plate).toContain(`data-birth-color="${color}"`));
     expect(plate).toContain("mix-blend-mode:color");
-    expect(plate).toContain("jewelGlow");
+    expect(plate).toContain("fractalNoise");
+    expect(plate).toContain("roughGold");
     expect(plate).toContain("stroke-dasharray");
+    const paintScales = [...plate.matchAll(/id="pigment\d"[\s\S]*?<feDisplacementMap[^>]+scale="([\d.]+)"/g)].map(match => Number(match[1]));
+    expect(paintScales).toHaveLength(6);
+    expect(paintScales.every(scale => scale >= 7)).toBe(true);
+    expect(plate).not.toContain("mc-rot");
+    expect(plate).not.toContain("jewelGlow");
+    expect(plate).not.toContain("<rect");
     expect(plate).not.toContain("image.pollinations");
     expect(plate).not.toContain("<image");
+  });
+  it("keeps still and exported compositions identical while regeneration changes the paintwork", () => {
+    expect(buildMandalaColorPlate(colors, 0, true)).toBe(buildMandalaColorPlate(colors, 0, false));
+    expect(buildMandalaColorPlate(colors, 1, false)).not.toBe(buildMandalaColorPlate(colors, 0, false));
   });
 });

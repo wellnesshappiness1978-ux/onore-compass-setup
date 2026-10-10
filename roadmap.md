@@ -216,3 +216,8 @@
 - [x] Rename the related-person roster to Family and align visible registration counts to 0/3/10/30/100.
 - [x] Update the signed-out introduction in all seven languages and align the database-enforced Family limits.
 - [x] Verify the signed-out introduction, five preview plans, Family roster limits and plan guidance on desktop and mobile.
+
+## Birth-color mandala hand-painted refinement
+- [x] Replace uniform translucent geometry, neon glow, jewelry rows, and independent rotation with natural-pigment washes, dry-brush detail, pointillism, and distressed gold mud.
+- [x] Preserve exact seven-color identity, deterministic regeneration, offline rendering, and matching live/export compositions.
+- [x] Verify desktop, mobile, full-screen, regeneration, reduced motion, PNG export, tests, and clean diagnostics.
