@@ -11,6 +11,7 @@ describe("compass mandala layout", () => {
     expect(l.layers.map(x => x.color)).toEqual(colors.slice(1));
     expect(l.layers[0]?.innerColor).toBe(colors[0]);
     expect(l.layers.every(x => x.path.length > 0 && !x.path.includes("NaN"))).toBe(true);
+    expect(l.layers.every(x => x.innerPath.length > 0 && x.facetPath.length > 0 && x.guillochePath.length > 0)).toBe(true);
   });
   it("is deterministic and variation changes the arrangement", () => {
     expect(compassMandalaLayout(colors)).toEqual(compassMandalaLayout(colors));
@@ -21,6 +22,8 @@ describe("compass mandala layout", () => {
     const plate = buildMandalaColorPlate(colors, 0, false);
     colors.forEach(color => expect(plate).toContain(`data-birth-color="${color}"`));
     expect(plate).toContain("mix-blend-mode:color");
+    expect(plate).toContain("jewelGlow");
+    expect(plate).toContain("stroke-dasharray");
     expect(plate).not.toContain("image.pollinations");
     expect(plate).not.toContain("<image");
   });

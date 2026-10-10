@@ -225,7 +225,19 @@ export function dotPaintLayout(colors: string[], radius = 480): PaintDot[] {
 }
 
 export type CompassBlade = { points: string; light: boolean };
-export type MandalaLayer = { color: string; innerColor: string; inner: number; outer: number; petals: number; phase: number; motif: MandalaMotif; path: string };
+export type MandalaLayer = {
+  color: string;
+  innerColor: string;
+  inner: number;
+  outer: number;
+  petals: number;
+  phase: number;
+  motif: MandalaMotif;
+  path: string;
+  innerPath: string;
+  facetPath: string;
+  guillochePath: string;
+};
 export type GoldParticle = { x: number; y: number; r: number; delay: number };
 
 const f = (n: number) => n.toFixed(2);
@@ -244,14 +256,55 @@ function layerPath(motif: MandalaMotif, petals: number, inner: number, outer: nu
   return parts.join("");
 }
 
+function facetedRingPath(points: number, inner: number, outer: number, phase: number) {
+  const parts: string[] = [];
+  const step = Math.PI * 2 / points;
+  for (let i = 0; i < points; i++) {
+    const a = phase + i * step;
+    const next = a + step;
+    const mid = a + step / 2;
+    const p = (r: number, angle: number) => `${f(Math.cos(angle) * r)} ${f(Math.sin(angle) * r)}`;
+    parts.push(`M${p(inner, a)}L${p(outer, mid)}L${p(inner, next)}L${p((inner + outer) * .52, mid)}Z`);
+  }
+  return parts.join("");
+}
+
+function guillocheRingPath(points: number, radius: number, amplitude: number, phase: number, weave = 3) {
+  const samples = Math.max(96, points * 10);
+  return Array.from({ length: samples + 1 }, (_, index) => {
+    const a = phase + index / samples * Math.PI * 2;
+    const r = radius + Math.sin(a * points * weave) * amplitude + Math.cos(a * points) * amplitude * .28;
+    return `${index === 0 ? "M" : "L"}${f(Math.cos(a) * r)} ${f(Math.sin(a) * r)}`;
+  }).join("") + "Z";
+}
+
+function colorWorkSeed(colors: string[]) {
+  return colors.join("").split("").reduce((seed, character, index) => (seed * 33 + character.charCodeAt(0) + index) % 104729, 5381);
+}
+
 /** Fully local compass mandala: golden 16-point compass core, six birth-color petal layers, deterministic gold particles. */
 export function compassMandalaLayout(colors: string[], variation = 0, radius = 480) {
   const { core, rings } = simpleMandalaRings(colors, radius);
-  const shift = seededUnit(variation + 1, 3) * Math.PI;
+  const workSeed = colorWorkSeed(colors) + variation * 7919;
+  const shift = seededUnit(workSeed + 1, 3) * Math.PI;
   const layers: MandalaLayer[] = rings.map((ring, i) => {
-    const petals = [8, 12, 16, 16, 24, 32][i] ?? 16;
-    const phase = -Math.PI / 2 + (variation ? shift / petals : 0) + (i % 2 ? Math.PI / petals : 0);
-    return { color: ring.color, innerColor: ring.innerColor, inner: ring.inner, outer: ring.outer, petals, phase, motif: ring.motif, path: layerPath(ring.motif, petals, ring.inner * .96, ring.outer, phase) };
+    const basePetals = [10, 12, 16, 18, 24, 32][i] ?? 16;
+    const petals = basePetals + (Math.floor(seededUnit(workSeed + 17, i) * 3) * 2);
+    const phase = -Math.PI / 2 + shift / petals + (i % 2 ? Math.PI / petals : 0);
+    const width = ring.outer - ring.inner;
+    return {
+      color: ring.color,
+      innerColor: ring.innerColor,
+      inner: ring.inner,
+      outer: ring.outer,
+      petals,
+      phase,
+      motif: ring.motif,
+      path: layerPath(ring.motif, petals, ring.inner * .98, ring.outer, phase),
+      innerPath: layerPath("petals", petals, ring.inner + width * .16, ring.outer - width * .18, phase + Math.PI / petals),
+      facetPath: facetedRingPath(petals, ring.inner + width * .08, ring.outer - width * .04, phase),
+      guillochePath: guillocheRingPath(petals, (ring.inner + ring.outer) / 2, width * .23, phase, 2 + i % 3),
+    };
   });
   const compassR = radius * .2;
   const blades: CompassBlade[] = [];
@@ -266,9 +319,9 @@ export function compassMandalaLayout(colors: string[], variation = 0, radius = 4
     blades.push({ points: `0,0 ${f(rx!)},${f(ry!)} ${f(tip[0]!)},${f(tip[1]!)}`, light: false });
   }
   const particles: GoldParticle[] = Array.from({ length: 140 }, (_, i) => {
-    const a = seededUnit(variation + 501, i) * Math.PI * 2;
-    const d = (.12 + Math.sqrt(seededUnit(variation + 503, i)) * .9) * radius;
-    return { x: Math.cos(a) * d, y: Math.sin(a) * d, r: .8 + seededUnit(variation + 509, i) * 2.2, delay: seededUnit(variation + 521, i) * 4 };
+    const a = seededUnit(workSeed + 501, i) * Math.PI * 2;
+    const d = (.12 + Math.sqrt(seededUnit(workSeed + 503, i)) * .9) * radius;
+    return { x: Math.cos(a) * d, y: Math.sin(a) * d, r: .8 + seededUnit(workSeed + 509, i) * 2.2, delay: seededUnit(workSeed + 521, i) * 4 };
   });
-  return { core, compassR, blades, layers, particles };
+  return { core, compassR, blades, layers, particles, workSeed };
 }
