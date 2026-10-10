@@ -240,3 +240,6 @@
 
 ## Birth-color mandala octagonal oil-diamond refinement
 - [x] Repaint the overall-color center as a precise octagonal diamond with layered crown and pavilion facets, oil-paint grain, restrained spectral reflections, and no circular setting or prongs; verify display and export views.
+
+## Birth-color mandala opaque diamond refinement
+- [x] Make the central octagonal diamond fully opaque with a solid overall-color backing, opaque facets, and surface-only oil-paint highlights; preserve its circular-frame-free setting and matching export.
