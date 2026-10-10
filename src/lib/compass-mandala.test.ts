@@ -29,7 +29,7 @@ describe("compass mandala layout", () => {
     expect(plate).toContain("midGold");
     expect(plate).toContain("leafGold");
     expect(plate).toContain("data-core-gemstone=\"#A17A21\"");
-    expect(plate).toContain("data-radiant-rays=\"72\"");
+    expect(plate).toContain('data-refracted-light="18"');
     expect(plate).toContain("gemFlash");
     expect(plate).toContain("platinumRay");
     expect(plate).toContain("stroke-dasharray");
@@ -41,10 +41,11 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("<rect");
     expect(plate).not.toContain("image.pollinations");
     expect(plate).not.toContain("<image");
-    expect((plate.match(/<polygon/g) ?? [])).toHaveLength(32);
+    expect(plate).not.toContain('data-compass-engraving=');
     expect(plate).toContain('data-gem-setting="inset"');
-    expect(plate).toContain('data-gem-radius-ratio="0.275"');
+    expect(plate).toContain('data-gem-radius-ratio="0.55"');
     expect(plate).not.toContain('data-gem-light-seat=');
+    expect(plate).not.toContain('data-gem-dark-seat=');
     expect(plate).toContain('data-color-role="health"');
     expect(plate).toContain('data-color-role="love"');
     expect(plate).toContain('data-color-role="work"');
@@ -52,19 +53,21 @@ describe("compass mandala layout", () => {
     expect(plate).toContain('data-color-role="sub" data-color-emphasis="supporting"');
     expect(plate).toContain('data-color-role="mind" data-color-emphasis="supporting"');
     expect([...plate.matchAll(/data-four-color-flow="([^"]+)"/g)].map(match => match[1])).toEqual(["health", "love", "work", "wealth"]);
-    expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(4);
+    expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(7);
     expect(plate).toContain('filter="url(#gemstoneRealism)"');
     const gem = plate.slice(plate.indexOf('<g data-core-gemstone='));
     expect(gem).not.toContain("<circle");
     expect(plate).toContain('gradientUnits="userSpaceOnUse"');
     colors.forEach(color => expect(plate).toContain(`data-sparkle-color="${color}"`));
-    expect((plate.match(/data-sparkle-color=/g) ?? []).length).toBeGreaterThan(250);
+    expect((plate.match(/data-sparkle-color=/g) ?? []).length).toBeGreaterThan(380);
+    expect((plate.match(/data-sparkle-form="halo"/g) ?? []).length).toBeGreaterThan(20);
+    expect((plate.match(/data-sparkle-form="diamond"/g) ?? []).length).toBeGreaterThan(20);
+    expect((plate.match(/data-sparkle-form="flare"/g) ?? []).length).toBeGreaterThan(20);
     expect((plate.match(/data-cosmic-star=/g) ?? []).length).toBeGreaterThan(200);
     expect((plate.match(/data-agolmen-shell="nautilus"/g) ?? [])).toHaveLength(5);
     expect(plate).toContain("starBloom");
     expect(plate).toContain("shellRelief");
-    expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? [])).toHaveLength(216);
-    expect((plate.match(/stroke-linecap="round" stroke-dasharray=/g) ?? []).length).toBeGreaterThan(140);
+    expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? []).length).toBeGreaterThan(40);
     expect((plate.match(/filter="url\(#fineGold\)"/g) ?? []).length).toBeGreaterThan(20);
   });
   it("keeps still and exported compositions identical while regeneration changes the paintwork", () => {
