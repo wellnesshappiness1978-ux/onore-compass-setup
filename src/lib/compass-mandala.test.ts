@@ -28,6 +28,10 @@ describe("compass mandala layout", () => {
     expect(plate).toContain("agedGold");
     expect(plate).toContain("midGold");
     expect(plate).toContain("leafGold");
+    expect(plate).toContain("data-core-gemstone=\"#A17A21\"");
+    expect(plate).toContain("data-radiant-rays=\"72\"");
+    expect(plate).toContain("gemFlash");
+    expect(plate).toContain("platinumRay");
     expect(plate).toContain("stroke-dasharray");
     const paintScales = [...plate.matchAll(/id="pigment\d"[\s\S]*?<feDisplacementMap[^>]+scale="([\d.]+)"/g)].map(match => Number(match[1]));
     expect(paintScales).toHaveLength(6);
@@ -38,6 +42,7 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("image.pollinations");
     expect(plate).not.toContain("<image");
     expect((plate.match(/<polygon/g) ?? [])).toHaveLength(32);
+    expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? [])).toHaveLength(72);
     expect((plate.match(/filter="url\(#fineGold\)"/g) ?? []).length).toBeGreaterThan(20);
   });
   it("keeps still and exported compositions identical while regeneration changes the paintwork", () => {
