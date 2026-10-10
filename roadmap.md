@@ -226,3 +226,8 @@
 - [x] Add hand-drawn petal veins, broken double contours, lace-like linework, and controlled density without covering the oil-paint texture.
 - [x] Add aged gold, mid gold, bright gold leaf, deterministic foil flecks, and engraved compass detail without neon glow.
 - [x] Verify desktop, mobile, full-screen, regeneration, matching 2048 PNG export, tests, and clean diagnostics.
+
+## Birth-color mandala radiant gemstone composition
+- [x] Rebuild the focal point as a large faceted gemstone using the exact overall birth color, with engraved compass backing and gold prongs.
+- [x] Add deterministic overall-color, platinum, and gold light rays plus layered fine-art detail for a visibly new composition.
+- [ ] Verify desktop, mobile, full-screen, regeneration, matching 2048 PNG export, tests, and clean diagnostics.
