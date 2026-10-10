@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { compassMandalaLayout } from "./art-geometry";
-import { buildMandalaColorPlate } from "@/components/MandalaCanvas";
+import { birthColorTones, buildMandalaColorPlate } from "@/components/MandalaCanvas";
 
 const colors = ["#A17A21", "#C34232", "#B95E77", "#238A62", "#158D9C", "#2756A3", "#75459B"];
 
@@ -12,6 +12,8 @@ describe("compass mandala layout", () => {
     expect(l.layers[0]?.innerColor).toBe(colors[0]);
     expect(l.layers.every(x => x.path.length > 0 && !x.path.includes("NaN"))).toBe(true);
     expect(l.layers.every(x => x.innerPath.length > 0 && x.facetPath.length > 0 && x.guillochePath.length > 0)).toBe(true);
+    expect(l.layers.every(x => x.segments.length === x.petals && x.innerSegments.length === x.petals && x.facetSegments.length === x.petals)).toBe(true);
+    expect(l.layers.flatMap(x => [...x.segments, ...x.innerSegments, ...x.facetSegments]).every(segment => segment.path.endsWith("Z"))).toBe(true);
   });
   it("is deterministic and variation changes the arrangement", () => {
     expect(compassMandalaLayout(colors)).toEqual(compassMandalaLayout(colors));
@@ -21,7 +23,9 @@ describe("compass mandala layout", () => {
   it("places every exact birth color in the local SVG plate", () => {
     const plate = buildMandalaColorPlate(colors, 0, false);
     colors.forEach(color => expect(plate).toContain(`data-birth-color="${color}"`));
-    expect(plate).toContain("mix-blend-mode:color");
+    expect(plate).toContain("mix-blend-mode:overlay");
+    expect(plate).toContain("mix-blend-mode:soft-light");
+    expect(plate).toContain("mix-blend-mode:color-burn");
     expect(plate).toContain("fractalNoise");
     expect(plate).toContain("roughGold");
     expect(plate).toContain("fineGold");
@@ -53,7 +57,13 @@ describe("compass mandala layout", () => {
     expect(plate).toContain('data-color-role="wealth"');
     expect(plate).toContain('data-color-role="sub" data-color-emphasis="supporting"');
     expect(plate).toContain('data-color-role="mind" data-color-emphasis="supporting"');
-    expect([...plate.matchAll(/data-four-color-flow="([^"]+)"/g)].map(match => match[1])).toEqual(["health", "love", "work", "wealth"]);
+    expect(plate).toContain('data-color-layers="path-bound"');
+    expect(plate).not.toContain("data-pattern-band");
+    expect(plate).not.toContain("data-four-color-flow");
+    expect((plate.match(/data-motif-segment=/g) ?? []).length).toBeGreaterThan(250);
+    expect((plate.match(/gradientUnits="userSpaceOnUse"/g) ?? []).length).toBeGreaterThanOrEqual(6);
+    expect(plate.indexOf('data-gold-layer="top"')).toBeGreaterThan(plate.indexOf('data-color-layers="path-bound"'));
+    expect(plate.indexOf('data-gold-layer="top"')).toBeGreaterThan(plate.indexOf('data-shading-layers="top"'));
     expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(4);
     expect((plate.match(/data-gem-facet="crown"/g) ?? [])).toHaveLength(8);
     expect((plate.match(/data-gem-facet="pavilion"/g) ?? [])).toHaveLength(8);
@@ -82,6 +92,13 @@ describe("compass mandala layout", () => {
     expect(plate).toContain("shellRelief");
     expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? []).length).toBeGreaterThan(40);
     expect((plate.match(/filter="url\(#fineGold\)"/g) ?? []).length).toBeGreaterThan(20);
+  });
+  it("derives highlight, exact base, and shadow tones from each birth color", () => {
+    const tones = birthColorTones("#238A62");
+    expect(tones.base).toBe("#238A62");
+    expect(tones.highlight).toMatch(/^#[0-9a-f]{6}$/i);
+    expect(tones.shadow).toMatch(/^#[0-9a-f]{6}$/i);
+    expect(new Set(Object.values(tones)).size).toBe(3);
   });
   it("keeps still and exported compositions identical while regeneration changes the paintwork", () => {
     expect(buildMandalaColorPlate(colors, 0, true)).toBe(buildMandalaColorPlate(colors, 0, false));
