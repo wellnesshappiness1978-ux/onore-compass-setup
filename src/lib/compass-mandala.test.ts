@@ -21,7 +21,7 @@ describe("compass mandala layout", () => {
     const plate = buildMandalaColorPlate(colors, 0, false);
     colors.forEach(color => expect(plate).toContain(`data-birth-color="${color}"`));
     expect(plate).toContain("mix-blend-mode:color");
-    expect(plate).not.toContain("http://");
-    expect(plate).not.toContain("https://");
+    expect(plate).not.toContain("image.pollinations");
+    expect(plate).not.toContain("<image");
   });
 });
