@@ -289,13 +289,13 @@ function colorWorkSeed(colors: string[]) {
 }
 
 /** Fully local compass mandala: golden 16-point compass core, six birth-color petal layers, deterministic gold particles. */
-export function compassMandalaLayout(colors: string[], variation = 0, radius = 480) {
+export function compassMandalaLayout(colors: string[], variation = 0, radius = 480, petalPlan: number[] | null = null) {
   const { core, rings } = simpleMandalaRings(colors, radius);
   const workSeed = colorWorkSeed(colors) + variation * 7919;
   const shift = seededUnit(workSeed + 1, 3) * Math.PI;
   const layers: MandalaLayer[] = rings.map((ring, i) => {
     const basePetals = [10, 12, 16, 18, 24, 32][i] ?? 16;
-    const petals = basePetals + (Math.floor(seededUnit(workSeed + 17, i) * 3) * 2);
+    const petals = petalPlan?.[i] ?? basePetals + (Math.floor(seededUnit(workSeed + 17, i) * 3) * 2);
     const phase = -Math.PI / 2 + shift / petals + (i % 2 ? Math.PI / petals : 0);
     const width = ring.outer - ring.inner;
     const segments = layerSegments(ring.motif, petals, ring.inner * .98, ring.outer, phase);
