@@ -234,39 +234,45 @@ export type MandalaLayer = {
   phase: number;
   motif: MandalaMotif;
   path: string;
+  segments: MandalaSegment[];
   innerPath: string;
+  innerSegments: MandalaSegment[];
   facetPath: string;
+  facetSegments: MandalaSegment[];
   guillochePath: string;
 };
+export type MandalaSegment = { path: string; angle: number; index: number };
 export type GoldParticle = { x: number; y: number; r: number; delay: number };
 
 const f = (n: number) => n.toFixed(2);
 
-function layerPath(motif: MandalaMotif, petals: number, inner: number, outer: number, phase: number) {
-  const parts: string[] = [];
+function layerSegments(motif: MandalaMotif, petals: number, inner: number, outer: number, phase: number): MandalaSegment[] {
+  const parts: MandalaSegment[] = [];
   const step = Math.PI * 2 / petals;
   for (let i = 0; i < petals; i++) {
     const a = phase + i * step;
     const p = (r: number, da = 0) => `${f(Math.cos(a + da) * r)} ${f(Math.sin(a + da) * r)}`;
     const half = step / 2;
-    if (motif === "petals") parts.push(`M${p(inner, -half * .9)}Q${p(outer * .98, -half * .55)} ${p(outer)}Q${p(outer * .98, half * .55)} ${p(inner, half * .9)}Z`);
-    else if (motif === "hexagon" || motif === "octagon") parts.push(`M${p(inner, -half)}L${p((inner + outer) / 2, -half * .5)}L${p(outer)}L${p((inner + outer) / 2, half * .5)}L${p(inner, half)}Z`);
-    else { const mid = (inner + outer) / 2; const rr = (outer - inner) / 2; const cx = Math.cos(a) * mid, cy = Math.sin(a) * mid; parts.push(`M${f(cx + rr)} ${f(cy)}A${f(rr)} ${f(rr)} 0 1 0 ${f(cx - rr)} ${f(cy)}A${f(rr)} ${f(rr)} 0 1 0 ${f(cx + rr)} ${f(cy)}Z`); }
+    let path: string;
+    if (motif === "petals") path = `M${p(inner, -half * .9)}Q${p(outer * .98, -half * .55)} ${p(outer)}Q${p(outer * .98, half * .55)} ${p(inner, half * .9)}Z`;
+    else if (motif === "hexagon" || motif === "octagon") path = `M${p(inner, -half)}L${p((inner + outer) / 2, -half * .5)}L${p(outer)}L${p((inner + outer) / 2, half * .5)}L${p(inner, half)}Z`;
+    else { const mid = (inner + outer) / 2; const rr = Math.min((outer - inner) * .46, mid * Math.sin(step / 2) * .9); const cx = Math.cos(a) * mid, cy = Math.sin(a) * mid; path = `M${f(cx + rr)} ${f(cy)}A${f(rr)} ${f(rr)} 0 1 0 ${f(cx - rr)} ${f(cy)}A${f(rr)} ${f(rr)} 0 1 0 ${f(cx + rr)} ${f(cy)}Z`; }
+    parts.push({ path, angle: a, index: i });
   }
-  return parts.join("");
+  return parts;
 }
 
-function facetedRingPath(points: number, inner: number, outer: number, phase: number) {
-  const parts: string[] = [];
+function facetedRingSegments(points: number, inner: number, outer: number, phase: number): MandalaSegment[] {
+  const parts: MandalaSegment[] = [];
   const step = Math.PI * 2 / points;
   for (let i = 0; i < points; i++) {
     const a = phase + i * step;
     const next = a + step;
     const mid = a + step / 2;
     const p = (r: number, angle: number) => `${f(Math.cos(angle) * r)} ${f(Math.sin(angle) * r)}`;
-    parts.push(`M${p(inner, a)}L${p(outer, mid)}L${p(inner, next)}L${p((inner + outer) * .52, mid)}Z`);
+    parts.push({ path: `M${p(inner, a)}L${p(outer, mid)}L${p(inner, next)}L${p((inner + outer) * .52, mid)}Z`, angle: mid, index: i });
   }
-  return parts.join("");
+  return parts;
 }
 
 function guillocheRingPath(points: number, radius: number, amplitude: number, phase: number, weave = 3) {
@@ -292,6 +298,9 @@ export function compassMandalaLayout(colors: string[], variation = 0, radius = 4
     const petals = basePetals + (Math.floor(seededUnit(workSeed + 17, i) * 3) * 2);
     const phase = -Math.PI / 2 + shift / petals + (i % 2 ? Math.PI / petals : 0);
     const width = ring.outer - ring.inner;
+    const segments = layerSegments(ring.motif, petals, ring.inner * .98, ring.outer, phase);
+    const innerSegments = layerSegments("petals", petals, ring.inner + width * .16, ring.outer - width * .18, phase + Math.PI / petals);
+    const facetSegments = facetedRingSegments(petals, ring.inner + width * .08, ring.outer - width * .04, phase);
     return {
       color: ring.color,
       innerColor: ring.innerColor,
@@ -300,9 +309,12 @@ export function compassMandalaLayout(colors: string[], variation = 0, radius = 4
       petals,
       phase,
       motif: ring.motif,
-      path: layerPath(ring.motif, petals, ring.inner * .98, ring.outer, phase),
-      innerPath: layerPath("petals", petals, ring.inner + width * .16, ring.outer - width * .18, phase + Math.PI / petals),
-      facetPath: facetedRingPath(petals, ring.inner + width * .08, ring.outer - width * .04, phase),
+      path: segments.map(segment => segment.path).join(""),
+      segments,
+      innerPath: innerSegments.map(segment => segment.path).join(""),
+      innerSegments,
+      facetPath: facetSegments.map(segment => segment.path).join(""),
+      facetSegments,
       guillochePath: guillocheRingPath(petals, (ring.inner + ring.outer) / 2, width * .23, phase, 2 + i % 3),
     };
   });
