@@ -31,11 +31,15 @@ export function mandalaPrompt(colors: MandalaColor[]) {
   const outerColors = outer.map(color => `${birthColorKeyword(color)} ${color.code}`).join(", ");
 
   return [
-    "masterpiece oil painting of a sacred geometry mandala",
-    "rich impasto texture, expressive brushstrokes, fine art",
-    `glowing gemstone core in ${overallColor}`,
-    `six radial birth colors glowing harmoniously: ${outerColors}`,
-    "intricate mystical ornate details, cosmic black background, 8k art",
+    "masterpiece front-facing circular sacred geometry mandala, perfectly centered and fully visible",
+    "extremely intricate delicate fine lines, complex kaleidoscopic masterwork detail",
+    "layered concentric rings, radial lotus petals, interlaced lattice, fine dot-painted bands, lace-like outer rim",
+    `vibrant glowing gemstone core in the overall birth color ${overallColor}`,
+    `six outer personal birth colors in distinct harmonious geometric layers: ${outerColors}`,
+    "utilizing all 7 personal birth colors, each color clearly visible, unmuddied and balanced",
+    "opaque vivid bold non-transparent rich colors, subtle rich impasto and refined brushwork",
+    "shimmering golden sparkles, glowing crystal luminescence, radiant jewel particles",
+    "pitch-black cosmic deep space background, symmetrical composition, 8k resolution, highly detailed",
   ].join(", ");
 }
 
