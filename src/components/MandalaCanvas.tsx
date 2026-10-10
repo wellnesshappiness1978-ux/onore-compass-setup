@@ -11,7 +11,7 @@ type Props = { colors: MandalaColor[]; language: Language; variation: number; re
 const OUT = 2048;
 const BASE_IMAGE = mandalaBase;
 /** Inner/outer radii (viewBox units) of the base art frames: compass, inner ring, blue petals, shell & large petals, outer frame, rim. */
-const PATTERN_BANDS: [number, number][] = [[46, 148], [148, 174], [174, 282], [282, 440], [440, 466], [466, 490]];
+const PATTERN_BANDS: [number, number][] = [[46, 206], [206, 226], [226, 286], [286, 442], [442, 468], [468, 492]];
 
 /** Builds the dynamic seven-color plate used for both live display and export. */
 export function buildMandalaColorPlate(codes: string[], variation: number, _animated: boolean) {
