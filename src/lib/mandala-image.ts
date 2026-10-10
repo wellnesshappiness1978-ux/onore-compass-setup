@@ -22,7 +22,7 @@ export function mandalaSeed(colors: MandalaColor[]) {
     hash ^= source.charCodeAt(index);
     hash = Math.imul(hash, 16777619);
   }
-  return hash >>> 0;
+  return (hash >>> 0) % 2147483647;
 }
 
 export function mandalaPrompt(colors: MandalaColor[]) {
@@ -40,6 +40,6 @@ export function mandalaPrompt(colors: MandalaColor[]) {
 }
 
 export function mandalaImageUrl(colors: MandalaColor[], variation = 0) {
-  const seed = (mandalaSeed(colors) + variation * 104729) >>> 0;
+  const seed = (mandalaSeed(colors) + variation * 104729) % 2147483647;
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(mandalaPrompt(colors))}?width=1024&height=1024&nologo=true&seed=${seed}`;
 }

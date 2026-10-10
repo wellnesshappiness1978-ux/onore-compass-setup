@@ -21,6 +21,7 @@ describe("AI mandala image", () => {
 
   it("builds a deterministic prompt and seed without personal data", () => {
     expect(mandalaSeed(colors)).toBe(mandalaSeed(colors));
+    expect(mandalaSeed(colors)).toBeLessThanOrEqual(2147483647);
     const prompt = mandalaPrompt(colors);
     expect(prompt).toContain("masterpiece oil painting");
     expect(prompt).toContain("rich impasto texture");
