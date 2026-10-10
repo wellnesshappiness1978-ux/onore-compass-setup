@@ -250,3 +250,4 @@
 
 ## Divination-linked mandala
 - [x] Drive mandala symmetry from life path, background aura and gold tint from dominant Four Pillars element, and center gem cut from essence type; keep seven colors, offline drawing and 2048px export.
+- [x] Re-center the oil base so its painted compass meets the exact canvas center under the gem, in live view and 2048px export.

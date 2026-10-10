@@ -21,3 +21,17 @@ describe("mandala traits", () => {
     expect(buildMandalaColorPlate(codes, 0, false)).toBe(buildMandalaColorPlate(codes, 0, false, DEFAULT_TRAITS));
   });
 });
+describe("mandala centering", () => {
+  it("keeps every gem cut centered at the origin with no offsets", () => {
+    for (const cut of ["hexagon","octagon","dodecagon","star"] as const) {
+      const svg = buildMandalaColorPlate(codes, 0, false, { lifePath: 1, symmetry: 8, element: "水", gemCut: cut });
+      expect(svg).toContain('viewBox="-512 -512 1024 1024"');
+      expect(svg).not.toMatch(/translate\(/);
+      const d = svg.match(/data-gem-occlusion="opaque" d="M([^"]+)Z"/)![1]!;
+      const pts = d.split(" L").map(p => p.split(",").map(Number));
+      const cx = pts.reduce((s, p) => s + p[0]!, 0) / pts.length, cy = pts.reduce((s, p) => s + p[1]!, 0) / pts.length;
+      expect(Math.abs(cx)).toBeLessThan(.2); expect(Math.abs(cy)).toBeLessThan(.2);
+      expect(svg).toContain('id="elementAura" cx="0" cy="0"');
+    }
+  });
+});
