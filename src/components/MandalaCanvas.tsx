@@ -107,22 +107,32 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const s = i % 8 === 0 ? 4.6 : 1.5 + unit(6700 + i) * 1.8;
     return `<path d="M${x.toFixed(1)} ${(y - s).toFixed(1)}L${(x + s * .62).toFixed(1)} ${y.toFixed(1)}L${x.toFixed(1)} ${(y + s).toFixed(1)}L${(x - s * .62).toFixed(1)} ${y.toFixed(1)}Z" fill="${i % 8 === 0 ? "#FFF4BF" : "url(#leafGold)"}" fill-opacity="${i % 8 === 0 ? ".88" : ".58"}" stroke="#7B551D" stroke-width=".35" filter="url(#fineGold)"/>`;
   }).join("");
-  // A hand-painted, fully opaque octagonal diamond: every facet is a solid shade of the overall color.
+  // A hand-painted, fully opaque diamond: every facet is a solid shade of the overall color.
+  // Its cut (6/8/12 sides or radiant star) follows the user's essence type.
   const gemDark = mixHex(core, "#000000", .5);
   const gemShade = mixHex(core, "#000000", .26);
   const gemBright = mixHex(core, "#FFFFFF", .28);
   const gemGlint = mixHex(core, "#FFFFFF", .62);
+  const cut = traits.gemCut;
+  const sides = cut === "hexagon" ? 6 : cut === "dodecagon" ? 12 : cut === "star" ? 16 : 8;
   const gemPoint = (i: number, scale = 1) => {
-    const a = -Math.PI / 2 + Math.PI / 8 + i * Math.PI / 4;
-    return `${(Math.cos(a) * gemRadius * scale).toFixed(1)},${(Math.sin(a) * gemRadius * scale).toFixed(1)}`;
+    const a = -Math.PI / 2 + Math.PI / sides + i * Math.PI * 2 / sides;
+    const star = cut === "star" && i % 2 === 1 && scale > .9 ? .74 : 1;
+    return `${(Math.cos(a) * gemRadius * scale * star).toFixed(1)},${(Math.sin(a) * gemRadius * scale * star).toFixed(1)}`;
   };
-  const gemOutline = Array.from({ length: 8 }, (_, i) => gemPoint(i)).join(" ");
-  const gemTable = Array.from({ length: 8 }, (_, i) => gemPoint(i, .42)).join(" ");
-  // Light falls from the upper left: facets 6,7 brightest, 2,3 deepest.
-  const crownTone = [gemBright, core, gemShade, gemDark, gemShade, core, gemGlint, gemBright];
-  const pavilionTone = [core, gemShade, gemDark, gemShade, core, gemBright, gemBright, gemGlint];
-  const gemCrownFacets = Array.from({ length: 8 }, (_, i) => `<path data-gem-facet="crown" d="M${gemPoint(i)} L${gemPoint((i + 1) % 8)} L${gemPoint((i + 1) % 8, .72)} L${gemPoint(i, .72)}Z" fill="${crownTone[i]}" stroke="${gemGlint}" stroke-opacity=".55" stroke-width=".35" stroke-linejoin="round"/>`).join("");
-  const gemPavilionFacets = Array.from({ length: 8 }, (_, i) => `<path data-gem-facet="pavilion" d="M${gemPoint(i, .72)} L${gemPoint((i + 1) % 8, .72)} L${gemPoint((i + 1) % 8, .42)} L${gemPoint(i, .42)}Z" fill="${pavilionTone[i]}" stroke="${gemGlint}" stroke-opacity=".42" stroke-width=".3" stroke-linejoin="round"/>`).join("");
+  const gemOutline = Array.from({ length: sides }, (_, i) => gemPoint(i)).join(" ");
+  const gemTable = Array.from({ length: sides }, (_, i) => gemPoint(i, .42)).join(" ");
+  // Light falls from the upper left: facets facing (-1,-1) are brightest.
+  const toneAt = (i: number, crown: boolean) => {
+    const a = -Math.PI / 2 + Math.PI / sides + (i + .5) * Math.PI * 2 / sides;
+    const lit = (-Math.cos(a) - Math.sin(a)) / Math.SQRT2 + (crown ? 0 : -.15);
+    return lit > .75 ? gemGlint : lit > .3 ? gemBright : lit > -.2 ? core : lit > -.65 ? gemShade : gemDark;
+  };
+  const gemCrownFacets = Array.from({ length: sides }, (_, i) => `<path data-gem-facet="crown" d="M${gemPoint(i)} L${gemPoint((i + 1) % sides)} L${gemPoint((i + 1) % sides, .72)} L${gemPoint(i, .72)}Z" fill="${toneAt(i, true)}" stroke="${gemGlint}" stroke-opacity=".55" stroke-width=".35" stroke-linejoin="round"/>`).join("");
+  const gemPavilionFacets = Array.from({ length: sides }, (_, i) => `<path data-gem-facet="pavilion" d="M${gemPoint(i, .72)} L${gemPoint((i + 1) % sides, .72)} L${gemPoint((i + 1) % sides, .42)} L${gemPoint(i, .42)}Z" fill="${toneAt(i, false)}" stroke="${gemGlint}" stroke-opacity=".42" stroke-width=".3" stroke-linejoin="round"/>`).join("");
+  const aura = traits.element ? ELEMENT_AURA[traits.element] : null;
+  const auraEl = aura ? `<circle data-element-aura="${traits.element}" r="512" fill="url(#elementAura)"/>` : "";
+  const auraDef = aura ? `<radialGradient id="elementAura" cx="0" cy="0" r="512" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${aura}" stop-opacity=".22"/><stop offset=".55" stop-color="${aura}" stop-opacity=".1"/><stop offset="1" stop-color="${aura}" stop-opacity="0"/></radialGradient>` : "";
   const gemPaintStrokes = Array.from({ length: 22 }, (_, i) => {
     const a = unit(8600 + i) * Math.PI * 2;
     const r = gemRadius * (.12 + unit(8700 + i) * .72);
