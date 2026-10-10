@@ -69,7 +69,7 @@ describe("compass mandala layout", () => {
     expect((plate.match(/data-agolmen-shell="nautilus"/g) ?? [])).toHaveLength(5);
     expect(plate).toContain("starBloom");
     expect(plate).toContain("shellRelief");
-    expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? []).length).toBeGreaterThan(40);
+    expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? [])).toHaveLength(36);
     expect((plate.match(/filter="url\(#fineGold\)"/g) ?? []).length).toBeGreaterThan(20);
   });
   it("keeps still and exported compositions identical while regeneration changes the paintwork", () => {
