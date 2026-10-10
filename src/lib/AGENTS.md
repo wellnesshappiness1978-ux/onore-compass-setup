@@ -9,3 +9,4 @@
 - VIP art derives repeatable golden-ratio geometry from seven birth colors and 10 geocentric bodies, labels missing-time JST noon, and exports illustrative PNG only. Why: preserve data fidelity without implying verified effects or entitlement.
 - Team analysis uses deterministic scores; team AI drafts and 1on1 text never imply member writes for guests. Why: reference workflows remain reproducible.
 - Birth-color mandala is drawn entirely in-app as SVG (golden compass core, six birth-color petal layers, glow filters, deterministic gold particles) using the seven colors unmodified; no external image service. Why: instant, offline, exact colors and no credits or network failures.
+- Mandala traits (symmetry, element aura, gem cut) derive client-side from the profile via core-layers, never from stored results. Why: instant, works for guests, matches the same calculation everywhere.

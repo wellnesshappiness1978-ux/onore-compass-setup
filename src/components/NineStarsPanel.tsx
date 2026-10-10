@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useMemo, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Copy, Crown, Download, Expand, LockKeyhole, RefreshCw, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import { artSpecialistCopy } from "@/lib/art-specialist-copy";
 import { nineStarName, trigramLabel } from "@/lib/ui-i18n";
 import { helioCopy } from "@/lib/helio-copy";
 
+import { computeCoreLayers } from "@/lib/ai/core-layers";
+import { mandalaTraitsFromCore } from "@/lib/mandala-traits";
 const MandalaScene = lazy(() => import("./MandalaCanvas"));
 type Props = { language: Language; onVip: () => void; profile: UserProfile; testUnlocked?: boolean };
 
@@ -25,6 +27,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
   const a = artSpecialistCopy[language];
   const { birthDate, bloodType } = profile;
   const palette = birthColorSpectrum(profile);
+  const mandalaTraits = useMemo(() => { try { return mandalaTraitsFromCore(computeCoreLayers({ nameKanji: profile.nameKanji ?? "", nameRomaji: profile.nameRomaji ?? "", birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, bloodType, birthPlace: profile.birthPlace, birthCity: profile.birthCity })); } catch { return mandalaTraitsFromCore(null); } }, [profile.nameKanji, profile.nameRomaji, birthDate, profile.birthTime, profile.birthTimeUnknown, bloodType, profile.birthPlace, profile.birthCity]);
   const sky = natalSky(birthDate, profile.birthTime, profile.birthTimeUnknown);
   const nine = nineStarProfile(birthDate, profile.birthTime, profile.birthTimeUnknown, profile.gender);
   const symbols = getArtSymbols(birthDate);
@@ -104,7 +107,7 @@ export default function NineStarsPanel({ language, onVip, profile, testUnlocked 
     {palette && testUnlocked && <div className="mx-auto mt-5 grid max-w-[720px] grid-cols-4 gap-2 sm:grid-cols-7" aria-label={a.palette}>{paletteColors(palette).map((color, index) => <div key={`${color.slot}-${index}`} className="min-w-0"><span className="mx-auto block size-8 rounded-full border border-primary/30" style={{ backgroundColor: color.code }} /><span className="mt-1 block truncate text-[11px] text-muted-foreground">{a.paletteSlots[index]}</span></div>)}</div>}
     <div className={`relative mx-auto mt-7 w-full overflow-hidden border-y border-primary/35 bg-background shadow-gold ${art === "cosmic" ? "aspect-[9/16] max-w-[760px] sm:max-h-[1120px]" : "aspect-square max-w-[920px]"}`} aria-label={art === "cosmic" ? a.cosmic : a.mandalaAlt}>
       {mounted && testUnlocked && sky && nine && art === "cosmic" ? <CosmicAlchemyArtwork sky={sky} nine={nine} colors={artColors} language={language} onCapture={setCapture} /> : mounted && testUnlocked && sky ? <Suspense fallback={<AgolmenLoading compact label={a.loading} />}>
-        <MandalaScene colors={displayedColors} language={language} variation={variation} reduced={reduced} onCapture={setCapture} />
+        <MandalaScene colors={displayedColors} language={language} variation={variation} reduced={reduced} traits={mandalaTraits} onCapture={setCapture} />
       </Suspense> : <NineStarsArtwork main={colors.main} sub={colors.sub} bloodType={bloodType} birthDate={birthDate} language={language} />}
       {!open && <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/65 p-4 backdrop-blur-[2px]">
         <div className="flex size-12 items-center justify-center rounded-full border border-primary/50 bg-background/80 text-primary"><LockKeyhole className="size-5" /></div>

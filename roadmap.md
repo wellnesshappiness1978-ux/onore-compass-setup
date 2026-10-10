@@ -247,3 +247,6 @@
 ## Birth-color mandala path-bound color integration
 - [x] Replace circular color bands with individually closed, gradient-filled motif segments; mask oil texture inside each part and keep shadows and gold filigree above all color.
 - [x] Verify exact seven-color retention, deterministic regeneration, matching live/export artwork, responsive views, and clean tests/diagnostics.
+
+## Divination-linked mandala
+- [x] Drive mandala symmetry from life path, background aura and gold tint from dominant Four Pillars element, and center gem cut from essence type; keep seven colors, offline drawing and 2048px export.
