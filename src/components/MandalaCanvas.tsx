@@ -96,9 +96,9 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
   ].map(({ role, color }, group) => {
     const petals = Array.from({ length: 4 }, (_, petal) => {
       const a = -Math.PI / 2 + (group + petal * 4) / 16 * Math.PI * 2;
-      const inner = gemRadius * .72;
-      const outer = 72 + group * 5;
-      const half = .1 + group * .007;
+      const inner = gemRadius * .68;
+      const outer = 76 + group * 5;
+      const half = .205 + group * .006;
       const p = (r: number, da = 0) => `${(Math.cos(a + da) * r).toFixed(1)} ${(Math.sin(a + da) * r).toFixed(1)}`;
       return `<path d="M${p(inner, -half)}Q${p(outer * .58, -half * .5)} ${p(outer)}Q${p(outer * .58, half * .5)} ${p(inner, half)}Z" fill="${color}" fill-opacity="${(.78 - group * .07).toFixed(2)}" stroke="${color}" stroke-opacity=".9" stroke-width="1.1" filter="url(#flowPaint)"/>`;
     }).join("");
