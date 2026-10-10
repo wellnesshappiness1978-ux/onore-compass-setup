@@ -230,7 +230,7 @@
 ## Birth-color mandala radiant gemstone composition
 - [x] Rebuild the focal point as a large faceted gemstone using the exact overall birth color, with engraved compass backing and gold prongs.
 - [x] Add deterministic overall-color, platinum, and gold light rays plus layered fine-art detail for a visibly new composition.
-- [ ] Verify desktop, mobile, full-screen, regeneration, matching 2048 PNG export, tests, and clean diagnostics.
+- [x] Verify desktop, mobile, full-screen, regeneration, matching 2048 PNG export, tests, and clean diagnostics.
 
 ## Inset gemstone and birth-color sparkle refinement
-- [ ] Remove circular gemstone surrounds, render a solid inset overall-color gemstone, golden light streaks and seven-color fluorescent sparkle accents; verify artwork and PNG export.
+- [x] Remove circular gemstone surrounds, render a solid inset overall-color gemstone, golden light streaks and seven-color fluorescent sparkle accents; verify artwork and PNG export.
