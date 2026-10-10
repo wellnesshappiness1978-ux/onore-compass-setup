@@ -38,7 +38,7 @@ describe("AI mandala image", () => {
     const regenerated = mandalaImageUrl(colors, 1);
     expect(first).toContain("width=1024&height=1024&nologo=true&model=flux&seed=");
     expect(first).not.toContain(" ");
-    expect(decodeURIComponent(first)).toContain("masterpiece, extremely intricate sacred geometry mandala");
+    expect(decodeURIComponent(first)).toContain("breathtaking circular sacred geometry mandala embodying 'Agolmen's Compass'");
     expect(regenerated.split("&seed=")[0]).toBe(first.split("&seed=")[0]);
     expect(regenerated).not.toBe(first);
   });
