@@ -42,6 +42,12 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("image.pollinations");
     expect(plate).not.toContain("<image");
     expect((plate.match(/<polygon/g) ?? [])).toHaveLength(32);
+    expect(plate).toContain('data-gem-setting="inset"');
+    const gem = plate.slice(plate.indexOf('<g data-core-gemstone='));
+    expect(gem).not.toContain("<circle");
+    expect(plate).toContain('gradientUnits="userSpaceOnUse"');
+    colors.forEach(color => expect(plate).toContain(`data-sparkle-color="${color}"`));
+    expect((plate.match(/data-sparkle-color=/g) ?? []).length).toBeGreaterThan(250);
     expect((plate.match(/filter="url\(#rayTexture\)"/g) ?? [])).toHaveLength(216);
     expect((plate.match(/stroke-linecap="round" stroke-dasharray=/g) ?? []).length).toBeGreaterThan(140);
     expect((plate.match(/filter="url\(#fineGold\)"/g) ?? []).length).toBeGreaterThan(20);
