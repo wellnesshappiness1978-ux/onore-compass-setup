@@ -47,21 +47,21 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const skew = (unit(4200 + i) - .5) * s;
     return `<path d="M${(p.x - s).toFixed(1)} ${(p.y + skew).toFixed(1)}l${(s * 1.2).toFixed(1)} ${(-s * .9).toFixed(1)}l${(s * .85).toFixed(1)} ${(s * 1.1).toFixed(1)}l${(-s * 1.35).toFixed(1)} ${(s * .48).toFixed(1)}Z" fill="url(#leafGold)" fill-opacity="${(.34 + unit(4300 + i) * .34).toFixed(2)}" filter="url(#fineGold)"/>`;
   }).join("");
-  const gemRadius = compassR * .55;
-  const refractedLight = Array.from({ length: 18 }, (_, i) => {
-    const a = i / 18 * Math.PI * 2 + (unit(5000 + i) - .5) * .18;
-    const start = gemRadius * (.72 + unit(5100 + i) * .22);
-    const end = gemRadius * (1.28 + unit(5200 + i) * 2.55);
+  const gemRadius = compassR * .44;
+  const refractedLight = Array.from({ length: 12 }, (_, i) => {
+    const a = i / 12 * Math.PI * 2 + (unit(5000 + i) - .5) * .28;
+    const start = gemRadius * (.8 + unit(5100 + i) * .18);
+    const end = gemRadius * (1.22 + unit(5200 + i) * 1.35);
     const bend = (unit(5300 + i) - .5) * .32;
-    const width = .004 + unit(5400 + i) * .014;
+    const width = .003 + unit(5400 + i) * .009;
     const point = (r: number, da = 0) => `${(Math.cos(a + da) * r).toFixed(1)} ${(Math.sin(a + da) * r).toFixed(1)}`;
     const color = i % 5 === 0 ? "url(#platinumRay)" : i % 3 === 0 ? "url(#coreRay)" : "url(#goldRay)";
-    return `<path d="M${point(start, -width)} Q${point((start + end) * .52, bend)} ${point(end)} Q${point((start + end) * .5, bend * .72)} ${point(start, width)}Z" fill="${color}" fill-opacity="${(.22 + unit(5500 + i) * .38).toFixed(2)}" filter="url(#rayTexture)"/>`;
+    return `<path d="M${point(start, -width)} Q${point((start + end) * .52, bend)} ${point(end)} Q${point((start + end) * .5, bend * .72)} ${point(start, width)}Z" fill="${color}" fill-opacity="${(.12 + unit(5500 + i) * .24).toFixed(2)}" filter="url(#rayTexture)"/>`;
   }).join("");
-  const lightFilaments = Array.from({ length: 36 }, (_, i) => {
-    const a = i / 36 * Math.PI * 2 + (unit(6000 + i) - .5) * .21;
+  const lightFilaments = Array.from({ length: 24 }, (_, i) => {
+    const a = i / 24 * Math.PI * 2 + (unit(6000 + i) - .5) * .25;
     const start = gemRadius * (.78 + unit(6100 + i) * .24);
-    const end = gemRadius * (1.15 + unit(6200 + i) * 2.25);
+    const end = gemRadius * (1.12 + unit(6200 + i) * 1.62);
     const bend = (unit(6300 + i) - .5) * 54;
     const sx = Math.cos(a) * start, sy = Math.sin(a) * start;
     const ex = Math.cos(a) * end, ey = Math.sin(a) * end;
@@ -78,18 +78,32 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const s = i % 8 === 0 ? 4.6 : 1.5 + unit(6700 + i) * 1.8;
     return `<path d="M${x.toFixed(1)} ${(y - s).toFixed(1)}L${(x + s * .62).toFixed(1)} ${y.toFixed(1)}L${x.toFixed(1)} ${(y + s).toFixed(1)}L${(x - s * .62).toFixed(1)} ${y.toFixed(1)}Z" fill="${i % 8 === 0 ? "#FFF4BF" : "url(#leafGold)"}" fill-opacity="${i % 8 === 0 ? ".88" : ".58"}" stroke="#7B551D" stroke-width=".35" filter="url(#fineGold)"/>`;
   }).join("");
-  // A large hand-set gemstone whose faceted edge is defined by reflected color, never a dark bezel.
-  const gemPoint = (i: number, scale = 1) => {
-    const a = -Math.PI / 2 + Math.PI / 8 + i * Math.PI / 4;
-    return `${(Math.cos(a) * gemRadius * .86 * scale).toFixed(1)},${(Math.sin(a) * gemRadius * 1.08 * scale).toFixed(1)}`;
+  // An irregular hand-polished rose cut: overall color remains the stone, with no bezel or circular seat.
+  const gemFacetCount = 14;
+  const gemPoint = (i: number, scale = 1, inner = false) => {
+    const a = -Math.PI / 2 + i / gemFacetCount * Math.PI * 2 + (unit(8600 + i + (inner ? 200 : 0)) - .5) * .055;
+    const irregularity = inner ? .95 + unit(8800 + i) * .08 : .91 + unit(8700 + i) * .13;
+    return `${(Math.cos(a) * gemRadius * .9 * scale * irregularity).toFixed(1)},${(Math.sin(a) * gemRadius * 1.06 * scale * irregularity).toFixed(1)}`;
   };
-  const gemOutline = Array.from({ length: 8 }, (_, i) => gemPoint(i)).join(" ");
-  const gemTable = Array.from({ length: 8 }, (_, i) => gemPoint(i, .48)).join(" ");
-  const gemFacets = Array.from({ length: 8 }, (_, i) => {
-    const fill = i < 2 ? "url(#gemLight)" : i < 5 ? "url(#gemDeep)" : "url(#gemFlash)";
-    return `<path d="M${gemPoint(i)} L${gemPoint((i + 1) % 8)} L${gemPoint((i + 1) % 8, .48)} L${gemPoint(i, .48)}Z" fill="${fill}" stroke="#FFF7D0" stroke-opacity="${i % 3 === 0 ? ".72" : ".28"}" stroke-width=".16"/>`;
+  const gemOutline = Array.from({ length: gemFacetCount }, (_, i) => gemPoint(i)).join(" ");
+  const gemInner = Array.from({ length: gemFacetCount }, (_, i) => gemPoint(i, .56, true)).join(" ");
+  const apexX = ((unit(9001) - .5) * gemRadius * .12).toFixed(1);
+  const apexY = ((unit(9002) - .5) * gemRadius * .1).toFixed(1);
+  const gemFacets = Array.from({ length: gemFacetCount }, (_, i) => {
+    const next = (i + 1) % gemFacetCount;
+    const lowerFill = i % 4 === 0 ? "url(#roseMilk)" : i % 3 === 0 ? "url(#roseDeep)" : "url(#roseCore)";
+    const crownFill = i % 5 === 0 ? "url(#roseLight)" : i % 2 === 0 ? "url(#roseCore)" : "url(#roseVeil)";
+    const edgeOpacity = (.12 + unit(9100 + i) * .18).toFixed(2);
+    return `<path d="M${gemPoint(i)}L${gemPoint(next)}L${gemPoint(next, .56, true)}L${gemPoint(i, .56, true)}Z" fill="${lowerFill}" stroke="#F6DEA0" stroke-opacity="${edgeOpacity}" stroke-width=".12"/><path d="M${gemPoint(i, .56, true)}L${gemPoint(next, .56, true)}L${apexX},${apexY}Z" fill="${crownFill}" stroke="#FFF5D0" stroke-opacity="${edgeOpacity}" stroke-width=".1"/>`;
   }).join("");
-  const gemProngs = [0, 2, 4, 6].map(i => `<path d="M${gemPoint(i, 1.09)}L${gemPoint(i, .84)}" stroke="url(#leafGold)" stroke-width=".72" stroke-linecap="round"/>`).join("");
+  const gemInclusions = Array.from({ length: 17 }, (_, i) => {
+    const a = unit(9200 + i) * Math.PI * 2;
+    const r1 = gemRadius * (.08 + unit(9300 + i) * .38);
+    const r2 = r1 + gemRadius * (.1 + unit(9400 + i) * .25);
+    const bend = (unit(9500 + i) - .5) * .3;
+    const p = (r: number, da = 0) => `${(Math.cos(a + da) * r).toFixed(1)} ${(Math.sin(a + da) * r).toFixed(1)}`;
+    return `<path data-gem-inclusion="true" d="M${p(r1)}Q${p((r1 + r2) / 2, bend)} ${p(r2, bend * .22)}" fill="none" stroke="${i % 4 === 0 ? "#FFF8E1" : core}" stroke-opacity="${(.12 + unit(9600 + i) * .2).toFixed(2)}" stroke-width="${(.22 + unit(9700 + i) * .42).toFixed(2)}" stroke-linecap="round"/>`;
+  }).join("");
   const fourColorFlow = [
     { role: "health", color: codes[5] ?? core },
     { role: "love", color: codes[4] ?? core },
@@ -106,12 +120,12 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     }).join("");
     return `<g data-four-color-flow="${role}">${petals}</g>`;
   }).join("");
-  const gemstoneSparkles = Array.from({ length: 7 }, (_, i) => {
+  const gemstoneSparkles = Array.from({ length: 5 }, (_, i) => {
     const a = -.92 + i * .93 + unit(6800 + i) * .16;
     const r = gemRadius * (.24 + unit(6900 + i) * .52);
     const x = Math.cos(a) * r;
     const y = Math.sin(a) * r;
-    const s = i === 0 ? 9.2 : 2.8 + unit(7000 + i) * 4.8;
+    const s = i === 0 ? 5.8 : 1.8 + unit(7000 + i) * 3.2;
     return `<path data-gem-sparkle="true" d="M${x.toFixed(1)} ${(y-s).toFixed(1)}C${(x+s*.12).toFixed(1)} ${(y-s*.25).toFixed(1)} ${(x+s*.25).toFixed(1)} ${(y-s*.12).toFixed(1)} ${(x+s).toFixed(1)} ${y.toFixed(1)}C${(x+s*.25).toFixed(1)} ${(y+s*.12).toFixed(1)} ${(x+s*.12).toFixed(1)} ${(y+s*.25).toFixed(1)} ${x.toFixed(1)} ${(y+s).toFixed(1)}C${(x-s*.12).toFixed(1)} ${(y+s*.25).toFixed(1)} ${(x-s*.25).toFixed(1)} ${(y+s*.12).toFixed(1)} ${(x-s).toFixed(1)} ${y.toFixed(1)}C${(x-s*.25).toFixed(1)} ${(y-s*.12).toFixed(1)} ${(x-s*.12).toFixed(1)} ${(y-s*.25).toFixed(1)} ${x.toFixed(1)} ${(y-s).toFixed(1)}Z" fill="#FFFFFF" fill-opacity="${i === 0 ? ".98" : ".86"}" filter="url(#gemSparkle)"/>`;
   }).join("");
   const birthSparkles = Array.from({ length: 420 }, (_, i) => {
