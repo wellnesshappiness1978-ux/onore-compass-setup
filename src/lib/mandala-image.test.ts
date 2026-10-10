@@ -19,20 +19,17 @@ describe("AI mandala image", () => {
     expect(lapis && birthColorKeyword(lapis)).toContain("deep sapphire lapis blue");
   });
 
-  it("builds a deterministic prompt and seed without personal data", () => {
+  it("uses the fixed Agolmen's Compass prompt without personal data", () => {
     expect(mandalaSeed(colors)).toBe(mandalaSeed(colors));
     expect(mandalaSeed(colors)).toBeLessThanOrEqual(2147483647);
     const prompt = mandalaPrompt(colors);
-    expect(prompt).toContain("masterpiece, extremely intricate sacred geometry mandala, hyper-detailed fine lines");
-    expect(prompt).toContain("vivid vibrant 7 rainbow birth colors");
-    expect(prompt).toContain("glowing neon crystal luminescence, shimmering gold sparkles");
-    expect(prompt).toContain("non-transparent rich bold colors, pitch-black cosmic space background");
-    expect(prompt).toContain("8k resolution, flawless symmetry");
-    expect(prompt).toContain("vibrant glowing gemstone core in the overall birth color shining imperial amber gold #A17A21");
-    for (const color of colors) {
-      expect(prompt).toContain(color.code);
-      expect(prompt).toContain(birthColorKeyword(color));
-    }
+    expect(prompt).toContain("embodying 'Agolmen's Compass'");
+    expect(prompt).toContain("central glowing golden starburst compass with intricate filigree");
+    expect(prompt).toContain("all 7 vivid personal birth colors (sapphire blue, ruby red, emerald green, golden yellow, royal violet, vibrant orange, diamond white)");
+    expect(prompt).toContain("rich non-transparent impasto oil painting texture");
+    expect(prompt).toContain("glowing crystal luminescence, shimmering golden sparkles");
+    expect(prompt).toContain("pitch-black deep cosmic space background");
+    expect(prompt).toContain("8k resolution, highly detailed, flawless radial symmetry");
     expect(prompt).not.toMatch(/user|birthdate|birthday|name|東京都/i);
   });
 
