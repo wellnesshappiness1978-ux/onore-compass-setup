@@ -96,13 +96,13 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     { role: "work", color: codes[3] ?? core },
     { role: "wealth", color: codes[2] ?? core },
   ].map(({ role, color }, group) => {
-    const petals = Array.from({ length: 4 }, (_, petal) => {
-      const a = -Math.PI / 2 + (group + petal * 4) / 16 * Math.PI * 2;
-      const inner = gemRadius * .18;
-      const outer = gemRadius * (1.48 + group * .19);
-      const half = .27 + group * .012;
+    const petals = Array.from({ length: 8 }, (_, petal) => {
+      const a = -Math.PI / 2 + (group + petal * 4) / 32 * Math.PI * 2 + (unit(8200 + group * 8 + petal) - .5) * .08;
+      const inner = gemRadius * .08;
+      const outer = gemRadius * (1.62 + group * .17 + unit(8300 + group * 8 + petal) * .22);
+      const half = .22 + group * .008 + unit(8400 + group * 8 + petal) * .035;
       const p = (r: number, da = 0) => `${(Math.cos(a + da) * r).toFixed(1)} ${(Math.sin(a + da) * r).toFixed(1)}`;
-      return `<path d="M${p(inner, -half)}Q${p(outer * .56, -half * .42)} ${p(outer)}Q${p(outer * .61, half * .48)} ${p(inner, half)}Z" fill="${color}" fill-opacity="${(.86 - group * .06).toFixed(2)}" stroke="${color}" stroke-opacity=".72" stroke-width=".7" filter="url(#flowPaint)"/>`;
+      return `<path d="M${p(inner, -half)}Q${p(outer * .48, -half * .54)} ${p(outer)}Q${p(outer * .57, half * .39)} ${p(inner, half)}Z" fill="${color}" fill-opacity="${(.94 - group * .045).toFixed(2)}" stroke="${color}" stroke-opacity=".8" stroke-width=".45" filter="url(#flowPaint)"/>`;
     }).join("");
     return `<g data-four-color-flow="${role}">${petals}</g>`;
   }).join("");

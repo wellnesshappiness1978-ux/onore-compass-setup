@@ -236,4 +236,4 @@
 - [x] Remove circular gemstone surrounds, render a solid inset overall-color gemstone, golden light streaks and seven-color fluorescent sparkle accents; verify artwork and PNG export.
 
 ## Birth-color mandala gemstone-light artistry refinement
-- [ ] Double the center gemstone, remove its black edge and circular backing, replace uniform rays with fine refracted light, and scatter varied seven-color sparkles; verify all display and export views.
+- [x] Double the center gemstone, remove its black edge and circular backing, replace uniform rays with fine refracted light, and scatter varied seven-color sparkles; verify all display and export views.
