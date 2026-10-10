@@ -44,6 +44,7 @@ describe("compass mandala layout", () => {
     expect((plate.match(/<polygon/g) ?? [])).toHaveLength(32);
     expect(plate).toContain('data-gem-setting="inset"');
     expect(plate).toContain('data-gem-radius-ratio="0.204"');
+    expect(plate).toContain('data-gem-light-seat="faceted"');
     expect(plate).toContain('filter="url(#gemstoneRealism)"');
     const gem = plate.slice(plate.indexOf('<g data-core-gemstone='));
     expect(gem).not.toContain("<circle");
