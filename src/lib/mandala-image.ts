@@ -31,19 +31,15 @@ export function mandalaPrompt(colors: MandalaColor[]) {
   const outerColors = outer.map(color => `${birthColorKeyword(color)} ${color.code}`).join(", ");
 
   return [
-    "masterpiece front-facing circular sacred geometry mandala, perfectly centered and fully visible",
-    "extremely intricate delicate fine lines, complex kaleidoscopic masterwork detail",
-    "layered concentric rings, radial lotus petals, interlaced lattice, fine dot-painted bands, lace-like outer rim",
+    "masterpiece, extremely intricate sacred geometry mandala, hyper-detailed fine lines",
+    "vivid vibrant 7 rainbow birth colors, glowing neon crystal luminescence, shimmering gold sparkles",
+    "non-transparent rich bold colors, pitch-black cosmic space background, 8k resolution, flawless symmetry",
     `vibrant glowing gemstone core in the overall birth color ${overallColor}`,
-    `six outer personal birth colors in distinct harmonious geometric layers: ${outerColors}`,
-    "utilizing all 7 personal birth colors, each color clearly visible, unmuddied and balanced",
-    "opaque vivid bold non-transparent rich colors, subtle rich impasto and refined brushwork",
-    "shimmering golden sparkles, glowing crystal luminescence, radiant jewel particles",
-    "pitch-black cosmic deep space background, symmetrical composition, 8k resolution, highly detailed",
+    `six outer personal birth colors glowing harmoniously: ${outerColors}`,
   ].join(", ");
 }
 
 export function mandalaImageUrl(colors: MandalaColor[], variation = 0) {
   const seed = (mandalaSeed(colors) + variation * 104729) % 2147483647;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(mandalaPrompt(colors))}?width=1024&height=1024&nologo=true&seed=${seed}`;
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(mandalaPrompt(colors))}?width=1024&height=1024&nologo=true&model=flux&seed=${seed}`;
 }

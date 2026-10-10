@@ -23,13 +23,11 @@ describe("AI mandala image", () => {
     expect(mandalaSeed(colors)).toBe(mandalaSeed(colors));
     expect(mandalaSeed(colors)).toBeLessThanOrEqual(2147483647);
     const prompt = mandalaPrompt(colors);
-    expect(prompt).toContain("masterpiece front-facing circular sacred geometry mandala");
-    expect(prompt).toContain("extremely intricate delicate fine lines");
-    expect(prompt).toContain("layered concentric rings, radial lotus petals, interlaced lattice");
-    expect(prompt).toContain("utilizing all 7 personal birth colors");
-    expect(prompt).toContain("opaque vivid bold non-transparent rich colors");
-    expect(prompt).toContain("shimmering golden sparkles");
-    expect(prompt).toContain("pitch-black cosmic deep space background");
+    expect(prompt).toContain("masterpiece, extremely intricate sacred geometry mandala, hyper-detailed fine lines");
+    expect(prompt).toContain("vivid vibrant 7 rainbow birth colors");
+    expect(prompt).toContain("glowing neon crystal luminescence, shimmering gold sparkles");
+    expect(prompt).toContain("non-transparent rich bold colors, pitch-black cosmic space background");
+    expect(prompt).toContain("8k resolution, flawless symmetry");
     expect(prompt).toContain("vibrant glowing gemstone core in the overall birth color shining imperial amber gold #A17A21");
     for (const color of colors) {
       expect(prompt).toContain(color.code);
@@ -41,9 +39,9 @@ describe("AI mandala image", () => {
   it("encodes the prompt and changes only the seed for regeneration", () => {
     const first = mandalaImageUrl(colors);
     const regenerated = mandalaImageUrl(colors, 1);
-    expect(first).toContain("width=1024&height=1024&nologo=true&seed=");
+    expect(first).toContain("width=1024&height=1024&nologo=true&model=flux&seed=");
     expect(first).not.toContain(" ");
-    expect(decodeURIComponent(first)).toContain("masterpiece front-facing circular sacred geometry mandala");
+    expect(decodeURIComponent(first)).toContain("masterpiece, extremely intricate sacred geometry mandala");
     expect(regenerated.split("&seed=")[0]).toBe(first.split("&seed=")[0]);
     expect(regenerated).not.toBe(first);
   });
