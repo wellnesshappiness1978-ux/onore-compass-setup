@@ -32,13 +32,10 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const ring = (r: number) => `M${r} 0A${r} ${r} 0 1 0 ${-r} 0A${r} ${r} 0 1 0 ${r} 0Z`;
     const band = `${ring(bandOut)}${ring(bandIn)}`;
     const role = i === 0 ? "health" : i === 1 ? "love" : i === 2 ? "work" : i === 3 ? "wealth" : i === 4 ? "sub" : "mind";
-    const paintedOuter = i === layers.length - 1 ? 514 : l.outer + 5;
-    const paintedInner = Math.max(0, l.inner - 5);
-    const middle = (paintedInner + paintedOuter) / 2;
-    const breadth = (paintedOuter - paintedInner) * (supportive ? .58 : 1);
+    const middle = (bandIn + bandOut) / 2;
     const stipple = Array.from({ length: l.petals * (supportive ? 2 : 4) }, (_, k) => {
       const a = l.phase + k * Math.PI * 2 / (l.petals * 4) + (unit(i * 400 + k) - .5) * .025;
-      const r = middle + (unit(i * 700 + k) - .5) * (l.outer - l.inner) * .58;
+      const r = middle + (unit(i * 700 + k) - .5) * (bandOut - bandIn) * .7;
       const size = .55 + unit(i * 900 + k) * 1.45;
       return `<circle cx="${(Math.cos(a) * r).toFixed(1)}" cy="${(Math.sin(a) * r).toFixed(1)}" r="${size.toFixed(2)}" fill="${k % 5 ? l.color : "#C49A3A"}" fill-opacity="${(.34 + unit(i * 1100 + k) * .42).toFixed(2)}"/>`;
     }).join("");
