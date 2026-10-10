@@ -239,4 +239,4 @@
 - [x] Double the center gemstone, remove its black edge and circular backing, replace uniform rays with fine refracted light, and scatter varied seven-color sparkles; verify all display and export views.
 
 ## Birth-color mandala star-core rose cut
-- [ ] Replace the regular gold-heavy center with a smaller asymmetric overall-color rose-cut gemstone, natural inclusions, hand-polished facets, and restrained refraction; verify every view and export.
+- [x] Replace the regular gold-heavy center with a smaller asymmetric overall-color rose-cut gemstone, natural inclusions, hand-polished facets, and restrained refraction; verify every view and export.
