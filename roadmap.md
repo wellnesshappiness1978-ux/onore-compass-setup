@@ -198,13 +198,11 @@
 - [x] Dot-painted eye core, radial petals, teardrops, peacock scales, wave lace edge
 - [x] Band-by-band reveal, slow rotation, reduced motion still
 
-## Birth-color mandala AI generation
-- [x] Replace the local SVG artwork with a deterministic Pollinations.ai URL driven by seven mapped birth colors only.
-- [x] Add localized loading, failure, fade-in, regeneration, full-screen, download, and share behavior without API keys.
-- [x] Remove the external image service; the mandala is now drawn locally in SVG with instant display, regeneration, full-screen and PNG save.
-- [x] Upgrade the dynamic prompt to professional impasto oil painting with the overall color at the gemstone core and all six outer colors named with exact codes; retain deterministic safe-range seeds and local SVG fallback.
-- [x] Refine the prompt with centered concentric geometry, fine lines, lotus petals, lattice, dot-painted bands, a lace rim, opaque seven-color layers, crystal light and gold particles; keep `nologo=true` and the local fallback.
-- [x] Switch the prompt to the Flux-optimized hyper-detailed sacred-geometry wording with neon crystal luminescence, gold sparkles, opaque rich colors, pitch-black cosmic background and flawless symmetry, and add `model=flux` to the URL while keeping the seven birth-color phrases, `nologo=true`, deterministic seeds and the local SVG fallback.
+## Birth-color mandala local hybrid artwork
+- [x] Remove external image generation and keep the mandala instant, deterministic, private, and available without API keys.
+- [x] Add localized regeneration, full-screen, download, and share behavior using only bundled and locally rendered artwork.
+- [x] Combine a bundled neutral impasto oil-paint base with exact seven-color SVG layers, a golden compass, glow, and deterministic particles.
+- [x] Use the same hybrid composition for display and 2048×2048 PNG export.
 
 ## Copy, traits, birth colors and audio placement
 - [x] Replace the signed-out introduction in seven languages and remove decorative input-row arrows.

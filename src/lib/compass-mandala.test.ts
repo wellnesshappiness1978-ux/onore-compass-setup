@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { compassMandalaLayout } from "./art-geometry";
+import { buildMandalaColorPlate } from "@/components/MandalaCanvas";
 
 const colors = ["#A17A21", "#C34232", "#B95E77", "#238A62", "#158D9C", "#2756A3", "#75459B"];
 
@@ -15,5 +16,12 @@ describe("compass mandala layout", () => {
     expect(compassMandalaLayout(colors)).toEqual(compassMandalaLayout(colors));
     expect(compassMandalaLayout(colors, 1).particles).not.toEqual(compassMandalaLayout(colors).particles);
     expect(compassMandalaLayout(colors).blades).toHaveLength(32);
+  });
+  it("places every exact birth color in the local SVG plate", () => {
+    const plate = buildMandalaColorPlate(colors, 0, false);
+    colors.forEach(color => expect(plate).toContain(`data-birth-color="${color}"`));
+    expect(plate).toContain("mix-blend-mode:color");
+    expect(plate).not.toContain("http://");
+    expect(plate).not.toContain("https://");
   });
 });
