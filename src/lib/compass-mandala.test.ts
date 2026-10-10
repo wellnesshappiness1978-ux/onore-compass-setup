@@ -43,6 +43,7 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("<image");
     expect(plate).not.toContain('data-compass-engraving=');
     expect(plate).toContain('data-gem-setting="inset"');
+    expect(plate).toContain('data-gem-shape="octagonal-diamond"');
     expect(plate).toContain('data-gem-radius-ratio="0.55"');
     expect(plate).not.toContain('data-gem-light-seat=');
     expect(plate).not.toContain('data-gem-dark-seat=');
@@ -54,6 +55,12 @@ describe("compass mandala layout", () => {
     expect(plate).toContain('data-color-role="mind" data-color-emphasis="supporting"');
     expect([...plate.matchAll(/data-four-color-flow="([^"]+)"/g)].map(match => match[1])).toEqual(["health", "love", "work", "wealth"]);
     expect((plate.match(/data-gem-sparkle=/g) ?? [])).toHaveLength(7);
+    expect((plate.match(/data-gem-facet="crown"/g) ?? [])).toHaveLength(8);
+    expect((plate.match(/data-gem-facet="pavilion"/g) ?? [])).toHaveLength(8);
+    expect((plate.match(/data-gem-oil-stroke=/g) ?? [])).toHaveLength(22);
+    expect(plate).toContain('id="gemOilPaint"');
+    expect(plate).toContain('id="gemSpectral"');
+    expect(plate).not.toContain('stroke-width=".72" stroke-linecap="round"');
     expect(plate).toContain('filter="url(#gemstoneRealism)"');
     const gem = plate.slice(plate.indexOf('<g data-core-gemstone='));
     expect(gem).not.toContain("<circle");
