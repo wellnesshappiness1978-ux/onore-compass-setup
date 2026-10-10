@@ -42,6 +42,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const skew = (unit(4200 + i) - .5) * s;
     return `<path d="M${(p.x - s).toFixed(1)} ${(p.y + skew).toFixed(1)}l${(s * 1.2).toFixed(1)} ${(-s * .9).toFixed(1)}l${(s * .85).toFixed(1)} ${(s * 1.1).toFixed(1)}l${(-s * 1.35).toFixed(1)} ${(s * .48).toFixed(1)}Z" fill="url(#leafGold)" fill-opacity="${(.34 + unit(4300 + i) * .34).toFixed(2)}" filter="url(#fineGold)"/>`;
   }).join("");
+  const gemRadius = compassR * .204;
   const rays = Array.from({ length: 72 }, (_, i) => {
     const a = i / 72 * Math.PI * 2 + unit(5000 + i) * .016;
     const start = gemRadius * (.9 + unit(5100 + i) * .34);
@@ -69,7 +70,6 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     return `<path d="M${x.toFixed(1)} ${(y - s).toFixed(1)}L${(x + s * .62).toFixed(1)} ${y.toFixed(1)}L${x.toFixed(1)} ${(y + s).toFixed(1)}L${(x - s * .62).toFixed(1)} ${y.toFixed(1)}Z" fill="${i % 8 === 0 ? "#FFF4BF" : "url(#leafGold)"}" fill-opacity="${i % 8 === 0 ? ".88" : ".58"}" stroke="#7B551D" stroke-width=".35" filter="url(#fineGold)"/>`;
   }).join("");
   const compassEngraving = blades.map((blade, i) => `<polygon points="${blade.points}" fill="none" stroke="${i % 4 ? "url(#agedGold)" : "url(#leafGold)"}" stroke-opacity="${blade.light ? ".7" : ".48"}" stroke-width="${blade.light ? ".78" : ".5"}" stroke-linejoin="round" stroke-dasharray="${i % 3 ? "8 2 1 3" : "13 3 2 2"}" filter="url(#roughGold)"/>`).join("");
-  const gemRadius = compassR * .204;
   // A prominent hand-set gemstone, enlarged to three times the miniature footprint without a circular bezel.
   const gemPoint = (i: number, scale = 1) => {
     const a = -Math.PI / 2 + Math.PI / 8 + i * Math.PI / 4;
