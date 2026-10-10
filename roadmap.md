@@ -245,5 +245,5 @@
 - [x] Make the central octagonal diamond fully opaque with a solid overall-color backing, opaque facets, and surface-only oil-paint highlights; preserve its circular-frame-free setting and matching export.
 
 ## Birth-color mandala path-bound color integration
-- [ ] Replace circular color bands with individually closed, gradient-filled motif segments; mask oil texture inside each part and keep shadows and gold filigree above all color.
-- [ ] Verify exact seven-color retention, deterministic regeneration, matching live/export artwork, responsive views, and clean tests/diagnostics.
+- [x] Replace circular color bands with individually closed, gradient-filled motif segments; mask oil texture inside each part and keep shadows and gold filigree above all color.
+- [x] Verify exact seven-color retention, deterministic regeneration, matching live/export artwork, responsive views, and clean tests/diagnostics.
