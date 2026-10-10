@@ -25,18 +25,11 @@ export function mandalaSeed(colors: MandalaColor[]) {
   return (hash >>> 0) % 2147483647;
 }
 
-export function mandalaPrompt(colors: MandalaColor[]) {
-  const [overall, ...outer] = colors;
-  const overallColor = overall ? `${birthColorKeyword(overall)} ${overall.code}` : "luminous jewel tone";
-  const outerColors = outer.map(color => `${birthColorKeyword(color)} ${color.code}`).join(", ");
+const agolmenMandalaPrompt =
+  "masterpiece, breathtaking circular sacred geometry mandala embodying 'Agolmen's Compass', central glowing golden starburst compass with intricate filigree, radiating spiral patterns seamlessly integrating all 7 vivid personal birth colors (sapphire blue, ruby red, emerald green, golden yellow, royal violet, vibrant orange, diamond white), rich non-transparent impasto oil painting texture, glowing crystal luminescence, shimmering golden sparkles, intricate fine lines, set against a pitch-black deep cosmic space background, 8k resolution, highly detailed, flawless radial symmetry";
 
-  return [
-    "masterpiece, extremely intricate sacred geometry mandala, hyper-detailed fine lines",
-    "vivid vibrant 7 rainbow birth colors, glowing neon crystal luminescence, shimmering gold sparkles",
-    "non-transparent rich bold colors, pitch-black cosmic space background, 8k resolution, flawless symmetry",
-    `vibrant glowing gemstone core in the overall birth color ${overallColor}`,
-    `six outer personal birth colors glowing harmoniously: ${outerColors}`,
-  ].join(", ");
+export function mandalaPrompt(_colors: MandalaColor[]) {
+  return agolmenMandalaPrompt;
 }
 
 export function mandalaImageUrl(colors: MandalaColor[], variation = 0) {
