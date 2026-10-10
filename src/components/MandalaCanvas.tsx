@@ -47,7 +47,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const skew = (unit(4200 + i) - .5) * s;
     return `<path d="M${(p.x - s).toFixed(1)} ${(p.y + skew).toFixed(1)}l${(s * 1.2).toFixed(1)} ${(-s * .9).toFixed(1)}l${(s * .85).toFixed(1)} ${(s * 1.1).toFixed(1)}l${(-s * 1.35).toFixed(1)} ${(s * .48).toFixed(1)}Z" fill="url(#leafGold)" fill-opacity="${(.34 + unit(4300 + i) * .34).toFixed(2)}" filter="url(#fineGold)"/>`;
   }).join("");
-  const gemRadius = compassR * .44;
+  const gemRadius = compassR * .46;
   const refractedLight = Array.from({ length: 12 }, (_, i) => {
     const a = i / 12 * Math.PI * 2 + (unit(5000 + i) - .5) * .28;
     const start = gemRadius * (.8 + unit(5100 + i) * .18);
@@ -83,7 +83,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
   const gemPoint = (i: number, scale = 1, inner = false) => {
     const a = -Math.PI / 2 + i / gemFacetCount * Math.PI * 2 + (unit(8600 + i + (inner ? 200 : 0)) - .5) * .055;
     const irregularity = inner ? .95 + unit(8800 + i) * .08 : .91 + unit(8700 + i) * .13;
-    return `${(Math.cos(a) * gemRadius * .9 * scale * irregularity).toFixed(1)},${(Math.sin(a) * gemRadius * 1.06 * scale * irregularity).toFixed(1)}`;
+    return `${(Math.cos(a) * gemRadius * .98 * scale * irregularity).toFixed(1)},${(Math.sin(a) * gemRadius * 1.01 * scale * irregularity).toFixed(1)}`;
   };
   const gemOutline = Array.from({ length: gemFacetCount }, (_, i) => gemPoint(i)).join(" ");
   const gemInner = Array.from({ length: gemFacetCount }, (_, i) => gemPoint(i, .56, true)).join(" ");
@@ -91,10 +91,10 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
   const apexY = ((unit(9002) - .5) * gemRadius * .1).toFixed(1);
   const gemFacets = Array.from({ length: gemFacetCount }, (_, i) => {
     const next = (i + 1) % gemFacetCount;
-    const lowerFill = i % 4 === 0 ? "url(#roseMilk)" : i % 3 === 0 ? "url(#roseDeep)" : "url(#roseCore)";
-    const crownFill = i % 5 === 0 ? "url(#roseLight)" : i % 2 === 0 ? "url(#roseCore)" : "url(#roseVeil)";
+    const lowerFill = i % 5 === 0 ? "url(#roseMilk)" : i % 3 === 0 ? "url(#roseDeep)" : i % 2 === 0 ? "url(#roseCore)" : "url(#roseVeil)";
+    const crownFill = i % 6 === 0 ? "url(#roseLight)" : i % 3 === 0 ? "url(#roseDeep)" : i % 2 === 0 ? "url(#roseCore)" : "url(#roseVeil)";
     const edgeOpacity = (.12 + unit(9100 + i) * .18).toFixed(2);
-    return `<path d="M${gemPoint(i)}L${gemPoint(next)}L${gemPoint(next, .56, true)}L${gemPoint(i, .56, true)}Z" fill="${lowerFill}" stroke="#F6DEA0" stroke-opacity="${edgeOpacity}" stroke-width=".12"/><path d="M${gemPoint(i, .56, true)}L${gemPoint(next, .56, true)}L${apexX},${apexY}Z" fill="${crownFill}" stroke="#FFF5D0" stroke-opacity="${edgeOpacity}" stroke-width=".1"/>`;
+    return `<path d="M${gemPoint(i)}L${gemPoint(next)}L${gemPoint(next, .56, true)}L${gemPoint(i, .56, true)}Z" fill="${lowerFill}" stroke="#F6DEA0" stroke-opacity="${edgeOpacity}" stroke-width=".12"/><path d="M${gemPoint(i, .56, true)}L${gemPoint(next, .56, true)}L${apexX},${apexY}Z" fill="${crownFill}" fill-opacity="${(.72 + unit(9150 + i) * .26).toFixed(2)}" stroke="#FFF5D0" stroke-opacity="${edgeOpacity}" stroke-width=".1"/>`;
   }).join("");
   const gemInclusions = Array.from({ length: 17 }, (_, i) => {
     const a = unit(9200 + i) * Math.PI * 2;
