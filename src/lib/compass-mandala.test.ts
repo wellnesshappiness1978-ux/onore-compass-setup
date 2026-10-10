@@ -41,7 +41,7 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("<rect");
     expect(plate).not.toContain("image.pollinations");
     expect(plate).not.toContain("<image");
-    expect((plate.match(/<polygon/g) ?? [])).toHaveLength(32);
+    expect((plate.match(/<polygon/g) ?? [])).toHaveLength(33);
     expect(plate).toContain('data-gem-setting="inset"');
     expect(plate).toContain('data-gem-radius-ratio="0.204"');
     expect(plate).toContain('data-gem-light-seat="faceted"');
