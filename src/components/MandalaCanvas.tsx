@@ -29,7 +29,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const paintedOuter = i === layers.length - 1 ? 514 : l.outer + 18;
     const paintedInner = Math.max(0, l.inner - 18);
     const middle = (paintedInner + paintedOuter) / 2;
-    const breadth = (paintedOuter - paintedInner) * (supportive ? .82 : 1.32);
+    const breadth = (paintedOuter - paintedInner) * (supportive ? .74 : 1.18);
     const stipple = Array.from({ length: l.petals * (supportive ? 2 : 4) }, (_, k) => {
       const a = l.phase + k * Math.PI * 2 / (l.petals * 4) + (unit(i * 400 + k) - .5) * .025;
       const r = middle + (unit(i * 700 + k) - .5) * (l.outer - l.inner) * .7;
@@ -39,7 +39,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const dash = `${(2.5 + unit(1400 + i) * 4).toFixed(1)} ${(5 + unit(1500 + i) * 8).toFixed(1)} ${(10 + unit(1600 + i) * 12).toFixed(1)} ${(3 + unit(1700 + i) * 4).toFixed(1)}`;
     const brokenBrush = `${(70 + unit(2300 + i) * 95).toFixed(1)} ${(9 + unit(2400 + i) * 25).toFixed(1)} ${(32 + unit(2500 + i) * 74).toFixed(1)} ${(5 + unit(2600 + i) * 16).toFixed(1)}`;
     const veinDash = `${(12 + unit(3100 + i) * 18).toFixed(1)} ${(3 + unit(3200 + i) * 7).toFixed(1)} ${(1 + unit(3300 + i) * 3).toFixed(1)} ${(4 + unit(3400 + i) * 9).toFixed(1)}`;
-    return `<g data-birth-color="${l.color}" data-color-role="${role}" data-color-emphasis="${supportive ? "supporting" : "primary"}" class="pigment-layer" opacity="${supportive ? ".5" : ".78"}"><circle r="${middle.toFixed(1)}" fill="none" stroke="${l.color}" stroke-opacity="${supportive ? ".16" : ".28"}" stroke-width="${breadth.toFixed(1)}" filter="url(#colorSoftener)"/><circle r="${(middle + (unit(2700 + i) - .5) * 5).toFixed(1)}" fill="none" stroke="${l.color}" stroke-opacity="${supportive ? ".12" : ".2"}" stroke-width="${(breadth * .92).toFixed(1)}" stroke-linecap="round" stroke-dasharray="${brokenBrush}" stroke-dashoffset="${(unit(2800 + i) * 97).toFixed(1)}" filter="url(#pigment${i})"/><path d="${l.innerPath}" fill="none" stroke="${l.color}" stroke-opacity="${supportive ? ".08" : ".13"}" stroke-width="${(1 + unit(1800 + i) * .65).toFixed(2)}" filter="url(#pigment${i})"/><path d="${l.path}" fill="none" stroke="url(#agedGold)" stroke-opacity="${(.2 + i * .016).toFixed(2)}" stroke-width="${(.42 + unit(3500 + i) * .34).toFixed(2)}" stroke-linecap="round" stroke-dasharray="${veinDash}" filter="url(#roughGold)"/><path d="${l.facetPath}" fill="none" stroke="url(#leafGold)" stroke-opacity="${(.12 + i * .012).toFixed(2)}" stroke-width="${(.3 + unit(3600 + i) * .24).toFixed(2)}" stroke-dasharray="${dash}" stroke-dashoffset="${(unit(3700 + i) * 31).toFixed(1)}" filter="url(#fineGold)"/><path d="${l.guillochePath}" fill="none" stroke="url(#midGold)" stroke-opacity=".32" stroke-width="${(.5 + unit(1900 + i) * .45).toFixed(2)}" stroke-linecap="round" stroke-dasharray="${dash}" stroke-dashoffset="${(unit(2000 + i) * 19).toFixed(1)}" filter="url(#roughGold)"/>${stipple}</g>`;
+    return `<g data-birth-color="${l.color}" data-color-role="${role}" data-color-emphasis="${supportive ? "supporting" : "primary"}" class="pigment-layer" opacity="${supportive ? ".48" : ".88"}"><circle r="${middle.toFixed(1)}" fill="none" stroke="${l.color}" stroke-opacity="${supportive ? ".2" : ".42"}" stroke-width="${breadth.toFixed(1)}" filter="url(#colorSoftener)"/><circle r="${(middle + (unit(2700 + i) - .5) * 5).toFixed(1)}" fill="none" stroke="${l.color}" stroke-opacity="${supportive ? ".16" : ".3"}" stroke-width="${(breadth * .92).toFixed(1)}" stroke-linecap="round" stroke-dasharray="${brokenBrush}" stroke-dashoffset="${(unit(2800 + i) * 97).toFixed(1)}" filter="url(#pigment${i})"/><path d="${l.innerPath}" fill="none" stroke="${l.color}" stroke-opacity="${supportive ? ".1" : ".18"}" stroke-width="${(1 + unit(1800 + i) * .65).toFixed(2)}" filter="url(#pigment${i})"/><path d="${l.path}" fill="none" stroke="url(#agedGold)" stroke-opacity="${(.23 + i * .016).toFixed(2)}" stroke-width="${(.42 + unit(3500 + i) * .34).toFixed(2)}" stroke-linecap="round" stroke-dasharray="${veinDash}" filter="url(#roughGold)"/><path d="${l.facetPath}" fill="none" stroke="url(#leafGold)" stroke-opacity="${(.15 + i * .012).toFixed(2)}" stroke-width="${(.3 + unit(3600 + i) * .24).toFixed(2)}" stroke-dasharray="${dash}" stroke-dashoffset="${(unit(3700 + i) * 31).toFixed(1)}" filter="url(#fineGold)"/><path d="${l.guillochePath}" fill="none" stroke="url(#midGold)" stroke-opacity=".37" stroke-width="${(.5 + unit(1900 + i) * .45).toFixed(2)}" stroke-linecap="round" stroke-dasharray="${dash}" stroke-dashoffset="${(unit(2000 + i) * 19).toFixed(1)}" filter="url(#roughGold)"/>${stipple}</g>`;
   }).join("");
   const parts = particles.slice(0, 92).map((p, i) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${(.35 + p.r * .46).toFixed(2)}" fill="${i % 4 ? "#A77B2C" : "#D8B65C"}" fill-opacity="${(.24 + unit(2200 + i) * .42).toFixed(2)}"/>`).join("");
   const goldLeaf = particles.slice(16, 62).filter((_, i) => i % 2 === 0).map((p, i) => {
@@ -47,7 +47,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     const skew = (unit(4200 + i) - .5) * s;
     return `<path d="M${(p.x - s).toFixed(1)} ${(p.y + skew).toFixed(1)}l${(s * 1.2).toFixed(1)} ${(-s * .9).toFixed(1)}l${(s * .85).toFixed(1)} ${(s * 1.1).toFixed(1)}l${(-s * 1.35).toFixed(1)} ${(s * .48).toFixed(1)}Z" fill="url(#leafGold)" fill-opacity="${(.34 + unit(4300 + i) * .34).toFixed(2)}" filter="url(#fineGold)"/>`;
   }).join("");
-  const gemRadius = compassR * .46;
+  const gemRadius = compassR * .58;
   const refractedLight = Array.from({ length: 12 }, (_, i) => {
     const a = i / 12 * Math.PI * 2 + (unit(5000 + i) - .5) * .28;
     const start = gemRadius * (.8 + unit(5100 + i) * .18);
@@ -144,7 +144,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
     { offset: "87%", color: codes[1] ?? core },
     { offset: "100%", color: codes[6] ?? core },
   ].map(({ offset, color }) => `<stop offset="${offset}" stop-color="${color}"/>`).join("");
-  const colorContinuum = `<circle data-color-continuum="soft" r="447" fill="url(#birthColorContinuum)" fill-opacity=".82" filter="url(#continuumTexture)"/>`;
+  const colorContinuum = `<circle data-color-continuum="soft" r="447" fill="url(#birthColorContinuum)" fill-opacity=".48" filter="url(#continuumTexture)"/>`;
   const cosmicStars = Array.from({ length: 220 }, (_, i) => {
     const a = unit(9000 + i) * Math.PI * 2;
     const r = Math.sqrt(unit(9300 + i)) * 506;

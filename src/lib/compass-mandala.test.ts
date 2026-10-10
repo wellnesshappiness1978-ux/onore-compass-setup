@@ -44,7 +44,7 @@ describe("compass mandala layout", () => {
     expect(plate).not.toContain("<image");
     expect(plate).not.toContain('data-compass-engraving=');
     expect(plate).toContain('data-gem-setting="inset"');
-    expect(plate).toContain('data-gem-radius-ratio="0.46"');
+    expect(plate).toContain('data-gem-radius-ratio="0.58"');
     expect(plate).not.toContain('data-gem-light-seat=');
     expect(plate).not.toContain('data-gem-dark-seat=');
     expect(plate).toContain('data-color-role="health"');
