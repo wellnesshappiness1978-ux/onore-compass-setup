@@ -243,4 +243,4 @@
 
 
 ## Birth-color mandala octagonal diamond refinement
-- [ ] Replace the rose-cut center with a precision overall-color octagonal brilliant and blend all surrounding birth colors into a seamless radial transition; verify every view and export.
+- [x] Replace the rose-cut center with a precision overall-color octagonal brilliant and blend all surrounding birth colors into a seamless radial transition; verify every view and export.
