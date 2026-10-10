@@ -82,7 +82,7 @@ export function buildMandalaColorPlate(codes: string[], variation: number, _anim
   const mixHex = (hex: string, target: string, amount: number) => {
     const read = (h: string) => { const v = h.replace("#", ""); const f = v.length === 3 ? v.split("").map(c => c + c).join("") : v.padEnd(6, "0"); return [0, 2, 4].map(o => parseInt(f.slice(o, o + 2), 16) || 0); };
     const a = read(hex); const b = read(target);
-    return `#${a.map((c, k) => Math.round(c + (b[k] - c) * amount).toString(16).padStart(2, "0")).join("")}`;
+    return `#${a.map((c, k) => Math.round(c + ((b[k] ?? 0) - c) * amount).toString(16).padStart(2, "0")).join("")}`;
   };
   const gemDark = mixHex(core, "#000000", .5);
   const gemShade = mixHex(core, "#000000", .26);
