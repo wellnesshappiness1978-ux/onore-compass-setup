@@ -8,7 +8,7 @@ import { nineStarsTranslations } from "@/lib/nine-stars-translations";
 import { getArtSymbols, NineStarsArtwork, zodiacGlyphs } from "./NineStarsArtwork";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
-import type { Capture } from "./MandalaScene";
+import type { Capture } from "./MandalaCanvas";
 import CosmicAlchemyArtwork from "./CosmicAlchemyArtwork";
 import { paletteColors } from "@/lib/art-geometry";
 import { AgolmenLoading } from "./AgolmenSpiral";
@@ -17,7 +17,7 @@ import { artSpecialistCopy } from "@/lib/art-specialist-copy";
 import { nineStarName, trigramLabel } from "@/lib/ui-i18n";
 import { helioCopy } from "@/lib/helio-copy";
 
-const MandalaScene = lazy(() => import("./MandalaScene"));
+const MandalaScene = lazy(() => import("./MandalaCanvas"));
 type Props = { language: Language; onVip: () => void; profile: UserProfile; testUnlocked?: boolean };
 
 export default function NineStarsPanel({ language, onVip, profile, testUnlocked = false }: Props) {

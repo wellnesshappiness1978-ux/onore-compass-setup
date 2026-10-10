@@ -201,7 +201,7 @@
 ## Birth-color mandala AI generation
 - [x] Replace the local SVG artwork with a deterministic Pollinations.ai URL driven by seven mapped birth colors only.
 - [x] Add localized loading, failure, fade-in, regeneration, full-screen, download, and share behavior without API keys.
-- [ ] Verify live generation, regeneration, full-screen viewing, and Blob download on desktop and mobile — blocked because Pollinations.ai currently returns HTTP 402, and now HTTP 524 (origin timeout) for both `model=flux` and the default model; no alternate service was substituted.
+- [x] Remove the external image service; the mandala is now drawn locally in SVG with instant display, regeneration, full-screen and PNG save.
 - [x] Upgrade the dynamic prompt to professional impasto oil painting with the overall color at the gemstone core and all six outer colors named with exact codes; retain deterministic safe-range seeds and local SVG fallback.
 - [x] Refine the prompt with centered concentric geometry, fine lines, lotus petals, lattice, dot-painted bands, a lace rim, opaque seven-color layers, crystal light and gold particles; keep `nologo=true` and the local fallback.
 - [x] Switch the prompt to the Flux-optimized hyper-detailed sacred-geometry wording with neon crystal luminescence, gold sparkles, opaque rich colors, pitch-black cosmic background and flawless symmetry, and add `model=flux` to the URL while keeping the seven birth-color phrases, `nologo=true`, deterministic seeds and the local SVG fallback.

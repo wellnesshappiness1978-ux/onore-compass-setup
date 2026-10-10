@@ -223,3 +223,52 @@ export function dotPaintLayout(colors: string[], radius = 480): PaintDot[] {
   ring(474, 2, 5, b[5]!);
   return dots;
 }
+
+export type CompassBlade = { points: string; light: boolean };
+export type MandalaLayer = { color: string; innerColor: string; inner: number; outer: number; petals: number; phase: number; motif: MandalaMotif; path: string };
+export type GoldParticle = { x: number; y: number; r: number; delay: number };
+
+const f = (n: number) => n.toFixed(2);
+
+function layerPath(motif: MandalaMotif, petals: number, inner: number, outer: number, phase: number) {
+  const parts: string[] = [];
+  const step = Math.PI * 2 / petals;
+  for (let i = 0; i < petals; i++) {
+    const a = phase + i * step;
+    const p = (r: number, da = 0) => `${f(Math.cos(a + da) * r)} ${f(Math.sin(a + da) * r)}`;
+    const half = step / 2;
+    if (motif === "petals") parts.push(`M${p(inner, -half * .9)}Q${p(outer * .98, -half * .55)} ${p(outer)}Q${p(outer * .98, half * .55)} ${p(inner, half * .9)}Z`);
+    else if (motif === "hexagon" || motif === "octagon") parts.push(`M${p(inner, -half)}L${p((inner + outer) / 2, -half * .5)}L${p(outer)}L${p((inner + outer) / 2, half * .5)}L${p(inner, half)}Z`);
+    else { const mid = (inner + outer) / 2; const rr = (outer - inner) / 2; const cx = Math.cos(a) * mid, cy = Math.sin(a) * mid; parts.push(`M${f(cx + rr)} ${f(cy)}A${f(rr)} ${f(rr)} 0 1 0 ${f(cx - rr)} ${f(cy)}A${f(rr)} ${f(rr)} 0 1 0 ${f(cx + rr)} ${f(cy)}Z`); }
+  }
+  return parts.join("");
+}
+
+/** Fully local compass mandala: golden 16-point compass core, six birth-color petal layers, deterministic gold particles. */
+export function compassMandalaLayout(colors: string[], variation = 0, radius = 480) {
+  const { core, rings } = simpleMandalaRings(colors, radius);
+  const shift = seededUnit(variation + 1, 3) * Math.PI;
+  const layers: MandalaLayer[] = rings.map((ring, i) => {
+    const petals = [8, 12, 16, 16, 24, 32][i] ?? 16;
+    const phase = -Math.PI / 2 + (variation ? shift / petals : 0) + (i % 2 ? Math.PI / petals : 0);
+    return { color: ring.color, innerColor: ring.innerColor, inner: ring.inner, outer: ring.outer, petals, phase, motif: ring.motif, path: layerPath(ring.motif, petals, ring.inner * .96, ring.outer, phase) };
+  });
+  const compassR = radius * .2;
+  const blades: CompassBlade[] = [];
+  for (let i = 0; i < 16; i++) {
+    const a = -Math.PI / 2 + i * Math.PI / 8;
+    const len = i % 4 === 0 ? compassR : i % 2 === 0 ? compassR * .72 : compassR * .5;
+    const w = Math.PI / 16;
+    const tip = [Math.cos(a) * len, Math.sin(a) * len];
+    const side = (s: number) => [Math.cos(a + s * w) * len * .22, Math.sin(a + s * w) * len * .22];
+    const [lx, ly] = side(-1), [rx, ry] = side(1);
+    blades.push({ points: `0,0 ${f(lx!)},${f(ly!)} ${f(tip[0]!)},${f(tip[1]!)}`, light: true });
+    blades.push({ points: `0,0 ${f(rx!)},${f(ry!)} ${f(tip[0]!)},${f(tip[1]!)}`, light: false });
+  }
+  const particles: GoldParticle[] = Array.from({ length: 140 }, (_, i) => {
+    const a = seededUnit(variation + 501, i) * Math.PI * 2;
+    const d = (.12 + Math.sqrt(seededUnit(variation + 503, i)) * .9) * radius;
+    return { x: Math.cos(a) * d, y: Math.sin(a) * d, r: .8 + seededUnit(variation + 509, i) * 2.2, delay: seededUnit(variation + 521, i) * 4 };
+  });
+  return { core, compassR, blades, layers, particles };
+}
