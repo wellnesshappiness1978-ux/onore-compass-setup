@@ -267,7 +267,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   const vignette = ctx.createRadialGradient(size * .5, size * .48, size * .12, size * .5, size * .5, size * .72);
   vignette.addColorStop(0, "#00000000"); vignette.addColorStop(.72, "#00000012"); vignette.addColorStop(1, "#000000c8"); ctx.fillStyle = vignette; ctx.fillRect(0, 0, size, size);
   paintNebulae(ctx, size, roles.all, genesis.seed);
-  paintMysticVeils(ctx, size, roles.prominence, genesis.seed + 2400);
+  paintMysticVeils(ctx, size, roles.prominence.map((color) => color ?? GOLD), genesis.seed + 2400);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .8);
   paintConstellation(ctx, size, genesis.moonSign, 1, genesis.seed + 900, .32);
   paintGuardian(ctx, size, genesis, placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.radius * (planet.id === "saturn" ? 2 : 1.15) })));
