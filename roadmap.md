@@ -257,6 +257,6 @@
 - [x] Verify astronomical calculations, plan gating, desktop/mobile rendering, download/share output, and clean diagnostics.
 
 ## Cosmic Genesis oil-paint masterwork
-- [ ] Separate Standard+ mandala access from VIP+ Cosmic Genesis access across viewing, fullscreen, save, and share.
-- [ ] Remove solar guide spokes, double every planet radius, and rebuild Cosmic Genesis with vivid seven-color nebulae, impasto planets, gemstone Earth, and dimensional gold filigree.
-- [ ] Verify deterministic live/2048 output, all five plan gates, responsive/fullscreen presentation, exports, tests, and diagnostics.
+- [x] Separate Standard+ mandala access from VIP+ Cosmic Genesis access across viewing, fullscreen, save, and share.
+- [x] Remove solar guide spokes, double every planet radius, and rebuild Cosmic Genesis with vivid seven-color nebulae, impasto planets, gemstone Earth, and dimensional gold filigree.
+- [x] Verify deterministic live/2048 output, all five plan gates, responsive/fullscreen presentation, exports, tests, and diagnostics.
