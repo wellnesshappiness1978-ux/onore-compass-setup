@@ -155,19 +155,21 @@ export default function CosmicGenesisCanvas({ genesis, colors, language, onCaptu
   const ref = useRef<HTMLCanvasElement>(null); const images = useRef<ArtAssets | null>(null);
   const onCaptureRef = useRef(onCapture);
   useEffect(() => { onCaptureRef.current = onCapture; }, [onCapture]);
+  const genesisKey = JSON.stringify(genesis);
+  const stableGenesis = useMemo(() => genesis, [genesisKey]);
   const colorKey = colors.join(",");
   const stableColors = useMemo(() => colorKey.split(","), [colorKey]);
   const capture = useCallback(async () => {
     const out = document.createElement("canvas"); out.width = 2048; out.height = 2048;
-    const art = images.current ?? await loadArt(); await paintCosmicGenesis(out, genesis, stableColors, art);
+    const art = images.current ?? await loadArt(); await paintCosmicGenesis(out, stableGenesis, stableColors, art);
     const blob = await new Promise<Blob>((resolve, reject) => out.toBlob(value => value ? resolve(value) : reject(new Error("PNG unavailable")), "image/png"));
     return { blob, width: out.width, height: out.height };
-  }, [genesis, stableColors]);
+  }, [stableGenesis, stableColors]);
   useEffect(() => {
     let active = true;
-    if (ref.current) void paintCosmicGenesis(ref.current, genesis, stableColors, null);
-    void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, genesis, stableColors, art); onCaptureRef.current(capture); });
+    if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableColors, null);
+    void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableColors, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
-  }, [genesis, stableColors, capture]);
+  }, [stableGenesis, stableColors, capture]);
   return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "出生瞬間の太陽中心惑星配置を描いた出生宇宙創生図" : "Natal Cosmic Genesis based on heliocentric planetary positions"} data-cosmic-genesis data-renderer="depth-staged-celestial-portrait" data-birth-color-role="nebula-light-only" data-guide-spokes="0" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
