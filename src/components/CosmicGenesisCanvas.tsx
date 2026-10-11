@@ -221,8 +221,8 @@ function projectEarth(image: HTMLImageElement, radius: number, view: EarthView) 
 }
 
 function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null, point: Point, radius: number, view: EarthView, size: number, seed: number) {
-  glow(ctx, point.x, point.y, radius * 1.78, "#2c8ec7", .22);
-  glow(ctx, point.x, point.y, radius * 1.35, "#54e1d1", .18);
+  glow(ctx, point.x, point.y, radius * 2.05, "#2c8ec7", .27);
+  glow(ctx, point.x, point.y, radius * 1.52, "#54e1d1", .24);
   ctx.save(); ctx.beginPath(); ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); ctx.clip();
   ctx.fillStyle = "#062b58"; ctx.fillRect(point.x - radius, point.y - radius, radius * 2, radius * 2);
   if (image) ctx.drawImage(projectEarth(image, radius, view), point.x - radius, point.y - radius, radius * 2, radius * 2);
@@ -241,9 +241,11 @@ function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | nul
   ctx.beginPath(); ctx.ellipse(point.x, point.y - radius * .48, radius * .62, radius * .16, -.12, Math.PI * 1.08, Math.PI * 1.92); ctx.stroke();
   ctx.restore();
   ctx.save(); ctx.globalCompositeOperation = "screen";
-  ctx.strokeStyle = "rgba(66,211,226,.28)"; ctx.lineWidth = radius * .025; ctx.shadowColor = "rgba(84,225,209,.48)"; ctx.shadowBlur = radius * .12;
-  ctx.beginPath(); ctx.arc(point.x, point.y, radius * 1.015, 0, Math.PI * 2); ctx.stroke();
-  glow(ctx, point.x, point.y, radius * .095, "#fff0b3", .34); ctx.restore();
+  const atmosphere = ctx.createRadialGradient(point.x, point.y, radius * .72, point.x, point.y, radius * 1.24);
+  atmosphere.addColorStop(0, "rgba(56,174,205,0)"); atmosphere.addColorStop(.58, "rgba(56,174,205,.04)");
+  atmosphere.addColorStop(.79, "rgba(84,225,209,.17)"); atmosphere.addColorStop(.9, "rgba(84,225,209,.07)"); atmosphere.addColorStop(1, "rgba(84,225,209,0)");
+  ctx.fillStyle = atmosphere; ctx.beginPath(); ctx.arc(point.x, point.y, radius * 1.24, 0, Math.PI * 2); ctx.fill();
+  glow(ctx, point.x, point.y, radius * .11, "#fff0b3", .48); ctx.restore();
 }
 
 function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined, point: Point, radius: number, id: CosmicPlanetId, size: number) {
