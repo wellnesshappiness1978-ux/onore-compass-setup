@@ -19,14 +19,9 @@ describe("cosmic genesis astronomy", () => {
 
   it("preserves the requested visual size hierarchy", () => {
     const result = cosmicGenesis("2001-01-01", "", true);
-    const radius = Object.fromEntries((result?.planets ?? []).map((planet) => [planet.id, planet.displayRadius]));
-    expect(radius.jupiter).toBeGreaterThan(radius.saturn);
-    expect(radius.saturn).toBeGreaterThan(radius.uranus);
-    expect(radius.uranus).toBeGreaterThan(radius.neptune);
-    expect(radius.neptune).toBeGreaterThan(radius.earth);
-    expect(radius.earth).toBeGreaterThan(radius.venus);
-    expect(radius.venus).toBeGreaterThan(radius.mars);
-    expect(radius.mars).toBeGreaterThan(radius.mercury);
+    const ordered = ["jupiter", "saturn", "uranus", "neptune", "earth", "venus", "mars", "mercury"];
+    const radii = ordered.map((id) => result?.planets.find((planet) => planet.id === id)?.displayRadius ?? 0);
+    for (let index = 0; index < radii.length - 1; index++) expect(radii[index] ?? 0).toBeGreaterThan(radii[index + 1] ?? 0);
     expect(result?.approximate).toBe(true);
   });
 
