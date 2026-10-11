@@ -158,7 +158,7 @@ function paintPlanet(ctx: CanvasRenderingContext2D, planet: CosmicPlanet, point:
 function paintOrbit(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius: number, color: string, index: number, seed: number, scale: number) {
   ctx.save(); ctx.translate(cx, cy); ctx.rotate((index - 3.5) * .018); ctx.scale(1, .975 - (index % 3) * .012);
   ctx.lineCap = "round";
-  [[scale * 8, .08], [scale * 3.2, .28], [scale * .85, .92]].forEach(([width, alpha]) => {
+  ([[scale * 8, .08], [scale * 3.2, .28], [scale * .85, .92]] as [number, number][]).forEach(([width, alpha]) => {
     ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.lineWidth = width; ctx.setLineDash([radius * (.12 + unit(seed + index) * .08), radius * .018, radius * .25, radius * .03]);
     ctx.lineDashOffset = -unit(seed + index * 13) * radius; ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.stroke();
   });
