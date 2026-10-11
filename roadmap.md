@@ -271,3 +271,8 @@
 - [x] Move all seven birth colors off planet bodies and into layered nebulae, emission filaments, reflected dust, and restrained light shafts.
 - [x] Deepen the gold zodiac guardian, constellation sculpture, foreground/background separation, and shared live/2048 renderer.
 - [x] Compare against the mandala, complete two visual refinement passes, and verify responsive/fullscreen/export/gating/tests/diagnostics.
+
+## Cosmic Genesis complete art reconstruction
+- [x] Replace the atlas and diagram layout with eight individual planet masters and a depth-staged celestial portrait.
+- [x] Replace orbit lines and literal zodiac graphics with restrained birth-color nebulae, dust constellations, and a masked particle guardian.
+- [x] Complete iterative visual QA for desktop, mobile, fullscreen, and matching 2048 export; verify gates, determinism, tests, and diagnostics.
