@@ -70,6 +70,10 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
   const setCapture = useCallback((fn: Capture | null) => { capture.current = fn; setCaptureReady(Boolean(fn)); }, []);
   const ignoreCapture = useCallback(() => undefined, []);
   const displayedColors = paletteEntries.map(color => ({ name: color.name ?? "参考色", code: color.code }));
+  const mandalaOpen = canUse(plan, "mandalaArt");
+  const cosmicOpen = canUse(plan, "cosmicGenesisArt");
+  const open = art === "mandala" ? mandalaOpen : cosmicOpen;
+  const gateCopy = accessCopy[language];
   useEffect(() => {
     setMounted(true);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -83,10 +87,6 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
     window.addEventListener("onore-share-card", share);
     return () => window.removeEventListener("onore-share-card", share);
   }, [open, art]);
-  const mandalaOpen = canUse(plan, "mandalaArt");
-  const cosmicOpen = canUse(plan, "cosmicGenesisArt");
-  const open = art === "mandala" ? mandalaOpen : cosmicOpen;
-  const gateCopy = accessCopy[language];
   useEffect(() => { capture.current = null; setCaptureReady(false); setStatus(""); }, [art, open]);
 
   async function createWallpaper() {
