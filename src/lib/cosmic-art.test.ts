@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_PLANET_SCALE, cosmicColorRoles, cosmicPlacements } from "./cosmic-art";
+import { COSMIC_GUARDIANS, COSMIC_PLANET_SCALE, cosmicColorRoles, cosmicPlacements } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("doubles every planet and keeps planets, including Saturn's ring, inside the canvas", () => {
@@ -21,5 +21,11 @@ describe("Cosmic Genesis artwork layout", () => {
   it("retains all seven exact birth colors as strong artwork roles", () => {
     const colors = ["#110001", "#220002", "#330003", "#440004", "#550005", "#660006", "#770007"];
     expect(cosmicColorRoles(colors).all).toEqual(colors);
+  });
+
+  it("provides one stable guardian identity for every East Asian zodiac year", () => {
+    expect(COSMIC_GUARDIANS).toHaveLength(12);
+    expect(new Set(COSMIC_GUARDIANS).size).toBe(12);
+    expect(COSMIC_GUARDIANS).toEqual(["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"]);
   });
 });
