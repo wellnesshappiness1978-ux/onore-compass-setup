@@ -273,6 +273,6 @@
 - [x] Compare against the mandala, complete two visual refinement passes, and verify responsive/fullscreen/export/gating/tests/diagnostics.
 
 ## Cosmic Genesis complete art reconstruction
-- [ ] Replace the atlas and diagram layout with eight individual planet masters and a depth-staged celestial portrait.
-- [ ] Replace orbit lines and literal zodiac graphics with restrained birth-color nebulae, dust constellations, and a masked particle guardian.
-- [ ] Complete iterative visual QA for desktop, mobile, fullscreen, and matching 2048 export; verify gates, determinism, tests, and diagnostics.
+- [x] Replace the atlas and diagram layout with eight individual planet masters and a depth-staged celestial portrait.
+- [x] Replace orbit lines and literal zodiac graphics with restrained birth-color nebulae, dust constellations, and a masked particle guardian.
+- [x] Complete iterative visual QA for desktop, mobile, fullscreen, and matching 2048 export; verify gates, determinism, tests, and diagnostics.
