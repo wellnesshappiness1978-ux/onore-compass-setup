@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_GUARDIANS, COSMIC_PLANET_SCALE, cosmicColorRoles, cosmicPlacements } from "./cosmic-art";
+import { COSMIC_GUARDIANS, COSMIC_PLANET_SCALE, cosmicBirthplaceLight, cosmicColorRoles, cosmicPlacements } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a Sun-centered portrait with Earth anchored in the foreground", () => {
@@ -26,6 +26,18 @@ describe("Cosmic Genesis artwork layout", () => {
     const colors = ["#110001", "#220002", "#330003", "#440004", "#550005", "#660006", "#770007"];
     expect(cosmicColorRoles(colors).all).toEqual(colors);
     expect(cosmicColorRoles(colors).prominence).toEqual([colors[0], colors[5], colors[4], colors[3], colors[2], colors[1], colors[6]]);
+  });
+
+  it("anchors the birthplace light to Earth's visible center and sends it into space", () => {
+    const genesis = cosmicGenesis("1990-04-15", "08:30", false);
+    if (!genesis) return;
+    const earth = cosmicPlacements(genesis, 1024).find((planet) => planet.id === "earth");
+    if (!earth) return;
+    const light = cosmicBirthplaceLight(earth);
+    expect(light.x).toBe(earth.x);
+    expect(light.y).toBe(earth.y);
+    expect(light.beamEndY).toBeLessThan(earth.y - earth.radius);
+    expect(light.safetyRadius).toBeGreaterThan(earth.radius * 3);
   });
 
   it("provides one stable guardian identity for every East Asian zodiac year", () => {
