@@ -4,18 +4,26 @@ export const COSMIC_PLANET_SCALE = 2;
 
 export type CosmicPlacement = CosmicPlanet & { x: number; y: number; radius: number; orbitRadius: number };
 
+export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
+
 const ORBIT_RATIOS = [.105, .155, .215, .28, .35, .415, .475, .535] as const;
 
 /** Keeps astronomical angles intact while mapping real distances to an artwork-safe orbital field. */
 export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPlacement[] {
-  const center = size / 2;
+  const centerX = size * .47;
+  const centerY = size * .53;
   const margin = size * .025;
   return genesis.planets.map((planet, index) => {
     const radius = planet.displayRadius * COSMIC_PLANET_SCALE * size / 1024;
-    const maximumOrbit = center - margin - radius * (planet.id === "saturn" ? 1.9 : 1.15);
+    const extent = radius * (planet.id === "saturn" ? 1.9 : 1.15);
+    const maximumOrbit = size * .5 - margin - extent;
     const orbitRadius = Math.min(size * (ORBIT_RATIOS[index] ?? .5), maximumOrbit);
-    const angle = (planet.longitude - 90) * Math.PI / 180;
-    return { ...planet, radius, orbitRadius, x: center + Math.cos(angle) * orbitRadius, y: center + Math.sin(angle) * orbitRadius };
+    const angle = (planet.longitude - 112) * Math.PI / 180;
+    const rawX = centerX + Math.cos(angle) * orbitRadius;
+    const rawY = centerY + Math.sin(angle) * orbitRadius * .72 + Math.cos(angle) * orbitRadius * .16;
+    const x = Math.min(size - margin - extent, Math.max(margin + extent, rawX));
+    const y = Math.min(size - margin - extent, Math.max(margin + extent, rawY));
+    return { ...planet, radius, orbitRadius, x, y };
   });
 }
 
