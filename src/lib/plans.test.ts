@@ -17,4 +17,8 @@ describe('plan value display', () => {
     expect(canUse('vip', 'helioBusiness')).toBe(false);
     expect(canUse('b2b', 'helioBusiness')).toBe(true);
   });
+  it('unlocks the mandala at Standard and Cosmic Genesis at VIP', () => {
+    expect(planOrder.map(plan => canUse(plan, 'mandalaArt'))).toEqual([false, true, true, true, true]);
+    expect(planOrder.map(plan => canUse(plan, 'cosmicGenesisArt'))).toEqual([false, false, true, true, true]);
+  });
 });

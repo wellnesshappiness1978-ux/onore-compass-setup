@@ -41,7 +41,14 @@ export const consultationDailyLimit = dailyUsageLimit;
 export { quickCompatibilityLimit };
 export const nextPlan = (plan: Plan): Plan | null => planOrder[rank(plan) + 1] ?? null;
 /** Minimum plan for birth-color and earth-calendar sections. */
-export type ContentFeature = "birthColorsFull" | "helioPersonal" | "helioDirections" | "helioBusiness";
-const contentMin: Record<ContentFeature, Plan> = { birthColorsFull: "standard", helioPersonal: "standard", helioDirections: "vip", helioBusiness: "b2b" };
+export type ContentFeature = "birthColorsFull" | "helioPersonal" | "helioDirections" | "helioBusiness" | "mandalaArt" | "cosmicGenesisArt";
+const contentMin: Record<ContentFeature, Plan> = {
+  birthColorsFull: "standard",
+  helioPersonal: "standard",
+  helioDirections: "vip",
+  helioBusiness: "b2b",
+  mandalaArt: "standard",
+  cosmicGenesisArt: "vip",
+};
 export const canUse = (plan: Plan, feature: ContentFeature) => rank(plan) >= rank(contentMin[feature]);
 export const minPlanFor = (feature: ContentFeature) => contentMin[feature];

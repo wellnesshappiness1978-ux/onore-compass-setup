@@ -630,7 +630,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             ) : tab === "business" ? (
               <><BusinessFeaturePreview language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>
             ) : tab === "art" ? (
-              <NineStarsPanel language={language} profile={profile} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} testUnlocked={previewPlan === "vip" || previewPlan === "b2b" || previewPlan === "b2b-premium"} />
+              <NineStarsPanel language={language} profile={profile} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} />
             ) : tab === "settings" ? (
               <SettingsPanel
                 profile={profile}
