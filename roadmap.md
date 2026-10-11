@@ -260,3 +260,8 @@
 - [x] Separate Standard+ mandala access from VIP+ Cosmic Genesis access across viewing, fullscreen, save, and share.
 - [x] Remove solar guide spokes, double every planet radius, and rebuild Cosmic Genesis with vivid seven-color nebulae, impasto planets, gemstone Earth, and dimensional gold filigree.
 - [x] Verify deterministic live/2048 output, all five plan gates, responsive/fullscreen presentation, exports, tests, and diagnostics.
+
+## Cosmic Genesis fantasy-real master art
+- [x] Recompose the scene as a diagonal celestial painting with monumental sun/moon constellations and one of twelve golden zodiac guardians.
+- [x] Give all eight planets distinct realistic surfaces, gemstone Earth, painterly light, and vivid deterministic birth-color reflections.
+- [x] Verify every guardian, live/fullscreen/mobile presentation, 2048px export, entitlement split, deterministic geometry, and clean diagnostics.
