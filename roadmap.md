@@ -296,7 +296,7 @@
 - [x] Verify desktop, mobile, fullscreen, matching 2048 export, tests, and diagnostics.
 
 ## VIP Cosmic Genesis Earth-dominant masterwork
-- [ ] Recompose the artwork around a monumental birthplace-visible Earth with a side-lit Sun and birth-instant planetary angles.
-- [ ] Replace the digital birthplace marker with atmospheric Overall-color radiance and rebuild the seven colors as deep layered nebulae.
-- [ ] Integrate zodiac constellations and the East Asian guardian as gold/platinum background phenomena with painterly texture.
-- [ ] Verify deterministic astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+- [x] Recompose the artwork around a monumental birthplace-visible Earth with a side-lit Sun and birth-instant planetary angles.
+- [x] Replace the digital birthplace marker with atmospheric Overall-color radiance and rebuild the seven colors as deep layered nebulae.
+- [x] Integrate zodiac constellations and the East Asian guardian as gold/platinum background phenomena with painterly texture.
+- [x] Verify deterministic astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
