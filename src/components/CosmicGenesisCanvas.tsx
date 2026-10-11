@@ -122,7 +122,7 @@ function paintPlanetSurface(ctx: CanvasRenderingContext2D, planet: CosmicPlanet,
 }
 
 function paintEarth(ctx: CanvasRenderingContext2D, point: Point, radius: number, aura: string, seed: number, scale: number) {
-  glow(ctx, point.x, point.y, radius * 2.8, aura, .92);
+  glow(ctx, point.x, point.y, radius * 3.8, aura, .96);
   ctx.save(); ctx.shadowColor = aura; ctx.shadowBlur = radius * .9;
   sphere(ctx, point.x, point.y, radius, [[0, "#F1FFFF"], [.12, "#67F0FF"], [.42, "#0876C9"], [.76, "#07377F"], [1, "#010717"]]);
   ctx.restore();
@@ -142,6 +142,8 @@ function paintEarth(ctx: CanvasRenderingContext2D, point: Point, radius: number,
   }
   ctx.strokeStyle = aura; ctx.globalAlpha = .76; ctx.lineWidth = Math.max(scale * 1.2, radius * .035);
   ctx.beginPath(); ctx.bezierCurveTo(point.x - radius, point.y - radius * .15, point.x - radius * .18, point.y - radius * .75, point.x + radius * .72, point.y - radius * .3); ctx.stroke();
+  ctx.globalCompositeOperation = "screen";
+  for (let facet = 0; facet < 12; facet++) { const a = facet * Math.PI / 6 + unit(seed + facet) * .12; ctx.strokeStyle = facet % 2 ? "#9cfff1" : "#b4d8ff"; ctx.globalAlpha = .18 + (facet % 3) * .08; ctx.lineWidth = Math.max(scale, radius * .02); ctx.beginPath(); ctx.moveTo(point.x, point.y); ctx.lineTo(point.x + Math.cos(a) * radius * .92, point.y + Math.sin(a) * radius * .92); ctx.stroke(); }
   ctx.restore();
   ctx.save(); ctx.strokeStyle = "#C8FFFF"; ctx.globalAlpha = .9; ctx.lineWidth = Math.max(scale, radius * .045);
   ctx.beginPath(); ctx.arc(point.x, point.y, radius * 1.08, Math.PI * 1.05, Math.PI * 1.83); ctx.stroke(); ctx.restore();
@@ -178,11 +180,15 @@ function paintPlanet(ctx: CanvasRenderingContext2D, planet: CosmicPlanet, point:
 
 function paintOrbit(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius: number, color: string, index: number, seed: number, scale: number) {
   ctx.save(); ctx.translate(cx, cy); ctx.rotate(-.22 + (index - 3.5) * .012); ctx.scale(1, .72 - (index % 3) * .015);
-  ctx.lineCap = "round";
-  ([[scale * 10, .045], [scale * 3.2, .16], [scale * .7, .52]] as [number, number][]).forEach(([width, alpha]) => {
-    ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.lineWidth = width; ctx.setLineDash([radius * (.12 + unit(seed + index) * .08), radius * .018, radius * .25, radius * .03]);
-    ctx.lineDashOffset = -unit(seed + index * 13) * radius; ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.stroke();
-  });
+  ctx.lineCap = "round"; ctx.globalCompositeOperation = "screen";
+  for (let fragment = 0; fragment < 18; fragment++) {
+    const salt = seed + index * 227 + fragment * 31;
+    const angle = unit(salt) * Math.PI * 2;
+    const length = .015 + unit(salt + 3) * .07;
+    ctx.strokeStyle = color; ctx.globalAlpha = .12 + unit(salt + 4) * .28; ctx.lineWidth = (.35 + unit(salt + 5) * 1.4) * scale;
+    ctx.beginPath(); ctx.arc(0, 0, radius, angle, angle + length); ctx.stroke();
+    const x = Math.cos(angle) * radius, y = Math.sin(angle) * radius; ctx.fillStyle = color; ctx.globalAlpha = .35 + unit(salt + 6) * .45; ctx.beginPath(); ctx.arc(x, y, (.45 + unit(salt + 7) * 1.4) * scale, 0, Math.PI * 2); ctx.fill();
+  }
   ctx.restore();
 }
 
@@ -212,6 +218,7 @@ function paintFiligree(ctx: CanvasRenderingContext2D, cx: number, cy: number, ra
   ctx.fillText(ZODIAC_GLYPHS[genesis.sunSign] ?? "✦", -radius * .74, -radius * .65);
   ctx.fillText(ZODIAC_GLYPHS[genesis.moonSign] ?? "✧", radius * .68, radius * .58);
   const ax = -radius * .6, ay = radius * .5, guardianSize = radius * .34;
+  guardianPath(ctx, genesis.animal, ax, ay, guardianSize); const guardianFill = ctx.createLinearGradient(ax - guardianSize, ay - guardianSize, ax + guardianSize, ay + guardianSize); guardianFill.addColorStop(0, "#fff5c733"); guardianFill.addColorStop(.5, "#d1a84c18"); guardianFill.addColorStop(1, "#70461733"); ctx.fillStyle = guardianFill; ctx.globalAlpha = .72; ctx.shadowColor = GOLD; ctx.shadowBlur = 22 * scale; ctx.fill();
   [[DEEP_GOLD, 15, .2], [MID_GOLD, 7, .38], [GOLD, 2.2, .82], ["#fff4c7", .65, .92]].forEach(([color, width, alpha]) => { guardianPath(ctx, genesis.animal, ax, ay, guardianSize); ctx.strokeStyle = color as string; ctx.globalAlpha = alpha as number; ctx.lineWidth = (width as number) * scale; ctx.shadowColor = GOLD; ctx.shadowBlur = (width as number) * scale; ctx.stroke(); });
   for (let i = 0; i < 34; i++) { const a = i * 2.399 + genesis.animal, r = guardianSize * (.25 + (i % 9) * .11); glow(ctx, ax + Math.cos(a) * r, ay + Math.sin(a) * r, (2 + i % 4) * scale, GOLD, .5); }
   ctx.restore();
@@ -234,7 +241,8 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   }
   ctx.globalAlpha = 1;
   placements.forEach((planet, index) => paintOrbit(ctx, cx, cy, planet.orbitRadius, roles.all[index % 7] ?? roles.overall, index, genesis.seed, scale));
-  glow(ctx, cx, cy, size * .16, roles.overall, .94); glow(ctx, cx, cy, size * .1, roles.wealth, .9);
+  glow(ctx, cx, cy, size * .2, roles.overall, .94); glow(ctx, cx, cy, size * .12, roles.wealth, .9);
+  ctx.save(); ctx.translate(cx, cy); ctx.globalCompositeOperation = "screen"; for (let ray = 0; ray < 48; ray++) { const a = ray * Math.PI / 24 + unit(genesis.seed + ray) * .035, inner = size * .055, outer = size * (.075 + unit(genesis.seed + ray * 3) * .09); ctx.strokeStyle = ray % 3 ? roles.overall : GOLD; ctx.globalAlpha = .08 + unit(genesis.seed + ray * 5) * .2; ctx.lineWidth = (.35 + unit(genesis.seed + ray * 7) * 1.4) * scale; ctx.beginPath(); ctx.moveTo(Math.cos(a) * inner, Math.sin(a) * inner); ctx.lineTo(Math.cos(a) * outer, Math.sin(a) * outer); ctx.stroke(); } ctx.restore();
   sphere(ctx, cx, cy, size * .055, [[0, "#FFFFFF"], [.14, "#FFF8C8"], [.42, mix(roles.overall, "#FFFFFF", .28)], [.72, roles.overall], [1, mix(roles.overall, "#000000", .55)]]);
   paintImpasto(ctx, cx, cy, size * .055, ["#FFFFFF", roles.overall, roles.wealth, mix(roles.overall, "#000000", .4)], genesis.seed + 9000, scale);
   placements.forEach((planet, index) => paintPlanet(ctx, planet, planet, planet.radius, roles.all[(index + 1) % 7] ?? roles.overall, genesis.seed, scale));
