@@ -300,3 +300,9 @@
 - [x] Replace the digital birthplace marker with atmospheric Overall-color radiance and rebuild the seven colors as deep layered nebulae.
 - [x] Integrate zodiac constellations and the East Asian guardian as gold/platinum background phenomena with painterly texture.
 - [x] Verify deterministic astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+
+## Cosmic Genesis art-and-astronomy two-layer reconstruction
+- [ ] Draw a readable birth-instant heliocentric overview with angularly accurate eight-planet positions and compressed orbital distances.
+- [ ] Connect the orbital Earth to a foreground birth-time Earth portrait with visible birthplace, terminator, and Overall-color radiance.
+- [ ] Integrate sparse astronomical labels, zodiac relief, ranked birth-color nebulae, and shared painterly light into one artwork.
+- [ ] Verify astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
