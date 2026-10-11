@@ -282,3 +282,9 @@
 - [x] Project Earth from the saved birth instant/place and correct planet aspect ratios, including Saturn's spherical body and rings.
 - [x] Prioritize Overall, Health, Love, Work, and Wealth nebulae while integrating the user's zodiac and guardian into one background painting.
 - [x] Verify astronomy, color order, live/fullscreen/mobile presentation, 2048 export, tests, and diagnostics.
+
+## Cosmic Genesis mystical birthplace refinement
+- [x] Center the registered birthplace on Earth's visible hemisphere and preserve birth-time daylight context.
+- [x] Remove hard gloss and replace it with atmosphere, night light, aurora, and a subtle birthplace glow.
+- [x] Unify nebulae, constellations, and the zodiac guardian as a dreamlike spiritual deep-space painting.
+- [x] Verify multiple birthplace orientations, live/fullscreen/mobile presentation, 2048 export, tests, and diagnostics.

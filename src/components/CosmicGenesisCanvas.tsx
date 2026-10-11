@@ -103,6 +103,27 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
   ctx.restore();
 }
 
+function paintMysticVeils(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
+  ctx.save(); ctx.globalCompositeOperation = "screen";
+  for (let veil = 0; veil < 9; veil++) {
+    const salt = seed + veil * 137;
+    const x = size * (.08 + unit(salt) * .84), y = size * (.08 + unit(salt + 3) * .84);
+    const radius = size * (.13 + unit(salt + 7) * .17), color = colors[veil % Math.max(colors.length, 1)] ?? GOLD;
+    const mist = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    mist.addColorStop(0, `${color}20`); mist.addColorStop(.34, `${color}0d`); mist.addColorStop(.75, `${color}05`); mist.addColorStop(1, `${color}00`);
+    ctx.save(); ctx.translate(x, y); ctx.rotate(unit(salt + 11) * Math.PI); ctx.scale(1.8, .52);
+    ctx.globalAlpha = .24 + unit(salt + 13) * .18; ctx.fillStyle = mist; ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  }
+  for (let mote = 0; mote < 180; mote++) {
+    const salt = seed + mote * 53;
+    const x = unit(salt) * size, y = unit(salt + 5) * size, radius = size * (.00018 + unit(salt + 9) * .00072);
+    ctx.fillStyle = mote % 5 ? GOLD : (colors[mote % Math.max(colors.length, 1)] ?? GOLD);
+    ctx.globalAlpha = .08 + unit(salt + 12) * .22; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = radius * 8;
+    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
 function constellationPoints(size: number, sign: number, side: -1 | 1) {
   const cx = size * (side < 0 ? .23 : .79), cy = size * (side < 0 ? .22 : .77);
   return Array.from({ length: 11 }, (_, index) => {
@@ -173,40 +194,58 @@ function paintSun(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null,
   }
 }
 
+function projectEarth(image: HTMLImageElement, radius: number, view: EarthView) {
+  const diameter = Math.max(2, Math.ceil(radius * 2));
+  const map = document.createElement("canvas"); map.width = image.width; map.height = image.height;
+  const mapContext = map.getContext("2d", { willReadFrequently: true });
+  const globe = document.createElement("canvas"); globe.width = diameter; globe.height = diameter;
+  const globeContext = globe.getContext("2d");
+  if (!mapContext || !globeContext) return globe;
+  mapContext.drawImage(image, 0, 0);
+  const source = mapContext.getImageData(0, 0, image.width, image.height).data;
+  const output = globeContext.createImageData(diameter, diameter), target = output.data;
+  const latitude = view.latitude * Math.PI / 180, longitude = view.longitude * Math.PI / 180;
+  const sinLatitude = Math.sin(latitude), cosLatitude = Math.cos(latitude);
+  for (let y = 0; y < diameter; y++) for (let x = 0; x < diameter; x++) {
+    const nx = (x + .5 - diameter / 2) / (diameter / 2), ny = -(y + .5 - diameter / 2) / (diameter / 2);
+    const square = nx * nx + ny * ny; if (square > 1) continue;
+    const nz = Math.sqrt(1 - square);
+    const sampleLatitude = Math.asin(ny * cosLatitude + nz * sinLatitude);
+    const sampleLongitude = longitude + Math.atan2(nx, nz * cosLatitude - ny * sinLatitude);
+    const sourceX = Math.min(image.width - 1, Math.max(0, Math.floor((((sampleLongitude / Math.PI + 1) % 2 + 2) % 2) * image.width / 2)));
+    const sourceY = Math.min(image.height - 1, Math.max(0, Math.floor((.5 - sampleLatitude / Math.PI) * image.height)));
+    const from = (sourceY * image.width + sourceX) * 4, to = (y * diameter + x) * 4;
+    target[to] = source[from] ?? 0; target[to + 1] = source[from + 1] ?? 0; target[to + 2] = source[from + 2] ?? 0; target[to + 3] = 255;
+  }
+  globeContext.putImageData(output, 0, 0); return globe;
+}
+
 function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null, point: Point, radius: number, view: EarthView, size: number, seed: number) {
-  glow(ctx, point.x, point.y, radius * 1.65, "#45d9ed", .42);
+  glow(ctx, point.x, point.y, radius * 2.05, "#2c8ec7", .27);
+  glow(ctx, point.x, point.y, radius * 1.52, "#54e1d1", .24);
   ctx.save(); ctx.beginPath(); ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); ctx.clip();
   ctx.fillStyle = "#062b58"; ctx.fillRect(point.x - radius, point.y - radius, radius * 2, radius * 2);
-  if (image) {
-    const centerLongitude = ((view.longitude % 360) + 360) % 360;
-    for (let dx = -Math.ceil(radius); dx <= Math.ceil(radius); dx++) {
-      const nx = dx / radius; if (Math.abs(nx) >= 1) continue;
-      const halfHeight = Math.sqrt(1 - nx * nx) * radius;
-      const longitude = centerLongitude + Math.asin(nx) * 180 / Math.PI;
-      const sourceX = (((longitude + 180) % 360 + 360) % 360) / 360 * image.width;
-      const sourceWidth = Math.max(2, image.width / (radius * 2.55));
-      const tilt = Math.sin(view.latitude * Math.PI / 180) * image.height * .12;
-      ctx.drawImage(image, sourceX, Math.max(0, tilt), sourceWidth, image.height - Math.abs(tilt), point.x + dx - .35, point.y - halfHeight, 1.8, halfHeight * 2);
-    }
+  if (image) ctx.drawImage(projectEarth(image, radius, view), point.x - radius, point.y - radius, radius * 2, radius * 2);
+  const lightOffset = Math.sin(view.solarHourAngle * Math.PI / 180) * radius * .5;
+  const shade = ctx.createRadialGradient(point.x + lightOffset, point.y - radius * .12, radius * .18, point.x, point.y, radius * 1.12);
+  shade.addColorStop(0, "rgba(18,80,105,.03)"); shade.addColorStop(.56, "rgba(1,15,38,.12)"); shade.addColorStop(1, "rgba(0,2,12,.7)");
+  ctx.fillStyle = shade; ctx.fillRect(point.x - radius, point.y - radius, radius * 2, radius * 2);
+  ctx.globalCompositeOperation = "screen";
+  for (let light = 0; light < 42; light++) {
+    const salt = seed + light * 83, angle = unit(salt) * Math.PI * 2, distance = Math.sqrt(unit(salt + 3)) * radius * .72;
+    const x = point.x + Math.cos(angle) * distance, y = point.y + Math.sin(angle) * distance;
+    ctx.fillStyle = light % 4 ? "rgba(128,218,225,.22)" : "rgba(255,224,151,.26)";
+    ctx.beginPath(); ctx.arc(x, y, radius * (.002 + unit(salt + 7) * .006), 0, Math.PI * 2); ctx.fill();
   }
-  const dayAtBirth = Math.max(0, Math.cos(view.solarHourAngle * Math.PI / 180));
-  const night = ctx.createLinearGradient(point.x - radius, point.y, point.x + radius, point.y);
-  night.addColorStop(0, `rgba(0,3,16,${.78 - dayAtBirth * .22})`);
-  night.addColorStop(.48 + Math.sin(view.solarHourAngle * Math.PI / 180) * .22, "rgba(0,8,24,.08)");
-  night.addColorStop(1, "rgba(0,1,8,.58)"); ctx.fillStyle = night; ctx.fillRect(point.x - radius, point.y - radius, radius * 2, radius * 2);
-  ctx.globalCompositeOperation = "screen"; ctx.strokeStyle = "rgba(235,252,255,.32)"; ctx.lineCap = "round";
-  for (let index = 0; index < 16; index++) {
-    const salt = seed + index * 83;
-    const y = point.y + (unit(salt) - .5) * radius * 1.45;
-    ctx.globalAlpha = .16 + unit(salt + 2) * .18; ctx.lineWidth = radius * (.008 + unit(salt + 4) * .018);
-    ctx.beginPath(); ctx.arc(point.x + (unit(salt + 8) - .5) * radius * .4, y, radius * (.15 + unit(salt + 5) * .33), Math.PI * 1.08, Math.PI * 1.88); ctx.stroke();
-  }
+  ctx.strokeStyle = "rgba(92,234,211,.2)"; ctx.lineWidth = radius * .012; ctx.shadowColor = "rgba(92,234,211,.38)"; ctx.shadowBlur = radius * .1;
+  ctx.beginPath(); ctx.ellipse(point.x, point.y - radius * .48, radius * .62, radius * .16, -.12, Math.PI * 1.08, Math.PI * 1.92); ctx.stroke();
   ctx.restore();
-  const atmosphere = ctx.createRadialGradient(point.x - radius * .25, point.y - radius * .3, radius * .55, point.x, point.y, radius * 1.06);
-  atmosphere.addColorStop(.82, "#42d9ff00"); atmosphere.addColorStop(.96, "#78f4ff70"); atmosphere.addColorStop(1, "#b4fff000");
-  ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.fillStyle = atmosphere; ctx.beginPath(); ctx.arc(point.x, point.y, radius * 1.07, 0, Math.PI * 2); ctx.fill();
-  const birthY = point.y - Math.sin(view.latitude * Math.PI / 180) * radius * .78;
-  glow(ctx, point.x, birthY, radius * .14, "#fff1ae", .6); ctx.restore();
+  ctx.save(); ctx.globalCompositeOperation = "screen";
+  const atmosphere = ctx.createRadialGradient(point.x, point.y, radius * .72, point.x, point.y, radius * 1.24);
+  atmosphere.addColorStop(0, "rgba(56,174,205,0)"); atmosphere.addColorStop(.58, "rgba(56,174,205,.04)");
+  atmosphere.addColorStop(.79, "rgba(84,225,209,.17)"); atmosphere.addColorStop(.9, "rgba(84,225,209,.07)"); atmosphere.addColorStop(1, "rgba(84,225,209,0)");
+  ctx.fillStyle = atmosphere; ctx.beginPath(); ctx.arc(point.x, point.y, radius * 1.24, 0, Math.PI * 2); ctx.fill();
+  glow(ctx, point.x, point.y, radius * .11, "#fff0b3", .48); ctx.restore();
 }
 
 function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined, point: Point, radius: number, id: CosmicPlanetId, size: number) {
@@ -228,6 +267,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   const vignette = ctx.createRadialGradient(size * .5, size * .48, size * .12, size * .5, size * .5, size * .72);
   vignette.addColorStop(0, "#00000000"); vignette.addColorStop(.72, "#00000012"); vignette.addColorStop(1, "#000000c8"); ctx.fillStyle = vignette; ctx.fillRect(0, 0, size, size);
   paintNebulae(ctx, size, roles.all, genesis.seed);
+  paintMysticVeils(ctx, size, roles.prominence.map((color) => color ?? GOLD), genesis.seed + 2400);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .8);
   paintConstellation(ctx, size, genesis.moonSign, 1, genesis.seed + 900, .32);
   paintGuardian(ctx, size, genesis, placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.radius * (planet.id === "saturn" ? 2 : 1.15) })));
