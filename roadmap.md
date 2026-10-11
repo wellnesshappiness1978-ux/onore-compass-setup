@@ -267,7 +267,7 @@
 - [x] Verify every guardian, live/fullscreen/mobile presentation, 2048px export, entitlement split, deterministic geometry, and clean diagnostics.
 
 ## Cosmic Genesis mandala-surpassing art refresh
-- [ ] Rebuild all eight planets with realistic native surfaces, spherical depth, atmospheric edges, and non-repeating painterly detail.
-- [ ] Move all seven birth colors off planet bodies and into layered nebulae, emission filaments, reflected dust, and restrained light shafts.
-- [ ] Deepen the gold zodiac guardian, constellation sculpture, foreground/background separation, and shared live/2048 renderer.
-- [ ] Compare against the mandala, complete two visual refinement passes, and verify responsive/fullscreen/export/gating/tests/diagnostics.
+- [x] Rebuild all eight planets with realistic native surfaces, spherical depth, atmospheric edges, and non-repeating painterly detail.
+- [x] Move all seven birth colors off planet bodies and into layered nebulae, emission filaments, reflected dust, and restrained light shafts.
+- [x] Deepen the gold zodiac guardian, constellation sculpture, foreground/background separation, and shared live/2048 renderer.
+- [x] Compare against the mandala, complete two visual refinement passes, and verify responsive/fullscreen/export/gating/tests/diagnostics.
