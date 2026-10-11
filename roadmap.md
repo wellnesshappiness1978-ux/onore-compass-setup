@@ -251,3 +251,7 @@
 ## Divination-linked mandala
 - [x] Drive mandala symmetry from life path, background aura and gold tint from dominant Four Pillars element, and center gem cut from essence type; keep seven colors, offline drawing and 2048px export.
 - [x] Re-center the oil base so its painted compass meets the exact canvas center under the gem, in live view and 2048px export.
+
+## VIP Natal Cosmic Genesis
+- [ ] Replace the existing cosmic artwork with a square heliocentric eight-planet composition, gemstone Earth, zodiac and East Asian zodiac gold filigree, restrained seven-color accents, full-screen viewing, and matching 2048px export.
+- [ ] Verify astronomical calculations, plan gating, desktop/mobile rendering, download/share output, and clean diagnostics.
