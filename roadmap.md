@@ -293,4 +293,4 @@
 - [x] Keep the Sun centered and reserve a clear foreground corridor for birthplace-facing Earth.
 - [x] Mark the birthplace with a visible star-like point and emit the exact Overall color into space.
 - [x] Amplify ranked nebulae, celestial veils, crystalline stars, solar corona, constellations, and guardian presence.
-- [ ] Verify desktop, mobile, fullscreen, matching 2048 export, tests, and diagnostics.
+- [x] Verify desktop, mobile, fullscreen, matching 2048 export, tests, and diagnostics.
