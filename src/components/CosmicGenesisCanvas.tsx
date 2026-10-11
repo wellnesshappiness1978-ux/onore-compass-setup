@@ -251,21 +251,26 @@ function projectEarth(image: HTMLImageElement, radius: number, view: EarthView) 
 }
 
 function paintBirthplaceRadiance(ctx: CanvasRenderingContext2D, point: Point, radius: number, overallColor: string, seed: number) {
-  const originX = point.x, originY = point.y, endY = point.y - radius * 3.35;
+  const originX = point.x, originY = point.y, endX = point.x + radius * 3.15, endY = point.y - radius * 3.35;
   ctx.save(); ctx.globalCompositeOperation = "screen";
-  const beam = ctx.createLinearGradient(originX, originY, originX, endY);
-  beam.addColorStop(0, `${overallColor}e8`); beam.addColorStop(.22, `${overallColor}8c`); beam.addColorStop(.68, `${overallColor}24`); beam.addColorStop(1, `${overallColor}00`);
-  ctx.fillStyle = beam; ctx.beginPath(); ctx.moveTo(originX - radius * .035, originY); ctx.lineTo(originX - radius * .48, endY); ctx.lineTo(originX + radius * .48, endY); ctx.lineTo(originX + radius * .035, originY); ctx.closePath(); ctx.fill();
+  const beam = ctx.createLinearGradient(originX, originY, endX, endY);
+  beam.addColorStop(0, `${overallColor}d8`); beam.addColorStop(.22, `${overallColor}76`); beam.addColorStop(.68, `${overallColor}20`); beam.addColorStop(1, `${overallColor}00`);
+  ctx.fillStyle = beam; ctx.beginPath(); ctx.moveTo(originX - radius * .02, originY + radius * .01);
+  ctx.bezierCurveTo(originX + radius * .5, originY - radius * .8, endX - radius * 1.05, endY + radius * .55, endX - radius * .48, endY - radius * .18);
+  ctx.bezierCurveTo(endX + radius * .18, endY + radius * .4, originX + radius * .75, originY - radius * .35, originX + radius * .02, originY - radius * .01); ctx.closePath(); ctx.fill();
   for (let shaft = 0; shaft < 7; shaft++) {
     const offset = (shaft - 3) * radius * .045;
-    ctx.strokeStyle = shaft === 3 ? GOLD : overallColor; ctx.globalAlpha = shaft === 3 ? .42 : .16;
-    ctx.lineWidth = radius * (shaft === 3 ? .012 : .006); ctx.shadowColor = overallColor; ctx.shadowBlur = radius * .18;
-    ctx.beginPath(); ctx.moveTo(originX + offset * .18, originY - radius * .03); ctx.quadraticCurveTo(originX + offset * 1.8, originY - radius * 1.5, originX + offset * 4.2, endY); ctx.stroke();
+    ctx.strokeStyle = shaft === 3 ? GOLD : overallColor; ctx.globalAlpha = shaft === 3 ? .3 : .14;
+    ctx.lineWidth = radius * (shaft === 3 ? .009 : .005); ctx.shadowColor = overallColor; ctx.shadowBlur = radius * .18;
+    ctx.beginPath(); ctx.moveTo(originX + offset * .18, originY - radius * .03);
+    ctx.bezierCurveTo(originX + radius * .7 + offset, originY - radius * .65, endX - radius * 1.15 + offset * 2, endY + radius * .7, endX + offset * 2.5, endY); ctx.stroke();
   }
   for (let mote = 0; mote < 64; mote++) {
     const salt = seed + mote * 47, progress = unit(salt);
     const spread = radius * (.08 + progress * .38);
-    const x = originX + (unit(salt + 3) - .5) * spread * 2, y = originY - progress * radius * 3.25;
+    const curve = progress * progress;
+    const x = originX + curve * (endX - originX) + (unit(salt + 3) - .5) * spread * 2;
+    const y = originY + progress * (endY - originY) + Math.sin(progress * Math.PI) * radius * .26;
     const r = radius * (.006 + unit(salt + 9) * .018);
     ctx.fillStyle = mote % 5 ? overallColor : GOLD; ctx.globalAlpha = .18 + unit(salt + 11) * .52;
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();

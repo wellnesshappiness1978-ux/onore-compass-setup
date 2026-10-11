@@ -36,6 +36,7 @@ describe("Cosmic Genesis artwork layout", () => {
     const light = cosmicBirthplaceLight(earth);
     expect(light.x).toBe(earth.x);
     expect(light.y).toBe(earth.y);
+    expect(light.beamEndX).toBeGreaterThan(earth.x + earth.radius * 3);
     expect(light.beamEndY).toBeLessThan(earth.y - earth.radius);
     expect(light.safetyRadius).toBeGreaterThan(earth.radius * 3);
   });
