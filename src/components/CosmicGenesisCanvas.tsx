@@ -324,8 +324,8 @@ function paintFiligree(ctx: CanvasRenderingContext2D, cx: number, cy: number, ra
   ctx.save(); guardianPath(ctx, genesis.animal, ax, ay, guardianSize); ctx.clip();
   for (let i = 0; i < 12; i++) { const r = guardianSize * (.1 + i * .06); ctx.strokeStyle = i % 3 ? MID_GOLD : GOLD; ctx.globalAlpha = .05 + (i % 4) * .018; ctx.lineWidth = (.3 + i % 3 * .18) * scale; ctx.beginPath(); ctx.arc(ax - guardianSize * .16, ay + guardianSize * .08, r, -1.5, 2.2); ctx.stroke(); }
   ctx.restore();
-  [[DEEP_GOLD, 7, .06], [MID_GOLD, 2.8, .12], [GOLD, .8, .24], ["#fff4c7", .3, .3]].forEach(([color, width, alpha]) => { guardianPath(ctx, genesis.animal, ax, ay, guardianSize); ctx.strokeStyle = color as string; ctx.globalAlpha = alpha as number; ctx.lineWidth = (width as number) * scale; ctx.shadowColor = GOLD; ctx.shadowBlur = (width as number) * 2 * scale; ctx.stroke(); });
-  for (let i = 0; i < 16; i++) { const a = i * 2.399 + genesis.animal, r = guardianSize * (.35 + (i % 7) * .12); glow(ctx, ax + Math.cos(a) * r, ay + Math.sin(a) * r, (3 + i % 4) * scale, GOLD, .13); }
+  [[DEEP_GOLD, 7, .035], [MID_GOLD, 2.8, .07], [GOLD, .8, .14], ["#fff4c7", .3, .17]].forEach(([color, width, alpha]) => { guardianPath(ctx, genesis.animal, ax, ay, guardianSize); ctx.strokeStyle = color as string; ctx.globalAlpha = alpha as number; ctx.lineWidth = (width as number) * scale; ctx.shadowColor = GOLD; ctx.shadowBlur = (width as number) * 2.5 * scale; ctx.stroke(); });
+  for (let i = 0; i < 12; i++) { const a = i * 2.399 + genesis.animal, r = guardianSize * (.4 + (i % 6) * .14); glow(ctx, ax + Math.cos(a) * r, ay + Math.sin(a) * r, (4 + i % 4) * scale, GOLD, .07); }
   ctx.restore();
 }
 
