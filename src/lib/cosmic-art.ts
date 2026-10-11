@@ -9,7 +9,7 @@ export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serp
 const PORTRAIT_ANCHORS: Record<CosmicPlanet["id"], readonly [number, number, number]> = {
   mercury: [.24, .34, .72],
   venus: [.34, .69, .88],
-  earth: [.55, .57, 1.72],
+  earth: [.55, .57, 3.72],
   mars: [.78, .76, .78],
   jupiter: [.76, .29, 1.38],
   saturn: [.2, .78, 1.3],
