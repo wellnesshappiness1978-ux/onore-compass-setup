@@ -276,3 +276,9 @@
 - [x] Replace the atlas and diagram layout with eight individual planet masters and a depth-staged celestial portrait.
 - [x] Replace orbit lines and literal zodiac graphics with restrained birth-color nebulae, dust constellations, and a masked particle guardian.
 - [x] Complete iterative visual QA for desktop, mobile, fullscreen, and matching 2048 export; verify gates, determinism, tests, and diagnostics.
+
+## Cosmic Genesis Sun-centered masterpiece
+- [x] Center a detailed Sun and arrange all eight birth-position planets around it with Earth in the foreground.
+- [x] Project Earth from the saved birth instant/place and correct planet aspect ratios, including Saturn's spherical body and rings.
+- [x] Prioritize Overall, Health, Love, Work, and Wealth nebulae while integrating the user's zodiac and guardian into one background painting.
+- [x] Verify astronomy, color order, live/fullscreen/mobile presentation, 2048 export, tests, and diagnostics.
