@@ -37,6 +37,9 @@ describe("cosmic genesis astronomy", () => {
     const okinawa = earthViewAtBirth(genesis, "沖縄県", "");
     expect(tokyo.approximatePlace).toBe(false);
     expect(tokyo.longitude).not.toBe(okinawa.longitude);
+    expect(tokyo.latitude).not.toBe(okinawa.latitude);
+    expect(tokyo.latitude).toBeGreaterThan(-90);
+    expect(tokyo.latitude).toBeLessThan(90);
     expect(tokyo.siderealRotation).toBeGreaterThanOrEqual(0);
     expect(tokyo.siderealRotation).toBeLessThan(360);
     expect(tokyo.solarHourAngle).toBeGreaterThanOrEqual(-180);
