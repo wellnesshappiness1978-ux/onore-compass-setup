@@ -302,7 +302,7 @@
 - [x] Verify deterministic astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
 
 ## Cosmic Genesis art-and-astronomy two-layer reconstruction
-- [ ] Draw a readable birth-instant heliocentric overview with angularly accurate eight-planet positions and compressed orbital distances.
-- [ ] Connect the orbital Earth to a foreground birth-time Earth portrait with visible birthplace, terminator, and Overall-color radiance.
-- [ ] Integrate sparse astronomical labels, zodiac relief, ranked birth-color nebulae, and shared painterly light into one artwork.
-- [ ] Verify astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+- [x] Draw a readable birth-instant heliocentric overview with angularly accurate eight-planet positions and compressed orbital distances.
+- [x] Connect the orbital Earth to a foreground birth-time Earth portrait with visible birthplace, terminator, and Overall-color radiance.
+- [x] Integrate sparse astronomical labels, zodiac relief, ranked birth-color nebulae, and shared painterly light into one artwork.
+- [x] Verify astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
