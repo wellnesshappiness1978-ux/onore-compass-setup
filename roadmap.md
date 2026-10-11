@@ -288,3 +288,9 @@
 - [x] Remove hard gloss and replace it with atmosphere, night light, aurora, and a subtle birthplace glow.
 - [x] Unify nebulae, constellations, and the zodiac guardian as a dreamlike spiritual deep-space painting.
 - [x] Verify multiple birthplace orientations, live/fullscreen/mobile presentation, 2048 export, tests, and diagnostics.
+
+## Cosmic Genesis birthplace beacon and mystical amplification
+- [x] Keep the Sun centered and reserve a clear foreground corridor for birthplace-facing Earth.
+- [x] Mark the birthplace with a visible star-like point and emit the exact Overall color into space.
+- [x] Amplify ranked nebulae, celestial veils, crystalline stars, solar corona, constellations, and guardian presence.
+- [x] Verify desktop, mobile, fullscreen, matching 2048 export, tests, and diagnostics.

@@ -9,7 +9,7 @@ import jupiter from "@/assets/cosmic-jupiter.png";
 import saturn from "@/assets/cosmic-saturn.png";
 import uranus from "@/assets/cosmic-uranus.png";
 import neptune from "@/assets/cosmic-neptune.png";
-import { COSMIC_GUARDIANS, cosmicColorRoles, cosmicPlacements } from "@/lib/cosmic-art";
+import { COSMIC_GUARDIANS, cosmicBirthplaceLight, cosmicColorRoles, cosmicPlacements } from "@/lib/cosmic-art";
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
 import type { Language } from "@/lib/translations";
 import type { Capture } from "./MandalaCanvas";
@@ -56,11 +56,11 @@ function glow(ctx: CanvasRenderingContext2D, x: number, y: number, radius: numbe
 
 function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
   const roles = [
-    { color: colors[0] ?? GOLD, alpha: .46, y: .56, bend: -.2, clouds: 15 },
-    { color: colors[5] ?? GOLD, alpha: .37, y: .7, bend: .16, clouds: 13 },
-    { color: colors[4] ?? GOLD, alpha: .3, y: .31, bend: -.13, clouds: 11 },
-    { color: colors[3] ?? GOLD, alpha: .24, y: .2, bend: .2, clouds: 9 },
-    { color: colors[2] ?? GOLD, alpha: .19, y: .82, bend: -.11, clouds: 8 },
+    { color: colors[0] ?? GOLD, alpha: .72, y: .56, bend: -.2, clouds: 19 },
+    { color: colors[5] ?? GOLD, alpha: .55, y: .7, bend: .16, clouds: 16 },
+    { color: colors[4] ?? GOLD, alpha: .44, y: .31, bend: -.13, clouds: 14 },
+    { color: colors[3] ?? GOLD, alpha: .35, y: .2, bend: .2, clouds: 12 },
+    { color: colors[2] ?? GOLD, alpha: .28, y: .82, bend: -.11, clouds: 10 },
   ];
   ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round";
   roles.forEach((role, index) => {
@@ -73,21 +73,21 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
       const y = size * role.y + offset + wave + (unit(salt + 3) - .5) * size * .08;
       const radius = size * (.07 + unit(salt + 7) * .08) * (1 - index * .045);
       const haze = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      haze.addColorStop(0, `${role.color}34`); haze.addColorStop(.28, `${role.color}22`); haze.addColorStop(.7, `${role.color}0c`); haze.addColorStop(1, `${role.color}00`);
+      haze.addColorStop(0, `${role.color}52`); haze.addColorStop(.28, `${role.color}2e`); haze.addColorStop(.7, `${role.color}10`); haze.addColorStop(1, `${role.color}00`);
       ctx.save(); ctx.translate(x, y); ctx.rotate(-.42 + role.bend); ctx.scale(1.75, .5);
       ctx.globalAlpha = role.alpha; ctx.fillStyle = haze; ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     }
-    for (let filament = 0; filament < 3; filament++) {
+    for (let filament = 0; filament < 5; filament++) {
       ctx.beginPath();
       const fineOffset = (filament - 1) * size * .01;
       ctx.moveTo(-size * .08, size * role.y + offset + fineOffset);
       ctx.bezierCurveTo(size * .22, size * (role.y + role.bend), size * .7, size * (role.y - role.bend), size * 1.08, size * (role.y + .02));
       ctx.strokeStyle = role.color;
-      ctx.globalAlpha = role.alpha * (.16 - filament * .025);
-      ctx.lineWidth = size * (.0012 + filament * .0008);
+      ctx.globalAlpha = role.alpha * (.2 - filament * .022);
+      ctx.lineWidth = size * (.0008 + filament * .00055);
       ctx.shadowColor = role.color; ctx.shadowBlur = size * (.014 + filament * .008); ctx.stroke();
     }
-    for (let particle = 0; particle < 42 - index * 5; particle++) {
+    for (let particle = 0; particle < 58 - index * 5; particle++) {
       const salt = seed + index * 991 + particle * 37;
       const x = unit(salt) * size;
       const y = size * role.y + Math.sin((x / size) * Math.PI * 2 + role.bend * 8) * size * .12 + (unit(salt + 3) - .5) * size * .16;
@@ -105,21 +105,43 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
 
 function paintMysticVeils(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
   ctx.save(); ctx.globalCompositeOperation = "screen";
-  for (let veil = 0; veil < 9; veil++) {
+  for (let veil = 0; veil < 14; veil++) {
     const salt = seed + veil * 137;
     const x = size * (.08 + unit(salt) * .84), y = size * (.08 + unit(salt + 3) * .84);
     const radius = size * (.13 + unit(salt + 7) * .17), color = colors[veil % Math.max(colors.length, 1)] ?? GOLD;
     const mist = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    mist.addColorStop(0, `${color}20`); mist.addColorStop(.34, `${color}0d`); mist.addColorStop(.75, `${color}05`); mist.addColorStop(1, `${color}00`);
+    mist.addColorStop(0, `${color}36`); mist.addColorStop(.34, `${color}18`); mist.addColorStop(.75, `${color}08`); mist.addColorStop(1, `${color}00`);
     ctx.save(); ctx.translate(x, y); ctx.rotate(unit(salt + 11) * Math.PI); ctx.scale(1.8, .52);
-    ctx.globalAlpha = .24 + unit(salt + 13) * .18; ctx.fillStyle = mist; ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    ctx.globalAlpha = .35 + unit(salt + 13) * .24; ctx.fillStyle = mist; ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.fill(); ctx.restore();
   }
-  for (let mote = 0; mote < 180; mote++) {
+  for (let mote = 0; mote < 280; mote++) {
     const salt = seed + mote * 53;
     const x = unit(salt) * size, y = unit(salt + 5) * size, radius = size * (.00018 + unit(salt + 9) * .00072);
     ctx.fillStyle = mote % 5 ? GOLD : (colors[mote % Math.max(colors.length, 1)] ?? GOLD);
     ctx.globalAlpha = .08 + unit(salt + 12) * .22; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = radius * 8;
     ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function paintCelestialRapture(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
+  ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round";
+  for (let ribbon = 0; ribbon < 7; ribbon++) {
+    const color = colors[ribbon % Math.max(colors.length, 1)] ?? GOLD;
+    const salt = seed + ribbon * 211;
+    const startY = size * (.12 + unit(salt) * .76);
+    ctx.beginPath(); ctx.moveTo(-size * .08, startY);
+    ctx.bezierCurveTo(size * .22, startY - size * (.2 + unit(salt + 2) * .13), size * .66, startY + size * (.2 + unit(salt + 5) * .12), size * 1.08, startY - size * .05);
+    ctx.strokeStyle = color; ctx.globalAlpha = .075 + (7 - ribbon) * .008;
+    ctx.lineWidth = size * (.0014 + unit(salt + 8) * .0022); ctx.shadowColor = color; ctx.shadowBlur = size * .035; ctx.stroke();
+  }
+  for (let crystal = 0; crystal < 88; crystal++) {
+    const salt = seed + crystal * 79;
+    const x = unit(salt) * size, y = unit(salt + 7) * size;
+    const color = crystal % 3 ? GOLD : (colors[crystal % Math.max(colors.length, 1)] ?? GOLD);
+    const radius = size * (.0007 + unit(salt + 11) * .0018);
+    ctx.strokeStyle = color; ctx.globalAlpha = .16 + unit(salt + 13) * .34; ctx.lineWidth = Math.max(1, size * .00034);
+    ctx.beginPath(); ctx.moveTo(x - radius * 4, y); ctx.lineTo(x + radius * 4, y); ctx.moveTo(x, y - radius * 6); ctx.lineTo(x, y + radius * 6); ctx.stroke();
   }
   ctx.restore();
 }
@@ -192,6 +214,14 @@ function paintSun(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null,
     ctx.save(); ctx.shadowColor = "#ffd372"; ctx.shadowBlur = size * .055;
     ctx.drawImage(image, x - radius, y - radius, radius * 2, radius * 2); ctx.restore();
   }
+  ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.strokeStyle = "#ffe4a0"; ctx.lineCap = "round";
+  for (let ray = 0; ray < 28; ray++) {
+    const angle = ray * Math.PI * 2 / 28 + .03;
+    const inner = radius * (1.12 + unit(ray * 19) * .12), outer = radius * (1.45 + unit(ray * 31) * .62);
+    ctx.globalAlpha = .045 + unit(ray * 43) * .08; ctx.lineWidth = size * (.0005 + unit(ray * 17) * .0012);
+    ctx.beginPath(); ctx.moveTo(x + Math.cos(angle) * inner, y + Math.sin(angle) * inner); ctx.lineTo(x + Math.cos(angle) * outer, y + Math.sin(angle) * outer); ctx.stroke();
+  }
+  ctx.restore();
 }
 
 function projectEarth(image: HTMLImageElement, radius: number, view: EarthView) {
@@ -220,7 +250,44 @@ function projectEarth(image: HTMLImageElement, radius: number, view: EarthView) 
   globeContext.putImageData(output, 0, 0); return globe;
 }
 
-function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null, point: Point, radius: number, view: EarthView, size: number, seed: number) {
+function paintBirthplaceRadiance(ctx: CanvasRenderingContext2D, point: Point, radius: number, overallColor: string, seed: number) {
+  const originX = point.x, originY = point.y, endX = point.x + radius * 3.15, endY = point.y - radius * 3.35;
+  ctx.save(); ctx.globalCompositeOperation = "screen";
+  const beam = ctx.createLinearGradient(originX, originY, endX, endY);
+  beam.addColorStop(0, `${overallColor}d8`); beam.addColorStop(.22, `${overallColor}76`); beam.addColorStop(.68, `${overallColor}20`); beam.addColorStop(1, `${overallColor}00`);
+  ctx.fillStyle = beam; ctx.beginPath(); ctx.moveTo(originX - radius * .02, originY + radius * .01);
+  ctx.bezierCurveTo(originX + radius * .5, originY - radius * .8, endX - radius * 1.05, endY + radius * .55, endX - radius * .48, endY - radius * .18);
+  ctx.bezierCurveTo(endX + radius * .18, endY + radius * .4, originX + radius * .75, originY - radius * .35, originX + radius * .02, originY - radius * .01); ctx.closePath(); ctx.fill();
+  for (let shaft = 0; shaft < 7; shaft++) {
+    const offset = (shaft - 3) * radius * .045;
+    ctx.strokeStyle = shaft === 3 ? GOLD : overallColor; ctx.globalAlpha = shaft === 3 ? .3 : .14;
+    ctx.lineWidth = radius * (shaft === 3 ? .009 : .005); ctx.shadowColor = overallColor; ctx.shadowBlur = radius * .18;
+    ctx.beginPath(); ctx.moveTo(originX + offset * .18, originY - radius * .03);
+    ctx.bezierCurveTo(originX + radius * .7 + offset, originY - radius * .65, endX - radius * 1.15 + offset * 2, endY + radius * .7, endX + offset * 2.5, endY); ctx.stroke();
+  }
+  for (let mote = 0; mote < 64; mote++) {
+    const salt = seed + mote * 47, progress = unit(salt);
+    const spread = radius * (.08 + progress * .38);
+    const curve = progress * progress;
+    const x = originX + curve * (endX - originX) + (unit(salt + 3) - .5) * spread * 2;
+    const y = originY + progress * (endY - originY) + Math.sin(progress * Math.PI) * radius * .26;
+    const r = radius * (.006 + unit(salt + 9) * .018);
+    ctx.fillStyle = mote % 5 ? overallColor : GOLD; ctx.globalAlpha = .18 + unit(salt + 11) * .52;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+  glow(ctx, originX, originY, radius * .48, overallColor, .78);
+  ctx.strokeStyle = overallColor; ctx.shadowColor = overallColor; ctx.shadowBlur = radius * .22;
+  for (let ring = 0; ring < 3; ring++) {
+    ctx.globalAlpha = .68 - ring * .17; ctx.lineWidth = radius * (.018 - ring * .004);
+    ctx.beginPath(); ctx.arc(originX, originY, radius * (.09 + ring * .075), 0, Math.PI * 2); ctx.stroke();
+  }
+  ctx.strokeStyle = GOLD; ctx.globalAlpha = .78; ctx.lineWidth = radius * .012;
+  ctx.beginPath(); ctx.moveTo(originX - radius * .22, originY); ctx.lineTo(originX + radius * .22, originY); ctx.moveTo(originX, originY - radius * .28); ctx.lineTo(originX, originY + radius * .28); ctx.stroke();
+  ctx.fillStyle = "#fff8db"; ctx.globalAlpha = 1; ctx.beginPath(); ctx.arc(originX, originY, radius * .042, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null, point: Point, radius: number, view: EarthView, size: number, seed: number, overallColor: string) {
   glow(ctx, point.x, point.y, radius * 2.05, "#2c8ec7", .27);
   glow(ctx, point.x, point.y, radius * 1.52, "#54e1d1", .24);
   ctx.save(); ctx.beginPath(); ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); ctx.clip();
@@ -245,7 +312,8 @@ function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | nul
   atmosphere.addColorStop(0, "rgba(56,174,205,0)"); atmosphere.addColorStop(.58, "rgba(56,174,205,.04)");
   atmosphere.addColorStop(.79, "rgba(84,225,209,.17)"); atmosphere.addColorStop(.9, "rgba(84,225,209,.07)"); atmosphere.addColorStop(1, "rgba(84,225,209,0)");
   ctx.fillStyle = atmosphere; ctx.beginPath(); ctx.arc(point.x, point.y, radius * 1.24, 0, Math.PI * 2); ctx.fill();
-  glow(ctx, point.x, point.y, radius * .11, "#fff0b3", .48); ctx.restore();
+  ctx.restore();
+  paintBirthplaceRadiance(ctx, point, radius, overallColor, seed + 5100);
 }
 
 function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined, point: Point, radius: number, id: CosmicPlanetId, size: number) {
@@ -268,15 +336,19 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   vignette.addColorStop(0, "#00000000"); vignette.addColorStop(.72, "#00000012"); vignette.addColorStop(1, "#000000c8"); ctx.fillStyle = vignette; ctx.fillRect(0, 0, size, size);
   paintNebulae(ctx, size, roles.all, genesis.seed);
   paintMysticVeils(ctx, size, roles.prominence.map((color) => color ?? GOLD), genesis.seed + 2400);
-  paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .8);
-  paintConstellation(ctx, size, genesis.moonSign, 1, genesis.seed + 900, .32);
+  paintCelestialRapture(ctx, size, roles.prominence.map((color) => color ?? GOLD), genesis.seed + 4100);
+  paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, 1.05);
+  paintConstellation(ctx, size, genesis.moonSign, 1, genesis.seed + 900, .46);
   paintGuardian(ctx, size, genesis, placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.radius * (planet.id === "saturn" ? 2 : 1.15) })));
   paintOrbits(ctx, size, placements);
   const earth = placements.find((planet) => planet.id === "earth");
   const rearOrder: CosmicPlanetId[] = ["neptune", "uranus", "saturn", "jupiter", "mars", "venus", "mercury"];
   rearOrder.forEach((id) => { const planet = placements.find((candidate) => candidate.id === id); if (planet) paintPlanet(ctx, assets?.planets[id], planet, planet.radius, id, size); });
   paintSun(ctx, assets?.sun ?? null, size);
-  if (earth) paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, size, genesis.seed);
+  if (earth) {
+    cosmicBirthplaceLight(earth);
+    paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, size, genesis.seed, roles.overall);
+  }
 }
 
 export default function CosmicGenesisCanvas({ genesis, earthView, colors, language, onCapture }: Props) {
@@ -301,5 +373,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "中央の太陽と出生瞬間の8惑星、出生地を向く地球を描いた出生宇宙創生図" : "Natal Cosmic Genesis with a central Sun, eight birth-position planets, and birthplace-facing Earth"} data-cosmic-genesis data-renderer="sun-centered-birthplace-earth" data-birth-color-role="ranked-nebula-light-only" data-guide-spokes="0" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "中央の太陽と出生瞬間の8惑星、総合カラーに輝く出生地点を向く地球を描いた出生宇宙創生図" : "Natal Cosmic Genesis with a central Sun, eight birth-position planets, and an overall-color birthplace light on Earth"} data-cosmic-genesis data-renderer="sun-centered-birthplace-earth" data-birth-color-role="ranked-nebula-and-overall-birthplace-light" data-guide-spokes="0" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }

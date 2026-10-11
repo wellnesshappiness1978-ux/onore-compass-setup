@@ -3,6 +3,7 @@ import type { CosmicGenesis, CosmicPlanet } from "./cosmic-astronomy";
 export const COSMIC_PLANET_SCALE = 2;
 
 export type CosmicPlacement = CosmicPlanet & { x: number; y: number; radius: number; orbitRadius: number };
+export type CosmicBirthplaceLight = { x: number; y: number; beamEndX: number; beamEndY: number; safetyRadius: number };
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
@@ -49,5 +50,16 @@ export function cosmicColorRoles(colors: string[]) {
     inner: seven[6] ?? fallback,
     prominence: [seven[0], seven[5], seven[4], seven[3], seven[2], seven[1], seven[6]],
     all: seven,
+  };
+}
+
+/** Keeps the birthplace mark on the face of Earth and reserves a clear upward spiritual-light corridor. */
+export function cosmicBirthplaceLight(earth: Pick<CosmicPlacement, "x" | "y" | "radius">): CosmicBirthplaceLight {
+  return {
+    x: earth.x,
+    y: earth.y,
+    beamEndX: earth.x + earth.radius * 3.15,
+    beamEndY: earth.y - earth.radius * 3.35,
+    safetyRadius: earth.radius * 3.5,
   };
 }
