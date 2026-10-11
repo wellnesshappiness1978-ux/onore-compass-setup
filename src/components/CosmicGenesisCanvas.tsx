@@ -194,12 +194,66 @@ function paintAtlasPlanet(ctx: CanvasRenderingContext2D, atlas: HTMLImageElement
   ctx.drawImage(atlas, sx, sy, sw, sh, point.x - dw / 2, point.y - dh / 2, dw, dh); ctx.restore();
 }
 
+function paintPlanetPresence(ctx: CanvasRenderingContext2D, planet: CosmicPlanet, point: Point, radius: number, seed: number, scale: number) {
+  const palette = planetPalette(planet.id);
+  const primary = planet.id === "earth" ? "#70E9FF" : palette[0] ?? GOLD;
+  const secondary = planet.id === "earth" ? "#68FFD0" : palette[1] ?? primary;
+  // A dark separation halo protects the silhouette from bright nebular passages.
+  const separation = ctx.createRadialGradient(point.x, point.y, radius * .86, point.x, point.y, radius * 2.2);
+  separation.addColorStop(0, "#02040a00"); separation.addColorStop(.5, "#02040aa8"); separation.addColorStop(1, "#02040a00");
+  ctx.save(); ctx.globalCompositeOperation = "source-over"; ctx.fillStyle = separation;
+  ctx.fillRect(point.x - radius * 2.25, point.y - radius * 2.25, radius * 4.5, radius * 4.5); ctx.restore();
+
+  ctx.save(); ctx.globalCompositeOperation = "screen";
+  glow(ctx, point.x, point.y, radius * (planet.id === "saturn" ? 2.65 : 2.05), primary, planet.id === "earth" ? .38 : .25);
+  glow(ctx, point.x + radius * .28, point.y - radius * .24, radius * 1.45, secondary, .17);
+  ctx.translate(point.x, point.y); ctx.rotate(-.42 + planet.orbitIndex * .17);
+  for (let ray = 0; ray < 5; ray++) {
+    const salt = seed + planet.orbitIndex * 1301 + ray * 79;
+    const angle = -1.2 + ray * .58 + (unit(salt) - .5) * .28;
+    const start = radius * (1.04 + unit(salt + 2) * .12), end = radius * (1.35 + unit(salt + 3) * .5);
+    const gradient = ctx.createLinearGradient(Math.cos(angle) * start, Math.sin(angle) * start, Math.cos(angle) * end, Math.sin(angle) * end);
+    gradient.addColorStop(0, `${ray % 2 ? secondary : primary}8c`); gradient.addColorStop(1, `${primary}00`);
+    ctx.strokeStyle = gradient; ctx.globalAlpha = .25; ctx.lineWidth = Math.max(scale * .5, radius * .012); ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(Math.cos(angle) * start, Math.sin(angle) * start); ctx.lineTo(Math.cos(angle) * end, Math.sin(angle) * end); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function paintPlanetSparkles(ctx: CanvasRenderingContext2D, planet: CosmicPlanet, point: Point, radius: number, seed: number, scale: number) {
+  const palette = planetPalette(planet.id);
+  const primary = planet.id === "earth" ? "#D9FFFF" : mix(palette[0] ?? GOLD, "#FFFFFF", .5);
+  const secondary = planet.id === "earth" ? "#8FFFF0" : mix(palette[1] ?? primary, "#FFFFFF", .38);
+  ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round";
+  for (let index = 0; index < 9; index++) {
+    const salt = seed + planet.orbitIndex * 1709 + index * 101;
+    const angle = -2.75 + unit(salt) * 3.9;
+    const distance = radius * (.46 + unit(salt + 3) * .72);
+    const x = point.x + Math.cos(angle) * distance, y = point.y + Math.sin(angle) * distance;
+    const length = radius * (.045 + unit(salt + 5) * .13);
+    const color = index % 3 ? primary : secondary;
+    ctx.strokeStyle = color; ctx.globalAlpha = .38 + unit(salt + 7) * .38; ctx.lineWidth = Math.max(scale * .45, radius * .008);
+    ctx.beginPath(); ctx.moveTo(x - length, y); ctx.lineTo(x + length, y); ctx.moveTo(x, y - length * .62); ctx.lineTo(x, y + length * .62); ctx.stroke();
+    ctx.fillStyle = "#FFFFFF"; ctx.globalAlpha = .72; ctx.beginPath(); ctx.arc(x, y, Math.max(scale * .45, radius * .011), 0, Math.PI * 2); ctx.fill();
+  }
+  const reflection = ctx.createRadialGradient(point.x - radius * .34, point.y - radius * .4, 0, point.x - radius * .34, point.y - radius * .4, radius * .52);
+  reflection.addColorStop(0, "#ffffffb8"); reflection.addColorStop(.2, `${primary}54`); reflection.addColorStop(1, `${primary}00`);
+  ctx.fillStyle = reflection; ctx.globalAlpha = .8; ctx.beginPath(); ctx.arc(point.x - radius * .34, point.y - radius * .4, radius * .52, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
 function paintPlanet(ctx: CanvasRenderingContext2D, planet: CosmicPlanet, point: Point, radius: number, seed: number, scale: number, atlas?: HTMLImageElement | null) {
+  paintPlanetPresence(ctx, planet, point, radius, seed, scale);
   if (atlas) {
     paintAtlasPlanet(ctx, atlas, planet, point, radius);
     const edge = planet.id === "earth" ? "#8ce8ff" : planetPalette(planet.id)[0] ?? GOLD;
-    ctx.save(); ctx.strokeStyle = edge; ctx.globalAlpha = planet.id === "earth" ? .62 : .32; ctx.lineWidth = Math.max(scale, radius * .018);
-    ctx.beginPath(); ctx.arc(point.x, point.y, radius * 1.01, Math.PI * 1.08, Math.PI * 1.78); ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.arc(point.x, point.y, radius * .985, 0, Math.PI * 2); ctx.clip();
+    const terminator = ctx.createLinearGradient(point.x - radius, point.y - radius, point.x + radius, point.y + radius);
+    terminator.addColorStop(0, "#ffffff24"); terminator.addColorStop(.46, "#ffffff00"); terminator.addColorStop(1, "#00020bc4"); ctx.fillStyle = terminator;
+    ctx.fillRect(point.x - radius, point.y - radius, radius * 2, radius * 2); ctx.restore();
+    ctx.save(); ctx.strokeStyle = mix(edge, "#FFFFFF", .62); ctx.globalAlpha = planet.id === "earth" ? .92 : .74; ctx.lineWidth = Math.max(scale * 1.1, radius * .028);
+    ctx.shadowColor = edge; ctx.shadowBlur = radius * .2; ctx.beginPath(); ctx.arc(point.x, point.y, radius * 1.005, Math.PI * 1.04, Math.PI * 1.83); ctx.stroke(); ctx.restore();
+    paintPlanetSparkles(ctx, planet, point, radius, seed, scale);
     return;
   }
   if (planet.id === "earth") { paintEarth(ctx, point, radius, seed, scale); return; }
@@ -223,6 +277,7 @@ function paintPlanet(ctx: CanvasRenderingContext2D, planet: CosmicPlanet, point:
     });
     ctx.strokeStyle = GOLD; ctx.globalAlpha = .78; ctx.lineWidth = Math.max(scale, radius * .03); ctx.setLineDash([radius * .14, radius * .06, radius * .04, radius * .08]); ctx.stroke(); ctx.restore();
   }
+  paintPlanetSparkles(ctx, planet, point, radius, seed, scale);
 }
 
 function paintOrbit(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius: number, index: number, seed: number, scale: number) {
@@ -253,24 +308,24 @@ function guardianPath(ctx: CanvasRenderingContext2D, animal: number, x: number, 
 }
 
 function paintFiligree(ctx: CanvasRenderingContext2D, cx: number, cy: number, radius: number, genesis: CosmicGenesis, scale: number) {
-  ctx.save(); ctx.translate(cx, cy); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.save(); ctx.translate(cx, cy); ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.globalCompositeOperation = "screen";
   const strokeLayer = (color: string, width: number, alpha: number, blur: number) => { ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = width; ctx.globalAlpha = alpha; ctx.shadowColor = color; ctx.shadowBlur = blur; };
   const constellation = (sign: number, ox: number, oy: number, span: number, rotation: number) => {
     const points = Array.from({ length: 9 }, (_, index) => { const angle = rotation + index * (.48 + (sign % 3) * .035); const r = span * (.38 + (((index * 17 + sign * 11) % 41) / 100)); return [ox + Math.cos(angle) * r, oy + Math.sin(angle) * r * .72] as const; });
-    [[DEEP_GOLD, scale * 3, .5, 3 * scale], [MID_GOLD, scale * 1.5, .72, 1.4 * scale], [GOLD, scale * .55, .92, 0]].forEach(([color, width, alpha, blur]) => { strokeLayer(color as string, width as number, alpha as number, blur as number); ctx.beginPath(); points.forEach(([x, y], index) => index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); });
-    points.forEach(([x, y], index) => { glow(ctx, x, y, (index % 3 ? 5 : 8) * scale, GOLD, .55); ctx.fillStyle = GOLD; ctx.globalAlpha = .95; ctx.beginPath(); ctx.arc(x, y, (index % 3 ? 1.5 : 2.7) * scale, 0, Math.PI * 2); ctx.fill(); });
+    [[DEEP_GOLD, scale * 1.8, .12, 5 * scale], [MID_GOLD, scale * .8, .18, 2.5 * scale], [GOLD, scale * .3, .28, 0]].forEach(([color, width, alpha, blur]) => { strokeLayer(color as string, width as number, alpha as number, blur as number); ctx.beginPath(); points.forEach(([x, y], index) => index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); });
+    points.forEach(([x, y], index) => { glow(ctx, x, y, (index % 3 ? 7 : 11) * scale, GOLD, .16); ctx.fillStyle = GOLD; ctx.globalAlpha = .38; ctx.beginPath(); ctx.arc(x, y, (index % 3 ? .8 : 1.35) * scale, 0, Math.PI * 2); ctx.fill(); });
   };
   constellation(genesis.sunSign, -radius * .54, -radius * .48, radius * .62, -.7); constellation(genesis.moonSign, radius * .52, radius * .38, radius * .68, .3);
-  strokeLayer(GOLD, scale * 1.2, .92, 5 * scale); ctx.font = `${Math.round(82 * scale)}px serif`;
+  strokeLayer(GOLD, scale * .6, .15, 14 * scale); ctx.font = `${Math.round(94 * scale)}px serif`;
   ctx.fillText(ZODIAC_GLYPHS[genesis.sunSign] ?? "✦", -radius * .74, -radius * .65);
   ctx.fillText(ZODIAC_GLYPHS[genesis.moonSign] ?? "✧", radius * .68, radius * .58);
   const ax = -radius * .6, ay = radius * .5, guardianSize = radius * .34;
-  guardianPath(ctx, genesis.animal, ax, ay, guardianSize); const guardianFill = ctx.createLinearGradient(ax - guardianSize, ay - guardianSize, ax + guardianSize, ay + guardianSize); guardianFill.addColorStop(0, "#fff5c72e"); guardianFill.addColorStop(.5, "#d1a84c12"); guardianFill.addColorStop(1, "#7046172e"); ctx.fillStyle = guardianFill; ctx.globalAlpha = .6; ctx.shadowColor = GOLD; ctx.shadowBlur = 12 * scale; ctx.fill();
+  guardianPath(ctx, genesis.animal, ax, ay, guardianSize); const guardianFill = ctx.createLinearGradient(ax - guardianSize, ay - guardianSize, ax + guardianSize, ay + guardianSize); guardianFill.addColorStop(0, "#fff5c718"); guardianFill.addColorStop(.5, "#d1a84c08"); guardianFill.addColorStop(1, "#70461716"); ctx.fillStyle = guardianFill; ctx.globalAlpha = .3; ctx.shadowColor = GOLD; ctx.shadowBlur = 20 * scale; ctx.fill();
   ctx.save(); guardianPath(ctx, genesis.animal, ax, ay, guardianSize); ctx.clip();
-  for (let i = 0; i < 18; i++) { const r = guardianSize * (.08 + i * .045); ctx.strokeStyle = i % 3 ? MID_GOLD : GOLD; ctx.globalAlpha = .16 + (i % 4) * .035; ctx.lineWidth = (.35 + i % 3 * .25) * scale; ctx.beginPath(); ctx.arc(ax - guardianSize * .16, ay + guardianSize * .08, r, -1.5, 2.2); ctx.stroke(); }
+  for (let i = 0; i < 12; i++) { const r = guardianSize * (.1 + i * .06); ctx.strokeStyle = i % 3 ? MID_GOLD : GOLD; ctx.globalAlpha = .05 + (i % 4) * .018; ctx.lineWidth = (.3 + i % 3 * .18) * scale; ctx.beginPath(); ctx.arc(ax - guardianSize * .16, ay + guardianSize * .08, r, -1.5, 2.2); ctx.stroke(); }
   ctx.restore();
-  [[DEEP_GOLD, 10, .14], [MID_GOLD, 4.5, .28], [GOLD, 1.5, .72], ["#fff4c7", .45, .82]].forEach(([color, width, alpha]) => { guardianPath(ctx, genesis.animal, ax, ay, guardianSize); ctx.strokeStyle = color as string; ctx.globalAlpha = alpha as number; ctx.lineWidth = (width as number) * scale; ctx.shadowColor = GOLD; ctx.shadowBlur = (width as number) * scale; ctx.stroke(); });
-  for (let i = 0; i < 34; i++) { const a = i * 2.399 + genesis.animal, r = guardianSize * (.25 + (i % 9) * .11); glow(ctx, ax + Math.cos(a) * r, ay + Math.sin(a) * r, (2 + i % 4) * scale, GOLD, .5); }
+  [[DEEP_GOLD, 7, .06], [MID_GOLD, 2.8, .12], [GOLD, .8, .24], ["#fff4c7", .3, .3]].forEach(([color, width, alpha]) => { guardianPath(ctx, genesis.animal, ax, ay, guardianSize); ctx.strokeStyle = color as string; ctx.globalAlpha = alpha as number; ctx.lineWidth = (width as number) * scale; ctx.shadowColor = GOLD; ctx.shadowBlur = (width as number) * 2 * scale; ctx.stroke(); });
+  for (let i = 0; i < 16; i++) { const a = i * 2.399 + genesis.animal, r = guardianSize * (.35 + (i % 7) * .12); glow(ctx, ax + Math.cos(a) * r, ay + Math.sin(a) * r, (3 + i % 4) * scale, GOLD, .13); }
   ctx.restore();
 }
 
@@ -283,7 +338,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   else { glow(ctx, size * .22, size * .28, size * .48, roles.secondary, .7); glow(ctx, size * .78, size * .7, size * .44, roles.love, .62); }
   paintNebula(ctx, size, roles.all, genesis.seed, scale);
   paintFiligree(ctx, size / 2, size / 2, size * .5, genesis, scale);
-  for (let i = 0; i < 1050; i++) {
+  for (let i = 0; i < 760; i++) {
     const salt = genesis.seed + i * 43, x = unit(salt) * size, y = unit(salt + 5) * size;
     const color = i % 5 === 0 ? roles.all[i % 7] ?? GOLD : GOLD;
     ctx.fillStyle = color; ctx.globalAlpha = i % 19 === 0 ? .95 : .28 + unit(salt + 11) * .48;
