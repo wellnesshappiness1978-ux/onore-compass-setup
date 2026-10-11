@@ -16,6 +16,11 @@ describe("Cosmic Genesis artwork layout", () => {
       expect(planet.x + extent).toBeLessThanOrEqual(1024);
       expect(planet.y + extent).toBeLessThanOrEqual(1024);
     });
+    placements.forEach((planet, index) => placements.slice(index + 1).forEach(other => {
+      const planetExtent = planet.radius * (planet.id === "saturn" ? 1.72 : 1.08);
+      const otherExtent = other.radius * (other.id === "saturn" ? 1.72 : 1.08);
+      expect(Math.hypot(planet.x - other.x, planet.y - other.y)).toBeGreaterThanOrEqual(planetExtent + otherExtent + 12.28 - .01);
+    }));
   });
 
   it("retains all seven exact birth colors as strong artwork roles", () => {
