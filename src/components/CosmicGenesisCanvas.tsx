@@ -153,6 +153,8 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
 
 export default function CosmicGenesisCanvas({ genesis, colors, language, onCapture }: Props) {
   const ref = useRef<HTMLCanvasElement>(null); const images = useRef<ArtAssets | null>(null);
+  const onCaptureRef = useRef(onCapture);
+  useEffect(() => { onCaptureRef.current = onCapture; }, [onCapture]);
   const colorKey = colors.join(",");
   const stableColors = useMemo(() => colorKey.split(","), [colorKey]);
   const capture = useCallback(async () => {
@@ -164,8 +166,8 @@ export default function CosmicGenesisCanvas({ genesis, colors, language, onCaptu
   useEffect(() => {
     let active = true;
     if (ref.current) void paintCosmicGenesis(ref.current, genesis, stableColors, null);
-    void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, genesis, stableColors, art); onCapture(capture); });
-    return () => { active = false; onCapture(null); };
-  }, [genesis, stableColors, capture, onCapture]);
+    void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, genesis, stableColors, art); onCaptureRef.current(capture); });
+    return () => { active = false; onCaptureRef.current(null); };
+  }, [genesis, stableColors, capture]);
   return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "出生瞬間の太陽中心惑星配置を描いた出生宇宙創生図" : "Natal Cosmic Genesis based on heliocentric planetary positions"} data-cosmic-genesis data-renderer="depth-staged-celestial-portrait" data-birth-color-role="nebula-light-only" data-guide-spokes="0" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
