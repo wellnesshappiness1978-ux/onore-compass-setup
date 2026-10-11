@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as A from "astronomy-engine";
-import { cosmicGenesis } from "./cosmic-astronomy";
+import { cosmicGenesis, earthViewAtBirth } from "./cosmic-astronomy";
 
 describe("cosmic genesis astronomy", () => {
   it("calculates eight heliocentric planets at the entered JST instant", () => {
@@ -28,5 +28,19 @@ describe("cosmic genesis astronomy", () => {
   it("is deterministic and rejects invalid dates", () => {
     expect(cosmicGenesis("2020-02-29", "12:15", false)).toEqual(cosmicGenesis("2020-02-29", "12:15", false));
     expect(cosmicGenesis("2020-02-30", "12:15", false)).toBeNull();
+  });
+
+  it("derives a deterministic birthplace-facing Earth orientation", () => {
+    const genesis = cosmicGenesis("1990-04-15", "08:30", false);
+    if (!genesis) return;
+    const tokyo = earthViewAtBirth(genesis, "東京都", "");
+    const okinawa = earthViewAtBirth(genesis, "沖縄県", "");
+    expect(tokyo.approximatePlace).toBe(false);
+    expect(tokyo.longitude).not.toBe(okinawa.longitude);
+    expect(tokyo.siderealRotation).toBeGreaterThanOrEqual(0);
+    expect(tokyo.siderealRotation).toBeLessThan(360);
+    expect(tokyo.solarHourAngle).toBeGreaterThanOrEqual(-180);
+    expect(tokyo.solarHourAngle).toBeLessThan(180);
+    expect(earthViewAtBirth(genesis, "東京都", "")).toEqual(tokyo);
   });
 });

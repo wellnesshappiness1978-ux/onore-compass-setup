@@ -6,30 +6,30 @@ export type CosmicPlacement = CosmicPlanet & { x: number; y: number; radius: num
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
-const PORTRAIT_ANCHORS: Record<CosmicPlanet["id"], readonly [number, number, number]> = {
-  mercury: [.24, .34, .72],
-  venus: [.34, .69, .88],
-  earth: [.55, .57, 3.72],
-  mars: [.78, .76, .78],
-  jupiter: [.76, .29, 1.38],
-  saturn: [.2, .78, 1.3],
-  uranus: [.88, .53, .94],
-  neptune: [.1, .49, .98],
+const ORBIT_DEPTH: Record<CosmicPlanet["id"], readonly [number, number, number]> = {
+  mercury: [.16, .105, .8],
+  venus: [.22, .145, .9],
+  earth: [.27, .225, 3.25],
+  mars: [.31, .205, .9],
+  jupiter: [.37, .245, 1.18],
+  saturn: [.405, .27, 1.08],
+  uranus: [.44, .29, .83],
+  neptune: [.465, .31, .78],
 };
 
-/** Maps astronomical longitude into a stable, depth-staged portrait rather than a solar-system diagram. */
+/** Rotates the real heliocentric longitudes so Earth is the foreground anchor beneath the central Sun. */
 export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPlacement[] {
+  const earthLongitude = genesis.planets.find((planet) => planet.id === "earth")?.longitude ?? 0;
   return genesis.planets.map((planet) => {
-    const anchor = PORTRAIT_ANCHORS[planet.id];
-    const angle = planet.longitude * Math.PI / 180;
-    const parallax = size * (planet.id === "earth" ? .014 : .024);
-    const radius = planet.displayRadius * COSMIC_PLANET_SCALE * anchor[2] * size / 1024;
+    const orbit = ORBIT_DEPTH[planet.id];
+    const angle = (planet.longitude - earthLongitude + 90) * Math.PI / 180;
+    const radius = planet.displayRadius * COSMIC_PLANET_SCALE * orbit[2] * size / 1024;
     return {
       ...planet,
       radius,
-      orbitRadius: Math.hypot((anchor[0] - .5) * size, (anchor[1] - .5) * size),
-      x: (anchor[0] * size) + Math.cos(angle) * parallax,
-      y: (anchor[1] * size) + Math.sin(angle) * parallax,
+      orbitRadius: orbit[0] * size,
+      x: size * (.5 + Math.cos(angle) * orbit[0]),
+      y: size * (.475 + Math.sin(angle) * orbit[1]),
     };
   });
 }
@@ -45,6 +45,7 @@ export function cosmicColorRoles(colors: string[]) {
     love: seven[4] ?? fallback,
     health: seven[5] ?? fallback,
     inner: seven[6] ?? fallback,
+    prominence: [seven[0], seven[5], seven[4], seven[3], seven[2], seven[1], seven[6]],
     all: seven,
   };
 }

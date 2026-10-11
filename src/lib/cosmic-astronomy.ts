@@ -1,4 +1,5 @@
 import * as A from "astronomy-engine";
+import { resolveBirthplace } from "./birthplace";
 
 export const cosmicPlanetSpecs = [
   { id: "mercury", name: "水星", body: A.Body.Mercury, relativeVolume: 0.056, displayRadius: 9 },
@@ -30,6 +31,14 @@ export type CosmicGenesis = {
   moonSign: number;
   animal: number;
   seed: number;
+};
+
+export type EarthView = {
+  latitude: number;
+  longitude: number;
+  siderealRotation: number;
+  solarHourAngle: number;
+  approximatePlace: boolean;
 };
 
 const signIndex = (longitude: number) => Math.floor((((longitude % 360) + 360) % 360) / 30);
@@ -66,4 +75,18 @@ export function cosmicGenesis(date: string, time: string, unknown: boolean): Cos
   const animal = ((birth.year - 4) % 12 + 12) % 12;
   const seed = planets.reduce((total, planet, index) => total + Math.round(planet.longitude * (index + 3) * 10), birth.year * 37 + animal * 101);
   return { instant: birth.instant.toISOString(), approximate: birth.approximate, planets, sunSign, moonSign, animal, seed };
+}
+
+const wrapDegrees = (value: number) => ((value % 360) + 360) % 360;
+
+/** Keeps the saved birthplace visible while deriving rotation and the day/night face from the birth instant. */
+export function earthViewAtBirth(genesis: CosmicGenesis, birthPlace: string, birthCity = ""): EarthView {
+  const resolved = resolveBirthplace(birthPlace, birthCity);
+  const latitude = resolved?.lat ?? 35.6762;
+  const longitude = resolved?.lon ?? 139.6503;
+  const instant = new Date(genesis.instant);
+  const siderealRotation = wrapDegrees(A.SiderealTime(instant) * 15);
+  const sun = A.Equator(A.Body.Sun, instant, new A.Observer(latitude, longitude, 0), true, true);
+  const solarHourAngle = wrapDegrees((A.SiderealTime(instant) + longitude / 15 - sun.ra) * 15 + 180) - 180;
+  return { latitude, longitude, siderealRotation, solarHourAngle, approximatePlace: !resolved };
 }
