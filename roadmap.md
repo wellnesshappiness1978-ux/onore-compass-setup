@@ -262,6 +262,6 @@
 - [x] Verify deterministic live/2048 output, all five plan gates, responsive/fullscreen presentation, exports, tests, and diagnostics.
 
 ## Cosmic Genesis fantasy-real master art
-- [ ] Recompose the scene as a diagonal celestial painting with monumental sun/moon constellations and one of twelve golden zodiac guardians.
-- [ ] Give all eight planets distinct realistic surfaces, gemstone Earth, painterly light, and vivid deterministic birth-color reflections.
-- [ ] Verify every guardian, live/fullscreen/mobile presentation, 2048px export, entitlement split, deterministic geometry, and clean diagnostics.
+- [x] Recompose the scene as a diagonal celestial painting with monumental sun/moon constellations and one of twelve golden zodiac guardians.
+- [x] Give all eight planets distinct realistic surfaces, gemstone Earth, painterly light, and vivid deterministic birth-color reflections.
+- [x] Verify every guardian, live/fullscreen/mobile presentation, 2048px export, entitlement split, deterministic geometry, and clean diagnostics.
