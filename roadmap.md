@@ -255,3 +255,8 @@
 ## VIP Natal Cosmic Genesis
 - [x] Replace the existing cosmic artwork with a square heliocentric eight-planet composition, gemstone Earth, zodiac and East Asian zodiac gold filigree, restrained seven-color accents, full-screen viewing, and matching 2048px export.
 - [x] Verify astronomical calculations, plan gating, desktop/mobile rendering, download/share output, and clean diagnostics.
+
+## Cosmic Genesis oil-paint masterwork
+- [ ] Separate Standard+ mandala access from VIP+ Cosmic Genesis access across viewing, fullscreen, save, and share.
+- [ ] Remove solar guide spokes, double every planet radius, and rebuild Cosmic Genesis with vivid seven-color nebulae, impasto planets, gemstone Earth, and dimensional gold filigree.
+- [ ] Verify deterministic live/2048 output, all five plan gates, responsive/fullscreen presentation, exports, tests, and diagnostics.

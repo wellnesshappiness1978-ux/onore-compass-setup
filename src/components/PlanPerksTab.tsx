@@ -57,6 +57,7 @@ export default function PlanPerksTab({ profile, language, plan, actualPlan, sign
           {card.features.map((f) => <li key={f} className="flex items-start gap-2 text-sm leading-6 text-foreground"><Check className="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />{f}</li>)}
         </ul>
         <div className="mt-5 flex flex-wrap gap-2">
+          {active === "standard" && <Button variant="outline" onClick={() => go("art")}>{t.mandala}</Button>}
           {active === "vip" && <><Button variant="outline" onClick={() => go("art")}>{t.mandala}</Button><Button variant="outline" onClick={() => go("consult")}>{t.voice}</Button></>}
           {(active === "b2b" || active === "b2b-premium") && <Button variant="outline" onClick={() => document.getElementById("team-studio-entry")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.team}</Button>}
           {!unlocked && <Button variant="champagne" onClick={upgrade}>{t.plans}</Button>}
