@@ -24,11 +24,13 @@ export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPl
     const orbit = ORBIT_DEPTH[planet.id];
     const angle = (planet.longitude - earthLongitude + 90) * Math.PI / 180;
     const radius = planet.displayRadius * COSMIC_PLANET_SCALE * orbit[2] * size / 1024;
+    const rawX = size * (.5 + Math.cos(angle) * orbit[0]);
+    const edgeExtent = radius * (planet.id === "saturn" ? 1.8 : 1.15);
     return {
       ...planet,
       radius,
       orbitRadius: orbit[0] * size,
-      x: size * (.5 + Math.cos(angle) * orbit[0]),
+      x: Math.min(size - edgeExtent, Math.max(edgeExtent, rawX)),
       y: size * (.475 + Math.sin(angle) * orbit[1]),
     };
   });

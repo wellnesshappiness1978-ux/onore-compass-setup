@@ -56,23 +56,36 @@ function glow(ctx: CanvasRenderingContext2D, x: number, y: number, radius: numbe
 
 function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
   const roles = [
-    { color: colors[0] ?? GOLD, alpha: .44, width: .085, y: .57, bend: -.2 },
-    { color: colors[5] ?? GOLD, alpha: .35, width: .063, y: .72, bend: .16 },
-    { color: colors[4] ?? GOLD, alpha: .29, width: .052, y: .31, bend: -.13 },
-    { color: colors[3] ?? GOLD, alpha: .23, width: .04, y: .2, bend: .2 },
-    { color: colors[2] ?? GOLD, alpha: .18, width: .032, y: .82, bend: -.11 },
+    { color: colors[0] ?? GOLD, alpha: .46, y: .56, bend: -.2, clouds: 15 },
+    { color: colors[5] ?? GOLD, alpha: .37, y: .7, bend: .16, clouds: 13 },
+    { color: colors[4] ?? GOLD, alpha: .3, y: .31, bend: -.13, clouds: 11 },
+    { color: colors[3] ?? GOLD, alpha: .24, y: .2, bend: .2, clouds: 9 },
+    { color: colors[2] ?? GOLD, alpha: .19, y: .82, bend: -.11, clouds: 8 },
   ];
   ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round";
   roles.forEach((role, index) => {
     const offset = (unit(seed + index * 91) - .5) * size * .09;
-    for (let layer = 0; layer < 7; layer++) {
+    for (let cloud = 0; cloud < role.clouds; cloud++) {
+      const salt = seed + index * 977 + cloud * 71;
+      const progress = (cloud + .35 + unit(salt) * .3) / role.clouds;
+      const x = progress * size;
+      const wave = Math.sin(progress * Math.PI * 2 + role.bend * 7) * size * .1;
+      const y = size * role.y + offset + wave + (unit(salt + 3) - .5) * size * .08;
+      const radius = size * (.07 + unit(salt + 7) * .08) * (1 - index * .045);
+      const haze = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      haze.addColorStop(0, `${role.color}34`); haze.addColorStop(.28, `${role.color}22`); haze.addColorStop(.7, `${role.color}0c`); haze.addColorStop(1, `${role.color}00`);
+      ctx.save(); ctx.translate(x, y); ctx.rotate(-.42 + role.bend); ctx.scale(1.75, .5);
+      ctx.globalAlpha = role.alpha; ctx.fillStyle = haze; ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    }
+    for (let filament = 0; filament < 3; filament++) {
       ctx.beginPath();
-      ctx.moveTo(-size * .08, size * role.y + offset + layer * size * .006);
+      const fineOffset = (filament - 1) * size * .01;
+      ctx.moveTo(-size * .08, size * role.y + offset + fineOffset);
       ctx.bezierCurveTo(size * .22, size * (role.y + role.bend), size * .7, size * (role.y - role.bend), size * 1.08, size * (role.y + .02));
       ctx.strokeStyle = role.color;
-      ctx.globalAlpha = role.alpha * (.08 + layer * .018);
-      ctx.lineWidth = size * role.width * (1 - layer * .1);
-      ctx.shadowColor = role.color; ctx.shadowBlur = size * (.025 + layer * .006); ctx.stroke();
+      ctx.globalAlpha = role.alpha * (.16 - filament * .025);
+      ctx.lineWidth = size * (.0012 + filament * .0008);
+      ctx.shadowColor = role.color; ctx.shadowBlur = size * (.014 + filament * .008); ctx.stroke();
     }
     for (let particle = 0; particle < 42 - index * 5; particle++) {
       const salt = seed + index * 991 + particle * 37;
@@ -165,15 +178,15 @@ function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | nul
   ctx.save(); ctx.beginPath(); ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); ctx.clip();
   ctx.fillStyle = "#062b58"; ctx.fillRect(point.x - radius, point.y - radius, radius * 2, radius * 2);
   if (image) {
-    const centerLongitude = ((view.longitude + view.siderealRotation * .08) % 360 + 360) % 360;
+    const centerLongitude = ((view.longitude % 360) + 360) % 360;
     for (let dx = -Math.ceil(radius); dx <= Math.ceil(radius); dx++) {
       const nx = dx / radius; if (Math.abs(nx) >= 1) continue;
       const halfHeight = Math.sqrt(1 - nx * nx) * radius;
       const longitude = centerLongitude + Math.asin(nx) * 180 / Math.PI;
       const sourceX = (((longitude + 180) % 360 + 360) % 360) / 360 * image.width;
-      const sourceWidth = Math.max(1, image.width / (radius * 3));
+      const sourceWidth = Math.max(2, image.width / (radius * 2.55));
       const tilt = Math.sin(view.latitude * Math.PI / 180) * image.height * .12;
-      ctx.drawImage(image, sourceX, Math.max(0, tilt), sourceWidth, image.height - Math.abs(tilt), point.x + dx, point.y - halfHeight, 1.35, halfHeight * 2);
+      ctx.drawImage(image, sourceX, Math.max(0, tilt), sourceWidth, image.height - Math.abs(tilt), point.x + dx - .35, point.y - halfHeight, 1.8, halfHeight * 2);
     }
   }
   const dayAtBirth = Math.max(0, Math.cos(view.solarHourAngle * Math.PI / 180));
@@ -201,7 +214,7 @@ function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | un
   const auraColor: Record<CosmicPlanetId, string> = { mercury: "#c7b48d", venus: "#e6b65f", earth: "#65dff2", mars: "#c45a34", jupiter: "#d7b185", saturn: "#d8bf83", uranus: "#8edfe5", neptune: "#3e75e8" };
   const aura = auraColor[id]; glow(ctx, point.x, point.y, radius * 1.52, aura, .18);
   ctx.save(); ctx.shadowColor = aura; ctx.shadowBlur = size * .009;
-  if (id === "saturn") ctx.drawImage(image, point.x - radius * 2, point.y - radius * 2, radius * 4, radius * 4);
+  if (id === "saturn") ctx.drawImage(image, point.x - radius * 1.8, point.y - radius * 1.8, radius * 3.6, radius * 3.6);
   else ctx.drawImage(image, point.x - radius, point.y - radius, radius * 2, radius * 2);
   ctx.restore();
 }
