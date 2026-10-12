@@ -1,6 +1,6 @@
 import type { CosmicGenesis, CosmicPlanet } from "./cosmic-astronomy";
 
-export const COSMIC_PLANET_SCALE = 0.00205;
+export const COSMIC_PLANET_SCALE = 0.0015;
 
 export type CosmicScreenPoint = { x: number; y: number; depth: number };
 export type CosmicPlacement = CosmicPlanet & { x: number; y: number; radius: number; ringOuterRadius: number; orbitRadius: number; displayAngle: number; depth: number; orbitPath: CosmicScreenPoint[] };

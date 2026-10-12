@@ -27,7 +27,12 @@ describe("Cosmic Genesis artwork layout", () => {
     const radii = Object.fromEntries(placements.map((planet) => [planet.id, planet.radius]));
     expect(radii.jupiter / radii.earth).toBeCloseTo(69911 / 6371, 8);
     expect(radii.earth / radii.mercury).toBeCloseTo(6371 / 2439.7, 8);
-    placements.forEach((planet) => expect(Math.hypot(planet.x - planet.orbitPath[0]!.x, planet.y - planet.orbitPath[0]!.y)).toBeLessThan(.001));
+    placements.forEach((planet) => {
+      const firstPoint = planet.orbitPath[0];
+      expect(firstPoint).toBeDefined();
+      if (!firstPoint) return;
+      expect(Math.hypot(planet.x - firstPoint.x, planet.y - firstPoint.y)).toBeLessThan(.001);
+    });
     const sun = cosmicSunPlacement(genesis, 1024);
     expect(sun.x).toBeCloseTo(440.32, 2);
     expect(sun.y).toBeCloseTo(378.88, 2);
