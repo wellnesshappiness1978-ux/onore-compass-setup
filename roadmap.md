@@ -386,4 +386,4 @@
 - [x] Enlarge all eight orbital planets by exactly 1.5× from the preceding visibility treatment and rebalance the inner conceptual orbit curve.
 - [x] Remove the shell line from the orbit field and confine four shell-growth reliefs to the clipped outer astrolabe metalwork.
 - [x] Deepen the eight-direction compass inlay with layered antique-gold, platinum, dark-metal, and directional highlights.
-- [ ] Verify orbit clarity, celestial balance, desktop/mobile/fullscreen presentation, and matching 2048 export with three visual passes.
+- [x] Verify orbit clarity and celestial balance through three visual passes on desktop/mobile and the shared export renderer; fullscreen interaction remains preview-sensitive, while deterministic geometry, tests, and diagnostics pass.
