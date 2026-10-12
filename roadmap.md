@@ -366,6 +366,6 @@
 - [ ] Verify desktop/mobile/fullscreen presentation and the 2048 export (blocked by the preview remaining on profile loading); safe geometry, VIP gating, tests, and diagnostics pass.
 
 ## Cosmic Genesis final artistic finish
-- [ ] Unify the goldwork, Sun, planets, birth-Earth, nebulae, and scientific plaques into one refined visual hierarchy.
-- [ ] Suppress orbit light beneath bodies and refine Saturn, exact birth-color depth, and long-label readability without changing astronomy.
-- [ ] Complete two visual refinement passes and verify desktop, mobile, fullscreen, and the 2048 export.
+- [x] Unify the goldwork, Sun, planets, birth-Earth, nebulae, and scientific plaques into one refined visual hierarchy.
+- [x] Suppress orbit light beneath bodies and refine Saturn, exact birth-color depth, and long-label readability without changing astronomy.
+- [ ] Complete desktop, mobile, fullscreen, and 2048 export verification (preview profile restoration is intermittent; tests and diagnostics pass).
