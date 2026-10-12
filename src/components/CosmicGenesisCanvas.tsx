@@ -197,8 +197,8 @@ function paintShellSpiral(ctx: CanvasRenderingContext2D, size: number, genesis: 
     ctx.beginPath();
     points.forEach((point, index) => index ? ctx.lineTo(point.x, point.y) : ctx.moveTo(point.x, point.y));
     ctx.strokeStyle = pass === 1 ? overall : pass === 3 ? PLATINUM : GOLD;
-    ctx.globalAlpha = [.035, .055, .2, .32][pass] ?? .1;
-    ctx.lineWidth = size * ([.009, .0044, .00135, .00042][pass] ?? .00042);
+    ctx.globalAlpha = [.045, .075, .26, .42][pass] ?? .1;
+    ctx.lineWidth = size * ([.008, .0038, .0013, .00048][pass] ?? .00048);
     ctx.shadowColor = pass === 1 ? overall : GOLD; ctx.shadowBlur = size * ([.018, .012, .005, .002][pass] ?? 0); ctx.stroke();
   }
   for (let rib = 12; rib < points.length - 4; rib += 12) {
@@ -224,13 +224,13 @@ function paintCompassInlay(ctx: CanvasRenderingContext2D, size: number) {
   for (let direction = 0; direction < 8; direction++) {
     const angle = direction * Math.PI / 4 - Math.PI / 2;
     const cardinal = direction % 2 === 0;
-    const inner = size * .072, outer = size * (cardinal ? .428 : .418);
-    const wing = cardinal ? .012 : .007;
+    const inner = size * .115, outer = size * (cardinal ? .426 : .416);
+    const wing = cardinal ? .0046 : .0028;
     ctx.save(); ctx.rotate(angle);
     const gradient = ctx.createLinearGradient(inner, 0, outer, 0);
-    gradient.addColorStop(0, "rgba(238,219,154,0)"); gradient.addColorStop(.48, cardinal ? "rgba(238,219,154,.09)" : "rgba(232,242,239,.045)"); gradient.addColorStop(1, "rgba(238,219,154,.28)");
+    gradient.addColorStop(0, "rgba(238,219,154,0)"); gradient.addColorStop(.64, cardinal ? "rgba(238,219,154,.035)" : "rgba(232,242,239,.018)"); gradient.addColorStop(1, "rgba(238,219,154,.16)");
     ctx.fillStyle = gradient; ctx.beginPath(); ctx.moveTo(inner, 0); ctx.lineTo(outer - size * .012, -size * wing); ctx.lineTo(outer, 0); ctx.lineTo(outer - size * .012, size * wing); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = cardinal ? "rgba(246,224,157,.22)" : "rgba(232,242,239,.1)"; ctx.lineWidth = Math.max(.5, size * .00036);
+    ctx.strokeStyle = cardinal ? "rgba(246,224,157,.11)" : "rgba(232,242,239,.05)"; ctx.lineWidth = Math.max(.5, size * .00028);
     ctx.beginPath(); ctx.moveTo(inner, 0); ctx.lineTo(outer, 0); ctx.stroke(); ctx.restore();
   }
   ctx.restore();
