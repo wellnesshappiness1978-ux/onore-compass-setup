@@ -11,7 +11,6 @@ export type CosmicComposition = { centerX: number; centerY: number; rotation: nu
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
-const VIEW_TILT = 32;
 const DISTANCE_CURVE = 1.8;
 const SCREEN_ROTATION = 0;
 const degrees = (value: number) => ((value % 360) + 360) % 360;
@@ -20,68 +19,55 @@ function compressedDistance(distanceAu: number) {
   return Math.log1p(distanceAu * DISTANCE_CURVE) / Math.log1p(30.4 * DISTANCE_CURVE);
 }
 
-function projectedUnit(vector: { x: number; y: number; z: number }, rotation: number) {
-  const rotationRadians = rotation * Math.PI / 180;
-  const tilt = VIEW_TILT * Math.PI / 180;
-  const distance = Math.hypot(vector.x, vector.y, vector.z) || 1;
-  const radial = compressedDistance(distance);
-  const normalizedX = vector.x / distance, normalizedY = vector.y / distance, normalizedZ = vector.z / distance;
-  const rotatedX = normalizedX * Math.cos(rotationRadians) - normalizedY * Math.sin(rotationRadians);
-  const rotatedY = normalizedX * Math.sin(rotationRadians) + normalizedY * Math.cos(rotationRadians);
-  const projectedY = rotatedY * Math.cos(tilt) - normalizedZ * Math.sin(tilt);
-  const depth = rotatedY * Math.sin(tilt) + normalizedZ * Math.cos(tilt);
-  return { x: rotatedX * radial, y: projectedY * radial, depth };
-}
-
-/** Keeps the Sun at the absolute artwork center and fits every sampled real orbit with one shared scale. */
+/** Keeps the Sun at the center and maps Neptune's distance to one shared conceptual-diagram radius. */
 export function cosmicComposition(genesis: CosmicGenesis, size: number): CosmicComposition {
   const rotation = SCREEN_ROTATION;
   const centerX = size * .5, centerY = size * .5;
-  const bounds = { left: size * .055, right: size * .945, top: size * .055, bottom: size * .945 };
-  const points = genesis.planets.flatMap((planet) => [
-    { x: planet.eclipticX, y: planet.eclipticY, z: planet.eclipticZ },
-    ...planet.orbit,
-  ]).map((point) => projectedUnit(point, rotation));
-  const positiveX = Math.max(.001, ...points.map((point) => point.x));
-  const negativeX = Math.max(.001, ...points.map((point) => -point.x));
-  const positiveY = Math.max(.001, ...points.map((point) => point.y));
-  const negativeY = Math.max(.001, ...points.map((point) => -point.y));
-  const scale = Math.min(
-    (bounds.right - centerX) / positiveX,
-    (centerX - bounds.left) / negativeX,
-    (bounds.bottom - centerY) / positiveY,
-    (centerY - bounds.top) / negativeY,
-  );
+  const scale = size * .41;
   const earth = genesis.planets.find((planet) => planet.id === "earth");
-  const projectedEarth = earth ? projectedUnit({ x: earth.eclipticX, y: earth.eclipticY, z: earth.eclipticZ }, rotation) : { x: 1, y: 0 };
-  const targetAngle = Math.atan2(projectedEarth.y, projectedEarth.x) * 180 / Math.PI;
+  const targetAngle = degrees((earth?.longitude ?? 0) + rotation);
   return { centerX, centerY, rotation, scale, targetAngle };
 }
 
 export function projectCosmicVector(vector: { x: number; y: number; z: number }, size: number, composition?: CosmicComposition): CosmicScreenPoint {
   const frame = composition ?? { centerX: size * .5, centerY: size * .5, rotation: SCREEN_ROTATION, scale: size * .42, targetAngle: 0 };
-  const point = projectedUnit(vector, frame.rotation);
-  return { x: frame.centerX + point.x * frame.scale, y: frame.centerY + point.y * frame.scale, depth: point.depth };
+  const distance = Math.hypot(vector.x, vector.y, vector.z) || 1;
+  const angle = Math.atan2(vector.y, vector.x) + frame.rotation * Math.PI / 180;
+  const radius = compressedDistance(distance) * frame.scale;
+  return { x: frame.centerX + Math.cos(angle) * radius, y: frame.centerY + Math.sin(angle) * radius, depth: Math.sin(angle) };
 }
 
-/** Preserves birth-instant heliocentric angles in a readable, distance-compressed solar-system overview. */
+/** Places each planet on a circular conceptual orbit at its birth-instant longitude and distance. */
 export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPlacement[] {
   const composition = cosmicComposition(genesis, size);
   return genesis.planets.map((planet) => {
     const displayAngle = degrees(planet.longitude + composition.rotation);
-    const point = projectCosmicVector({ x: planet.eclipticX, y: planet.eclipticY, z: planet.eclipticZ }, size, composition);
+    const angle = displayAngle * Math.PI / 180;
+    const orbitRadius = compressedDistance(planet.distanceAu) * composition.scale;
+    const point = {
+      x: composition.centerX + Math.cos(angle) * orbitRadius,
+      y: composition.centerY + Math.sin(angle) * orbitRadius,
+      depth: Math.sin(angle),
+    };
     const radius = planet.meanRadiusKm * COSMIC_PLANET_SCALE * size / 1024;
     const ringOuterRadius = (planet.ringOuterRadiusKm ?? planet.meanRadiusKm) * COSMIC_PLANET_SCALE * size / 1024;
     return {
       ...planet,
       radius,
       ringOuterRadius,
-      orbitRadius: compressedDistance(planet.distanceAu) * composition.scale,
+      orbitRadius,
       x: point.x,
       y: point.y,
       displayAngle,
       depth: point.depth,
-      orbitPath: planet.orbit.map((sample) => projectCosmicVector(sample, size, composition)),
+      orbitPath: Array.from({ length: 128 }, (_, index) => {
+        const orbitAngle = index / 128 * Math.PI * 2;
+        return {
+          x: composition.centerX + Math.cos(orbitAngle) * orbitRadius,
+          y: composition.centerY + Math.sin(orbitAngle) * orbitRadius,
+          depth: Math.sin(orbitAngle),
+        };
+      }),
     };
   });
 }
@@ -99,7 +85,7 @@ export function cosmicSunPlacement(_genesis: CosmicGenesis, size: number): Cosmi
 
 /** Enlarges the same orbital Earth into a birthplace-facing foreground portrait. */
 export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
-  return { x: size * .79, y: size * .79, radius: size * .145 };
+  return { x: size * .835, y: size * .835, radius: size * .098 };
 }
 
 export function cosmicColorRoles(colors: string[]) {
