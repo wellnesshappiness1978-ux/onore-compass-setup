@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicShellSpiral, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
+import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, COSMIC_PLANET_DISPLAY_MULTIPLIER, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a readable conceptual Solar System while preserving birth longitudes", () => {
@@ -137,16 +137,14 @@ describe("Cosmic Genesis artwork layout", () => {
     }
   });
 
-  it("grows one shell spiral from the inner axis without crossing the astrolabe", () => {
-    const spiral = cosmicShellSpiral(1024, 30);
-    const frame = cosmicAstrolabeFrame(1024);
-    expect(spiral).toHaveLength(241);
-    expect(spiral[0]?.radius).toBeCloseTo(1024 * .052, 8);
-    expect(spiral.at(-1)?.radius).toBeCloseTo(1024 * .405, 8);
-    for (let index = 1; index < spiral.length; index++) {
-      expect(spiral[index]?.radius ?? 0).toBeGreaterThan(spiral[index - 1]?.radius ?? 0);
-    }
-    expect(spiral.at(-1)?.radius ?? 0).toBeLessThan(frame.innerRadius);
+  it("enlarges only the eight orbital planets by exactly 1.5 from the previous treatment", () => {
+    const genesis = cosmicGenesis("1990-04-15", "08:30", false);
+    if (!genesis) return;
+    expect(COSMIC_PLANET_DISPLAY_MULTIPLIER).toBeCloseTo(1.11 * 1.5, 10);
+    cosmicPlacements(genesis, 1024).forEach((planet) => {
+      expect(planet.radius).toBeCloseTo(cosmicDisplayRadius(planet.meanRadiusKm, 1024) * 1.11 * 1.5, 8);
+    });
+    expect(cosmicSunPlacement(genesis, 1024).radius).toBeCloseTo(cosmicDisplayRadius(COSMIC_BODY_RADII_KM.sun, 1024), 8);
   });
 
   it("keeps the engraved astrolabe outside every orbit and inside the square artwork", () => {
