@@ -44,7 +44,8 @@ describe("Cosmic Genesis artwork layout", () => {
   });
 
   it("keeps one shared birth-Earth composition transform across dates", () => {
-    for (const [date, time] of [["1965-06-08", "04:10"], ["2001-01-01", "12:00"], ["2026-10-12", "13:10"]]) {
+    const births: Array<[string, string]> = [["1965-06-08", "04:10"], ["2001-01-01", "12:00"], ["2026-10-12", "13:10"]];
+    for (const [date, time] of births) {
       const genesis = cosmicGenesis(date, time, false);
       if (!genesis) continue;
       const placements = cosmicPlacements(genesis, 1024);
