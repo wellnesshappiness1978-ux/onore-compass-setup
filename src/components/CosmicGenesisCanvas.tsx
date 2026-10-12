@@ -358,6 +358,40 @@ function paintSun(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null,
   ctx.restore();
 }
 
+function paintPlanetIdentity(ctx: CanvasRenderingContext2D, point: Point, radius: number, id: CosmicPlanetId, sunPoint: Point, size: number, seed: number) {
+  if (id === "saturn") return;
+  const lightAngle = Math.atan2(sunPoint.y - point.y, sunPoint.x - point.x);
+  ctx.save(); ctx.beginPath(); ctx.arc(point.x, point.y, radius * .985, 0, Math.PI * 2); ctx.clip();
+  ctx.globalCompositeOperation = "screen";
+  if (id === "mercury") {
+    for (let crater = 0; crater < 13; crater++) {
+      const salt = seed + crater * 37, angle = unit(salt) * Math.PI * 2, distance = Math.sqrt(unit(salt + 3)) * radius * .72;
+      ctx.strokeStyle = crater % 3 ? "rgba(235,220,184,.18)" : "rgba(32,26,24,.3)"; ctx.lineWidth = Math.max(.5, size * .00028);
+      ctx.beginPath(); ctx.ellipse(point.x + Math.cos(angle) * distance, point.y + Math.sin(angle) * distance, radius * (.025 + unit(salt + 7) * .065), radius * (.012 + unit(salt + 9) * .03), angle, 0, Math.PI * 2); ctx.stroke();
+    }
+  } else if (id === "venus") {
+    ctx.strokeStyle = "rgba(255,239,191,.22)"; ctx.lineWidth = radius * .07;
+    for (let cloud = 0; cloud < 5; cloud++) { ctx.beginPath(); ctx.arc(point.x - radius * .2, point.y + (cloud - 2) * radius * .22, radius * (.52 + cloud * .05), -.2, 2.9); ctx.stroke(); }
+  } else if (id === "mars") {
+    ctx.fillStyle = "rgba(82,28,18,.28)"; ctx.beginPath(); ctx.ellipse(point.x - radius * .18, point.y + radius * .16, radius * .34, radius * .16, -.45, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "rgba(245,221,184,.36)"; ctx.beginPath(); ctx.ellipse(point.x, point.y - radius * .8, radius * .34, radius * .12, 0, 0, Math.PI * 2); ctx.fill();
+  } else if (id === "jupiter") {
+    for (let band = -4; band <= 4; band++) { ctx.strokeStyle = band % 2 ? "rgba(255,238,203,.2)" : "rgba(125,66,42,.24)"; ctx.lineWidth = radius * .075; ctx.beginPath(); ctx.ellipse(point.x, point.y + band * radius * .16, radius * .96, radius * .2, 0, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.fillStyle = "rgba(176,67,44,.62)"; ctx.beginPath(); ctx.ellipse(point.x + radius * .36, point.y + radius * .28, radius * .18, radius * .095, -.1, 0, Math.PI * 2); ctx.fill();
+  } else if (id === "uranus") {
+    ctx.strokeStyle = "rgba(220,255,252,.34)"; ctx.lineWidth = Math.max(1, size * .00042); ctx.beginPath(); ctx.ellipse(point.x, point.y, radius * 1.42, radius * .34, 1.42, 0, Math.PI * 2); ctx.stroke();
+  } else if (id === "neptune") {
+    ctx.strokeStyle = "rgba(141,199,255,.24)"; ctx.lineWidth = radius * .055;
+    for (let band = -2; band <= 2; band++) { ctx.beginPath(); ctx.moveTo(point.x - radius * .75, point.y + band * radius * .23); ctx.quadraticCurveTo(point.x, point.y + band * radius * .23 - radius * .08, point.x + radius * .75, point.y + band * radius * .23); ctx.stroke(); }
+    ctx.fillStyle = "rgba(16,39,105,.46)"; ctx.beginPath(); ctx.ellipse(point.x + radius * .24, point.y + radius * .18, radius * .16, radius * .08, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  const lightX = point.x + Math.cos(lightAngle) * radius * .68, lightY = point.y + Math.sin(lightAngle) * radius * .68;
+  const illumination = ctx.createRadialGradient(lightX, lightY, radius * .05, point.x, point.y, radius * 1.25);
+  illumination.addColorStop(0, "rgba(255,246,218,.2)"); illumination.addColorStop(.48, "rgba(255,246,218,.035)"); illumination.addColorStop(.72, "rgba(0,2,11,.16)"); illumination.addColorStop(1, "rgba(0,1,8,.72)");
+  ctx.globalCompositeOperation = "source-over"; ctx.fillStyle = illumination; ctx.fillRect(point.x - radius, point.y - radius, radius * 2, radius * 2);
+  ctx.restore();
+}
+
 function paintOrbitalField(ctx: CanvasRenderingContext2D, size: number, solar: Point, placements: ReturnType<typeof cosmicPlacements>) {
   ctx.save(); ctx.globalCompositeOperation = "screen";
   placements.forEach((planet, orbitIndex) => {
@@ -428,6 +462,9 @@ function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genes
   const instant = genesis.instant.replace("T", " ").slice(0, 16) + " UTC";
   const copy = SCIENCE_COPY[language];
   ctx.save(); ctx.font = `${Math.max(8, size * .0074)}px ui-sans-serif, sans-serif`; ctx.textBaseline = "middle"; ctx.letterSpacing = "0px";
+  const leftBand = ctx.createLinearGradient(0, 0, size * .27, 0); leftBand.addColorStop(0, "rgba(1,3,10,.78)"); leftBand.addColorStop(1, "rgba(1,3,10,0)");
+  const rightBand = ctx.createLinearGradient(size, 0, size * .73, 0); rightBand.addColorStop(0, "rgba(1,3,10,.78)"); rightBand.addColorStop(1, "rgba(1,3,10,0)");
+  ctx.fillStyle = leftBand; ctx.fillRect(0, size * .11, size * .27, size * .62); ctx.fillStyle = rightBand; ctx.fillRect(size * .73, size * .11, size * .27, size * .62);
   const left = placements.filter((planet) => planet.x < size * .5).sort((a, b) => a.y - b.y);
   const right = placements.filter((planet) => planet.x >= size * .5).sort((a, b) => a.y - b.y);
   [...left.map((planet) => ({ planet, side: -1 as const })), ...right.map((planet) => ({ planet, side: 1 as const }))].forEach(({ planet, side }) => {
@@ -450,13 +487,13 @@ function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genes
       ctx.font = `${Math.max(7, fontSize)}px ui-sans-serif, sans-serif`;
     }
     const measured = Math.min(maxLabelWidth, ctx.measureText(label).width + size * .012);
-    paintMetalPlaque(ctx, side < 0 ? labelX - size * .005 : labelX - measured + size * .005, labelY - size * .008, measured, size * .016);
     ctx.strokeStyle = planet.id === "earth" ? "rgba(238,219,154,.42)" : "rgba(226,235,236,.2)";
     ctx.lineWidth = Math.max(1, size * .00042); ctx.beginPath(); ctx.moveTo(edge, planet.y); ctx.lineTo(edge + outward * size * .012, planet.y); ctx.lineTo(labelX - outward * size * .008, labelY); ctx.stroke();
     ctx.fillStyle = planet.id === "earth" ? "rgba(244,224,157,.92)" : "rgba(226,235,236,.68)";
     ctx.fillText(label, labelX, labelY);
   });
-  paintMetalPlaque(ctx, size * .014, size * .013, size * .7, size * .046);
+  const headingBand = ctx.createLinearGradient(0, 0, size * .72, 0); headingBand.addColorStop(0, "rgba(1,3,10,.88)"); headingBand.addColorStop(.72, "rgba(1,3,10,.38)"); headingBand.addColorStop(1, "rgba(1,3,10,0)");
+  ctx.fillStyle = headingBand; ctx.fillRect(0, size * .008, size * .74, size * .055);
   ctx.textAlign = "left"; ctx.fillStyle = "rgba(255,235,172,.94)"; ctx.font = `${Math.max(10, size * .0105)}px ui-sans-serif, sans-serif`;
   ctx.fillText(copy.placement, size * .02, size * .028);
   ctx.fillStyle = "rgba(226,235,236,.62)"; ctx.font = `${Math.max(9, size * .0088)}px ui-sans-serif, sans-serif`;
@@ -621,7 +658,7 @@ function paintOrbitalEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElemen
   ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * .98, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
 }
 
-function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined, point: Point, radius: number, ringOuterRadius: number, id: CosmicPlanetId, size: number, seed: number, depth: number) {
+function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined, point: Point, radius: number, ringOuterRadius: number, id: CosmicPlanetId, sunPoint: Point, size: number, seed: number, depth: number) {
   if (!image) return;
   const auraColor: Record<CosmicPlanetId, string> = { mercury: "#c7b48d", venus: "#e6b65f", earth: "#65dff2", mars: "#c45a34", jupiter: "#d7b185", saturn: "#d8bf83", uranus: "#8edfe5", neptune: "#3e75e8" };
   irregularGlow(ctx, point.x, point.y, radius * 2.35, auraColor[id], .36 + depth * .14, seed);
@@ -632,6 +669,7 @@ function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | un
   }
   if (id === "saturn") ctx.drawImage(image, point.x - ringOuterRadius, point.y - ringOuterRadius, ringOuterRadius * 2, ringOuterRadius * 2);
   else ctx.drawImage(image, point.x - radius, point.y - radius, radius * 2, radius * 2);
+  paintPlanetIdentity(ctx, point, radius, id, sunPoint, size, seed);
   if (id === "saturn") {
     ctx.strokeStyle = "rgba(248,226,161,.5)"; ctx.lineWidth = Math.max(1, size * .0011);
     ctx.beginPath(); ctx.ellipse(point.x, point.y, ringOuterRadius * .94, ringOuterRadius * .31, -.16, 0, Math.PI); ctx.stroke();
@@ -663,7 +701,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   paintDeepSpace(ctx, size, assets?.field ?? null, genesis.seed);
   paintMilkyWay(ctx, size, roles.all, genesis.seed + 6400);
   paintNebulae(ctx, size, roles.all, genesis.seed + 1200);
-  paintSpiralNebula(ctx, size, roles.prominence, genesis.seed + 4400);
+  paintStarLifeVeils(ctx, size, roles.prominence, genesis.seed + 4400, cosmicPlacements(genesis, size).find((planet) => planet.id === "earth")?.displayAngle ?? 0);
   paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius }))]);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
   paintConstellation(ctx, size, genesis.moonSign, 1, genesis.seed + 900, .52);
@@ -674,13 +712,13 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   paintOrbitalField(ctx, size, solar, placements);
   paintOrbitSilence(ctx, size, placements);
   const surrounding = placements.slice().sort((a, b) => a.depth - b.depth);
-  surrounding.filter((planet) => planet.depth < 0).forEach((planet) => planet.id === "earth" ? paintOrbitalEarth(ctx, assets?.earthMap ?? null, planet, planet.radius, earthView, solar, size, genesis.seed + planet.orbitIndex * 73) : paintPlanet(ctx, assets?.planets[planet.id], planet, planet.radius, planet.ringOuterRadius, planet.id, size, genesis.seed + planet.orbitIndex * 73, (planet.depth + 1) / 2));
+  surrounding.filter((planet) => planet.depth < 0).forEach((planet) => planet.id === "earth" ? paintOrbitalEarth(ctx, assets?.earthMap ?? null, planet, planet.radius, earthView, solar, size, genesis.seed + planet.orbitIndex * 73) : paintPlanet(ctx, assets?.planets[planet.id], planet, planet.radius, planet.ringOuterRadius, planet.id, solar, size, genesis.seed + planet.orbitIndex * 73, (planet.depth + 1) / 2));
   paintSun(ctx, assets?.sun ?? null, solar, solar.radius, size, genesis.seed + 8200);
-  surrounding.filter((planet) => planet.depth >= 0).forEach((planet) => planet.id === "earth" ? paintOrbitalEarth(ctx, assets?.earthMap ?? null, planet, planet.radius, earthView, solar, size, genesis.seed + planet.orbitIndex * 73) : paintPlanet(ctx, assets?.planets[planet.id], planet, planet.radius, planet.ringOuterRadius, planet.id, size, genesis.seed + planet.orbitIndex * 73, (planet.depth + 1) / 2));
+  surrounding.filter((planet) => planet.depth >= 0).forEach((planet) => planet.id === "earth" ? paintOrbitalEarth(ctx, assets?.earthMap ?? null, planet, planet.radius, earthView, solar, size, genesis.seed + planet.orbitIndex * 73) : paintPlanet(ctx, assets?.planets[planet.id], planet, planet.radius, planet.ringOuterRadius, planet.id, solar, size, genesis.seed + planet.orbitIndex * 73, (planet.depth + 1) / 2));
   if (orbitalEarth) paintEarthCorrespondence(ctx, orbitalEarth, earth, orbitalEarth.radius, earth.radius, roles.overall, size);
   paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, solar, genesis.seed, roles.overall);
   paintForegroundDust(ctx, size, genesis.seed + 9700);
-  paintAstrolabeFrame(ctx, size, genesis.seed + 11800, roles.prominence, genesis.animal);
+  paintAstrolabeFrame(ctx, size, genesis.seed + 11800, roles.prominence, genesis);
   paintAstronomyLabels(ctx, size, genesis, placements, language, birthPlace, earth);
   paintSizeComparison(ctx, size, genesis, assets, language);
 }
@@ -704,5 +742,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "黄金天球儀の彫金枠、天の川と七彩渦状星雲、軌道上の出生地球を含む8惑星、9天体実半径比較、出生地球拡大図" : "Golden astrolabe birth artwork with orbital Earth, eight planets, seven-color spiral nebula, Milky Way, true-radius comparison, and enlarged birth-Earth detail"} data-cosmic-genesis data-renderer="golden-astrolabe-birth-cosmos" data-birth-color-role="ranked-spiral-nebula-milky-way-and-atmospheric-birthplace-light" data-guide-spokes="0" data-orbit-count="8" data-size-comparison-count="9" data-astrolabe-ticks="72" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、8惑星、七彩星命雲、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth, eight planets, seven birth-color veils, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="sacred-star-life-compass" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-orbit-count="8" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
