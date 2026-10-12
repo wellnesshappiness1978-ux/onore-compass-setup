@@ -2,6 +2,18 @@ import type { CosmicGenesis, CosmicPlanet } from "./cosmic-astronomy";
 
 export const COSMIC_PLANET_SCALE = 0.0015;
 
+/** Representative semi-major axes keep conceptual orbit bands in their real, stable order. */
+export const COSMIC_ORBIT_AU: Record<CosmicPlanet["id"], number> = {
+  mercury: 0.387,
+  venus: 0.723,
+  earth: 1,
+  mars: 1.524,
+  jupiter: 5.203,
+  saturn: 9.537,
+  uranus: 19.191,
+  neptune: 30.069,
+};
+
 export type CosmicScreenPoint = { x: number; y: number; depth: number };
 export type CosmicPlacement = CosmicPlanet & { x: number; y: number; radius: number; ringOuterRadius: number; orbitRadius: number; displayAngle: number; depth: number; orbitPath: CosmicScreenPoint[] };
 export type CosmicSunPlacement = { x: number; y: number; radius: number; displayAngle: number };
@@ -19,7 +31,7 @@ function compressedDistance(distanceAu: number) {
   return Math.log1p(distanceAu * DISTANCE_CURVE) / Math.log1p(30.4 * DISTANCE_CURVE);
 }
 
-/** Keeps the Sun at the center and maps Neptune's distance to one shared conceptual-diagram radius. */
+/** Keeps the Sun at the center and maps Neptune's representative orbit to one shared diagram radius. */
 export function cosmicComposition(genesis: CosmicGenesis, size: number): CosmicComposition {
   const rotation = SCREEN_ROTATION;
   const centerX = size * .5, centerY = size * .5;
@@ -37,13 +49,13 @@ export function projectCosmicVector(vector: { x: number; y: number; z: number },
   return { x: frame.centerX + Math.cos(angle) * radius, y: frame.centerY + Math.sin(angle) * radius, depth: Math.sin(angle) };
 }
 
-/** Places each planet on a circular conceptual orbit at its birth-instant longitude and distance. */
+/** Places each planet at its birth longitude on a fixed, correctly ordered conceptual orbit band. */
 export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPlacement[] {
   const composition = cosmicComposition(genesis, size);
   return genesis.planets.map((planet) => {
     const displayAngle = degrees(planet.longitude + composition.rotation);
     const angle = displayAngle * Math.PI / 180;
-    const orbitRadius = compressedDistance(planet.distanceAu) * composition.scale;
+    const orbitRadius = compressedDistance(COSMIC_ORBIT_AU[planet.id]) * composition.scale;
     const point = {
       x: composition.centerX + Math.cos(angle) * orbitRadius,
       y: composition.centerY + Math.sin(angle) * orbitRadius,
@@ -85,7 +97,7 @@ export function cosmicSunPlacement(_genesis: CosmicGenesis, size: number): Cosmi
 
 /** Enlarges the same orbital Earth into a birthplace-facing foreground portrait. */
 export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
-  return { x: size * .835, y: size * .835, radius: size * .098 };
+  return { x: size * .86, y: size * .86, radius: size * .055 };
 }
 
 export function cosmicColorRoles(colors: string[]) {
