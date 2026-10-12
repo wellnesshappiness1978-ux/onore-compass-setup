@@ -188,7 +188,7 @@ function paintStarLifeVeils(ctx: CanvasRenderingContext2D, size: number, colors:
   ctx.restore();
 }
 
-function paintShellSpiral(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, colors: string[], seed: number) {
+function paintShellSpiral(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, colors: string[]) {
   const identity = cosmicCompassIdentity(genesis);
   const points = cosmicShellSpiral(size, identity.sunSign * 30 - 90);
   const overall = colors[0] ?? GOLD;
@@ -760,7 +760,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   paintMilkyWay(ctx, size, roles.all, genesis.seed + 6400);
   paintNebulae(ctx, size, roles.all, genesis.seed + 1200);
   paintStarLifeVeils(ctx, size, roles.prominence, genesis.seed + 4400, cosmicPlacements(genesis, size).find((planet) => planet.id === "earth")?.displayAngle ?? 0);
-  paintShellSpiral(ctx, size, genesis, roles.prominence, genesis.seed + 7300);
+  paintShellSpiral(ctx, size, genesis, roles.prominence);
   paintCompassInlay(ctx, size);
   paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius }))]);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
@@ -802,5 +802,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、8惑星、七彩星命雲、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth, eight planets, seven birth-color veils, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="sacred-star-life-compass" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-orbit-count="8" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、8惑星、七彩星命雲、黄金の殻螺旋、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth, eight planets, seven birth-color veils, golden shell spiral, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="agolmen-shell-compass" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-compass-directions="8" data-shell-spiral="logarithmic-growth-inlay" data-orbit-count="8" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
