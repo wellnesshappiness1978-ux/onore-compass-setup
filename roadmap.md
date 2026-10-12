@@ -364,3 +364,8 @@
 - [x] Build a seven-color spiral nebula behind the Sun while preserving celestial quiet zones and the corner Milky Way.
 - [x] Unify scientific labels, birth-Earth detail, and the nine-body comparison with restrained metal plaque treatments.
 - [ ] Verify desktop/mobile/fullscreen presentation and the 2048 export (blocked by the preview remaining on profile loading); safe geometry, VIP gating, tests, and diagnostics pass.
+
+## Cosmic Genesis final artistic finish
+- [x] Unify the goldwork, Sun, planets, birth-Earth, nebulae, and scientific plaques into one refined visual hierarchy.
+- [x] Suppress orbit light beneath bodies and refine Saturn, exact birth-color depth, and long-label readability without changing astronomy.
+- [ ] Complete desktop, mobile, fullscreen, and 2048 export verification (preview profile restoration is intermittent; tests and diagnostics pass).
