@@ -111,6 +111,10 @@
   --craft-aqua: #81cbbd;
   --craft-rose: #d8a5b4;
   --craft-ink: #030710;
+  --cosmic-text-main: #F5E6AB;
+  --cosmic-text-data: #FFF8DC;
+  --cosmic-text-shadow: rgb(0 0 0 / 85%);
+  --cosmic-text-leader: rgb(230 202 101 / 45%);
 }
 
 .share-card-modal { background: var(--share-midnight); z-index: 100; }
