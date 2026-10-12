@@ -310,4 +310,4 @@
 ## Cosmic Genesis physical-data reconstruction
 - [x] Replace decorative planet radii with physical mean-radius ratios and a single shared display multiplier.
 - [x] Replace fixed orbit rings and placements with birth-instant heliocentric vectors, logarithmic AU scaling, and sampled real orbital paths.
-- [ ] Verify real position, distance and diameter ratios, Saturn proportions, labels, responsive/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+- [x] Verify real position, distance and diameter ratios, Saturn proportions, labels, responsive/fullscreen presentation, matching 2048 export, tests, and diagnostics.
