@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
+import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicShellSpiral, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a readable conceptual Solar System while preserving birth longitudes", () => {
@@ -135,6 +135,18 @@ describe("Cosmic Genesis artwork layout", () => {
     for (let index = 1; index < inner.length; index++) {
       expect(inner[index]!.orbitRadius - inner[index - 1]!.orbitRadius).toBeGreaterThan(inner[index]!.radius + inner[index - 1]!.radius);
     }
+  });
+
+  it("grows one shell spiral from the inner axis without crossing the astrolabe", () => {
+    const spiral = cosmicShellSpiral(1024, 30);
+    const frame = cosmicAstrolabeFrame(1024);
+    expect(spiral).toHaveLength(241);
+    expect(spiral[0]?.radius).toBeCloseTo(1024 * .052, 8);
+    expect(spiral.at(-1)?.radius).toBeCloseTo(1024 * .405, 8);
+    for (let index = 1; index < spiral.length; index++) {
+      expect(spiral[index]?.radius ?? 0).toBeGreaterThan(spiral[index - 1]?.radius ?? 0);
+    }
+    expect(spiral.at(-1)?.radius ?? 0).toBeLessThan(frame.innerRadius);
   });
 
   it("keeps the engraved astrolabe outside every orbit and inside the square artwork", () => {

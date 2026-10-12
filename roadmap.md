@@ -371,7 +371,13 @@
 - [ ] Complete desktop, mobile, fullscreen, and 2048 export verification (preview profile restoration is intermittent; tests and diagnostics pass).
 
 ## Cosmic Genesis complete artistic recreation
-- [ ] Recompose the artwork as one sacred celestial compass with clear Sun, birth-Earth, zodiac, and guardian hierarchy.
-- [ ] Repaint the seven exact birth colors as layered star-life veils and give every planet Sun-directed light and distinctive surface detail.
-- [ ] Replace fragmented plaques with integrated scientific bands while preserving every value and all seven languages.
+- [x] Recompose the artwork as one sacred celestial compass with clear Sun, birth-Earth, zodiac, and guardian hierarchy.
+- [x] Repaint the seven exact birth colors as layered star-life veils and give every planet Sun-directed light and distinctive surface detail.
+- [x] Replace fragmented plaques with integrated scientific bands while preserving every value and all seven languages.
 - [ ] Extend deterministic tests and complete desktop, mobile, fullscreen, and 2048 export verification with three visual refinement passes.
+
+## Cosmic Genesis Agolmen compass and shell refinement
+- [x] Enlarge the eight display planets while preserving the exact lower physical-radius comparison and safe orbit hierarchy.
+- [x] Deepen each planet's own material color and strengthen Sun-directed dimensional contrast.
+- [x] Integrate a restrained eight-direction compass inlay and masked logarithmic shell-growth spiral beneath the celestial subjects.
+- [ ] Verify desktop, mobile, fullscreen, and 2048 export presentation with the restored validation profile.

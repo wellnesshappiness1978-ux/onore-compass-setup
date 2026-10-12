@@ -9,7 +9,7 @@ import jupiter from "@/assets/cosmic-jupiter.png";
 import saturn from "@/assets/cosmic-saturn.png";
 import uranus from "@/assets/cosmic-uranus.png";
 import neptune from "@/assets/cosmic-neptune.png";
-import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "@/lib/cosmic-art";
+import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicEarthPortrait, cosmicPlacements, cosmicShellSpiral, cosmicSizeComparison, cosmicSunPlacement } from "@/lib/cosmic-art";
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
 import type { Language } from "@/lib/translations";
 import type { Capture } from "./MandalaCanvas";
@@ -188,6 +188,54 @@ function paintStarLifeVeils(ctx: CanvasRenderingContext2D, size: number, colors:
   ctx.restore();
 }
 
+function paintShellSpiral(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, colors: string[]) {
+  const identity = cosmicCompassIdentity(genesis);
+  const points = cosmicShellSpiral(size, identity.sunSign * 30 - 90);
+  const overall = colors[0] ?? GOLD;
+  ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  for (let pass = 0; pass < 4; pass++) {
+    ctx.beginPath();
+    points.forEach((point, index) => index ? ctx.lineTo(point.x, point.y) : ctx.moveTo(point.x, point.y));
+    ctx.strokeStyle = pass === 1 ? overall : pass === 3 ? PLATINUM : GOLD;
+    ctx.globalAlpha = [.045, .075, .26, .42][pass] ?? .1;
+    ctx.lineWidth = size * ([.008, .0038, .0013, .00048][pass] ?? .00048);
+    ctx.shadowColor = pass === 1 ? overall : GOLD; ctx.shadowBlur = size * ([.018, .012, .005, .002][pass] ?? 0); ctx.stroke();
+  }
+  for (let rib = 12; rib < points.length - 4; rib += 12) {
+    const point = points[rib];
+    if (!point) continue;
+    const innerRadius = Math.max(size * .045, point.radius * (.72 + point.progress * .08));
+    const inner = { x: size * .5 + Math.cos(point.angle - .16) * innerRadius, y: size * .47 + Math.sin(point.angle - .16) * innerRadius };
+    ctx.beginPath(); ctx.moveTo(inner.x, inner.y);
+    ctx.quadraticCurveTo(size * .5 + Math.cos(point.angle + .08) * point.radius * .9, size * .47 + Math.sin(point.angle + .08) * point.radius * .9, point.x, point.y);
+    ctx.strokeStyle = rib % 36 ? GOLD : PLATINUM; ctx.globalAlpha = .06 + point.progress * .13;
+    ctx.lineWidth = size * (rib % 36 ? .00034 : .00055); ctx.shadowBlur = size * .002; ctx.stroke();
+    if (rib % 24 === 0) {
+      ctx.fillStyle = rib % 48 ? overall : GOLD; ctx.globalAlpha = .18 + point.progress * .2;
+      ctx.beginPath(); ctx.arc(point.x, point.y, size * (.00055 + point.progress * .00045), 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+function paintCompassInlay(ctx: CanvasRenderingContext2D, size: number) {
+  const centerX = size * .5, centerY = size * .47;
+  ctx.save(); ctx.translate(centerX, centerY); ctx.globalCompositeOperation = "screen";
+  for (let direction = 0; direction < 8; direction++) {
+    const angle = direction * Math.PI / 4 - Math.PI / 2;
+    const cardinal = direction % 2 === 0;
+    const inner = size * .115, outer = size * (cardinal ? .426 : .416);
+    const wing = cardinal ? .0046 : .0028;
+    ctx.save(); ctx.rotate(angle);
+    const gradient = ctx.createLinearGradient(inner, 0, outer, 0);
+    gradient.addColorStop(0, "rgba(238,219,154,0)"); gradient.addColorStop(.64, cardinal ? "rgba(238,219,154,.035)" : "rgba(232,242,239,.018)"); gradient.addColorStop(1, "rgba(238,219,154,.16)");
+    ctx.fillStyle = gradient; ctx.beginPath(); ctx.moveTo(inner, 0); ctx.lineTo(outer - size * .012, -size * wing); ctx.lineTo(outer, 0); ctx.lineTo(outer - size * .012, size * wing); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = cardinal ? "rgba(246,224,157,.11)" : "rgba(232,242,239,.05)"; ctx.lineWidth = Math.max(.5, size * .00028);
+    ctx.beginPath(); ctx.moveTo(inner, 0); ctx.lineTo(outer, 0); ctx.stroke(); ctx.restore();
+  }
+  ctx.restore();
+}
+
 function metalGradient(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, alpha = 1) {
   const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
   gradient.addColorStop(0, `rgba(58,31,15,${.94 * alpha})`);
@@ -212,8 +260,10 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
   });
   for (let tick = 0; tick < frame.tickCount; tick++) {
     const angle = tick / frame.tickCount * Math.PI * 2;
-    const long = tick % 6 === 0, inner = frame.innerRadius + size * (long ? .003 : .007), outer = frame.outerRadius - size * .003;
-    ctx.strokeStyle = long ? "rgba(255,226,145,.9)" : "rgba(67,34,15,.72)"; ctx.lineWidth = Math.max(1, size * (long ? .001 : .00055));
+    const cardinal = tick % 18 === 0, intercardinal = tick % 9 === 0;
+    const long = tick % 6 === 0, inner = frame.innerRadius + size * (cardinal ? -.006 : intercardinal ? 0 : long ? .003 : .007), outer = frame.outerRadius - size * .003;
+    ctx.strokeStyle = cardinal ? "rgba(255,244,204,.98)" : intercardinal ? "rgba(236,242,230,.88)" : long ? "rgba(255,226,145,.9)" : "rgba(67,34,15,.72)";
+    ctx.lineWidth = Math.max(1, size * (cardinal ? .0017 : intercardinal ? .00125 : long ? .001 : .00055));
     ctx.beginPath(); ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner); ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer); ctx.stroke();
   }
   for (let jewel = 0; jewel < 12; jewel++) {
@@ -645,7 +695,9 @@ function paintOrbitalEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElemen
   ctx.fillStyle = "#062b58"; ctx.fillRect(earth.x - radius, earth.y - radius, radius * 2, radius * 2);
   if (image) {
     const projected = projectEarth(image, Math.max(radius, 8), view);
+    ctx.filter = "saturate(1.2) contrast(1.13)";
     ctx.drawImage(projected.image, earth.x - radius, earth.y - radius, radius * 2, radius * 2);
+    ctx.filter = "none";
   }
   const sunAngle = Math.atan2(sunPoint.y - earth.y, sunPoint.x - earth.x);
   const lightX = earth.x + Math.cos(sunAngle) * radius * .6, lightY = earth.y + Math.sin(sunAngle) * radius * .6;
@@ -662,13 +714,19 @@ function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | un
   if (!image) return;
   const auraColor: Record<CosmicPlanetId, string> = { mercury: "#c7b48d", venus: "#e6b65f", earth: "#65dff2", mars: "#c45a34", jupiter: "#d7b185", saturn: "#d8bf83", uranus: "#8edfe5", neptune: "#3e75e8" };
   irregularGlow(ctx, point.x, point.y, radius * 2.35, auraColor[id], .36 + depth * .14, seed);
-  ctx.save(); ctx.globalAlpha = .86 + depth * .14; ctx.shadowColor = auraColor[id]; ctx.shadowBlur = size * (.008 + depth * .008);
+  ctx.save(); ctx.globalAlpha = .9 + depth * .1; ctx.shadowColor = auraColor[id]; ctx.shadowBlur = size * (.009 + depth * .009);
+  const filters: Record<CosmicPlanetId, string> = {
+    mercury: "saturate(1.08) contrast(1.2)", venus: "saturate(1.16) contrast(1.14)", earth: "saturate(1.2) contrast(1.13)", mars: "saturate(1.28) contrast(1.16)",
+    jupiter: "saturate(1.22) contrast(1.14)", saturn: "saturate(1.2) contrast(1.15)", uranus: "saturate(1.24) contrast(1.13)", neptune: "saturate(1.3) contrast(1.17)",
+  };
+  ctx.filter = filters[id];
   if (id === "saturn") {
     ctx.strokeStyle = "rgba(215,191,131,.32)"; ctx.lineWidth = Math.max(1, size * .0018);
     ctx.beginPath(); ctx.ellipse(point.x, point.y, ringOuterRadius * .94, ringOuterRadius * .31, -.16, Math.PI, Math.PI * 2); ctx.stroke();
   }
   if (id === "saturn") ctx.drawImage(image, point.x - ringOuterRadius, point.y - ringOuterRadius, ringOuterRadius * 2, ringOuterRadius * 2);
   else ctx.drawImage(image, point.x - radius, point.y - radius, radius * 2, radius * 2);
+  ctx.filter = "none";
   paintPlanetIdentity(ctx, point, radius, id, sunPoint, size, seed);
   if (id === "saturn") {
     ctx.strokeStyle = "rgba(248,226,161,.5)"; ctx.lineWidth = Math.max(1, size * .0011);
@@ -702,6 +760,8 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   paintMilkyWay(ctx, size, roles.all, genesis.seed + 6400);
   paintNebulae(ctx, size, roles.all, genesis.seed + 1200);
   paintStarLifeVeils(ctx, size, roles.prominence, genesis.seed + 4400, cosmicPlacements(genesis, size).find((planet) => planet.id === "earth")?.displayAngle ?? 0);
+  paintShellSpiral(ctx, size, genesis, roles.prominence);
+  paintCompassInlay(ctx, size);
   paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius }))]);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
   paintConstellation(ctx, size, genesis.moonSign, 1, genesis.seed + 900, .52);
@@ -742,5 +802,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、8惑星、七彩星命雲、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth, eight planets, seven birth-color veils, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="sacred-star-life-compass" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-orbit-count="8" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、8惑星、七彩星命雲、黄金の殻螺旋、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth, eight planets, seven birth-color veils, golden shell spiral, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="agolmen-shell-compass" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-compass-directions="8" data-shell-spiral="logarithmic-growth-inlay" data-orbit-count="8" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
