@@ -83,7 +83,7 @@ export function cosmicDisplayRadius(meanRadiusKm: number, size: number) {
 export function cosmicComposition(genesis: CosmicGenesis, size: number): CosmicComposition {
   const rotation = SCREEN_ROTATION;
   const centerX = size * .5, centerY = size * .47;
-  const scale = size * .438;
+  const scale = size * .423;
   const earth = genesis.planets.find((planet) => planet.id === "earth");
   const targetAngle = degrees((earth?.longitude ?? 0) + rotation);
   return { centerX, centerY, rotation, scale, targetAngle };
@@ -146,7 +146,7 @@ export function cosmicSunPlacement(_genesis: CosmicGenesis, size: number): Cosmi
 
 /** Enlarges the same orbital Earth into a birthplace-facing foreground portrait. */
 export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
-  return { x: size * .87, y: size * .13, radius: size * .06 };
+  return { x: size * .865, y: size * .135, radius: size * .058 };
 }
 
 /** Places the birth Moon beside orbital Earth using its exact geocentric ecliptic direction and phase. */
@@ -169,7 +169,7 @@ export function cosmicMoonPlacement(genesis: CosmicGenesis, size: number, earth?
 
 /** A fixed outer instrument ring that frames, but never changes, the astronomical diagram. */
 export function cosmicAstrolabeFrame(size: number): CosmicAstrolabeFrame {
-  return { x: size * .5, y: size * .47, innerRadius: size * .4395, outerRadius: size * .469, tickCount: 72 };
+  return { x: size * .5, y: size * .47, innerRadius: size * .426, outerRadius: size * .469, tickCount: 72 };
 }
 
 /** Stable symbolic identity for the zodiac and guardian ring; astronomy remains the source of every sector. */

@@ -20,7 +20,7 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(earth).toBeDefined();
     expect(earth?.id).toBe("earth");
     expect(earth?.displayAngle).toBeCloseTo(((earth?.longitude ?? 0) + cosmicComposition(genesis, 1024).rotation + 360) % 360, 8);
-    expect(cosmicEarthPortrait(1024)).toEqual({ x: 890.88, y: 133.12, radius: 61.44 });
+    expect(cosmicEarthPortrait(1024)).toEqual({ x: 885.76, y: 138.24, radius: 59.392 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
     const venus = placements.find((planet) => planet.id === "venus");
@@ -130,10 +130,15 @@ describe("Cosmic Genesis artwork layout", () => {
     if (!genesis) return;
     const placements = cosmicPlacements(genesis, 1024);
     const sun = cosmicSunPlacement(genesis, 1024);
-    const inner = ["mercury", "venus", "earth", "mars"].map((id) => placements.find((planet) => planet.id === id)!);
-    expect(inner[0]!.orbitRadius - inner[0]!.radius).toBeGreaterThan(sun.radius);
+    const inner = ["mercury", "venus", "earth", "mars"].map((id) => placements.find((planet) => planet.id === id));
+    expect(inner.every(Boolean)).toBe(true);
+    const first = inner[0];
+    if (!first) return;
+    expect(first.orbitRadius - first.radius).toBeGreaterThan(sun.radius);
     for (let index = 1; index < inner.length; index++) {
-      expect(inner[index]!.orbitRadius - inner[index - 1]!.orbitRadius).toBeGreaterThan(inner[index]!.radius + inner[index - 1]!.radius);
+      const current = inner[index], previous = inner[index - 1];
+      if (!current || !previous) return;
+      expect(current.orbitRadius - previous.orbitRadius).toBeGreaterThan(current.radius + previous.radius);
     }
   });
 
@@ -169,6 +174,7 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(frame.innerRadius).toBeGreaterThan(outerOrbit);
     expect(frame.outerRadius).toBeLessThanOrEqual(Math.min(frame.x, frame.y, 1024 - frame.x, 1024 - frame.y));
     expect(frame.tickCount).toBe(72);
+    expect(frame.outerRadius - frame.innerRadius).toBeGreaterThanOrEqual(1024 * .04);
   });
 
   it("provides one stable guardian identity for every East Asian zodiac year", () => {
