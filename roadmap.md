@@ -405,4 +405,4 @@
 - [x] Refine VIP guilloche/nacre and branching seven-color nebular details without changing astronomy.
 - [x] Add clipped enamel depth and polished engraving to Standard mandala with matching local export.
 - [x] Add five art export formats, optional birth disclosures, independent commemorative numbers and seven-language copy.
-- [ ] Verify private exports, all formats, both artworks, desktop/mobile/fullscreen and tests/diagnostics.
+- [x] Verify default-private disclosures, all five downloads for both artworks, desktop/mobile/fullscreen, 36 passing tests and clean diagnostics. Actual paid entitlements and native device-share destinations were not verified; artwork checks used the development VIP preview.
