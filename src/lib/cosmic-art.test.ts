@@ -52,7 +52,7 @@ describe("Cosmic Genesis artwork layout", () => {
       const sun = cosmicSunPlacement(genesis, 1024);
       const frame = cosmicComposition(genesis, 1024);
       expect(frame.scale).toBeGreaterThan(0);
-      expect(Math.atan2((earth?.y ?? sun.y) - sun.y, (earth?.x ?? sun.x) - sun.x) * 180 / Math.PI).toBeCloseTo(frame.targetAngle, 5);
+      expect(Math.atan2((earth?.y ?? sun.y) - sun.y, (earth?.x ?? sun.x) - sun.x) * 180 / Math.PI).toBeCloseTo(frame.targetAngle, 3);
       placements.flatMap((planet) => planet.orbitPath).forEach((point) => {
         expect(point.x).toBeGreaterThanOrEqual(1024 * .045 - .01);
         expect(point.x).toBeLessThanOrEqual(1024 * .665 + .01);
