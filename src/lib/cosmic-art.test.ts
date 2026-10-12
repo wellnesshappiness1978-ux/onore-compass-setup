@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicBirthplaceLight, cosmicColorRoles, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
+import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a readable conceptual Solar System while preserving birth longitudes", () => {
@@ -135,6 +135,16 @@ describe("Cosmic Genesis artwork layout", () => {
     for (let index = 1; index < inner.length; index++) {
       expect(inner[index]!.orbitRadius - inner[index - 1]!.orbitRadius).toBeGreaterThan(inner[index]!.radius + inner[index - 1]!.radius);
     }
+  });
+
+  it("keeps the engraved astrolabe outside every orbit and inside the square artwork", () => {
+    const genesis = cosmicGenesis("1990-04-15", "08:30", false);
+    if (!genesis) return;
+    const frame = cosmicAstrolabeFrame(1024);
+    const outerOrbit = Math.max(...cosmicPlacements(genesis, 1024).map((planet) => planet.orbitRadius));
+    expect(frame.innerRadius).toBeGreaterThan(outerOrbit);
+    expect(frame.outerRadius).toBeLessThanOrEqual(Math.min(frame.x, frame.y, 1024 - frame.x, 1024 - frame.y));
+    expect(frame.tickCount).toBe(72);
   });
 
   it("provides one stable guardian identity for every East Asian zodiac year", () => {

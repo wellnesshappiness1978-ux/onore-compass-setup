@@ -9,7 +9,7 @@ import jupiter from "@/assets/cosmic-jupiter.png";
 import saturn from "@/assets/cosmic-saturn.png";
 import uranus from "@/assets/cosmic-uranus.png";
 import neptune from "@/assets/cosmic-neptune.png";
-import { COSMIC_GUARDIANS, cosmicBirthplaceLight, cosmicColorRoles, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "@/lib/cosmic-art";
+import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "@/lib/cosmic-art";
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
 import type { Language } from "@/lib/translations";
 import type { Capture } from "./MandalaCanvas";
@@ -139,6 +139,76 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
     }
   });
   ctx.restore();
+}
+
+function paintSpiralNebula(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
+  const centerX = size * .5, centerY = size * .47;
+  ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round";
+  for (let arm = 0; arm < 7; arm++) {
+    const color = colors[arm] ?? GOLD;
+    const prominence = [1, .48, .68, .55, .76, .86, .36][arm] ?? .4;
+    for (let ribbon = 0; ribbon < 9; ribbon++) {
+      const salt = seed + arm * 991 + ribbon * 53;
+      const turn = arm * Math.PI * 2 / 7 + (ribbon - 4) * .025;
+      ctx.beginPath();
+      for (let step = 0; step <= 92; step++) {
+        const progress = step / 92;
+        const radius = size * (.075 + progress * .31);
+        const angle = turn + progress * Math.PI * 2.15 + (unit(salt + step) - .5) * .018;
+        const x = centerX + Math.cos(angle) * radius * (1 + .05 * Math.sin(progress * Math.PI));
+        const y = centerY + Math.sin(angle) * radius * .82;
+        if (step === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = prominence * (.012 + unit(salt + 7) * .013);
+      ctx.lineWidth = size * (.004 + unit(salt + 11) * .012);
+      ctx.shadowColor = color; ctx.shadowBlur = size * .018; ctx.stroke();
+    }
+  }
+  for (let dust = 0; dust < 520; dust++) {
+    const salt = seed + dust * 41, progress = Math.sqrt(unit(salt));
+    const arm = dust % 7, angle = arm * Math.PI * 2 / 7 + progress * Math.PI * 2.15 + (unit(salt + 5) - .5) * .22;
+    const radius = size * (.08 + progress * .31);
+    const x = centerX + Math.cos(angle) * radius, y = centerY + Math.sin(angle) * radius * .82;
+    ctx.fillStyle = colors[arm] ?? GOLD; ctx.globalAlpha = .025 + unit(salt + 9) * .11;
+    ctx.beginPath(); ctx.arc(x, y, size * (.00018 + unit(salt + 13) ** 2 * .00078), 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: number) {
+  const frame = cosmicAstrolabeFrame(size);
+  ctx.save(); ctx.translate(frame.x, frame.y);
+  const metal = ctx.createRadialGradient(0, 0, frame.innerRadius, 0, 0, frame.outerRadius);
+  metal.addColorStop(0, "rgba(75,43,19,0)"); metal.addColorStop(.08, "rgba(104,58,25,.88)");
+  metal.addColorStop(.28, "rgba(233,196,112,.96)"); metal.addColorStop(.5, "rgba(117,62,26,.96)");
+  metal.addColorStop(.72, "rgba(244,211,127,.94)"); metal.addColorStop(1, "rgba(49,27,13,.95)");
+  ctx.fillStyle = metal; ctx.beginPath(); ctx.arc(0, 0, frame.outerRadius, 0, Math.PI * 2); ctx.arc(0, 0, frame.innerRadius, 0, Math.PI * 2, true); ctx.fill("evenodd");
+  [frame.innerRadius, (frame.innerRadius + frame.outerRadius) / 2, frame.outerRadius].forEach((radius, index) => {
+    ctx.strokeStyle = index === 1 ? "rgba(73,38,17,.82)" : "rgba(248,221,143,.72)";
+    ctx.lineWidth = Math.max(1, size * (index === 1 ? .0012 : .0018)); ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.stroke();
+  });
+  for (let tick = 0; tick < frame.tickCount; tick++) {
+    const angle = tick / frame.tickCount * Math.PI * 2;
+    const long = tick % 6 === 0, inner = frame.innerRadius + size * (long ? .003 : .007), outer = frame.outerRadius - size * .003;
+    ctx.strokeStyle = long ? "rgba(255,226,145,.9)" : "rgba(67,34,15,.72)"; ctx.lineWidth = Math.max(1, size * (long ? .001 : .00055));
+    ctx.beginPath(); ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner); ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer); ctx.stroke();
+  }
+  for (let jewel = 0; jewel < 12; jewel++) {
+    const angle = jewel / 12 * Math.PI * 2, radius = (frame.innerRadius + frame.outerRadius) / 2;
+    const x = Math.cos(angle) * radius, y = Math.sin(angle) * radius;
+    const jewelColor = jewel % 3 === 0 ? "#70d6df" : jewel % 3 === 1 ? "#e7b75d" : "#9673cf";
+    irregularGlow(ctx, x, y, size * .012, jewelColor, .38, seed + jewel * 29);
+    ctx.fillStyle = jewelColor; ctx.globalAlpha = .9; ctx.beginPath(); ctx.arc(x, y, size * .0032, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function paintMetalPlaque(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
+  const gradient = ctx.createLinearGradient(x, y, x, y + height);
+  gradient.addColorStop(0, "rgba(236,205,126,.76)"); gradient.addColorStop(.5, "rgba(91,52,24,.76)"); gradient.addColorStop(1, "rgba(199,154,76,.7)");
+  ctx.fillStyle = gradient; ctx.strokeStyle = "rgba(250,222,145,.62)"; ctx.lineWidth = Math.max(1, height * .055);
+  ctx.beginPath(); ctx.roundRect(x, y, width, height, height * .12); ctx.fill(); ctx.stroke();
 }
 
 function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
@@ -327,6 +397,8 @@ function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genes
     const outward = side < 0 ? -1 : 1;
     const edge = planet.x + outward * (edgeRadius + size * .004);
     ctx.textAlign = side < 0 ? "left" : "right";
+    const measured = Math.min(size * .43, ctx.measureText(label).width + size * .012);
+    paintMetalPlaque(ctx, side < 0 ? labelX - size * .005 : labelX - measured + size * .005, labelY - size * .008, measured, size * .016);
     ctx.strokeStyle = planet.id === "earth" ? "rgba(238,219,154,.42)" : "rgba(226,235,236,.2)";
     ctx.lineWidth = Math.max(1, size * .00042); ctx.beginPath(); ctx.moveTo(edge, planet.y); ctx.lineTo(edge + outward * size * .012, planet.y); ctx.lineTo(labelX - outward * size * .008, labelY); ctx.stroke();
     ctx.fillStyle = planet.id === "earth" ? "rgba(244,224,157,.92)" : "rgba(226,235,236,.68)";
@@ -348,6 +420,7 @@ function paintSizeComparison(ctx: CanvasRenderingContext2D, size: number, genesi
   const veil = ctx.createLinearGradient(0, size * .825, 0, size);
   veil.addColorStop(0, "rgba(1,3,10,0)"); veil.addColorStop(.28, "rgba(1,3,10,.48)"); veil.addColorStop(1, "rgba(1,3,10,.88)");
   ctx.fillStyle = veil; ctx.fillRect(0, size * .825, size, size * .175);
+  paintMetalPlaque(ctx, size * .018, size * .846, size * .45, size * .028);
   ctx.strokeStyle = "rgba(238,219,154,.32)"; ctx.lineWidth = Math.max(1, size * .0006);
   ctx.beginPath(); ctx.moveTo(size * .025, size * .845); ctx.lineTo(size * .975, size * .845); ctx.stroke();
   ctx.fillStyle = "rgba(244,224,157,.84)"; ctx.textAlign = "left"; ctx.font = `${Math.max(10, size * .0105)}px ui-sans-serif, sans-serif`;
@@ -529,6 +602,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   paintDeepSpace(ctx, size, assets?.field ?? null, genesis.seed);
   paintMilkyWay(ctx, size, roles.all, genesis.seed + 6400);
   paintNebulae(ctx, size, roles.all, genesis.seed + 1200);
+  paintSpiralNebula(ctx, size, roles.prominence, genesis.seed + 4400);
   paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius }))]);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
   paintConstellation(ctx, size, genesis.moonSign, 1, genesis.seed + 900, .52);
@@ -543,6 +617,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   if (orbitalEarth) paintEarthCorrespondence(ctx, orbitalEarth, earth, orbitalEarth.radius, earth.radius, roles.overall, size);
   paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, solar, genesis.seed, roles.overall);
   paintForegroundDust(ctx, size, genesis.seed + 9700);
+  paintAstrolabeFrame(ctx, size, genesis.seed + 11800);
   paintAstronomyLabels(ctx, size, genesis, placements, language, birthPlace, earth);
   paintSizeComparison(ctx, size, genesis, assets, language);
 }
@@ -566,5 +641,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "天の川と七彩星雲を背景に、軌道上の出生地球を含む8惑星を描いた太陽中心配置、9天体実半径比較、出生地球拡大図" : "Sun-centered birth-instant artwork with orbital Earth, eight planets, seven-color nebulae, Milky Way, true-radius comparison, and enlarged birth-Earth detail"} data-cosmic-genesis data-renderer="orbital-birth-earth-seven-color-nebula-and-milky-way" data-birth-color-role="ranked-nebula-milky-way-and-atmospheric-birthplace-light" data-guide-spokes="0" data-orbit-count="8" data-size-comparison-count="9" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "黄金天球儀の彫金枠、天の川と七彩渦状星雲、軌道上の出生地球を含む8惑星、9天体実半径比較、出生地球拡大図" : "Golden astrolabe birth artwork with orbital Earth, eight planets, seven-color spiral nebula, Milky Way, true-radius comparison, and enlarged birth-Earth detail"} data-cosmic-genesis data-renderer="golden-astrolabe-birth-cosmos" data-birth-color-role="ranked-spiral-nebula-milky-way-and-atmospheric-birthplace-light" data-guide-spokes="0" data-orbit-count="8" data-size-comparison-count="9" data-astrolabe-ticks="72" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }

@@ -32,6 +32,7 @@ export type CosmicBirthplaceLight = { x: number; y: number; plumeAngle: number; 
 export type CosmicEarthPortrait = { x: number; y: number; radius: number };
 export type CosmicComposition = { centerX: number; centerY: number; rotation: number; scale: number; targetAngle: number };
 export type CosmicSizeComparison = { id: "sun" | CosmicPlanet["id"]; x: number; y: number; radius: number; physicalRadiusKm: number };
+export type CosmicAstrolabeFrame = { x: number; y: number; innerRadius: number; outerRadius: number; tickCount: number };
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
@@ -118,6 +119,11 @@ export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
   return { x: size * .87, y: size * .13, radius: size * .06 };
 }
 
+/** A fixed outer instrument ring that frames, but never changes, the astronomical diagram. */
+export function cosmicAstrolabeFrame(size: number): CosmicAstrolabeFrame {
+  return { x: size * .5, y: size * .47, innerRadius: size * .446, outerRadius: size * .466, tickCount: 72 };
+}
+
 /** Sun and planets on one linear physical-radius scale, independent from the visibility-scaled orbit diagram. */
 export function cosmicSizeComparison(genesis: CosmicGenesis, size: number): CosmicSizeComparison[] {
   const ids: CosmicSizeComparison["id"][] = ["sun", "mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"];
@@ -137,7 +143,7 @@ export function cosmicSizeComparison(genesis: CosmicGenesis, size: number): Cosm
 
 export function cosmicColorRoles(colors: string[]) {
   const fallback = "#F4D03F";
-  const seven = Array.from({ length: 7 }, (_, index) => colors[index] ?? colors[index % Math.max(colors.length, 1)] ?? fallback);
+  const seven: [string, string, string, string, string, string, string] = [0, 1, 2, 3, 4, 5, 6].map((index) => colors[index] ?? colors[index % Math.max(colors.length, 1)] ?? fallback) as [string, string, string, string, string, string, string];
   return {
     overall: seven[0] ?? fallback,
     secondary: seven[1] ?? fallback,
