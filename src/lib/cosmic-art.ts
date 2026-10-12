@@ -1,8 +1,8 @@
 import { COSMIC_SUN_MEAN_RADIUS_KM, type CosmicGenesis, type CosmicPlanet } from "./cosmic-astronomy";
 
 export const COSMIC_PLANET_SCALE = 0.0009;
-/** The current visibility treatment (1.11) enlarged by the requested exact 1.5×. */
-export const COSMIC_PLANET_DISPLAY_MULTIPLIER = 1.11 * 1.5;
+/** The prior 1.11 × 1.5 visibility treatment enlarged by the requested exact 1.3×. */
+export const COSMIC_PLANET_DISPLAY_MULTIPLIER = 1.11 * 1.5 * 1.3;
 export const COSMIC_BODY_RADII_KM = {
   sun: COSMIC_SUN_MEAN_RADIUS_KM,
   mercury: 2439.7,
@@ -35,6 +35,7 @@ export type CosmicEarthPortrait = { x: number; y: number; radius: number };
 export type CosmicComposition = { centerX: number; centerY: number; rotation: number; scale: number; targetAngle: number };
 export type CosmicSizeComparison = { id: "sun" | CosmicPlanet["id"]; x: number; y: number; radius: number; physicalRadiusKm: number };
 export type CosmicAstrolabeFrame = { x: number; y: number; innerRadius: number; outerRadius: number; tickCount: number };
+export type CosmicMoonPlacement = { x: number; y: number; radius: number; distance: number; displayAngle: number; phaseFraction: number; phaseAngle: number };
 export type CosmicCompassIdentity = { sunSign: number; moonSign: number; guardian: number; awakenedSectors: readonly number[] };
 export type CosmicShellPoint = CosmicScreenPoint & { progress: number; angle: number; radius: number };
 
@@ -55,10 +56,10 @@ function compressedDistance(distanceAu: number) {
 function conceptualOrbitDistance(distanceAu: number) {
   const knots = [
     { au: 0, ratio: 0 },
-    { au: COSMIC_ORBIT_AU.mercury, ratio: .166 },
-    { au: COSMIC_ORBIT_AU.venus, ratio: .241 },
-    { au: COSMIC_ORBIT_AU.earth, ratio: .318 },
-    { au: COSMIC_ORBIT_AU.mars, ratio: .393 },
+    { au: COSMIC_ORBIT_AU.mercury, ratio: .18 },
+    { au: COSMIC_ORBIT_AU.venus, ratio: .275 },
+    { au: COSMIC_ORBIT_AU.earth, ratio: .37 },
+    { au: COSMIC_ORBIT_AU.mars, ratio: .465 },
     { au: COSMIC_ORBIT_AU.jupiter, ratio: compressedDistance(COSMIC_ORBIT_AU.jupiter) },
     { au: COSMIC_ORBIT_AU.saturn, ratio: compressedDistance(COSMIC_ORBIT_AU.saturn) },
     { au: COSMIC_ORBIT_AU.uranus, ratio: compressedDistance(COSMIC_ORBIT_AU.uranus) },
@@ -148,9 +149,27 @@ export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
   return { x: size * .87, y: size * .13, radius: size * .06 };
 }
 
+/** Places the birth Moon beside orbital Earth using its exact geocentric ecliptic direction and phase. */
+export function cosmicMoonPlacement(genesis: CosmicGenesis, size: number, earth?: CosmicPlacement): CosmicMoonPlacement | null {
+  const orbitalEarth = earth ?? cosmicPlacements(genesis, size).find((planet) => planet.id === "earth");
+  if (!orbitalEarth) return null;
+  const displayAngle = degrees(genesis.moon.longitude + cosmicComposition(genesis, size).rotation);
+  const angle = displayAngle * Math.PI / 180;
+  const distance = size * .052;
+  return {
+    x: orbitalEarth.x + Math.cos(angle) * distance,
+    y: orbitalEarth.y + Math.sin(angle) * distance,
+    radius: size * .0115,
+    distance,
+    displayAngle,
+    phaseFraction: genesis.moon.phaseFraction,
+    phaseAngle: genesis.moon.phaseAngle,
+  };
+}
+
 /** A fixed outer instrument ring that frames, but never changes, the astronomical diagram. */
 export function cosmicAstrolabeFrame(size: number): CosmicAstrolabeFrame {
-  return { x: size * .5, y: size * .47, innerRadius: size * .446, outerRadius: size * .466, tickCount: 72 };
+  return { x: size * .5, y: size * .47, innerRadius: size * .4395, outerRadius: size * .469, tickCount: 72 };
 }
 
 /** Stable symbolic identity for the zodiac and guardian ring; astronomy remains the source of every sector. */
