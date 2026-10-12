@@ -1,6 +1,6 @@
 import type { CosmicGenesis, CosmicPlanet } from "./cosmic-astronomy";
 
-export const COSMIC_PLANET_SCALE = 0.0015;
+export const COSMIC_PLANET_SCALE = 0.0009;
 
 /** Representative semi-major axes keep conceptual orbit bands in their real, stable order. */
 export const COSMIC_ORBIT_AU: Record<CosmicPlanet["id"], number> = {
