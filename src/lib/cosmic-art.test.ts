@@ -17,6 +17,9 @@ describe("Cosmic Genesis artwork layout", () => {
     });
     const earth = placements.find((planet) => planet.id === "earth");
     expect(earth?.orbitRadius).toBeGreaterThan(0);
+    expect(earth).toBeDefined();
+    expect(earth?.id).toBe("earth");
+    expect(earth?.displayAngle).toBeCloseTo(((earth?.longitude ?? 0) + cosmicComposition(genesis, 1024).rotation + 360) % 360, 8);
     expect(cosmicEarthPortrait(1024)).toEqual({ x: 890.88, y: 133.12, radius: 61.44 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
@@ -107,6 +110,7 @@ describe("Cosmic Genesis artwork layout", () => {
     const colors = ["#110001", "#220002", "#330003", "#440004", "#550005", "#660006", "#770007"];
     expect(cosmicColorRoles(colors).all).toEqual(colors);
     expect(cosmicColorRoles(colors).prominence).toEqual([colors[0], colors[5], colors[4], colors[3], colors[2], colors[1], colors[6]]);
+    expect(new Set(cosmicColorRoles(colors).all).size).toBe(7);
   });
 
   it("anchors the birthplace radiance to a visible point on Earth", () => {
