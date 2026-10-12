@@ -355,6 +355,6 @@
 - [x] Verify deterministic astronomy, celestial hierarchy, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
 
 ## Cosmic Genesis body presence tuning
-- [ ] Enlarge display radii ~16% and widen inner orbit curve
-- [ ] Strengthen Sun/planet/Earth glow
-- [ ] Add inner-orbit non-overlap test; run tests and verify
+- [x] Enlarge display radii ~16% and widen inner orbit curve
+- [x] Strengthen Sun/planet/Earth glow
+- [x] Add inner-orbit non-overlap test; run tests and verify
