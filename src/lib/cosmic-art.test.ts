@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_GUARDIANS, cosmicBirthplaceLight, cosmicColorRoles, cosmicEarthPortrait, cosmicPlacements, cosmicSunPlacement } from "./cosmic-art";
+import { COSMIC_GUARDIANS, cosmicBirthplaceLight, cosmicColorRoles, cosmicEarthPortrait, cosmicPlacements, cosmicSunPlacement, projectCosmicVector } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a readable heliocentric overview while preserving absolute angles", () => {
@@ -16,13 +16,18 @@ describe("Cosmic Genesis artwork layout", () => {
       expect(planet.y - extent).toBeLessThan(1024);
     });
     const earth = placements.find((planet) => planet.id === "earth");
-    expect(earth?.orbitRadius).toBeCloseTo(174.08, 2);
+    expect(earth?.orbitRadius).toBeCloseTo(projectCosmicVector({ x: earth?.distanceAu ?? 0, y: 0, z: 0 }, 1024).x - 440.32, 5);
     expect(cosmicEarthPortrait(1024)).toEqual({ x: 686.08, y: 737.28, radius: 240.64 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
     const venus = placements.find((planet) => planet.id === "venus");
     expect(mercury?.displayAngle).toBeCloseTo(((mercury?.longitude ?? 0) - 18 + 360) % 360, 8);
     expect(venus?.displayAngle).toBeCloseTo(((venus?.longitude ?? 0) - 18 + 360) % 360, 8);
+    expect((venus?.orbitRadius ?? 0) < (earth?.orbitRadius ?? 0)).toBe(true);
+    const radii = Object.fromEntries(placements.map((planet) => [planet.id, planet.radius]));
+    expect(radii.jupiter / radii.earth).toBeCloseTo(69911 / 6371, 8);
+    expect(radii.earth / radii.mercury).toBeCloseTo(6371 / 2439.7, 8);
+    placements.forEach((planet) => expect(Math.hypot(planet.x - planet.orbitPath[0]!.x, planet.y - planet.orbitPath[0]!.y)).toBeLessThan(.001));
     const sun = cosmicSunPlacement(genesis, 1024);
     expect(sun.x).toBeCloseTo(440.32, 2);
     expect(sun.y).toBeCloseTo(378.88, 2);

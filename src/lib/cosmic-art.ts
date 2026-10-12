@@ -1,44 +1,56 @@
 import type { CosmicGenesis, CosmicPlanet } from "./cosmic-astronomy";
 
-export const COSMIC_PLANET_SCALE = 2;
+export const COSMIC_PLANET_SCALE = 0.00205;
 
-export type CosmicPlacement = CosmicPlanet & { x: number; y: number; radius: number; orbitRadius: number; displayAngle: number; depth: number };
+export type CosmicScreenPoint = { x: number; y: number; depth: number };
+export type CosmicPlacement = CosmicPlanet & { x: number; y: number; radius: number; ringOuterRadius: number; orbitRadius: number; displayAngle: number; depth: number; orbitPath: CosmicScreenPoint[] };
 export type CosmicSunPlacement = { x: number; y: number; radius: number; displayAngle: number };
 export type CosmicBirthplaceLight = { x: number; y: number; plumeAngle: number; safetyRadius: number };
 export type CosmicEarthPortrait = { x: number; y: number; radius: number };
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
-const ORBIT_RADIUS: Record<CosmicPlanet["id"], number> = {
-  mercury: .105,
-  venus: .135,
-  earth: .17,
-  mars: .205,
-  jupiter: .245,
-  saturn: .285,
-  uranus: .325,
-  neptune: .36,
-};
-
 const ART_ROTATION = -18;
+const VIEW_TILT = 32;
+const MAX_ORBIT_RADIUS = .335;
+const DISTANCE_CURVE = 1.8;
 const degrees = (value: number) => ((value % 360) + 360) % 360;
+
+function compressedDistance(distanceAu: number) {
+  return Math.log1p(distanceAu * DISTANCE_CURVE) / Math.log1p(30.4 * DISTANCE_CURVE);
+}
+
+export function projectCosmicVector(vector: { x: number; y: number; z: number }, size: number): CosmicScreenPoint {
+  const centerX = size * .43, centerY = size * .37;
+  const rotation = ART_ROTATION * Math.PI / 180;
+  const tilt = VIEW_TILT * Math.PI / 180;
+  const distance = Math.hypot(vector.x, vector.y, vector.z) || 1;
+  const radial = compressedDistance(distance) * size * MAX_ORBIT_RADIUS;
+  const normalizedX = vector.x / distance, normalizedY = vector.y / distance, normalizedZ = vector.z / distance;
+  const rotatedX = normalizedX * Math.cos(rotation) - normalizedY * Math.sin(rotation);
+  const rotatedY = normalizedX * Math.sin(rotation) + normalizedY * Math.cos(rotation);
+  const projectedY = rotatedY * Math.cos(tilt) - normalizedZ * Math.sin(tilt);
+  const depth = rotatedY * Math.sin(tilt) + normalizedZ * Math.cos(tilt);
+  return { x: centerX + rotatedX * radial, y: centerY + projectedY * radial, depth };
+}
 
 /** Preserves birth-instant heliocentric angles in a readable, distance-compressed solar-system overview. */
 export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPlacement[] {
   return genesis.planets.map((planet) => {
-    const orbit = ORBIT_RADIUS[planet.id];
     const displayAngle = degrees(planet.longitude + ART_ROTATION);
-    const angle = displayAngle * Math.PI / 180;
-    const radius = Math.max(size * .007, planet.displayRadius * COSMIC_PLANET_SCALE * size / 1900);
-    const centerX = size * .43, centerY = size * .37;
+    const point = projectCosmicVector({ x: planet.eclipticX, y: planet.eclipticY, z: planet.eclipticZ }, size);
+    const radius = planet.meanRadiusKm * COSMIC_PLANET_SCALE * size / 1024;
+    const ringOuterRadius = (planet.ringOuterRadiusKm ?? planet.meanRadiusKm) * COSMIC_PLANET_SCALE * size / 1024;
     return {
       ...planet,
       radius,
-      orbitRadius: orbit * size,
-      x: centerX + Math.cos(angle) * orbit * size,
-      y: centerY + Math.sin(angle) * orbit * size * .72,
+      ringOuterRadius,
+      orbitRadius: compressedDistance(planet.distanceAu) * size * MAX_ORBIT_RADIUS,
+      x: point.x,
+      y: point.y,
       displayAngle,
-      depth: .3 + (Math.sin(angle) + 1) * .2,
+      depth: point.depth,
+      orbitPath: planet.orbit.map((sample) => projectCosmicVector(sample, size)),
     };
   });
 }
