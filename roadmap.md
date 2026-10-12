@@ -337,7 +337,7 @@
 - [x] Verify orbital ordering, astronomy, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
 
 ## Cosmic Genesis scientific placement and nine-body size comparison
-- [ ] Add the Sun and eight planets to one canonical physical-radius dataset and verify their hierarchy.
-- [ ] Integrate the birth-instant heliocentric placement diagram with a separate linear-scale nine-body size comparison.
-- [ ] Refine the birthplace-facing Earth detail, collision-safe scientific labels, legends, and seven-language copy.
-- [ ] Verify VIP gating, deterministic local rendering, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+- [x] Add the Sun and eight planets to one canonical physical-radius dataset and verify their hierarchy.
+- [x] Integrate the birth-instant heliocentric placement diagram with a separate linear-scale nine-body size comparison.
+- [x] Refine the birthplace-facing Earth detail, collision-safe scientific labels, legends, and seven-language copy.
+- [x] Verify VIP gating, deterministic local rendering, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
