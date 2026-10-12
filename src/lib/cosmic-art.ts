@@ -7,59 +7,92 @@ export type CosmicPlacement = CosmicPlanet & { x: number; y: number; radius: num
 export type CosmicSunPlacement = { x: number; y: number; radius: number; displayAngle: number };
 export type CosmicBirthplaceLight = { x: number; y: number; plumeAngle: number; safetyRadius: number };
 export type CosmicEarthPortrait = { x: number; y: number; radius: number };
+export type CosmicComposition = { centerX: number; centerY: number; rotation: number; scale: number; targetAngle: number };
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
-const ART_ROTATION = -18;
 const VIEW_TILT = 32;
-const MAX_ORBIT_RADIUS = .335;
 const DISTANCE_CURVE = 1.8;
+const TARGET_EARTH_ANGLE = 43;
 const degrees = (value: number) => ((value % 360) + 360) % 360;
 
 function compressedDistance(distanceAu: number) {
   return Math.log1p(distanceAu * DISTANCE_CURVE) / Math.log1p(30.4 * DISTANCE_CURVE);
 }
 
-export function projectCosmicVector(vector: { x: number; y: number; z: number }, size: number): CosmicScreenPoint {
-  const centerX = size * .43, centerY = size * .37;
-  const rotation = ART_ROTATION * Math.PI / 180;
+function projectedUnit(vector: { x: number; y: number; z: number }, rotation: number) {
+  const rotationRadians = rotation * Math.PI / 180;
   const tilt = VIEW_TILT * Math.PI / 180;
   const distance = Math.hypot(vector.x, vector.y, vector.z) || 1;
-  const radial = compressedDistance(distance) * size * MAX_ORBIT_RADIUS;
+  const radial = compressedDistance(distance);
   const normalizedX = vector.x / distance, normalizedY = vector.y / distance, normalizedZ = vector.z / distance;
-  const rotatedX = normalizedX * Math.cos(rotation) - normalizedY * Math.sin(rotation);
-  const rotatedY = normalizedX * Math.sin(rotation) + normalizedY * Math.cos(rotation);
+  const rotatedX = normalizedX * Math.cos(rotationRadians) - normalizedY * Math.sin(rotationRadians);
+  const rotatedY = normalizedX * Math.sin(rotationRadians) + normalizedY * Math.cos(rotationRadians);
   const projectedY = rotatedY * Math.cos(tilt) - normalizedZ * Math.sin(tilt);
   const depth = rotatedY * Math.sin(tilt) + normalizedZ * Math.cos(tilt);
-  return { x: centerX + rotatedX * radial, y: centerY + projectedY * radial, depth };
+  return { x: rotatedX * radial, y: projectedY * radial, depth };
+}
+
+/** Uses the real orbital Earth as the single composition axis, then fits every sampled orbit with one scale. */
+export function cosmicComposition(genesis: CosmicGenesis, size: number): CosmicComposition {
+  const earth = genesis.planets.find((planet) => planet.id === "earth");
+  const earthAngle = earth ? Math.atan2(earth.eclipticY, earth.eclipticX) * 180 / Math.PI : 0;
+  const tilt = VIEW_TILT * Math.PI / 180;
+  const targetBeforeTilt = Math.atan2(Math.sin(TARGET_EARTH_ANGLE * Math.PI / 180) / Math.cos(tilt), Math.cos(TARGET_EARTH_ANGLE * Math.PI / 180)) * 180 / Math.PI;
+  const rotation = targetBeforeTilt - earthAngle;
+  const centerX = size * .315, centerY = size * .295;
+  const bounds = { left: size * .045, right: size * .665, top: size * .055, bottom: size * .615 };
+  const points = genesis.planets.flatMap((planet) => [
+    { x: planet.eclipticX, y: planet.eclipticY, z: planet.eclipticZ },
+    ...planet.orbit,
+  ]).map((point) => projectedUnit(point, rotation));
+  const positiveX = Math.max(.001, ...points.map((point) => point.x));
+  const negativeX = Math.max(.001, ...points.map((point) => -point.x));
+  const positiveY = Math.max(.001, ...points.map((point) => point.y));
+  const negativeY = Math.max(.001, ...points.map((point) => -point.y));
+  const scale = Math.min(
+    (bounds.right - centerX) / positiveX,
+    (centerX - bounds.left) / negativeX,
+    (bounds.bottom - centerY) / positiveY,
+    (centerY - bounds.top) / negativeY,
+  );
+  return { centerX, centerY, rotation, scale, targetAngle: TARGET_EARTH_ANGLE };
+}
+
+export function projectCosmicVector(vector: { x: number; y: number; z: number }, size: number, composition?: CosmicComposition): CosmicScreenPoint {
+  const frame = composition ?? { centerX: size * .315, centerY: size * .295, rotation: 0, scale: size * .3, targetAngle: TARGET_EARTH_ANGLE };
+  const point = projectedUnit(vector, frame.rotation);
+  return { x: frame.centerX + point.x * frame.scale, y: frame.centerY + point.y * frame.scale, depth: point.depth };
 }
 
 /** Preserves birth-instant heliocentric angles in a readable, distance-compressed solar-system overview. */
 export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPlacement[] {
+  const composition = cosmicComposition(genesis, size);
   return genesis.planets.map((planet) => {
-    const displayAngle = degrees(planet.longitude + ART_ROTATION);
-    const point = projectCosmicVector({ x: planet.eclipticX, y: planet.eclipticY, z: planet.eclipticZ }, size);
+    const displayAngle = degrees(planet.longitude + composition.rotation);
+    const point = projectCosmicVector({ x: planet.eclipticX, y: planet.eclipticY, z: planet.eclipticZ }, size, composition);
     const radius = planet.meanRadiusKm * COSMIC_PLANET_SCALE * size / 1024;
     const ringOuterRadius = (planet.ringOuterRadiusKm ?? planet.meanRadiusKm) * COSMIC_PLANET_SCALE * size / 1024;
     return {
       ...planet,
       radius,
       ringOuterRadius,
-      orbitRadius: compressedDistance(planet.distanceAu) * size * MAX_ORBIT_RADIUS,
+      orbitRadius: compressedDistance(planet.distanceAu) * composition.scale,
       x: point.x,
       y: point.y,
       displayAngle,
       depth: point.depth,
-      orbitPath: planet.orbit.map((sample) => projectCosmicVector(sample, size)),
+      orbitPath: planet.orbit.map((sample) => projectCosmicVector(sample, size, composition)),
     };
   });
 }
 
 /** The overview Sun is the fixed origin of the heliocentric layer. */
 export function cosmicSunPlacement(_genesis: CosmicGenesis, size: number): CosmicSunPlacement {
+  const composition = cosmicComposition(_genesis, size);
   return {
-    x: size * .43,
-    y: size * .37,
+    x: composition.centerX,
+    y: composition.centerY,
     radius: size * .063,
     displayAngle: 0,
   };
@@ -67,7 +100,7 @@ export function cosmicSunPlacement(_genesis: CosmicGenesis, size: number): Cosmi
 
 /** Enlarges the same orbital Earth into a birthplace-facing foreground portrait. */
 export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
-  return { x: size * .67, y: size * .72, radius: size * .235 };
+  return { x: size * .74, y: size * .745, radius: size * .205 };
 }
 
 export function cosmicColorRoles(colors: string[]) {

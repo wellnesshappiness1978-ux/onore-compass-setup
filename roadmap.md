@@ -311,3 +311,9 @@
 - [x] Replace decorative planet radii with physical mean-radius ratios and a single shared display multiplier.
 - [x] Replace fixed orbit rings and placements with birth-instant heliocentric vectors, logarithmic AU scaling, and sampled real orbital paths.
 - [x] Verify real position, distance and diameter ratios, Saturn proportions, labels, responsive/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+
+## Cosmic Genesis birthplace-axis dual-focus composition
+- [x] Align the whole calculated solar system to one birth-Earth composition axis without moving individual planets.
+- [x] Fit every real sampled orbit with one shared scale while reserving a balanced birthplace-facing Earth portrait.
+- [x] Rebuild orbit depth, Earth correspondence, nebular flow, and collision-safe labels around the dual-focus composition.
+- [x] Verify preserved astronomy, Earth orientation, desktop/mobile/fullscreen presentation, matching shared live/export renderer, tests, and diagnostics.
