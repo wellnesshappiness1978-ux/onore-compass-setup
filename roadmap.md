@@ -352,4 +352,4 @@
 - [x] Render the birth-instant Earth visibly on its calculated heliocentric longitude and circular Earth orbit.
 - [x] Reuse the birth-time Earth orientation for the orbital globe while retaining the separate birthplace-facing detail.
 - [x] Layer all seven exact birth colors through complex gas, emission filaments, dust, quiet zones, and a corner Milky Way.
-- [ ] Verify deterministic astronomy, celestial hierarchy, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+- [x] Verify deterministic astronomy, celestial hierarchy, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
