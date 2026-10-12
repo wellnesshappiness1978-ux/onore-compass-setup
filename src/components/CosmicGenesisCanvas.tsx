@@ -9,7 +9,7 @@ import jupiter from "@/assets/cosmic-jupiter.png";
 import saturn from "@/assets/cosmic-saturn.png";
 import uranus from "@/assets/cosmic-uranus.png";
 import neptune from "@/assets/cosmic-neptune.png";
-import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "@/lib/cosmic-art";
+import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicEarthPortrait, cosmicMoonPlacement, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement, type CosmicMoonPlacement } from "@/lib/cosmic-art";
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
 import type { Language } from "@/lib/translations";
 import type { Capture } from "./MandalaCanvas";
@@ -85,9 +85,9 @@ function irregularGlow(ctx: CanvasRenderingContext2D, x: number, y: number, radi
 
 function paintDeepSpace(ctx: CanvasRenderingContext2D, size: number, image: HTMLImageElement | null, seed: number) {
   ctx.fillStyle = VOID; ctx.fillRect(0, 0, size, size);
-  if (image) { ctx.save(); ctx.globalAlpha = .82; ctx.drawImage(image, 0, 0, size, size); ctx.restore(); }
+  if (image) { ctx.save(); ctx.globalAlpha = .94; ctx.filter = "saturate(1.18) brightness(1.13)"; ctx.drawImage(image, 0, 0, size, size); ctx.restore(); }
   const depth = ctx.createRadialGradient(size * .48, size * .45, size * .06, size * .5, size * .48, size * .76);
-  depth.addColorStop(0, "rgba(2,18,38,.08)"); depth.addColorStop(.55, "rgba(1,6,18,.12)"); depth.addColorStop(1, "rgba(0,1,7,.82)");
+  depth.addColorStop(0, "rgba(2,18,38,.03)"); depth.addColorStop(.55, "rgba(1,6,18,.06)"); depth.addColorStop(1, "rgba(0,1,7,.62)");
   ctx.fillStyle = depth; ctx.fillRect(0, 0, size, size);
   ctx.save(); ctx.globalCompositeOperation = "screen";
   for (let star = 0; star < 420; star++) {
@@ -119,7 +119,7 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
       const spread = size * (.035 + Math.sqrt(unit(salt + 4)) * .23);
       const x = size * ax + Math.cos(angle) * spread * 1.65;
       const y = size * ay + Math.sin(angle) * spread;
-      irregularGlow(ctx, x, y, size * (.05 + unit(salt + 7) * .105), role.color, role.weight * .38, salt);
+      irregularGlow(ctx, x, y, size * (.06 + unit(salt + 7) * .12), role.color, role.weight * .54, salt);
     }
     for (let filament = 0; filament < 7; filament++) {
       const salt = seed + index * 733 + filament * 67;
@@ -127,10 +127,10 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
       ctx.beginPath();
       ctx.moveTo(size * (ax - .34), size * ay + offset);
       ctx.bezierCurveTo(size * (ax - .14), size * (ay - .22 - unit(salt) * .08), size * (ax + .16), size * (ay + .2 + unit(salt + 5) * .08), size * (ax + .38), size * (ay - .04));
-      ctx.strokeStyle = role.color; ctx.globalAlpha = role.weight * (.055 + unit(salt + 8) * .045);
+      ctx.strokeStyle = role.color; ctx.globalAlpha = role.weight * (.075 + unit(salt + 8) * .065);
       ctx.lineWidth = size * (.00045 + filament * .00018); ctx.shadowColor = role.color; ctx.shadowBlur = size * .018; ctx.stroke();
     }
-    for (let mote = 0; mote < 46; mote++) {
+    for (let mote = 0; mote < 72; mote++) {
       const salt = seed + index * 919 + mote * 37;
       const x = size * ax + (unit(salt) - .5) * size * .55;
       const y = size * ay + (unit(salt + 3) - .5) * size * .34;
@@ -227,6 +227,13 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
   ctx.save(); ctx.translate(frame.x, frame.y);
   ctx.fillStyle = metalGradient(ctx, -frame.outerRadius, -frame.outerRadius, frame.outerRadius, frame.outerRadius);
   ctx.beginPath(); ctx.arc(0, 0, frame.outerRadius, 0, Math.PI * 2); ctx.arc(0, 0, frame.innerRadius, 0, Math.PI * 2, true); ctx.fill("evenodd");
+  ctx.save(); ctx.globalCompositeOperation = "screen";
+  [frame.innerRadius + size * .004, frame.outerRadius - size * .004].forEach((radius, index) => {
+    ctx.strokeStyle = index ? "rgba(255,224,132,.94)" : "rgba(255,244,204,.78)";
+    ctx.shadowColor = index ? GOLD : PLATINUM; ctx.shadowBlur = size * .008;
+    ctx.lineWidth = size * (index ? .0031 : .0024); ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.stroke();
+  });
+  ctx.restore();
   [frame.innerRadius, (frame.innerRadius + frame.outerRadius) / 2, frame.outerRadius].forEach((radius, index) => {
     ctx.strokeStyle = index === 1 ? "rgba(63,34,17,.9)" : "rgba(252,229,159,.8)";
     ctx.lineWidth = Math.max(1, size * (index === 1 ? .0012 : .0018)); ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.stroke();
@@ -265,7 +272,7 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     const anchor = -Math.PI * .75 + shell * Math.PI / 2;
     const centerRadius = (frame.innerRadius + frame.outerRadius) / 2;
     const cx = Math.cos(anchor) * centerRadius, cy = Math.sin(anchor) * centerRadius;
-    const shellRadius = size * .0155;
+    const shellRadius = size * .023;
     for (let pass = 0; pass < 3; pass++) {
       ctx.beginPath();
       for (let step = 0; step <= 92; step++) {
@@ -275,8 +282,8 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
         step ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
       }
       ctx.strokeStyle = pass === 1 ? (colors[(shell * 2) % Math.max(colors.length, 1)] ?? GOLD) : pass === 2 ? PLATINUM : GOLD;
-      ctx.globalAlpha = [ .24, .3, .86 ][pass] ?? .3;
-      ctx.lineWidth = size * ([ .0044, .0018, .00048 ][pass] ?? .00048);
+      ctx.globalAlpha = [ .32, .48, .96 ][pass] ?? .3;
+      ctx.lineWidth = size * ([ .0062, .0024, .00065 ][pass] ?? .00048);
       ctx.shadowColor = pass === 1 ? ctx.strokeStyle : GOLD; ctx.shadowBlur = size * ([ .008, .004, .001 ][pass] ?? 0); ctx.stroke();
     }
     for (let rib = 2; rib < 11; rib++) {
@@ -284,6 +291,13 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
       const radius = shellRadius * (.08 + rib / 10 * .92);
       ctx.strokeStyle = rib % 3 ? GOLD : PLATINUM; ctx.globalAlpha = .46; ctx.lineWidth = Math.max(.45, size * .00038);
       ctx.beginPath(); ctx.moveTo(cx + Math.cos(angle) * radius * .54, cy + Math.sin(angle) * radius * .54); ctx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius); ctx.stroke();
+    }
+    for (let bead = 0; bead < 7; bead++) {
+      const angle = anchor + Math.PI + (bead + 2) / 9 * Math.PI * 4.35;
+      const radius = shellRadius * (.18 + bead / 8 * .72);
+      ctx.fillStyle = colors[(shell + bead) % Math.max(colors.length, 1)] ?? GOLD;
+      ctx.globalAlpha = .82; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = size * .004;
+      ctx.beginPath(); ctx.arc(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius, size * (.0014 + bead * .00012), 0, Math.PI * 2); ctx.fill();
     }
   }
   ctx.restore();
@@ -320,20 +334,20 @@ function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: stri
   art.save(); art.globalCompositeOperation = "screen"; art.lineCap = "round";
   const trace = (offset: number) => {
     art.beginPath();
-    art.moveTo(size * -.08, size * (.18 + offset));
-    art.bezierCurveTo(size * .13, size * (.015 + offset), size * .32, size * (.015 + offset), size * .47, size * (.13 + offset));
+    art.moveTo(size * -.12, size * (.28 + offset));
+    art.bezierCurveTo(size * .12, size * (-.02 + offset), size * .39, size * (-.015 + offset), size * .58, size * (.17 + offset));
   };
-  for (let veil = 0; veil < 34; veil++) {
+  for (let veil = 0; veil < 52; veil++) {
     const salt = seed + veil * 83;
     trace((unit(salt) - .5) * .13);
     art.strokeStyle = veil % 5 === 0 ? (colors[veil % Math.max(colors.length, 1)] ?? PLATINUM) : PLATINUM;
-    art.globalAlpha = veil % 5 === 0 ? .018 : .012 + unit(salt + 4) * .018;
-    art.lineWidth = size * (.006 + unit(salt + 7) * .019);
+    art.globalAlpha = veil % 5 === 0 ? .03 : .019 + unit(salt + 4) * .027;
+    art.lineWidth = size * (.008 + unit(salt + 7) * .025);
     art.shadowColor = art.strokeStyle; art.shadowBlur = size * .024; art.stroke();
   }
-  for (let star = 0; star < 760; star++) {
+  for (let star = 0; star < 1100; star++) {
     const salt = seed + star * 47, progress = unit(salt);
-    const x = size * (-.04 + progress * .56);
+    const x = size * (-.04 + progress * .67);
     const centerY = size * (.11 - .035 * Math.sin(progress * Math.PI * 1.4));
     const width = size * (.018 + Math.sin(progress * Math.PI) * .055);
     const y = centerY + (unit(salt + 3) - .5) * width * 2;
@@ -345,7 +359,7 @@ function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: stri
   art.globalCompositeOperation = "destination-out";
   trace(0); art.strokeStyle = "rgba(0,0,0,.34)"; art.globalAlpha = .48; art.lineWidth = size * .012; art.shadowBlur = 0; art.stroke();
   art.restore();
-  ctx.save(); ctx.globalAlpha = .78; ctx.drawImage(layer, 0, 0); ctx.restore();
+  ctx.save(); ctx.globalAlpha = .94; ctx.drawImage(layer, 0, 0); ctx.restore();
 }
 
 function paintCelestialSilence(ctx: CanvasRenderingContext2D, size: number, points: Array<Point & { radius: number }>) {
