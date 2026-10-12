@@ -398,4 +398,4 @@
 - [x] Rebuild the outer compass as deeper multi-rail antique-gold, platinum and dark-metal relief with prominent jewel-set nautilus emblems.
 - [x] Place the golden instrument behind celestial bodies, tighten the orbit field, and give the separate birth Earth a jeweled cradle so no important body is hidden by the frame.
 - [x] Replace faint edge text with larger two-level high-contrast obsidian plaques and matching Moon, birth-Earth and physical-size labels.
-- [ ] Verify desktop, mobile, fullscreen and 2048 PNG presentation, all seven languages, deterministic geometry, tests and diagnostics.
+- [x] Verify desktop/mobile rendering, fullscreen opening and closing, and an actual 2048 × 2048 PNG download; 17 astronomy/geometry tests pass. Seven-language label dictionaries remain wired into the shared renderer; individual non-Japanese visual reviews were not performed.
