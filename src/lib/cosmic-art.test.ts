@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_GUARDIANS, cosmicBirthplaceLight, cosmicColorRoles, cosmicEarthPortrait, cosmicPlacements, cosmicSunPlacement } from "./cosmic-art";
+import { COSMIC_GUARDIANS, cosmicBirthplaceLight, cosmicColorRoles, cosmicComposition, cosmicEarthPortrait, cosmicPlacements, cosmicSunPlacement } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a readable heliocentric overview while preserving absolute angles", () => {
@@ -17,12 +17,13 @@ describe("Cosmic Genesis artwork layout", () => {
     });
     const earth = placements.find((planet) => planet.id === "earth");
     expect(earth?.orbitRadius).toBeGreaterThan(0);
-    expect(cosmicEarthPortrait(1024)).toEqual({ x: 686.08, y: 737.28, radius: 240.64 });
+    expect(cosmicEarthPortrait(1024)).toEqual({ x: 757.76, y: 762.88, radius: 209.92 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
     const venus = placements.find((planet) => planet.id === "venus");
-    expect(mercury?.displayAngle).toBeCloseTo(((mercury?.longitude ?? 0) - 18 + 360) % 360, 8);
-    expect(venus?.displayAngle).toBeCloseTo(((venus?.longitude ?? 0) - 18 + 360) % 360, 8);
+    const composition = cosmicComposition(genesis, 1024);
+    expect(mercury?.displayAngle).toBeCloseTo(((mercury?.longitude ?? 0) + composition.rotation + 360) % 360, 8);
+    expect(venus?.displayAngle).toBeCloseTo(((venus?.longitude ?? 0) + composition.rotation + 360) % 360, 8);
     expect((venus?.orbitRadius ?? 0) < (earth?.orbitRadius ?? 0)).toBe(true);
     const jupiter = placements.find((planet) => planet.id === "jupiter");
     expect(jupiter).toBeDefined();
@@ -37,8 +38,28 @@ describe("Cosmic Genesis artwork layout", () => {
       expect(Math.hypot(planet.x - firstPoint.x, planet.y - firstPoint.y)).toBeLessThan(.001);
     });
     const sun = cosmicSunPlacement(genesis, 1024);
-    expect(sun.x).toBeCloseTo(440.32, 2);
-    expect(sun.y).toBeCloseTo(378.88, 2);
+    expect(sun.x).toBeCloseTo(322.56, 2);
+    expect(sun.y).toBeCloseTo(302.08, 2);
+    expect(Math.atan2((earth.y - sun.y), (earth.x - sun.x)) * 180 / Math.PI).toBeCloseTo(composition.targetAngle, 5);
+  });
+
+  it("keeps one shared birth-Earth composition transform across dates", () => {
+    for (const [date, time] of [["1965-06-08", "04:10"], ["2001-01-01", "12:00"], ["2026-10-12", "13:10"]]) {
+      const genesis = cosmicGenesis(date, time, false);
+      if (!genesis) continue;
+      const placements = cosmicPlacements(genesis, 1024);
+      const earth = placements.find((planet) => planet.id === "earth");
+      const sun = cosmicSunPlacement(genesis, 1024);
+      const frame = cosmicComposition(genesis, 1024);
+      expect(frame.scale).toBeGreaterThan(0);
+      expect(Math.atan2((earth?.y ?? sun.y) - sun.y, (earth?.x ?? sun.x) - sun.x) * 180 / Math.PI).toBeCloseTo(frame.targetAngle, 5);
+      placements.flatMap((planet) => planet.orbitPath).forEach((point) => {
+        expect(point.x).toBeGreaterThanOrEqual(1024 * .045 - .01);
+        expect(point.x).toBeLessThanOrEqual(1024 * .665 + .01);
+        expect(point.y).toBeGreaterThanOrEqual(1024 * .055 - .01);
+        expect(point.y).toBeLessThanOrEqual(1024 * .615 + .01);
+      });
+    }
   });
 
   it("retains all seven exact birth colors as strong artwork roles", () => {
