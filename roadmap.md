@@ -369,3 +369,9 @@
 - [x] Unify the goldwork, Sun, planets, birth-Earth, nebulae, and scientific plaques into one refined visual hierarchy.
 - [x] Suppress orbit light beneath bodies and refine Saturn, exact birth-color depth, and long-label readability without changing astronomy.
 - [ ] Complete desktop, mobile, fullscreen, and 2048 export verification (preview profile restoration is intermittent; tests and diagnostics pass).
+
+## Cosmic Genesis complete artistic recreation
+- [ ] Recompose the artwork as one sacred celestial compass with clear Sun, birth-Earth, zodiac, and guardian hierarchy.
+- [ ] Repaint the seven exact birth colors as layered star-life veils and give every planet Sun-directed light and distinctive surface detail.
+- [ ] Replace fragmented plaques with integrated scientific bands while preserving every value and all seven languages.
+- [ ] Extend deterministic tests and complete desktop, mobile, fullscreen, and 2048 export verification with three visual refinement passes.
