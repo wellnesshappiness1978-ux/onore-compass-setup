@@ -353,3 +353,8 @@
 - [x] Reuse the birth-time Earth orientation for the orbital globe while retaining the separate birthplace-facing detail.
 - [x] Layer all seven exact birth colors through complex gas, emission filaments, dust, quiet zones, and a corner Milky Way.
 - [x] Verify deterministic astronomy, celestial hierarchy, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+
+## Cosmic Genesis body presence tuning
+- [ ] Enlarge display radii ~16% and widen inner orbit curve
+- [ ] Strengthen Sun/planet/Earth glow
+- [ ] Add inner-orbit non-overlap test; run tests and verify
