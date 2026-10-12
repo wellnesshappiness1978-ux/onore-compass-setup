@@ -48,7 +48,7 @@ function compressedDistance(distanceAu: number) {
 
 /** One monotonic visibility scale for the central diagram; physical ratios remain exact in the comparison strip. */
 export function cosmicDisplayRadius(meanRadiusKm: number, size: number) {
-  return size * .0645 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
+  return size * .058 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
 }
 
 /** Keeps the Sun at the center and maps Neptune's representative orbit to one shared diagram radius. */
@@ -81,7 +81,7 @@ export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPl
       y: composition.centerY + Math.sin(angle) * orbitRadius,
       depth: Math.sin(angle),
     };
-    const radius = cosmicDisplayRadius(planet.meanRadiusKm, size);
+    const radius = cosmicDisplayRadius(planet.meanRadiusKm, size) * 1.11;
     const ringOuterRadius = planet.id === "saturn" ? radius * ((planet.ringOuterRadiusKm ?? planet.meanRadiusKm) / planet.meanRadiusKm) : radius;
     return {
       ...planet,
