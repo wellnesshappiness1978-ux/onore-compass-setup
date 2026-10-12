@@ -408,6 +408,6 @@
 - [x] Verify default-private disclosures, all five downloads for both artworks, desktop/mobile/fullscreen, 36 passing tests and clean diagnostics. Actual paid entitlements and native device-share destinations were not verified; artwork checks used the development VIP preview.
 
 ## Cosmic Genesis direct gold lettering and 9:16 wallpaper
-- [ ] Remove every text plaque and comparison backing; apply scaled champagne lettering, subtle shadows and straight fine leaders.
-- [ ] Preserve existing craft, astronomy, gates and local rendering; add opt-in birth engraving and Julian day without changing private commemorative IDs.
-- [ ] Deliver true 9:16 wallpaper with clock-safe space and verify live/fullscreen/export, privacy and targeted tests.
+- [x] Remove every text plaque and comparison backing; apply scaled champagne lettering, subtle shadows and straight fine leaders.
+- [x] Preserve existing craft, astronomy, gates and local rendering; add opt-in birth engraving and Julian day without changing private commemorative IDs.
+- [x] Verify all five actual downloads for both artworks, 1440×2560 clock-safe wallpaper, 2048 square artwork, default-private disclosure reset, desktop/mobile/fullscreen and clean diagnostics. Checks used the development VIP preview; actual billing entitlements and native device-share destinations remain unverified.
