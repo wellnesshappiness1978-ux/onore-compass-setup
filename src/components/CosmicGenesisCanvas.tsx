@@ -657,7 +657,6 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   const orbitalEarth = placements.find((planet) => planet.id === "earth");
   const earth = cosmicEarthPortrait(size);
   paintCelestialSilence(ctx, size, [{ ...earth, radius: earth.radius * 1.3 }]);
-  paintGuardian(ctx, size, genesis);
   paintOrbitalField(ctx, size, solar, placements);
   paintOrbitSilence(ctx, size, placements);
   const surrounding = placements.slice().sort((a, b) => a.depth - b.depth);
