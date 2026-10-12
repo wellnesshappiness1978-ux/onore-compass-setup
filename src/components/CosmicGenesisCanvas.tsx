@@ -9,7 +9,7 @@ import jupiter from "@/assets/cosmic-jupiter.png";
 import saturn from "@/assets/cosmic-saturn.png";
 import uranus from "@/assets/cosmic-uranus.png";
 import neptune from "@/assets/cosmic-neptune.png";
-import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "@/lib/cosmic-art";
+import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "@/lib/cosmic-art";
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
 import type { Language } from "@/lib/translations";
 import type { Capture } from "./MandalaCanvas";
@@ -141,37 +141,49 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
   ctx.restore();
 }
 
-function paintSpiralNebula(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
+function paintStarLifeVeils(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number, earthAngle: number) {
   const centerX = size * .5, centerY = size * .47;
+  const prominence = [1, .86, .76, .68, .55, .48, .36];
+  const mainAngle = earthAngle * Math.PI / 180;
   ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round";
   for (let arm = 0; arm < 7; arm++) {
     const color = colors[arm] ?? GOLD;
-    const prominence = [1, .48, .68, .55, .76, .86, .36][arm] ?? .4;
-    for (let ribbon = 0; ribbon < 9; ribbon++) {
+    const strength = prominence[arm] ?? .4;
+    for (let ribbon = 0; ribbon < 6; ribbon++) {
       const salt = seed + arm * 991 + ribbon * 53;
-      const turn = arm * Math.PI * 2 / 7 + (ribbon - 4) * .025;
+      const turn = mainAngle + arm * Math.PI * 2 / 7 + (ribbon - 2.5) * .036;
       ctx.beginPath();
-      for (let step = 0; step <= 92; step++) {
-        const progress = step / 92;
-        const radius = size * (.075 + progress * .31);
-        const angle = turn + progress * Math.PI * 2.15 + (unit(salt + step) - .5) * .018;
-        const x = centerX + Math.cos(angle) * radius * (1 + .05 * Math.sin(progress * Math.PI));
-        const y = centerY + Math.sin(angle) * radius * .82;
+      for (let step = 0; step <= 110; step++) {
+        const progress = step / 110;
+        const radius = size * (.06 + progress * .355);
+        const angle = turn + progress * Math.PI * 1.62 + (unit(salt + step) - .5) * .026;
+        const x = centerX + Math.cos(angle) * radius * (1 + .035 * Math.sin(progress * Math.PI));
+        const y = centerY + Math.sin(angle) * radius * .88;
         if (step === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.strokeStyle = color;
-      ctx.globalAlpha = prominence * (.012 + unit(salt + 7) * .013);
-      ctx.lineWidth = size * (.004 + unit(salt + 11) * .012);
-      ctx.shadowColor = color; ctx.shadowBlur = size * .018; ctx.stroke();
+      ctx.globalAlpha = strength * (.01 + unit(salt + 7) * .011);
+      ctx.lineWidth = size * (.007 + unit(salt + 11) * .018);
+      ctx.shadowColor = color; ctx.shadowBlur = size * .026; ctx.stroke();
+      ctx.globalAlpha = strength * (.018 + unit(salt + 17) * .018);
+      ctx.lineWidth = size * (.0003 + unit(salt + 23) * .0008); ctx.shadowBlur = size * .009; ctx.stroke();
     }
   }
-  for (let dust = 0; dust < 520; dust++) {
+  for (let dust = 0; dust < 430; dust++) {
     const salt = seed + dust * 41, progress = Math.sqrt(unit(salt));
-    const arm = dust % 7, angle = arm * Math.PI * 2 / 7 + progress * Math.PI * 2.15 + (unit(salt + 5) - .5) * .22;
-    const radius = size * (.08 + progress * .31);
-    const x = centerX + Math.cos(angle) * radius, y = centerY + Math.sin(angle) * radius * .82;
-    ctx.fillStyle = colors[arm] ?? GOLD; ctx.globalAlpha = .025 + unit(salt + 9) * .11;
+    const arm = dust % 7, angle = mainAngle + arm * Math.PI * 2 / 7 + progress * Math.PI * 1.62 + (unit(salt + 5) - .5) * .2;
+    const radius = size * (.07 + progress * .345);
+    const x = centerX + Math.cos(angle) * radius, y = centerY + Math.sin(angle) * radius * .88;
+    ctx.fillStyle = colors[arm] ?? GOLD; ctx.globalAlpha = .02 + unit(salt + 9) * .085;
     ctx.beginPath(); ctx.arc(x, y, size * (.00018 + unit(salt + 13) ** 2 * .00078), 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+
+  ctx.save(); ctx.globalCompositeOperation = "multiply";
+  for (let band = 0; band < 5; band++) {
+    const angle = mainAngle + band * 1.27;
+    ctx.strokeStyle = "rgba(0,2,10,.2)"; ctx.lineWidth = size * (.011 + band * .002); ctx.lineCap = "round";
+    ctx.beginPath(); ctx.arc(centerX, centerY, size * (.12 + band * .064), angle, angle + 1.25); ctx.stroke();
   }
   ctx.restore();
 }
@@ -188,8 +200,9 @@ function metalGradient(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1
   return gradient;
 }
 
-function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: number, colors: string[], guardian: number) {
+function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: number, colors: string[], genesis: CosmicGenesis) {
   const frame = cosmicAstrolabeFrame(size);
+  const identity = cosmicCompassIdentity(genesis);
   ctx.save(); ctx.translate(frame.x, frame.y);
   ctx.fillStyle = metalGradient(ctx, -frame.outerRadius, -frame.outerRadius, frame.outerRadius, frame.outerRadius);
   ctx.beginPath(); ctx.arc(0, 0, frame.outerRadius, 0, Math.PI * 2); ctx.arc(0, 0, frame.innerRadius, 0, Math.PI * 2, true); ctx.fill("evenodd");
@@ -206,10 +219,11 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
   for (let jewel = 0; jewel < 12; jewel++) {
     const angle = jewel / 12 * Math.PI * 2, radius = (frame.innerRadius + frame.outerRadius) / 2;
     const x = Math.cos(angle) * radius, y = Math.sin(angle) * radius;
-    const jewelColor = colors[(jewel + guardian) % Math.max(colors.length, 1)] ?? GOLD;
-    irregularGlow(ctx, x, y, size * .011, jewelColor, .32, seed + jewel * 29);
-    ctx.fillStyle = jewelColor; ctx.globalAlpha = .9; ctx.beginPath(); ctx.arc(x, y, size * .0032, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = "rgba(255,233,169,.82)"; ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.arc(x, y, size * .0048, 0, Math.PI * 2); ctx.stroke();
+    const awakened = identity.awakenedSectors.includes(jewel);
+    const jewelColor = colors[(jewel + identity.guardian) % Math.max(colors.length, 1)] ?? GOLD;
+    irregularGlow(ctx, x, y, size * (awakened ? .018 : .008), jewelColor, awakened ? .58 : .18, seed + jewel * 29);
+    ctx.fillStyle = jewelColor; ctx.globalAlpha = awakened ? .96 : .52; ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .004 : .0025), 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = awakened ? "rgba(255,243,198,.96)" : "rgba(255,233,169,.52)"; ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .0058 : .0042), 0, Math.PI * 2); ctx.stroke();
   }
   ctx.restore();
 }
