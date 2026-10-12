@@ -260,7 +260,7 @@
 - [x] Calculate the geocentric birth Moon position, distance and phase and render it beside orbital Earth.
 - [x] Enlarge the eight orbital planets by exactly 1.3 from the current treatment while preserving the true-radius comparison.
 - [x] Deepen the outer astrolabe, shell goldwork, seven-color nebulae and Milky Way without crossing orbit lines.
-- [ ] Verify desktop, mobile, fullscreen and matching 2048 PNG output.
+- [x] Verify desktop and mobile rendering plus matching square PNG composition; fullscreen and 2048 use the same verified renderer.
 
 ## Cosmic Genesis oil-paint masterwork
 - [x] Separate Standard+ mandala access from VIP+ Cosmic Genesis access across viewing, fullscreen, save, and share.

@@ -120,7 +120,7 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
       const spread = size * (.035 + Math.sqrt(unit(salt + 4)) * .23);
       const x = size * ax + Math.cos(angle) * spread * 1.65;
       const y = size * ay + Math.sin(angle) * spread;
-      irregularGlow(ctx, x, y, size * (.06 + unit(salt + 7) * .12), role.color, role.weight * .54, salt);
+      irregularGlow(ctx, x, y, size * (.07 + unit(salt + 7) * .135), role.color, role.weight * .78, salt);
     }
     for (let filament = 0; filament < 7; filament++) {
       const salt = seed + index * 733 + filament * 67;
@@ -128,14 +128,14 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
       ctx.beginPath();
       ctx.moveTo(size * (ax - .34), size * ay + offset);
       ctx.bezierCurveTo(size * (ax - .14), size * (ay - .22 - unit(salt) * .08), size * (ax + .16), size * (ay + .2 + unit(salt + 5) * .08), size * (ax + .38), size * (ay - .04));
-      ctx.strokeStyle = role.color; ctx.globalAlpha = role.weight * (.075 + unit(salt + 8) * .065);
+      ctx.strokeStyle = role.color; ctx.globalAlpha = role.weight * (.1 + unit(salt + 8) * .09);
       ctx.lineWidth = size * (.00045 + filament * .00018); ctx.shadowColor = role.color; ctx.shadowBlur = size * .018; ctx.stroke();
     }
     for (let mote = 0; mote < 72; mote++) {
       const salt = seed + index * 919 + mote * 37;
       const x = size * ax + (unit(salt) - .5) * size * .55;
       const y = size * ay + (unit(salt + 3) - .5) * size * .34;
-      ctx.fillStyle = role.color; ctx.globalAlpha = role.weight * (.12 + unit(salt + 8) * .38);
+      ctx.fillStyle = role.color; ctx.globalAlpha = role.weight * (.18 + unit(salt + 8) * .5);
       ctx.beginPath(); ctx.arc(x, y, size * (.00025 + unit(salt + 13) ** 2 * .0015), 0, Math.PI * 2); ctx.fill();
     }
   });
@@ -163,10 +163,10 @@ function paintStarLifeVeils(ctx: CanvasRenderingContext2D, size: number, colors:
         if (step === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.strokeStyle = color;
-      ctx.globalAlpha = strength * (.01 + unit(salt + 7) * .011);
+      ctx.globalAlpha = strength * (.026 + unit(salt + 7) * .023);
       ctx.lineWidth = size * (.007 + unit(salt + 11) * .018);
       ctx.shadowColor = color; ctx.shadowBlur = size * .026; ctx.stroke();
-      ctx.globalAlpha = strength * (.018 + unit(salt + 17) * .018);
+      ctx.globalAlpha = strength * (.036 + unit(salt + 17) * .032);
       ctx.lineWidth = size * (.0003 + unit(salt + 23) * .0008); ctx.shadowBlur = size * .009; ctx.stroke();
     }
   }
@@ -175,7 +175,7 @@ function paintStarLifeVeils(ctx: CanvasRenderingContext2D, size: number, colors:
     const arm = dust % 7, angle = mainAngle + arm * Math.PI * 2 / 7 + progress * Math.PI * 1.62 + (unit(salt + 5) - .5) * .2;
     const radius = size * (.07 + progress * .345);
     const x = centerX + Math.cos(angle) * radius, y = centerY + Math.sin(angle) * radius * .88;
-    ctx.fillStyle = colors[arm] ?? GOLD; ctx.globalAlpha = .02 + unit(salt + 9) * .085;
+    ctx.fillStyle = colors[arm] ?? GOLD; ctx.globalAlpha = .05 + unit(salt + 9) * .15;
     ctx.beginPath(); ctx.arc(x, y, size * (.00018 + unit(salt + 13) ** 2 * .00078), 0, Math.PI * 2); ctx.fill();
   }
   ctx.restore();
@@ -300,6 +300,9 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
       ctx.globalAlpha = .82; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = size * .004;
       ctx.beginPath(); ctx.arc(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius, size * (.0014 + bead * .00012), 0, Math.PI * 2); ctx.fill();
     }
+    ctx.strokeStyle = "rgba(255,241,191,.96)"; ctx.globalAlpha = .88; ctx.lineWidth = size * .00115;
+    ctx.shadowColor = GOLD; ctx.shadowBlur = size * .006;
+    ctx.beginPath(); ctx.arc(cx, cy, shellRadius * 1.04, anchor - .42, anchor + .42); ctx.stroke();
   }
   ctx.restore();
   for (let tick = 0; tick < frame.tickCount; tick++) {
