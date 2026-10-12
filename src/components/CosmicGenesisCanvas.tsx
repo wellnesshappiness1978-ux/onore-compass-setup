@@ -242,6 +242,25 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.fillStyle = braid % 2 ? GOLD : PLATINUM; ctx.globalAlpha = braid % 6 === 0 ? .48 : .18;
     ctx.beginPath(); ctx.ellipse(x, y, size * .0017, size * .00062, angle + Math.PI / 2, 0, Math.PI * 2); ctx.fill();
   }
+  for (let fan = 0; fan < 4; fan++) {
+    const anchor = -Math.PI * .75 + fan * Math.PI / 2;
+    for (let growth = 0; growth < 9; growth++) {
+      const radius = frame.innerRadius + size * (.0028 + growth * .00205);
+      const spread = .032 + growth * .009;
+      ctx.strokeStyle = growth % 3 === 2 ? PLATINUM : GOLD;
+      ctx.globalAlpha = .34 + growth * .055;
+      ctx.lineWidth = Math.max(.6, size * (growth % 3 === 2 ? .00072 : .0005));
+      ctx.shadowColor = growth % 3 === 2 ? PLATINUM : GOLD; ctx.shadowBlur = size * .0025;
+      ctx.beginPath(); ctx.arc(0, 0, radius, anchor - spread, anchor + spread); ctx.stroke();
+    }
+    for (let ray = -3; ray <= 3; ray++) {
+      const angle = anchor + ray * .019;
+      ctx.strokeStyle = ray === 0 ? PLATINUM : GOLD; ctx.globalAlpha = ray === 0 ? .82 : .44;
+      ctx.lineWidth = Math.max(.5, size * (ray === 0 ? .00075 : .0004));
+      ctx.beginPath(); ctx.moveTo(Math.cos(angle) * (frame.innerRadius + size * .001), Math.sin(angle) * (frame.innerRadius + size * .001));
+      ctx.lineTo(Math.cos(angle) * (frame.outerRadius - size * .001), Math.sin(angle) * (frame.outerRadius - size * .001)); ctx.stroke();
+    }
+  }
   for (let shell = 0; shell < 4; shell++) {
     const anchor = -Math.PI * .75 + shell * Math.PI / 2;
     const centerRadius = (frame.innerRadius + frame.outerRadius) / 2;
