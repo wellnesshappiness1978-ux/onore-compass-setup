@@ -207,12 +207,11 @@ function paintOrbitalField(ctx: CanvasRenderingContext2D, size: number, solar: P
     path.forEach((point, index) => {
       const next = path[(index + 1) % path.length];
       if (!next) return;
-      const depth = Math.max(0, Math.min(1, ((point.depth + next.depth) / 2 + 1) / 2));
       ctx.beginPath(); ctx.moveTo(point.x, point.y); ctx.lineTo(next.x, next.y);
-      ctx.strokeStyle = planet.id === "earth" ? `rgba(238,219,154,${.12 + depth * .32})` : `rgba(238,219,154,${.035 + depth * .14})`;
-      ctx.lineWidth = size * (planet.id === "earth" ? .0007 + depth * .00075 : .00028 + depth * .00034);
+      ctx.strokeStyle = planet.id === "earth" ? "rgba(238,219,154,.42)" : "rgba(226,235,236,.16)";
+      ctx.lineWidth = size * (planet.id === "earth" ? .00105 : .00052);
       ctx.shadowColor = GOLD;
-      ctx.shadowBlur = planet.id === "earth" ? size * depth * .007 : size * depth * .0015;
+      ctx.shadowBlur = planet.id === "earth" ? size * .006 : size * .0015;
       ctx.stroke();
     });
     if (planet.id === "earth") {
@@ -276,7 +275,7 @@ function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genes
   ctx.fillStyle = "rgba(226,235,236,.62)"; ctx.font = `${Math.max(10, size * .0105)}px ui-sans-serif, sans-serif`;
   ctx.fillText(`${birthPlace || "—"}  ·  ${genesis.approximate ? "JST 12:00 reference" : "birth-time sky"}`, size * .055, size * .952);
   ctx.textAlign = "right";
-  ctx.fillText("POSITION: BIRTH-INSTANT HELIOCENTRIC  ·  DISTANCE: LOG SCALE  ·  PLANET RADIUS: PHYSICAL RATIO  ·  SUN / EARTH DETAIL: SEPARATE SCALE", size * .945, size * .952);
+  ctx.fillText("CONCEPT DIAGRAM · ANGLE: BIRTH-INSTANT LONGITUDE · ORBIT SPACING: LOG SCALE · PLANET RADIUS: PHYSICAL RATIO · SUN / EARTH DETAIL: SEPARATE SCALE", size * .945, size * .952);
   ctx.textAlign = "center"; ctx.fillStyle = "rgba(244,224,157,.76)"; ctx.font = `${Math.max(9, size * .0095)}px ui-sans-serif, sans-serif`;
   ctx.fillText(language === "ja" ? "出生地球・拡大細部図" : "BIRTH EARTH · ENLARGED DETAIL", earthPortrait.x, earthPortrait.y + earthPortrait.radius * 1.22);
   ctx.restore();
@@ -447,5 +446,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "太陽を中心に出生瞬間の実配置と実半径比で描いた太陽系と、出生地点が輝く地球拡大細部図" : "Sun-centered birth-instant Solar System with physical planet-radius ratios and an enlarged birthplace-visible Earth detail"} data-cosmic-genesis data-renderer="sun-centered-physical-layout" data-birth-color-role="ranked-nebula-and-atmospheric-birthplace-light" data-guide-spokes="0" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "太陽を中心に登録ユーザーの出生時の惑星配置を示す太陽系概念図と、出生地点が輝く地球拡大細部図" : "Sun-centered conceptual Solar System showing the registered user's birth-instant planet positions and an enlarged birthplace-visible Earth detail"} data-cosmic-genesis data-renderer="birth-instant-solar-system-concept" data-birth-color-role="ranked-nebula-and-atmospheric-birthplace-light" data-guide-spokes="0" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
