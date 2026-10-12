@@ -328,4 +328,10 @@
 - [x] Replace projected sampled paths with eight concentric conceptual orbit bands centered on the Sun.
 - [x] Place every planet at the registered user's birth-instant heliocentric longitude while preserving logarithmic distance order and physical radius ratios.
 - [x] Retain the separate birthplace-facing Earth detail, restrained celestial artwork, shared live/export renderer, and VIP gate.
-- [ ] Verify desktop/mobile/fullscreen presentation, matching 2048 export, and final diagnostics.
+- [x] Verify desktop/mobile/fullscreen presentation, matching 2048 export, and final diagnostics.
+
+## Cosmic Genesis circular orbital-order art refinement
+- [x] Derive eight fixed concentric orbit bands from representative orbital distances so their order always remains Mercury through Neptune.
+- [x] Preserve each planet's birth-instant heliocentric longitude and displayed instantaneous AU while separating both from orbit-band radius.
+- [x] Rebalance the orbital artwork and move the birthplace-facing Earth detail beyond the orbit field at a smaller scale.
+- [x] Verify orbital ordering, astronomy, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.

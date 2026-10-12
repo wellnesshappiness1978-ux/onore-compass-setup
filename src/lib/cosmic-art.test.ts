@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_GUARDIANS, cosmicBirthplaceLight, cosmicColorRoles, cosmicComposition, cosmicEarthPortrait, cosmicPlacements, cosmicSunPlacement } from "./cosmic-art";
+import { COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicBirthplaceLight, cosmicColorRoles, cosmicComposition, cosmicEarthPortrait, cosmicPlacements, cosmicSunPlacement } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a readable conceptual Solar System while preserving birth longitudes", () => {
@@ -17,7 +17,7 @@ describe("Cosmic Genesis artwork layout", () => {
     });
     const earth = placements.find((planet) => planet.id === "earth");
     expect(earth?.orbitRadius).toBeGreaterThan(0);
-    expect(cosmicEarthPortrait(1024)).toEqual({ x: 855.04, y: 855.04, radius: 100.352 });
+    expect(cosmicEarthPortrait(1024)).toEqual({ x: 880.64, y: 880.64, radius: 56.32 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
     const venus = placements.find((planet) => planet.id === "venus");
@@ -42,6 +42,21 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(sun.x).toBeCloseTo(512, 8);
     expect(sun.y).toBeCloseTo(512, 8);
     expect(((Math.atan2((earth.y - sun.y), (earth.x - sun.x)) * 180 / Math.PI) + 360) % 360).toBeCloseTo(composition.targetAngle, 5);
+  });
+
+  it("keeps every circular orbit in physical orbital order regardless of instantaneous distance", () => {
+    const expected = ["mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"] as const;
+    const births: Array<[string, string]> = [["1965-06-08", "04:10"], ["1990-04-15", "08:30"], ["2026-10-12", "13:10"]];
+    expect(expected.map((id) => COSMIC_ORBIT_AU[id])).toEqual([...expected.map((id) => COSMIC_ORBIT_AU[id])].sort((a, b) => a - b));
+    for (const [date, time] of births) {
+      const genesis = cosmicGenesis(date, time, false);
+      if (!genesis) continue;
+      const placements = cosmicPlacements(genesis, 1024);
+      const radii = expected.map((id) => placements.find((planet) => planet.id === id)?.orbitRadius ?? 0);
+      for (let index = 1; index < radii.length; index++) expect(radii[index]).toBeGreaterThan(radii[index - 1] ?? 0);
+      const earthRadius = radii[2] ?? 0;
+      expected.slice(4).forEach((id) => expect(placements.find((planet) => planet.id === id)?.orbitRadius ?? 0).toBeGreaterThan(earthRadius));
+    }
   });
 
   it("keeps one shared Sun-centered conceptual scale across dates", () => {
