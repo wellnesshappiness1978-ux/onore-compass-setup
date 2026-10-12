@@ -34,6 +34,7 @@ export type CosmicComposition = { centerX: number; centerY: number; rotation: nu
 export type CosmicSizeComparison = { id: "sun" | CosmicPlanet["id"]; x: number; y: number; radius: number; physicalRadiusKm: number };
 export type CosmicAstrolabeFrame = { x: number; y: number; innerRadius: number; outerRadius: number; tickCount: number };
 export type CosmicCompassIdentity = { sunSign: number; moonSign: number; guardian: number; awakenedSectors: readonly number[] };
+export type CosmicShellPoint = CosmicScreenPoint & { progress: number; angle: number; radius: number };
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
@@ -47,7 +48,7 @@ function compressedDistance(distanceAu: number) {
 
 /** One monotonic visibility scale for the central diagram; physical ratios remain exact in the comparison strip. */
 export function cosmicDisplayRadius(meanRadiusKm: number, size: number) {
-  return size * .058 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
+  return size * .0645 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
 }
 
 /** Keeps the Sun at the center and maps Neptune's representative orbit to one shared diagram radius. */
@@ -131,6 +132,26 @@ export function cosmicCompassIdentity(genesis: CosmicGenesis): CosmicCompassIden
   const moonSign = ((genesis.moonSign % 12) + 12) % 12;
   const guardian = ((genesis.animal % 12) + 12) % 12;
   return { sunSign, moonSign, guardian, awakenedSectors: sunSign === moonSign ? [sunSign] : [sunSign, moonSign] };
+}
+
+/** A deterministic logarithmic shell growth line beneath the astronomical layers. */
+export function cosmicShellSpiral(size: number, rotationDegrees = 0): CosmicShellPoint[] {
+  const centerX = size * .5, centerY = size * .47;
+  const startRadius = size * .052, endRadius = size * .405;
+  const turns = 2.42, rotation = rotationDegrees * Math.PI / 180;
+  return Array.from({ length: 241 }, (_, index) => {
+    const progress = index / 240;
+    const radius = startRadius * Math.pow(endRadius / startRadius, progress);
+    const angle = rotation + progress * Math.PI * 2 * turns;
+    return {
+      x: centerX + Math.cos(angle) * radius,
+      y: centerY + Math.sin(angle) * radius,
+      depth: Math.sin(angle),
+      progress,
+      angle,
+      radius,
+    };
+  });
 }
 
 /** Sun and planets on one linear physical-radius scale, independent from the visibility-scaled orbit diagram. */
