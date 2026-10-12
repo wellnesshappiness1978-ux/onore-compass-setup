@@ -125,6 +125,18 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(light.safetyRadius).toBeGreaterThan(earth.radius);
   });
 
+  it("keeps enlarged inner bodies clear of the Sun and neighbouring orbit bands", () => {
+    const genesis = cosmicGenesis("1990-04-15", "08:30", false);
+    if (!genesis) return;
+    const placements = cosmicPlacements(genesis, 1024);
+    const sun = cosmicSunPlacement(genesis, 1024);
+    const inner = ["mercury", "venus", "earth", "mars"].map((id) => placements.find((planet) => planet.id === id)!);
+    expect(inner[0]!.orbitRadius - inner[0]!.radius).toBeGreaterThan(sun.radius);
+    for (let index = 1; index < inner.length; index++) {
+      expect(inner[index]!.orbitRadius - inner[index - 1]!.orbitRadius).toBeGreaterThan(inner[index]!.radius + inner[index - 1]!.radius);
+    }
+  });
+
   it("provides one stable guardian identity for every East Asian zodiac year", () => {
     expect(COSMIC_GUARDIANS).toHaveLength(12);
     expect(new Set(COSMIC_GUARDIANS).size).toBe(12);

@@ -240,9 +240,9 @@ function paintGuardian(ctx: CanvasRenderingContext2D, size: number, genesis: Cos
 }
 
 function paintSun(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null, point: Point, radius: number, size: number, seed: number) {
-  irregularGlow(ctx, point.x, point.y, radius * 3.05, "#ffc95e", .78, seed);
-  irregularGlow(ctx, point.x, point.y, radius * 1.72, "#fff0b4", .86, seed + 51);
-  if (image) { ctx.save(); ctx.shadowColor = "#ffd372"; ctx.shadowBlur = size * .052; ctx.drawImage(image, point.x - radius, point.y - radius, radius * 2, radius * 2); ctx.restore(); }
+  irregularGlow(ctx, point.x, point.y, radius * 3.3, "#ffc95e", .78, seed);
+  irregularGlow(ctx, point.x, point.y, radius * 1.85, "#fff0b4", .86, seed + 51);
+  if (image) { ctx.save(); ctx.shadowColor = "#ffd372"; ctx.shadowBlur = size * .06; ctx.drawImage(image, point.x - radius, point.y - radius, radius * 2, radius * 2); ctx.restore(); }
   ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round";
   for (let ray = 0; ray < 46; ray++) {
     const angle = ray * Math.PI * 2 / 46 + unit(seed + ray) * .08;
@@ -439,7 +439,7 @@ function paintBirthplaceRadiance(ctx: CanvasRenderingContext2D, earth: Point, po
 function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null, earth: Point, radius: number, view: EarthView, sunPoint: Point, seed: number, overallColor: string) {
   ctx.save(); ctx.strokeStyle = "rgba(238,219,154,.34)"; ctx.lineWidth = Math.max(1, radius * .009); ctx.setLineDash([radius * .04, radius * .025]);
   ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * 1.09, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
-  irregularGlow(ctx, earth.x, earth.y, radius * 1.55, "#2c8ec7", .5, seed + 71);
+  irregularGlow(ctx, earth.x, earth.y, radius * 1.65, "#2c8ec7", .56, seed + 71);
   irregularGlow(ctx, earth.x, earth.y, radius * 1.25, "#54e1d1", .34, seed + 93);
   let birthplace = { x: earth.x, y: earth.y - radius * .12 };
   ctx.save(); ctx.beginPath(); ctx.arc(earth.x, earth.y, radius, 0, Math.PI * 2); ctx.clip();
@@ -477,7 +477,7 @@ function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | nul
 }
 
 function paintOrbitalEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null, earth: Point, radius: number, view: EarthView, sunPoint: Point, size: number, seed: number) {
-  irregularGlow(ctx, earth.x, earth.y, radius * 2.45, "#65dff2", .48, seed);
+  irregularGlow(ctx, earth.x, earth.y, radius * 2.7, "#65dff2", .55, seed);
   ctx.save(); ctx.beginPath(); ctx.arc(earth.x, earth.y, radius, 0, Math.PI * 2); ctx.clip();
   ctx.fillStyle = "#062b58"; ctx.fillRect(earth.x - radius, earth.y - radius, radius * 2, radius * 2);
   if (image) {
@@ -498,7 +498,7 @@ function paintOrbitalEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElemen
 function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined, point: Point, radius: number, ringOuterRadius: number, id: CosmicPlanetId, size: number, seed: number, depth: number) {
   if (!image) return;
   const auraColor: Record<CosmicPlanetId, string> = { mercury: "#c7b48d", venus: "#e6b65f", earth: "#65dff2", mars: "#c45a34", jupiter: "#d7b185", saturn: "#d8bf83", uranus: "#8edfe5", neptune: "#3e75e8" };
-  irregularGlow(ctx, point.x, point.y, radius * 2.05, auraColor[id], .3 + depth * .14, seed);
+  irregularGlow(ctx, point.x, point.y, radius * 2.35, auraColor[id], .36 + depth * .14, seed);
   ctx.save(); ctx.globalAlpha = .86 + depth * .14; ctx.shadowColor = auraColor[id]; ctx.shadowBlur = size * (.008 + depth * .008);
   if (id === "saturn") ctx.drawImage(image, point.x - ringOuterRadius, point.y - ringOuterRadius, ringOuterRadius * 2, ringOuterRadius * 2);
   else ctx.drawImage(image, point.x - radius, point.y - radius, radius * 2, radius * 2);

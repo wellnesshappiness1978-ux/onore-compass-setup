@@ -35,7 +35,7 @@ export type CosmicSizeComparison = { id: "sun" | CosmicPlanet["id"]; x: number; 
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
-const DISTANCE_CURVE = 1.8;
+const DISTANCE_CURVE = 2.4;
 const SCREEN_ROTATION = 0;
 const degrees = (value: number) => ((value % 360) + 360) % 360;
 
@@ -45,7 +45,7 @@ function compressedDistance(distanceAu: number) {
 
 /** One monotonic visibility scale for the central diagram; physical ratios remain exact in the comparison strip. */
 export function cosmicDisplayRadius(meanRadiusKm: number, size: number) {
-  return size * .05 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
+  return size * .058 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
 }
 
 /** Keeps the Sun at the center and maps Neptune's representative orbit to one shared diagram radius. */
