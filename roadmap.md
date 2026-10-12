@@ -256,6 +256,12 @@
 - [x] Replace the existing cosmic artwork with a square heliocentric eight-planet composition, gemstone Earth, zodiac and East Asian zodiac gold filigree, restrained seven-color accents, full-screen viewing, and matching 2048px export.
 - [x] Verify astronomical calculations, plan gating, desktop/mobile rendering, download/share output, and clean diagnostics.
 
+## Cosmic Genesis birth Moon and opulent compass refinement
+- [x] Calculate the geocentric birth Moon position, distance and phase and render it beside orbital Earth.
+- [x] Enlarge the eight orbital planets by exactly 1.3 from the current treatment while preserving the true-radius comparison.
+- [x] Deepen the outer astrolabe, shell goldwork, seven-color nebulae and Milky Way without crossing orbit lines.
+- [ ] Verify desktop, mobile, fullscreen and matching 2048 PNG output.
+
 ## Cosmic Genesis oil-paint masterwork
 - [x] Separate Standard+ mandala access from VIP+ Cosmic Genesis access across viewing, fullscreen, save, and share.
 - [x] Remove solar guide spokes, double every planet radius, and rebuild Cosmic Genesis with vivid seven-color nebulae, impasto planets, gemstone Earth, and dimensional gold filigree.
