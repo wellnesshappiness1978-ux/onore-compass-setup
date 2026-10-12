@@ -33,6 +33,7 @@ const PLANET_LABELS: Record<Language, string[]> = {
   fr: ["Mercure", "Vénus", "Terre", "Mars", "Jupiter", "Saturne", "Uranus", "Neptune"],
 };
 const SUN_LABELS: Record<Language, string> = { ja: "太陽", en: "Sun", "zh-CN": "太阳", "zh-TW": "太陽", ko: "태양", es: "Sol", fr: "Soleil" };
+const MOON_LABELS: Record<Language, string> = { ja: "出生月", en: "Birth Moon", "zh-CN": "出生月亮", "zh-TW": "出生月亮", ko: "출생 달", es: "Luna natal", fr: "Lune natale" };
 const SCIENCE_COPY: Record<Language, { placement: string; size: string; earth: string; reference: string }> = {
   ja: { placement: "出生瞬間の太陽中心配置｜角度＝太陽中心黄経｜軌道間隔＝代表距離の対数縮尺｜天体径＝視認用", size: "太陽・8惑星 実半径比｜同一線形縮尺", earth: "出生地球｜別縮尺の拡大細部図", reference: "時刻不明：JST正午の参考配置" },
   en: { placement: "BIRTH-INSTANT HELIOCENTRIC PLACEMENT · ANGLES: LONGITUDE · ORBITS: LOG SCALE · BODIES: VISIBILITY SCALE", size: "SUN + 8 PLANETS · TRUE RADII · ONE LINEAR SCALE", earth: "BIRTH EARTH · ENLARGED DETAIL", reference: "UNKNOWN TIME · JST NOON REFERENCE" },
@@ -753,6 +754,38 @@ function paintOrbitalEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElemen
   ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * .98, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
 }
 
+function paintBirthMoon(ctx: CanvasRenderingContext2D, moon: CosmicMoonPlacement, earth: Point, size: number, seed: number, language: Language) {
+  const radius = moon.radius;
+  ctx.save();
+  ctx.strokeStyle = "rgba(238,219,154,.28)"; ctx.lineWidth = Math.max(1, size * .00045); ctx.setLineDash([size * .003, size * .003]);
+  ctx.beginPath(); ctx.moveTo(earth.x, earth.y); ctx.lineTo(moon.x, moon.y); ctx.stroke(); ctx.setLineDash([]);
+  irregularGlow(ctx, moon.x, moon.y, radius * 2.8, PLATINUM, .38, seed);
+  ctx.beginPath(); ctx.arc(moon.x, moon.y, radius, 0, Math.PI * 2); ctx.clip();
+  const stone = ctx.createRadialGradient(moon.x - radius * .32, moon.y - radius * .38, 0, moon.x, moon.y, radius * 1.12);
+  stone.addColorStop(0, "#f2eee1"); stone.addColorStop(.48, "#aaa89f"); stone.addColorStop(1, "#282c34");
+  ctx.fillStyle = stone; ctx.fillRect(moon.x - radius, moon.y - radius, radius * 2, radius * 2);
+  for (let crater = 0; crater < 19; crater++) {
+    const salt = seed + crater * 61, angle = unit(salt) * Math.PI * 2, distance = Math.sqrt(unit(salt + 4)) * radius * .78;
+    const x = moon.x + Math.cos(angle) * distance, y = moon.y + Math.sin(angle) * distance;
+    ctx.fillStyle = crater % 3 ? "rgba(31,35,42,.22)" : "rgba(247,242,220,.12)";
+    ctx.beginPath(); ctx.ellipse(x, y, radius * (.035 + unit(salt + 7) * .12), radius * (.025 + unit(salt + 9) * .08), angle, 0, Math.PI * 2); ctx.fill();
+  }
+  const waxing = moon.displayAngle % 360 < 180;
+  const phaseWidth = radius * (moon.phaseFraction * 2 - 1);
+  const shade = ctx.createLinearGradient(moon.x - radius, moon.y, moon.x + radius, moon.y);
+  if (waxing) {
+    shade.addColorStop(0, "rgba(0,2,10,.94)"); shade.addColorStop(Math.max(.08, .5 - phaseWidth / radius * .35), "rgba(0,2,10,.76)"); shade.addColorStop(1, "rgba(0,2,10,.04)");
+  } else {
+    shade.addColorStop(0, "rgba(0,2,10,.04)"); shade.addColorStop(Math.min(.92, .5 + phaseWidth / radius * .35), "rgba(0,2,10,.76)"); shade.addColorStop(1, "rgba(0,2,10,.94)");
+  }
+  ctx.fillStyle = shade; ctx.fillRect(moon.x - radius, moon.y - radius, radius * 2, radius * 2); ctx.restore();
+  ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.strokeStyle = PLATINUM; ctx.globalAlpha = .72; ctx.lineWidth = Math.max(1, size * .00055);
+  ctx.beginPath(); ctx.arc(moon.x, moon.y, radius, 0, Math.PI * 2); ctx.stroke();
+  const labelX = moon.x + (moon.x >= earth.x ? radius * 1.45 : -radius * 1.45);
+  ctx.fillStyle = GOLD; ctx.globalAlpha = .86; ctx.font = `600 ${Math.max(8, size * .0085)}px sans-serif`; ctx.textAlign = moon.x >= earth.x ? "left" : "right"; ctx.textBaseline = "middle";
+  ctx.fillText(`${MOON_LABELS[language]} ${Math.round(moon.phaseFraction * 100)}%`, labelX, moon.y - radius * 1.2); ctx.restore();
+}
+
 function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined, point: Point, radius: number, ringOuterRadius: number, id: CosmicPlanetId, sunPoint: Point, size: number, seed: number, depth: number) {
   if (!image) return;
   const auraColor: Record<CosmicPlanetId, string> = { mercury: "#c7b48d", venus: "#e6b65f", earth: "#65dff2", mars: "#c45a34", jupiter: "#d7b185", saturn: "#d8bf83", uranus: "#8edfe5", neptune: "#3e75e8" };
@@ -799,16 +832,17 @@ function paintForegroundDust(ctx: CanvasRenderingContext2D, size: number, seed: 
 export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: CosmicGenesis, earthView: EarthView, colors: string[], language: Language, birthPlace: string, assets?: ArtAssets | null) {
   const ctx = canvas.getContext("2d"); if (!ctx) throw new Error("Canvas unavailable");
   const size = canvas.width, roles = cosmicColorRoles(colors), placements = cosmicPlacements(genesis, size), solar = cosmicSunPlacement(genesis, size);
+  const orbitalEarth = placements.find((planet) => planet.id === "earth");
+  const moon = cosmicMoonPlacement(genesis, size, orbitalEarth);
   paintDeepSpace(ctx, size, assets?.field ?? null, genesis.seed);
   paintMilkyWay(ctx, size, roles.all, genesis.seed + 6400);
   paintNebulae(ctx, size, roles.all, genesis.seed + 1200);
   paintStarLifeVeils(ctx, size, roles.prominence, genesis.seed + 4400, cosmicPlacements(genesis, size).find((planet) => planet.id === "earth")?.displayAngle ?? 0);
   paintCompassInlay(ctx, size);
-  paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius }))]);
+  paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius })), ...(moon ? [{ x: moon.x, y: moon.y, radius: moon.radius }] : [])]);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
   paintConstellation(ctx, size, genesis.moonSign, 1, genesis.seed + 900, .52);
   paintGuardian(ctx, size, genesis);
-  const orbitalEarth = placements.find((planet) => planet.id === "earth");
   const earth = cosmicEarthPortrait(size);
   paintCelestialSilence(ctx, size, [{ ...earth, radius: earth.radius * 1.3 }]);
   paintOrbitalField(ctx, size, solar, placements);
@@ -817,6 +851,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   surrounding.filter((planet) => planet.depth < 0).forEach((planet) => planet.id === "earth" ? paintOrbitalEarth(ctx, assets?.earthMap ?? null, planet, planet.radius, earthView, solar, size, genesis.seed + planet.orbitIndex * 73) : paintPlanet(ctx, assets?.planets[planet.id], planet, planet.radius, planet.ringOuterRadius, planet.id, solar, size, genesis.seed + planet.orbitIndex * 73, (planet.depth + 1) / 2));
   paintSun(ctx, assets?.sun ?? null, solar, solar.radius, size, genesis.seed + 8200);
   surrounding.filter((planet) => planet.depth >= 0).forEach((planet) => planet.id === "earth" ? paintOrbitalEarth(ctx, assets?.earthMap ?? null, planet, planet.radius, earthView, solar, size, genesis.seed + planet.orbitIndex * 73) : paintPlanet(ctx, assets?.planets[planet.id], planet, planet.radius, planet.ringOuterRadius, planet.id, solar, size, genesis.seed + planet.orbitIndex * 73, (planet.depth + 1) / 2));
+  if (moon && orbitalEarth) paintBirthMoon(ctx, moon, orbitalEarth, size, genesis.seed + 7600, language);
   if (orbitalEarth) paintEarthCorrespondence(ctx, orbitalEarth, earth, orbitalEarth.radius, earth.radius, roles.overall, size);
   paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, solar, genesis.seed, roles.overall);
   paintForegroundDust(ctx, size, genesis.seed + 9700);
@@ -844,5 +879,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、8惑星、七彩星命雲、外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth, eight planets, seven birth-color veils, golden shell relief in the outer metalwork, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="weighty-agolmen-compass" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="outer-metalwork-only" data-orbit-count="8" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="birth-moon-opulent-agolmen-compass" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-outer-metalwork-only" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }

@@ -57,9 +57,9 @@ function conceptualOrbitDistance(distanceAu: number) {
   const knots = [
     { au: 0, ratio: 0 },
     { au: COSMIC_ORBIT_AU.mercury, ratio: .18 },
-    { au: COSMIC_ORBIT_AU.venus, ratio: .275 },
-    { au: COSMIC_ORBIT_AU.earth, ratio: .37 },
-    { au: COSMIC_ORBIT_AU.mars, ratio: .465 },
+    { au: COSMIC_ORBIT_AU.venus, ratio: .27 },
+    { au: COSMIC_ORBIT_AU.earth, ratio: .376 },
+    { au: COSMIC_ORBIT_AU.mars, ratio: .47 },
     { au: COSMIC_ORBIT_AU.jupiter, ratio: compressedDistance(COSMIC_ORBIT_AU.jupiter) },
     { au: COSMIC_ORBIT_AU.saturn, ratio: compressedDistance(COSMIC_ORBIT_AU.saturn) },
     { au: COSMIC_ORBIT_AU.uranus, ratio: compressedDistance(COSMIC_ORBIT_AU.uranus) },
