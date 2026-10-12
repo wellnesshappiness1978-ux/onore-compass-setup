@@ -358,3 +358,9 @@
 - [x] Enlarge display radii ~16% and widen inner orbit curve
 - [x] Strengthen Sun/planet/Earth glow
 - [x] Add inner-orbit non-overlap test; run tests and verify
+
+## Cosmic Genesis golden astrolabe artwork
+- [ ] Add a deterministic engraved astrolabe frame outside the orbital field without changing astronomy.
+- [ ] Build a seven-color spiral nebula behind the Sun while preserving celestial quiet zones and the corner Milky Way.
+- [ ] Unify scientific labels, birth-Earth detail, and the nine-body comparison with restrained metal plaque treatments.
+- [ ] Verify safe geometry, VIP gating, tests, diagnostics, desktop/mobile/fullscreen presentation, and the 2048 export.
