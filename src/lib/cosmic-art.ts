@@ -13,7 +13,7 @@ export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serp
 
 const VIEW_TILT = 32;
 const DISTANCE_CURVE = 1.8;
-const TARGET_EARTH_ANGLE = 43;
+const SCREEN_ROTATION = 0;
 const degrees = (value: number) => ((value % 360) + 360) % 360;
 
 function compressedDistance(distanceAu: number) {
@@ -33,15 +33,11 @@ function projectedUnit(vector: { x: number; y: number; z: number }, rotation: nu
   return { x: rotatedX * radial, y: projectedY * radial, depth };
 }
 
-/** Uses the real orbital Earth as the single composition axis, then fits every sampled orbit with one scale. */
+/** Keeps the Sun at the absolute artwork center and fits every sampled real orbit with one shared scale. */
 export function cosmicComposition(genesis: CosmicGenesis, size: number): CosmicComposition {
-  const earth = genesis.planets.find((planet) => planet.id === "earth");
-  const earthAngle = earth ? Math.atan2(earth.eclipticY, earth.eclipticX) * 180 / Math.PI : 0;
-  const tilt = VIEW_TILT * Math.PI / 180;
-  const targetBeforeTilt = Math.atan2(Math.sin(TARGET_EARTH_ANGLE * Math.PI / 180) / Math.cos(tilt), Math.cos(TARGET_EARTH_ANGLE * Math.PI / 180)) * 180 / Math.PI;
-  const rotation = targetBeforeTilt - earthAngle;
-  const centerX = size * .315, centerY = size * .295;
-  const bounds = { left: size * .045, right: size * .665, top: size * .055, bottom: size * .615 };
+  const rotation = SCREEN_ROTATION;
+  const centerX = size * .5, centerY = size * .5;
+  const bounds = { left: size * .055, right: size * .945, top: size * .055, bottom: size * .945 };
   const points = genesis.planets.flatMap((planet) => [
     { x: planet.eclipticX, y: planet.eclipticY, z: planet.eclipticZ },
     ...planet.orbit,
@@ -56,11 +52,14 @@ export function cosmicComposition(genesis: CosmicGenesis, size: number): CosmicC
     (bounds.bottom - centerY) / positiveY,
     (centerY - bounds.top) / negativeY,
   );
-  return { centerX, centerY, rotation, scale, targetAngle: TARGET_EARTH_ANGLE };
+  const earth = genesis.planets.find((planet) => planet.id === "earth");
+  const projectedEarth = earth ? projectedUnit({ x: earth.eclipticX, y: earth.eclipticY, z: earth.eclipticZ }, rotation) : { x: 1, y: 0 };
+  const targetAngle = Math.atan2(projectedEarth.y, projectedEarth.x) * 180 / Math.PI;
+  return { centerX, centerY, rotation, scale, targetAngle };
 }
 
 export function projectCosmicVector(vector: { x: number; y: number; z: number }, size: number, composition?: CosmicComposition): CosmicScreenPoint {
-  const frame = composition ?? { centerX: size * .315, centerY: size * .295, rotation: 0, scale: size * .3, targetAngle: TARGET_EARTH_ANGLE };
+  const frame = composition ?? { centerX: size * .5, centerY: size * .5, rotation: SCREEN_ROTATION, scale: size * .42, targetAngle: 0 };
   const point = projectedUnit(vector, frame.rotation);
   return { x: frame.centerX + point.x * frame.scale, y: frame.centerY + point.y * frame.scale, depth: point.depth };
 }
@@ -100,7 +99,7 @@ export function cosmicSunPlacement(_genesis: CosmicGenesis, size: number): Cosmi
 
 /** Enlarges the same orbital Earth into a birthplace-facing foreground portrait. */
 export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
-  return { x: size * .74, y: size * .745, radius: size * .205 };
+  return { x: size * .79, y: size * .79, radius: size * .145 };
 }
 
 export function cosmicColorRoles(colors: string[]) {
