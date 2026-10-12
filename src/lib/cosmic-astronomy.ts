@@ -12,6 +12,9 @@ export const cosmicPlanetSpecs = [
   { id: "neptune", name: "海王星", body: A.Body.Neptune, meanRadiusKm: 24622 },
 ] as const;
 
+/** IAU/NASA nominal solar radius used by the physical size-comparison strip. */
+export const COSMIC_SUN_MEAN_RADIUS_KM = 695_700;
+
 export type CosmicPlanetId = (typeof cosmicPlanetSpecs)[number]["id"];
 export type CosmicPlanet = {
   id: CosmicPlanetId;
@@ -44,6 +47,8 @@ export type EarthView = {
   longitude: number;
   siderealRotation: number;
   solarHourAngle: number;
+  axialTiltDegrees: number;
+  subsolarLatitude: number;
   approximatePlace: boolean;
 };
 
@@ -105,5 +110,13 @@ export function earthViewAtBirth(genesis: CosmicGenesis, birthPlace: string, bir
   const siderealRotation = wrapDegrees(A.SiderealTime(instant) * 15);
   const sun = A.Equator(A.Body.Sun, instant, new A.Observer(latitude, longitude, 0), true, true);
   const solarHourAngle = wrapDegrees((A.SiderealTime(instant) + longitude / 15 - sun.ra) * 15 + 180) - 180;
-  return { latitude, longitude, siderealRotation, solarHourAngle, approximatePlace: !resolved };
+  return {
+    latitude,
+    longitude,
+    siderealRotation,
+    solarHourAngle,
+    axialTiltDegrees: 23.439281,
+    subsolarLatitude: sun.dec,
+    approximatePlace: !resolved,
+  };
 }

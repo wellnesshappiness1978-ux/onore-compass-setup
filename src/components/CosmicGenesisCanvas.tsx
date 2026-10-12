@@ -9,7 +9,7 @@ import jupiter from "@/assets/cosmic-jupiter.png";
 import saturn from "@/assets/cosmic-saturn.png";
 import uranus from "@/assets/cosmic-uranus.png";
 import neptune from "@/assets/cosmic-neptune.png";
-import { COSMIC_GUARDIANS, cosmicBirthplaceLight, cosmicColorRoles, cosmicEarthPortrait, cosmicPlacements, cosmicSunPlacement } from "@/lib/cosmic-art";
+import { COSMIC_GUARDIANS, cosmicBirthplaceLight, cosmicColorRoles, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "@/lib/cosmic-art";
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
 import type { Language } from "@/lib/translations";
 import type { Capture } from "./MandalaCanvas";
@@ -31,6 +31,16 @@ const PLANET_LABELS: Record<Language, string[]> = {
   ko: ["수성", "금성", "지구", "화성", "목성", "토성", "천왕성", "해왕성"],
   es: ["Mercurio", "Venus", "Tierra", "Marte", "Júpiter", "Saturno", "Urano", "Neptuno"],
   fr: ["Mercure", "Vénus", "Terre", "Mars", "Jupiter", "Saturne", "Uranus", "Neptune"],
+};
+const SUN_LABELS: Record<Language, string> = { ja: "太陽", en: "Sun", "zh-CN": "太阳", "zh-TW": "太陽", ko: "태양", es: "Sol", fr: "Soleil" };
+const SCIENCE_COPY: Record<Language, { placement: string; size: string; earth: string; reference: string }> = {
+  ja: { placement: "出生瞬間の太陽中心配置｜角度＝太陽中心黄経｜軌道間隔＝代表距離の対数縮尺｜天体径＝視認用", size: "太陽・8惑星 実半径比｜同一線形縮尺", earth: "出生地球｜別縮尺の拡大細部図", reference: "時刻不明：JST正午の参考配置" },
+  en: { placement: "BIRTH-INSTANT HELIOCENTRIC PLACEMENT · ANGLES: LONGITUDE · ORBITS: LOG SCALE · BODIES: VISIBILITY SCALE", size: "SUN + 8 PLANETS · TRUE RADII · ONE LINEAR SCALE", earth: "BIRTH EARTH · ENLARGED DETAIL", reference: "UNKNOWN TIME · JST NOON REFERENCE" },
+  "zh-CN": { placement: "出生瞬间日心配置｜角度＝日心经度｜轨道＝对数缩尺｜天体＝可视缩尺", size: "太阳与八大行星｜真实半径｜同一线性缩尺", earth: "出生地球｜独立缩尺细节", reference: "时间未知：JST正午参考" },
+  "zh-TW": { placement: "出生瞬間日心配置｜角度＝日心黃經｜軌道＝對數縮尺｜天體＝可視縮尺", size: "太陽與八大行星｜真實半徑｜同一線性縮尺", earth: "出生地球｜獨立縮尺細節", reference: "時間未知：JST正午參考" },
+  ko: { placement: "출생 순간 태양 중심 배치｜각도＝황경｜궤도＝로그 축척｜천체＝가시 축척", size: "태양과 8행성｜실제 반지름｜동일 선형 축척", earth: "출생 지구｜별도 축척 상세", reference: "시간 미상: JST 정오 기준" },
+  es: { placement: "POSICIÓN HELIOCÉNTRICA NATAL · ÁNGULOS: LONGITUD · ÓRBITAS: ESCALA LOG · CUERPOS: ESCALA VISIBLE", size: "SOL + 8 PLANETAS · RADIOS REALES · UNA ESCALA LINEAL", earth: "TIERRA NATAL · DETALLE AMPLIADO", reference: "HORA DESCONOCIDA · REFERENCIA MEDIODÍA JST" },
+  fr: { placement: "POSITION HÉLIOCENTRIQUE NATALE · ANGLES : LONGITUDE · ORBITES : ÉCHELLE LOG · ASTRES : ÉCHELLE VISIBLE", size: "SOLEIL + 8 PLANÈTES · RAYONS RÉELS · MÊME ÉCHELLE LINÉAIRE", earth: "TERRE NATALE · DÉTAIL AGRANDI", reference: "HEURE INCONNUE · MIDI JST DE RÉFÉRENCE" },
 };
 
 function unit(seed: number) {
@@ -256,30 +266,61 @@ function paintEarthCorrespondence(ctx: CanvasRenderingContext2D, orbitalEarth: P
 
 function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, placements: ReturnType<typeof cosmicPlacements>, language: Language, birthPlace: string, earthPortrait: ReturnType<typeof cosmicEarthPortrait>) {
   const instant = genesis.instant.replace("T", " ").slice(0, 16) + " UTC";
-  ctx.save(); ctx.font = `${Math.max(11, size * .011)}px ui-sans-serif, sans-serif`; ctx.textBaseline = "middle"; ctx.letterSpacing = "0px";
-  const labels = placements.map((planet, index) => ({ planet, index })).sort((a, b) => a.planet.y - b.planet.y);
-  labels.forEach(({ planet, index }, labelIndex) => {
-    const label = `${PLANET_LABELS[language][index] ?? planet.name}  ${planet.longitude.toFixed(1)}° · ${planet.distanceAu.toFixed(2)} AU`;
-    const leftLane = labelIndex < 4;
-    const laneIndex = leftLane ? labelIndex : labelIndex - 4;
-    const labelY = size * (.12 + laneIndex * .038);
-    const labelX = size * (leftLane ? .055 : .73);
-    const direction = labelX > planet.x ? 1 : -1;
-    const edge = planet.x + direction * ((planet.id === "saturn" ? planet.ringOuterRadius : planet.radius) * 1.1 + size * .004);
-    ctx.textAlign = "left";
+  const copy = SCIENCE_COPY[language];
+  ctx.save(); ctx.font = `${Math.max(9, size * .0088)}px ui-sans-serif, sans-serif`; ctx.textBaseline = "middle"; ctx.letterSpacing = "0px";
+  const left = placements.filter((planet) => planet.x < size * .5).sort((a, b) => a.y - b.y);
+  const right = placements.filter((planet) => planet.x >= size * .5).sort((a, b) => a.y - b.y);
+  [...left.map((planet) => ({ planet, side: -1 as const })), ...right.map((planet) => ({ planet, side: 1 as const }))].forEach(({ planet, side }) => {
+    const lane = side < 0 ? left.indexOf(planet) : right.indexOf(planet);
+    const count = side < 0 ? left.length : right.length;
+    const labelY = size * (.285 + (count === 1 ? .17 : lane * .34 / (count - 1)));
+    const labelX = size * (side < 0 ? .018 : .982);
+    const ratio = planet.meanRadiusKm / 6371;
+    const index = genesis.planets.findIndex((candidate) => candidate.id === planet.id);
+    const label = `${PLANET_LABELS[language][index] ?? planet.name}  ${planet.longitude.toFixed(1)}° · ${planet.distanceAu.toFixed(2)} AU · ${planet.meanRadiusKm.toLocaleString()} km · ${ratio.toFixed(2)} R⊕`;
+    const edgeRadius = planet.id === "saturn" ? planet.ringOuterRadius : planet.radius;
+    const outward = side < 0 ? -1 : 1;
+    const edge = planet.x + outward * (edgeRadius + size * .004);
+    ctx.textAlign = side < 0 ? "left" : "right";
     ctx.strokeStyle = planet.id === "earth" ? "rgba(238,219,154,.42)" : "rgba(226,235,236,.2)";
-    ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.moveTo(edge, planet.y); ctx.lineTo(labelX - size * .01, labelY); ctx.stroke();
+    ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.moveTo(edge, planet.y); ctx.lineTo(labelX - outward * size * .01, labelY); ctx.stroke();
     ctx.fillStyle = planet.id === "earth" ? "rgba(244,224,157,.92)" : "rgba(226,235,236,.68)";
     ctx.fillText(label, labelX, labelY);
   });
-  ctx.textAlign = "left"; ctx.fillStyle = "rgba(244,224,157,.82)"; ctx.font = `${Math.max(12, size * .013)}px ui-sans-serif, sans-serif`;
-  ctx.fillText(instant, size * .055, size * .925);
-  ctx.fillStyle = "rgba(226,235,236,.62)"; ctx.font = `${Math.max(10, size * .0105)}px ui-sans-serif, sans-serif`;
-  ctx.fillText(`${birthPlace || "—"}  ·  ${genesis.approximate ? "JST 12:00 reference" : "birth-time sky"}`, size * .055, size * .952);
-  ctx.textAlign = "right";
-  ctx.fillText("CONCEPT DIAGRAM · ANGLE: BIRTH-INSTANT LONGITUDE · ORBIT ORDER: PHYSICAL · SPACING: LOG SEMI-MAJOR AXIS · PLANET RADIUS: PHYSICAL RATIO · EARTH DETAIL: SEPARATE SCALE", size * .945, size * .952);
+  ctx.textAlign = "left"; ctx.fillStyle = "rgba(244,224,157,.86)"; ctx.font = `${Math.max(10, size * .0105)}px ui-sans-serif, sans-serif`;
+  ctx.fillText(copy.placement, size * .025, size * .038);
+  ctx.fillStyle = "rgba(226,235,236,.62)"; ctx.font = `${Math.max(9, size * .0088)}px ui-sans-serif, sans-serif`;
+  ctx.fillText(`${instant} · ${birthPlace || "—"}${genesis.approximate ? ` · ${copy.reference}` : ""}`, size * .025, size * .062);
   ctx.textAlign = "center"; ctx.fillStyle = "rgba(244,224,157,.76)"; ctx.font = `${Math.max(9, size * .0095)}px ui-sans-serif, sans-serif`;
-  ctx.fillText(language === "ja" ? "出生地球・拡大細部図" : "BIRTH EARTH · ENLARGED DETAIL", earthPortrait.x, earthPortrait.y + earthPortrait.radius * 1.22);
+  ctx.fillText(copy.earth, earthPortrait.x, earthPortrait.y + earthPortrait.radius * 1.28);
+  ctx.restore();
+}
+
+function paintSizeComparison(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, assets: ArtAssets | null | undefined, language: Language) {
+  const items = cosmicSizeComparison(genesis, size);
+  const copy = SCIENCE_COPY[language];
+  ctx.save();
+  ctx.strokeStyle = "rgba(238,219,154,.32)"; ctx.lineWidth = Math.max(1, size * .0006);
+  ctx.beginPath(); ctx.moveTo(size * .025, size * .82); ctx.lineTo(size * .975, size * .82); ctx.stroke();
+  ctx.fillStyle = "rgba(244,224,157,.84)"; ctx.textAlign = "left"; ctx.font = `${Math.max(10, size * .0105)}px ui-sans-serif, sans-serif`;
+  ctx.fillText(copy.size, size * .025, size * .845);
+  items.forEach((item, index) => {
+    const visualRadius = Math.max(item.radius, size * .0007);
+    const image = item.id === "sun" ? assets?.sun : item.id === "earth" ? assets?.earthMap : assets?.planets[item.id];
+    ctx.save(); ctx.beginPath(); ctx.arc(item.x, item.y, visualRadius, 0, Math.PI * 2); ctx.clip();
+    if (image) ctx.drawImage(image, item.x - visualRadius, item.y - visualRadius, visualRadius * 2, visualRadius * 2);
+    else { ctx.fillStyle = item.id === "sun" ? "#f3c86d" : "#dce8e5"; ctx.fill(); }
+    ctx.restore();
+    if (item.id !== "sun" && item.radius < size * .0022) {
+      ctx.strokeStyle = "rgba(232,242,239,.55)"; ctx.lineWidth = Math.max(1, size * .00045); ctx.beginPath(); ctx.arc(item.x, item.y, size * .0022, 0, Math.PI * 2); ctx.stroke();
+    }
+    const planetIndex = item.id === "sun" ? -1 : genesis.planets.findIndex((planet) => planet.id === item.id);
+    const name = item.id === "sun" ? SUN_LABELS[language] : PLANET_LABELS[language][planetIndex] ?? item.id;
+    ctx.textAlign = "center"; ctx.fillStyle = "rgba(226,235,236,.76)"; ctx.font = `${Math.max(8, size * .0078)}px ui-sans-serif, sans-serif`;
+    ctx.fillText(name, item.x, size * .956);
+    ctx.fillStyle = "rgba(226,235,236,.5)"; ctx.font = `${Math.max(7, size * .0065)}px ui-monospace, monospace`;
+    ctx.fillText(`${Math.round(item.physicalRadiusKm).toLocaleString()} km`, item.x, size * .974);
+  });
   ctx.restore();
 }
 
@@ -381,6 +422,9 @@ function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | nul
   const atmosphere = ctx.createRadialGradient(earth.x, earth.y, radius * .72, earth.x, earth.y, radius * 1.17);
   atmosphere.addColorStop(0, "rgba(56,174,205,0)"); atmosphere.addColorStop(.58, "rgba(56,174,205,.03)"); atmosphere.addColorStop(.8, "rgba(84,225,209,.18)"); atmosphere.addColorStop(.91, "rgba(84,225,209,.07)"); atmosphere.addColorStop(1, "rgba(84,225,209,0)");
   ctx.fillStyle = atmosphere; ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * 1.17, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.translate(earth.x, earth.y); ctx.rotate(-view.axialTiltDegrees * Math.PI / 180);
+  ctx.strokeStyle = "rgba(238,219,154,.56)"; ctx.lineWidth = Math.max(1, radius * .012); ctx.setLineDash([radius * .06, radius * .045]);
+  ctx.beginPath(); ctx.moveTo(0, -radius * 1.22); ctx.lineTo(0, radius * 1.22); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
   paintBirthplaceRadiance(ctx, earth, birthplace, radius, overallColor, seed + 5100);
 }
 
@@ -427,6 +471,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, solar, genesis.seed, roles.overall);
   paintForegroundDust(ctx, size, genesis.seed + 9700);
   paintAstronomyLabels(ctx, size, genesis, placements, language, birthPlace, earth);
+  paintSizeComparison(ctx, size, genesis, assets, language);
 }
 
 export default function CosmicGenesisCanvas({ genesis, earthView, colors, language, birthPlace, onCapture }: Props) {
@@ -448,5 +493,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "太陽を中心に公転順どおりの8本の円形軌道と、登録ユーザーの出生時の惑星角度を示す太陽系概念図" : "Sun-centered conceptual Solar System with eight correctly ordered circular orbits and the registered user's birth-instant planet angles"} data-cosmic-genesis data-renderer="birth-instant-circular-orbit-art" data-birth-color-role="ranked-nebula-and-atmospheric-birthplace-light" data-guide-spokes="0" data-orbit-count="8" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "出生瞬間の太陽中心8惑星配置、太陽を含む9天体の実半径比較、出生地球の拡大細部図" : "Birth-instant heliocentric placement, true-radius comparison of the Sun and eight planets, and enlarged birth-Earth detail"} data-cosmic-genesis data-renderer="scientific-placement-and-nine-body-size-comparison" data-birth-color-role="ranked-nebula-and-atmospheric-birthplace-light" data-guide-spokes="0" data-orbit-count="8" data-size-comparison-count="9" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }

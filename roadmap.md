@@ -335,3 +335,9 @@
 - [x] Preserve each planet's birth-instant heliocentric longitude and displayed instantaneous AU while separating both from orbit-band radius.
 - [x] Rebalance the orbital artwork and move the birthplace-facing Earth detail beyond the orbit field at a smaller scale.
 - [x] Verify orbital ordering, astronomy, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+
+## Cosmic Genesis scientific placement and nine-body size comparison
+- [ ] Add the Sun and eight planets to one canonical physical-radius dataset and verify their hierarchy.
+- [ ] Integrate the birth-instant heliocentric placement diagram with a separate linear-scale nine-body size comparison.
+- [ ] Refine the birthplace-facing Earth detail, collision-safe scientific labels, legends, and seven-language copy.
+- [ ] Verify VIP gating, deterministic local rendering, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
