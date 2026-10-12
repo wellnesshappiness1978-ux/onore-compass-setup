@@ -22,7 +22,7 @@ export type CosmicPlanet = {
   eclipticY: number;
   eclipticZ: number;
   meanRadiusKm: number;
-  ringOuterRadiusKm?: number;
+  ringOuterRadiusKm: number;
   orbit: CosmicOrbitPoint[];
   orbitIndex: number;
 };
@@ -82,7 +82,7 @@ export function cosmicGenesis(date: string, time: string, unknown: boolean): Cos
       eclipticY: ecliptic.vec.y,
       eclipticZ: ecliptic.vec.z,
       meanRadiusKm: spec.meanRadiusKm,
-      ringOuterRadiusKm: "ringOuterRadiusKm" in spec ? spec.ringOuterRadiusKm : undefined,
+      ringOuterRadiusKm: "ringOuterRadiusKm" in spec ? spec.ringOuterRadiusKm : spec.meanRadiusKm,
       orbit,
       orbitIndex,
     };

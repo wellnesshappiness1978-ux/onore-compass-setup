@@ -24,9 +24,12 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(mercury?.displayAngle).toBeCloseTo(((mercury?.longitude ?? 0) - 18 + 360) % 360, 8);
     expect(venus?.displayAngle).toBeCloseTo(((venus?.longitude ?? 0) - 18 + 360) % 360, 8);
     expect((venus?.orbitRadius ?? 0) < (earth?.orbitRadius ?? 0)).toBe(true);
-    const radii = Object.fromEntries(placements.map((planet) => [planet.id, planet.radius]));
-    expect(radii.jupiter / radii.earth).toBeCloseTo(69911 / 6371, 8);
-    expect(radii.earth / radii.mercury).toBeCloseTo(6371 / 2439.7, 8);
+    const jupiter = placements.find((planet) => planet.id === "jupiter");
+    expect(jupiter).toBeDefined();
+    expect(mercury).toBeDefined();
+    if (!jupiter || !earth || !mercury) return;
+    expect(jupiter.radius / earth.radius).toBeCloseTo(69911 / 6371, 8);
+    expect(earth.radius / mercury.radius).toBeCloseTo(6371 / 2439.7, 8);
     placements.forEach((planet) => {
       const firstPoint = planet.orbitPath[0];
       expect(firstPoint).toBeDefined();
