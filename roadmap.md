@@ -393,3 +393,9 @@
 - [x] Remove the shell line from the orbit field and confine four shell-growth reliefs to the clipped outer astrolabe metalwork.
 - [x] Deepen the eight-direction compass inlay with layered antique-gold, platinum, dark-metal, and directional highlights.
 - [x] Verify orbit clarity and celestial balance through three visual passes on desktop/mobile and the shared export renderer; fullscreen interaction remains preview-sensitive, while deterministic geometry, tests, and diagnostics pass.
+
+## Cosmic Genesis heirloom compass and readable science plates
+- [x] Rebuild the outer compass as deeper multi-rail antique-gold, platinum and dark-metal relief with prominent jewel-set nautilus emblems.
+- [x] Place the golden instrument behind celestial bodies, tighten the orbit field, and give the separate birth Earth a jeweled cradle so no important body is hidden by the frame.
+- [x] Replace faint edge text with larger two-level high-contrast obsidian plaques and matching Moon, birth-Earth and physical-size labels.
+- [x] Verify desktop/mobile rendering, fullscreen opening and closing, and an actual 2048 × 2048 PNG download; 17 astronomy/geometry tests pass. Seven-language label dictionaries remain wired into the shared renderer; individual non-Japanese visual reviews were not performed.
