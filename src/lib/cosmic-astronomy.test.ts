@@ -46,6 +46,9 @@ describe("cosmic genesis astronomy", () => {
     expect(tokyo.siderealRotation).toBeLessThan(360);
     expect(tokyo.solarHourAngle).toBeGreaterThanOrEqual(-180);
     expect(tokyo.solarHourAngle).toBeLessThan(180);
+    expect(tokyo.axialTiltDegrees).toBeCloseTo(23.439281, 6);
+    expect(tokyo.subsolarLatitude).toBeGreaterThanOrEqual(-23.5);
+    expect(tokyo.subsolarLatitude).toBeLessThanOrEqual(23.5);
     expect(earthViewAtBirth(genesis, "東京都", "")).toEqual(tokyo);
   });
 });

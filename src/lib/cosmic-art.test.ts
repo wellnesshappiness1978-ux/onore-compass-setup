@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicBirthplaceLight, cosmicColorRoles, cosmicComposition, cosmicEarthPortrait, cosmicPlacements, cosmicSunPlacement } from "./cosmic-art";
+import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicBirthplaceLight, cosmicColorRoles, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a readable conceptual Solar System while preserving birth longitudes", () => {
@@ -17,7 +17,7 @@ describe("Cosmic Genesis artwork layout", () => {
     });
     const earth = placements.find((planet) => planet.id === "earth");
     expect(earth?.orbitRadius).toBeGreaterThan(0);
-    expect(cosmicEarthPortrait(1024)).toEqual({ x: 880.64, y: 880.64, radius: 56.32 });
+    expect(cosmicEarthPortrait(1024)).toEqual({ x: 906.24, y: 184.32, radius: 53.248 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
     const venus = placements.find((planet) => planet.id === "venus");
@@ -29,18 +29,18 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(jupiter).toBeDefined();
     expect(mercury).toBeDefined();
     if (!jupiter || !earth || !mercury) return;
-    expect(jupiter.radius / earth.radius).toBeCloseTo(69911 / 6371, 8);
-    expect(earth.radius / mercury.radius).toBeCloseTo(6371 / 2439.7, 8);
+    expect(jupiter.radius).toBeGreaterThan(earth.radius);
+    expect(earth.radius).toBeGreaterThan(mercury.radius);
     placements.forEach((planet) => {
       expect(planet.orbitPath).toHaveLength(128);
       planet.orbitPath.forEach((point) => {
-        expect(Math.hypot(point.x - 512, point.y - 512)).toBeCloseTo(planet.orbitRadius, 5);
+        expect(Math.hypot(point.x - 512, point.y - 465.92)).toBeCloseTo(planet.orbitRadius, 5);
       });
-      expect(Math.hypot(planet.x - 512, planet.y - 512)).toBeCloseTo(planet.orbitRadius, 5);
+      expect(Math.hypot(planet.x - 512, planet.y - 465.92)).toBeCloseTo(planet.orbitRadius, 5);
     });
     const sun = cosmicSunPlacement(genesis, 1024);
     expect(sun.x).toBeCloseTo(512, 8);
-    expect(sun.y).toBeCloseTo(512, 8);
+    expect(sun.y).toBeCloseTo(465.92, 8);
     expect(((Math.atan2((earth.y - sun.y), (earth.x - sun.x)) * 180 / Math.PI) + 360) % 360).toBeCloseTo(composition.targetAngle, 5);
   });
 
@@ -70,7 +70,7 @@ describe("Cosmic Genesis artwork layout", () => {
       const frame = cosmicComposition(genesis, 1024);
       expect(frame.scale).toBeGreaterThan(0);
       expect(frame.centerX).toBe(512);
-      expect(frame.centerY).toBe(512);
+      expect(frame.centerY).toBe(465.92);
       expect((((Math.atan2((earth?.y ?? sun.y) - sun.y, (earth?.x ?? sun.x) - sun.x) * 180 / Math.PI) + 360) % 360)).toBeCloseTo(frame.targetAngle, 3);
       placements.flatMap((planet) => planet.orbitPath).forEach((point) => {
         expect(point.x).toBeGreaterThanOrEqual(1024 * .09 - .01);
@@ -79,6 +79,28 @@ describe("Cosmic Genesis artwork layout", () => {
         expect(point.y).toBeLessThanOrEqual(1024 * .91 + .01);
       });
     }
+  });
+
+  it("keeps the Sun and eight planets on one exact linear physical-radius comparison scale", () => {
+    const genesis = cosmicGenesis("1990-04-15", "08:30", false);
+    if (!genesis) return;
+    const comparison = cosmicSizeComparison(genesis, 1024);
+    expect(comparison).toHaveLength(9);
+    const sun = comparison.find((body) => body.id === "sun");
+    const earth = comparison.find((body) => body.id === "earth");
+    const jupiter = comparison.find((body) => body.id === "jupiter");
+    const mercury = comparison.find((body) => body.id === "mercury");
+    expect(sun?.physicalRadiusKm).toBe(COSMIC_BODY_RADII_KM.sun);
+    expect((sun?.radius ?? 0) / (earth?.radius ?? 1)).toBeCloseTo(COSMIC_BODY_RADII_KM.sun / COSMIC_BODY_RADII_KM.earth, 8);
+    expect((jupiter?.radius ?? 0) / (earth?.radius ?? 1)).toBeCloseTo(COSMIC_BODY_RADII_KM.jupiter / COSMIC_BODY_RADII_KM.earth, 8);
+    expect(jupiter?.radius ?? 0).toBeGreaterThan(earth?.radius ?? 0);
+    expect(earth?.radius ?? 0).toBeGreaterThan(mercury?.radius ?? 0);
+  });
+
+  it("uses one monotonic visibility scale without reversing physical body order", () => {
+    const ordered = [COSMIC_BODY_RADII_KM.sun, COSMIC_BODY_RADII_KM.jupiter, COSMIC_BODY_RADII_KM.saturn, COSMIC_BODY_RADII_KM.uranus, COSMIC_BODY_RADII_KM.neptune, COSMIC_BODY_RADII_KM.earth, COSMIC_BODY_RADII_KM.venus, COSMIC_BODY_RADII_KM.mars, COSMIC_BODY_RADII_KM.mercury];
+    const display = ordered.map((radius) => cosmicDisplayRadius(radius, 1024));
+    for (let index = 1; index < display.length; index++) expect(display[index - 1]).toBeGreaterThan(display[index] ?? 0);
   });
 
   it("retains all seven exact birth colors as strong artwork roles", () => {

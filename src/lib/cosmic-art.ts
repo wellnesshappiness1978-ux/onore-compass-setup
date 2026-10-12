@@ -1,6 +1,17 @@
-import type { CosmicGenesis, CosmicPlanet } from "./cosmic-astronomy";
+import { COSMIC_SUN_MEAN_RADIUS_KM, type CosmicGenesis, type CosmicPlanet } from "./cosmic-astronomy";
 
 export const COSMIC_PLANET_SCALE = 0.0009;
+export const COSMIC_BODY_RADII_KM = {
+  sun: COSMIC_SUN_MEAN_RADIUS_KM,
+  mercury: 2439.7,
+  venus: 6051.8,
+  earth: 6371,
+  mars: 3389.5,
+  jupiter: 69911,
+  saturn: 58232,
+  uranus: 25362,
+  neptune: 24622,
+} as const;
 
 /** Representative semi-major axes keep conceptual orbit bands in their real, stable order. */
 export const COSMIC_ORBIT_AU: Record<CosmicPlanet["id"], number> = {
@@ -16,10 +27,11 @@ export const COSMIC_ORBIT_AU: Record<CosmicPlanet["id"], number> = {
 
 export type CosmicScreenPoint = { x: number; y: number; depth: number };
 export type CosmicPlacement = CosmicPlanet & { x: number; y: number; radius: number; ringOuterRadius: number; orbitRadius: number; displayAngle: number; depth: number; orbitPath: CosmicScreenPoint[] };
-export type CosmicSunPlacement = { x: number; y: number; radius: number; displayAngle: number };
+export type CosmicSunPlacement = { x: number; y: number; radius: number; physicalRadiusKm: number; displayAngle: number };
 export type CosmicBirthplaceLight = { x: number; y: number; plumeAngle: number; safetyRadius: number };
 export type CosmicEarthPortrait = { x: number; y: number; radius: number };
 export type CosmicComposition = { centerX: number; centerY: number; rotation: number; scale: number; targetAngle: number };
+export type CosmicSizeComparison = { id: "sun" | CosmicPlanet["id"]; x: number; y: number; radius: number; physicalRadiusKm: number };
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
@@ -31,11 +43,16 @@ function compressedDistance(distanceAu: number) {
   return Math.log1p(distanceAu * DISTANCE_CURVE) / Math.log1p(30.4 * DISTANCE_CURVE);
 }
 
+/** One monotonic visibility scale for the central diagram; physical ratios remain exact in the comparison strip. */
+export function cosmicDisplayRadius(meanRadiusKm: number, size: number) {
+  return size * .041 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
+}
+
 /** Keeps the Sun at the center and maps Neptune's representative orbit to one shared diagram radius. */
 export function cosmicComposition(genesis: CosmicGenesis, size: number): CosmicComposition {
   const rotation = SCREEN_ROTATION;
-  const centerX = size * .5, centerY = size * .5;
-  const scale = size * .41;
+  const centerX = size * .5, centerY = size * .455;
+  const scale = size * .315;
   const earth = genesis.planets.find((planet) => planet.id === "earth");
   const targetAngle = degrees((earth?.longitude ?? 0) + rotation);
   return { centerX, centerY, rotation, scale, targetAngle };
@@ -61,8 +78,8 @@ export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPl
       y: composition.centerY + Math.sin(angle) * orbitRadius,
       depth: Math.sin(angle),
     };
-    const radius = planet.meanRadiusKm * COSMIC_PLANET_SCALE * size / 1024;
-    const ringOuterRadius = (planet.ringOuterRadiusKm ?? planet.meanRadiusKm) * COSMIC_PLANET_SCALE * size / 1024;
+    const radius = cosmicDisplayRadius(planet.meanRadiusKm, size);
+    const ringOuterRadius = planet.id === "saturn" ? radius * ((planet.ringOuterRadiusKm ?? planet.meanRadiusKm) / planet.meanRadiusKm) : radius;
     return {
       ...planet,
       radius,
@@ -90,14 +107,32 @@ export function cosmicSunPlacement(_genesis: CosmicGenesis, size: number): Cosmi
   return {
     x: composition.centerX,
     y: composition.centerY,
-    radius: size * .063,
+    radius: cosmicDisplayRadius(COSMIC_SUN_MEAN_RADIUS_KM, size),
+    physicalRadiusKm: COSMIC_SUN_MEAN_RADIUS_KM,
     displayAngle: 0,
   };
 }
 
 /** Enlarges the same orbital Earth into a birthplace-facing foreground portrait. */
 export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
-  return { x: size * .86, y: size * .86, radius: size * .055 };
+  return { x: size * .885, y: size * .18, radius: size * .052 };
+}
+
+/** Sun and planets on one linear physical-radius scale, independent from the visibility-scaled orbit diagram. */
+export function cosmicSizeComparison(genesis: CosmicGenesis, size: number): CosmicSizeComparison[] {
+  const ids: CosmicSizeComparison["id"][] = ["sun", "mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"];
+  const maxRadius = size * .047;
+  return ids.map((id, index) => {
+    const planet = id === "sun" ? undefined : genesis.planets.find((candidate) => candidate.id === id);
+    const physicalRadiusKm = id === "sun" ? COSMIC_SUN_MEAN_RADIUS_KM : planet?.meanRadiusKm ?? COSMIC_BODY_RADII_KM[id];
+    return {
+      id,
+      x: size * (.065 + index * .1085),
+      y: size * .895,
+      radius: maxRadius * physicalRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM,
+      physicalRadiusKm,
+    };
+  });
 }
 
 export function cosmicColorRoles(colors: string[]) {
