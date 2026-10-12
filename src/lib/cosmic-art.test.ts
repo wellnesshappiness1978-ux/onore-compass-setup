@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
+import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a readable conceptual Solar System while preserving birth longitudes", () => {
@@ -151,5 +151,17 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(COSMIC_GUARDIANS).toHaveLength(12);
     expect(new Set(COSMIC_GUARDIANS).size).toBe(12);
     expect(COSMIC_GUARDIANS).toEqual(["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"]);
+  });
+
+  it("derives the zodiac guardian ring solely from registered birth astronomy", () => {
+    const genesis = cosmicGenesis("1990-04-15", "08:30", false);
+    if (!genesis) return;
+    const identity = cosmicCompassIdentity(genesis);
+    expect(identity.sunSign).toBe(genesis.sunSign);
+    expect(identity.moonSign).toBe(genesis.moonSign);
+    expect(identity.guardian).toBe(genesis.animal);
+    expect(identity.awakenedSectors).toContain(genesis.sunSign);
+    expect(identity.awakenedSectors).toContain(genesis.moonSign);
+    expect(identity.awakenedSectors.every((sector) => sector >= 0 && sector < 12)).toBe(true);
   });
 });
