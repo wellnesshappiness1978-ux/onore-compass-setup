@@ -323,3 +323,9 @@
 - [x] Preserve one logarithmic distance transform and one physical-radius multiplier across all eight planets.
 - [x] Separate and label the birthplace-facing Earth detail without changing the orbital Earth or planetary geometry.
 - [x] Verify astronomy tests, desktop/mobile presentation, matching 2048 export, and diagnostics.
+
+## Cosmic Genesis birth-instant Solar System concept diagram
+- [x] Replace projected sampled paths with eight concentric conceptual orbit bands centered on the Sun.
+- [x] Place every planet at the registered user's birth-instant heliocentric longitude while preserving logarithmic distance order and physical radius ratios.
+- [x] Retain the separate birthplace-facing Earth detail, restrained celestial artwork, shared live/export renderer, and VIP gate.
+- [ ] Verify desktop/mobile/fullscreen presentation, matching 2048 export, and final diagnostics.
