@@ -256,19 +256,16 @@ function paintEarthCorrespondence(ctx: CanvasRenderingContext2D, orbitalEarth: P
 function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, placements: ReturnType<typeof cosmicPlacements>, language: Language, birthPlace: string) {
   const instant = genesis.instant.replace("T", " ").slice(0, 16) + " UTC";
   ctx.save(); ctx.font = `${Math.max(11, size * .011)}px ui-sans-serif, sans-serif`; ctx.textBaseline = "middle"; ctx.letterSpacing = "0px";
-  const labels = placements.map((planet, index) => ({ planet, index, side: planet.x < size * .315 ? -1 : 1 as -1 | 1 }))
-    .sort((a, b) => a.planet.y - b.planet.y);
-  const lastY = new Map<number, number>([[-1, size * .06], [1, size * .06]]);
-  labels.forEach(({ planet, index, side }) => {
+  const labels = placements.map((planet, index) => ({ planet, index })).sort((a, b) => a.planet.y - b.planet.y);
+  labels.forEach(({ planet, index }, labelIndex) => {
     const label = `${PLANET_LABELS[language][index] ?? planet.name}  ${planet.longitude.toFixed(1)}° · ${planet.distanceAu.toFixed(2)} AU`;
-    const prior = lastY.get(side) ?? size * .06;
-    const labelY = Math.min(size * .63, Math.max(planet.y, prior + size * .026));
-    lastY.set(side, labelY);
-    const labelX = side < 0 ? size * .035 : size * .68;
-    const edge = planet.x + side * ((planet.id === "saturn" ? planet.ringOuterRadius : planet.radius) * 1.1 + size * .004);
-    ctx.textAlign = side < 0 ? "left" : "left";
+    const labelY = size * (.105 + labelIndex * .033);
+    const labelX = size * .705;
+    const direction = labelX > planet.x ? 1 : -1;
+    const edge = planet.x + direction * ((planet.id === "saturn" ? planet.ringOuterRadius : planet.radius) * 1.1 + size * .004);
+    ctx.textAlign = "left";
     ctx.strokeStyle = planet.id === "earth" ? "rgba(238,219,154,.42)" : "rgba(226,235,236,.2)";
-    ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.moveTo(edge, planet.y); ctx.lineTo(labelX - side * size * .008, labelY); ctx.stroke();
+    ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.moveTo(edge, planet.y); ctx.lineTo(labelX - size * .01, labelY); ctx.stroke();
     ctx.fillStyle = planet.id === "earth" ? "rgba(244,224,157,.92)" : "rgba(226,235,236,.68)";
     ctx.fillText(label, labelX, labelY);
   });
