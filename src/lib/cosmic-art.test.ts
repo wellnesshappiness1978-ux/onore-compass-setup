@@ -17,7 +17,7 @@ describe("Cosmic Genesis artwork layout", () => {
     });
     const earth = placements.find((planet) => planet.id === "earth");
     expect(earth?.orbitRadius).toBeGreaterThan(0);
-    expect(cosmicEarthPortrait(1024)).toEqual({ x: 906.24, y: 184.32, radius: 53.248 });
+    expect(cosmicEarthPortrait(1024)).toEqual({ x: 890.88, y: 133.12, radius: 61.44 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
     const venus = placements.find((planet) => planet.id === "venus");
@@ -34,13 +34,13 @@ describe("Cosmic Genesis artwork layout", () => {
     placements.forEach((planet) => {
       expect(planet.orbitPath).toHaveLength(128);
       planet.orbitPath.forEach((point) => {
-        expect(Math.hypot(point.x - 512, point.y - 465.92)).toBeCloseTo(planet.orbitRadius, 5);
+        expect(Math.hypot(point.x - 512, point.y - 481.28)).toBeCloseTo(planet.orbitRadius, 5);
       });
-      expect(Math.hypot(planet.x - 512, planet.y - 465.92)).toBeCloseTo(planet.orbitRadius, 5);
+      expect(Math.hypot(planet.x - 512, planet.y - 481.28)).toBeCloseTo(planet.orbitRadius, 5);
     });
     const sun = cosmicSunPlacement(genesis, 1024);
     expect(sun.x).toBeCloseTo(512, 8);
-    expect(sun.y).toBeCloseTo(465.92, 8);
+    expect(sun.y).toBeCloseTo(481.28, 8);
     expect(((Math.atan2((earth.y - sun.y), (earth.x - sun.x)) * 180 / Math.PI) + 360) % 360).toBeCloseTo(composition.targetAngle, 5);
   });
 
@@ -70,13 +70,13 @@ describe("Cosmic Genesis artwork layout", () => {
       const frame = cosmicComposition(genesis, 1024);
       expect(frame.scale).toBeGreaterThan(0);
       expect(frame.centerX).toBe(512);
-      expect(frame.centerY).toBe(465.92);
+      expect(frame.centerY).toBe(481.28);
       expect((((Math.atan2((earth?.y ?? sun.y) - sun.y, (earth?.x ?? sun.x) - sun.x) * 180 / Math.PI) + 360) % 360)).toBeCloseTo(frame.targetAngle, 3);
       placements.flatMap((planet) => planet.orbitPath).forEach((point) => {
-        expect(point.x).toBeGreaterThanOrEqual(1024 * .09 - .01);
-        expect(point.x).toBeLessThanOrEqual(1024 * .91 + .01);
-        expect(point.y).toBeGreaterThanOrEqual(1024 * .09 - .01);
-        expect(point.y).toBeLessThanOrEqual(1024 * .91 + .01);
+        expect(point.x).toBeGreaterThanOrEqual(1024 * .055 - .01);
+        expect(point.x).toBeLessThanOrEqual(1024 * .945 + .01);
+        expect(point.y).toBeGreaterThanOrEqual(1024 * .025 - .01);
+        expect(point.y).toBeLessThanOrEqual(1024 * .915 + .01);
       });
     }
   });
