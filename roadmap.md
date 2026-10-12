@@ -360,7 +360,7 @@
 - [x] Add inner-orbit non-overlap test; run tests and verify
 
 ## Cosmic Genesis golden astrolabe artwork
-- [ ] Add a deterministic engraved astrolabe frame outside the orbital field without changing astronomy.
-- [ ] Build a seven-color spiral nebula behind the Sun while preserving celestial quiet zones and the corner Milky Way.
-- [ ] Unify scientific labels, birth-Earth detail, and the nine-body comparison with restrained metal plaque treatments.
-- [ ] Verify safe geometry, VIP gating, tests, diagnostics, desktop/mobile/fullscreen presentation, and the 2048 export.
+- [x] Add a deterministic engraved astrolabe frame outside the orbital field without changing astronomy.
+- [x] Build a seven-color spiral nebula behind the Sun while preserving celestial quiet zones and the corner Milky Way.
+- [x] Unify scientific labels, birth-Earth detail, and the nine-body comparison with restrained metal plaque treatments.
+- [ ] Verify desktop/mobile/fullscreen presentation and the 2048 export (blocked by the preview remaining on profile loading); safe geometry, VIP gating, tests, and diagnostics pass.
