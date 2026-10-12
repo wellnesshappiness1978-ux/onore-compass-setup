@@ -14,6 +14,7 @@ import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astr
 import type { Language } from "@/lib/translations";
 import { paintEngravedRing, paintBranchingFilaments } from "@/lib/art-craft";
 import type { Capture } from "./MandalaCanvas";
+import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
@@ -223,23 +224,6 @@ function metalGradient(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1
   return gradient;
 }
 
-function paintObsidianPlaque(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, side: -1 | 0 | 1 = 0) {
-  ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,.82)"; ctx.shadowBlur = height * .32; ctx.shadowOffsetY = height * .08;
-  const stone = ctx.createLinearGradient(x, y, x + width, y + height);
-  stone.addColorStop(0, "rgba(3,8,18,.97)"); stone.addColorStop(.48, "rgba(8,18,32,.95)"); stone.addColorStop(1, "rgba(1,4,12,.98)");
-  ctx.fillStyle = stone; ctx.strokeStyle = "rgba(244,214,134,.88)"; ctx.lineWidth = Math.max(1, height * .025);
-  ctx.beginPath(); ctx.roundRect(x, y, width, height, height * .12); ctx.fill(); ctx.stroke();
-  ctx.shadowBlur = 0;
-  const inset = height * .095;
-  ctx.strokeStyle = "rgba(114,77,38,.86)"; ctx.lineWidth = Math.max(.7, height * .014);
-  ctx.beginPath(); ctx.roundRect(x + inset, y + inset, width - inset * 2, height - inset * 2, height * .075); ctx.stroke();
-  const capX = side < 0 ? x + width - inset * 1.2 : side > 0 ? x + inset * 1.2 : x + width * .5;
-  ctx.fillStyle = "rgba(255,239,183,.95)"; ctx.shadowColor = GOLD; ctx.shadowBlur = height * .16;
-  ctx.beginPath(); ctx.arc(capX, y + height * .5, height * .045, 0, Math.PI * 2); ctx.fill();
-  ctx.restore();
-}
-
 function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: number, colors: string[], genesis: CosmicGenesis) {
   const frame = cosmicAstrolabeFrame(size);
   const identity = cosmicCompassIdentity(genesis);
@@ -421,13 +405,6 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
   }
   ctx.restore();
   paintEngravedRing(ctx, frame.x, frame.y, frame.innerRadius + size * .002, frame.outerRadius - size * .002, size);
-}
-
-function paintMetalPlaque(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
-  ctx.fillStyle = metalGradient(ctx, x, y, x + width, y + height, .82); ctx.strokeStyle = "rgba(252,226,153,.7)"; ctx.lineWidth = Math.max(1, height * .055);
-  ctx.beginPath(); ctx.roundRect(x, y, width, height, height * .12); ctx.fill(); ctx.stroke();
-  ctx.strokeStyle = "rgba(44,23,12,.58)"; ctx.lineWidth = Math.max(1, height * .025);
-  ctx.beginPath(); ctx.roundRect(x + height * .08, y + height * .08, width - height * .16, height - height * .16, height * .08); ctx.stroke();
 }
 
 function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
@@ -656,77 +633,52 @@ function paintEarthCorrespondence(ctx: CanvasRenderingContext2D, orbitalEarth: P
 function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, placements: ReturnType<typeof cosmicPlacements>, language: Language, birthPlace: string, earthPortrait: ReturnType<typeof cosmicEarthPortrait>, hideBirthDetails = false) {
   const instant = genesis.instant.replace("T", " ").slice(0, 16) + " UTC";
   const copy = SCIENCE_COPY[language];
-  ctx.save(); ctx.textBaseline = "middle"; ctx.letterSpacing = "0px";
+  ctx.save();
   const left = placements.filter((planet) => planet.x < size * .5).sort((a, b) => a.y - b.y);
   const right = placements.filter((planet) => planet.x >= size * .5).sort((a, b) => a.y - b.y);
   [...left.map((planet) => ({ planet, side: -1 as const })), ...right.map((planet) => ({ planet, side: 1 as const }))].forEach(({ planet, side }) => {
-    const lane = side < 0 ? left.indexOf(planet) : right.indexOf(planet);
-    const count = side < 0 ? left.length : right.length;
-    const labelY = size * (.16 + (count === 1 ? .25 : lane * .52 / (count - 1)));
-    const plaqueWidth = size * .295, plaqueHeight = size * .065;
-    const plaqueX = size * (side < 0 ? .012 : .988) - (side < 0 ? 0 : plaqueWidth);
-    const plaqueY = labelY - plaqueHeight * .5;
-    const labelX = plaqueX + (side < 0 ? size * .014 : plaqueWidth - size * .014);
-    const ratio = planet.meanRadiusKm / 6371;
+    const group = side < 0 ? left : right;
+    const lane = group.indexOf(planet);
+    const labelY = size * (.26 + (group.length === 1 ? .18 : lane * .49 / (group.length - 1)));
+    const labelX = size * (side < 0 ? .026 : .974);
     const index = genesis.planets.findIndex((candidate) => candidate.id === planet.id);
     const title = PLANET_LABELS[language][index] ?? planet.name;
-    const detailRows = [`${planet.longitude.toFixed(1)}°  ·  ${planet.distanceAu.toFixed(2)} AU`, `${planet.meanRadiusKm.toLocaleString()} km  ·  ${ratio.toFixed(2)} R⊕`];
-    const edgeRadius = planet.id === "saturn" ? planet.ringOuterRadius : planet.radius;
-    const outward = side < 0 ? -1 : 1;
-    const edge = planet.x + outward * (edgeRadius + size * .004);
+    const radius = planet.id === "saturn" ? planet.ringOuterRadius : planet.radius;
+    const edgeX = planet.x + side * (radius + size * .004);
+    const lineEnd = labelX - side * size * .15;
+    ctx.save(); ctx.strokeStyle = cosmicTextPalette().leader; ctx.lineWidth = .5 * size / 1024;
+    ctx.beginPath(); ctx.moveTo(edgeX, planet.y); ctx.lineTo(lineEnd, labelY - size * .022); ctx.stroke();
+    ctx.fillStyle = cosmicTextPalette().main; ctx.beginPath(); ctx.arc(edgeX, planet.y, size * .0013, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     ctx.textAlign = side < 0 ? "left" : "right";
-    paintObsidianPlaque(ctx, plaqueX, plaqueY, plaqueWidth, plaqueHeight, side);
-    ctx.strokeStyle = planet.id === "earth" ? "rgba(255,226,142,.9)" : "rgba(229,239,239,.6)";
-    ctx.lineWidth = Math.max(1, size * .00062); ctx.shadowColor = "rgba(0,0,0,.9)"; ctx.shadowBlur = size * .003;
-    ctx.beginPath(); ctx.moveTo(edge, planet.y); ctx.lineTo(edge + outward * size * .012, planet.y); ctx.lineTo(plaqueX + (side < 0 ? plaqueWidth : 0), labelY); ctx.stroke(); ctx.shadowBlur = 0;
-    ctx.textAlign = side < 0 ? "left" : "right";
-    ctx.fillStyle = planet.id === "earth" ? "rgba(255,233,164,.98)" : "rgba(248,244,224,.98)";
-    ctx.font = `700 ${Math.max(11, size * .0108)}px ui-sans-serif, sans-serif`; ctx.fillText(title, labelX, labelY - size * .018);
-    ctx.font = `500 ${Math.max(10, size * .0102)}px ui-monospace, monospace`;
-    ctx.fillStyle = "rgba(217,231,235,.96)";
-    detailRows.forEach((row, rowIndex) => ctx.fillText(row, labelX, labelY + size * (-.001 + rowIndex * .016)));
-
+    paintCosmicText(ctx, size, title, labelX, labelY - size * .022, 'name', size * .22);
+    paintCosmicText(ctx, size, `${planet.longitude.toFixed(1)}°  ·  ${planet.distanceAu.toFixed(2)} AU`, labelX, labelY - size * .006, 'data', size * .22);
+    paintCosmicText(ctx, size, `${planet.meanRadiusKm.toLocaleString()} km  ·  ${(planet.meanRadiusKm / 6371).toFixed(2)} R⊕`, labelX, labelY + size * .01, 'data', size * .22);
   });
-  paintObsidianPlaque(ctx, size * .014, size * .009, size * .69, size * .056);
-  ctx.textAlign = "left"; ctx.fillStyle = "rgba(255,235,172,.98)"; ctx.font = `700 ${Math.max(11, size * .0108)}px ui-sans-serif, sans-serif`;
-  ctx.fillText(copy.placement, size * .027, size * .028, size * .663);
-  ctx.fillStyle = "rgba(225,237,239,.92)"; ctx.font = `500 ${Math.max(9, size * .0088)}px ui-sans-serif, sans-serif`;
-  ctx.fillText(hideBirthDetails ? (genesis.approximate ? copy.reference : "") : `${instant} · ${birthPlace || "—"}${genesis.approximate ? ` · ${copy.reference}` : ""}`, size * .027, size * .0505);
-  const earthLabelWidth = size * .245, earthLabelHeight = size * .027;
-  paintObsidianPlaque(ctx, earthPortrait.x - earthLabelWidth * .5, earthPortrait.y + earthPortrait.radius * 1.18, earthLabelWidth, earthLabelHeight);
-  ctx.textAlign = "center"; ctx.fillStyle = "rgba(255,231,157,.98)"; ctx.font = `700 ${Math.max(9, size * .0092)}px ui-sans-serif, sans-serif`;
-  ctx.fillText(copy.earth, earthPortrait.x, earthPortrait.y + earthPortrait.radius * 1.18 + earthLabelHeight * .52);
+  ctx.textAlign = "left";
+  paintCosmicText(ctx, size, copy.placement, size * .027, size * .028, 'name', size * .70);
+  const birthCaption = hideBirthDetails ? (genesis.approximate ? copy.reference : "") : `${instant} · ${birthPlace || "—"}${genesis.approximate ? ` · ${copy.reference}` : ""}`;
+  paintCosmicText(ctx, size, birthCaption, size * .027, size * .0505, 'data', size * .70);
+  ctx.textAlign = "center";
+  paintCosmicText(ctx, size, copy.earth, earthPortrait.x, earthPortrait.y + earthPortrait.radius * 1.45, 'data', size * .24);
   ctx.restore();
 }
 
 function paintSizeComparison(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, assets: ArtAssets | null | undefined, language: Language) {
   const items = cosmicSizeComparison(genesis, size);
-  const copy = SCIENCE_COPY[language];
   ctx.save();
-  const veil = ctx.createLinearGradient(0, size * .825, 0, size);
-  veil.addColorStop(0, "rgba(1,3,10,0)"); veil.addColorStop(.28, "rgba(1,3,10,.48)"); veil.addColorStop(1, "rgba(1,3,10,.88)");
-  ctx.fillStyle = veil; ctx.fillRect(0, size * .825, size, size * .175);
-  paintMetalPlaque(ctx, size * .018, size * .846, size * .45, size * .028);
-  ctx.strokeStyle = "rgba(238,219,154,.32)"; ctx.lineWidth = Math.max(1, size * .0006);
-  ctx.beginPath(); ctx.moveTo(size * .025, size * .845); ctx.lineTo(size * .975, size * .845); ctx.stroke();
-  ctx.fillStyle = "rgba(244,224,157,.84)"; ctx.textAlign = "left"; ctx.font = `${Math.max(10, size * .0105)}px ui-sans-serif, sans-serif`;
-  ctx.fillText(copy.size, size * .025, size * .865);
-  items.forEach((item, index) => {
-    const visualRadius = Math.max(item.radius, size * .0007);
+  ctx.textAlign = "left";
+  paintCosmicText(ctx, size, SCIENCE_COPY[language].size, size * .025, size * .865, 'name', size * .80);
+  items.forEach((item) => {
     const image = item.id === "sun" ? assets?.sun : item.id === "earth" ? assets?.earthMap : assets?.planets[item.id];
-    ctx.save(); ctx.beginPath(); ctx.arc(item.x, item.y, visualRadius, 0, Math.PI * 2); ctx.clip();
-    if (image) ctx.drawImage(image, item.x - visualRadius, item.y - visualRadius, visualRadius * 2, visualRadius * 2);
-    else { ctx.fillStyle = item.id === "sun" ? "#f3c86d" : "#dce8e5"; ctx.fill(); }
+    ctx.save(); ctx.beginPath(); ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2); ctx.clip();
+    if (image) ctx.drawImage(image, item.x - item.radius, item.y - item.radius, item.radius * 2, item.radius * 2);
+    else { ctx.fillStyle = item.id === "sun" ? GOLD : PLATINUM; ctx.fill(); }
     ctx.restore();
-    if (item.id !== "sun" && item.radius < size * .0022) {
-      ctx.strokeStyle = "rgba(232,242,239,.55)"; ctx.lineWidth = Math.max(1, size * .00045); ctx.beginPath(); ctx.arc(item.x, item.y, size * .0022, 0, Math.PI * 2); ctx.stroke();
-    }
     const planetIndex = item.id === "sun" ? -1 : genesis.planets.findIndex((planet) => planet.id === item.id);
     const name = item.id === "sun" ? SUN_LABELS[language] : PLANET_LABELS[language][planetIndex] ?? item.id;
-    ctx.textAlign = "center"; ctx.fillStyle = "rgba(241,246,242,.94)"; ctx.font = `600 ${Math.max(9, size * .0086)}px ui-sans-serif, sans-serif`;
-    ctx.fillText(name, item.x, size * .967);
-    ctx.fillStyle = "rgba(213,228,232,.82)"; ctx.font = `500 ${Math.max(8, size * .0073)}px ui-monospace, monospace`;
-    ctx.fillText(`${Math.round(item.physicalRadiusKm).toLocaleString()} km`, item.x, size * .984);
+    ctx.textAlign = "center";
+    paintCosmicText(ctx, size, name, item.x, size * .967, 'name', size * .10);
+    paintCosmicText(ctx, size, `${Math.round(item.physicalRadiusKm).toLocaleString()} km`, item.x, size * .984, 'data', size * .10);
   });
   ctx.restore();
 }
@@ -890,13 +842,13 @@ function paintBirthMoon(ctx: CanvasRenderingContext2D, moon: CosmicMoonPlacement
   ctx.fillStyle = shade; ctx.fillRect(moon.x - radius, moon.y - radius, radius * 2, radius * 2); ctx.restore();
   ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.strokeStyle = PLATINUM; ctx.globalAlpha = .72; ctx.lineWidth = Math.max(1, size * .00055);
   ctx.beginPath(); ctx.arc(moon.x, moon.y, radius, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+  ctx.save();
   const side = moon.x >= earth.x ? 1 : -1;
-  const labelWidth = size * .105, labelHeight = size * .022;
-  const labelX = moon.x + side * radius * 1.35 - (side < 0 ? labelWidth : 0);
-  const labelY = moon.y - radius * 1.7;
-  paintObsidianPlaque(ctx, labelX, labelY, labelWidth, labelHeight, side);
-  ctx.fillStyle = "rgba(255,235,172,.98)"; ctx.globalAlpha = 1; ctx.font = `700 ${Math.max(8.5, size * .0083)}px sans-serif`; ctx.textAlign = side > 0 ? "left" : "right"; ctx.textBaseline = "middle";
-  ctx.fillText(`${MOON_LABELS[language]} ${Math.round(moon.phaseFraction * 100)}%`, labelX + (side > 0 ? size * .008 : labelWidth - size * .008), labelY + labelHeight * .52); ctx.restore();
+  const labelX = Math.max(size * .025, Math.min(size * .975, moon.x + side * radius * 1.35));
+  ctx.textAlign = side > 0 ? "left" : "right";
+  paintCosmicText(ctx, size, `${MOON_LABELS[language]} ${Math.round(moon.phaseFraction * 100)}%`, labelX, moon.y - radius * 1.7, 'data', size * .12);
+  ctx.restore();
 }
 
 function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | undefined, point: Point, radius: number, ringOuterRadius: number, id: CosmicPlanetId, sunPoint: Point, size: number, seed: number, depth: number) {
@@ -993,5 +945,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="high-contrast-obsidian-plaques" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="direct-champagne-gold-fine-shadow" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
