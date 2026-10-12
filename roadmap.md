@@ -306,3 +306,8 @@
 - [x] Connect the orbital Earth to a foreground birth-time Earth portrait with visible birthplace, terminator, and Overall-color radiance.
 - [x] Integrate sparse astronomical labels, zodiac relief, ranked birth-color nebulae, and shared painterly light into one artwork.
 - [x] Verify astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+
+## Cosmic Genesis physical-data reconstruction
+- [x] Replace decorative planet radii with physical mean-radius ratios and a single shared display multiplier.
+- [x] Replace fixed orbit rings and placements with birth-instant heliocentric vectors, logarithmic AU scaling, and sampled real orbital paths.
+- [x] Verify real position, distance and diameter ratios, Saturn proportions, labels, responsive/fullscreen presentation, matching 2048 export, tests, and diagnostics.

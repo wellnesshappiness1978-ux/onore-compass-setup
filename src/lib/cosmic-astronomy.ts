@@ -2,14 +2,14 @@ import * as A from "astronomy-engine";
 import { resolveBirthplace } from "./birthplace";
 
 export const cosmicPlanetSpecs = [
-  { id: "mercury", name: "水星", body: A.Body.Mercury, relativeVolume: 0.056, displayRadius: 9 },
-  { id: "venus", name: "金星", body: A.Body.Venus, relativeVolume: 0.857, displayRadius: 15 },
-  { id: "earth", name: "地球", body: A.Body.Earth, relativeVolume: 1, displayRadius: 17 },
-  { id: "mars", name: "火星", body: A.Body.Mars, relativeVolume: 0.151, displayRadius: 11 },
-  { id: "jupiter", name: "木星", body: A.Body.Jupiter, relativeVolume: 1321, displayRadius: 34 },
-  { id: "saturn", name: "土星", body: A.Body.Saturn, relativeVolume: 764, displayRadius: 30 },
-  { id: "uranus", name: "天王星", body: A.Body.Uranus, relativeVolume: 63.1, displayRadius: 24 },
-  { id: "neptune", name: "海王星", body: A.Body.Neptune, relativeVolume: 57.7, displayRadius: 22 },
+  { id: "mercury", name: "水星", body: A.Body.Mercury, meanRadiusKm: 2439.7 },
+  { id: "venus", name: "金星", body: A.Body.Venus, meanRadiusKm: 6051.8 },
+  { id: "earth", name: "地球", body: A.Body.Earth, meanRadiusKm: 6371.0 },
+  { id: "mars", name: "火星", body: A.Body.Mars, meanRadiusKm: 3389.5 },
+  { id: "jupiter", name: "木星", body: A.Body.Jupiter, meanRadiusKm: 69911 },
+  { id: "saturn", name: "土星", body: A.Body.Saturn, meanRadiusKm: 58232, ringOuterRadiusKm: 140220 },
+  { id: "uranus", name: "天王星", body: A.Body.Uranus, meanRadiusKm: 25362 },
+  { id: "neptune", name: "海王星", body: A.Body.Neptune, meanRadiusKm: 24622 },
 ] as const;
 
 export type CosmicPlanetId = (typeof cosmicPlanetSpecs)[number]["id"];
@@ -18,10 +18,16 @@ export type CosmicPlanet = {
   name: string;
   longitude: number;
   distanceAu: number;
-  relativeVolume: number;
-  displayRadius: number;
+  eclipticX: number;
+  eclipticY: number;
+  eclipticZ: number;
+  meanRadiusKm: number;
+  ringOuterRadiusKm: number;
+  orbit: CosmicOrbitPoint[];
   orbitIndex: number;
 };
+
+export type CosmicOrbitPoint = { x: number; y: number; z: number; distanceAu: number };
 
 export type CosmicGenesis = {
   instant: string;
@@ -60,13 +66,24 @@ export function cosmicGenesis(date: string, time: string, unknown: boolean): Cos
   if (!birth) return null;
   const planets = cosmicPlanetSpecs.map((spec, orbitIndex) => {
     const vector = A.HelioVector(spec.body, birth.instant);
+    const ecliptic = A.Ecliptic(vector);
+    const period = A.PlanetOrbitalPeriod(spec.body);
+    const orbit = Array.from({ length: 96 }, (_, index) => {
+      const sampleInstant = new Date(birth.instant.getTime() + period * index / 96 * 86_400_000);
+      const sample = A.Ecliptic(A.HelioVector(spec.body, sampleInstant)).vec;
+      return { x: sample.x, y: sample.y, z: sample.z, distanceAu: Math.hypot(sample.x, sample.y, sample.z) };
+    });
     return {
       id: spec.id,
       name: spec.name,
-      longitude: A.EclipticLongitude(spec.body, birth.instant),
+      longitude: ecliptic.elon,
       distanceAu: Math.hypot(vector.x, vector.y, vector.z),
-      relativeVolume: spec.relativeVolume,
-      displayRadius: spec.displayRadius,
+      eclipticX: ecliptic.vec.x,
+      eclipticY: ecliptic.vec.y,
+      eclipticZ: ecliptic.vec.z,
+      meanRadiusKm: spec.meanRadiusKm,
+      ringOuterRadiusKm: "ringOuterRadiusKm" in spec ? spec.ringOuterRadiusKm : spec.meanRadiusKm,
+      orbit,
       orbitIndex,
     };
   });

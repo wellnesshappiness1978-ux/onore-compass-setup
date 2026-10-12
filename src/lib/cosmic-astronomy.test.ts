@@ -14,13 +14,15 @@ describe("cosmic genesis astronomy", () => {
       ), 8);
       expect(planet.longitude).toBeGreaterThanOrEqual(0);
       expect(planet.longitude).toBeLessThan(360);
+      expect(planet.distanceAu).toBeCloseTo(Math.hypot(planet.eclipticX, planet.eclipticY, planet.eclipticZ), 8);
+      expect(planet.orbit).toHaveLength(96);
     }
   });
 
-  it("preserves the requested visual size hierarchy", () => {
+  it("stores the physical mean-radius hierarchy", () => {
     const result = cosmicGenesis("2001-01-01", "", true);
     const ordered = ["jupiter", "saturn", "uranus", "neptune", "earth", "venus", "mars", "mercury"];
-    const radii = ordered.map((id) => result?.planets.find((planet) => planet.id === id)?.displayRadius ?? 0);
+    const radii = ordered.map((id) => result?.planets.find((planet) => planet.id === id)?.meanRadiusKm ?? 0);
     for (let index = 0; index < radii.length - 1; index++) expect(radii[index] ?? 0).toBeGreaterThan(radii[index + 1] ?? 0);
     expect(result?.approximate).toBe(true);
   });

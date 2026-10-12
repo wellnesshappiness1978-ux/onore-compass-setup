@@ -16,13 +16,26 @@ describe("Cosmic Genesis artwork layout", () => {
       expect(planet.y - extent).toBeLessThan(1024);
     });
     const earth = placements.find((planet) => planet.id === "earth");
-    expect(earth?.orbitRadius).toBeCloseTo(174.08, 2);
+    expect(earth?.orbitRadius).toBeGreaterThan(0);
     expect(cosmicEarthPortrait(1024)).toEqual({ x: 686.08, y: 737.28, radius: 240.64 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
     const venus = placements.find((planet) => planet.id === "venus");
     expect(mercury?.displayAngle).toBeCloseTo(((mercury?.longitude ?? 0) - 18 + 360) % 360, 8);
     expect(venus?.displayAngle).toBeCloseTo(((venus?.longitude ?? 0) - 18 + 360) % 360, 8);
+    expect((venus?.orbitRadius ?? 0) < (earth?.orbitRadius ?? 0)).toBe(true);
+    const jupiter = placements.find((planet) => planet.id === "jupiter");
+    expect(jupiter).toBeDefined();
+    expect(mercury).toBeDefined();
+    if (!jupiter || !earth || !mercury) return;
+    expect(jupiter.radius / earth.radius).toBeCloseTo(69911 / 6371, 8);
+    expect(earth.radius / mercury.radius).toBeCloseTo(6371 / 2439.7, 8);
+    placements.forEach((planet) => {
+      const firstPoint = planet.orbitPath[0];
+      expect(firstPoint).toBeDefined();
+      if (!firstPoint) return;
+      expect(Math.hypot(planet.x - firstPoint.x, planet.y - firstPoint.y)).toBeLessThan(.001);
+    });
     const sun = cosmicSunPlacement(genesis, 1024);
     expect(sun.x).toBeCloseTo(440.32, 2);
     expect(sun.y).toBeCloseTo(378.88, 2);
