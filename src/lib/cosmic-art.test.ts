@@ -17,7 +17,7 @@ describe("Cosmic Genesis artwork layout", () => {
     });
     const earth = placements.find((planet) => planet.id === "earth");
     expect(earth?.orbitRadius).toBeGreaterThan(0);
-    expect(cosmicEarthPortrait(1024)).toEqual({ x: 757.76, y: 762.88, radius: 209.92 });
+    expect(cosmicEarthPortrait(1024)).toEqual({ x: 808.96, y: 808.96, radius: 148.48 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
     const venus = placements.find((planet) => planet.id === "venus");
@@ -38,12 +38,12 @@ describe("Cosmic Genesis artwork layout", () => {
       expect(Math.hypot(planet.x - firstPoint.x, planet.y - firstPoint.y)).toBeLessThan(.001);
     });
     const sun = cosmicSunPlacement(genesis, 1024);
-    expect(sun.x).toBeCloseTo(322.56, 2);
-    expect(sun.y).toBeCloseTo(302.08, 2);
+    expect(sun.x).toBeCloseTo(512, 8);
+    expect(sun.y).toBeCloseTo(512, 8);
     expect(Math.atan2((earth.y - sun.y), (earth.x - sun.x)) * 180 / Math.PI).toBeCloseTo(composition.targetAngle, 5);
   });
 
-  it("keeps one shared birth-Earth composition transform across dates", () => {
+  it("keeps one shared Sun-centered composition transform across dates", () => {
     const births: Array<[string, string]> = [["1965-06-08", "04:10"], ["2001-01-01", "12:00"], ["2026-10-12", "13:10"]];
     for (const [date, time] of births) {
       const genesis = cosmicGenesis(date, time, false);
@@ -53,12 +53,14 @@ describe("Cosmic Genesis artwork layout", () => {
       const sun = cosmicSunPlacement(genesis, 1024);
       const frame = cosmicComposition(genesis, 1024);
       expect(frame.scale).toBeGreaterThan(0);
+      expect(frame.centerX).toBe(512);
+      expect(frame.centerY).toBe(512);
       expect(Math.atan2((earth?.y ?? sun.y) - sun.y, (earth?.x ?? sun.x) - sun.x) * 180 / Math.PI).toBeCloseTo(frame.targetAngle, 3);
       placements.flatMap((planet) => planet.orbitPath).forEach((point) => {
-        expect(point.x).toBeGreaterThanOrEqual(1024 * .045 - .01);
-        expect(point.x).toBeLessThanOrEqual(1024 * .665 + .01);
+        expect(point.x).toBeGreaterThanOrEqual(1024 * .055 - .01);
+        expect(point.x).toBeLessThanOrEqual(1024 * .945 + .01);
         expect(point.y).toBeGreaterThanOrEqual(1024 * .055 - .01);
-        expect(point.y).toBeLessThanOrEqual(1024 * .615 + .01);
+        expect(point.y).toBeLessThanOrEqual(1024 * .945 + .01);
       });
     }
   });

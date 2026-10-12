@@ -317,3 +317,9 @@
 - [x] Fit every real sampled orbit with one shared scale while reserving a balanced birthplace-facing Earth portrait.
 - [x] Rebuild orbit depth, Earth correspondence, nebular flow, and collision-safe labels around the dual-focus composition.
 - [x] Verify preserved astronomy, Earth orientation, desktop/mobile/fullscreen presentation, matching shared live/export renderer, tests, and diagnostics.
+
+## Cosmic Genesis Sun-centered physical layout
+- [x] Return the Sun to the absolute artwork center and place every planet from its birth-instant heliocentric vector.
+- [x] Preserve one logarithmic distance transform and one physical-radius multiplier across all eight planets.
+- [x] Separate and label the birthplace-facing Earth detail without changing the orbital Earth or planetary geometry.
+- [ ] Verify astronomy tests, desktop/mobile/fullscreen presentation, matching 2048 export, and diagnostics.

@@ -253,14 +253,16 @@ function paintEarthCorrespondence(ctx: CanvasRenderingContext2D, orbitalEarth: P
   ctx.restore();
 }
 
-function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, placements: ReturnType<typeof cosmicPlacements>, language: Language, birthPlace: string) {
+function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, placements: ReturnType<typeof cosmicPlacements>, language: Language, birthPlace: string, earthPortrait: ReturnType<typeof cosmicEarthPortrait>) {
   const instant = genesis.instant.replace("T", " ").slice(0, 16) + " UTC";
   ctx.save(); ctx.font = `${Math.max(11, size * .011)}px ui-sans-serif, sans-serif`; ctx.textBaseline = "middle"; ctx.letterSpacing = "0px";
   const labels = placements.map((planet, index) => ({ planet, index })).sort((a, b) => a.planet.y - b.planet.y);
   labels.forEach(({ planet, index }, labelIndex) => {
     const label = `${PLANET_LABELS[language][index] ?? planet.name}  ${planet.longitude.toFixed(1)}° · ${planet.distanceAu.toFixed(2)} AU`;
-    const labelY = size * (.105 + labelIndex * .033);
-    const labelX = size * .705;
+    const leftLane = labelIndex < 4;
+    const laneIndex = leftLane ? labelIndex : labelIndex - 4;
+    const labelY = size * (.12 + laneIndex * .038);
+    const labelX = size * (leftLane ? .055 : .73);
     const direction = labelX > planet.x ? 1 : -1;
     const edge = planet.x + direction * ((planet.id === "saturn" ? planet.ringOuterRadius : planet.radius) * 1.1 + size * .004);
     ctx.textAlign = "left";
@@ -274,7 +276,9 @@ function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genes
   ctx.fillStyle = "rgba(226,235,236,.62)"; ctx.font = `${Math.max(10, size * .0105)}px ui-sans-serif, sans-serif`;
   ctx.fillText(`${birthPlace || "—"}  ·  ${genesis.approximate ? "JST 12:00 reference" : "birth-time sky"}`, size * .055, size * .952);
   ctx.textAlign = "right";
-  ctx.fillText("POSITION: BIRTH-INSTANT HELIOCENTRIC  ·  DISTANCE: LOG SCALE  ·  DIAMETER: PHYSICAL RATIO", size * .945, size * .952);
+  ctx.fillText("POSITION: BIRTH-INSTANT HELIOCENTRIC  ·  DISTANCE: LOG SCALE  ·  PLANET RADIUS: PHYSICAL RATIO  ·  SUN / EARTH DETAIL: SEPARATE SCALE", size * .945, size * .952);
+  ctx.textAlign = "center"; ctx.fillStyle = "rgba(244,224,157,.76)"; ctx.font = `${Math.max(9, size * .0095)}px ui-sans-serif, sans-serif`;
+  ctx.fillText(language === "ja" ? "出生地球・拡大細部図" : "BIRTH EARTH · ENLARGED DETAIL", earthPortrait.x, earthPortrait.y + earthPortrait.radius * 1.22);
   ctx.restore();
 }
 
@@ -343,6 +347,8 @@ function paintBirthplaceRadiance(ctx: CanvasRenderingContext2D, earth: Point, po
 }
 
 function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | null, earth: Point, radius: number, view: EarthView, sunPoint: Point, seed: number, overallColor: string) {
+  ctx.save(); ctx.strokeStyle = "rgba(238,219,154,.34)"; ctx.lineWidth = Math.max(1, radius * .009); ctx.setLineDash([radius * .04, radius * .025]);
+  ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * 1.09, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
   irregularGlow(ctx, earth.x, earth.y, radius * 1.55, "#2c8ec7", .5, seed + 71);
   irregularGlow(ctx, earth.x, earth.y, radius * 1.25, "#54e1d1", .34, seed + 93);
   let birthplace = { x: earth.x, y: earth.y - radius * .12 };
@@ -419,7 +425,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   if (orbitalEarth) paintEarthCorrespondence(ctx, orbitalEarth, earth, orbitalEarth.radius, earth.radius, roles.overall, size);
   paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, solar, genesis.seed, roles.overall);
   paintForegroundDust(ctx, size, genesis.seed + 9700);
-  paintAstronomyLabels(ctx, size, genesis, placements, language, birthPlace);
+  paintAstronomyLabels(ctx, size, genesis, placements, language, birthPlace, earth);
 }
 
 export default function CosmicGenesisCanvas({ genesis, earthView, colors, language, birthPlace, onCapture }: Props) {
@@ -441,5 +447,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "出生地球軸に沿った太陽系全景と、出生地点が輝く地球拡大図を重ねた出生宇宙創生図" : "Natal Cosmic Genesis aligned to the orbital Earth with an enlarged birthplace-visible Earth"} data-cosmic-genesis data-renderer="birth-earth-axis-dual-focus" data-birth-color-role="ranked-nebula-and-atmospheric-birthplace-light" data-guide-spokes="0" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "太陽を中心に出生瞬間の実配置と実半径比で描いた太陽系と、出生地点が輝く地球拡大細部図" : "Sun-centered birth-instant Solar System with physical planet-radius ratios and an enlarged birthplace-visible Earth detail"} data-cosmic-genesis data-renderer="sun-centered-physical-layout" data-birth-color-role="ranked-nebula-and-atmospheric-birthplace-light" data-guide-spokes="0" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
