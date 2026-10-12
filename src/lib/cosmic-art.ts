@@ -1,6 +1,8 @@
 import { COSMIC_SUN_MEAN_RADIUS_KM, type CosmicGenesis, type CosmicPlanet } from "./cosmic-astronomy";
 
 export const COSMIC_PLANET_SCALE = 0.0009;
+/** The current visibility treatment (1.11) enlarged by the requested exact 1.5×. */
+export const COSMIC_PLANET_DISPLAY_MULTIPLIER = 1.11 * 1.5;
 export const COSMIC_BODY_RADII_KM = {
   sun: COSMIC_SUN_MEAN_RADIUS_KM,
   mercury: 2439.7,
@@ -46,6 +48,31 @@ function compressedDistance(distanceAu: number) {
   return Math.log1p(distanceAu * DISTANCE_CURVE) / Math.log1p(30.4 * DISTANCE_CURVE);
 }
 
+/**
+ * A single monotonic conceptual-orbit curve with a little more room around Earth.
+ * The knots preserve representative AU order while keeping enlarged inner bodies readable.
+ */
+function conceptualOrbitDistance(distanceAu: number) {
+  const knots = [
+    { au: 0, ratio: 0 },
+    { au: COSMIC_ORBIT_AU.mercury, ratio: .166 },
+    { au: COSMIC_ORBIT_AU.venus, ratio: .241 },
+    { au: COSMIC_ORBIT_AU.earth, ratio: .318 },
+    { au: COSMIC_ORBIT_AU.mars, ratio: .393 },
+    { au: COSMIC_ORBIT_AU.jupiter, ratio: compressedDistance(COSMIC_ORBIT_AU.jupiter) },
+    { au: COSMIC_ORBIT_AU.saturn, ratio: compressedDistance(COSMIC_ORBIT_AU.saturn) },
+    { au: COSMIC_ORBIT_AU.uranus, ratio: compressedDistance(COSMIC_ORBIT_AU.uranus) },
+    { au: COSMIC_ORBIT_AU.neptune, ratio: compressedDistance(COSMIC_ORBIT_AU.neptune) },
+  ];
+  const upperIndex = knots.findIndex((knot) => distanceAu <= knot.au);
+  if (upperIndex <= 0) return knots[0]?.ratio ?? 0;
+  if (upperIndex < 0) return knots.at(-1)?.ratio ?? 1;
+  const lower = knots[upperIndex - 1], upper = knots[upperIndex];
+  if (!lower || !upper) return compressedDistance(distanceAu);
+  const progress = (distanceAu - lower.au) / (upper.au - lower.au);
+  return lower.ratio + (upper.ratio - lower.ratio) * progress;
+}
+
 /** One monotonic visibility scale for the central diagram; physical ratios remain exact in the comparison strip. */
 export function cosmicDisplayRadius(meanRadiusKm: number, size: number) {
   return size * .058 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
@@ -75,13 +102,13 @@ export function cosmicPlacements(genesis: CosmicGenesis, size: number): CosmicPl
   return genesis.planets.map((planet) => {
     const displayAngle = degrees(planet.longitude + composition.rotation);
     const angle = displayAngle * Math.PI / 180;
-    const orbitRadius = compressedDistance(COSMIC_ORBIT_AU[planet.id]) * composition.scale;
+    const orbitRadius = conceptualOrbitDistance(COSMIC_ORBIT_AU[planet.id]) * composition.scale;
     const point = {
       x: composition.centerX + Math.cos(angle) * orbitRadius,
       y: composition.centerY + Math.sin(angle) * orbitRadius,
       depth: Math.sin(angle),
     };
-    const radius = cosmicDisplayRadius(planet.meanRadiusKm, size) * 1.11;
+    const radius = cosmicDisplayRadius(planet.meanRadiusKm, size) * COSMIC_PLANET_DISPLAY_MULTIPLIER;
     const ringOuterRadius = planet.id === "saturn" ? radius * ((planet.ringOuterRadiusKm ?? planet.meanRadiusKm) / planet.meanRadiusKm) : radius;
     return {
       ...planet,

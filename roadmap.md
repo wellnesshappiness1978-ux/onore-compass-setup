@@ -381,3 +381,9 @@
 - [x] Deepen each planet's own material color and strengthen Sun-directed dimensional contrast.
 - [x] Integrate a restrained eight-direction compass inlay and masked logarithmic shell-growth spiral beneath the celestial subjects.
 - [ ] Verify desktop, mobile, fullscreen, and 2048 export presentation with the restored validation profile.
+
+## Cosmic Genesis weighty compass and shell goldwork refinement
+- [x] Enlarge all eight orbital planets by exactly 1.5× from the preceding visibility treatment and rebalance the inner conceptual orbit curve.
+- [x] Remove the shell line from the orbit field and confine four shell-growth reliefs to the clipped outer astrolabe metalwork.
+- [x] Deepen the eight-direction compass inlay with layered antique-gold, platinum, dark-metal, and directional highlights.
+- [x] Verify orbit clarity and celestial balance through three visual passes on desktop/mobile and the shared export renderer; fullscreen interaction remains preview-sensitive, while deterministic geometry, tests, and diagnostics pass.
