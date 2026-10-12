@@ -343,7 +343,7 @@
 - [x] Verify VIP gating, deterministic local rendering, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
 
 ## Cosmic Genesis full-frame orbital artwork
-- [ ] Expand Neptune's orbit to the artwork safe edge while preserving all eight ordered logarithmic orbit bands.
-- [ ] Increase the Sun and planet presence with hierarchy-safe sizing, clearer surfaces, and refined orbital light.
-- [ ] Reflow scientific labels, the birth-Earth detail, and the linear nine-body comparison around the enlarged orbit field.
-- [ ] Verify astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+- [x] Expand Neptune's orbit to the artwork safe edge while preserving all eight ordered logarithmic orbit bands.
+- [x] Increase the Sun and planet presence with hierarchy-safe sizing, clearer surfaces, and refined orbital light.
+- [x] Reflow scientific labels, the birth-Earth detail, and the linear nine-body comparison around the enlarged orbit field.
+- [x] Verify astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
