@@ -617,9 +617,9 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   if (orbitalEarth) paintEarthCorrespondence(ctx, orbitalEarth, earth, orbitalEarth.radius, earth.radius, roles.overall, size);
   paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, solar, genesis.seed, roles.overall);
   paintForegroundDust(ctx, size, genesis.seed + 9700);
+  paintAstrolabeFrame(ctx, size, genesis.seed + 11800);
   paintAstronomyLabels(ctx, size, genesis, placements, language, birthPlace, earth);
   paintSizeComparison(ctx, size, genesis, assets, language);
-  paintAstrolabeFrame(ctx, size, genesis.seed + 11800);
 }
 
 export default function CosmicGenesisCanvas({ genesis, earthView, colors, language, birthPlace, onCapture }: Props) {
