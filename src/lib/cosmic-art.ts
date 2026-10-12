@@ -33,6 +33,7 @@ export type CosmicEarthPortrait = { x: number; y: number; radius: number };
 export type CosmicComposition = { centerX: number; centerY: number; rotation: number; scale: number; targetAngle: number };
 export type CosmicSizeComparison = { id: "sun" | CosmicPlanet["id"]; x: number; y: number; radius: number; physicalRadiusKm: number };
 export type CosmicAstrolabeFrame = { x: number; y: number; innerRadius: number; outerRadius: number; tickCount: number };
+export type CosmicCompassIdentity = { sunSign: number; moonSign: number; guardian: number; awakenedSectors: readonly number[] };
 
 export const COSMIC_GUARDIANS = ["rat", "ox", "tiger", "rabbit", "dragon", "serpent", "horse", "goat", "monkey", "rooster", "dog", "boar"] as const;
 
@@ -122,6 +123,14 @@ export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
 /** A fixed outer instrument ring that frames, but never changes, the astronomical diagram. */
 export function cosmicAstrolabeFrame(size: number): CosmicAstrolabeFrame {
   return { x: size * .5, y: size * .47, innerRadius: size * .446, outerRadius: size * .466, tickCount: 72 };
+}
+
+/** Stable symbolic identity for the zodiac and guardian ring; astronomy remains the source of every sector. */
+export function cosmicCompassIdentity(genesis: CosmicGenesis): CosmicCompassIdentity {
+  const sunSign = ((genesis.sunSign % 12) + 12) % 12;
+  const moonSign = ((genesis.moonSign % 12) + 12) % 12;
+  const guardian = ((genesis.animal % 12) + 12) % 12;
+  return { sunSign, moonSign, guardian, awakenedSectors: sunSign === moonSign ? [sunSign] : [sunSign, moonSign] };
 }
 
 /** Sun and planets on one linear physical-radius scale, independent from the visibility-scaled orbit diagram. */
