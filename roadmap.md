@@ -399,3 +399,10 @@
 - [x] Place the golden instrument behind celestial bodies, tighten the orbit field, and give the separate birth Earth a jeweled cradle so no important body is hidden by the frame.
 - [x] Replace faint edge text with larger two-level high-contrast obsidian plaques and matching Moon, birth-Earth and physical-size labels.
 - [x] Verify desktop/mobile rendering, fullscreen opening and closing, and an actual 2048 × 2048 PNG download; 17 astronomy/geometry tests pass. Seven-language label dictionaries remain wired into the shared renderer; individual non-Japanese visual reviews were not performed.
+
+
+## Star jewelry and private artwork records
+- [x] Refine VIP guilloche/nacre and branching seven-color nebular details without changing astronomy.
+- [x] Add clipped enamel depth and polished engraving to Standard mandala with matching local export.
+- [x] Add five art export formats, optional birth disclosures, independent commemorative numbers and seven-language copy.
+- [x] Verify default-private disclosures, all five downloads for both artworks, desktop/mobile/fullscreen, 36 passing tests and clean diagnostics. Actual paid entitlements and native device-share destinations were not verified; artwork checks used the development VIP preview.

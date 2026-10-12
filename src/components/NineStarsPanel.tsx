@@ -17,6 +17,8 @@ import { artSpecialistCopy } from "@/lib/art-specialist-copy";
 import { nineStarName, trigramLabel } from "@/lib/ui-i18n";
 import { helioCopy } from "@/lib/helio-copy";
 import { canUse } from "@/lib/plans";
+import ArtExportDialog from "./ArtExportDialog";
+import { newArtSerial } from "@/lib/art-certificate";
 import type { Plan } from "@/lib/design-modes";
 
 import { computeCoreLayers } from "@/lib/ai/core-layers";
@@ -63,9 +65,11 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
   const paletteEntries = palette ? paletteColors(palette) : [];
   const artColors = paletteEntries.length ? paletteEntries.map(color => color.code) : [colors.main, colors.sub];
   const [status, setStatus] = useState("");
-  const [busy, setBusy] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [variation, setVariation] = useState(0);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [serial, setSerial] = useState("");
+  useEffect(() => { setSerial(newArtSerial()); }, [art, variation]);
   const [captureReady, setCaptureReady] = useState(false);
   const capture = useRef<Capture | null>(null);
   const setCapture = useCallback((fn: Capture | null) => { capture.current = fn; setCaptureReady(Boolean(fn)); }, []);
@@ -84,41 +88,12 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
   }, []);
   useEffect(() => {
     if (!open) return;
-    const share = (event: Event) => { event.preventDefault(); void shareImage(); };
+    const share = (event: Event) => { event.preventDefault(); setExportOpen(true); };
     window.addEventListener("onore-share-card", share);
     return () => window.removeEventListener("onore-share-card", share);
   }, [open, art]);
   useEffect(() => { capture.current = null; setCaptureReady(false); setStatus(""); }, [art, open]);
 
-  async function createWallpaper() {
-    if (!capture.current) throw new Error("Artwork unavailable");
-    return capture.current();
-  }
-  async function download() {
-    setBusy(true);
-    try {
-      const { blob, width, height } = await createWallpaper();
-      const url = URL.createObjectURL(blob);
-      const extension = blob.type === "image/jpeg" ? "jpg" : "png";
-      const link = document.createElement("a"); link.href = url; link.download = `agolmen-${art === "cosmic" ? "cosmic-alchemy" : "birth-color-mandala"}-preview.${extension}`;
-      document.body.append(link); link.click(); link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 10000);
-      setStatus(`${t.saved} · ${width} × ${height}`);
-    } catch { setStatus(t.exportError); }
-    finally { setBusy(false); }
-  }
-  async function shareImage() {
-    setBusy(true);
-    try {
-      const { blob } = await createWallpaper();
-      const extension = blob.type === "image/jpeg" ? "jpg" : "png";
-      const file = new File([blob], `agolmen-${art === "cosmic" ? "cosmic-alchemy" : "birth-color-mandala"}-preview.${extension}`, { type: blob.type });
-      if (navigator.canShare?.({ files: [file] }) && navigator.share) { await navigator.share({ files: [file], title: art === "cosmic" ? a.cosmic : a.mandala, text: t.shareText }); setStatus(t.shared); }
-      else if (navigator.clipboard?.write && typeof ClipboardItem !== "undefined") { await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]); setStatus(t.imageCopied); }
-      else setStatus(t.shareFallback);
-    } catch (error) { if (!(error instanceof DOMException && error.name === "AbortError")) setStatus(t.shareFallback); }
-    finally { setBusy(false); }
-  }
   async function copyLink() {
     try { await navigator.clipboard.writeText(window.location.origin); setStatus(t.linkCopied); }
     catch { setStatus(t.shareFallback); }
@@ -154,7 +129,8 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
       {symbols && <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground"><span>{t.zodiac}: <strong className="font-normal text-foreground">{zodiacGlyphs[symbols.zodiac]} {a.zodiacNames[symbols.zodiac]}</strong></span><span>{t.animal}: <strong className="font-normal text-foreground">{a.animalNames[symbols.animal]}</strong></span></div>}
       <p className="mt-2 text-sm leading-6 text-muted-foreground">{t.symbolDisclaimer}</p>
     </div>
-    <div className="mt-6 flex flex-wrap justify-center gap-2"><Button variant="outline" onClick={download} disabled={!open || busy || !captureReady} className="min-h-11 border-primary/40 text-primary"><Download />{art === "mandala" ? a.downloadWallpaper : t.downloadPreview}</Button><Button variant="outline" onClick={shareImage} disabled={!open || busy || !captureReady} className="min-h-11 border-primary/40 text-primary"><Share2 />{t.shareImage}</Button><Button variant="ghost" onClick={copyLink} className="min-h-11 text-muted-foreground"><Copy />{t.copyLink}</Button></div>
+    <div className="mt-6 flex flex-wrap justify-center gap-2"><Button variant="outline" onClick={() => setExportOpen(true)} disabled={!open || !captureReady} className="min-h-11 border-primary/40 text-primary"><Download />{art === "mandala" ? a.downloadWallpaper : t.downloadPreview}</Button><Button variant="outline" onClick={() => setExportOpen(true)} disabled={!open || !captureReady} className="min-h-11 border-primary/40 text-primary"><Share2 />{t.shareImage}</Button><Button variant="ghost" onClick={copyLink} className="min-h-11 text-muted-foreground"><Copy />{t.copyLink}</Button></div>
+    {open && <ArtExportDialog open={exportOpen} onOpenChange={setExportOpen} capture={capture.current} language={language} record={{title:art === "cosmic" ? a.cosmic : a.mandala,serial,name:[profile.nameKanji,profile.nameRomaji].filter(Boolean).join(" / "),birthDate:profile.birthDate,birthTime:profile.birthTime,birthTimeUnknown:profile.birthTimeUnknown,birthPlace:profile.birthPlace,birthCity:profile.birthCity ?? ""}} />}
     <p className="mt-3 text-sm leading-6 text-muted-foreground">{t.shareNote}</p><p role="status" aria-live="polite" className="mt-2 min-h-6 text-sm text-primary">{status}</p>
   </section>;
 }

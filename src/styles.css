@@ -104,6 +104,13 @@
   --share-paper: oklch(0.96 0.016 90);
   --share-veil: oklch(0.105 0.008 265 / 0.7);
   --share-panel: oklch(0.16 0.008 265 / 0.9);
+  --craft-gold: #c99a45;
+  --craft-light: #fff1bc;
+  --craft-shadow: #35251d;
+  --craft-pearl: #ecf3e8;
+  --craft-aqua: #81cbbd;
+  --craft-rose: #d8a5b4;
+  --craft-ink: #030710;
 }
 
 .share-card-modal { background: var(--share-midnight); z-index: 100; }
