@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cosmicGenesis } from "./cosmic-astronomy";
-import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, COSMIC_PLANET_DISPLAY_MULTIPLIER, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
+import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, COSMIC_PLANET_DISPLAY_MULTIPLIER, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicMoonPlacement, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
   it("builds a readable conceptual Solar System while preserving birth longitudes", () => {
@@ -137,14 +137,28 @@ describe("Cosmic Genesis artwork layout", () => {
     }
   });
 
-  it("enlarges only the eight orbital planets by exactly 1.5 from the previous treatment", () => {
+  it("enlarges only the eight orbital planets by exactly 1.3 from the current treatment", () => {
     const genesis = cosmicGenesis("1990-04-15", "08:30", false);
     if (!genesis) return;
-    expect(COSMIC_PLANET_DISPLAY_MULTIPLIER).toBeCloseTo(1.11 * 1.5, 10);
+    expect(COSMIC_PLANET_DISPLAY_MULTIPLIER).toBeCloseTo(1.11 * 1.5 * 1.3, 10);
     cosmicPlacements(genesis, 1024).forEach((planet) => {
-      expect(planet.radius).toBeCloseTo(cosmicDisplayRadius(planet.meanRadiusKm, 1024) * 1.11 * 1.5, 8);
+      expect(planet.radius).toBeCloseTo(cosmicDisplayRadius(planet.meanRadiusKm, 1024) * 1.11 * 1.5 * 1.3, 8);
     });
     expect(cosmicSunPlacement(genesis, 1024).radius).toBeCloseTo(cosmicDisplayRadius(COSMIC_BODY_RADII_KM.sun, 1024), 8);
+  });
+
+  it("places the birth Moon beside Earth at its exact geocentric direction", () => {
+    const genesis = cosmicGenesis("1990-04-15", "08:30", false);
+    if (!genesis) return;
+    const earth = cosmicPlacements(genesis, 1024).find((planet) => planet.id === "earth");
+    const moon = cosmicMoonPlacement(genesis, 1024, earth);
+    expect(earth).toBeDefined();
+    expect(moon).not.toBeNull();
+    if (!earth || !moon) return;
+    expect(Math.hypot(moon.x - earth.x, moon.y - earth.y)).toBeCloseTo(moon.distance, 8);
+    expect(moon.displayAngle).toBeCloseTo(genesis.moon.longitude, 8);
+    expect(moon.phaseFraction).toBeCloseTo(genesis.moon.phaseFraction, 8);
+    expect(moon.distance).toBeGreaterThan(earth.radius + moon.radius);
   });
 
   it("keeps the engraved astrolabe outside every orbit and inside the square artwork", () => {

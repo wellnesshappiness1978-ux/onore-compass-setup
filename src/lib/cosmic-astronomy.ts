@@ -36,10 +36,20 @@ export type CosmicGenesis = {
   instant: string;
   approximate: boolean;
   planets: CosmicPlanet[];
+  moon: CosmicMoon;
   sunSign: number;
   moonSign: number;
   animal: number;
   seed: number;
+};
+
+export type CosmicMoon = {
+  longitude: number;
+  latitude: number;
+  distanceAu: number;
+  phaseAngle: number;
+  phaseFraction: number;
+  phaseLongitude: number;
 };
 
 export type EarthView = {
@@ -93,10 +103,20 @@ export function cosmicGenesis(date: string, time: string, unknown: boolean): Cos
     };
   });
   const sunSign = signIndex(A.SunPosition(birth.instant).elon);
-  const moonSign = signIndex(A.EclipticGeoMoon(birth.instant).lon);
+  const lunar = A.EclipticGeoMoon(birth.instant);
+  const illumination = A.Illumination(A.Body.Moon, birth.instant);
+  const moon: CosmicMoon = {
+    longitude: lunar.lon,
+    latitude: lunar.lat,
+    distanceAu: lunar.dist,
+    phaseAngle: illumination.phase_angle,
+    phaseFraction: illumination.phase_fraction,
+    phaseLongitude: A.MoonPhase(birth.instant),
+  };
+  const moonSign = signIndex(moon.longitude);
   const animal = ((birth.year - 4) % 12 + 12) % 12;
   const seed = planets.reduce((total, planet, index) => total + Math.round(planet.longitude * (index + 3) * 10), birth.year * 37 + animal * 101);
-  return { instant: birth.instant.toISOString(), approximate: birth.approximate, planets, sunSign, moonSign, animal, seed };
+  return { instant: birth.instant.toISOString(), approximate: birth.approximate, planets, moon, sunSign, moonSign, animal, seed };
 }
 
 const wrapDegrees = (value: number) => ((value % 360) + 360) % 360;

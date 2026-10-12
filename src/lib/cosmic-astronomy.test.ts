@@ -17,6 +17,15 @@ describe("cosmic genesis astronomy", () => {
       expect(planet.distanceAu).toBeCloseTo(Math.hypot(planet.eclipticX, planet.eclipticY, planet.eclipticZ), 8);
       expect(planet.orbit).toHaveLength(96);
     }
+    const instant = new Date("1990-04-14T23:30:00.000Z");
+    const moon = A.EclipticGeoMoon(instant);
+    const illumination = A.Illumination(A.Body.Moon, instant);
+    expect(result?.moon.longitude).toBeCloseTo(moon.lon, 8);
+    expect(result?.moon.latitude).toBeCloseTo(moon.lat, 8);
+    expect(result?.moon.distanceAu).toBeCloseTo(moon.dist, 10);
+    expect(result?.moon.phaseAngle).toBeCloseTo(illumination.phase_angle, 8);
+    expect(result?.moon.phaseFraction).toBeCloseTo(illumination.phase_fraction, 8);
+    expect(result?.moon.phaseLongitude).toBeCloseTo(A.MoonPhase(instant), 8);
   });
 
   it("stores the physical mean-radius hierarchy", () => {
