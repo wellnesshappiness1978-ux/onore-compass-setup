@@ -307,7 +307,27 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
       ctx.lineTo(Math.cos(angle) * (frame.outerRadius - size * .001), Math.sin(angle) * (frame.outerRadius - size * .001)); ctx.stroke();
     }
   }
+  ctx.restore();
+  for (let tick = 0; tick < frame.tickCount; tick++) {
+    const angle = tick / frame.tickCount * Math.PI * 2;
+    const cardinal = tick % 18 === 0, intercardinal = tick % 9 === 0;
+    const long = tick % 6 === 0, inner = frame.innerRadius + size * (cardinal ? -.006 : intercardinal ? 0 : long ? .003 : .007), outer = frame.outerRadius - size * .003;
+    ctx.strokeStyle = cardinal ? "rgba(255,244,204,.98)" : intercardinal ? "rgba(236,242,230,.88)" : long ? "rgba(255,226,145,.9)" : "rgba(67,34,15,.72)";
+    ctx.lineWidth = Math.max(1, size * (cardinal ? .0017 : intercardinal ? .00125 : long ? .001 : .00055));
+    ctx.beginPath(); ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner); ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer); ctx.stroke();
+  }
+  for (let jewel = 0; jewel < 12; jewel++) {
+    const angle = jewel / 12 * Math.PI * 2, radius = (frame.innerRadius + frame.outerRadius) / 2;
+    const x = Math.cos(angle) * radius, y = Math.sin(angle) * radius;
+    const awakened = identity.awakenedSectors.includes(jewel);
+    const jewelColor = colors[(jewel + identity.guardian) % Math.max(colors.length, 1)] ?? GOLD;
+    irregularGlow(ctx, x, y, size * (awakened ? .018 : .008), jewelColor, awakened ? .58 : .18, seed + jewel * 29);
+    ctx.fillStyle = jewelColor; ctx.globalAlpha = awakened ? .96 : .52; ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .004 : .0025), 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = awakened ? "rgba(255,243,198,.96)" : "rgba(255,233,169,.52)"; ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .0058 : .0042), 0, Math.PI * 2); ctx.stroke();
+  }
+  ctx.save(); ctx.beginPath(); ctx.arc(0, 0, frame.outerRadius - size * .001, 0, Math.PI * 2); ctx.arc(0, 0, frame.innerRadius + size * .001, 0, Math.PI * 2, true); ctx.clip("evenodd");
   for (let shell = 0; shell < 4; shell++) {
+    ctx.save(); ctx.globalCompositeOperation = "source-over";
     const anchor = -Math.PI * .75 + shell * Math.PI / 2;
     const centerRadius = (frame.innerRadius + frame.outerRadius) / 2;
     const cx = Math.cos(anchor) * centerRadius, cy = Math.sin(anchor) * centerRadius;
@@ -341,7 +361,7 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.restore();
     const shellBase = ctx.createRadialGradient(cx - shellRadius * .24, cy - shellRadius * .24, shellRadius * .06, cx, cy, shellRadius);
     shellBase.addColorStop(0, "rgba(255,239,181,.92)"); shellBase.addColorStop(.24, "rgba(173,104,39,.95)"); shellBase.addColorStop(.58, "rgba(70,34,17,.98)"); shellBase.addColorStop(.82, "rgba(232,188,94,.92)"); shellBase.addColorStop(1, "rgba(35,17,10,.18)");
-    ctx.fillStyle = shellBase; ctx.globalAlpha = .94; ctx.shadowColor = GOLD; ctx.shadowBlur = size * .01;
+    ctx.fillStyle = shellBase; ctx.globalAlpha = .36; ctx.shadowColor = GOLD; ctx.shadowBlur = size * .01;
     ctx.beginPath(); ctx.arc(cx, cy, shellRadius, 0, Math.PI * 2); ctx.fill();
     for (let chamber = 0; chamber < 12; chamber++) {
       const angle = anchor + Math.PI + chamber / 11 * Math.PI * 4.6;
@@ -361,9 +381,9 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
         step ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
       }
       ctx.strokeStyle = pass === 1 ? shellGem : pass === 2 ? PLATINUM : GOLD;
-      ctx.globalAlpha = [ .28, .52, .98, .72 ][pass] ?? .3;
+      ctx.globalAlpha = [ .32, .58, .78, .65 ][pass] ?? .3;
       ctx.lineWidth = size * ([ .008, .0034, .00082, .00042 ][pass] ?? .00048);
-      ctx.shadowColor = pass === 1 ? shellGem : GOLD; ctx.shadowBlur = size * ([ .011, .006, .002, 0 ][pass] ?? 0); ctx.stroke();
+      ctx.shadowColor = pass === 1 ? shellGem : GOLD; ctx.shadowBlur = size * ([ .003, .002, 0, 0 ][pass] ?? 0); ctx.stroke();
     }
     for (let rib = 2; rib < 11; rib++) {
       const angle = anchor + Math.PI + rib / 10 * Math.PI * 4.6;
@@ -383,25 +403,9 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.strokeStyle = "rgba(255,241,191,.96)"; ctx.globalAlpha = .92; ctx.lineWidth = size * .0014;
     ctx.shadowColor = GOLD; ctx.shadowBlur = size * .006;
     ctx.beginPath(); ctx.arc(cx, cy, shellRadius * 1.04, anchor - .42, anchor + .42); ctx.stroke();
+    ctx.restore();
   }
   ctx.restore();
-  for (let tick = 0; tick < frame.tickCount; tick++) {
-    const angle = tick / frame.tickCount * Math.PI * 2;
-    const cardinal = tick % 18 === 0, intercardinal = tick % 9 === 0;
-    const long = tick % 6 === 0, inner = frame.innerRadius + size * (cardinal ? -.006 : intercardinal ? 0 : long ? .003 : .007), outer = frame.outerRadius - size * .003;
-    ctx.strokeStyle = cardinal ? "rgba(255,244,204,.98)" : intercardinal ? "rgba(236,242,230,.88)" : long ? "rgba(255,226,145,.9)" : "rgba(67,34,15,.72)";
-    ctx.lineWidth = Math.max(1, size * (cardinal ? .0017 : intercardinal ? .00125 : long ? .001 : .00055));
-    ctx.beginPath(); ctx.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner); ctx.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer); ctx.stroke();
-  }
-  for (let jewel = 0; jewel < 12; jewel++) {
-    const angle = jewel / 12 * Math.PI * 2, radius = (frame.innerRadius + frame.outerRadius) / 2;
-    const x = Math.cos(angle) * radius, y = Math.sin(angle) * radius;
-    const awakened = identity.awakenedSectors.includes(jewel);
-    const jewelColor = colors[(jewel + identity.guardian) % Math.max(colors.length, 1)] ?? GOLD;
-    irregularGlow(ctx, x, y, size * (awakened ? .018 : .008), jewelColor, awakened ? .58 : .18, seed + jewel * 29);
-    ctx.fillStyle = jewelColor; ctx.globalAlpha = awakened ? .96 : .52; ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .004 : .0025), 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = awakened ? "rgba(255,243,198,.96)" : "rgba(255,233,169,.52)"; ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .0058 : .0042), 0, Math.PI * 2); ctx.stroke();
-  }
   for (let direction = 0; direction < 8; direction++) {
     const angle = direction * Math.PI / 4 - Math.PI / 2;
     const cardinal = direction % 2 === 0;
@@ -657,14 +661,14 @@ function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genes
     const lane = side < 0 ? left.indexOf(planet) : right.indexOf(planet);
     const count = side < 0 ? left.length : right.length;
     const labelY = size * (.16 + (count === 1 ? .25 : lane * .52 / (count - 1)));
-    const plaqueWidth = size * .295, plaqueHeight = size * .048;
+    const plaqueWidth = size * .295, plaqueHeight = size * .065;
     const plaqueX = size * (side < 0 ? .012 : .988) - (side < 0 ? 0 : plaqueWidth);
     const plaqueY = labelY - plaqueHeight * .5;
     const labelX = plaqueX + (side < 0 ? size * .014 : plaqueWidth - size * .014);
     const ratio = planet.meanRadiusKm / 6371;
     const index = genesis.planets.findIndex((candidate) => candidate.id === planet.id);
     const title = PLANET_LABELS[language][index] ?? planet.name;
-    const details = `${planet.longitude.toFixed(1)}°  ·  ${planet.distanceAu.toFixed(2)} AU  ·  ${planet.meanRadiusKm.toLocaleString()} km  ·  ${ratio.toFixed(2)} R⊕`;
+    const detailRows = [`${planet.longitude.toFixed(1)}°  ·  ${planet.distanceAu.toFixed(2)} AU`, `${planet.meanRadiusKm.toLocaleString()} km  ·  ${ratio.toFixed(2)} R⊕`];
     const edgeRadius = planet.id === "saturn" ? planet.ringOuterRadius : planet.radius;
     const outward = side < 0 ? -1 : 1;
     const edge = planet.x + outward * (edgeRadius + size * .004);
@@ -675,10 +679,11 @@ function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genes
     ctx.beginPath(); ctx.moveTo(edge, planet.y); ctx.lineTo(edge + outward * size * .012, planet.y); ctx.lineTo(plaqueX + (side < 0 ? plaqueWidth : 0), labelY); ctx.stroke(); ctx.shadowBlur = 0;
     ctx.textAlign = side < 0 ? "left" : "right";
     ctx.fillStyle = planet.id === "earth" ? "rgba(255,233,164,.98)" : "rgba(248,244,224,.98)";
-    ctx.font = `700 ${Math.max(11, size * .0108)}px ui-sans-serif, sans-serif`; ctx.fillText(title, labelX, labelY - size * .0092);
-    let detailSize = size * .0082; ctx.font = `500 ${Math.max(8.5, detailSize)}px ui-monospace, monospace`;
-    while (ctx.measureText(details).width > plaqueWidth - size * .028 && detailSize > size * .0072) { detailSize -= size * .00015; ctx.font = `500 ${Math.max(8.5, detailSize)}px ui-monospace, monospace`; }
-    ctx.fillStyle = "rgba(217,231,235,.92)"; ctx.fillText(details, labelX, labelY + size * .0095);
+    ctx.font = `700 ${Math.max(11, size * .0108)}px ui-sans-serif, sans-serif`; ctx.fillText(title, labelX, labelY - size * .018);
+    ctx.font = `500 ${Math.max(10, size * .0102)}px ui-monospace, monospace`;
+    ctx.fillStyle = "rgba(217,231,235,.96)";
+    detailRows.forEach((row, rowIndex) => ctx.fillText(row, labelX, labelY + size * (-.001 + rowIndex * .016)));
+
   });
   paintObsidianPlaque(ctx, size * .014, size * .009, size * .69, size * .056);
   ctx.textAlign = "left"; ctx.fillStyle = "rgba(255,235,172,.98)"; ctx.font = `700 ${Math.max(11, size * .0108)}px ui-sans-serif, sans-serif`;
