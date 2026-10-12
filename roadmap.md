@@ -341,3 +341,9 @@
 - [x] Integrate the birth-instant heliocentric placement diagram with a separate linear-scale nine-body size comparison.
 - [x] Refine the birthplace-facing Earth detail, collision-safe scientific labels, legends, and seven-language copy.
 - [x] Verify VIP gating, deterministic local rendering, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.
+
+## Cosmic Genesis full-frame orbital artwork
+- [ ] Expand Neptune's orbit to the artwork safe edge while preserving all eight ordered logarithmic orbit bands.
+- [ ] Increase the Sun and planet presence with hierarchy-safe sizing, clearer surfaces, and refined orbital light.
+- [ ] Reflow scientific labels, the birth-Earth detail, and the linear nine-body comparison around the enlarged orbit field.
+- [ ] Verify astronomy, VIP gating, desktop/mobile/fullscreen presentation, matching 2048 export, tests, and diagnostics.

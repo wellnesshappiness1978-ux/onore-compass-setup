@@ -45,14 +45,14 @@ function compressedDistance(distanceAu: number) {
 
 /** One monotonic visibility scale for the central diagram; physical ratios remain exact in the comparison strip. */
 export function cosmicDisplayRadius(meanRadiusKm: number, size: number) {
-  return size * .041 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
+  return size * .05 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
 }
 
 /** Keeps the Sun at the center and maps Neptune's representative orbit to one shared diagram radius. */
 export function cosmicComposition(genesis: CosmicGenesis, size: number): CosmicComposition {
   const rotation = SCREEN_ROTATION;
-  const centerX = size * .5, centerY = size * .455;
-  const scale = size * .315;
+  const centerX = size * .5, centerY = size * .47;
+  const scale = size * .438;
   const earth = genesis.planets.find((planet) => planet.id === "earth");
   const targetAngle = degrees((earth?.longitude ?? 0) + rotation);
   return { centerX, centerY, rotation, scale, targetAngle };
@@ -115,20 +115,20 @@ export function cosmicSunPlacement(_genesis: CosmicGenesis, size: number): Cosmi
 
 /** Enlarges the same orbital Earth into a birthplace-facing foreground portrait. */
 export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
-  return { x: size * .885, y: size * .18, radius: size * .052 };
+  return { x: size * .87, y: size * .13, radius: size * .06 };
 }
 
 /** Sun and planets on one linear physical-radius scale, independent from the visibility-scaled orbit diagram. */
 export function cosmicSizeComparison(genesis: CosmicGenesis, size: number): CosmicSizeComparison[] {
   const ids: CosmicSizeComparison["id"][] = ["sun", "mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"];
-  const maxRadius = size * .047;
+  const maxRadius = size * .041;
   return ids.map((id, index) => {
     const planet = id === "sun" ? undefined : genesis.planets.find((candidate) => candidate.id === id);
     const physicalRadiusKm = id === "sun" ? COSMIC_SUN_MEAN_RADIUS_KM : planet?.meanRadiusKm ?? COSMIC_BODY_RADII_KM[id];
     return {
       id,
       x: size * (.065 + index * .1085),
-      y: size * .895,
+      y: size * .912,
       radius: maxRadius * physicalRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM,
       physicalRadiusKm,
     };
