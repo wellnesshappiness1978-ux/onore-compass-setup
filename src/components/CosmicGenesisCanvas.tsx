@@ -12,6 +12,7 @@ import neptune from "@/assets/cosmic-neptune.png";
 import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicEarthPortrait, cosmicMoonPlacement, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement, type CosmicMoonPlacement } from "@/lib/cosmic-art";
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
 import type { Language } from "@/lib/translations";
+import { paintEngravedRing, paintBranchingFilaments } from "@/lib/art-craft";
 import type { Capture } from "./MandalaCanvas";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
@@ -419,6 +420,7 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.restore();
   }
   ctx.restore();
+  paintEngravedRing(ctx, frame.x, frame.y, frame.innerRadius + size * .002, frame.outerRadius - size * .002, size);
 }
 
 function paintMetalPlaque(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
@@ -651,7 +653,7 @@ function paintEarthCorrespondence(ctx: CanvasRenderingContext2D, orbitalEarth: P
   ctx.restore();
 }
 
-function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, placements: ReturnType<typeof cosmicPlacements>, language: Language, birthPlace: string, earthPortrait: ReturnType<typeof cosmicEarthPortrait>) {
+function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genesis: CosmicGenesis, placements: ReturnType<typeof cosmicPlacements>, language: Language, birthPlace: string, earthPortrait: ReturnType<typeof cosmicEarthPortrait>, hideBirthDetails = false) {
   const instant = genesis.instant.replace("T", " ").slice(0, 16) + " UTC";
   const copy = SCIENCE_COPY[language];
   ctx.save(); ctx.textBaseline = "middle"; ctx.letterSpacing = "0px";
@@ -687,9 +689,9 @@ function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genes
   });
   paintObsidianPlaque(ctx, size * .014, size * .009, size * .69, size * .056);
   ctx.textAlign = "left"; ctx.fillStyle = "rgba(255,235,172,.98)"; ctx.font = `700 ${Math.max(11, size * .0108)}px ui-sans-serif, sans-serif`;
-  ctx.fillText(copy.placement, size * .027, size * .028);
+  ctx.fillText(copy.placement, size * .027, size * .028, size * .663);
   ctx.fillStyle = "rgba(225,237,239,.92)"; ctx.font = `500 ${Math.max(9, size * .0088)}px ui-sans-serif, sans-serif`;
-  ctx.fillText(`${instant} · ${birthPlace || "—"}${genesis.approximate ? ` · ${copy.reference}` : ""}`, size * .027, size * .0505);
+  ctx.fillText(hideBirthDetails ? (genesis.approximate ? copy.reference : "") : `${instant} · ${birthPlace || "—"}${genesis.approximate ? ` · ${copy.reference}` : ""}`, size * .027, size * .0505);
   const earthLabelWidth = size * .245, earthLabelHeight = size * .027;
   paintObsidianPlaque(ctx, earthPortrait.x - earthLabelWidth * .5, earthPortrait.y + earthPortrait.radius * 1.18, earthLabelWidth, earthLabelHeight);
   ctx.textAlign = "center"; ctx.fillStyle = "rgba(255,231,157,.98)"; ctx.font = `700 ${Math.max(9, size * .0092)}px ui-sans-serif, sans-serif`;
@@ -940,7 +942,7 @@ function paintForegroundDust(ctx: CanvasRenderingContext2D, size: number, seed: 
   ctx.restore();
 }
 
-export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: CosmicGenesis, earthView: EarthView, colors: string[], language: Language, birthPlace: string, assets?: ArtAssets | null) {
+export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: CosmicGenesis, earthView: EarthView, colors: string[], language: Language, birthPlace: string, assets?: ArtAssets | null, hideBirthDetails = false) {
   const ctx = canvas.getContext("2d"); if (!ctx) throw new Error("Canvas unavailable");
   const size = canvas.width, roles = cosmicColorRoles(colors), placements = cosmicPlacements(genesis, size), solar = cosmicSunPlacement(genesis, size);
   const orbitalEarth = placements.find((planet) => planet.id === "earth");
@@ -949,6 +951,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   paintMilkyWay(ctx, size, roles.all, genesis.seed + 6400);
   paintNebulae(ctx, size, roles.all, genesis.seed + 1200);
   paintStarLifeVeils(ctx, size, roles.prominence, genesis.seed + 4400, cosmicPlacements(genesis, size).find((planet) => planet.id === "earth")?.displayAngle ?? 0);
+  paintBranchingFilaments(ctx, size, roles.all, genesis.seed + 17100);
   paintCompassInlay(ctx, size);
   paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius })), ...(moon ? [{ x: moon.x, y: moon.y, radius: moon.radius }] : [])]);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
@@ -967,7 +970,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   if (orbitalEarth) paintEarthCorrespondence(ctx, orbitalEarth, earth, orbitalEarth.radius, earth.radius, roles.overall, size);
   paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, solar, genesis.seed, roles.overall);
   paintForegroundDust(ctx, size, genesis.seed + 9700);
-  paintAstronomyLabels(ctx, size, genesis, placements, language, birthPlace, earth);
+  paintAstronomyLabels(ctx, size, genesis, placements, language, birthPlace, earth, hideBirthDetails);
   paintSizeComparison(ctx, size, genesis, assets, language);
 }
 
@@ -978,9 +981,9 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
   const genesisKey = JSON.stringify(genesis); const stableGenesis = useMemo(() => genesis, [genesisKey]);
   const earthKey = JSON.stringify(earthView); const stableEarthView = useMemo(() => earthView, [earthKey]);
   const colorKey = colors.join(","); const stableColors = useMemo(() => colorKey.split(","), [colorKey]);
-  const capture = useCallback(async () => {
+  const capture = useCallback<Capture>(async (options) => {
     const out = document.createElement("canvas"); out.width = 2048; out.height = 2048;
-    const art = images.current ?? await loadArt(); await paintCosmicGenesis(out, stableGenesis, stableEarthView, stableColors, language, birthPlace, art);
+    const art = images.current ?? await loadArt(); await paintCosmicGenesis(out, stableGenesis, stableEarthView, stableColors, language, birthPlace, art, options?.hideBirthDetails ?? false);
     const blob = await new Promise<Blob>((resolve, reject) => out.toBlob(value => value ? resolve(value) : reject(new Error("PNG unavailable")), "image/png"));
     return { blob, width: out.width, height: out.height };
   }, [stableGenesis, stableEarthView, stableColors, language, birthPlace]);
@@ -990,5 +993,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="agolmen-heirloom-compass-obsidian-science-plates" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="high-contrast-obsidian-plaques" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="seven-exact-star-life-veils-and-atmospheric-birthplace-light" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="high-contrast-obsidian-plaques" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
