@@ -322,4 +322,4 @@
 - [x] Return the Sun to the absolute artwork center and place every planet from its birth-instant heliocentric vector.
 - [x] Preserve one logarithmic distance transform and one physical-radius multiplier across all eight planets.
 - [x] Separate and label the birthplace-facing Earth detail without changing the orbital Earth or planetary geometry.
-- [ ] Verify astronomy tests, desktop/mobile/fullscreen presentation, matching 2048 export, and diagnostics.
+- [x] Verify astronomy tests, desktop/mobile presentation, matching 2048 export, and diagnostics.
