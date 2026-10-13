@@ -1,155 +1,87 @@
-/** Original procedural space painting. This module never owns natal positions. */
-export const COSMIC_BACKGROUND_OPACITY = 0.14;
-export const COSMIC_BACKGROUND_MAX_OPACITY = 0.18;
+/** Seven exact-color screen emitters; no astronomical state belongs here. */
+export const COSMIC_BACKGROUND_OPACITY = 1;
 export const COSMIC_FOREGROUND_OPACITY = 1;
-export const COSMIC_REAR_VIGNETTE_OPACITY = 0.08;
-export const COSMIC_BACKGROUND_ENGINE = 'volumetric-fibers-v1';
-
+export const COSMIC_BACKGROUND_ENGINE = 'seven-screen-nodes-cross-sparks-v1';
+export const COSMIC_STELLAR_COUNT = 4800;
 export function prepareCosmicForeground(ctx: CanvasRenderingContext2D) {
-  ctx.globalAlpha = COSMIC_FOREGROUND_OPACITY;
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.filter = 'none';
-  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.filter = 'none'; ctx.shadowBlur = 0;
 }
 export function birthColorPalette(colors: readonly string[], fallback: string) {
   return Array.from({ length: 7 }, (_, i) => colors[i] ?? colors[0] ?? fallback);
 }
-const clamp = (v: number) => Math.max(0, Math.min(1, v));
-const hash = (x: number, y: number, seed: number) => {
-  let v = Math.imul(x, 1597334677) ^ Math.imul(y, 3812015801) ^ Math.imul(seed, 958282831);
-  v = Math.imul(v ^ (v >>> 16), 2246822519);
-  return ((v ^ (v >>> 13)) >>> 0) / 4294967296;
-};
-function lattice(x: number, y: number, seed: number) {
-  const a = Math.floor(x), b = Math.floor(y);
-  let u = x - a, v = y - b;
-  u = u * u * u * (u * (u * 6 - 15) + 10);
-  v = v * v * v * (v * (v * 6 - 15) + 10);
-  return (hash(a, b, seed) * (1 - u) + hash(a + 1, b, seed) * u) * (1 - v)
-    + (hash(a, b + 1, seed) * (1 - u) + hash(a + 1, b + 1, seed) * u) * v;
+function random(index: number, salt: number, seed: number) {
+  let h = Math.imul(index + salt * 997, 1597334677) ^ Math.imul(seed, 958282831);
+  h = Math.imul(h ^ (h >>> 16), 2246822519);
+  return ((h ^ (h >>> 13)) >>> 0) / 4294967296;
 }
-function turbulence(x: number, y: number, seed: number) {
-  let sum = 0, amplitude = .52;
-  for (let octave = 0; octave < 5; octave++) {
-    sum += lattice(x, y, seed + octave * 101) * amplitude;
-    const next = x * 1.73 + y * 1.04 + 17.8;
-    y = y * 1.73 - x * 1.04 - 9.2; x = next;
-    amplitude *= .48;
-  }
-  return sum;
-}
-/** Domain-warped emissive sheet, thin turbulent ridges and crisp absorbing lanes.
- * Normalized coordinates make all spatial features independent of output size.
- * The two crossing fields are continuous sheets, not circular gradient blobs.
- */
-export function cosmicMedium(u: number, v: number, seed: number) {
-  const drift = hash(19, 41, seed) * 5;
-  const wx = lattice(u * 3.6 + drift, v * 3.6, seed + 11) - .5;
-  const wy = lattice(u * 3.6, v * 3.6 - drift, seed + 23) - .5;
-  const x = u + wx * .19, y = v + wy * .19;
-  const density = turbulence(x * 7.3 + drift, y * 7.3, seed + 47);
-  const vein = lattice(x * 93 + density * 13, y * 41 - density * 9, seed + 89);
-  const contour = Math.abs(density - .49 + Math.sin(x * 8 + y * 3 + drift) * .075);
-  const fine = turbulence(x * 42 + density * 4, y * 21, seed + 131);
-  const fibers = Math.exp(-contour * 105) * (.25 + vein * .75)
-    + Math.exp(-Math.abs(fine - .5) * 70) * .32;
-  const sheet = clamp(1 - Math.abs(y - (.27 + .34 * x + Math.sin(x * 6 + drift) * .1)) * 3.3);
-  const secondary = clamp(1 - Math.abs(x + y * .65 - .85 - wx * .4) * 2.4);
-  const edge = Math.abs(vein - .43 + (density - .5) * .6);
-  const extinction = clamp((.025 - edge) * 42) * (.4 + .6 * sheet);
-  const quiet = .17 + .83 * clamp(Math.hypot((u - .5) * 2.3, (v - .47) * 2.3));
-  const emission = (.16 + sheet * (.26 + density * .68) + secondary * .2 + fibers * .95)
-    * (1 - extinction * .58) * quiet;
-  const colorFlow = clamp(.5 + wx * .6 + wy * .35 + Math.sin(x * 4 - y * 3 + drift) * .37);
-  return { emission, fibers, extinction, quiet, colorFlow, density };
-}
-const rgb = (hex: string) => {
-  const value = Number.parseInt(hex.replace('#', '').slice(0, 6), 16) || 0;
-  return [(value >>> 16) & 255, (value >>> 8) & 255, value & 255];
-};
-/** Optical screen transfer is computed per pixel, before the one bounded composite. */
-export function spacePaintingPixels(size: number, colors: readonly string[], seed: number, ink: string, starlight: string) {
-  const palette = birthColorPalette(colors, starlight).map(rgb);
-  const base = rgb(ink), pearl = rgb(starlight);
-  // Spectral mixtures retain every exact source; no replacement hue or desaturation.
-  const spectrum = Array.from({ length: 256 }, (_, index) => {
-    const t = index / 255;
-    const weights = palette.map((_, role) => role === 0 ? .9 : Math.exp(-((t - (role - 1) / 5) ** 2) / .035) + .045);
-    const total = weights.reduce((a, b) => a + b, 0);
-    return [0, 1, 2].map(c => weights.reduce((sum, weight, role) => sum + weight * (palette[role]?.[c] ?? 0), 0) / total);
+const NODE_ANCHORS = [[.18, .19], [.68, .13], [.89, .38], [.72, .73], [.39, .87], [.08, .62], [.37, .35]] as const;
+export function emissionNodes(colors: readonly string[], seed: number, fallback: string) {
+  return birthColorPalette(colors, fallback).map((color, role) => {
+    const anchor = NODE_ANCHORS[role] ?? [.5, .5];
+    return { color, role, u: (anchor[0] ?? .5) + (random(role, 11, seed) - .5) * .065,
+      v: (anchor[1] ?? .5) + (random(role, 19, seed) - .5) * .065,
+      radius: role === 0 ? .57 : .38 + random(role, 23, seed) * .12,
+      alpha: role === 0 ? .85 : .62, angle: random(role, 31, seed) * Math.PI };
   });
-  const pixels = new Uint8ClampedArray(size * size * 4);
-  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
-    const m = cosmicMedium(x / size, y / size, seed);
-    const pigment = spectrum[Math.min(255, Math.floor(m.colorFlow * 255))] ?? base;
-    const i = (y * size + x) * 4;
-    for (let c = 0; c < 3; c++) {
-      const radiance = (pigment[c] ?? 0) / 255 * m.emission * 2.4
-        + (pearl[c] ?? 0) / 255 * m.fibers * .5 * m.quiet;
-      pixels[i + c] = 255 - (255 - (base[c] ?? 0)) * Math.exp(-radiance);
-    }
-    pixels[i + 3] = 255;
-  }
-  return pixels;
 }
-export const COSMIC_STELLAR_COUNT = 22400;
-/** New fractured stellar stream plus irregular associations, never a star catalogue. */
 export function stellarSample(index: number, seed: number) {
-  const a = hash(index, 7, seed), b = hash(index, 17, seed);
-  let u = a, v = b;
-  if (index % 4 < 2) {
-    v = .14 + .64 * a + Math.sin(a * 9 + hash(7, 9, seed) * 4) * .12
-      + (b + hash(index, 29, seed) - 1) * .16;
-  } else if (index % 4 === 2) {
-    const group = index % 19;
-    const angle = a * Math.PI * 2, r = b ** 1.7 * .065;
-    u = .08 + hash(group, 61, seed) * .84 + Math.cos(angle) * r;
-    v = .08 + hash(group, 71, seed) * .84 + Math.sin(angle) * r * .55;
-  }
-  const brightness = hash(index, 37, seed);
-  const major = index % 317 === 0;
-  const quiet = .17 + .83 * clamp(Math.hypot((u - .5) * 2.3, (v - .47) * 2.3));
-  return { u: clamp(u), v: clamp(v), major, role: index % 7,
-    radius: major ? .0012 + brightness * .001 : .00035 + brightness ** 4 * .00085,
-    alpha: (.42 + brightness * .58) * quiet };
+  const u = random(index, 3, seed), scatter = random(index, 7, seed);
+  const v = index % 3 === 0 ? .19 + u * .56 + Math.sin(u * 7) * .09 + (scatter - .5) * .17 : scatter;
+  const quiet = .3 + .7 * Math.min(1, Math.hypot((u - .5) * 2, (v - .47) * 2));
+  return { u, v: Math.max(0, Math.min(1, v)), role: index % 7, major: index % 61 === 0,
+    radius: .00032 + random(index, 17, seed) ** 3 * .00085,
+    alpha: (.3 + random(index, 29, seed) * .7) * quiet };
+}
+function drawGlow(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string) {
+  const light = ctx.createRadialGradient(x, y, 0, x, y, radius);
+  light.addColorStop(0, color + 'd9'); light.addColorStop(.2, color + '9c');
+  light.addColorStop(.5, color + '45'); light.addColorStop(.78, color + '17');
+  light.addColorStop(1, color + '00');
+  ctx.fillStyle = light; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
 }
 export function paintBirthColorSpace(ctx: CanvasRenderingContext2D, size: number, colors: readonly string[], seed: number) {
   const css = getComputedStyle(document.documentElement);
   const ink = css.getPropertyValue('--cosmic-space-ink').trim();
   const pearl = css.getPropertyValue('--cosmic-star-core').trim();
   const palette = birthColorPalette(colors, pearl);
-  const layer = document.createElement('canvas'); layer.width = size; layer.height = size;
-  const rear = layer.getContext('2d');
-  if (!rear) throw new Error('Background canvas unavailable');
-  const image = rear.createImageData(size, size);
-  image.data.set(spacePaintingPixels(size, palette, seed, ink, pearl));
-  rear.putImageData(image, 0, 0);
-  rear.globalCompositeOperation = 'screen';
+  ctx.save(); prepareCosmicForeground(ctx);
+  // A single opaque base is required to clear any earlier painting, not a color loop.
+  ctx.fillStyle = ink; ctx.beginPath(); ctx.rect(0, 0, size, size); ctx.fill();
+  ctx.globalCompositeOperation = 'screen';
+  for (const node of emissionNodes(palette, seed, pearl)) {
+    ctx.save(); ctx.globalAlpha = node.alpha;
+    ctx.translate(node.u * size, node.v * size); ctx.rotate(node.angle); ctx.scale(1, .74);
+    drawGlow(ctx, 0, 0, node.radius * size, node.color); ctx.restore();
+  }
+  // Local contrast, never a global opacity cap; the Sun's heart stays restful.
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  const quiet = ctx.createRadialGradient(size * .5, size * .47, size * .035, size * .5, size * .47, size * .38);
+  quiet.addColorStop(0, ink + 'db'); quiet.addColorStop(.4, ink + 'a6'); quiet.addColorStop(1, ink + '00');
+  ctx.fillStyle = quiet; ctx.beginPath(); ctx.arc(size * .5, size * .47, size * .38, 0, Math.PI * 2); ctx.fill();
+  ctx.globalCompositeOperation = 'screen';
   for (let i = 0; i < COSMIC_STELLAR_COUNT; i++) {
-    const s = stellarSample(i, seed + 997), x = s.u * size, y = s.v * size, r = s.radius * size;
-    rear.globalAlpha = s.alpha;
-    rear.fillStyle = i % 3 ? pearl : palette[s.role] ?? pearl;
-    rear.beginPath();
-    // Four unequal points resolve into crystalline grains, not uniform round dots.
-    rear.moveTo(x, y - r); rear.lineTo(x + r * .6, y);
-    rear.lineTo(x, y + r * .8); rear.lineTo(x - r * .6, y); rear.fill();
-    if (!s.major) continue;
-    rear.strokeStyle = pearl;
+    const star = stellarSample(i, seed + 997), x = star.u * size, y = star.v * size;
+    const r = star.radius * size, color = palette[star.role] ?? pearl;
+    ctx.globalAlpha = star.alpha;
+    ctx.fillStyle = i % 3 ? pearl : color;
+    ctx.beginPath(); ctx.moveTo(x, y - r); ctx.lineTo(x + r * .6, y);
+    ctx.lineTo(x, y + r); ctx.lineTo(x - r * .6, y); ctx.fill();
+    if (!star.major) continue;
+    ctx.globalAlpha = star.alpha * .32;
+    drawGlow(ctx, x, y, size * .011, color);
+    ctx.strokeStyle = pearl;
+    // Exactly four tapered needle rays with color halos behind the white cores.
     for (let ray = 0; ray < 4; ray++) {
-      const angle = ray * Math.PI / 2 + .27;
+      const angle = ray * Math.PI / 2;
       for (let segment = 0; segment < 5; segment++) {
-        rear.globalAlpha = s.alpha * (1 - segment / 5) ** 2;
-        rear.lineWidth = size * .00055 / (segment + 1);
-        const from = r * (1 + segment * 2), to = r * (3 + segment * 2);
-        rear.beginPath(); rear.moveTo(x + Math.cos(angle) * from, y + Math.sin(angle) * from);
-        rear.lineTo(x + Math.cos(angle) * to, y + Math.sin(angle) * to); rear.stroke();
+        ctx.globalAlpha = star.alpha * (1 - segment / 5) ** 2;
+        ctx.lineWidth = size * .00065 / (segment + 1);
+        const from = size * .0012 * segment, to = size * .0012 * (segment + 1);
+        ctx.beginPath(); ctx.moveTo(x + Math.cos(angle) * from, y + Math.sin(angle) * from);
+        ctx.lineTo(x + Math.cos(angle) * to, y + Math.sin(angle) * to); ctx.stroke();
       }
     }
   }
-  ctx.save(); prepareCosmicForeground(ctx);
-  ctx.fillStyle = ink; ctx.fillRect(0, 0, size, size);
-  ctx.globalAlpha = COSMIC_BACKGROUND_OPACITY;
-  ctx.drawImage(layer, 0, 0);
-  // Quiet contrast is already encoded in each pixel, avoiding gradient overlays.
-  ctx.restore();
+  ctx.restore(); prepareCosmicForeground(ctx);
 }
