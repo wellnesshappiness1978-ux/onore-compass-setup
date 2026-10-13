@@ -474,3 +474,8 @@
 - [x] Open seven-color translucent depths and screen light, Overall foremost, without changing the foreground artwork or imitating a named artist.
 - [x] Restore the true Earth/Moon radius ratio and compress their separation while preserving birth-distance variation, direction and lunar optics; update seven-language scale captions.
 - [x] Verify 30 focused tests and clean build diagnostics; inspect live/fullscreen and actual 2048×2048 PNG with natural lunar grouping and retained foreground contrast. Initial review found bright crests washing out orbit lines; use bounded screen exposure and recheck. No page errors. Synthetic guest birth profile and development VIP preview used; paid membership and non-Japanese visual checks are not verified, and high-resolution saving requires waiting.
+
+## Fixed uploaded VIP cosmic background
+- [x] Replace procedural background with the uploaded image, centered cover and cached decoded assets shared by live and 2048 PNG.
+- [x] Preserve foreground goldwork, astronomy, both Earths, Moon, direct lettering, privacy and VIP gates.
+- [x] Verify 33 focused regressions, clean build diagnostics, live/fullscreen and actual 2048×2048 PNG with no browser errors. Fixed background matches the upload; its embedded planets and orbit lines are decorative, not natal calculations, and its 768px source is enlarged for export. Foreground positions, goldwork and direct labels remain unchanged. Checks used a synthetic guest profile and development VIP preview, not verified paid membership. Bright source features remain visible behind existing direct text; no plates or image alterations added.

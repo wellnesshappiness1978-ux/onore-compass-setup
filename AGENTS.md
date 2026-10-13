@@ -31,4 +31,4 @@
 
 - Artwork records compose the existing private local captures through one shared certificate renderer; disclosure starts off on every open, scientific birth captions are suppressed in shared captures, and random commemorative IDs never derive from personal data. Why: optional birth details must not leak through embedded artwork labels.
 
-- Read directory-specific AGENTS.md in src/components and src/lib before changes there. Keep the cosmic background in one shared seeded Canvas module separate from foreground astronomy. Why: replace artistic direction without changing birth calculations or export consistency.
+- Read directory-specific AGENTS.md in src/components and src/lib before changes there. Keep the fixed uploaded cosmic background in one shared centered-cover Canvas module separate from foreground astronomy; cache decoded assets and use the same image in live and export rendering. Why: replace artistic direction without changing birth calculations or export consistency.
