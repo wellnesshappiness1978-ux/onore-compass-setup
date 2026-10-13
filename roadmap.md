@@ -456,4 +456,4 @@
 ## Luminous original cosmic fantasy and natural Moon scale
 - [x] Open seven-color translucent depths and screen light, Overall foremost, without changing the foreground artwork or imitating a named artist.
 - [x] Restore the true Earth/Moon radius ratio and compress their separation while preserving birth-distance variation, direction and lunar optics; update seven-language scale captions.
-- [ ] Verify focused tests, build diagnostics and live/2048 artwork, including lunar grouping and retained foreground contrast.
+- [x] Verify 30 focused tests and clean build diagnostics; inspect live/fullscreen and actual 2048×2048 PNG with natural lunar grouping and retained foreground contrast. Initial review found bright crests washing out orbit lines; use bounded screen exposure and recheck. No page errors. Synthetic guest birth profile and development VIP preview used; paid membership and non-Japanese visual checks are not verified, and high-resolution saving requires waiting.
