@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { distantPhenomena } from './cosmic-fantasy';
+import { distantPhenomena, distantGrain } from './cosmic-fantasy';
 
 describe('Distant fantasy phenomena', () => {
+  it('distinguishes every morphology and contains luminous grains', () => {
+    const kinds = distantPhenomena(42).map(f => f.kind);
+    expect(new Set(kinds.map(k => JSON.stringify(distantGrain(k,.61,1.1,.24)))).size).toBe(7);
+    for (const kind of kinds) for (let i=0;i<=100;i++) {
+      const point=distantGrain(kind,i/100,i*.73,Math.sin(i)*.5);
+      expect(Math.abs(point.x)).toBeLessThanOrEqual(1.5);
+      expect(Math.abs(point.y)).toBeLessThanOrEqual(1);
+    }
+  });
   it('keeps all seven prioritized roles deterministic and away from the solar core', () => {
     const fields = distantPhenomena(42);
     expect(fields).toEqual(distantPhenomena(42));

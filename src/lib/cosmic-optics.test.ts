@@ -15,7 +15,7 @@ describe('Lunar spherical optics and ranked gas', () => {
     const moon={phaseAngle:90,lightAngle:0,poleAngle:-Math.PI/2,librationLongitude:0,librationLatitude:0};
     const image=lunarSurfacePixels(moon,64,[184,183,177]);
     const sample=(x:number,y:number)=>image[(y*64+x)*4]??0;
-    expect(sample(48,32)).toBeGreaterThan(sample(16,32)*3);
+    expect(sample(48,32)).toBeGreaterThan(sample(16,32)*2);
     expect(image).toEqual(lunarSurfacePixels(moon,64,[184,183,177]));
     expect(image[3]).toBe(0);
     const reverse=lunarSurfacePixels({...moon,lightAngle:Math.PI},64,[184,183,177]);
@@ -32,14 +32,28 @@ describe('Lunar spherical optics and ranked gas', () => {
     for(let y=20;y<76;y++) for(let x=20;x<76;x++) {
       const i=(y*96+x)*4;
       if((shadow[i+3]??0)<250) continue;
-      expect(shadow[i]).toBeGreaterThan(8);
+      expect(shadow[i]).toBeGreaterThan(24);
       expect(shadow[i+2]).toBeGreaterThan(shadow[i]??0);
       tones.add(shadow[i]??0);
     }
     expect(tones.size).toBeGreaterThan(8);
     const full=lunarSurfacePixels({...moon,phaseAngle:0},96,[184,183,177],[159,189,221]);
-    expect(full[(48*96+48)*4]).toBeGreaterThan((shadow[(48*96+48)*4]??0)*4);
+    expect(full[(48*96+48)*4]).toBeGreaterThan((shadow[(48*96+48)*4]??0)*2);
     expect(shadow).toEqual(lunarSurfacePixels(moon,96,[184,183,177],[159,189,221]));
+  });
+  it('keeps shadow relief legible across crescent and quarter orientations', () => {
+    for (const phaseAngle of [90,135,170,180]) for (const lightAngle of [0,1.2,Math.PI]) {
+      const pixels=lunarSurfacePixels({phaseAngle,lightAngle,poleAngle:.4,librationLongitude:5,librationLatitude:-3},64,[184,183,177],[159,189,221]);
+      const light=lunarLightNormal(phaseAngle,lightAngle), tones:number[]=[];
+      for(let y=12;y<52;y++) for(let x=12;x<52;x++) {
+        const nx=(x+.5)/32-1,ny=(y+.5)/32-1,nz=Math.sqrt(Math.max(0,1-nx*nx-ny*ny)),i=(y*64+x)*4;
+        if((pixels[i+3]??0)<250 || nx*light.x+ny*light.y+nz*light.z>-.15) continue;
+        tones.push((pixels[i]??0)*.2126+(pixels[i+1]??0)*.7152+(pixels[i+2]??0)*.0722);
+      }
+      expect(tones.length).toBeGreaterThan(10);
+      expect(tones.reduce((a,b)=>a+b,0)/tones.length).toBeGreaterThan(38);
+      expect(Math.max(...tones)-Math.min(...tones)).toBeGreaterThan(10);
+    }
   });
   it('keeps seven exact sources in vivid transparent gas with dark lanes', () => {
     const colors=['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff','#ffffff'];

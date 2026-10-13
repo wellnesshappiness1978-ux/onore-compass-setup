@@ -62,7 +62,7 @@ export function lunarSurfacePixels(moon: Pick<CosmicMoonPlacement,'phaseAngle'|'
     const incidence=nx*light.x+ny*light.y+nz*light.z;
     // Visibility-enhanced artistic earthshine: retain the true sunlit hemisphere,
     // but reveal textured shadow albedo even at new Moon. No atmosphere is implied.
-    const earthshine=.12+.12*(1-light.z)/2;
+    const earthshine=(.28+.12*(1-light.z)/2)*(.76+.24*nz);
     const sunlight=Math.max(0,incidence+relief*.35)**.65*.96;
     const rim=.035*Math.pow(1-nz,5);
     const grain=.96+.08*noise(x*37+y*71);
