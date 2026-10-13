@@ -38,7 +38,7 @@ const noise = (n: number) => { const v = Math.sin(n * 12.9898 + 78.233) * 43758.
 const maria = [[.28,-.28,.33,.24],[-.38,-.05,.39,.47],[.47,.08,.24,.23],[-.06,-.42,.25,.18],[.18,.39,.17,.13]];
 const craters = Array.from({length: 180}, (_,i) => ({x:(noise(i*17+3)-.5)*1.9,y:(noise(i*23+7)-.5)*1.9,r:.008+noise(i*31+11)**3*.085}));
 
-export function lunarSurfacePixels(moon: Pick<CosmicMoonPlacement,'phaseAngle'|'lightAngle'|'poleAngle'|'librationLongitude'|'librationLatitude'>, diameter: number, stone: readonly number[]) {
+export function lunarSurfacePixels(moon: Pick<CosmicMoonPlacement,'phaseAngle'|'lightAngle'|'poleAngle'|'librationLongitude'|'librationLatitude'>, diameter: number, stone: readonly number[], reflected: readonly number[] = stone) {
   const pixels = new Uint8ClampedArray(diameter * diameter * 4);
   const light = lunarLightNormal(moon.phaseAngle, moon.lightAngle);
   const rotation = moon.poleAngle + Math.PI / 2, c = Math.cos(rotation), s = Math.sin(rotation);
@@ -60,11 +60,14 @@ export function lunarSurfacePixels(moon: Pick<CosmicMoonPlacement,'phaseAngle'|'
       relief+=(.13*Math.exp(-(((d-.91)*9)**2))-.09*Math.exp(-d*d*5))*(1+light.x*(u-crater.x)/crater.r+light.y*(v-crater.y)/crater.r);
     }
     const incidence=nx*light.x+ny*light.y+nz*light.z;
-    const earthshine=.024*(1-light.z)/2;
-    const brightness=earthshine+Math.max(0,incidence+relief*.35)**.65*.96;
+    // Visibility-enhanced artistic earthshine: retain the true sunlit hemisphere,
+    // but reveal textured shadow albedo even at new Moon. No atmosphere is implied.
+    const earthshine=.085+.055*(1-light.z)/2;
+    const sunlight=Math.max(0,incidence+relief*.35)**.65*.96;
+    const rim=.035*Math.pow(1-nz,5);
     const grain=.96+.08*noise(x*37+y*71);
     const index=(y*diameter+x)*4;
-    for(let channel=0;channel<3;channel++) pixels[index+channel]=(stone[channel]??184)*Math.max(.22,albedo+relief)*brightness*grain;
+    for(let channel=0;channel<3;channel++) pixels[index+channel]=Math.max(.22,albedo+relief)*grain*((stone[channel]??184)*sunlight+(reflected[channel]??184)*(earthshine+rim));
     pixels[index+3]=Math.min(1,(1-Math.sqrt(squared))*diameter)*255;
   }
   return pixels;
@@ -74,11 +77,13 @@ export function paintLunarSurface(ctx: CanvasRenderingContext2D, moon: CosmicMoo
   const css=getComputedStyle(document.documentElement);
   const stone=css.getPropertyValue('--cosmic-lunar-stone').trim();
   const rgb=[1,3,5].map(i=>parseInt(stone.slice(i,i+2),16));
+  const silver=css.getPropertyValue('--cosmic-lunar-earthshine').trim();
+  const reflected=[1,3,5].map(i=>parseInt(silver.slice(i,i+2),16));
   const diameter=Math.max(48,Math.ceil(moon.radius*2));
   const surface=document.createElement('canvas'); surface.width=diameter; surface.height=diameter;
   const art=surface.getContext('2d'); if(!art) return;
   const image=art.createImageData(diameter,diameter);
-  image.data.set(lunarSurfacePixels(moon,diameter,rgb)); art.putImageData(image,0,0);
+  image.data.set(lunarSurfacePixels(moon,diameter,rgb,reflected)); art.putImageData(image,0,0);
   ctx.drawImage(surface,moon.x-moon.radius,moon.y-moon.radius,moon.radius*2,moon.radius*2);
 }
 

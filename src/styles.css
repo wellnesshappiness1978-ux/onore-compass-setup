@@ -119,6 +119,8 @@
   --cosmic-solar-ray: #ffd372;
   --cosmic-solar-core: #fff3c7;
   --cosmic-lunar-stone: #b8b7b1;
+  --cosmic-lunar-earthshine: #9fbddd;
+  --cosmic-lunar-rim: #e5e7d6;
 }
 
 .share-card-modal { background: var(--share-midnight); z-index: 100; }
