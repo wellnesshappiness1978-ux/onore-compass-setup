@@ -39,7 +39,9 @@ describe('Replacement volumetric cosmic engine', () => {
       if (m.fibers > .3) fibers++;
       if (m.extinction > .5) lanes++;
     }
-    expect(fibers).toBeGreaterThan(200); expect(lanes).toBeGreaterThan(100);
+    expect(fibers).toBeGreaterThan(200);
+    // Narrow absorption lanes must exist without dominating luminous fibers.
+    expect(lanes).toBeGreaterThan(50); expect(lanes).toBeLessThan(500);
   });
   it('replaces the old stripe paths with dense irregular seeded crystalline stars', () => {
     expect(COSMIC_STELLAR_COUNT).toBeGreaterThan(20000);
