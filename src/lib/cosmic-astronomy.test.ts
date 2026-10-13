@@ -26,6 +26,10 @@ describe("cosmic genesis astronomy", () => {
     expect(result?.moon.phaseAngle).toBeCloseTo(illumination.phase_angle, 8);
     expect(result?.moon.phaseFraction).toBeCloseTo(illumination.phase_fraction, 8);
     expect(result?.moon.phaseLongitude).toBeCloseTo(A.MoonPhase(instant), 8);
+    expect(result?.moon.librationLongitude).toBeCloseTo(A.Libration(instant).elon, 10);
+    expect(result?.moon.librationLatitude).toBeCloseTo(A.Libration(instant).elat, 10);
+    expect(Number.isFinite(result?.moon.lightAngle)).toBe(true);
+    expect(Number.isFinite(result?.moon.poleAngle)).toBe(true);
   });
 
   it("stores the physical mean-radius hierarchy", () => {

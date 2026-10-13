@@ -1,4 +1,4 @@
-import { COSMIC_SUN_MEAN_RADIUS_KM, type CosmicGenesis, type CosmicPlanet } from "./cosmic-astronomy";
+import { COSMIC_MOON_MEAN_RADIUS_KM, COSMIC_SUN_MEAN_RADIUS_KM, type CosmicGenesis, type CosmicPlanet } from "./cosmic-astronomy";
 
 export const COSMIC_PLANET_SCALE = 0.0009;
 /** The prior 1.11 × 1.5 visibility treatment enlarged by the requested exact 1.3×. */
@@ -35,7 +35,7 @@ export type CosmicEarthPortrait = { x: number; y: number; radius: number };
 export type CosmicComposition = { centerX: number; centerY: number; rotation: number; scale: number; targetAngle: number };
 export type CosmicSizeComparison = { id: "sun" | CosmicPlanet["id"]; x: number; y: number; radius: number; physicalRadiusKm: number };
 export type CosmicAstrolabeFrame = { x: number; y: number; innerRadius: number; outerRadius: number; tickCount: number };
-export type CosmicMoonPlacement = { x: number; y: number; radius: number; distance: number; displayAngle: number; phaseFraction: number; phaseAngle: number };
+export type CosmicMoonPlacement = { x: number; y: number; radius: number; distance: number; displayAngle: number; phaseFraction: number; phaseAngle: number; lightAngle: number; poleAngle: number; librationLongitude: number; librationLatitude: number };
 export type CosmicCompassIdentity = { sunSign: number; moonSign: number; guardian: number; awakenedSectors: readonly number[] };
 export type CosmicShellPoint = CosmicScreenPoint & { progress: number; angle: number; radius: number };
 
@@ -159,11 +159,15 @@ export function cosmicMoonPlacement(genesis: CosmicGenesis, size: number, earth?
   return {
     x: orbitalEarth.x + Math.cos(angle) * distance,
     y: orbitalEarth.y + Math.sin(angle) * distance,
-    radius: size * .0115,
+    radius: orbitalEarth.radius * COSMIC_MOON_MEAN_RADIUS_KM / orbitalEarth.meanRadiusKm,
     distance,
     displayAngle,
     phaseFraction: genesis.moon.phaseFraction,
     phaseAngle: genesis.moon.phaseAngle,
+    lightAngle: genesis.moon.lightAngle,
+    poleAngle: genesis.moon.poleAngle,
+    librationLongitude: genesis.moon.librationLongitude,
+    librationLatitude: genesis.moon.librationLatitude,
   };
 }
 
