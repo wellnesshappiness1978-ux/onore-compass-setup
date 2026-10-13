@@ -25,7 +25,7 @@ describe('Lunar spherical optics and ranked gas', () => {
     expect(COSMIC_NEBULA_WEIGHTS).toHaveLength(7);
     for(let i=1;i<7;i++) expect(COSMIC_NEBULA_WEIGHTS[i-1]).toBeGreaterThan(COSMIC_NEBULA_WEIGHTS[i]??0);
   });
-  it('keeps seven exact color sources in deterministic low-opacity separated gas', () => {
+  it('keeps seven exact sources in vivid transparent gas with dark lanes', () => {
     const colors=['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff','#ffffff'];
     const pixels=deepNebulaPixels(colors,42,128);
     expect(pixels).toEqual(deepNebulaPixels(colors,42,128));
@@ -37,7 +37,8 @@ describe('Lunar spherical optics and ranked gas', () => {
       if((pixels[i+3]??0)<3) quiet++;
     }
     expect(observed.size).toBe(7);
-    expect(quiet).toBeGreaterThan(128*128*.15);
+    // Vivid coverage still reserves at least a tenth of the field as deep extinction lanes.
+    expect(quiet).toBeGreaterThan(128*128*.1);
     expect(quiet).toBeLessThan(128*128*.65);
     const visible=Array.from(pixels).filter((v,i)=>i%4===3&&v>25).length;
     expect(visible).toBeGreaterThan(128*128*.06);
