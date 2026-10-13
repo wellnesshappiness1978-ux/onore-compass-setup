@@ -66,6 +66,10 @@
 - [x] Verify live AI output, card save, and two-member team grouping through the signed-in preview; the voice control is present and starts, but audible speech cannot be confirmed in headless Chromium.
 - [x] Refine SNS card/modal: midnight portrait PNG, localized readings, tier-safe palettes and save/share fallback; verified guest 1080×1920 exports on all five plans, JP/EN/繁體 cards and mobile layout. Native app destination selection remains device-dependent.
 
+## Current VIP finishing request
+- [ ] Add Sun visibility-scale note, move detail Earth beyond the ring, double display glow and birthplace beacon, remove its axial dotted guide.
+- [ ] Refine ring filigree, soften Jupiter/Saturn rear cavities locally, sharpen gold leader endpoints; verify tests, live/fullscreen and 2048 export.
+
 ## Current update
 - [x] Fix selected design application and add palette previews, theme fonts and lock badges across 19 themes.
 - [x] Add optional partner inputs and computed reference-layer comparison, without claiming verified personality or storing partner details.
