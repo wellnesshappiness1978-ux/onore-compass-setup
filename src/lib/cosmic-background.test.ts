@@ -70,7 +70,7 @@ describe('Unified seven-color space painting', () => {
       expect(p).toEqual(cosmicFilament(512 / 2048, role, thread, 42));
       expect(p.u).toBeGreaterThan(0); expect(p.u).toBeLessThan(1);
       expect(p.v).toBeGreaterThan(0); expect(p.v).toBeLessThan(1);
-      expect(p.alpha).toBeLessThanOrEqual(.46);
+      expect(p.alpha).toBeLessThanOrEqual(.88);
     }
     expect(paintBirthColorSpace.toString()).not.toContain('blur(');
     expect(paintBirthColorSpace.toString()).not.toContain("globalCompositeOperation = 'lighter'");

@@ -53,8 +53,8 @@ export function cosmicStar(depth: CosmicStarDepth, index: number, seed: number) 
   const quiet = spaceComposition(u, v, seed).quiet;
   const shine = random(index, 11, salt);
   return { u, v, quiet, shine, role: index % 7,
-    radius: depth === 'dust' ? .00012 + shine * .00022 : depth === 'cluster' ? .0003 + shine ** 3 * .00045 : .00052 + shine * .00055,
-    alpha: (depth === 'dust' ? .22 + shine * .58 : depth === 'cluster' ? .5 + shine * .5 : 1) * quiet };
+    radius: depth === 'dust' ? .00024 + shine * .00036 : depth === 'cluster' ? .00048 + shine ** 3 * .0007 : .0008 + shine * .00075,
+    alpha: (depth === 'dust' ? .6 + shine * .4 : depth === 'cluster' ? .75 + shine * .25 : 1) * quiet };
 }
 
 /** Fine independent silk folds, with all seven color roles and Overall longest. */
@@ -67,7 +67,7 @@ export function cosmicFilament(t: number, role: number, thread: number, seed: nu
     + Math.sin(t * 27 + role * .9) * .0025;
   const taper = Math.sin(Math.PI * t) ** .7;
   const quiet = spaceComposition(u, v, seed).quiet;
-  return { u, v, alpha: taper * quiet * (role === 0 ? .46 : .28) * (.55 + .45 * Math.sin(thread * 1.7 + 1) ** 2) };
+  return { u, v, alpha: taper * quiet * (role === 0 ? .88 : .64) * (.55 + .45 * Math.sin(thread * 1.7 + 1) ** 2) };
 }
 
 /** Normalized composition: sweeping depth around a restful solar heart, not seven stripes. */
@@ -130,7 +130,7 @@ export function paintBirthColorSpace(ctx: CanvasRenderingContext2D, size: number
   // Every luminous stitch stays on the private rear canvas. No blur or glow wash.
   for (let role = 6; role >= 0; role--) for (let thread = 0; thread < 23; thread++) {
     rear.strokeStyle = palette[role] ?? pearl;
-    rear.lineWidth = size * (role === 0 ? .00055 : .00035);
+    rear.lineWidth = size * (role === 0 ? .00095 : .00065);
     for (let segment = 0; segment < 12; segment++) {
       const mid = cosmicFilament((segment + .5) / 12, role, thread, seed);
       rear.globalAlpha = mid.alpha;
