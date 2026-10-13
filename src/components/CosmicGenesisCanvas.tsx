@@ -98,8 +98,11 @@ function paintDeepSpace(ctx: CanvasRenderingContext2D, size: number, colors: str
       const u = x / 320, v = y / 320;
       const warp = Math.sin(u * 8 + v * 5 + seed % 11) * .17 + Math.sin(v * 14 - u * 6) * .07;
       const field = (u * .9 + v * .65 + warp) * 4.8;
-      const index = ((Math.floor(field) % 7) + 7) % 7;
-      const next = (index + 1) % 7, mix = field - Math.floor(field);
+      const total = COSMIC_NEBULA_WEIGHTS.reduce((sum, weight) => sum + weight, 0);
+      const coordinate = ((field / 7 % 1) + 1) % 1 * total;
+      let lower = 0, index = 0;
+      while (index < 6 && coordinate > lower + (COSMIC_NEBULA_WEIGHTS[index] ?? .24)) { lower += COSMIC_NEBULA_WEIGHTS[index] ?? .24; index++; }
+      const next = (index + 1) % 7, mix = (coordinate - lower) / (COSMIC_NEBULA_WEIGHTS[index] ?? .24);
       const wisps = .5 + .2 * Math.sin(u * 29 + v * 23 + warp * 16) + .12 * Math.sin(u * 71 - v * 59 + warp * 30) + .07 * Math.sin(u * 157 + v * 111);
       const density = (.24 + wisps * .62) * (.6 + (COSMIC_NEBULA_WEIGHTS[index] ?? .24) * .4);
       const pixel = (y * 320 + x) * 4;
@@ -132,7 +135,7 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
   ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round";
   roles.forEach((role, index) => {
     const [ax, ay] = role.anchor;
-    for (let cloud = 0; cloud < Math.round(18 + role.weight * 24); cloud++) {
+    for (let cloud = 0; cloud < Math.round(12 + role.weight * 12); cloud++) {
       const salt = seed + index * 977 + cloud * 71;
       const angle = cloud / 18 * Math.PI * 2 + unit(salt) * .35;
       const spread = size * (.035 + Math.sqrt(unit(salt + 4)) * .23);
@@ -904,10 +907,16 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   const size = canvas.width, roles = cosmicColorRoles(colors), placements = cosmicPlacements(genesis, size), solar = cosmicSunPlacement(genesis, size);
   const orbitalEarth = placements.find((planet) => planet.id === "earth");
   const moon = cosmicMoonPlacement(genesis, size, orbitalEarth);
-  paintDeepSpace(ctx, size, roles.all, genesis.seed);
-  paintMilkyWay(ctx, size, roles.all, genesis.seed + 6400);
-  paintNebulae(ctx, size, roles.all, genesis.seed + 1200);
-  paintStarLifeVeils(ctx, size, roles.prominence, genesis.seed + 4400, cosmicPlacements(genesis, size).find((planet) => planet.id === "earth")?.displayAngle ?? 0);
+  // Diffuse gas is resolution-independent; keep expensive optical blending off the full-size surface.
+  const background = document.createElement('canvas'); background.width = 512; background.height = 512;
+  const gas = background.getContext('2d');
+  if (gas) {
+    paintDeepSpace(gas, 512, roles.all, genesis.seed);
+    paintMilkyWay(gas, 512, roles.all, genesis.seed + 6400);
+    paintNebulae(gas, 512, roles.all, genesis.seed + 1200);
+    paintStarLifeVeils(gas, 512, roles.prominence, genesis.seed + 4400, orbitalEarth?.displayAngle ?? 0);
+    ctx.drawImage(background, 0, 0, size, size);
+  }
   paintBranchingFilaments(ctx, size, roles.prominence, genesis.seed + 17100);
   paintCompassInlay(ctx, size);
   paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius })), ...(moon ? [{ x: moon.x, y: moon.y, radius: moon.radius }] : [])]);
