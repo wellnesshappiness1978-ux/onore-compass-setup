@@ -30,3 +30,5 @@
 - Natal Cosmic Genesis uses the shared live/2048 renderer for its birth-instant Solar System, multi-rail golden astrolabe and ring-clipped nautilus relief; celestial bodies are drawn in front of the instrument, all lettering uses shared resolution-scaled direct typography without backing plates, and the separate birthplace-facing Earth and linear physical-radius strip retain explicit scale labels. Why: preserve birth astronomy and exact seven-color identity while retaining transparent, readable artwork.
 
 - Artwork records compose the existing private local captures through one shared certificate renderer; disclosure starts off on every open, scientific birth captions are suppressed in shared captures, and random commemorative IDs never derive from personal data. Why: optional birth details must not leak through embedded artwork labels.
+
+- Read directory-specific AGENTS.md in src/components and src/lib before changes there. Keep the cosmic background in one shared seeded Canvas module separate from foreground astronomy. Why: replace artistic direction without changing birth calculations or export consistency.
