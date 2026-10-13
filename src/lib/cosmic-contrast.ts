@@ -7,7 +7,8 @@ export function cosmicSilenceRegions(sun: { x: number; y: number; radius: number
 }
 
 export function paintCosmicSilence(ctx: CanvasRenderingContext2D, sun: Parameters<typeof cosmicSilenceRegions>[0], planets: Parameters<typeof cosmicSilenceRegions>[1]) {
-  const black = getComputedStyle(document.documentElement).getPropertyValue('--cosmic-mask-ink').trim();
+  const token = getComputedStyle(document.documentElement).getPropertyValue('--cosmic-mask-ink').trim();
+  const black = /^#[\da-f]{3}$/i.test(token) ? '#' + token.slice(1).split('').map(c => c + c).join('') : token;
   ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none'; ctx.shadowBlur = 0;
   for (const region of cosmicSilenceRegions(sun, planets)) {
     const gradient = ctx.createRadialGradient(region.x, region.y, region.core, region.x, region.y, region.outer);
