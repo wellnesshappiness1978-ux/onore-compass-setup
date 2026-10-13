@@ -732,7 +732,10 @@ function paintBirthplaceRadiance(ctx: CanvasRenderingContext2D, earth: Point, po
     ctx.fillStyle = mote % 6 ? overallColor : GOLD; ctx.globalAlpha = .12 + unit(salt + 11) * .48;
     ctx.beginPath(); ctx.arc(x, y, radius * (.002 + unit(salt + 9) ** 2 * .012), 0, Math.PI * 2); ctx.fill();
   }
-  ctx.fillStyle = PLATINUM; ctx.globalAlpha = .82; ctx.beginPath(); ctx.arc(point.x, point.y, radius * .014, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = overallColor; ctx.shadowColor = overallColor; ctx.shadowBlur = radius * .05;
+  for (let ring = 0; ring < 3; ring++) { ctx.globalAlpha = .55 - ring * .15; ctx.lineWidth = Math.max(1, radius * (.008 - ring * .002)); ctx.beginPath(); ctx.arc(point.x, point.y, radius * (.05 + ring * .045), 0, Math.PI * 2); ctx.stroke(); }
+  ctx.fillStyle = overallColor; ctx.globalAlpha = .95; ctx.beginPath(); ctx.arc(point.x, point.y, radius * .024, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = PLATINUM; ctx.globalAlpha = .9; ctx.beginPath(); ctx.arc(point.x, point.y, radius * .011, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 }
 
@@ -883,6 +886,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   if (gas) {
     paintDeepSpace(gas, 512, roles.all, genesis.seed);
     paintMilkyWay(gas, 512, roles.all, genesis.seed + 6400);
+    paintInterstellarMedium(gas, 512, roles.all, genesis.seed + 2600);
     paintNebulae(gas, 512, roles.all, genesis.seed + 1200);
     paintFantasyDepth(gas, 512, roles.prominence, genesis.seed + 5300);
     paintStarLifeVeils(gas, 512, roles.prominence, genesis.seed + 4400, orbitalEarth?.displayAngle ?? 0);
