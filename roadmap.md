@@ -421,3 +421,9 @@
 - [x] Replace opaque rainbow fields and seven-arm ribbons with restrained, seeded deep nebulae, distant remnant dust and fine Milky Way light; preserve exact birth-color inputs and priority.
 - [x] Keep cosmic color phenomena inside the deep-background pass behind goldwork and celestial bodies without changing astronomy, direct lettering, gates or exports; existing birthplace light and jeweled craft remain intact.
 - [x] Verify live and actual 2048 PNG export twice visually. First pass found gas too subdued; refine existing optical density only, then confirm no new rainbow bands, white arches or background occlusion. All 24 focused astronomy/optics/typography/craft tests pass, build OK, no page errors. Checks use a guest profile and development VIP preview; paid entitlements and literal zero-second rendering are not established.
+
+## Cosmic Genesis vivid space, prominent Moon and golden nautilus
+- [ ] Restore luminous seven-color gas contrast without rainbow fields or white arches.
+- [ ] Enlarge the visibility-scale Moon, preserve birth phase/direction and add artistic diffraction halo.
+- [ ] Refine ring-clipped golden-ratio nautilus chambers, mirror gold and nacre engraving.
+- [ ] Verify tests, live artwork, mobile layout and actual 2048 PNG; distinguish preview access and rendering latency from paid entitlements and instant guarantees.
