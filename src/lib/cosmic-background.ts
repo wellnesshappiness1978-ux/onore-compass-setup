@@ -48,16 +48,18 @@ export function cosmicMedium(u: number, v: number, seed: number) {
   const wy = lattice(u * 3.6, v * 3.6 - drift, seed + 23) - .5;
   const x = u + wx * .19, y = v + wy * .19;
   const density = turbulence(x * 7.3 + drift, y * 7.3, seed + 47);
-  const vein = lattice(x * 39 + density * 9, y * 13 - density * 6, seed + 89);
+  const vein = lattice(x * 93 + density * 13, y * 41 - density * 9, seed + 89);
   const contour = Math.abs(density - .49 + Math.sin(x * 8 + y * 3 + drift) * .075);
-  const fibers = Math.exp(-contour * 80) * (.35 + vein * .65);
+  const fine = turbulence(x * 42 + density * 4, y * 21, seed + 131);
+  const fibers = Math.exp(-contour * 105) * (.25 + vein * .75)
+    + Math.exp(-Math.abs(fine - .5) * 70) * .32;
   const sheet = clamp(1 - Math.abs(y - (.27 + .34 * x + Math.sin(x * 6 + drift) * .1)) * 3.3);
   const secondary = clamp(1 - Math.abs(x + y * .65 - .85 - wx * .4) * 2.4);
   const edge = Math.abs(vein - .43 + (density - .5) * .6);
-  const extinction = clamp((.06 - edge) * 24) * (.4 + .6 * sheet);
+  const extinction = clamp((.025 - edge) * 42) * (.4 + .6 * sheet);
   const quiet = .17 + .83 * clamp(Math.hypot((u - .5) * 2.3, (v - .47) * 2.3));
   const emission = (.16 + sheet * (.26 + density * .68) + secondary * .2 + fibers * .95)
-    * (1 - extinction * .86) * quiet;
+    * (1 - extinction * .58) * quiet;
   const colorFlow = clamp(.5 + wx * .6 + wy * .35 + Math.sin(x * 4 - y * 3 + drift) * .37);
   return { emission, fibers, extinction, quiet, colorFlow, density };
 }
@@ -82,8 +84,8 @@ export function spacePaintingPixels(size: number, colors: readonly string[], see
     const pigment = spectrum[Math.min(255, Math.floor(m.colorFlow * 255))] ?? base;
     const i = (y * size + x) * 4;
     for (let c = 0; c < 3; c++) {
-      const radiance = (pigment[c] ?? 0) / 255 * m.emission * 3.1
-        + (pearl[c] ?? 0) / 255 * m.fibers * .2 * m.quiet;
+      const radiance = (pigment[c] ?? 0) / 255 * m.emission * 2.4
+        + (pearl[c] ?? 0) / 255 * m.fibers * .5 * m.quiet;
       pixels[i + c] = 255 - (255 - (base[c] ?? 0)) * Math.exp(-radiance);
     }
     pixels[i + 3] = 255;
@@ -108,7 +110,7 @@ export function stellarSample(index: number, seed: number) {
   const major = index % 317 === 0;
   const quiet = .17 + .83 * clamp(Math.hypot((u - .5) * 2.3, (v - .47) * 2.3));
   return { u: clamp(u), v: clamp(v), major, role: index % 7,
-    radius: major ? .001 + brightness * .00085 : .00017 + brightness ** 5 * .00066,
+    radius: major ? .0012 + brightness * .001 : .00035 + brightness ** 4 * .00085,
     alpha: (.42 + brightness * .58) * quiet };
 }
 export function paintBirthColorSpace(ctx: CanvasRenderingContext2D, size: number, colors: readonly string[], seed: number) {
