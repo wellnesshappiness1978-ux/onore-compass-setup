@@ -10,6 +10,7 @@ import uranus from "@/assets/cosmic-uranus.png";
 import neptune from "@/assets/cosmic-neptune.png";
 import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicEarthPortrait, cosmicMoonPlacement, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement, type CosmicMoonPlacement } from "@/lib/cosmic-art";
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
+import { daylight, eclipticNorthView, latLonVector, orthoBasis, projectOrtho, unprojectOrtho, vectorLatLon, type Vec3 } from "@/lib/earth-globe";
 import type { Language } from "@/lib/translations";
 import { goldenShellRadius, paintEngravedRing, paintNautilusPartitions } from "@/lib/art-craft";
 import type { Capture } from "./MandalaCanvas";
@@ -20,7 +21,7 @@ import { paintFantasyDepth } from "@/lib/cosmic-fantasy";
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
 type ArtAssets = { field: HTMLImageElement | null; sun: HTMLImageElement | null; earthMap: HTMLImageElement | null; planets: Partial<Record<CosmicPlanetId, HTMLImageElement>> };
-type ProjectedEarth = { image: HTMLCanvasElement; birthplace: Point };
+type ProjectedEarth = { image: HTMLCanvasElement; birthplace: Point; sunScreen: { x: number; y: number; visible: boolean }; poleScreen: { x: number; y: number; visible: boolean } };
 
 const PLANET_SOURCES: Partial<Record<CosmicPlanetId, string>> = { mercury, venus, mars, jupiter, saturn, uranus, neptune };
 const GOLD = "#eedb9a";
@@ -669,35 +670,37 @@ function paintSizeComparison(ctx: CanvasRenderingContext2D, size: number, genesi
   ctx.restore();
 }
 
-function projectEarth(image: HTMLImageElement, radius: number, view: EarthView): ProjectedEarth {
+function projectEarth(image: HTMLImageElement, radius: number, centerLat: number, centerLon: number, sun: Vec3): ProjectedEarth {
   const diameter = Math.max(2, Math.ceil(radius * 2));
   const map = document.createElement("canvas"); map.width = image.width; map.height = image.height;
   const mapContext = map.getContext("2d", { willReadFrequently: true });
   const globe = document.createElement("canvas"); globe.width = diameter; globe.height = diameter;
   const globeContext = globe.getContext("2d");
-  const visibleOffsetX = Math.sin(view.siderealRotation * Math.PI / 180) * .2;
-  const visibleOffsetY = Math.max(-.18, Math.min(.18, -view.latitude / 260));
-  const birthplace = { x: diameter * (.5 + visibleOffsetX), y: diameter * (.5 + visibleOffsetY) };
-  if (!mapContext || !globeContext) return { image: globe, birthplace };
+  const basis = orthoBasis(centerLat, centerLon);
+  const sunScreen = projectOrtho(basis, sun), poleScreen = projectOrtho(basis, { x: 0, y: 0, z: 1 });
+  const result = { image: globe, birthplace: { x: diameter / 2, y: diameter / 2 }, sunScreen, poleScreen };
+  if (!mapContext || !globeContext) return result;
   mapContext.drawImage(image, 0, 0);
   const source = mapContext.getImageData(0, 0, image.width, image.height).data;
   const output = globeContext.createImageData(diameter, diameter), target = output.data;
-  const centerLatitude = (view.latitude - visibleOffsetY * 78) * Math.PI / 180;
-  const centerLongitude = (view.longitude - visibleOffsetX * 72) * Math.PI / 180;
-  const sinLatitude = Math.sin(centerLatitude), cosLatitude = Math.cos(centerLatitude);
   for (let y = 0; y < diameter; y++) for (let x = 0; x < diameter; x++) {
     const nx = (x + .5 - diameter / 2) / (diameter / 2), ny = -(y + .5 - diameter / 2) / (diameter / 2);
-    const square = nx * nx + ny * ny; if (square > 1) continue;
-    const nz = Math.sqrt(1 - square);
-    const sampleLatitude = Math.asin(ny * cosLatitude + nz * sinLatitude);
-    const sampleLongitude = centerLongitude + Math.atan2(nx, nz * cosLatitude - ny * sinLatitude);
-    const sourceX = Math.min(image.width - 1, Math.max(0, Math.floor((((sampleLongitude / Math.PI + 1) % 2 + 2) % 2) * image.width / 2)));
-    const sourceY = Math.min(image.height - 1, Math.max(0, Math.floor((.5 - sampleLatitude / Math.PI) * image.height)));
+    const normal = unprojectOrtho(basis, nx, ny); if (!normal) continue;
+    const { lat, lon } = vectorLatLon(normal);
+    const sourceX = Math.min(image.width - 1, Math.max(0, Math.floor((lon / 180 + 1) / 2 * image.width)));
+    const sourceY = Math.min(image.height - 1, Math.max(0, Math.floor((.5 - lat / 180) * image.height)));
     const from = (sourceY * image.width + sourceX) * 4, to = (y * diameter + x) * 4;
-    target[to] = source[from] ?? 0; target[to + 1] = source[from + 1] ?? 0; target[to + 2] = source[from + 2] ?? 0; target[to + 3] = 255;
+    // Day/night from the true subsolar direction: lit relief by day, deep blue night with a faint twilight band.
+    const day = daylight(normal, sun), twilight = Math.max(0, 1 - Math.abs(day - .5) * 2);
+    const limb = .78 + .22 * Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
+    const lit = (.14 + .86 * day) * limb;
+    target[to] = Math.min(255, (source[from] ?? 0) * lit + twilight * 26);
+    target[to + 1] = Math.min(255, (source[from + 1] ?? 0) * lit + (1 - day) * 6 + twilight * 12);
+    target[to + 2] = Math.min(255, (source[from + 2] ?? 0) * lit + (1 - day) * 22 + twilight * 8);
+    target[to + 3] = 255;
   }
   globeContext.putImageData(output, 0, 0);
-  return { image: globe, birthplace };
+  return result;
 }
 
 function paintBirthplaceRadiance(ctx: CanvasRenderingContext2D, earth: Point, point: Point, radius: number, overallColor: string, seed: number) {
@@ -745,20 +748,15 @@ function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | nul
   ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * 1.09, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
   irregularGlow(ctx, earth.x, earth.y, radius * 1.65, "#2c8ec7", .56, seed + 71);
   irregularGlow(ctx, earth.x, earth.y, radius * 1.25, "#54e1d1", .34, seed + 93);
-  let birthplace = { x: earth.x, y: earth.y - radius * .12 };
+  let birthplace = { x: earth.x, y: earth.y }, poleAngle = -Math.PI / 2;
   ctx.save(); ctx.beginPath(); ctx.arc(earth.x, earth.y, radius, 0, Math.PI * 2); ctx.clip();
   ctx.fillStyle = "#062b58"; ctx.fillRect(earth.x - radius, earth.y - radius, radius * 2, radius * 2);
   if (image) {
-    const projected = projectEarth(image, radius, view);
+    const projected = projectEarth(image, radius, view.latitude, view.longitude, latLonVector(view.subsolarLatitude, view.subsolarLongitude));
     ctx.drawImage(projected.image, earth.x - radius, earth.y - radius, radius * 2, radius * 2);
-    birthplace = { x: earth.x - radius + projected.birthplace.x, y: earth.y - radius + projected.birthplace.y };
+    birthplace = { x: earth.x, y: earth.y };
+    poleAngle = Math.atan2(-projected.poleScreen.y, projected.poleScreen.x);
   }
-  const hourAngle = view.solarHourAngle * Math.PI / 180;
-  const lightX = birthplace.x - Math.sin(hourAngle) * radius * .68;
-  const lightY = birthplace.y - Math.abs(Math.sin(hourAngle * .5)) * radius * .08;
-  const shade = ctx.createRadialGradient(lightX, lightY, radius * .12, earth.x, earth.y, radius * 1.18);
-  shade.addColorStop(0, "rgba(128,235,224,.08)"); shade.addColorStop(.48, "rgba(5,45,76,.06)"); shade.addColorStop(.76, "rgba(1,14,39,.3)"); shade.addColorStop(1, "rgba(0,2,12,.82)");
-  ctx.fillStyle = shade; ctx.fillRect(earth.x - radius, earth.y - radius, radius * 2, radius * 2);
   ctx.globalCompositeOperation = "screen";
   for (let stroke = 0; stroke < 180; stroke++) {
     const salt = seed + stroke * 83, angle = unit(salt) * Math.PI * 2, distance = Math.sqrt(unit(salt + 3)) * radius * .88;
@@ -774,7 +772,7 @@ function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | nul
   const atmosphere = ctx.createRadialGradient(earth.x, earth.y, radius * .72, earth.x, earth.y, radius * 1.17);
   atmosphere.addColorStop(0, "rgba(56,174,205,0)"); atmosphere.addColorStop(.58, "rgba(56,174,205,.03)"); atmosphere.addColorStop(.8, "rgba(84,225,209,.18)"); atmosphere.addColorStop(.91, "rgba(84,225,209,.07)"); atmosphere.addColorStop(1, "rgba(84,225,209,0)");
   ctx.fillStyle = atmosphere; ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * 1.17, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-  ctx.save(); ctx.translate(earth.x, earth.y); ctx.rotate(-view.axialTiltDegrees * Math.PI / 180);
+  ctx.save(); ctx.translate(earth.x, earth.y); ctx.rotate(poleAngle + Math.PI / 2);
   ctx.strokeStyle = "rgba(238,219,154,.56)"; ctx.lineWidth = Math.max(1, radius * .012); ctx.setLineDash([radius * .06, radius * .045]);
   ctx.beginPath(); ctx.moveTo(0, -radius * 1.22); ctx.lineTo(0, radius * 1.22); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
   paintBirthplaceRadiance(ctx, earth, birthplace, radius, overallColor, seed + 5100);
@@ -784,17 +782,25 @@ function paintOrbitalEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElemen
   irregularGlow(ctx, earth.x, earth.y, radius * 2.7, "#65dff2", .55, seed);
   ctx.save(); ctx.beginPath(); ctx.arc(earth.x, earth.y, radius, 0, Math.PI * 2); ctx.clip();
   ctx.fillStyle = "#062b58"; ctx.fillRect(earth.x - radius, earth.y - radius, radius * 2, radius * 2);
+  const sunAngle = Math.atan2(sunPoint.y - earth.y, sunPoint.x - earth.x);
+  let turn = 0, pole: { x: number; y: number } | null = null;
   if (image) {
-    const projected = projectEarth(image, Math.max(radius, 8), view);
+    // Seen from ecliptic north as in the top-down orbit diagram, then turned so the real subsolar side faces the drawn Sun.
+    const center = eclipticNorthView(view.siderealRotation);
+    const projected = projectEarth(image, Math.max(radius, 8), center.lat, center.lon, latLonVector(view.subsolarLatitude, view.subsolarLongitude));
+    turn = sunAngle - Math.atan2(-projected.sunScreen.y, projected.sunScreen.x);
+    pole = projected.poleScreen;
+    ctx.translate(earth.x, earth.y); ctx.rotate(turn);
     ctx.filter = "saturate(1.2) contrast(1.13)";
-    ctx.drawImage(projected.image, earth.x - radius, earth.y - radius, radius * 2, radius * 2);
+    ctx.drawImage(projected.image, -radius, -radius, radius * 2, radius * 2);
     ctx.filter = "none";
   }
-  const sunAngle = Math.atan2(sunPoint.y - earth.y, sunPoint.x - earth.x);
-  const lightX = earth.x + Math.cos(sunAngle) * radius * .6, lightY = earth.y + Math.sin(sunAngle) * radius * .6;
-  const shade = ctx.createRadialGradient(lightX, lightY, radius * .08, earth.x, earth.y, radius * 1.16);
-  shade.addColorStop(0, "rgba(134,238,225,.04)"); shade.addColorStop(.52, "rgba(3,35,67,.04)"); shade.addColorStop(.78, "rgba(0,8,25,.38)"); shade.addColorStop(1, "rgba(0,1,9,.88)");
-  ctx.fillStyle = shade; ctx.fillRect(earth.x - radius, earth.y - radius, radius * 2, radius * 2); ctx.restore();
+  ctx.restore();
+  if (pole) {
+    const a = Math.atan2(-pole.y, pole.x) + turn, r = Math.hypot(pole.x, pole.y);
+    ctx.save(); ctx.strokeStyle = "rgba(238,219,154,.62)"; ctx.lineWidth = Math.max(1, size * .00045);
+    ctx.beginPath(); ctx.moveTo(earth.x - Math.cos(a) * radius * r * 1.35, earth.y - Math.sin(a) * radius * r * 1.35); ctx.lineTo(earth.x + Math.cos(a) * radius * (r * 1.35 + .2), earth.y + Math.sin(a) * radius * (r * 1.35 + .2)); ctx.stroke(); ctx.restore();
+  }
   ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.strokeStyle = "rgba(101,223,242,.74)"; ctx.lineWidth = Math.max(1, size * .00075);
   ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * 1.01, sunAngle - 1.48, sunAngle + 1.48); ctx.stroke();
   ctx.strokeStyle = PLATINUM; ctx.globalAlpha = .66; ctx.lineWidth = Math.max(1, size * .00042);
