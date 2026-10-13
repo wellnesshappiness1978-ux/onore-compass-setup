@@ -64,6 +64,7 @@ export type EarthView = {
   solarHourAngle: number;
   axialTiltDegrees: number;
   subsolarLatitude: number;
+  subsolarLongitude: number;
   approximatePlace: boolean;
 };
 
@@ -156,6 +157,7 @@ export function earthViewAtBirth(genesis: CosmicGenesis, birthPlace: string, bir
     solarHourAngle,
     axialTiltDegrees: 23.439281,
     subsolarLatitude: sun.dec,
+    subsolarLongitude: wrapDegrees(longitude - solarHourAngle + 180) - 180,
     approximatePlace: !resolved,
   };
 }
