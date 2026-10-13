@@ -15,6 +15,7 @@ import { goldenShellRadius, paintEngravedRing, paintNautilusPartitions } from "@
 import type { Capture } from "./MandalaCanvas";
 import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
 import { COSMIC_NEBULA_WEIGHTS, deepNebulaPixels, paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
+import { paintFantasyDepth } from "@/lib/cosmic-fantasy";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
@@ -807,7 +808,11 @@ function paintBirthMoon(ctx: CanvasRenderingContext2D, moon: CosmicMoonPlacement
   ctx.beginPath(); ctx.moveTo(earth.x, earth.y); ctx.lineTo(moon.x, moon.y); ctx.stroke(); ctx.setLineDash([]);
   paintLunarHalo(ctx, moon, seed);
   paintLunarSurface(ctx, moon);
-  ctx.globalCompositeOperation = "screen"; ctx.strokeStyle = cosmicTextPalette().data; ctx.globalAlpha = .16; ctx.lineWidth = size * .00025;
+  ctx.globalCompositeOperation = "screen";
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--cosmic-lunar-rim').trim();
+  ctx.globalAlpha = .32; ctx.lineWidth = size * .00045;
+  ctx.beginPath(); ctx.arc(moon.x, moon.y, radius * .995, 0, Math.PI * 2); ctx.stroke();
+  ctx.globalAlpha = .5; ctx.lineWidth = size * .00055;
   ctx.beginPath(); ctx.arc(moon.x, moon.y, radius * .995, moon.lightAngle - Math.PI * .45, moon.lightAngle + Math.PI * .45); ctx.stroke();
   ctx.restore();
   ctx.save();
@@ -873,6 +878,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
     paintDeepSpace(gas, 512, roles.all, genesis.seed);
     paintMilkyWay(gas, 512, roles.all, genesis.seed + 6400);
     paintNebulae(gas, 512, roles.all, genesis.seed + 1200);
+    paintFantasyDepth(gas, 512, roles.prominence, genesis.seed + 5300);
     paintStarLifeVeils(gas, 512, roles.prominence, genesis.seed + 4400, orbitalEarth?.displayAngle ?? 0);
     ctx.drawImage(background, 0, 0, size, size);
   }

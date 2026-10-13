@@ -427,3 +427,8 @@
 - [x] Enlarge only the Moon's visibility radius by 2.1, mark ×2.1, preserve birth phase/direction and add artistic diffraction halo without fictional atmosphere.
 - [x] Refine ring-clipped quarter-turn golden-ratio nautilus chambers, mirror gold and nacre engraving; first visual pass found engraving covering shell emblems, corrected layer order and rechecked.
 - [x] Verify 25 focused tests, desktop and 390px mobile with no horizontal overflow or page errors, and actual 2048×2048 PNG through two visual passes including Moon/ring details. Build OK. Checks used a synthetic guest profile and development VIP preview, not verified paid entitlements; literal zero-second display/export remains unproven and high-resolution saving may require waiting.
+
+## Cosmic Genesis fantasy depth and visible lunar earthshine
+- [x] Add deterministic seven-color distant galaxies, clustered stars, nebular disks and auroral filaments only behind existing foreground artwork.
+- [x] Keep lunar shadow textures visible with blue-silver earthshine and a fine full silhouette rim without changing phase, orientation or scale. Initial visual pass found new-Moon shadows still too subdued; raised reflected-light visibility and inspected exported maria/craters and rim again.
+- [x] Verify 27 focused tests, clean build diagnostics, live/fullscreen art and actual 2048×2048 private-default PNG with no page errors. Synthetic guest profile and development VIP preview used; actual paid entitlements and literal zero-second rendering remain unverified. High-resolution saving required an extended wait. Astronomy, existing gates, goldwork and direct lettering unchanged.

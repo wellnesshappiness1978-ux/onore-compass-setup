@@ -25,6 +25,22 @@ describe('Lunar spherical optics and ranked gas', () => {
     expect(COSMIC_NEBULA_WEIGHTS).toHaveLength(7);
     for(let i=1;i<7;i++) expect(COSMIC_NEBULA_WEIGHTS[i-1]).toBeGreaterThan(COSMIC_NEBULA_WEIGHTS[i]??0);
   });
+  it('reveals blue-silver shadow textures at new Moon without flattening its sunlit phase', () => {
+    const moon={phaseAngle:180,lightAngle:0,poleAngle:-Math.PI/2,librationLongitude:0,librationLatitude:0};
+    const shadow=lunarSurfacePixels(moon,96,[184,183,177],[159,189,221]);
+    const tones=new Set<number>();
+    for(let y=20;y<76;y++) for(let x=20;x<76;x++) {
+      const i=(y*96+x)*4;
+      if((shadow[i+3]??0)<250) continue;
+      expect(shadow[i]).toBeGreaterThan(8);
+      expect(shadow[i+2]).toBeGreaterThan(shadow[i]??0);
+      tones.add(shadow[i]??0);
+    }
+    expect(tones.size).toBeGreaterThan(8);
+    const full=lunarSurfacePixels({...moon,phaseAngle:0},96,[184,183,177],[159,189,221]);
+    expect(full[(48*96+48)*4]).toBeGreaterThan((shadow[(48*96+48)*4]??0)*4);
+    expect(shadow).toEqual(lunarSurfacePixels(moon,96,[184,183,177],[159,189,221]));
+  });
   it('keeps seven exact sources in vivid transparent gas with dark lanes', () => {
     const colors=['#ff0000','#00ff00','#0000ff','#ffff00','#ff00ff','#00ffff','#ffffff'];
     const pixels=deepNebulaPixels(colors,42,128);
