@@ -2,6 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { COSMIC_NEBULA_WEIGHTS, deepNebulaPixels, lunarLightNormal, lunarSurfacePixels } from './cosmic-optics';
 
 describe('Lunar spherical optics and ranked gas', () => {
+  it('renders a bright textured full-light Moon independent of birth phase without mutating astronomy', () => {
+    const moon={phaseAngle:180,lightAngle:1.3,poleAngle:.4,librationLongitude:5,librationLatitude:-3};
+    const original={...moon};
+    const image=lunarSurfacePixels(moon,96,[184,183,177],[159,189,221],'full-light');
+    expect(image).toEqual(lunarSurfacePixels({...moon,phaseAngle:0,lightAngle:0},96,[184,183,177],[159,189,221],'full-light'));
+    expect(moon).toEqual(original);
+    const tones:number[]=[];
+    for(let i=0;i<image.length;i+=4) if((image[i+3]??0)>250) tones.push(image[i]??0);
+    expect(Math.min(...tones)).toBeGreaterThanOrEqual(80);
+    expect(Math.max(...tones)-Math.min(...tones)).toBeGreaterThan(30);
+    expect(image[3]).toBe(0);
+  });
   it('uses a unit light vector at new, quarter and full phases', () => {
     for (const phase of [0,45,90,135,180]) {
       const v=lunarLightNormal(phase,.63);

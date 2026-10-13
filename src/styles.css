@@ -114,6 +114,11 @@
   --cosmic-text-main: #F5E6AB;
   --cosmic-text-data: #FFF8DC;
   --cosmic-text-shadow: rgb(0 0 0 / 85%);
+  --cosmic-text-outline: #000000;
+  --cosmic-mask-ink: #000000;
+  --cosmic-foil-gold: #e3c477;
+  --cosmic-foil-light: #fff1bd;
+  --cosmic-foil-shadow: #59401f;
   --cosmic-text-leader: rgb(230 202 101 / 45%);
   --cosmic-space-ink: #020208;
   --cosmic-star-core: #edf5ff;

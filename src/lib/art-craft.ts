@@ -18,6 +18,21 @@ export function paintNautilusPartitions(ctx:CanvasRenderingContext2D,x:number,y:
  ctx.restore();
 }
 export function guillochePoints(inner:number,outer:number,phase=0,waves=96,count=1536){return Array.from({length:count+1},(_,i)=>{const a=i/count*Math.PI*2;const r=(inner+outer)/2+Math.sin(a*waves+phase)*(outer-inner)*.42;return {x:Math.cos(a)*r,y:Math.sin(a)*r};});}
+/** Mirrored acanthus scrollwork, bounded to the ring; golden shell geometry remains independent. */
+export function arabesquePoints(inner:number,outer:number,sector:number,side:number,count=96){
+ const mid=(inner+outer)/2,width=outer-inner,anchor=(sector+.5)*Math.PI*2/48;
+ return Array.from({length:count+1},(_,i)=>{const t=i/count,theta=t*Math.PI*3.2,r=width*.39*(1-t*.88),radial=Math.sin(theta)*r*side,tangent=Math.cos(theta)*r+width*(t-.5)*.4;
+ return {x:Math.cos(anchor)*(mid+radial)-Math.sin(anchor)*tangent,y:Math.sin(anchor)*(mid+radial)+Math.cos(anchor)*tangent};});
+}
+export function paintGoldLeafArabesque(ctx:CanvasRenderingContext2D,x:number,y:number,inner:number,outer:number,size:number){
+ const css=getComputedStyle(document.documentElement),gold=css.getPropertyValue('--cosmic-foil-gold').trim(),light=css.getPropertyValue('--cosmic-foil-light').trim(),shadow=css.getPropertyValue('--cosmic-foil-shadow').trim();
+ const width=outer-inner;ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.arc(0,0,outer,0,Math.PI*2);ctx.arc(0,0,inner,0,Math.PI*2,true);ctx.clip('evenodd');ctx.shadowBlur=0;ctx.globalCompositeOperation='source-over';
+ const foil=ctx.createLinearGradient(-outer,-outer,outer,outer);foil.addColorStop(0,shadow);foil.addColorStop(.22,gold);foil.addColorStop(.36,light);foil.addColorStop(.52,gold);foil.addColorStop(.7,shadow);foil.addColorStop(.85,light);foil.addColorStop(1,gold);
+ ctx.fillStyle=foil;ctx.globalAlpha=.72;ctx.fillRect(-outer,-outer,outer*2,outer*2);
+ for(let chip=0;chip<1200;chip++){const n=Math.sin(chip*78.233+11)*43758.5453,u=n-Math.floor(n),a=chip*2.399963,r=inner+width*u;ctx.save();ctx.translate(Math.cos(a)*r,Math.sin(a)*r);ctx.rotate(a+u*3);ctx.globalAlpha=.08+u*.22;ctx.fillStyle=chip%4?light:shadow;ctx.beginPath();ctx.moveTo(-size*.0012,0);ctx.lineTo(0,-size*.0008);ctx.lineTo(size*.0018,size*.0003);ctx.lineTo(0,size*.001);ctx.closePath();ctx.fill();ctx.restore();}
+ for(let sector=0;sector<48;sector++)for(const side of [-1,1]){const points=arabesquePoints(inner,outer,sector,side);for(let pass=0;pass<3;pass++){ctx.beginPath();points.forEach((p,i)=>{const offset=pass===0?size*.0007:0;i?ctx.lineTo(p.x,p.y+offset):ctx.moveTo(p.x,p.y+offset);});ctx.strokeStyle=pass===0?shadow:pass===1?gold:light;ctx.globalAlpha=pass===2?.9:1;ctx.lineWidth=size*(pass===0?.0028:pass===1?.0016:.00055);ctx.stroke();}}
+ ctx.restore();
+}
 export function craftPalette(){const css=getComputedStyle(document.documentElement);const get=(key:string)=>css.getPropertyValue(key).trim();return {gold:get('--craft-gold'),light:get('--craft-light'),shadow:get('--craft-shadow'),pearl:get('--craft-pearl'),aqua:get('--craft-aqua'),rose:get('--craft-rose'),ink:get('--craft-ink')};}
 export function paintEngravedRing(ctx:CanvasRenderingContext2D,x:number,y:number,inner:number,outer:number,size:number){
  const p=craftPalette();ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.arc(0,0,outer,0,Math.PI*2);ctx.arc(0,0,inner,0,Math.PI*2,true);ctx.clip('evenodd');ctx.shadowBlur=0;
