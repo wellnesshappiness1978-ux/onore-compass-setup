@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { birthColorPalette, spaceComposition, spacePaintingPixels } from './cosmic-background';
+import { describe, expect, it, vi } from 'vitest';
+import { birthColorPalette, spaceComposition, spacePaintingPixels, paintBirthColorSpace, prepareCosmicForeground, COSMIC_BACKGROUND_OPACITY, COSMIC_BACKGROUND_MAX_OPACITY } from './cosmic-background';
 
 const colors = ['#bb2266', '#3366bb', '#aa7722', '#228866', '#7733aa', '#2299aa', '#aa3322'];
 describe('Unified seven-color space painting', () => {
@@ -26,16 +26,25 @@ describe('Unified seven-color space painting', () => {
       expect(s.light).toBeGreaterThanOrEqual(0); expect(s.light).toBeLessThanOrEqual(.9);
     }
   });
-  it('opens the colored depths without flattening the central light hierarchy', () => {
-    const pixels = spacePaintingPixels(96, colors, 42, '#010105', '#edf5ff');
-    let black = 0, bright = 0;
-    for (let i = 0; i < pixels.length; i += 4) {
-      const maximum = Math.max(pixels[i] ?? 0, pixels[i+1] ?? 0, pixels[i+2] ?? 0);
-      if (maximum < 18) black++;
-      if (maximum > 100) bright++;
-    }
-    expect(black / (96 * 96)).toBeLessThan(.05);
-    expect(bright / (96 * 96)).toBeGreaterThan(.15);
+  it('locks the combined background opacity, not just individual overlapping passes', () => {
+    expect(COSMIC_BACKGROUND_OPACITY).toBeGreaterThanOrEqual(.10);
+    expect(COSMIC_BACKGROUND_OPACITY).toBeLessThanOrEqual(COSMIC_BACKGROUND_MAX_OPACITY);
+    expect(COSMIC_BACKGROUND_MAX_OPACITY).toBe(.18);
+    const draws: number[] = [];
+    const rear = { createImageData: () => ({ data: new Uint8ClampedArray(8 * 8 * 4) }), putImageData: vi.fn(), beginPath: vi.fn(), arc: vi.fn(), fill: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn() };
+    const ctx = { globalAlpha: 1, globalCompositeOperation: 'source-over', filter: 'none', shadowBlur: 0, save: vi.fn(), restore: vi.fn(), fillRect: vi.fn(), drawImage() { draws.push(this.globalAlpha); }, createRadialGradient: () => ({ addColorStop: vi.fn() }) };
+    vi.stubGlobal('document', { documentElement: {}, createElement: () => ({ getContext: () => rear }) });
+    vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: (name: string) => name === '--cosmic-space-ink' ? '#020208' : '#edf5ff' }));
+    try {
+      paintBirthColorSpace(ctx as unknown as CanvasRenderingContext2D, 8, colors, 42);
+      expect(draws).toEqual([COSMIC_BACKGROUND_OPACITY]);
+      expect(rear.putImageData).toHaveBeenCalledOnce();
+      prepareCosmicForeground(ctx as unknown as CanvasRenderingContext2D);
+      expect(ctx.globalAlpha).toBe(1);
+      expect(ctx.globalCompositeOperation).toBe('source-over');
+      expect(ctx.filter).toBe('none');
+      expect(ctx.shadowBlur).toBe(0);
+    } finally { vi.unstubAllGlobals(); }
     expect(spaceComposition(.5, .47, 42).light).toBeLessThan(spaceComposition(.15, .35, 42).light);
   });
 });
