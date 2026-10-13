@@ -447,3 +447,8 @@
 - [x] Replace blurred and enlarged background layers with native-resolution gas, sharp extinction lanes and pin-point stars.
 - [x] Preserve all foreground art, astronomy, VIP gates and shared 2048 export; no entitlement or astronomical calculation changes.
 - [x] Verify 34 focused tests, clean build diagnostics, desktop/mobile/fullscreen, no page errors or mobile overflow, and actual 2048×2048 PNG. Checks use a synthetic guest birth profile and development VIP preview; paid membership is not verified and saving still requires waiting.
+
+## Cosmic background zero-base artistic reset
+- [x] Replace all prior background passes with one freely composed, harmonious seven-color space painting, with Overall foremost; clear obsolete background prescriptions from memory and architecture rules.
+- [x] Preserve foreground astronomy, goldwork, both Earths, lunar optics, direct typography, size strip, privacy and VIP/export behavior; foreground drawing and membership logic unchanged.
+- [x] Verify 33 focused tests, clean build diagnostics, live/fullscreen and actual 2048 PNG visually, with no page errors. Synthetic guest profile and development VIP preview used, not a verified paid membership; saving requires waiting. Unrelated earlier multilingual localization task remains outside this background-only request.

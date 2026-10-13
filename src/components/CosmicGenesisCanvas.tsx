@@ -16,7 +16,7 @@ import { goldenShellRadius, paintEngravedRing, paintNautilusPartitions } from "@
 import type { Capture } from "./MandalaCanvas";
 import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
 import { paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
-import { paintFantasyDepth, paintInterstellarMedium } from "@/lib/cosmic-fantasy";
+import { paintBirthColorSpace } from "@/lib/cosmic-background";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
@@ -84,41 +84,6 @@ function irregularGlow(ctx: CanvasRenderingContext2D, x: number, y: number, radi
     ctx.fillStyle = gradient;
     ctx.save(); ctx.translate(x, y); ctx.rotate(unit(seed + layer * 17) * Math.PI); ctx.scale(1.05 + unit(seed + layer * 31) * .65, .7 + unit(seed + layer * 41) * .36);
     ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-  }
-  ctx.restore();
-}
-
-function paintDeepSpace(ctx: CanvasRenderingContext2D, size: number, _colors: string[], seed: number) {
-  ctx.save(); ctx.globalCompositeOperation = "screen";
-  for (let star = 0; star < 3200; star++) {
-    const salt = seed + star * 43, x = unit(salt) * size, y = unit(salt + 5) * size;
-    const radius = size * (.00012 + unit(salt + 11) ** 3 * .00055);
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(star % 13 ? "--cosmic-star-core" : "--cosmic-solar-core").trim();
-    ctx.globalAlpha = .22 + unit(salt + 9) * .72;
-    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
-  }
-  ctx.restore();
-}
-
-function paintStarLifeVeils(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number, earthAngle: number) {
-  const centerX = size * .5, centerY = size * .47;
-  const mainAngle = earthAngle * Math.PI / 180;
-  // One almost imperceptible Overall filament replaces the seven rainbow spiral arms.
-  // Overall-color main vein ends at the actual orbital Earth, not on a decorative spiral.
-  const earthRadius = size * .423 * .376;
-  ctx.save(); ctx.globalCompositeOperation = 'screen';
-  for (let thread = 0; thread < 12; thread++) {
-    const offset = (thread - 5.5) * size * .0007;
-    ctx.beginPath();
-    for (let step = 0; step <= 64; step++) {
-      const t = step / 64, along = t * earthRadius;
-      const across = Math.sin(t * Math.PI) * (offset + Math.sin(t * 12 + thread * .7) * size * .0017);
-      const x = centerX + Math.cos(mainAngle) * along - Math.sin(mainAngle) * across;
-      const y = centerY + Math.sin(mainAngle) * along + Math.cos(mainAngle) * across;
-      if (step) ctx.lineTo(x, y); else ctx.moveTo(x, y);
-    }
-    ctx.strokeStyle = colors[0] ?? GOLD; ctx.globalAlpha = .085; ctx.lineWidth = size * .00045;
-    ctx.shadowBlur = 0; ctx.stroke();
   }
   ctx.restore();
 }
@@ -340,38 +305,6 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.restore();
   }
   ctx.restore();
-}
-
-function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
-  const layer = document.createElement("canvas"); layer.width = size; layer.height = size;
-  const art = layer.getContext("2d"); if (!art) return;
-  art.save(); art.globalCompositeOperation = "screen"; art.lineCap = "round";
-  const trace = (offset: number) => {
-    art.beginPath();
-    art.moveTo(size * -.12, size * (.28 + offset));
-    art.bezierCurveTo(size * .12, size * (-.02 + offset), size * .39, size * (-.015 + offset), size * .58, size * (.17 + offset));
-  };
-  for (let veil = 0; veil < 160; veil++) {
-    const salt = seed + veil * 83;
-    trace((unit(salt) - .5) * .13);
-    art.strokeStyle = colors[veil % Math.max(colors.length, 1)] ?? GOLD;
-    art.globalAlpha = .03 + unit(salt + 4) * .04;
-    art.lineWidth = size * (.00022 + unit(salt + 7) * .00045);
-    art.shadowBlur = 0; art.stroke();
-  }
-  for (let star = 0; star < 5400; star++) {
-    const salt = seed + star * 47, progress = unit(salt);
-    const x = size * (-.04 + progress * .67);
-    const centerY = size * (.11 - .035 * Math.sin(progress * Math.PI * 1.4));
-    const width = size * (.018 + Math.sin(progress * Math.PI) * .055);
-    const y = centerY + (unit(salt + 3) - .5) * width * 2;
-    const color = star % 19 === 0 ? (colors[star % Math.max(colors.length, 1)] ?? GOLD) : star % 7 ? PLATINUM : GOLD;
-    art.fillStyle = color; art.globalAlpha = .05 + unit(salt + 9) ** 2 * .42;
-    const radius = size * (.00012 + unit(salt + 13) ** 3 * .00082);
-    art.beginPath(); art.arc(x, y, radius, 0, Math.PI * 2); art.fill();
-  }
-  art.restore();
-  ctx.save(); ctx.globalAlpha = .8; ctx.drawImage(layer, 0, 0); ctx.restore();
 }
 
 function paintCelestialSilence(ctx: CanvasRenderingContext2D, size: number, points: Array<Point & { radius: number }>) {
@@ -828,14 +761,8 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   const size = canvas.width, roles = cosmicColorRoles(colors), placements = cosmicPlacements(genesis, size), solar = cosmicSunPlacement(genesis, size);
   const orbitalEarth = placements.find((planet) => planet.id === "earth");
   const moon = cosmicMoonPlacement(genesis, size, orbitalEarth);
-  // Every background element is drawn at the target resolution, before all foreground art.
-  ctx.filter = 'none'; ctx.shadowBlur = 0;
-  paintInterstellarMedium(ctx, size, roles.prominence, genesis.seed + 2600);
-  paintDeepSpace(ctx, size, roles.all, genesis.seed);
-  // The native medium owns the base; draw pin-point stars and fine filaments above it.
-  paintMilkyWay(ctx, size, roles.all, genesis.seed + 6400);
-  paintFantasyDepth(ctx, size, roles.prominence, genesis.seed + 5300);
-  paintStarLifeVeils(ctx, size, roles.prominence, genesis.seed + 4400, orbitalEarth?.displayAngle ?? 0);
+  // One unified birth-color painting replaces all accumulated background passes.
+  paintBirthColorSpace(ctx, size, roles.prominence, genesis.seed + 2600);
   paintCompassInlay(ctx, size);
   paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius })), ...(moon ? [{ x: moon.x, y: moon.y, radius: moon.radius }] : [])]);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
@@ -878,5 +805,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-background-resolution="native" data-background-filter="none" data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="seven-exact-deep-nebulae-remnants-and-milky-way" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="direct-champagne-gold-fine-shadow" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-background-resolution="native" data-background-filter="none" data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="seven-exact-unified-space-painting" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="direct-champagne-gold-fine-shadow" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
