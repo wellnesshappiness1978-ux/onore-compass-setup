@@ -462,6 +462,10 @@
 - [x] Add fine seven-color silk/auroral filaments inside the single 14% rear composite; preserve all foreground calculations and exports. Overall threads receive greater intensity; no blur, smoke or additional foreground overlays.
 - [x] Verify 33 passing regression tests and clean build diagnostics; visually inspect live/fullscreen and actual 2048 PNG twice. First review found stars too fine at display size; strengthen native-size grains and threads without increasing composite opacity, then recheck. No page errors. Tests used a synthetic guest profile and development VIP preview, not verified paid membership; color/starlight remains deliberately restrained at the retained 14% cap and saving requires waiting. Non-Japanese/mobile checks not repeated.
 
+## Native photorealistic cosmic background replacement
+- [x] Replace the entire background engine with seeded domain-warped pixel emission, sharp extinction fibers and 22,400 irregular crystalline stars using all seven exact colors; leave foreground and access unchanged. Retain the previously required single 14% composite, so final background colors deliberately remain subdued.
+- [x] Verify 33 focused regressions, clean build diagnostics, live artwork, fullscreen and actual 2048 PNG twice. First visual review found dark contour lines too prominent; narrow absorption and add finer turbulent fibers and more visible star grains. Synthetic guest profile and development VIP preview used, not paid membership verification; non-Japanese and other birthplace checks not repeated, saving requires waiting. Unrelated historical open tasks remain outside this background-only request.
+
 ## Luminous original cosmic fantasy and natural Moon scale
 - [x] Open seven-color translucent depths and screen light, Overall foremost, without changing the foreground artwork or imitating a named artist.
 - [x] Restore the true Earth/Moon radius ratio and compress their separation while preserving birth-distance variation, direction and lunar optics; update seven-language scale captions.

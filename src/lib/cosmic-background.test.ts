@@ -1,78 +1,79 @@
 import { describe, expect, it, vi } from 'vitest';
-import { birthColorPalette, spaceComposition, spacePaintingPixels, paintBirthColorSpace, prepareCosmicForeground, COSMIC_BACKGROUND_OPACITY, COSMIC_BACKGROUND_MAX_OPACITY, cosmicStar, cosmicFilament, COSMIC_STAR_COUNTS } from './cosmic-background';
-
+import { birthColorPalette, cosmicMedium, spacePaintingPixels, stellarSample, paintBirthColorSpace, prepareCosmicForeground, COSMIC_BACKGROUND_OPACITY, COSMIC_BACKGROUND_MAX_OPACITY, COSMIC_STELLAR_COUNT } from './cosmic-background';
 const colors = ['#bb2266', '#3366bb', '#aa7722', '#228866', '#7733aa', '#2299aa', '#aa3322'];
-describe('Unified seven-color space painting', () => {
-  it('retains all seven exact inputs with Overall first and safe missing-color fallback', () => {
+describe('Replacement volumetric cosmic engine', () => {
+  it('retains seven exact inputs and safe missing-color fallbacks', () => {
     expect(birthColorPalette(colors, '#edf5ff')).toEqual(colors);
     expect(birthColorPalette([], '#edf5ff')).toEqual(Array(7).fill('#edf5ff'));
   });
-  it('is reproducible, birth-seeded and opaque at every pixel', () => {
-    const pixels = spacePaintingPixels(48, colors, 42, '#010105', '#edf5ff');
-    expect(pixels).toEqual(spacePaintingPixels(48, colors, 42, '#010105', '#edf5ff'));
-    expect(pixels).not.toEqual(spacePaintingPixels(48, colors, 43, '#010105', '#edf5ff'));
+  it('is birth-seeded, opaque and responds to every source color', () => {
+    const pixels = spacePaintingPixels(48, colors, 42, '#020208', '#edf5ff');
+    expect(pixels).toEqual(spacePaintingPixels(48, colors, 42, '#020208', '#edf5ff'));
+    expect(pixels).not.toEqual(spacePaintingPixels(48, colors, 43, '#020208', '#edf5ff'));
     for (let i = 3; i < pixels.length; i += 4) expect(pixels[i]).toBe(255);
     for (let role = 0; role < 7; role++) {
-      const changed = colors.map((c, i) => i === role ? '#ffffff' : c);
-      expect(spacePaintingPixels(48, changed, 42, '#010105', '#edf5ff')).not.toEqual(pixels);
+      expect(spacePaintingPixels(48, colors.map((c, i) => i === role ? '#ffffff' : c), 42, '#020208', '#edf5ff')).not.toEqual(pixels);
     }
   });
-  it('shares the spatial composition across preview/export and reserves the solar heart', () => {
-    expect(spaceComposition(256 / 1024, 768 / 1024, 42)).toEqual(spaceComposition(512 / 2048, 1536 / 2048, 42));
-    expect(spaceComposition(.5, .47, 42).quiet).toBeCloseTo(.13);
-    expect(spaceComposition(.1, .1, 42).quiet).toBeGreaterThan(.9);
-    for (let i = 0; i < 100; i++) {
-      const s = spaceComposition(i / 100, (i * 7 % 100) / 100, 42);
-      expect(s.light).toBeGreaterThanOrEqual(0); expect(s.light).toBeLessThanOrEqual(.9);
+  it('has bright resolved emission and sharp absorption rather than an almost-black field', () => {
+    const pixels = spacePaintingPixels(96, colors, 42, '#020208', '#edf5ff');
+    let bright = 0, dark = 0, sharp = 0;
+    for (let i = 0; i < pixels.length; i += 4) {
+      const peak = Math.max(pixels[i] ?? 0, pixels[i + 1] ?? 0, pixels[i + 2] ?? 0);
+      if (peak > 80) bright++;
+      if (peak < 15) dark++;
+      if (i >= 4 && Math.abs((pixels[i] ?? 0) - (pixels[i - 4] ?? 0)) > 15) sharp++;
     }
+    expect(bright / (96 * 96)).toBeGreaterThan(.4);
+    expect(dark / (96 * 96)).toBeLessThan(.05);
+    expect(sharp).toBeGreaterThan(200);
   });
-  it('locks the combined background opacity, not just individual overlapping passes', () => {
-    expect(COSMIC_BACKGROUND_OPACITY).toBeGreaterThanOrEqual(.10);
-    expect(COSMIC_BACKGROUND_OPACITY).toBeLessThanOrEqual(COSMIC_BACKGROUND_MAX_OPACITY);
-    expect(COSMIC_BACKGROUND_MAX_OPACITY).toBe(.18);
+  it('shares normalized geometry between preview/export and protects the solar heart', () => {
+    expect(cosmicMedium(256 / 1024, 768 / 1024, 42)).toEqual(cosmicMedium(512 / 2048, 1536 / 2048, 42));
+    expect(cosmicMedium(.5, .47, 42).quiet).toBe(.17);
+    let fibers = 0, lanes = 0;
+    for (let i = 0; i < 10000; i++) {
+      const m = cosmicMedium((i % 100) / 100, Math.floor(i / 100) / 100, 42);
+      expect(m.emission).toBeGreaterThanOrEqual(0);
+      expect(m.extinction).toBeLessThanOrEqual(1);
+      if (m.fibers > .3) fibers++;
+      if (m.extinction > .5) lanes++;
+    }
+    expect(fibers).toBeGreaterThan(200);
+    // Narrow absorption lanes must exist without dominating luminous fibers.
+    expect(lanes).toBeGreaterThan(50); expect(lanes).toBeLessThan(500);
+  });
+  it('replaces the old stripe paths with dense irregular seeded crystalline stars', () => {
+    expect(COSMIC_STELLAR_COUNT).toBeGreaterThan(20000);
+    let major = 0;
+    for (let i = 0; i < COSMIC_STELLAR_COUNT; i++) {
+      const s = stellarSample(i, 42);
+      expect(s.u).toBeGreaterThanOrEqual(0); expect(s.u).toBeLessThanOrEqual(1);
+      expect(s.v).toBeGreaterThanOrEqual(0); expect(s.v).toBeLessThanOrEqual(1);
+      expect(s.alpha).toBeGreaterThanOrEqual(0); expect(s.alpha).toBeLessThanOrEqual(1);
+      if (s.major) major++;
+    }
+    expect(major).toBeGreaterThan(40); expect(major).toBeLessThan(100);
+    expect(stellarSample(27, 42)).toEqual(stellarSample(27, 42));
+    expect(stellarSample(27, 42)).not.toEqual(stellarSample(27, 43));
+  });
+  it('composites only once at the retained cap and resets foreground state', () => {
     const draws: number[] = [];
-    const rear = { createImageData: () => ({ data: new Uint8ClampedArray(8 * 8 * 4) }), putImageData: vi.fn(), beginPath: vi.fn(), arc: vi.fn(), fill: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn() };
-    const ctx = { globalAlpha: 1, globalCompositeOperation: 'source-over', filter: 'none', shadowBlur: 0, save: vi.fn(), restore: vi.fn(), fillRect: vi.fn(), drawImage() { draws.push(this.globalAlpha); }, createRadialGradient: () => ({ addColorStop: vi.fn() }) };
+    const rear = { createImageData: () => ({ data: new Uint8ClampedArray(8 * 8 * 4) }), putImageData: vi.fn(), beginPath: vi.fn(), fill: vi.fn(), moveTo: vi.fn(), lineTo: vi.fn(), stroke: vi.fn() };
+    const ctx = { globalAlpha: 1, globalCompositeOperation: 'source-over', filter: 'none', shadowBlur: 0, save: vi.fn(), restore: vi.fn(), fillRect: vi.fn(), drawImage() { draws.push(this.globalAlpha); } };
     vi.stubGlobal('document', { documentElement: {}, createElement: () => ({ getContext: () => rear }) });
     vi.stubGlobal('getComputedStyle', () => ({ getPropertyValue: (name: string) => name === '--cosmic-space-ink' ? '#020208' : '#edf5ff' }));
     try {
       paintBirthColorSpace(ctx as unknown as CanvasRenderingContext2D, 8, colors, 42);
-      expect(draws).toEqual([COSMIC_BACKGROUND_OPACITY]);
-      expect(rear.putImageData).toHaveBeenCalledOnce();
+      expect(draws).toEqual([.14]); expect(rear.putImageData).toHaveBeenCalledOnce();
       prepareCosmicForeground(ctx as unknown as CanvasRenderingContext2D);
-      expect(ctx.globalAlpha).toBe(1);
-      expect(ctx.globalCompositeOperation).toBe('source-over');
-      expect(ctx.filter).toBe('none');
-      expect(ctx.shadowBlur).toBe(0);
+      expect(ctx.globalAlpha).toBe(1); expect(ctx.globalCompositeOperation).toBe('source-over');
+      expect(ctx.filter).toBe('none'); expect(ctx.shadowBlur).toBe(0);
     } finally { vi.unstubAllGlobals(); }
-    expect(spaceComposition(.5, .47, 42).light).toBeLessThan(spaceComposition(.15, .35, 42).light);
-  });
-  it('uses three distinct dense stellar depths, repeatable at live/export coordinates', () => {
-    expect(COSMIC_STAR_COUNTS.dust).toBeGreaterThan(10000);
-    expect(COSMIC_STAR_COUNTS.cluster).toBeGreaterThan(2000);
-    expect(COSMIC_STAR_COUNTS.diamond).toBeLessThan(100);
-    for (const depth of ['dust', 'cluster', 'diamond'] as const) {
-      for (let i = 0; i < COSMIC_STAR_COUNTS[depth]; i++) {
-        const star = cosmicStar(depth, i, 42);
-        expect(star.u).toBeGreaterThan(0); expect(star.u).toBeLessThan(1);
-        expect(star.v).toBeGreaterThan(0); expect(star.v).toBeLessThan(1);
-        expect(star.alpha).toBeGreaterThanOrEqual(0); expect(star.alpha).toBeLessThanOrEqual(1);
-      }
-      expect(cosmicStar(depth, 27, 42)).toEqual(cosmicStar(depth, 27, 42));
-      expect(cosmicStar(depth, 27, 42)).not.toEqual(cosmicStar(depth, 27, 43));
-    }
-    expect(cosmicStar('diamond', 3, 42).radius).toBeGreaterThan(cosmicStar('dust', 3, 42).radius);
-  });
-  it('keeps seven sharp silk roles deterministic, bounded and tapered', () => {
-    for (let role = 0; role < 7; role++) for (let thread = 0; thread < 23; thread++) {
-      expect(cosmicFilament(0, role, thread, 42).alpha).toBe(0);
-      const p = cosmicFilament(256 / 1024, role, thread, 42);
-      expect(p).toEqual(cosmicFilament(512 / 2048, role, thread, 42));
-      expect(p.u).toBeGreaterThan(0); expect(p.u).toBeLessThan(1);
-      expect(p.v).toBeGreaterThan(0); expect(p.v).toBeLessThan(1);
-      expect(p.alpha).toBeLessThanOrEqual(.88);
-    }
+    expect(COSMIC_BACKGROUND_OPACITY).toBeGreaterThanOrEqual(.10);
+    expect(COSMIC_BACKGROUND_OPACITY).toBeLessThanOrEqual(COSMIC_BACKGROUND_MAX_OPACITY);
+    expect(COSMIC_BACKGROUND_MAX_OPACITY).toBe(.18);
+    expect(paintBirthColorSpace.toString()).not.toContain('createRadialGradient');
     expect(paintBirthColorSpace.toString()).not.toContain('blur(');
-    expect(paintBirthColorSpace.toString()).not.toContain("globalCompositeOperation = 'lighter'");
   });
 });
