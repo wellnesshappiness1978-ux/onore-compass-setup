@@ -418,6 +418,6 @@
 - [x] Verify live artwork and actual 2048 PNG download visually, 32 tests and clean build diagnostics; checks used a guest birth profile with development VIP preview, not verified paid entitlements. Headless high-resolution captures needed extended waits; literal zero-second rendering is not established.
 
 ## Cosmic Genesis deep-space color harmony
-- [ ] Replace opaque rainbow fields and seven-arm ribbons with restrained, seeded deep nebulae, distant remnant dust and fine Milky Way light; preserve exact birth-color inputs and priority.
-- [ ] Keep every color phenomenon behind the goldwork and celestial bodies without changing astronomy, direct lettering, gates or exports.
-- [ ] Verify live and 2048 export visually, refine existing marks, and run focused regression tests; distinguish development preview from paid entitlement verification.
+- [x] Replace opaque rainbow fields and seven-arm ribbons with restrained, seeded deep nebulae, distant remnant dust and fine Milky Way light; preserve exact birth-color inputs and priority.
+- [x] Keep cosmic color phenomena inside the deep-background pass behind goldwork and celestial bodies without changing astronomy, direct lettering, gates or exports; existing birthplace light and jeweled craft remain intact.
+- [x] Verify live and actual 2048 PNG export twice visually. First pass found gas too subdued; refine existing optical density only, then confirm no new rainbow bands, white arches or background occlusion. All 24 focused astronomy/optics/typography/craft tests pass, build OK, no page errors. Checks use a guest profile and development VIP preview; paid entitlements and literal zero-second rendering are not established.
