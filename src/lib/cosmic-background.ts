@@ -40,6 +40,7 @@ export function spaceComposition(u: number, v: number, seed: number) {
 
 export function spacePaintingPixels(size: number, colors: readonly string[], seed: number, ink: string, starlight: string) {
   const palette = birthColorPalette(colors, starlight).map(rgb), base = rgb(ink), pearl = rgb(starlight);
+  const underlight = [0, 1, 2].map(c => palette.slice(1).reduce((sum, color) => sum + (color[c] ?? 0), 0) / 6);
   const pixels = new Uint8ClampedArray(size * size * 4);
   for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
     const s = spaceComposition(x / size, y / size, seed);
@@ -50,7 +51,7 @@ export function spacePaintingPixels(size: number, colors: readonly string[], see
     const i = (y * size + x) * 4;
     for (let c = 0; c < 3; c++) {
       const local = (first[c] ?? 0) * (1 - blend) + (next[c] ?? 0) * blend;
-      const pigment = (overall[c] ?? 0) * .56 + local * .44;
+      const pigment = (overall[c] ?? 0) * .56 + local * .32 + (underlight[c] ?? 0) * .12;
       const gleam = Math.max(0, s.light - .22) ** 2 * .6;
       pixels[i + c] = (base[c] ?? 0) + pigment * s.light * 1.25 + (pearl[c] ?? 0) * gleam;
     }
