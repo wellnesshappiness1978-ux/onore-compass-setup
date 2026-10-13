@@ -442,3 +442,8 @@
 - [x] Birthplace-centered detail globe with overall-color beacon and true terminator
 - [x] Orbital Earth with sidereal rotation, subsolar day side and axis
 - [x] Noise-based interstellar medium with dark lanes
+
+## Crisp high-resolution cosmic background
+- [ ] Replace blurred and enlarged background layers with native-resolution gas, sharp extinction lanes and pin-point stars.
+- [ ] Preserve all foreground art, astronomy, VIP gates and shared 2048 export.
+- [ ] Verify focused tests, live art, mobile/fullscreen and actual 2048 PNG.
