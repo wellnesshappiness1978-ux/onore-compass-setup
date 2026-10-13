@@ -27,25 +27,18 @@ export function distantGrain(kind: DistantPhenomenon['kind'], t: number, angle: 
 /** Bounded deep-space grains and broken filaments, never opaque color fields. */
 export function paintFantasyDepth(ctx: CanvasRenderingContext2D, size: number, colors: readonly string[], seed: number) {
   const starlight = getComputedStyle(document.documentElement).getPropertyValue('--craft-pearl').trim();
-  ctx.save(); ctx.globalCompositeOperation = 'screen';
+  ctx.save(); ctx.filter = 'none'; ctx.shadowBlur = 0; ctx.globalCompositeOperation = 'screen';
   for (const field of distantPhenomena(seed)) {
     const color = colors[field.role] ?? colors[0] ?? starlight;
     ctx.save(); ctx.translate(field.x * size, field.y * size); ctx.rotate(field.tilt);
     const radius = field.radius * size;
-    for (let i = 0; i < Math.round(520 + field.weight * 420); i++) {
+    for (let i = 0; i < Math.round(1600 + field.weight * 1200); i++) {
       const salt = seed + field.role * 911 + i * 43, t = Math.sqrt(unit(salt));
       const point = distantGrain(field.kind, t, unit(salt + 5) * Math.PI * 2, unit(salt + 7) - .5);
       const x = point.x * radius, y = point.y * radius;
-      const glow = size * (.0007 + unit(salt + 13) ** 2 * .0028);
+      const glow = size * (.00016 + unit(salt + 13) ** 3 * .00048);
       ctx.fillStyle = i % 31 === 0 ? starlight : color;
-      ctx.globalAlpha = (.075 + field.weight * .2) * (.35 + unit(salt + 17) * .65);
-      if (i % 5 === 0) {
-        const mist = ctx.createRadialGradient(x, y, 0, x, y, glow * 5);
-        mist.addColorStop(0, color); mist.addColorStop(1, 'transparent');
-        ctx.fillStyle = mist; ctx.globalAlpha *= .22;
-        ctx.beginPath(); ctx.arc(x, y, glow * 5, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = i % 31 === 0 ? starlight : color; ctx.globalAlpha /= .22;
-      }
+      ctx.globalAlpha = (.16 + field.weight * .34) * (.35 + unit(salt + 17) * .65);
       ctx.beginPath(); ctx.arc(x, y, glow, 0, Math.PI * 2); ctx.fill();
       if (i % 31 === 0) {
         ctx.globalAlpha *= .7; ctx.strokeStyle = starlight; ctx.lineWidth = size * .0004;
@@ -53,11 +46,11 @@ export function paintFantasyDepth(ctx: CanvasRenderingContext2D, size: number, c
       }
     }
     if (field.kind !== 'cluster' && field.kind !== 'elliptical') {
-      ctx.strokeStyle = color; ctx.lineWidth = size * .00065;
-      for (let thread = 0; thread < 14; thread++) {
-        ctx.globalAlpha = (.07 + field.weight * .08) * (1 - thread / 18); ctx.beginPath();
-        for (let step = 0; step <= 64; step++) {
-          const t = step / 64;
+      ctx.strokeStyle = color; ctx.lineWidth = size * .00032;
+      for (let thread = 0; thread < 44; thread++) {
+        ctx.globalAlpha = (.07 + field.weight * .08) * (1 - thread / 58); ctx.beginPath();
+        for (let step = 0; step <= 192; step++) {
+          const t = step / 192;
           let x: number, y: number;
           if (field.kind === 'curtain' || field.kind === 'dust') { x = (t * 2 - 1) * radius * 1.5; y = Math.sin(t * 7.5 + thread * .055) * radius * .35 + (thread - 6.5) * radius * .028; }
           else { const a = t * (field.kind === 'spiral' ? 11.4 : Math.PI * 2) + thread * .12, r = radius * (field.kind === 'spiral' ? .12 + t * .85 : .42 + thread * .038); x = Math.cos(a) * r; y = Math.sin(a) * r * (field.kind === 'disk' ? .2 : .68); }
@@ -70,7 +63,12 @@ export function paintFantasyDepth(ctx: CanvasRenderingContext2D, size: number, c
   }
   ctx.restore();
 }
-const hash2 = (x: number, y: number, seed: number) => unit(x * 157.31 + y * 311.7 + seed * .618);
+// Integer lattice hash avoids expensive trigonometry in the native-resolution pass.
+const hash2 = (x: number, y: number, seed: number) => {
+  let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(seed | 0, 1274126177);
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+};
 function valueNoise(x: number, y: number, seed: number) {
   const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
   const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
@@ -85,38 +83,39 @@ export function fbm(x: number, y: number, seed: number, octaves = 5) {
 }
 const rgb = (hex: string) => { const n = parseInt(hex.replace('#', '').slice(0, 6), 16) || 0; return [(n >> 16) & 255, (n >> 8) & 255, n & 255] as const; };
 
-/** Photographic interstellar medium: ridged gas filaments tinted by the exact birth colors and dark absorbing lanes. */
+/** Same spatial field at every resolution: fine ridges, sharp absorption, a quiet solar core. */
+export function interstellarSample(u: number, v: number, seed: number) {
+  const x = u * 7, y = v * 7;
+  const warp = fbm(x + 3.1, y - 1.7, seed + 5, 3) * 1.8;
+  const base = fbm(x + warp, y + warp * .6, seed, 4);
+  const ridged = Math.abs(fbm(x * 3.8 + warp, y * 3.8, seed + 31, 4) - .5);
+  const fiber = Math.max(0, 1 - ridged * 24) ** 3;
+  const detail = valueNoise(x * 96 + warp, y * 96, seed + 401);
+  const laneNoise = valueNoise(x * 2.3 - warp, y * 2.3, seed + 211);
+  const extinction = Math.min(1, Math.max(0, (laneNoise - .54) * 22));
+  const quiet = Math.min(1, Math.hypot(u - .5, v - .47) / .4) ** 1.6;
+  const density = Math.max(0, (base - .38) * 1.8);
+  const emission = Math.min(1, (density ** 2 * .3 + fiber * density * (1.2 + detail * .8)) * quiet) * (1 - extinction * .97);
+  return { emission, extinction, core: fiber ** 3 * density * quiet * (1 - extinction), role: Math.min(6, Math.floor(valueNoise(x * .4 + 9, y * .4 - 4, seed + 77) * 7)), quiet };
+}
+
+/** No scaled bitmap, blur, gradient fog or post-sharpening: compute each output pixel. */
+export function interstellarPixels(size: number, colors: readonly string[], seed: number, ink: string, light: string) {
+  const pixels = new Uint8ClampedArray(size * size * 4);
+  const palette = (colors.length ? colors : [light]).map(rgb), black = rgb(ink), white = rgb(light);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const sample = interstellarSample(x / size, y / size, seed);
+    const color = palette[sample.role % palette.length] ?? white;
+    const i = (y * size + x) * 4;
+    for (let c = 0; c < 3; c++) pixels[i + c] = (black[c] ?? 0) + (color[c] ?? 0) * sample.emission * .84 + (white[c] ?? 0) * sample.core * .48;
+    pixels[i + 3] = 255;
+  }
+  return pixels;
+}
+
 export function paintInterstellarMedium(ctx: CanvasRenderingContext2D, size: number, colors: readonly string[], seed: number) {
-  const grid = 192, palette = (colors.length ? colors : ['#8899cc']).map(rgb);
-  const glow = ctx.createImageData(grid, grid), dark = ctx.createImageData(grid, grid);
-  for (let y = 0; y < grid; y++) for (let x = 0; x < grid; x++) {
-    const u = x / grid * 4, v = y / grid * 4;
-    const warp = fbm(u + 3.1, v - 1.7, seed + 5) * 2.2;
-    const base = fbm(u + warp, v + warp * .6, seed);
-    const ridge = 1 - Math.abs(fbm(u * 1.8 + warp, v * 1.8, seed + 31) * 2 - 1);
-    const filament = Math.pow(ridge, 7) * base;
-    const pick = fbm(u * .55 + 9, v * .55 - 4, seed + 77) * palette.length * 1.6;
-    const c0 = palette[Math.floor(pick) % palette.length]!, c1 = palette[(Math.floor(pick) + 1) % palette.length]!, f = pick % 1;
-    const dx = x / grid - .5, dy = y / grid - .47, quiet = Math.min(1, Math.hypot(dx, dy) / .42);
-    const a = Math.min(1, (Math.pow(base, 2.4) * .55 + filament * 1.5) * (.35 + .65 * quiet)), i = (y * grid + x) * 4;
-    glow.data[i] = c0[0] + (c1[0] - c0[0]) * f; glow.data[i + 1] = c0[1] + (c1[1] - c0[1]) * f; glow.data[i + 2] = c0[2] + (c1[2] - c0[2]) * f; glow.data[i + 3] = a * 150;
-    const lane = Math.max(0, fbm(u * 1.3 - warp * .5, v * 1.3, seed + 211) - .56) * 2.6;
-    dark.data[i] = 2; dark.data[i + 1] = 3; dark.data[i + 2] = 10; dark.data[i + 3] = Math.min(1, lane) * 150 * quiet;
-  }
-  const layer = document.createElement('canvas'); layer.width = grid; layer.height = grid;
-  const l = layer.getContext('2d'); if (!l) return;
-  ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-  l.putImageData(glow, 0, 0); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = .9; ctx.drawImage(layer, 0, 0, size, size);
-  ctx.filter = `blur(${size * .006}px)`; ctx.globalAlpha = .5; ctx.drawImage(layer, 0, 0, size, size); ctx.filter = 'none';
-  l.clearRect(0, 0, grid, grid); l.putImageData(dark, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = .8; ctx.drawImage(layer, 0, 0, size, size);
-  // Scattered starlight: tiny clusters and remnant shells kept faint.
-  ctx.globalCompositeOperation = 'screen';
-  for (let k = 0; k < 5; k++) {
-    const cx = (.08 + unit(seed + k * 41) * .84) * size, cy = (.06 + unit(seed + k * 43) * .88) * size;
-    if (Math.hypot(cx / size - .5, cy / size - .47) < .3) continue;
-    const color = colors[k % colors.length] ?? '#ffffff';
-    if (k % 2) { ctx.strokeStyle = color; ctx.lineWidth = size * .0012; ctx.globalAlpha = .18; ctx.beginPath(); ctx.ellipse(cx, cy, size * .022, size * .017, unit(seed + k) * 3, 0, Math.PI * 2); ctx.stroke(); }
-    for (let s = 0; s < 40; s++) { const r = size * .02 * unit(seed + k * 7 + s) ** 1.6, a = unit(seed + k * 9 + s * 3) * Math.PI * 2; ctx.fillStyle = s % 4 ? '#f4f1e6' : color; ctx.globalAlpha = .35 + unit(seed + s) * .5; ctx.fillRect(cx + Math.cos(a) * r, cy + Math.sin(a) * r, size * .0018, size * .0018); }
-  }
-  ctx.restore();
+  const css = getComputedStyle(document.documentElement);
+  const image = ctx.createImageData(size, size);
+  image.data.set(interstellarPixels(size, colors, seed, css.getPropertyValue('--cosmic-space-ink').trim(), css.getPropertyValue('--cosmic-star-core').trim()));
+  ctx.putImageData(image, 0, 0);
 }
