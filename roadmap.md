@@ -478,4 +478,4 @@
 ## Fixed uploaded VIP cosmic background
 - [x] Replace procedural background with the uploaded image, centered cover and cached decoded assets shared by live and 2048 PNG.
 - [x] Preserve foreground goldwork, astronomy, both Earths, Moon, direct lettering, privacy and VIP gates.
-- [ ] Verify focused regressions and live/fullscreen/actual 2048 PNG; note fixed image contains decorative celestial objects, not natal data.
+- [x] Verify 33 focused regressions, clean build diagnostics, live/fullscreen and actual 2048×2048 PNG with no browser errors. Fixed background matches the upload; its embedded planets and orbit lines are decorative, not natal calculations, and its 768px source is enlarged for export. Foreground positions, goldwork and direct labels remain unchanged. Checks used a synthetic guest profile and development VIP preview, not verified paid membership. Bright source features remain visible behind existing direct text; no plates or image alterations added.
