@@ -14,6 +14,7 @@ export const cosmicPlanetSpecs = [
 
 /** IAU/NASA nominal solar radius used by the physical size-comparison strip. */
 export const COSMIC_SUN_MEAN_RADIUS_KM = 695_700;
+export const COSMIC_MOON_MEAN_RADIUS_KM = 1737.4;
 
 export type CosmicPlanetId = (typeof cosmicPlanetSpecs)[number]["id"];
 export type CosmicPlanet = {
@@ -50,6 +51,10 @@ export type CosmicMoon = {
   phaseAngle: number;
   phaseFraction: number;
   phaseLongitude: number;
+  lightAngle: number;
+  poleAngle: number;
+  librationLongitude: number;
+  librationLatitude: number;
 };
 
 export type EarthView = {
@@ -105,6 +110,17 @@ export function cosmicGenesis(date: string, time: string, unknown: boolean): Cos
   const sunSign = signIndex(A.SunPosition(birth.instant).elon);
   const lunar = A.EclipticGeoMoon(birth.instant);
   const illumination = A.Illumination(A.Body.Moon, birth.instant);
+  const moonVector = A.GeoMoon(birth.instant);
+  const length = Math.hypot(moonVector.x, moonVector.y, moonVector.z);
+  const normal = { x: moonVector.x / length, y: moonVector.y / length, z: moonVector.z / length };
+  const eastLength = Math.hypot(normal.x, normal.y);
+  const east = { x: -normal.y / eastLength, y: normal.x / eastLength, z: 0 };
+  const north = { x: -normal.z * east.y, y: normal.z * east.x, z: eastLength };
+  const projectAngle = (vector: { x: number; y: number; z: number }) => Math.atan2(-(vector.x * north.x + vector.y * north.y + vector.z * north.z), vector.x * east.x + vector.y * east.y);
+  const lunarSun = { x: illumination.hc.x - moonVector.x, y: illumination.hc.y - moonVector.y, z: illumination.hc.z - moonVector.z };
+  // hc is heliocentric Moon, so its negative is the Moon-to-Sun direction.
+  lunarSun.x = -illumination.hc.x; lunarSun.y = -illumination.hc.y; lunarSun.z = -illumination.hc.z;
+  const libration = A.Libration(birth.instant);
   const moon: CosmicMoon = {
     longitude: lunar.lon,
     latitude: lunar.lat,
@@ -112,6 +128,10 @@ export function cosmicGenesis(date: string, time: string, unknown: boolean): Cos
     phaseAngle: illumination.phase_angle,
     phaseFraction: illumination.phase_fraction,
     phaseLongitude: A.MoonPhase(birth.instant),
+    lightAngle: projectAngle(lunarSun),
+    poleAngle: projectAngle(A.RotationAxis(A.Body.Moon, birth.instant).north),
+    librationLongitude: libration.elon,
+    librationLatitude: libration.elat,
   };
   const moonSign = signIndex(moon.longitude);
   const animal = ((birth.year - 4) % 12 + 12) % 12;
