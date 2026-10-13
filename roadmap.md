@@ -432,3 +432,8 @@
 - [x] Add deterministic seven-color distant galaxies, clustered stars, nebular disks and auroral filaments only behind existing foreground artwork.
 - [x] Keep lunar shadow textures visible with blue-silver earthshine and a fine full silhouette rim without changing phase, orientation or scale. Initial visual pass found new-Moon shadows still too subdued; raised reflected-light visibility and inspected exported maria/craters and rim again.
 - [x] Verify 27 focused tests, clean build diagnostics, live/fullscreen art and actual 2048×2048 private-default PNG with no page errors. Synthetic guest profile and development VIP preview used; actual paid entitlements and literal zero-second rendering remain unverified. High-resolution saving required an extended wait. Astronomy, existing gates, goldwork and direct lettering unchanged.
+
+## Cosmic Genesis elegant vivid distance and lunar shadow revision
+- [x] Refine seven-color distant morphology and corner Milky Way without changing natal positions, goldwork or labels.
+- [x] Lift textured blue-silver lunar reflected light independently of the calculated solar phase.
+- [ ] Verify phase/geometry tests, desktop/mobile/fullscreen and actual 2048 PNG; inspect shadow detail and background balance.

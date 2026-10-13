@@ -404,15 +404,15 @@ function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: stri
     art.moveTo(size * -.12, size * (.28 + offset));
     art.bezierCurveTo(size * .12, size * (-.02 + offset), size * .39, size * (-.015 + offset), size * .58, size * (.17 + offset));
   };
-  for (let veil = 0; veil < 38; veil++) {
+  for (let veil = 0; veil < 46; veil++) {
     const salt = seed + veil * 83;
     trace((unit(salt) - .5) * .13);
     art.strokeStyle = colors[veil % Math.max(colors.length, 1)] ?? GOLD;
-    art.globalAlpha = .025 + unit(salt + 4) * .035;
+    art.globalAlpha = .03 + unit(salt + 4) * .04;
     art.lineWidth = size * (.001 + unit(salt + 7) * .003);
     art.shadowColor = art.strokeStyle; art.shadowBlur = size * .008; art.stroke();
   }
-  for (let star = 0; star < 1100; star++) {
+  for (let star = 0; star < 1500; star++) {
     const salt = seed + star * 47, progress = unit(salt);
     const x = size * (-.04 + progress * .67);
     const centerY = size * (.11 - .035 * Math.sin(progress * Math.PI * 1.4));
