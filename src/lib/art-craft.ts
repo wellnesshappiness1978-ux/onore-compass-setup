@@ -1,4 +1,22 @@
 /** Local craft geometry; material palette is read from semantic CSS tokens. */
+/** Radius grows by phi per quarter-turn, shared by shell outlines and chamber partitions. */
+export function goldenShellRadius(progress:number,outer:number,turns=2){return outer*Math.pow((1+Math.sqrt(5))/2,(progress-1)*turns*4);}
+export function paintNautilusPartitions(ctx:CanvasRenderingContext2D,x:number,y:number,inner:number,outer:number,size:number,colors:readonly string[]){
+ const p=craftPalette(),mid=(inner+outer)/2,width=outer-inner;
+ ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.arc(0,0,outer,0,Math.PI*2);ctx.arc(0,0,inner,0,Math.PI*2,true);ctx.clip('evenodd');ctx.shadowBlur=0;
+ for(let sector=0;sector<24;sector++){
+  const a=(sector+.5)/24*Math.PI*2;ctx.save();ctx.translate(Math.cos(a)*mid,Math.sin(a)*mid);ctx.rotate(a+Math.PI/2);
+  for(let pass=0;pass<2;pass++){
+   ctx.beginPath();for(let step=0;step<=96;step++){const t=step/96,r=goldenShellRadius(t,width*.44,1.5),angle=t*Math.PI*3;const px=Math.cos(angle)*r,py=Math.sin(angle)*r+pass*size*.0006;step?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+   ctx.globalAlpha=pass?.88:.95;ctx.strokeStyle=pass?p.gold:p.shadow;ctx.lineWidth=size*(pass?.0007:.0022);ctx.stroke();
+  }
+  for(let chamber=1;chamber<=9;chamber++){const t=chamber/9,r=goldenShellRadius(t,width*.44,1.5),a=t*Math.PI*3;ctx.strokeStyle=p.light;ctx.globalAlpha=.62;ctx.lineWidth=size*.0004;ctx.beginPath();ctx.moveTo(Math.cos(a)*r*.62,Math.sin(a)*r*.62);ctx.quadraticCurveTo(Math.cos(a+.2)*r*.85,Math.sin(a+.2)*r*.85,Math.cos(a)*r,Math.sin(a)*r);ctx.stroke();}
+  ctx.globalCompositeOperation='screen';ctx.strokeStyle=colors[sector%Math.max(1,colors.length)]??p.pearl;ctx.globalAlpha=.28;ctx.lineWidth=size*.001;ctx.beginPath();ctx.arc(0,0,width*.46,-2.6,-.6);ctx.stroke();ctx.restore();
+ }
+ ctx.globalCompositeOperation='screen';ctx.strokeStyle=p.light;ctx.lineWidth=size*.0018;
+ for(let rail=0;rail<2;rail++)for(let arc=0;arc<8;arc++){const a=arc*Math.PI/4;ctx.globalAlpha=arc%3===0?.86:.24;ctx.beginPath();ctx.arc(0,0,rail?outer-size*.0018:inner+size*.0018,a+.02,a+.38);ctx.stroke();}
+ ctx.restore();
+}
 export function guillochePoints(inner:number,outer:number,phase=0,waves=96,count=1536){return Array.from({length:count+1},(_,i)=>{const a=i/count*Math.PI*2;const r=(inner+outer)/2+Math.sin(a*waves+phase)*(outer-inner)*.42;return {x:Math.cos(a)*r,y:Math.sin(a)*r};});}
 export function craftPalette(){const css=getComputedStyle(document.documentElement);const get=(key:string)=>css.getPropertyValue(key).trim();return {gold:get('--craft-gold'),light:get('--craft-light'),shadow:get('--craft-shadow'),pearl:get('--craft-pearl'),aqua:get('--craft-aqua'),rose:get('--craft-rose'),ink:get('--craft-ink')};}
 export function paintEngravedRing(ctx:CanvasRenderingContext2D,x:number,y:number,inner:number,outer:number,size:number){
