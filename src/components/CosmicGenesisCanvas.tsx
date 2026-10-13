@@ -294,6 +294,10 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.fillStyle = jewelColor; ctx.globalAlpha = awakened ? .96 : .52; ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .004 : .0025), 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = awakened ? "rgba(255,243,198,.96)" : "rgba(255,233,169,.52)"; ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .0058 : .0042), 0, Math.PI * 2); ctx.stroke();
   }
+  ctx.save(); ctx.translate(-frame.x, -frame.y);
+  paintEngravedRing(ctx, frame.x, frame.y, frame.innerRadius + size * .002, frame.outerRadius - size * .002, size);
+  paintNautilusPartitions(ctx, frame.x, frame.y, frame.innerRadius, frame.outerRadius, size, colors);
+  ctx.restore();
   ctx.save(); ctx.beginPath(); ctx.arc(0, 0, frame.outerRadius - size * .001, 0, Math.PI * 2); ctx.arc(0, 0, frame.innerRadius + size * .001, 0, Math.PI * 2, true); ctx.clip("evenodd");
   for (let shell = 0; shell < 4; shell++) {
     ctx.save(); ctx.globalCompositeOperation = "source-over";
@@ -388,8 +392,6 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.restore();
   }
   ctx.restore();
-  paintEngravedRing(ctx, frame.x, frame.y, frame.innerRadius + size * .002, frame.outerRadius - size * .002, size);
-  paintNautilusPartitions(ctx, frame.x, frame.y, frame.innerRadius, frame.outerRadius, size, colors);
 }
 
 function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {

@@ -19,7 +19,7 @@ export function deepNebulaPixels(colors: readonly string[], seed: number, diamet
       if (density > strongest) { strongest = density; role = index; }
     });
     // Fine extinction lanes interrupt the gas without circular masks or white veils.
-    const extinction = .35 + .65 * Math.abs(Math.sin(u * 19 - v * 31 + warp * 80));
+    const extinction = .22 + .78 * Math.abs(Math.sin(u * 19 - v * 31 + warp * 80));
     const pixel = (y * diameter + x) * 4;
     for (let channel = 0; channel < 3; channel++) pixels[pixel + channel] = channels[role]?.[channel] ?? 0;
     pixels[pixel + 3] = 255 * Math.min(.52, strongest * wisps * extinction * 1.18);
