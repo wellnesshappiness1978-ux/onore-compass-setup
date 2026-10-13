@@ -17,7 +17,8 @@ describe("earth globe", () => {
     expect(daylight(sun, sun)).toBe(1);
     expect(daylight({ x: -sun.x, y: -sun.y, z: -sun.z }, sun)).toBe(0);
     // 08:30 JST morning in Tokyo: subsolar point is east of Tokyo by roughly 3.5 hours.
-    expect(v.subsolarLongitude).toBeGreaterThan(160);
+    expect(((v.subsolarLongitude - 139.65) % 360 + 360) % 360).toBeGreaterThan(40);
+    expect(((v.subsolarLongitude - 139.65) % 360 + 360) % 360).toBeLessThan(65);
   });
   it("views the orbital Earth from ecliptic north so the Sun lies on the limb", () => {
     const g = cosmicGenesis("2000-06-21", "12:00", false)!;
