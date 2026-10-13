@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { birthColorPalette, spaceComposition, spacePaintingPixels, paintBirthColorSpace, prepareCosmicForeground, COSMIC_BACKGROUND_OPACITY, COSMIC_BACKGROUND_MAX_OPACITY } from './cosmic-background';
+import { birthColorPalette, spaceComposition, spacePaintingPixels, paintBirthColorSpace, prepareCosmicForeground, COSMIC_BACKGROUND_OPACITY, COSMIC_BACKGROUND_MAX_OPACITY, cosmicStar, cosmicFilament, COSMIC_STAR_COUNTS } from './cosmic-background';
 
 const colors = ['#bb2266', '#3366bb', '#aa7722', '#228866', '#7733aa', '#2299aa', '#aa3322'];
 describe('Unified seven-color space painting', () => {
@@ -46,5 +46,33 @@ describe('Unified seven-color space painting', () => {
       expect(ctx.shadowBlur).toBe(0);
     } finally { vi.unstubAllGlobals(); }
     expect(spaceComposition(.5, .47, 42).light).toBeLessThan(spaceComposition(.15, .35, 42).light);
+  });
+  it('uses three distinct dense stellar depths, repeatable at live/export coordinates', () => {
+    expect(COSMIC_STAR_COUNTS.dust).toBeGreaterThan(10000);
+    expect(COSMIC_STAR_COUNTS.cluster).toBeGreaterThan(2000);
+    expect(COSMIC_STAR_COUNTS.diamond).toBeLessThan(100);
+    for (const depth of ['dust', 'cluster', 'diamond'] as const) {
+      for (let i = 0; i < COSMIC_STAR_COUNTS[depth]; i++) {
+        const star = cosmicStar(depth, i, 42);
+        expect(star.u).toBeGreaterThan(0); expect(star.u).toBeLessThan(1);
+        expect(star.v).toBeGreaterThan(0); expect(star.v).toBeLessThan(1);
+        expect(star.alpha).toBeGreaterThanOrEqual(0); expect(star.alpha).toBeLessThanOrEqual(1);
+      }
+      expect(cosmicStar(depth, 27, 42)).toEqual(cosmicStar(depth, 27, 42));
+      expect(cosmicStar(depth, 27, 42)).not.toEqual(cosmicStar(depth, 27, 43));
+    }
+    expect(cosmicStar('diamond', 3, 42).radius).toBeGreaterThan(cosmicStar('dust', 3, 42).radius);
+  });
+  it('keeps seven sharp silk roles deterministic, bounded and tapered', () => {
+    for (let role = 0; role < 7; role++) for (let thread = 0; thread < 23; thread++) {
+      expect(cosmicFilament(0, role, thread, 42).alpha).toBe(0);
+      const p = cosmicFilament(.37, role, thread, 42);
+      expect(p).toEqual(cosmicFilament(758 / 2048, role, thread, 42));
+      expect(p.u).toBeGreaterThan(0); expect(p.u).toBeLessThan(1);
+      expect(p.v).toBeGreaterThan(0); expect(p.v).toBeLessThan(1);
+      expect(p.alpha).toBeLessThanOrEqual(.46);
+    }
+    expect(paintBirthColorSpace.toString()).not.toContain('blur(');
+    expect(paintBirthColorSpace.toString()).not.toContain("globalCompositeOperation = 'lighter'");
   });
 });
