@@ -15,7 +15,7 @@ import type { Language } from "@/lib/translations";
 import { goldenShellRadius, paintEngravedRing, paintNautilusPartitions } from "@/lib/art-craft";
 import type { Capture } from "./MandalaCanvas";
 import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
-import { COSMIC_NEBULA_WEIGHTS, deepNebulaPixels, paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
+import { paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
 import { paintFantasyDepth, paintInterstellarMedium } from "@/lib/cosmic-fantasy";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
@@ -88,69 +88,15 @@ function irregularGlow(ctx: CanvasRenderingContext2D, x: number, y: number, radi
   ctx.restore();
 }
 
-function paintDeepSpace(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--cosmic-space-ink').trim(); ctx.fillRect(0, 0, size, size);
-  // Transparent gas islands preserve source Hex values; no full-canvas color ramp.
-  const layer = document.createElement('canvas'); layer.width = 320; layer.height = 320;
-  const art = layer.getContext('2d');
-  if (art) {
-    const pixels = art.createImageData(320, 320);
-    pixels.data.set(deepNebulaPixels(cosmicColorRoles(colors).prominence, seed, 320));
-    art.putImageData(pixels, 0, 0);
-    ctx.save(); ctx.globalCompositeOperation = 'screen';
-    ctx.drawImage(layer, 0, 0, size, size); ctx.restore();
-  }
+function paintDeepSpace(ctx: CanvasRenderingContext2D, size: number, _colors: string[], seed: number) {
   ctx.save(); ctx.globalCompositeOperation = "screen";
-  for (let star = 0; star < 420; star++) {
+  for (let star = 0; star < 3200; star++) {
     const salt = seed + star * 43, x = unit(salt) * size, y = unit(salt + 5) * size;
-    const radius = size * (.00018 + unit(salt + 11) ** 3 * .00125);
-    ctx.fillStyle = star % 13 ? "rgba(221,235,242,.7)" : "rgba(246,218,151,.8)";
-    ctx.globalAlpha = .12 + unit(salt + 9) * .56;
+    const radius = size * (.00012 + unit(salt + 11) ** 3 * .00055);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(star % 13 ? "--cosmic-star-core" : "--cosmic-solar-core").trim();
+    ctx.globalAlpha = .22 + unit(salt + 9) * .72;
     ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
   }
-  ctx.restore();
-}
-
-function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
-  const roles = [
-    { color: colors[0] ?? GOLD, weight: COSMIC_NEBULA_WEIGHTS[0], anchor: [.28, .58] },
-    { color: colors[5] ?? GOLD, weight: COSMIC_NEBULA_WEIGHTS[1], anchor: [.74, .31] },
-    { color: colors[4] ?? GOLD, weight: COSMIC_NEBULA_WEIGHTS[2], anchor: [.68, .76] },
-    { color: colors[3] ?? GOLD, weight: COSMIC_NEBULA_WEIGHTS[3], anchor: [.22, .2] },
-    { color: colors[2] ?? GOLD, weight: COSMIC_NEBULA_WEIGHTS[4], anchor: [.86, .58] },
-    { color: colors[1] ?? GOLD, weight: COSMIC_NEBULA_WEIGHTS[5], anchor: [.12, .8] },
-    { color: colors[6] ?? GOLD, weight: COSMIC_NEBULA_WEIGHTS[6], anchor: [.52, .1] },
-  ] as const;
-  ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.lineCap = "round";
-  roles.forEach((role, index) => {
-    const [ax, ay] = role.anchor;
-    for (let cloud = 0; cloud < Math.round(5 + role.weight * 5); cloud++) {
-      const salt = seed + index * 977 + cloud * 71;
-      const angle = cloud / 18 * Math.PI * 2 + unit(salt) * .35;
-      const spread = size * (.035 + Math.sqrt(unit(salt + 4)) * .23);
-      const x = size * ax + Math.cos(angle) * spread * 1.65;
-      const y = size * ay + Math.sin(angle) * spread;
-      irregularGlow(ctx, x, y, size * (.035 + unit(salt + 7) * .065), role.color, .22 + role.weight * .23, salt);
-    }
-    for (let filament = 0; filament < 7; filament++) {
-      const salt = seed + index * 733 + filament * 67;
-      const offset = (filament - 3) * size * .012;
-      ctx.beginPath();
-      ctx.moveTo(size * (ax - .34), size * ay + offset);
-      ctx.bezierCurveTo(size * (ax - .14), size * (ay - .22 - unit(salt) * .08), size * (ax + .16), size * (ay + .2 + unit(salt + 5) * .08), size * (ax + .38), size * (ay - .04));
-      ctx.strokeStyle = role.color; ctx.globalAlpha = role.weight * (.09 + unit(salt + 8) * .08);
-      ctx.lineWidth = size * (.00045 + filament * .00018); ctx.shadowColor = role.color; ctx.shadowBlur = size * .005; ctx.stroke();
-    }
-    for (let mote = 0; mote < 72; mote++) {
-      const salt = seed + index * 919 + mote * 37;
-      const angle = mote / 72 * Math.PI * 2;
-      const remnant = size * (.018 + unit(salt + 3) * .009);
-      const x = size * ax + Math.cos(angle) * remnant * 1.618;
-      const y = size * ay + Math.sin(angle) * remnant;
-      ctx.fillStyle = role.color; ctx.globalAlpha = role.weight * (.1 + unit(salt + 8) * .22);
-      ctx.beginPath(); ctx.arc(x, y, size * (.00025 + unit(salt + 13) ** 2 * .0015), 0, Math.PI * 2); ctx.fill();
-    }
-  });
   ctx.restore();
 }
 
@@ -172,7 +118,7 @@ function paintStarLifeVeils(ctx: CanvasRenderingContext2D, size: number, colors:
       if (step) ctx.lineTo(x, y); else ctx.moveTo(x, y);
     }
     ctx.strokeStyle = colors[0] ?? GOLD; ctx.globalAlpha = .085; ctx.lineWidth = size * .00045;
-    ctx.shadowColor = colors[0] ?? GOLD; ctx.shadowBlur = size * .004; ctx.stroke();
+    ctx.shadowBlur = 0; ctx.stroke();
   }
   ctx.restore();
 }
@@ -405,15 +351,15 @@ function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: stri
     art.moveTo(size * -.12, size * (.28 + offset));
     art.bezierCurveTo(size * .12, size * (-.02 + offset), size * .39, size * (-.015 + offset), size * .58, size * (.17 + offset));
   };
-  for (let veil = 0; veil < 46; veil++) {
+  for (let veil = 0; veil < 160; veil++) {
     const salt = seed + veil * 83;
     trace((unit(salt) - .5) * .13);
     art.strokeStyle = colors[veil % Math.max(colors.length, 1)] ?? GOLD;
     art.globalAlpha = .03 + unit(salt + 4) * .04;
-    art.lineWidth = size * (.001 + unit(salt + 7) * .003);
-    art.shadowColor = art.strokeStyle; art.shadowBlur = size * .008; art.stroke();
+    art.lineWidth = size * (.00022 + unit(salt + 7) * .00045);
+    art.shadowBlur = 0; art.stroke();
   }
-  for (let star = 0; star < 1500; star++) {
+  for (let star = 0; star < 5400; star++) {
     const salt = seed + star * 47, progress = unit(salt);
     const x = size * (-.04 + progress * .67);
     const centerY = size * (.11 - .035 * Math.sin(progress * Math.PI * 1.4));
@@ -869,9 +815,9 @@ function paintForegroundDust(ctx: CanvasRenderingContext2D, size: number, seed: 
   ctx.save(); ctx.globalCompositeOperation = "screen";
   for (let dust = 0; dust < 72; dust++) {
     const salt = seed + dust * 101, x = unit(salt) * size, y = unit(salt + 4) * size;
-    const radius = size * (.0005 + unit(salt + 8) ** 2 * .0024);
+    const radius = size * (.00015 + unit(salt + 8) ** 3 * .00055);
     ctx.fillStyle = dust % 5 ? PLATINUM : GOLD; ctx.globalAlpha = .08 + unit(salt + 12) * .28;
-    ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = radius * 8;
+    ctx.shadowBlur = 0;
     ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
   }
   ctx.restore();
@@ -882,18 +828,14 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   const size = canvas.width, roles = cosmicColorRoles(colors), placements = cosmicPlacements(genesis, size), solar = cosmicSunPlacement(genesis, size);
   const orbitalEarth = placements.find((planet) => planet.id === "earth");
   const moon = cosmicMoonPlacement(genesis, size, orbitalEarth);
-  // Diffuse gas is resolution-independent; keep expensive optical blending off the full-size surface.
-  const background = document.createElement('canvas'); background.width = 512; background.height = 512;
-  const gas = background.getContext('2d');
-  if (gas) {
-    paintDeepSpace(gas, 512, roles.all, genesis.seed);
-    paintMilkyWay(gas, 512, roles.all, genesis.seed + 6400);
-    paintInterstellarMedium(gas, 512, roles.all, genesis.seed + 2600);
-    paintNebulae(gas, 512, roles.all, genesis.seed + 1200);
-    paintFantasyDepth(gas, 512, roles.prominence, genesis.seed + 5300);
-    paintStarLifeVeils(gas, 512, roles.prominence, genesis.seed + 4400, orbitalEarth?.displayAngle ?? 0);
-    ctx.drawImage(background, 0, 0, size, size);
-  }
+  // Every background element is drawn at the target resolution, before all foreground art.
+  ctx.filter = 'none'; ctx.shadowBlur = 0;
+  paintInterstellarMedium(ctx, size, roles.prominence, genesis.seed + 2600);
+  paintDeepSpace(ctx, size, roles.all, genesis.seed);
+  // The native medium owns the base; draw pin-point stars and fine filaments above it.
+  paintMilkyWay(ctx, size, roles.all, genesis.seed + 6400);
+  paintFantasyDepth(ctx, size, roles.prominence, genesis.seed + 5300);
+  paintStarLifeVeils(ctx, size, roles.prominence, genesis.seed + 4400, orbitalEarth?.displayAngle ?? 0);
   paintCompassInlay(ctx, size);
   paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius })), ...(moon ? [{ x: moon.x, y: moon.y, radius: moon.radius }] : [])]);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
@@ -936,5 +878,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="seven-exact-deep-nebulae-remnants-and-milky-way" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="direct-champagne-gold-fine-shadow" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-background-resolution="native" data-background-filter="none" data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="seven-exact-deep-nebulae-remnants-and-milky-way" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="direct-champagne-gold-fine-shadow" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
