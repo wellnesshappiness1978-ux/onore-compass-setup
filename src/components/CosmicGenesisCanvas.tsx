@@ -16,7 +16,7 @@ import { goldenShellRadius, paintEngravedRing, paintNautilusPartitions } from "@
 import type { Capture } from "./MandalaCanvas";
 import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
 import { paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
-import { paintBirthColorSpace } from "@/lib/cosmic-background";
+import { paintBirthColorSpace, prepareCosmicForeground } from "@/lib/cosmic-background";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
@@ -719,7 +719,7 @@ function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | un
   if (!image) return;
   const auraColor: Record<CosmicPlanetId, string> = { mercury: "#c7b48d", venus: "#e6b65f", earth: "#65dff2", mars: "#c45a34", jupiter: "#d7b185", saturn: "#d8bf83", uranus: "#8edfe5", neptune: "#3e75e8" };
   irregularGlow(ctx, point.x, point.y, radius * 2.35, auraColor[id], .36 + depth * .14, seed);
-  ctx.save(); ctx.globalAlpha = .9 + depth * .1; ctx.shadowColor = auraColor[id]; ctx.shadowBlur = size * (.009 + depth * .009);
+  ctx.save(); ctx.globalAlpha = 1; ctx.shadowColor = auraColor[id]; ctx.shadowBlur = size * (.009 + depth * .009);
   const filters: Record<CosmicPlanetId, string> = {
     mercury: "saturate(1.08) contrast(1.2)", venus: "saturate(1.16) contrast(1.14)", earth: "saturate(1.2) contrast(1.13)", mars: "saturate(1.28) contrast(1.16)",
     jupiter: "saturate(1.22) contrast(1.14)", saturn: "saturate(1.2) contrast(1.15)", uranus: "saturate(1.24) contrast(1.13)", neptune: "saturate(1.3) contrast(1.17)",
@@ -746,18 +746,6 @@ function paintPlanet(ctx: CanvasRenderingContext2D, image: HTMLImageElement | un
   ctx.restore();
 }
 
-function paintForegroundDust(ctx: CanvasRenderingContext2D, size: number, seed: number) {
-  ctx.save(); ctx.globalCompositeOperation = "screen";
-  for (let dust = 0; dust < 72; dust++) {
-    const salt = seed + dust * 101, x = unit(salt) * size, y = unit(salt + 4) * size;
-    const radius = size * (.00015 + unit(salt + 8) ** 3 * .00055);
-    ctx.fillStyle = dust % 5 ? PLATINUM : GOLD; ctx.globalAlpha = .08 + unit(salt + 12) * .28;
-    ctx.shadowBlur = 0;
-    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
-  }
-  ctx.restore();
-}
-
 export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: CosmicGenesis, earthView: EarthView, colors: string[], language: Language, birthPlace: string, assets?: ArtAssets | null, hideBirthDetails = false) {
   const ctx = canvas.getContext("2d"); if (!ctx) throw new Error("Canvas unavailable");
   const size = canvas.width, roles = cosmicColorRoles(colors), placements = cosmicPlacements(genesis, size), solar = cosmicSunPlacement(genesis, size);
@@ -765,6 +753,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   const moon = cosmicMoonPlacement(genesis, size, orbitalEarth);
   // One unified birth-color painting replaces all accumulated background passes.
   paintBirthColorSpace(ctx, size, roles.prominence, genesis.seed + 2600);
+  prepareCosmicForeground(ctx);
   paintCompassInlay(ctx, size);
   paintCelestialSilence(ctx, size, [{ ...solar, radius: solar.radius }, ...placements.map((planet) => ({ x: planet.x, y: planet.y, radius: planet.id === "saturn" ? planet.ringOuterRadius : planet.radius })), ...(moon ? [{ x: moon.x, y: moon.y, radius: moon.radius }] : [])]);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
@@ -783,7 +772,6 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   if (moon && orbitalEarth) paintBirthMoon(ctx, moon, orbitalEarth, size, genesis.seed + 7600, language);
   if (orbitalEarth) paintEarthCorrespondence(ctx, orbitalEarth, earth, orbitalEarth.radius, earth.radius, roles.overall, size);
   paintEarth(ctx, assets?.earthMap ?? null, earth, earth.radius, earthView, solar, genesis.seed, roles.overall);
-  paintForegroundDust(ctx, size, genesis.seed + 9700);
   paintAstronomyLabels(ctx, size, genesis, placements, language, birthPlace, earth, hideBirthDetails);
   paintSizeComparison(ctx, size, genesis, assets, language);
 }
@@ -807,5 +795,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then((art) => { if (!active) return; images.current = art; if (ref.current) void paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); onCaptureRef.current(capture); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-background-resolution="native" data-background-filter="none" data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="seven-exact-unified-space-painting" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="direct-champagne-gold-fine-shadow" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、七彩星命雲、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, seven birth-color veils, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-background-opacity="0.14" data-foreground-opacity="1" data-background-resolution="native" data-background-filter="none" data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="seven-exact-unified-space-painting" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="direct-champagne-gold-fine-shadow" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
