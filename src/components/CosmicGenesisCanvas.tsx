@@ -688,7 +688,7 @@ function projectEarth(image: HTMLImageElement, radius: number, centerLat: number
     const normal = unprojectOrtho(basis, nx, ny); if (!normal) continue;
     const { lat, lon } = vectorLatLon(normal);
     // Calibrated to the bundled artwork map (landmarks: Tokyo, London): it sits ~11.5° west and stretches high latitudes.
-    const mapLon = ((lon - 11.5 + 540) % 360) - 180, mapLat = Math.max(-89, Math.min(89, lat + Math.sign(lat) * Math.max(0, Math.abs(lat) - 35) * .5));
+    const mapLon = ((lon - 11.5 + 540) % 360) - 180, mapLat = Math.max(-89, Math.min(89, lat + Math.sign(lat) * Math.max(0, Math.min(Math.abs(lat) - 35, 90 - Math.abs(lat))) * .5));
     const sourceX = Math.min(image.width - 1, Math.max(0, Math.floor((mapLon / 180 + 1) / 2 * image.width)));
     const sourceY = Math.min(image.height - 1, Math.max(0, Math.floor((.5 - mapLat / 180) * image.height)));
     const from = (sourceY * image.width + sourceX) * 4, to = (y * diameter + x) * 4;
