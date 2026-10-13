@@ -11,10 +11,10 @@ import neptune from "@/assets/cosmic-neptune.png";
 import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicEarthPortrait, cosmicMoonPlacement, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement, type CosmicMoonPlacement } from "@/lib/cosmic-art";
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
 import type { Language } from "@/lib/translations";
-import { paintEngravedRing } from "@/lib/art-craft";
+import { goldenShellRadius, paintEngravedRing, paintNautilusPartitions } from "@/lib/art-craft";
 import type { Capture } from "./MandalaCanvas";
 import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
-import { COSMIC_NEBULA_WEIGHTS, deepNebulaPixels, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
+import { COSMIC_NEBULA_WEIGHTS, deepNebulaPixels, paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
@@ -128,7 +128,7 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
       const spread = size * (.035 + Math.sqrt(unit(salt + 4)) * .23);
       const x = size * ax + Math.cos(angle) * spread * 1.65;
       const y = size * ay + Math.sin(angle) * spread;
-      irregularGlow(ctx, x, y, size * (.025 + unit(salt + 7) * .05), role.color, .15 + role.weight * .09, salt);
+      irregularGlow(ctx, x, y, size * (.035 + unit(salt + 7) * .065), role.color, .22 + role.weight * .23, salt);
     }
     for (let filament = 0; filament < 7; filament++) {
       const salt = seed + index * 733 + filament * 67;
@@ -136,7 +136,7 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
       ctx.beginPath();
       ctx.moveTo(size * (ax - .34), size * ay + offset);
       ctx.bezierCurveTo(size * (ax - .14), size * (ay - .22 - unit(salt) * .08), size * (ax + .16), size * (ay + .2 + unit(salt + 5) * .08), size * (ax + .38), size * (ay - .04));
-      ctx.strokeStyle = role.color; ctx.globalAlpha = role.weight * (.035 + unit(salt + 8) * .025);
+      ctx.strokeStyle = role.color; ctx.globalAlpha = role.weight * (.09 + unit(salt + 8) * .08);
       ctx.lineWidth = size * (.00045 + filament * .00018); ctx.shadowColor = role.color; ctx.shadowBlur = size * .005; ctx.stroke();
     }
     for (let mote = 0; mote < 72; mote++) {
@@ -145,7 +145,7 @@ function paintNebulae(ctx: CanvasRenderingContext2D, size: number, colors: strin
       const remnant = size * (.018 + unit(salt + 3) * .009);
       const x = size * ax + Math.cos(angle) * remnant * 1.618;
       const y = size * ay + Math.sin(angle) * remnant;
-      ctx.fillStyle = role.color; ctx.globalAlpha = role.weight * (.045 + unit(salt + 8) * .12);
+      ctx.fillStyle = role.color; ctx.globalAlpha = role.weight * (.1 + unit(salt + 8) * .22);
       ctx.beginPath(); ctx.arc(x, y, size * (.00025 + unit(salt + 13) ** 2 * .0015), 0, Math.PI * 2); ctx.fill();
     }
   });
@@ -169,7 +169,7 @@ function paintStarLifeVeils(ctx: CanvasRenderingContext2D, size: number, colors:
       const y = centerY + Math.sin(mainAngle) * along + Math.cos(mainAngle) * across;
       if (step) ctx.lineTo(x, y); else ctx.moveTo(x, y);
     }
-    ctx.strokeStyle = colors[0] ?? GOLD; ctx.globalAlpha = .024; ctx.lineWidth = size * .00045;
+    ctx.strokeStyle = colors[0] ?? GOLD; ctx.globalAlpha = .085; ctx.lineWidth = size * .00045;
     ctx.shadowColor = colors[0] ?? GOLD; ctx.shadowBlur = size * .004; ctx.stroke();
   }
   ctx.restore();
@@ -294,6 +294,10 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.fillStyle = jewelColor; ctx.globalAlpha = awakened ? .96 : .52; ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .004 : .0025), 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = awakened ? "rgba(255,243,198,.96)" : "rgba(255,233,169,.52)"; ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .0058 : .0042), 0, Math.PI * 2); ctx.stroke();
   }
+  ctx.save(); ctx.translate(-frame.x, -frame.y);
+  paintEngravedRing(ctx, frame.x, frame.y, frame.innerRadius + size * .002, frame.outerRadius - size * .002, size);
+  paintNautilusPartitions(ctx, frame.x, frame.y, frame.innerRadius, frame.outerRadius, size, colors);
+  ctx.restore();
   ctx.save(); ctx.beginPath(); ctx.arc(0, 0, frame.outerRadius - size * .001, 0, Math.PI * 2); ctx.arc(0, 0, frame.innerRadius + size * .001, 0, Math.PI * 2, true); ctx.clip("evenodd");
   for (let shell = 0; shell < 4; shell++) {
     ctx.save(); ctx.globalCompositeOperation = "source-over";
@@ -306,8 +310,8 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     for (let halo = 0; halo < 3; halo++) {
       ctx.beginPath();
       for (let step = 0; step <= 132; step++) {
-        const progress = step / 132, angle = progress * Math.PI * 4.85;
-        const radius = shellRadius * (.055 + progress * .945);
+        const progress = step / 132, angle = progress * Math.PI * 4;
+        const radius = goldenShellRadius(progress, shellRadius);
         const x = Math.cos(angle) * radius, y = Math.sin(angle) * radius;
         step ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
       }
@@ -317,8 +321,8 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
       ctx.shadowColor = halo === 1 ? shellGem : GOLD; ctx.shadowBlur = size * (halo === 1 ? .009 : .003); ctx.stroke();
     }
     for (let chamber = 2; chamber <= 13; chamber++) {
-      const progress = chamber / 13, angle = progress * Math.PI * 4.85;
-      const radius = shellRadius * (.055 + progress * .945);
+      const progress = chamber / 13, angle = progress * Math.PI * 4;
+      const radius = goldenShellRadius(progress, shellRadius);
       const innerRadius = radius * (.26 + progress * .22);
       ctx.strokeStyle = chamber % 3 === 0 ? PLATINUM : "rgba(255,222,132,.94)";
       ctx.globalAlpha = .42 + progress * .46; ctx.lineWidth = Math.max(.7, size * .0005);
@@ -333,9 +337,9 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.fillStyle = shellBase; ctx.globalAlpha = .36; ctx.shadowColor = GOLD; ctx.shadowBlur = size * .01;
     ctx.beginPath(); ctx.arc(cx, cy, shellRadius, 0, Math.PI * 2); ctx.fill();
     for (let chamber = 0; chamber < 12; chamber++) {
-      const angle = anchor + Math.PI + chamber / 11 * Math.PI * 4.6;
+      const angle = anchor + Math.PI + chamber / 11 * Math.PI * 4;
       const progress = chamber / 11;
-      const radius = shellRadius * (.12 + progress * .8);
+      const radius = goldenShellRadius(progress, shellRadius);
       ctx.strokeStyle = chamber % 3 === 0 ? PLATINUM : "rgba(255,221,132,.92)";
       ctx.globalAlpha = .34 + progress * .5; ctx.lineWidth = Math.max(.65, size * (.00048 + progress * .00038));
       ctx.beginPath(); ctx.moveTo(cx + Math.cos(angle) * radius * .18, cy + Math.sin(angle) * radius * .18);
@@ -344,8 +348,8 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     for (let pass = 0; pass < 4; pass++) {
       ctx.beginPath();
       for (let step = 0; step <= 112; step++) {
-        const progress = step / 112, angle = anchor + Math.PI + progress * Math.PI * 4.6;
-        const radius = shellRadius * (.08 + progress * .92);
+        const progress = step / 112, angle = anchor + Math.PI + progress * Math.PI * 4;
+        const radius = goldenShellRadius(progress, shellRadius);
         const x = cx + Math.cos(angle) * radius, y = cy + Math.sin(angle) * radius;
         step ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
       }
@@ -355,14 +359,14 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
       ctx.shadowColor = pass === 1 ? shellGem : GOLD; ctx.shadowBlur = size * ([ .003, .002, 0, 0 ][pass] ?? 0); ctx.stroke();
     }
     for (let rib = 2; rib < 11; rib++) {
-      const angle = anchor + Math.PI + rib / 10 * Math.PI * 4.6;
-      const radius = shellRadius * (.08 + rib / 10 * .92);
+      const angle = anchor + Math.PI + rib / 10 * Math.PI * 4;
+      const radius = goldenShellRadius(rib / 10, shellRadius);
       ctx.strokeStyle = rib % 3 ? GOLD : PLATINUM; ctx.globalAlpha = .46; ctx.lineWidth = Math.max(.45, size * .00038);
       ctx.beginPath(); ctx.moveTo(cx + Math.cos(angle) * radius * .54, cy + Math.sin(angle) * radius * .54); ctx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius); ctx.stroke();
     }
     for (let bead = 0; bead < 7; bead++) {
-      const angle = anchor + Math.PI + (bead + 2) / 9 * Math.PI * 4.6;
-      const radius = shellRadius * (.18 + bead / 8 * .72);
+      const angle = anchor + Math.PI + (bead + 2) / 9 * Math.PI * 4;
+      const radius = goldenShellRadius((bead + 2) / 9, shellRadius);
       ctx.fillStyle = colors[(shell + bead) % Math.max(colors.length, 1)] ?? GOLD;
       ctx.globalAlpha = .82; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = size * .004;
       ctx.beginPath(); ctx.arc(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius, size * (.0014 + bead * .00012), 0, Math.PI * 2); ctx.fill();
@@ -388,7 +392,6 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.restore();
   }
   ctx.restore();
-  paintEngravedRing(ctx, frame.x, frame.y, frame.innerRadius + size * .002, frame.outerRadius - size * .002, size);
 }
 
 function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: string[], seed: number) {
@@ -404,7 +407,7 @@ function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: stri
     const salt = seed + veil * 83;
     trace((unit(salt) - .5) * .13);
     art.strokeStyle = colors[veil % Math.max(colors.length, 1)] ?? GOLD;
-    art.globalAlpha = .009 + unit(salt + 4) * .012;
+    art.globalAlpha = .025 + unit(salt + 4) * .035;
     art.lineWidth = size * (.001 + unit(salt + 7) * .003);
     art.shadowColor = art.strokeStyle; art.shadowBlur = size * .008; art.stroke();
   }
@@ -420,7 +423,7 @@ function paintMilkyWay(ctx: CanvasRenderingContext2D, size: number, colors: stri
     art.beginPath(); art.arc(x, y, radius, 0, Math.PI * 2); art.fill();
   }
   art.restore();
-  ctx.save(); ctx.globalAlpha = .55; ctx.drawImage(layer, 0, 0); ctx.restore();
+  ctx.save(); ctx.globalAlpha = .8; ctx.drawImage(layer, 0, 0); ctx.restore();
 }
 
 function paintCelestialSilence(ctx: CanvasRenderingContext2D, size: number, points: Array<Point & { radius: number }>) {
@@ -802,6 +805,7 @@ function paintBirthMoon(ctx: CanvasRenderingContext2D, moon: CosmicMoonPlacement
   ctx.save();
   ctx.strokeStyle = "rgba(238,219,154,.28)"; ctx.lineWidth = Math.max(1, size * .00045); ctx.setLineDash([size * .003, size * .003]);
   ctx.beginPath(); ctx.moveTo(earth.x, earth.y); ctx.lineTo(moon.x, moon.y); ctx.stroke(); ctx.setLineDash([]);
+  paintLunarHalo(ctx, moon, seed);
   paintLunarSurface(ctx, moon);
   ctx.globalCompositeOperation = "screen"; ctx.strokeStyle = cosmicTextPalette().data; ctx.globalAlpha = .16; ctx.lineWidth = size * .00025;
   ctx.beginPath(); ctx.arc(moon.x, moon.y, radius * .995, moon.lightAngle - Math.PI * .45, moon.lightAngle + Math.PI * .45); ctx.stroke();
@@ -810,7 +814,7 @@ function paintBirthMoon(ctx: CanvasRenderingContext2D, moon: CosmicMoonPlacement
   const side = moon.x >= earth.x ? 1 : -1;
   const labelX = Math.max(size * .025, Math.min(size * .975, moon.x + side * radius * 1.35));
   ctx.textAlign = side > 0 ? "left" : "right";
-  paintCosmicText(ctx, size, `${MOON_LABELS[language]} ${Math.round(moon.phaseFraction * 100)}%`, labelX, moon.y - radius * 1.7, 'data', size * .12);
+  paintCosmicText(ctx, size, `${MOON_LABELS[language]} ${Math.round(moon.phaseFraction * 100)}% · ×2.1`, labelX, moon.y - radius * 1.7, 'data', size * .16);
   ctx.restore();
 }
 

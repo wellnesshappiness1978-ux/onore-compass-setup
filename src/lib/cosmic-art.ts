@@ -3,6 +3,8 @@ import { COSMIC_MOON_MEAN_RADIUS_KM, COSMIC_SUN_MEAN_RADIUS_KM, type CosmicGenes
 export const COSMIC_PLANET_SCALE = 0.0009;
 /** The prior 1.11 × 1.5 visibility treatment enlarged by the requested exact 1.3×. */
 export const COSMIC_PLANET_DISPLAY_MULTIPLIER = 1.11 * 1.5 * 1.3;
+/** Artistic satellite enlargement only; astronomy and physical comparison remain unchanged. */
+export const COSMIC_MOON_DISPLAY_MULTIPLIER = 2.1;
 export const COSMIC_BODY_RADII_KM = {
   sun: COSMIC_SUN_MEAN_RADIUS_KM,
   mercury: 2439.7,
@@ -155,11 +157,11 @@ export function cosmicMoonPlacement(genesis: CosmicGenesis, size: number, earth?
   if (!orbitalEarth) return null;
   const displayAngle = degrees(genesis.moon.longitude + cosmicComposition(genesis, size).rotation);
   const angle = displayAngle * Math.PI / 180;
-  const distance = size * .052;
+  const distance = size * .078;
   return {
     x: orbitalEarth.x + Math.cos(angle) * distance,
     y: orbitalEarth.y + Math.sin(angle) * distance,
-    radius: orbitalEarth.radius * COSMIC_MOON_MEAN_RADIUS_KM / orbitalEarth.meanRadiusKm,
+    radius: orbitalEarth.radius * COSMIC_MOON_MEAN_RADIUS_KM / orbitalEarth.meanRadiusKm * COSMIC_MOON_DISPLAY_MULTIPLIER,
     distance,
     displayAngle,
     phaseFraction: genesis.moon.phaseFraction,

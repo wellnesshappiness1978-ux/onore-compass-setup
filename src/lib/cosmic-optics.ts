@@ -14,15 +14,15 @@ export function deepNebulaPixels(colors: readonly string[], seed: number, diamet
     const wisps = Math.max(0, .36 + .25 * Math.sin(u * 37 + v * 29 + warp * 45) + .18 * Math.sin(u * 83 - v * 67) + .12 * Math.sin(u * 173 + v * 139));
     let strongest = 0, role = 0;
     anchors.forEach(([ax = 0, ay = 0], index) => {
-      const dx = (u - ax + warp) / .19, dy = (v - ay - warp) / .105;
-      const density = Math.exp(-(dx * dx + dy * dy) * 1.8) * (COSMIC_NEBULA_WEIGHTS[index] ?? .24);
+      const dx = (u - ax + warp) / .31, dy = (v - ay - warp) / .18;
+      const density = Math.exp(-(dx * dx + dy * dy) * 1.45) * (COSMIC_NEBULA_WEIGHTS[index] ?? .24);
       if (density > strongest) { strongest = density; role = index; }
     });
     // Fine extinction lanes interrupt the gas without circular masks or white veils.
-    const extinction = .35 + .65 * Math.abs(Math.sin(u * 19 - v * 31 + warp * 80));
+    const extinction = .22 + .78 * Math.abs(Math.sin(u * 19 - v * 31 + warp * 80));
     const pixel = (y * diameter + x) * 4;
     for (let channel = 0; channel < 3; channel++) pixels[pixel + channel] = channels[role]?.[channel] ?? 0;
-    pixels[pixel + 3] = 255 * Math.min(.24, strongest * wisps * extinction * .42);
+    pixels[pixel + 3] = 255 * Math.min(.52, strongest * wisps * extinction * 1.18);
   }
   return pixels;
 }
@@ -80,6 +80,27 @@ export function paintLunarSurface(ctx: CanvasRenderingContext2D, moon: CosmicMoo
   const image=art.createImageData(diameter,diameter);
   image.data.set(lunarSurfacePixels(moon,diameter,rgb)); art.putImageData(image,0,0);
   ctx.drawImage(surface,moon.x-moon.radius,moon.y-moon.radius,moon.radius*2,moon.radius*2);
+}
+
+/** Artistic diffraction halo, not a fictional lunar atmosphere; keep the phase silhouette clear. */
+export function paintLunarHalo(ctx: CanvasRenderingContext2D, moon: CosmicMoonPlacement, seed: number) {
+  const palette=getComputedStyle(document.documentElement);
+  const light=palette.getPropertyValue('--craft-pearl').trim();
+  const {x,y,radius}=moon;
+  ctx.save(); ctx.globalCompositeOperation='screen';
+  const halo=ctx.createRadialGradient(x,y,radius*.9,x,y,radius*2.8);
+  halo.addColorStop(0,light); halo.addColorStop(.18,light); halo.addColorStop(1,'transparent');
+  ctx.globalAlpha=.13; ctx.fillStyle=halo;
+  ctx.beginPath();ctx.arc(x,y,radius*2.8,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle=light;ctx.lineWidth=radius*.022;
+  for(let ray=0;ray<40;ray++) {
+    const a=ray/40*Math.PI*2;
+    const length=radius*(1.35+noise(seed+ray*17)*.95);
+    ctx.globalAlpha=.025+.045*noise(seed+ray);
+    ctx.beginPath();ctx.moveTo(x+Math.cos(a)*radius*1.08,y+Math.sin(a)*radius*1.08);
+    ctx.lineTo(x+Math.cos(a)*length,y+Math.sin(a)*length);ctx.stroke();
+  }
+  ctx.restore();
 }
 
 export function paintWideSolarRays(ctx: CanvasRenderingContext2D, size: number, sun: {x:number;y:number;radius:number}, seed: number) {
