@@ -457,6 +457,11 @@
 - [x] Flatten seven colors and starlight to one private rear canvas and composite once at fixed 14% (maximum allowed 18%) over #020208; remove emissive transfer and foreground dust, reset foreground alpha to 1 and add an 8% rear vignette.
 - [x] Verify 28 focused regression/astronomy/optics/typography tests and clean build diagnostics; visually inspect live/fullscreen and actual 2048×2048 PNG with no page errors. Uses synthetic guest birth input and development VIP preview, not verified paid membership; export still requires waiting. Geometry, Earth/Moon calculations, direct labels and gates remain unchanged.
 
+## Dense VIP starlight and seven-color silk
+- [x] Replace sparse rear stars with 14,500 deterministic distant grains, 2,400 clustered middle stars and 84 diamond-ray highlights.
+- [x] Add fine seven-color silk/auroral filaments inside the single 14% rear composite; preserve all foreground calculations and exports. Overall threads receive greater intensity; no blur, smoke or additional foreground overlays.
+- [x] Verify 33 passing regression tests and clean build diagnostics; visually inspect live/fullscreen and actual 2048 PNG twice. First review found stars too fine at display size; strengthen native-size grains and threads without increasing composite opacity, then recheck. No page errors. Tests used a synthetic guest profile and development VIP preview, not verified paid membership; color/starlight remains deliberately restrained at the retained 14% cap and saving requires waiting. Non-Japanese/mobile checks not repeated.
+
 ## Luminous original cosmic fantasy and natural Moon scale
 - [x] Open seven-color translucent depths and screen light, Overall foremost, without changing the foreground artwork or imitating a named artist.
 - [x] Restore the true Earth/Moon radius ratio and compress their separation while preserving birth-distance variation, direction and lunar optics; update seven-language scale captions.

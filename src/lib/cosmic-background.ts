@@ -32,6 +32,44 @@ const rgb = (hex: string) => {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 };
 
+export type CosmicStarDepth = 'dust' | 'cluster' | 'diamond';
+export const COSMIC_STAR_COUNTS = { dust: 14500, cluster: 2400, diamond: 84 } as const;
+
+/** Normalized, birth-seeded imaginary stars: not a catalogue or a natal sky map. */
+export function cosmicStar(depth: CosmicStarDepth, index: number, seed: number) {
+  const salt = seed + (depth === 'dust' ? 401 : depth === 'cluster' ? 701 : 1103);
+  let u = random(index, 3, salt), v = random(index, 7, salt);
+  if (depth === 'dust' && index % 3 !== 0) {
+    // A finely resolved flowing stellar river, not a broad painted stripe.
+    v = .18 + .48 * u + Math.sin(u * 5.1 + random(1, 2, seed) * .7) * .13
+      + (random(index, 13, salt) + random(index, 17, salt) - 1) * .12;
+  } else if (depth === 'cluster' && index % 3 !== 0) {
+    const group = index % 11;
+    const a = random(index, 23, salt) * Math.PI * 2;
+    const r = random(index, 29, salt) ** 1.5 * .052;
+    u = .09 + random(group, 31, salt) * .82 + Math.cos(a) * r;
+    v = .08 + random(group, 37, salt) * .84 + Math.sin(a) * r * .7;
+  }
+  const quiet = spaceComposition(u, v, seed).quiet;
+  const shine = random(index, 11, salt);
+  return { u, v, quiet, shine, role: index % 7,
+    radius: depth === 'dust' ? .00024 + shine * .00036 : depth === 'cluster' ? .00048 + shine ** 3 * .0007 : .0008 + shine * .00075,
+    alpha: (depth === 'dust' ? .6 + shine * .4 : depth === 'cluster' ? .75 + shine * .25 : 1) * quiet };
+}
+
+/** Fine independent silk folds, with all seven color roles and Overall longest. */
+export function cosmicFilament(t: number, role: number, thread: number, seed: number) {
+  const drift = random(1, 2, seed) * .7;
+  const u = .025 + t * .95;
+  const crest = .18 + .48 * u + Math.sin(u * 5.1 + drift) * .13;
+  const v = crest + (role - 3) * .027 + (thread - 11) * .0017
+    + Math.sin(t * 11 + role * .8 + thread * .06 + drift) * .014
+    + Math.sin(t * 27 + role * .9) * .0025;
+  const taper = Math.sin(Math.PI * t) ** .7;
+  const quiet = spaceComposition(u, v, seed).quiet;
+  return { u, v, alpha: taper * quiet * (role === 0 ? .88 : .64) * (.55 + .45 * Math.sin(thread * 1.7 + 1) ** 2) };
+}
+
 /** Normalized composition: sweeping depth around a restful solar heart, not seven stripes. */
 export function spaceComposition(u: number, v: number, seed: number) {
   const drift = random(1, 2, seed) * .7;
@@ -66,7 +104,7 @@ export function spacePaintingPixels(size: number, colors: readonly string[], see
       const local = (first[c] ?? 0) * (1 - blend) + (next[c] ?? 0) * blend;
       const pigment = (overall[c] ?? 0) * .5 + local * .4 + (underlight[c] ?? 0) * .1;
       // Quiet pigment only: no emissive screen transfer, gas or white-hot crests.
-      const depth = .35 + s.light * .65;
+      const depth = .08 + s.light * .28;
       pixels[i + c] = (base[c] ?? 0) * (1 - depth) + pigment * depth;
     }
     pixels[i + 3] = 255;
@@ -89,19 +127,48 @@ export function paintBirthColorSpace(ctx: CanvasRenderingContext2D, size: number
   image.data.set(spacePaintingPixels(size, palette, seed, ink, pearl));
   rear.putImageData(image, 0, 0);
   rear.globalCompositeOperation = 'screen';
-  // Varied, restrained star light gives scale to the continuous colored depths.
-  for (let i = 0; i < 2100; i++) {
-    const u = random(i, 3, seed), v = random(i, 7, seed);
-    const shine = random(i, 11, seed);
-    const quiet = spaceComposition(u, v, seed).quiet;
-    const radius = size * (.00018 + shine ** 9 * .00072);
-    rear.fillStyle = i % 11 ? pearl : palette[i % 7] ?? pearl;
-    rear.globalAlpha = (.1 + shine ** 3 * .62) * quiet;
-    rear.beginPath(); rear.arc(u * size, v * size, radius, 0, Math.PI * 2); rear.fill();
-    if (shine > .993) {
-      rear.globalAlpha *= .28; rear.strokeStyle = pearl; rear.lineWidth = size * .00032;
-      rear.beginPath(); rear.moveTo(u * size - radius * 3.5, v * size); rear.lineTo(u * size + radius * 3.5, v * size);
-      rear.moveTo(u * size, v * size - radius * 3.5); rear.lineTo(u * size, v * size + radius * 3.5); rear.stroke();
+  // Every luminous stitch stays on the private rear canvas. No blur or glow wash.
+  for (let role = 6; role >= 0; role--) for (let thread = 0; thread < 23; thread++) {
+    rear.strokeStyle = palette[role] ?? pearl;
+    rear.lineWidth = size * (role === 0 ? .00095 : .00065);
+    for (let segment = 0; segment < 12; segment++) {
+      const mid = cosmicFilament((segment + .5) / 12, role, thread, seed);
+      rear.globalAlpha = mid.alpha;
+      rear.beginPath();
+      for (let step = 0; step <= 16; step++) {
+        const p = cosmicFilament((segment + step / 16) / 12, role, thread, seed);
+        if (step) rear.lineTo(p.u * size, p.v * size); else rear.moveTo(p.u * size, p.v * size);
+      }
+      rear.stroke();
+    }
+  }
+  for (const depth of ['dust', 'cluster', 'diamond'] as const) {
+    for (let i = 0; i < COSMIC_STAR_COUNTS[depth]; i++) {
+      const star = cosmicStar(depth, i, seed);
+      const x = star.u * size, y = star.v * size, r = star.radius * size;
+      rear.fillStyle = i % 5 ? pearl : palette[star.role] ?? pearl;
+      rear.globalAlpha = star.alpha;
+      rear.beginPath();
+      if (depth === 'dust') {
+        // Angular subpixel grains keep the far field crystalline rather than dotted.
+        rear.moveTo(x, y - r); rear.lineTo(x + r * .65, y);
+        rear.lineTo(x, y + r); rear.lineTo(x - r * .65, y);
+      } else rear.arc(x, y, r, 0, Math.PI * 2);
+      rear.fill();
+      if (depth === 'diamond') {
+        rear.strokeStyle = pearl;
+        // Tapered diffraction rays, with a minute secondary cross; no blurry disks.
+        for (let ray = 0; ray < 4; ray++) {
+          const a = ray * Math.PI / 2 + .16;
+          for (let band = 0; band < 3; band++) {
+            const reach = r * (2 + band * 2.4);
+            rear.globalAlpha = star.alpha * (.64 / (band + 1));
+            rear.lineWidth = size * (.00046 / (band + 1));
+            rear.beginPath(); rear.moveTo(x, y);
+            rear.lineTo(x + Math.cos(a) * reach, y + Math.sin(a) * reach); rear.stroke();
+          }
+        }
+      }
     }
   }
   ctx.fillStyle = ink; ctx.fillRect(0, 0, size, size);
