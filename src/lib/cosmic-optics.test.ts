@@ -32,11 +32,14 @@ describe('Lunar spherical optics and ranked gas', () => {
     expect(pixels).not.toEqual(deepNebulaPixels(colors,43,128));
     const observed=new Set<string>(); let quiet=0;
     for(let i=0;i<pixels.length;i+=4) {
-      expect(pixels[i+3]).toBeLessThanOrEqual(62);
+      expect(pixels[i+3]).toBeLessThanOrEqual(133);
       if((pixels[i+3]??0)>0) observed.add(Array.from(pixels.slice(i,i+3)).join(','));
       if((pixels[i+3]??0)<3) quiet++;
     }
     expect(observed.size).toBe(7);
-    expect(quiet).toBeGreaterThan(128*128*.45);
+    expect(quiet).toBeGreaterThan(128*128*.15);
+    expect(quiet).toBeLessThan(128*128*.65);
+    const visible=Array.from(pixels).filter((v,i)=>i%4===3&&v>25).length;
+    expect(visible).toBeGreaterThan(128*128*.06);
   });
 });
