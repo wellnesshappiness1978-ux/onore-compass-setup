@@ -13,11 +13,12 @@ import { COSMIC_GUARDIANS, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicCo
 import type { CosmicGenesis, CosmicPlanetId, EarthView } from "@/lib/cosmic-astronomy";
 import { daylight, eclipticNorthView, latLonVector, orthoBasis, projectOrtho, unprojectOrtho, vectorLatLon, type Vec3 } from "@/lib/earth-globe";
 import type { Language } from "@/lib/translations";
-import { goldenShellRadius, paintEngravedRing, paintNautilusPartitions } from "@/lib/art-craft";
+import { goldenShellRadius, paintGoldLeafArabesque, paintNautilusPartitions } from "@/lib/art-craft";
 import type { Capture } from "./MandalaCanvas";
 import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
 import { paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
-import { paintCosmicBackground, prepareCosmicForeground } from "@/lib/cosmic-background";
+import { COSMIC_BACKGROUND_OPACITY, paintCosmicBackground, prepareCosmicForeground } from "@/lib/cosmic-background";
+import { paintCosmicSilence } from "@/lib/cosmic-contrast";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
@@ -217,7 +218,7 @@ function paintAstrolabeFrame(ctx: CanvasRenderingContext2D, size: number, seed: 
     ctx.strokeStyle = awakened ? "rgba(255,243,198,.96)" : "rgba(255,233,169,.52)"; ctx.lineWidth = Math.max(1, size * .00055); ctx.beginPath(); ctx.arc(x, y, size * (awakened ? .0058 : .0042), 0, Math.PI * 2); ctx.stroke();
   }
   ctx.save(); ctx.translate(-frame.x, -frame.y);
-  paintEngravedRing(ctx, frame.x, frame.y, frame.innerRadius + size * .002, frame.outerRadius - size * .002, size);
+  paintGoldLeafArabesque(ctx, frame.x, frame.y, frame.innerRadius + size * .002, frame.outerRadius - size * .002, size);
   paintNautilusPartitions(ctx, frame.x, frame.y, frame.innerRadius, frame.outerRadius, size, colors);
   ctx.restore();
   ctx.save(); ctx.beginPath(); ctx.arc(0, 0, frame.outerRadius - size * .001, 0, Math.PI * 2); ctx.arc(0, 0, frame.innerRadius + size * .001, 0, Math.PI * 2, true); ctx.clip("evenodd");
@@ -709,7 +710,10 @@ function paintBirthMoon(ctx: CanvasRenderingContext2D, moon: CosmicMoonPlacement
   const labelX = Math.max(size * .025, Math.min(size * .975, moon.x + side * radius * 1.35));
   ctx.textAlign = side > 0 ? "left" : "right";
   const distanceLabel: Record<Language, string> = { ja: "距離圧縮", en: "distance compressed", "zh-CN": "距离压缩", "zh-TW": "距離壓縮", ko: "거리 축소", es: "distancia comprimida", fr: "distance comprimée" };
-  paintCosmicText(ctx, size, `${MOON_LABELS[language]} ${Math.round(moon.phaseFraction * 100)}% · ${distanceLabel[language]}`, labelX, moon.y - radius * 1.7, 'data', size * .17);
+  const fullLight: Record<Language, string> = { ja: "全光表現", en: "full-light art", "zh-CN": "全光艺术", "zh-TW": "全光藝術", ko: "전광 예술", es: "arte de luz plena", fr: "art en pleine lumière" };
+  const actualPhase: Record<Language, string> = { ja: "実月相", en: "birth phase", "zh-CN": "实际月相", "zh-TW": "實際月相", ko: "실제 위상", es: "fase natal", fr: "phase natale" };
+  paintCosmicText(ctx, size, `${MOON_LABELS[language]} · ${fullLight[language]}`, labelX, moon.y - radius * 1.7, 'data', size * .20);
+  paintCosmicText(ctx, size, `${actualPhase[language]} ${Math.round(moon.phaseFraction * 100)}% · ${distanceLabel[language]}`, labelX, moon.y - radius * 1.7 + size * .013, 'data', size * .20);
   ctx.restore();
 }
 
@@ -752,6 +756,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   const art = assets ?? await loadArt();
   // The fixed uploaded painting is identical in live view and PNG captures.
   paintCosmicBackground(ctx, size, art.field);
+  paintCosmicSilence(ctx, solar, placements);
   prepareCosmicForeground(ctx);
   paintCompassInlay(ctx, size);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);
@@ -759,7 +764,6 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   paintGuardian(ctx, size, genesis);
   const earth = cosmicEarthPortrait(size);
   paintOrbitalField(ctx, size, solar, placements);
-  paintOrbitSilence(ctx, size, placements);
   paintWideSolarRays(ctx, size, solar, genesis.seed + 8100);
   paintAstrolabeFrame(ctx, size, genesis.seed + 11800, roles.prominence, genesis);
   const surrounding = placements.slice().sort((a, b) => a.depth - b.depth);
