@@ -94,7 +94,7 @@ export function interstellarSample(u: number, v: number, seed: number) {
   const laneNoise = valueNoise(x * 2.3 - warp, y * 2.3, seed + 211);
   const extinction = Math.min(1, Math.max(0, (laneNoise - .54) * 22));
   const quiet = Math.min(1, Math.hypot(u - .5, v - .47) / .4) ** 1.6;
-  const density = Math.max(0, (base - .38) * 1.8);
+  const density = Math.max(0, (base - .34) * 2.4);
   const emission = Math.min(1, (density ** 2 * .3 + fiber * density * (1.2 + detail * .8)) * quiet) * (1 - extinction * .97);
   return { emission, extinction, core: fiber ** 3 * density * quiet * (1 - extinction), role: Math.min(6, Math.floor(valueNoise(x * .4 + 9, y * .4 - 4, seed + 77) * 7)), quiet };
 }
