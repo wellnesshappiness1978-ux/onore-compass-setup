@@ -16,7 +16,7 @@ import { goldenShellRadius, paintEngravedRing, paintNautilusPartitions } from "@
 import type { Capture } from "./MandalaCanvas";
 import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
 import { COSMIC_NEBULA_WEIGHTS, deepNebulaPixels, paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
-import { paintFantasyDepth } from "@/lib/cosmic-fantasy";
+import { paintFantasyDepth, paintInterstellarMedium } from "@/lib/cosmic-fantasy";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
