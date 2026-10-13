@@ -462,10 +462,9 @@
 - [x] Add fine seven-color silk/auroral filaments inside the single 14% rear composite; preserve all foreground calculations and exports. Overall threads receive greater intensity; no blur, smoke or additional foreground overlays.
 - [x] Verify 33 passing regression tests and clean build diagnostics; visually inspect live/fullscreen and actual 2048 PNG twice. First review found stars too fine at display size; strengthen native-size grains and threads without increasing composite opacity, then recheck. No page errors. Tests used a synthetic guest profile and development VIP preview, not verified paid membership; color/starlight remains deliberately restrained at the retained 14% cap and saving requires waiting. Non-Japanese/mobile checks not repeated.
 
-## Native photorealistic cosmic background replacement
 ## Seven screen emitters and cross-spark replacement
 - [x] Remove the old volumetric pixel background and replace it with seven exact-color radial screen nodes, 4,800 crystalline grains and four-ray principal stars with birth-color halos; user explicitly removed the prior 18% cap.
-- [ ] Verify regressions, vivid live/fullscreen artwork and actual 2048 PNG while preserving foreground astronomy, privacy and VIP gates.
+- [x] Verify 31 focused regressions, clean build diagnostics, vivid live/fullscreen artwork and actual 2048 PNG with no page errors; foreground astronomy, privacy and VIP gate code unchanged. Synthetic guest profile and development VIP preview used, not paid entitlement verification; non-Japanese and other birthplace checks not repeated, high-resolution saving still requires waiting.
 
 ## Native photorealistic cosmic background replacement
 - [x] Replace the entire background engine with seeded domain-warped pixel emission, sharp extinction fibers and 22,400 irregular crystalline stars using all seven exact colors; leave foreground and access unchanged. Retain the previously required single 14% composite, so final background colors deliberately remain subdued.
