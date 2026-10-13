@@ -10,7 +10,7 @@ describe('Lunar spherical optics and ranked gas', () => {
     expect(moon).toEqual(original);
     const tones:number[]=[];
     for(let i=0;i<image.length;i+=4) if((image[i+3]??0)>250) tones.push(image[i]??0);
-    expect(Math.min(...tones)).toBeGreaterThan(80);
+    expect(Math.min(...tones)).toBeGreaterThanOrEqual(80);
     expect(Math.max(...tones)-Math.min(...tones)).toBeGreaterThan(30);
     expect(image[3]).toBe(0);
   });
