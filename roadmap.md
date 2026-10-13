@@ -411,3 +411,8 @@
 - [x] Remove every text plaque and comparison backing; apply scaled champagne lettering, subtle shadows and straight fine leaders.
 - [x] Preserve existing craft, astronomy, gates and local rendering; add opt-in birth engraving and Julian day without changing private commemorative IDs.
 - [x] Verify all five actual downloads for both artworks, 1440×2560 clock-safe wallpaper, 2048 square artwork, default-private disclosure reset, desktop/mobile/fullscreen and clean diagnostics. Checks used the development VIP preview; actual billing entitlements and native device-share destinations remain unverified.
+
+## Cosmic Genesis lunar realism and radiant birth-color space
+- [ ] Refine birth Moon surface, physical Earth/Moon size ratio and calculated phase orientation.
+- [ ] Replace the white-arch background with dense ranked seven-color gas and broad solar filaments.
+- [ ] Verify astronomy, live rendering and actual 2048 export while preserving direct lettering and VIP gates.
