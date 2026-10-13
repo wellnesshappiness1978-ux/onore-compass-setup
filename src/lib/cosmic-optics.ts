@@ -2,6 +2,31 @@ import type { CosmicMoonPlacement } from './cosmic-art';
 
 export const COSMIC_NEBULA_WEIGHTS = [1, .82, .68, .54, .43, .3, .24] as const;
 
+/** Separate gas islands, never a spatial rainbow ramp. RGB retains the exact input;
+ * optical depth alone moderates its appearance against the shared space ink. */
+export function deepNebulaPixels(colors: readonly string[], seed: number, diameter: number) {
+  const pixels = new Uint8ClampedArray(diameter * diameter * 4);
+  const channels = colors.map(color => [1, 3, 5].map(i => parseInt(color.slice(i, i + 2), 16)));
+  const anchors = [[.28,.58],[.74,.31],[.68,.76],[.22,.2],[.86,.58],[.12,.8],[.52,.1]];
+  for (let y = 0; y < diameter; y++) for (let x = 0; x < diameter; x++) {
+    const u = x / diameter, v = y / diameter;
+    const warp = Math.sin(u * 11 + v * 7 + seed % 19) * .035 + Math.sin(v * 23 - u * 13) * .018;
+    const wisps = Math.max(0, .36 + .25 * Math.sin(u * 37 + v * 29 + warp * 45) + .18 * Math.sin(u * 83 - v * 67) + .12 * Math.sin(u * 173 + v * 139));
+    let strongest = 0, role = 0;
+    anchors.forEach(([ax = 0, ay = 0], index) => {
+      const dx = (u - ax + warp) / .19, dy = (v - ay - warp) / .105;
+      const density = Math.exp(-(dx * dx + dy * dy) * 1.8) * (COSMIC_NEBULA_WEIGHTS[index] ?? .24);
+      if (density > strongest) { strongest = density; role = index; }
+    });
+    // Fine extinction lanes interrupt the gas without circular masks or white veils.
+    const extinction = .35 + .65 * Math.abs(Math.sin(u * 19 - v * 31 + warp * 80));
+    const pixel = (y * diameter + x) * 4;
+    for (let channel = 0; channel < 3; channel++) pixels[pixel + channel] = channels[role]?.[channel] ?? 0;
+    pixels[pixel + 3] = 255 * Math.min(.24, strongest * wisps * extinction * .42);
+  }
+  return pixels;
+}
+
 /** Earth-facing spherical illumination: no fake atmosphere or phase-gradient shortcuts. */
 export function lunarLightNormal(phaseAngle: number, lightAngle: number) {
   const phase = phaseAngle * Math.PI / 180;
