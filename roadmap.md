@@ -67,8 +67,8 @@
 - [x] Refine SNS card/modal: midnight portrait PNG, localized readings, tier-safe palettes and save/share fallback; verified guest 1080×1920 exports on all five plans, JP/EN/繁體 cards and mobile layout. Native app destination selection remains device-dependent.
 
 ## Current VIP finishing request
-- [ ] Add Sun visibility-scale note, move detail Earth beyond the ring, double display glow and birthplace beacon, remove its axial dotted guide.
-- [ ] Refine ring filigree, soften Jupiter/Saturn rear cavities locally, sharpen gold leader endpoints; verify tests, live/fullscreen and 2048 export.
+- [x] Add seven-language Sun visibility-scale note, move detail Earth and cradle beyond the ring, double display exposure/glow and birthplace gem/ring radii, remove its axial dotted guide without altering astronomical daylight.
+- [x] Refine clipped hairline ring filigree, soften Jupiter/Saturn rear cavities with bounded exact-color dust/filaments outside solar silence, sharpen gold leader endpoints. Verified 38 tests, build OK, live/fullscreen and actual 2048×2048 PNG (8.6 MB), no page errors. Synthetic guest/development VIP preview, not paid entitlement verification; native sharing remains device-dependent.
 
 ## Current update
 - [x] Fix selected design application and add palette previews, theme fonts and lock badges across 19 themes.
