@@ -31,3 +31,4 @@
 
 - Artwork records compose the existing private local captures through one shared certificate renderer; disclosure starts off on every open, scientific birth captions are suppressed in shared captures, and random commemorative IDs never derive from personal data. Why: optional birth details must not leak through embedded artwork labels.
 - Craft modules hold deterministic guilloche, nacre and enamel layers separately from astronomical positions and birth-color calculations. Why: visual refinement must not alter personal signals or scientific geometry.
+- Cosmic optics owns seeded gas, perimeter solar rays and spherical lunar albedo lighting; lunar direction, pole and libration come from the astronomy snapshot and Moon radius uses orbital Earth's physical ratio. Why: keep local live/export rendering identical without bitmap mask artifacts or fictional lunar atmosphere.

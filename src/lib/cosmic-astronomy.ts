@@ -117,9 +117,8 @@ export function cosmicGenesis(date: string, time: string, unknown: boolean): Cos
   const east = { x: -normal.y / eastLength, y: normal.x / eastLength, z: 0 };
   const north = { x: -normal.z * east.y, y: normal.z * east.x, z: eastLength };
   const projectAngle = (vector: { x: number; y: number; z: number }) => Math.atan2(-(vector.x * north.x + vector.y * north.y + vector.z * north.z), vector.x * east.x + vector.y * east.y);
-  const lunarSun = { x: illumination.hc.x - moonVector.x, y: illumination.hc.y - moonVector.y, z: illumination.hc.z - moonVector.z };
   // hc is heliocentric Moon, so its negative is the Moon-to-Sun direction.
-  lunarSun.x = -illumination.hc.x; lunarSun.y = -illumination.hc.y; lunarSun.z = -illumination.hc.z;
+  const lunarSun = { x: -illumination.hc.x, y: -illumination.hc.y, z: -illumination.hc.z };
   const libration = A.Libration(birth.instant);
   const moon: CosmicMoon = {
     longitude: lunar.lon,

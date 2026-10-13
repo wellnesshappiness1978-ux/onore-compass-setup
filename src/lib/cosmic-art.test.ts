@@ -163,6 +163,9 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(Math.hypot(moon.x - earth.x, moon.y - earth.y)).toBeCloseTo(moon.distance, 8);
     expect(moon.displayAngle).toBeCloseTo(genesis.moon.longitude, 8);
     expect(moon.phaseFraction).toBeCloseTo(genesis.moon.phaseFraction, 8);
+    expect(moon.radius / earth.radius).toBeCloseTo(1737.4 / 6371, 12);
+    expect(moon.lightAngle).toBe(genesis.moon.lightAngle);
+    expect(moon.poleAngle).toBe(genesis.moon.poleAngle);
     expect(moon.distance).toBeGreaterThan(earth.radius + moon.radius);
   });
 

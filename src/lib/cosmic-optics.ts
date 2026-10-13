@@ -32,7 +32,7 @@ export function lunarSurfacePixels(moon: Pick<CosmicMoonPlacement,'phaseAngle'|'
       const d=Math.hypot(u-crater.x,v-crater.y)/crater.r;
       if(d>1.45) continue;
       albedo-=.16*Math.exp(-d*d*3);
-      relief+=(.13*Math.exp(-((d-.91)*9)**2)-.09*Math.exp(-d*d*5))*(1+light.x*(u-crater.x)/crater.r+light.y*(v-crater.y)/crater.r);
+      relief+=(.13*Math.exp(-(((d-.91)*9)**2))-.09*Math.exp(-d*d*5))*(1+light.x*(u-crater.x)/crater.r+light.y*(v-crater.y)/crater.r);
     }
     const incidence=nx*light.x+ny*light.y+nz*light.z;
     const earthshine=.024*(1-light.z)/2;
