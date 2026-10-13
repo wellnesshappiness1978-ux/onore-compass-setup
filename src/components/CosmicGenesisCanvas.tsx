@@ -459,17 +459,6 @@ function paintOrbitalField(ctx: CanvasRenderingContext2D, size: number, solar: P
   ctx.restore();
 }
 
-function paintOrbitSilence(ctx: CanvasRenderingContext2D, size: number, placements: ReturnType<typeof cosmicPlacements>) {
-  ctx.save();
-  placements.forEach((planet) => {
-    const bodyRadius = planet.id === "saturn" ? planet.ringOuterRadius : planet.radius;
-    const quiet = ctx.createRadialGradient(planet.x, planet.y, bodyRadius * .72, planet.x, planet.y, bodyRadius * 1.28);
-    quiet.addColorStop(0, "rgba(1,3,10,.9)"); quiet.addColorStop(.62, "rgba(1,3,10,.48)"); quiet.addColorStop(1, "rgba(1,3,10,0)");
-    ctx.fillStyle = quiet; ctx.beginPath(); ctx.arc(planet.x, planet.y, bodyRadius * 1.28, 0, Math.PI * 2); ctx.fill();
-  });
-  ctx.restore();
-}
-
 function paintEarthCorrespondence(ctx: CanvasRenderingContext2D, orbitalEarth: Point, portrait: Point, orbitalRadius: number, portraitRadius: number, color: string, size: number) {
   const startAngle = Math.atan2(portrait.y - orbitalEarth.y, portrait.x - orbitalEarth.x);
   const start = { x: orbitalEarth.x + Math.cos(startAngle) * orbitalRadius * 1.2, y: orbitalEarth.y + Math.sin(startAngle) * orbitalRadius * 1.2 };
@@ -796,5 +785,5 @@ export default function CosmicGenesisCanvas({ genesis, earthView, colors, langua
     void loadArt().then(async (art) => { if (!active) return; images.current = art; if (ref.current) await paintCosmicGenesis(ref.current, stableGenesis, stableEarthView, stableColors, language, birthPlace, art); if (active) onCaptureRef.current(capture); }).catch(() => { if (active) onCaptureRef.current(null); });
     return () => { active = false; onCaptureRef.current(null); };
   }, [stableGenesis, stableEarthView, stableColors, capture, language, birthPlace]);
-  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、固定の宇宙背景、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, a fixed cosmic background, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-background-opacity="1" data-background-engine="fixed-uploaded-image-v1" data-foreground-opacity="1" data-background-resolution="native" data-background-filter="none" data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="personalized-foreground-details" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="direct-champagne-gold-fine-shadow" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
+  return <canvas ref={ref} width={1024} height={1024} role="img" aria-label={language === "ja" ? "星命聖環として再構成した出生宇宙創生図。太陽、出生地球、出生月、8惑星、固定の宇宙背景、豪華な外周彫金の黄金殻模様、星座守護環、9天体実半径比較" : "Sacred stellar compass with the Sun, birth Earth and Moon, eight planets, a fixed cosmic background, opulent golden shell relief, zodiac guardian ring, and true-radius comparison"} data-cosmic-genesis data-background-opacity={COSMIC_BACKGROUND_OPACITY} data-background-engine="fixed-uploaded-image-v1" data-foreground-opacity="1" data-background-resolution="native" data-background-filter="none" data-renderer="agolmen-star-jewelry-guilloche-nacre" data-birth-color-role="personalized-foreground-details" data-guide-spokes="0" data-compass-directions="8" data-shell-relief="opulent-nautilus-outer-metalwork-only" data-celestial-layer="foreground-over-goldwork" data-label-treatment="direct-champagne-gold-black-outline" data-moon-lighting="artistic-full-light" data-rear-masks="sun-black-planet-silence" data-orbit-count="8" data-moon-count="1" data-size-comparison-count="9" data-astrolabe-ticks="72" data-zodiac-sectors="12" data-planet-count={genesis.planets.length} className="block h-full w-full object-contain" />;
 }
