@@ -54,9 +54,10 @@ export function spacePaintingPixels(size: number, colors: readonly string[], see
     for (let c = 0; c < 3; c++) {
       const local = (first[c] ?? 0) * (1 - blend) + (next[c] ?? 0) * blend;
       const pigment = (overall[c] ?? 0) * .5 + local * .4 + (underlight[c] ?? 0) * .1;
-      const gleam = Math.max(0, s.light - .38) ** 2 * .8;
+      const gleam = Math.max(0, s.light - .48) ** 2 * .28;
       // Optical screen transfer retains exact source colors while opening the deep midtones.
-      const emission = Math.min(245, pigment * s.light * 1.95 + (pearl[c] ?? 0) * gleam);
+      const exposure = 1 - Math.exp(-s.light * 2.6);
+      const emission = Math.min(215, pigment * exposure * 1.2 + (pearl[c] ?? 0) * gleam);
       pixels[i + c] = 255 - (255 - (base[c] ?? 0)) * (1 - emission / 255);
     }
     pixels[i + 3] = 255;
