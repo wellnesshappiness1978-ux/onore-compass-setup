@@ -437,3 +437,8 @@
 - [x] Refine seven-color distant morphology and corner Milky Way without changing natal positions, goldwork or labels.
 - [x] Lift textured blue-silver lunar reflected light independently of the calculated solar phase.
 - [x] Verify 29 focused tests, clean build diagnostics, desktop/mobile/fullscreen and actual 2048 PNG. Inspect lunar shadows at four phases over two palettes and actual export detail: textured blue-silver shadows remain darker than sunlight without black crush; galaxies stay behind bodies/gold. No page errors or mobile horizontal overflow. Synthetic guest profile/development VIP used, not paid entitlement verification; export still requires waiting. Non-Japanese visual reviews not repeated.
+
+## Realistic deep space and two-Earth linkage
+- [x] Birthplace-centered detail globe with overall-color beacon and true terminator
+- [x] Orbital Earth with sidereal rotation, subsolar day side and axis
+- [x] Noise-based interstellar medium with dark lanes

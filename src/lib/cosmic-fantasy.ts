@@ -70,3 +70,53 @@ export function paintFantasyDepth(ctx: CanvasRenderingContext2D, size: number, c
   }
   ctx.restore();
 }
+const hash2 = (x: number, y: number, seed: number) => unit(x * 157.31 + y * 311.7 + seed * .618);
+function valueNoise(x: number, y: number, seed: number) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const a = hash2(xi, yi, seed), b = hash2(xi + 1, yi, seed), c = hash2(xi, yi + 1, seed), d = hash2(xi + 1, yi + 1, seed);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+/** Deterministic fractal noise in 0..1, independent of output resolution. */
+export function fbm(x: number, y: number, seed: number, octaves = 5) {
+  let total = 0, amp = .5, freq = 1, norm = 0;
+  for (let o = 0; o < octaves; o++) { total += valueNoise(x * freq, y * freq, seed + o * 17) * amp; norm += amp; amp *= .5; freq *= 2.03; }
+  return total / norm;
+}
+const rgb = (hex: string) => { const n = parseInt(hex.replace('#', '').slice(0, 6), 16) || 0; return [(n >> 16) & 255, (n >> 8) & 255, n & 255] as const; };
+
+/** Photographic interstellar medium: ridged gas filaments tinted by the exact birth colors and dark absorbing lanes. */
+export function paintInterstellarMedium(ctx: CanvasRenderingContext2D, size: number, colors: readonly string[], seed: number) {
+  const grid = 192, palette = (colors.length ? colors : ['#8899cc']).map(rgb);
+  const glow = ctx.createImageData(grid, grid), dark = ctx.createImageData(grid, grid);
+  for (let y = 0; y < grid; y++) for (let x = 0; x < grid; x++) {
+    const u = x / grid * 4, v = y / grid * 4;
+    const warp = fbm(u + 3.1, v - 1.7, seed + 5) * 2.2;
+    const base = fbm(u + warp, v + warp * .6, seed);
+    const ridge = 1 - Math.abs(fbm(u * 1.8 + warp, v * 1.8, seed + 31) * 2 - 1);
+    const filament = Math.pow(ridge, 7) * base;
+    const pick = fbm(u * .55 + 9, v * .55 - 4, seed + 77) * palette.length * 1.6;
+    const c0 = palette[Math.floor(pick) % palette.length]!, c1 = palette[(Math.floor(pick) + 1) % palette.length]!, f = pick % 1;
+    const dx = x / grid - .5, dy = y / grid - .47, quiet = Math.min(1, Math.hypot(dx, dy) / .42);
+    const a = Math.min(1, (Math.pow(base, 2.4) * .55 + filament * 1.5) * (.35 + .65 * quiet)), i = (y * grid + x) * 4;
+    glow.data[i] = c0[0] + (c1[0] - c0[0]) * f; glow.data[i + 1] = c0[1] + (c1[1] - c0[1]) * f; glow.data[i + 2] = c0[2] + (c1[2] - c0[2]) * f; glow.data[i + 3] = a * 150;
+    const lane = Math.max(0, fbm(u * 1.3 - warp * .5, v * 1.3, seed + 211) - .56) * 2.6;
+    dark.data[i] = 2; dark.data[i + 1] = 3; dark.data[i + 2] = 10; dark.data[i + 3] = Math.min(1, lane) * 150 * quiet;
+  }
+  const layer = document.createElement('canvas'); layer.width = grid; layer.height = grid;
+  const l = layer.getContext('2d'); if (!l) return;
+  ctx.save(); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  l.putImageData(glow, 0, 0); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = .9; ctx.drawImage(layer, 0, 0, size, size);
+  ctx.filter = `blur(${size * .006}px)`; ctx.globalAlpha = .5; ctx.drawImage(layer, 0, 0, size, size); ctx.filter = 'none';
+  l.clearRect(0, 0, grid, grid); l.putImageData(dark, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = .8; ctx.drawImage(layer, 0, 0, size, size);
+  // Scattered starlight: tiny clusters and remnant shells kept faint.
+  ctx.globalCompositeOperation = 'screen';
+  for (let k = 0; k < 5; k++) {
+    const cx = (.08 + unit(seed + k * 41) * .84) * size, cy = (.06 + unit(seed + k * 43) * .88) * size;
+    if (Math.hypot(cx / size - .5, cy / size - .47) < .3) continue;
+    const color = colors[k % colors.length] ?? '#ffffff';
+    if (k % 2) { ctx.strokeStyle = color; ctx.lineWidth = size * .0012; ctx.globalAlpha = .18; ctx.beginPath(); ctx.ellipse(cx, cy, size * .022, size * .017, unit(seed + k) * 3, 0, Math.PI * 2); ctx.stroke(); }
+    for (let s = 0; s < 40; s++) { const r = size * .02 * unit(seed + k * 7 + s) ** 1.6, a = unit(seed + k * 9 + s * 3) * Math.PI * 2; ctx.fillStyle = s % 4 ? '#f4f1e6' : color; ctx.globalAlpha = .35 + unit(seed + s) * .5; ctx.fillRect(cx + Math.cos(a) * r, cy + Math.sin(a) * r, size * .0018, size * .0018); }
+  }
+  ctx.restore();
+}
