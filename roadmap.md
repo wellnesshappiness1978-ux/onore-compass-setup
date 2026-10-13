@@ -436,4 +436,4 @@
 ## Cosmic Genesis elegant vivid distance and lunar shadow revision
 - [x] Refine seven-color distant morphology and corner Milky Way without changing natal positions, goldwork or labels.
 - [x] Lift textured blue-silver lunar reflected light independently of the calculated solar phase.
-- [ ] Verify phase/geometry tests, desktop/mobile/fullscreen and actual 2048 PNG; inspect shadow detail and background balance.
+- [x] Verify 29 focused tests, clean build diagnostics, desktop/mobile/fullscreen and actual 2048 PNG. Inspect lunar shadows at four phases over two palettes and actual export detail: textured blue-silver shadows remain darker than sunlight without black crush; galaxies stay behind bodies/gold. No page errors or mobile horizontal overflow. Synthetic guest profile/development VIP used, not paid entitlement verification; export still requires waiting. Non-Japanese visual reviews not repeated.
