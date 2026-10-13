@@ -32,10 +32,12 @@ export function spaceComposition(u: number, v: number, seed: number) {
   const counter = Math.exp(-((v - (.76 - u * .38 + warp * .15)) ** 2) / .025);
   const quiet = .13 + .87 * (1 - Math.exp(-((u - .5) ** 2 + (v - .47) ** 2) / .043));
   const relief = Math.max(0, cloud - .27);
-  const light = (veil * (.16 + relief * 1.15) + counter * relief * .32) * quiet;
-  const fold = .4 + .6 * noise(u * 16 + warp * 3, v * 16, seed + 111);
+  // Continuous translucent depths, with luminous crests rather than isolated dark islands.
+  const mantle = .15 + cloud * .28;
+  const light = (mantle + veil * (.24 + relief * 1.35) + counter * (.12 + relief * .65)) * (.4 + .6 * quiet);
+  const fold = .62 + .38 * noise(u * 16 + warp * 3, v * 16, seed + 111);
   const role = noise(u * 2.2 + 7, v * 2.2 - 8, seed + 71) * 6;
-  return { light: Math.min(.75, light * fold), role, quiet, cloud };
+  return { light: Math.min(.9, light * fold), role, quiet, cloud };
 }
 
 export function spacePaintingPixels(size: number, colors: readonly string[], seed: number, ink: string, starlight: string) {
@@ -51,9 +53,12 @@ export function spacePaintingPixels(size: number, colors: readonly string[], see
     const i = (y * size + x) * 4;
     for (let c = 0; c < 3; c++) {
       const local = (first[c] ?? 0) * (1 - blend) + (next[c] ?? 0) * blend;
-      const pigment = (overall[c] ?? 0) * .56 + local * .32 + (underlight[c] ?? 0) * .12;
-      const gleam = Math.max(0, s.light - .22) ** 2 * .6;
-      pixels[i + c] = (base[c] ?? 0) + pigment * s.light * 1.25 + (pearl[c] ?? 0) * gleam;
+      const pigment = (overall[c] ?? 0) * .5 + local * .4 + (underlight[c] ?? 0) * .1;
+      const gleam = Math.max(0, s.light - .48) ** 2 * .28;
+      // Optical screen transfer retains exact source colors while opening the deep midtones.
+      const exposure = 1 - Math.exp(-s.light * 2.6);
+      const emission = Math.min(215, pigment * exposure * 1.2 + (pearl[c] ?? 0) * gleam);
+      pixels[i + c] = 255 - (255 - (base[c] ?? 0)) * (1 - emission / 255);
     }
     pixels[i + 3] = 255;
   }

@@ -23,7 +23,19 @@ describe('Unified seven-color space painting', () => {
     expect(spaceComposition(.1, .1, 42).quiet).toBeGreaterThan(.9);
     for (let i = 0; i < 100; i++) {
       const s = spaceComposition(i / 100, (i * 7 % 100) / 100, 42);
-      expect(s.light).toBeGreaterThanOrEqual(0); expect(s.light).toBeLessThanOrEqual(.75);
+      expect(s.light).toBeGreaterThanOrEqual(0); expect(s.light).toBeLessThanOrEqual(.9);
     }
+  });
+  it('opens the colored depths without flattening the central light hierarchy', () => {
+    const pixels = spacePaintingPixels(96, colors, 42, '#010105', '#edf5ff');
+    let black = 0, bright = 0;
+    for (let i = 0; i < pixels.length; i += 4) {
+      const maximum = Math.max(pixels[i] ?? 0, pixels[i+1] ?? 0, pixels[i+2] ?? 0);
+      if (maximum < 18) black++;
+      if (maximum > 100) bright++;
+    }
+    expect(black / (96 * 96)).toBeLessThan(.05);
+    expect(bright / (96 * 96)).toBeGreaterThan(.15);
+    expect(spaceComposition(.5, .47, 42).light).toBeLessThan(spaceComposition(.15, .35, 42).light);
   });
 });

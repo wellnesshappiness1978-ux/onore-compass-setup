@@ -452,3 +452,8 @@
 - [x] Replace all prior background passes with one freely composed, harmonious seven-color space painting, with Overall foremost; clear obsolete background prescriptions from memory and architecture rules.
 - [x] Preserve foreground astronomy, goldwork, both Earths, lunar optics, direct typography, size strip, privacy and VIP/export behavior; foreground drawing and membership logic unchanged.
 - [x] Verify 33 focused tests, clean build diagnostics, live/fullscreen and actual 2048 PNG visually, with no page errors. Synthetic guest profile and development VIP preview used, not a verified paid membership; saving requires waiting. Unrelated earlier multilingual localization task remains outside this background-only request.
+
+## Luminous original cosmic fantasy and natural Moon scale
+- [x] Open seven-color translucent depths and screen light, Overall foremost, without changing the foreground artwork or imitating a named artist.
+- [x] Restore the true Earth/Moon radius ratio and compress their separation while preserving birth-distance variation, direction and lunar optics; update seven-language scale captions.
+- [x] Verify 30 focused tests and clean build diagnostics; inspect live/fullscreen and actual 2048×2048 PNG with natural lunar grouping and retained foreground contrast. Initial review found bright crests washing out orbit lines; use bounded screen exposure and recheck. No page errors. Synthetic guest birth profile and development VIP preview used; paid membership and non-Japanese visual checks are not verified, and high-resolution saving requires waiting.

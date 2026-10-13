@@ -694,8 +694,9 @@ function paintOrbitalEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElemen
 function paintBirthMoon(ctx: CanvasRenderingContext2D, moon: CosmicMoonPlacement, earth: Point, size: number, seed: number, language: Language) {
   const radius = moon.radius;
   ctx.save();
-  ctx.strokeStyle = "rgba(238,219,154,.28)"; ctx.lineWidth = Math.max(1, size * .00045); ctx.setLineDash([size * .003, size * .003]);
-  ctx.beginPath(); ctx.moveTo(earth.x, earth.y); ctx.lineTo(moon.x, moon.y); ctx.stroke(); ctx.setLineDash([]);
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--cosmic-lunar-rim').trim(); ctx.globalAlpha = .22; ctx.lineWidth = size * .00045; ctx.setLineDash([size * .002, size * .003]);
+  const direction = Math.atan2(moon.y - earth.y, moon.x - earth.x);
+  ctx.beginPath(); ctx.moveTo(earth.x + Math.cos(direction) * radius * 4.1, earth.y + Math.sin(direction) * radius * 4.1); ctx.lineTo(moon.x - Math.cos(direction) * radius * 1.5, moon.y - Math.sin(direction) * radius * 1.5); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
   paintLunarHalo(ctx, moon, seed);
   paintLunarSurface(ctx, moon);
   ctx.globalCompositeOperation = "screen";
@@ -709,7 +710,8 @@ function paintBirthMoon(ctx: CanvasRenderingContext2D, moon: CosmicMoonPlacement
   const side = moon.x >= earth.x ? 1 : -1;
   const labelX = Math.max(size * .025, Math.min(size * .975, moon.x + side * radius * 1.35));
   ctx.textAlign = side > 0 ? "left" : "right";
-  paintCosmicText(ctx, size, `${MOON_LABELS[language]} ${Math.round(moon.phaseFraction * 100)}% · ×2.1`, labelX, moon.y - radius * 1.7, 'data', size * .16);
+  const distanceLabel: Record<Language, string> = { ja: "距離圧縮", en: "distance compressed", "zh-CN": "距离压缩", "zh-TW": "距離壓縮", ko: "거리 축소", es: "distancia comprimida", fr: "distance comprimée" };
+  paintCosmicText(ctx, size, `${MOON_LABELS[language]} ${Math.round(moon.phaseFraction * 100)}% · ${distanceLabel[language]}`, labelX, moon.y - radius * 1.7, 'data', size * .17);
   ctx.restore();
 }
 

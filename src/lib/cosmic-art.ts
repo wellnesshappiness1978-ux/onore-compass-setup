@@ -3,8 +3,8 @@ import { COSMIC_MOON_MEAN_RADIUS_KM, COSMIC_SUN_MEAN_RADIUS_KM, type CosmicGenes
 export const COSMIC_PLANET_SCALE = 0.0009;
 /** The prior 1.11 × 1.5 visibility treatment enlarged by the requested exact 1.3×. */
 export const COSMIC_PLANET_DISPLAY_MULTIPLIER = 1.11 * 1.5 * 1.3;
-/** Artistic satellite enlargement only; astronomy and physical comparison remain unchanged. */
-export const COSMIC_MOON_DISPLAY_MULTIPLIER = 2.1;
+/** Preserve the real Earth/Moon radius ratio; only their separation is compressed. */
+export const COSMIC_MOON_DISPLAY_MULTIPLIER = 1;
 export const COSMIC_BODY_RADII_KM = {
   sun: COSMIC_SUN_MEAN_RADIUS_KM,
   mercury: 2439.7,
@@ -157,7 +157,10 @@ export function cosmicMoonPlacement(genesis: CosmicGenesis, size: number, earth?
   if (!orbitalEarth) return null;
   const displayAngle = degrees(genesis.moon.longitude + cosmicComposition(genesis, size).rotation);
   const angle = displayAngle * Math.PI / 180;
-  const distance = size * .078;
+  // Mean lunar separation is 60.3 Earth radii: compress it to a readable satellite grouping.
+  // Retain the actual birth-distance variation without moving Earth's heliocentric position.
+  const birthDistanceRatio = genesis.moon.distanceAu / (384400 / 149597870.7);
+  const distance = orbitalEarth.radius * 2.15 * birthDistanceRatio;
   return {
     x: orbitalEarth.x + Math.cos(angle) * distance,
     y: orbitalEarth.y + Math.sin(angle) * distance,
