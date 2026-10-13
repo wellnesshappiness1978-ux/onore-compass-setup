@@ -453,6 +453,10 @@
 - [x] Preserve foreground astronomy, goldwork, both Earths, lunar optics, direct typography, size strip, privacy and VIP/export behavior; foreground drawing and membership logic unchanged.
 - [x] Verify 33 focused tests, clean build diagnostics, live/fullscreen and actual 2048 PNG visually, with no page errors. Synthetic guest profile and development VIP preview used, not a verified paid membership; saving requires waiting. Unrelated earlier multilingual localization task remains outside this background-only request.
 
+## Fixed background opacity and crisp foreground
+- [x] Flatten seven colors and starlight to one private rear canvas and composite once at fixed 14% (maximum allowed 18%) over #020208; remove emissive transfer and foreground dust, reset foreground alpha to 1 and add an 8% rear vignette.
+- [x] Verify 28 focused regression/astronomy/optics/typography tests and clean build diagnostics; visually inspect live/fullscreen and actual 2048×2048 PNG with no page errors. Uses synthetic guest birth input and development VIP preview, not verified paid membership; export still requires waiting. Geometry, Earth/Moon calculations, direct labels and gates remain unchanged.
+
 ## Luminous original cosmic fantasy and natural Moon scale
 - [x] Open seven-color translucent depths and screen light, Overall foremost, without changing the foreground artwork or imitating a named artist.
 - [x] Restore the true Earth/Moon radius ratio and compress their separation while preserving birth-distance variation, direction and lunar optics; update seven-language scale captions.

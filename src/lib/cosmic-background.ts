@@ -1,4 +1,15 @@
-/** One private, seeded space painting. Color roles never change natal calculations. */
+/** One private, seeded rear layer. Color roles never change natal calculations. */
+export const COSMIC_BACKGROUND_OPACITY = 0.14;
+export const COSMIC_BACKGROUND_MAX_OPACITY = 0.18;
+export const COSMIC_FOREGROUND_OPACITY = 1;
+export const COSMIC_REAR_VIGNETTE_OPACITY = 0.08;
+
+export function prepareCosmicForeground(ctx: CanvasRenderingContext2D) {
+  ctx.globalAlpha = COSMIC_FOREGROUND_OPACITY;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.filter = 'none';
+  ctx.shadowBlur = 0;
+}
 const random = (x: number, y: number, seed: number) => {
   let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(seed | 0, 1274126177);
   h = Math.imul(h ^ (h >>> 13), 1274126177);
@@ -54,11 +65,9 @@ export function spacePaintingPixels(size: number, colors: readonly string[], see
     for (let c = 0; c < 3; c++) {
       const local = (first[c] ?? 0) * (1 - blend) + (next[c] ?? 0) * blend;
       const pigment = (overall[c] ?? 0) * .5 + local * .4 + (underlight[c] ?? 0) * .1;
-      const gleam = Math.max(0, s.light - .48) ** 2 * .28;
-      // Optical screen transfer retains exact source colors while opening the deep midtones.
-      const exposure = 1 - Math.exp(-s.light * 2.6);
-      const emission = Math.min(215, pigment * exposure * 1.2 + (pearl[c] ?? 0) * gleam);
-      pixels[i + c] = 255 - (255 - (base[c] ?? 0)) * (1 - emission / 255);
+      // Quiet pigment only: no emissive screen transfer, gas or white-hot crests.
+      const depth = .35 + s.light * .65;
+      pixels[i + c] = (base[c] ?? 0) * (1 - depth) + pigment * depth;
     }
     pixels[i + 3] = 255;
   }
@@ -71,24 +80,36 @@ export function paintBirthColorSpace(ctx: CanvasRenderingContext2D, size: number
   const pearl = css.getPropertyValue('--cosmic-star-core').trim();
   const palette = birthColorPalette(colors, pearl);
   ctx.save(); ctx.filter = 'none'; ctx.shadowBlur = 0; ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
-  const image = ctx.createImageData(size, size);
+  // Flatten colors and stars privately, then composite ONCE: overlaps cannot
+  // accumulate past the fixed opacity. putImageData ignores globalAlpha.
+  const layer = document.createElement('canvas'); layer.width = size; layer.height = size;
+  const rear = layer.getContext('2d');
+  if (!rear) throw new Error('Background canvas unavailable');
+  const image = rear.createImageData(size, size);
   image.data.set(spacePaintingPixels(size, palette, seed, ink, pearl));
-  ctx.putImageData(image, 0, 0);
-  ctx.globalCompositeOperation = 'screen';
+  rear.putImageData(image, 0, 0);
+  rear.globalCompositeOperation = 'screen';
   // Varied, restrained star light gives scale to the continuous colored depths.
   for (let i = 0; i < 2100; i++) {
     const u = random(i, 3, seed), v = random(i, 7, seed);
     const shine = random(i, 11, seed);
     const quiet = spaceComposition(u, v, seed).quiet;
     const radius = size * (.00018 + shine ** 9 * .00072);
-    ctx.fillStyle = i % 11 ? pearl : palette[i % 7] ?? pearl;
-    ctx.globalAlpha = (.1 + shine ** 3 * .62) * quiet;
-    ctx.beginPath(); ctx.arc(u * size, v * size, radius, 0, Math.PI * 2); ctx.fill();
+    rear.fillStyle = i % 11 ? pearl : palette[i % 7] ?? pearl;
+    rear.globalAlpha = (.1 + shine ** 3 * .62) * quiet;
+    rear.beginPath(); rear.arc(u * size, v * size, radius, 0, Math.PI * 2); rear.fill();
     if (shine > .993) {
-      ctx.globalAlpha *= .28; ctx.strokeStyle = pearl; ctx.lineWidth = size * .00032;
-      ctx.beginPath(); ctx.moveTo(u * size - radius * 3.5, v * size); ctx.lineTo(u * size + radius * 3.5, v * size);
-      ctx.moveTo(u * size, v * size - radius * 3.5); ctx.lineTo(u * size, v * size + radius * 3.5); ctx.stroke();
+      rear.globalAlpha *= .28; rear.strokeStyle = pearl; rear.lineWidth = size * .00032;
+      rear.beginPath(); rear.moveTo(u * size - radius * 3.5, v * size); rear.lineTo(u * size + radius * 3.5, v * size);
+      rear.moveTo(u * size, v * size - radius * 3.5); rear.lineTo(u * size, v * size + radius * 3.5); rear.stroke();
     }
   }
+  ctx.fillStyle = ink; ctx.fillRect(0, 0, size, size);
+  ctx.globalAlpha = COSMIC_BACKGROUND_OPACITY;
+  ctx.drawImage(layer, 0, 0);
+  ctx.globalAlpha = COSMIC_REAR_VIGNETTE_OPACITY;
+  const vignette = ctx.createRadialGradient(size * .5, size * .47, 0, size * .5, size * .47, size * .49);
+  vignette.addColorStop(0, ink); vignette.addColorStop(.65, ink); vignette.addColorStop(1, 'transparent');
+  ctx.fillStyle = vignette; ctx.fillRect(0, 0, size, size);
   ctx.restore();
 }
