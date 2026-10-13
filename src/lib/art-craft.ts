@@ -30,7 +30,13 @@ export function paintGoldLeafArabesque(ctx:CanvasRenderingContext2D,x:number,y:n
  const foil=ctx.createLinearGradient(-outer,-outer,outer,outer);foil.addColorStop(0,shadow);foil.addColorStop(.22,gold);foil.addColorStop(.36,light);foil.addColorStop(.52,gold);foil.addColorStop(.7,shadow);foil.addColorStop(.85,light);foil.addColorStop(1,gold);
  ctx.fillStyle=foil;ctx.globalAlpha=.72;ctx.fillRect(-outer,-outer,outer*2,outer*2);
  for(let chip=0;chip<1200;chip++){const n=Math.sin(chip*78.233+11)*43758.5453,u=n-Math.floor(n),a=chip*2.399963,r=inner+width*u;ctx.save();ctx.translate(Math.cos(a)*r,Math.sin(a)*r);ctx.rotate(a+u*3);ctx.globalAlpha=.08+u*.22;ctx.fillStyle=chip%4?light:shadow;ctx.beginPath();ctx.moveTo(-size*.0012,0);ctx.lineTo(0,-size*.0008);ctx.lineTo(size*.0018,size*.0003);ctx.lineTo(0,size*.001);ctx.closePath();ctx.fill();ctx.restore();}
- for(let sector=0;sector<48;sector++)for(const side of [-1,1]){const points=arabesquePoints(inner,outer,sector,side);for(let pass=0;pass<3;pass++){ctx.beginPath();points.forEach((p,i)=>{const offset=pass===0?size*.0007:0;i?ctx.lineTo(p.x,p.y+offset):ctx.moveTo(p.x,p.y+offset);});ctx.strokeStyle=pass===0?shadow:pass===1?gold:light;ctx.globalAlpha=pass===2?.9:1;ctx.lineWidth=size*(pass===0?.0028:pass===1?.0016:.00055);ctx.stroke();}}
+  for(let sector=0;sector<48;sector++)for(const side of [-1,1]){
+   const points=arabesquePoints(inner,outer,sector,side);
+   for(let pass=0;pass<3;pass++){ctx.beginPath();points.forEach((p,i)=>{const offset=pass===0?size*.0005:0;i?ctx.lineTo(p.x,p.y+offset):ctx.moveTo(p.x,p.y+offset);});ctx.strokeStyle=pass===0?shadow:pass===1?gold:light;ctx.globalAlpha=pass===2?.92:1;ctx.lineWidth=size*(pass===0?.0018:pass===1?.00085:.0003);ctx.stroke();}
+   // Paired hairline inlay and tiny raised granules follow the same bounded scroll.
+   for(const edge of [-1,1]){ctx.beginPath();points.forEach((p,i)=>{const a=Math.atan2(p.y,p.x),shift=edge*size*.00075;i?ctx.lineTo(p.x+Math.cos(a)*shift,p.y+Math.sin(a)*shift):ctx.moveTo(p.x+Math.cos(a)*shift,p.y+Math.sin(a)*shift);});ctx.strokeStyle=edge<0?shadow:light;ctx.globalAlpha=.64;ctx.lineWidth=size*.00022;ctx.stroke();}
+   points.filter((_,i)=>i%12===0).forEach((p,i)=>{ctx.globalAlpha=.8;ctx.fillStyle=i%2?gold:light;ctx.beginPath();ctx.arc(p.x,p.y,size*.00045,0,Math.PI*2);ctx.fill();});
+  }
  ctx.restore();
 }
 export function craftPalette(){const css=getComputedStyle(document.documentElement);const get=(key:string)=>css.getPropertyValue(key).trim();return {gold:get('--craft-gold'),light:get('--craft-light'),shadow:get('--craft-shadow'),pearl:get('--craft-pearl'),aqua:get('--craft-aqua'),rose:get('--craft-rose'),ink:get('--craft-ink')};}

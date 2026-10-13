@@ -18,7 +18,7 @@ import type { Capture } from "./MandalaCanvas";
 import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
 import { paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
 import { COSMIC_BACKGROUND_OPACITY, paintCosmicBackground, prepareCosmicForeground } from "@/lib/cosmic-background";
-import { paintCosmicSilence } from "@/lib/cosmic-contrast";
+import { paintCosmicGiantDust, paintCosmicSilence } from "@/lib/cosmic-contrast";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
@@ -48,6 +48,16 @@ const SCIENCE_COPY: Record<Language, { placement: string; size: string; earth: s
   ko: { placement: "출생 순간 태양 중심 배치｜각도＝황경｜궤도＝로그 축척｜천체＝가시 축척", size: "태양과 8행성｜실제 반지름｜동일 선형 축척", earth: "출생 지구｜별도 축척 상세", reference: "시간 미상: JST 정오 기준" },
   es: { placement: "POSICIÓN HELIOCÉNTRICA NATAL · ÁNGULOS: LONGITUD · ÓRBITAS: ESCALA LOG · CUERPOS: ESCALA VISIBLE", size: "SOL + 8 PLANETAS · RADIOS REALES · UNA ESCALA LINEAL", earth: "TIERRA NATAL · DETALLE AMPLIADO", reference: "HORA DESCONOCIDA · REFERENCIA MEDIODÍA JST" },
   fr: { placement: "POSITION HÉLIOCENTRIQUE NATALE · ANGLES : LONGITUDE · ORBITES : ÉCHELLE LOG · ASTRES : ÉCHELLE VISIBLE", size: "SOLEIL + 8 PLANÈTES · RAYONS RÉELS · MÊME ÉCHELLE LINÉAIRE", earth: "TERRE NATALE · DÉTAIL AGRANDI", reference: "HEURE INCONNUE · MIDI JST DE RÉFÉRENCE" },
+};
+
+const SUN_SCALE_NOTE: Record<Language, string> = {
+  ja: "※主図内の太陽サイズは画面レイアウトおよび視認性を考慮した表現スケールとなっています",
+  en: "※ The main Sun uses a display scale chosen for layout and visibility.",
+  "zh-CN": "※主图中的太阳大小采用兼顾画面布局与可视性的表现缩尺。",
+  "zh-TW": "※主圖中的太陽大小採用兼顧畫面配置與可視性的表現縮尺。",
+  ko: "※주 도식의 태양 크기는 화면 배치와 가시성을 고려한 표현 축척입니다.",
+  es: "※ El Sol principal usa una escala visual adaptada al diseño y la legibilidad.",
+  fr: "※ Le Soleil principal utilise une échelle adaptée à la composition et à la lisibilité.",
 };
 
 function unit(seed: number) {
@@ -499,10 +509,17 @@ function paintAstronomyLabels(ctx: CanvasRenderingContext2D, size: number, genes
     const title = PLANET_LABELS[language][index] ?? planet.name;
     const radius = planet.id === "saturn" ? planet.ringOuterRadius : planet.radius;
     const edgeX = planet.x + side * (radius + size * .004);
-    const lineEnd = labelX - side * size * .15;
-    ctx.save(); ctx.strokeStyle = cosmicTextPalette().leader; ctx.lineWidth = .5 * size / 1024;
-    ctx.beginPath(); ctx.moveTo(edgeX, planet.y); ctx.lineTo(lineEnd, labelY - size * .022); ctx.stroke();
-    ctx.fillStyle = cosmicTextPalette().main; ctx.beginPath(); ctx.arc(edgeX, planet.y, size * .0013, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    const lineEnd = labelX - side * size * .012;
+    const palette = cosmicTextPalette();
+    ctx.save(); ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(edgeX, planet.y); ctx.lineTo(lineEnd, labelY - size * .022);
+    ctx.strokeStyle = palette.outline; ctx.lineWidth = 1.8 * size / 1024; ctx.stroke();
+    ctx.strokeStyle = palette.main; ctx.lineWidth = .6 * size / 1024;
+    ctx.shadowColor = palette.main; ctx.shadowBlur = 2 * size / 1024; ctx.stroke();
+    for (const point of [{ x: edgeX, y: planet.y }, { x: lineEnd, y: labelY - size * .022 }]) {
+      ctx.fillStyle = palette.main; ctx.beginPath(); ctx.arc(point.x, point.y, size * .0013, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
     ctx.textAlign = side < 0 ? "left" : "right";
     paintCosmicText(ctx, size, title, labelX, labelY - size * .022, 'name', size * .22);
     paintCosmicText(ctx, size, `${planet.longitude.toFixed(1)}°  ·  ${planet.distanceAu.toFixed(2)} AU`, labelX, labelY - size * .006, 'data', size * .22);
@@ -522,6 +539,7 @@ function paintSizeComparison(ctx: CanvasRenderingContext2D, size: number, genesi
   ctx.save();
   ctx.textAlign = "left";
   paintCosmicText(ctx, size, SCIENCE_COPY[language].size, size * .025, size * .865, 'name', size * .80);
+  paintCosmicText(ctx, size, SUN_SCALE_NOTE[language], size * .025, size * .846, 'data', size * .80);
   items.forEach((item) => {
     const image = item.id === "sun" ? assets?.sun : item.id === "earth" ? assets?.earthMap : assets?.planets[item.id];
     ctx.save(); ctx.beginPath(); ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2); ctx.clip();
@@ -537,7 +555,7 @@ function paintSizeComparison(ctx: CanvasRenderingContext2D, size: number, genesi
   ctx.restore();
 }
 
-function projectEarth(image: HTMLImageElement, radius: number, centerLat: number, centerLon: number, sun: Vec3): ProjectedEarth {
+function projectEarth(image: HTMLImageElement, radius: number, centerLat: number, centerLon: number, sun: Vec3, exposure = 1): ProjectedEarth {
   const diameter = Math.max(2, Math.ceil(radius * 2));
   const map = document.createElement("canvas"); map.width = image.width; map.height = image.height;
   const mapContext = map.getContext("2d", { willReadFrequently: true });
@@ -563,9 +581,9 @@ function projectEarth(image: HTMLImageElement, radius: number, centerLat: number
     const day = daylight(normal, sun), twilight = Math.max(0, 1 - Math.abs(day - .5) * 2);
     const limb = .78 + .22 * Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
     const lit = (.14 + .86 * day) * limb;
-    target[to] = Math.min(255, (source[from] ?? 0) * lit + twilight * 26);
-    target[to + 1] = Math.min(255, (source[from + 1] ?? 0) * lit + (1 - day) * 6 + twilight * 12);
-    target[to + 2] = Math.min(255, (source[from + 2] ?? 0) * lit + (1 - day) * 22 + twilight * 8);
+    target[to] = Math.min(255, ((source[from] ?? 0) * lit + twilight * 26) * exposure);
+    target[to + 1] = Math.min(255, ((source[from + 1] ?? 0) * lit + (1 - day) * 6 + twilight * 12) * exposure);
+    target[to + 2] = Math.min(255, ((source[from + 2] ?? 0) * lit + (1 - day) * 22 + twilight * 8) * exposure);
     target[to + 3] = 255;
   }
   globeContext.putImageData(output, 0, 0);
@@ -575,8 +593,10 @@ function projectEarth(image: HTMLImageElement, radius: number, centerLat: number
 function paintBirthplaceRadiance(ctx: CanvasRenderingContext2D, earth: Point, point: Point, radius: number, overallColor: string, seed: number) {
   const light = cosmicBirthplaceLight({ ...earth, radius }, point);
   ctx.save(); ctx.globalCompositeOperation = "screen";
-  irregularGlow(ctx, point.x, point.y, radius * .34, overallColor, .92, seed);
-  irregularGlow(ctx, point.x, point.y, radius * .16, PLATINUM, .66, seed + 19);
+  for (let pass = 0; pass < 2; pass++) {
+    irregularGlow(ctx, point.x, point.y, radius * .68, overallColor, .92, seed);
+    irregularGlow(ctx, point.x, point.y, radius * .32, PLATINUM, .66, seed + 19);
+  }
   for (let plume = 0; plume < 7; plume++) {
     const salt = seed + plume * 53;
     const angle = light.plumeAngle + (unit(salt) - .5) * .54;
@@ -601,10 +621,12 @@ function paintBirthplaceRadiance(ctx: CanvasRenderingContext2D, earth: Point, po
     ctx.fillStyle = mote % 6 ? overallColor : GOLD; ctx.globalAlpha = .12 + unit(salt + 11) * .48;
     ctx.beginPath(); ctx.arc(x, y, radius * (.002 + unit(salt + 9) ** 2 * .012), 0, Math.PI * 2); ctx.fill();
   }
-  ctx.strokeStyle = overallColor; ctx.shadowColor = overallColor; ctx.shadowBlur = radius * .05;
-  for (let ring = 0; ring < 3; ring++) { ctx.globalAlpha = .55 - ring * .15; ctx.lineWidth = Math.max(1, radius * (.008 - ring * .002)); ctx.beginPath(); ctx.arc(point.x, point.y, radius * (.05 + ring * .045), 0, Math.PI * 2); ctx.stroke(); }
-  ctx.fillStyle = overallColor; ctx.globalAlpha = .95; ctx.beginPath(); ctx.arc(point.x, point.y, radius * .024, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = PLATINUM; ctx.globalAlpha = .9; ctx.beginPath(); ctx.arc(point.x, point.y, radius * .011, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = overallColor; ctx.shadowColor = overallColor; ctx.shadowBlur = radius * .10;
+  for (let pass = 0; pass < 2; pass++) {
+    for (let ring = 0; ring < 3; ring++) { ctx.globalAlpha = .55 - ring * .15; ctx.lineWidth = Math.max(1, radius * (.008 - ring * .002)); ctx.beginPath(); ctx.arc(point.x, point.y, radius * (.10 + ring * .09), 0, Math.PI * 2); ctx.stroke(); }
+    ctx.fillStyle = overallColor; ctx.globalAlpha = .95; ctx.beginPath(); ctx.arc(point.x, point.y, radius * .048, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = PLATINUM; ctx.globalAlpha = .9; ctx.beginPath(); ctx.arc(point.x, point.y, radius * .022, 0, Math.PI * 2); ctx.fill();
+  }
   ctx.restore();
 }
 
@@ -618,16 +640,18 @@ function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | nul
   ctx.restore();
   ctx.save(); ctx.strokeStyle = "rgba(238,219,154,.34)"; ctx.lineWidth = Math.max(1, radius * .009); ctx.setLineDash([radius * .04, radius * .025]);
   ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * 1.09, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
-  irregularGlow(ctx, earth.x, earth.y, radius * 1.65, "#2c8ec7", .56, seed + 71);
-  irregularGlow(ctx, earth.x, earth.y, radius * 1.25, "#54e1d1", .34, seed + 93);
-  let birthplace = { x: earth.x, y: earth.y }, poleAngle = -Math.PI / 2;
+  const atmosphereColor = getComputedStyle(document.documentElement).getPropertyValue('--craft-aqua').trim();
+  for (let pass = 0; pass < 2; pass++) {
+    irregularGlow(ctx, earth.x, earth.y, radius * 1.65, atmosphereColor, .56, seed + 71);
+    irregularGlow(ctx, earth.x, earth.y, radius * 1.25, atmosphereColor, .34, seed + 93);
+  }
+  let birthplace = { x: earth.x, y: earth.y };
   ctx.save(); ctx.beginPath(); ctx.arc(earth.x, earth.y, radius, 0, Math.PI * 2); ctx.clip();
   ctx.fillStyle = "#062b58"; ctx.fillRect(earth.x - radius, earth.y - radius, radius * 2, radius * 2);
   if (image) {
-    const projected = projectEarth(image, radius, view.latitude, view.longitude, latLonVector(view.subsolarLatitude, view.subsolarLongitude));
+    const projected = projectEarth(image, radius, view.latitude, view.longitude, latLonVector(view.subsolarLatitude, view.subsolarLongitude), 2);
     ctx.drawImage(projected.image, earth.x - radius, earth.y - radius, radius * 2, radius * 2);
     birthplace = { x: earth.x, y: earth.y };
-    poleAngle = Math.atan2(-projected.poleScreen.y, projected.poleScreen.x);
   }
   ctx.globalCompositeOperation = "screen";
   for (let stroke = 0; stroke < 180; stroke++) {
@@ -644,9 +668,6 @@ function paintEarth(ctx: CanvasRenderingContext2D, image: HTMLImageElement | nul
   const atmosphere = ctx.createRadialGradient(earth.x, earth.y, radius * .72, earth.x, earth.y, radius * 1.17);
   atmosphere.addColorStop(0, "rgba(56,174,205,0)"); atmosphere.addColorStop(.58, "rgba(56,174,205,.03)"); atmosphere.addColorStop(.8, "rgba(84,225,209,.18)"); atmosphere.addColorStop(.91, "rgba(84,225,209,.07)"); atmosphere.addColorStop(1, "rgba(84,225,209,0)");
   ctx.fillStyle = atmosphere; ctx.beginPath(); ctx.arc(earth.x, earth.y, radius * 1.17, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-  ctx.save(); ctx.translate(earth.x, earth.y); ctx.rotate(poleAngle + Math.PI / 2);
-  ctx.strokeStyle = "rgba(238,219,154,.56)"; ctx.lineWidth = Math.max(1, radius * .012); ctx.setLineDash([radius * .06, radius * .045]);
-  ctx.beginPath(); ctx.moveTo(0, -radius * 1.22); ctx.lineTo(0, radius * 1.22); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
   paintBirthplaceRadiance(ctx, earth, birthplace, radius, overallColor, seed + 5100);
 }
 
@@ -746,6 +767,7 @@ export async function paintCosmicGenesis(canvas: HTMLCanvasElement, genesis: Cos
   // The fixed uploaded painting is identical in live view and PNG captures.
   paintCosmicBackground(ctx, size, art.field);
   paintCosmicSilence(ctx, solar, placements);
+  paintCosmicGiantDust(ctx, size, solar, placements, roles.all, genesis.seed);
   prepareCosmicForeground(ctx);
   paintCompassInlay(ctx, size);
   paintConstellation(ctx, size, genesis.sunSign, -1, genesis.seed, .95);

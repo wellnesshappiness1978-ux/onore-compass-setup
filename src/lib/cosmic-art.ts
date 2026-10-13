@@ -148,7 +148,7 @@ export function cosmicSunPlacement(_genesis: CosmicGenesis, size: number): Cosmi
 
 /** Enlarges the same orbital Earth into a birthplace-facing foreground portrait. */
 export function cosmicEarthPortrait(size: number): CosmicEarthPortrait {
-  return { x: size * .865, y: size * .135, radius: size * .058 };
+  return { x: size * .91, y: size * .085, radius: size * .058 };
 }
 
 /** Places the birth Moon beside orbital Earth using its exact geocentric ecliptic direction and phase. */

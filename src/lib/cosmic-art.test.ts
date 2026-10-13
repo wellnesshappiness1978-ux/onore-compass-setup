@@ -3,6 +3,14 @@ import { cosmicGenesis } from "./cosmic-astronomy";
 import { COSMIC_BODY_RADII_KM, COSMIC_GUARDIANS, COSMIC_ORBIT_AU, COSMIC_PLANET_DISPLAY_MULTIPLIER, cosmicAstrolabeFrame, cosmicBirthplaceLight, cosmicColorRoles, cosmicCompassIdentity, cosmicComposition, cosmicDisplayRadius, cosmicEarthPortrait, cosmicMoonPlacement, cosmicPlacements, cosmicSizeComparison, cosmicSunPlacement } from "./cosmic-art";
 
 describe("Cosmic Genesis artwork layout", () => {
+  it("keeps the entire detail Earth outside the ring and scales identically for export", () => {
+    for (const size of [1024, 2048]) {
+      const earth = cosmicEarthPortrait(size), ring = cosmicAstrolabeFrame(size);
+      expect(Math.hypot(earth.x - ring.x, earth.y - ring.y) - earth.radius * 1.34).toBeGreaterThan(ring.outerRadius);
+      expect(earth.x + earth.radius).toBeLessThan(size);
+      expect(earth.y - earth.radius).toBeGreaterThan(0);
+    }
+  });
   it("builds a readable conceptual Solar System while preserving birth longitudes", () => {
     const genesis = cosmicGenesis("1990-04-15", "08:30", false);
     expect(genesis).not.toBeNull();
@@ -20,7 +28,7 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(earth).toBeDefined();
     expect(earth?.id).toBe("earth");
     expect(earth?.displayAngle).toBeCloseTo(((earth?.longitude ?? 0) + cosmicComposition(genesis, 1024).rotation + 360) % 360, 8);
-    expect(cosmicEarthPortrait(1024)).toEqual({ x: 885.76, y: 138.24, radius: 59.392 });
+    expect(cosmicEarthPortrait(1024)).toEqual({ x: 931.84, y: 87.04, radius: 59.392 });
     expect(new Set(placements.map((planet) => `${Math.round(planet.x)},${Math.round(planet.y)}`)).size).toBe(8);
     const mercury = placements.find((planet) => planet.id === "mercury");
     const venus = placements.find((planet) => planet.id === "venus");
