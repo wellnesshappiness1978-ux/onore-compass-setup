@@ -66,8 +66,8 @@ describe('Unified seven-color space painting', () => {
   it('keeps seven sharp silk roles deterministic, bounded and tapered', () => {
     for (let role = 0; role < 7; role++) for (let thread = 0; thread < 23; thread++) {
       expect(cosmicFilament(0, role, thread, 42).alpha).toBe(0);
-      const p = cosmicFilament(.37, role, thread, 42);
-      expect(p).toEqual(cosmicFilament(758 / 2048, role, thread, 42));
+      const p = cosmicFilament(256 / 1024, role, thread, 42);
+      expect(p).toEqual(cosmicFilament(512 / 2048, role, thread, 42));
       expect(p.u).toBeGreaterThan(0); expect(p.u).toBeLessThan(1);
       expect(p.v).toBeGreaterThan(0); expect(p.v).toBeLessThan(1);
       expect(p.alpha).toBeLessThanOrEqual(.46);
