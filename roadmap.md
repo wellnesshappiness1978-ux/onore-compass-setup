@@ -416,3 +416,8 @@
 - [x] Refine birth Moon surface, physical Earth/Moon size ratio and calculated phase orientation; maria/craters are deterministic artistic albedo, not surveyed lunar imagery, and faint earthshine replaces fictional atmosphere.
 - [x] Replace the bitmap/white-arch background with dense ranked seven-color gas and broad solar filaments behind celestial bodies and goldwork.
 - [x] Verify live artwork and actual 2048 PNG download visually, 32 tests and clean build diagnostics; checks used a guest birth profile with development VIP preview, not verified paid entitlements. Headless high-resolution captures needed extended waits; literal zero-second rendering is not established.
+
+## Cosmic Genesis deep-space color harmony
+- [ ] Replace opaque rainbow fields and seven-arm ribbons with restrained, seeded deep nebulae, distant remnant dust and fine Milky Way light; preserve exact birth-color inputs and priority.
+- [ ] Keep every color phenomenon behind the goldwork and celestial bodies without changing astronomy, direct lettering, gates or exports.
+- [ ] Verify live and 2048 export visually, refine existing marks, and run focused regression tests; distinguish development preview from paid entitlement verification.
