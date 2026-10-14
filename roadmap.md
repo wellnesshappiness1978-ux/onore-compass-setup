@@ -1,7 +1,7 @@
 ## Current birth-color and appearance request
-- [ ] Replace color details with three accessible steps, six role readings, practical scene switches and seven-language copy; separate science from symbolism and preserve Free restrictions.
-- [ ] Add automatic plan-mapped visual families and isolated live fitting with motif comparisons; preserve all prices, storage, membership gates, 15 palette choices and existing audio.
-- [ ] Verify the complete guest UI flow, plan mapping, responsive fitting, localization and artwork regression tests.
+- [x] Replace color details with three accessible steps, six role readings, practical scene switches and seven-language copy; separate science from symbolism and preserve Free restrictions.
+- [x] Add automatic plan-mapped visual families and isolated live fitting with motif comparisons; preserve all prices, storage, membership gates, 15 palette choices and existing audio. The five existing membership IDs are mapped; Royal Sovereign is available as a Corporate visual specimen only because no independent Business contract exists in the current membership model.
+- [x] Verify the complete guest UI flow, six themes, selected scene, isolated VIP fitting, session-local auto preference, mobile layout and Free main-only color restriction. Japanese/English browser checks, seven-language completeness test and 39 existing/new regression tests pass; build OK. Membership writes, authenticated entitlement changes and billing are unchanged and outside this display-only request.
 
 - [x] Build the celestial home dashboard with an interactive compass and daily status.
 - [x] Add usable navigation, profile access, and notification feedback while preserving language selection.
