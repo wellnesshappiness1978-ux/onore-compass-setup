@@ -8,7 +8,7 @@ import { appearanceUiCopy } from '@/lib/appearance-ui-copy';
 import { canUseAppearance, type AppearanceSelection } from '@/lib/appearance-customization';
 import { designCopy, type Plan, type DesignMode } from '@/lib/design-modes';
 import type { Language } from '@/lib/translations';
-const familyModes: Record<AppearanceFamily, DesignMode> = { minimal: 'classic', celestial: 'aura-gold-luxe', sacred: 'masculine-luxe', harmony: 'business-night', sovereign: 'business-zero', royal: 'business-emperor' };
+const familyModes: Record<AppearanceFamily, DesignMode> = { minimal: 'classic', celestial: 'feminine', sacred: 'masculine-luxe', harmony: 'business-night', sovereign: 'business-zero', royal: 'business-emperor' };
 export function AppearanceFitting({ plan, language, selection, onSave, onModeChange, onUpgrade }: { plan: Plan; language: Language; selection: AppearanceSelection; onSave: (selection: AppearanceSelection) => void; onModeChange: (mode: DesignMode) => void; onUpgrade: () => void }) {
   const [preview, setPreview] = useState<AppearanceFamily | null>(null);
   const copy = appearanceUiCopy[language];

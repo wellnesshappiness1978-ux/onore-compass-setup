@@ -12,9 +12,9 @@ describe('localized appearance controls', () => {
       expect(Object.values(appearanceTabLabels(language)).flat().sort()).toEqual(Object.values(copy.plans).sort());
     }
   });
-  it('keeps Family celestial and Corporate independent', () => {
-    expect(appearanceForPlan('b2b')).toBe('celestial');
-    expect(appearanceForPlan('b2b-premium')).toBe('sacred');
+  it('keeps Family designs and Corporate independent', () => {
+    expect(appearanceForPlan('b2b')).toBe('harmony');
+    expect(appearanceForPlan('b2b-premium')).toBe('sovereign');
     expect(appearanceForPlan('b2b', true)).toBe('royal');
     expect(appearanceUiCopy.ja.plans.b2b).toBe('ファミリー');
     expect(appearanceUiCopy.ja.plans.free).toBe('フリー');
