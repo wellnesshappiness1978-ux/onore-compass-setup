@@ -124,7 +124,7 @@ describe("Cosmic Genesis artwork layout", () => {
     expect(jupiter.radius / earth.radius).toBeGreaterThan(4);
     planets.forEach((planet) => {
       expect(planet.radius).toBeGreaterThan(5);
-      expect(planet.radius / jupiter.radius).toBeCloseTo(Math.log1p(planet.meanRadiusKm / 8000) / Math.log1p(69911 / 8000), 12);
+      expect(planet.radius / jupiter.radius).toBeCloseTo(Math.log1p(planet.meanRadiusKm / 10000) / Math.log1p(69911 / 10000), 12);
       const doubled = cosmicPlacements(genesis, 2048).find((candidate) => candidate.id === planet.id);
       expect(doubled?.radius).toBeCloseTo(planet.radius * 2, 12);
     });

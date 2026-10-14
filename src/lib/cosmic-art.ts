@@ -79,7 +79,7 @@ function conceptualOrbitDistance(distanceAu: number) {
 /** One shared log-radius scale: preserve Jupiter's existing extent while making giant/rocky contrast clearer. The Sun is separately scaled. */
 export function cosmicDisplayRadius(meanRadiusKm: number, size: number) {
   if (meanRadiusKm === COSMIC_SUN_MEAN_RADIUS_KM) return size * .058;
-  const referenceRadiusKm = 8000;
+  const referenceRadiusKm = 10000;
   const giantRadius = size * .058 * Math.pow(COSMIC_BODY_RADII_KM.jupiter / COSMIC_SUN_MEAN_RADIUS_KM, .38);
   return giantRadius * Math.log1p(Math.max(0, meanRadiusKm) / referenceRadiusKm) / Math.log1p(COSMIC_BODY_RADII_KM.jupiter / referenceRadiusKm);
 }
