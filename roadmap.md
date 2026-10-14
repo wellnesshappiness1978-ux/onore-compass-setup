@@ -1,8 +1,8 @@
 ## Theory explanations and first-year middle-school companion voice
-- [ ] Update seven-language gravity/life and birth-color theory with affirmative, scientifically separated symbolism.
-- [ ] Enrich color essence and remove discouraging negation while preserving accurate light references.
-- [ ] Align shared AI and daily/reference prose to simple warm concrete conversation; preserve existing reading UI, astronomy, appearance and exports.
-- [ ] Run focused tests and verify updated explanations and one real AI flow.
+- [x] Update seven-language gravity/life and birth-color theory with affirmative, scientifically separated symbolism.
+- [x] Enrich color essence and remove discouraging negation while preserving accurate light references.
+- [x] Align shared AI and daily/reference prose to simple warm concrete conversation; preserve reading UI and bump the shared query version consistently. Astronomy, appearance and export logic unchanged.
+- [x] All 31 focused tests pass and latest build is OK. Signed-in theory dialog and desktop/390px color essence verified with no horizontal overflow or page errors. Real consultation returned 200 and a completed warm, concrete reply with a tomorrow step (development Standard preview used after Free usage blocked the first submission). Paid access, independent-device synchronization and a new 2048 download were not re-tested; their code is unchanged.
 ## Catchphrase, available readings and circular shell refresh
 - [x] Add personal catchphrase and approximately 400-character closing summary; show only available nonempty reading cards with tap-to-open details. Blood/sibling passages remain explicitly symbolic entertainment, not factual personality claims.
 - [x] Prioritize color qualities, refine shared 90%-circular shell jewelry and remove visible Business terminology without changing IDs or membership.
