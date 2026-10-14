@@ -18,4 +18,13 @@ describe('saved customization is independent of membership', () => {
     expect(readAppearance('broken').icons).toBe('minimal');
     expect(readDesign('constructor')).toBe('classic');
   });
+  it('unlocks exactly five cumulative decorative grades without corporate access', () => {
+    const families = ['minimal', 'celestial', 'sacred', 'harmony', 'sovereign'] as const;
+    const plans = ['free', 'standard', 'vip', 'b2b', 'b2b-premium'] as const;
+    plans.forEach((plan, index) => {
+      expect(families.map(family => canUseAppearance(plan, family))).toEqual(families.map((_, i) => i <= index));
+      expect(canUseAppearance(plan, 'royal')).toBe(false);
+    });
+    expect(readAppearance('{"background":"harmony","parts":"sovereign","icons":"royal"}')).toEqual({ background: 'harmony', parts: 'sovereign', icons: 'royal' });
+  });
 });
