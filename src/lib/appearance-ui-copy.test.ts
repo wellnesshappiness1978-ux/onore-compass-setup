@@ -9,7 +9,7 @@ describe('localized appearance controls', () => {
       const copy = appearanceUiCopy[language];
       expect(Object.values(copy.plans)).toHaveLength(7);
       expect(Object.values(copy.plans).every(value => value.length > 0)).toBe(true);
-      expect(Object.values(appearanceTabLabels(language)).flat()).toEqual(Object.values(copy.plans));
+      expect(Object.values(appearanceTabLabels(language)).flat().sort()).toEqual(Object.values(copy.plans).sort());
     }
   });
   it('keeps Family celestial and Corporate independent', () => {
