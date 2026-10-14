@@ -18,8 +18,6 @@ export default function BirthColorGuide({ profile, plan, language, onUpgrade }: 
   const copy = birthColorCopy[language];
   const full = canUse(plan, "birthColorsFull");
   if (!palette) return null;
-  const selectedColor = selected ? palette[selected] : null;
-  const selectedCopy = selected ? copy.roles[selected] : null;
 
   return <section className="border-y border-primary/25 py-7" aria-labelledby="birth-color-title">
     <div className="flex items-start gap-3"><Palette className="mt-1 size-5 shrink-0 text-primary" aria-hidden="true" /><div><h3 id="birth-color-title" className="font-serif text-xl text-primary">{copy.title}</h3><p className="mt-2 text-sm leading-7 text-muted-foreground">{copy.intro}</p></div></div>

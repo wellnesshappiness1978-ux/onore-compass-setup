@@ -2,6 +2,7 @@ import { Compass, Sparkles } from "lucide-react";
 import type { DesignMode, Plan } from "@/lib/design-modes";
 import type { AppearanceFamily } from "@/lib/appearance-families";
 import { appearanceForPlan } from "@/lib/appearance-families";
+import { AppearanceMotif } from "./AppearanceMotif";
 
 /** One miniature screen, fed by the same theme tokens as the actual dashboard. */
 export function ThemeSample({ mode, tier, name, large = false, family = appearanceForPlan(tier) }: { mode: DesignMode; tier: Plan; name: string; large?: boolean; family?: AppearanceFamily }) {
@@ -11,7 +12,7 @@ export function ThemeSample({ mode, tier, name, large = false, family = appearan
     <div className="theme-sample-content">
       <div className="theme-sample-heading"><Sparkles size={large ? 20 : 12} aria-hidden="true" /><span>{name}</span></div>
       <div className="theme-sample-body">
-        <div className="theme-sample-dial"><Compass size={large ? 52 : 30} strokeWidth={1.2} aria-hidden="true" /></div>
+        <div className="theme-sample-dial relative"><AppearanceMotif /><Compass size={large ? 52 : 30} strokeWidth={1.2} aria-hidden="true" /></div>
         <div className="theme-sample-lines" aria-hidden="true"><span /><span /><span /></div>
       </div>
       <div className="theme-sample-actions" aria-hidden="true"><span className="theme-sample-cta">✦</span><span /><span /></div>

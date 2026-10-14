@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Button } from './ui/button';
 import { Switch } from './ui/switch';
 import { ThemeSample } from './ThemeSample';
+import { AppearanceMotif } from './AppearanceMotif';
 import { appearanceFamilies, appearanceForPlan, appearanceNames, type AppearanceFamily } from '@/lib/appearance-families';
 import { colorExperienceCopy } from '@/lib/color-experience-copy';
 import type { Plan, DesignMode } from '@/lib/design-modes';
@@ -25,7 +26,7 @@ export function AppearanceFitting({ plan, mode, language, automatic, onAutomatic
         <ThemeSample mode={family === current ? mode : modes[family]} tier={tiers[family]} name={appearanceNames[family]} family={family} large />
         <p className="mt-3 text-xs leading-6 text-muted-foreground">{family === 'royal' ? copy[8] : copy[7]}</p>
         <h5 className="mt-5 text-sm text-primary">{copy[3]}</h5>
-        <div className="mt-3 grid grid-cols-3 gap-2" data-appearance={family}>{[Compass, Orbit, Gem].map((Icon, i) => <article key={i} className="appearance-part rounded-md border border-primary/25 px-2 py-4 text-center"><div className="appearance-part-icon mx-auto grid size-16 place-items-center"><Icon className="size-9 text-primary" strokeWidth={1} /></div><p className="mt-3 break-words text-[11px] leading-5">{copy[4 + i]}</p></article>)}</div>
+        <div className="mt-3 grid grid-cols-3 gap-2" data-appearance={family}>{[Compass, Orbit, Gem].map((Icon, i) => <article key={i} className="appearance-part rounded-md border border-primary/25 px-2 py-4 text-center"><div className="appearance-part-icon mx-auto grid size-16 place-items-center"><AppearanceMotif /><Icon className="size-9 text-primary" strokeWidth={1} /></div><p className="mt-3 break-words text-[11px] leading-5">{copy[4 + i]}</p></article>)}</div>
       </TabsContent>)}
     </Tabs>
     {!automatic && <Button variant="link" className="mt-4 px-0 text-xs" onClick={() => onAutomaticChange(true)}><Check className="size-4" />{copy[1]}</Button>}
