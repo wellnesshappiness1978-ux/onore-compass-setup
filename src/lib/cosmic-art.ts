@@ -76,9 +76,12 @@ function conceptualOrbitDistance(distanceAu: number) {
   return lower.ratio + (upper.ratio - lower.ratio) * progress;
 }
 
-/** One monotonic visibility scale for the central diagram; physical ratios remain exact in the comparison strip. */
+/** One shared log-radius scale: preserve Jupiter's existing extent while making giant/rocky contrast clearer. The Sun is separately scaled. */
 export function cosmicDisplayRadius(meanRadiusKm: number, size: number) {
-  return size * .058 * Math.pow(meanRadiusKm / COSMIC_SUN_MEAN_RADIUS_KM, .38);
+  if (meanRadiusKm === COSMIC_SUN_MEAN_RADIUS_KM) return size * .058;
+  const referenceRadiusKm = 8000;
+  const giantRadius = size * .058 * Math.pow(COSMIC_BODY_RADII_KM.jupiter / COSMIC_SUN_MEAN_RADIUS_KM, .38);
+  return giantRadius * Math.log1p(Math.max(0, meanRadiusKm) / referenceRadiusKm) / Math.log1p(COSMIC_BODY_RADII_KM.jupiter / referenceRadiusKm);
 }
 
 /** Keeps the Sun at the center and maps Neptune's representative orbit to one shared diagram radius. */
@@ -214,8 +217,7 @@ export function cosmicSizeComparison(genesis: CosmicGenesis, size: number): Cosm
   const ids: CosmicSizeComparison["id"][] = ["sun", "mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune"];
   const maxRadius = size * .041;
   return ids.map((id, index) => {
-    const planet = id === "sun" ? undefined : genesis.planets.find((candidate) => candidate.id === id);
-    const physicalRadiusKm = id === "sun" ? COSMIC_SUN_MEAN_RADIUS_KM : planet?.meanRadiusKm ?? COSMIC_BODY_RADII_KM[id];
+    const physicalRadiusKm = COSMIC_BODY_RADII_KM[id];
     return {
       id,
       x: size * (.065 + index * .1085),

@@ -19,6 +19,7 @@ import { cosmicTextPalette, paintCosmicText } from "@/lib/cosmic-typography";
 import { paintLunarHalo, paintLunarSurface, paintWideSolarRays } from "@/lib/cosmic-optics";
 import { COSMIC_BACKGROUND_OPACITY, paintCosmicBackground, prepareCosmicForeground } from "@/lib/cosmic-background";
 import { paintCosmicGiantDust, paintCosmicSilence } from "@/lib/cosmic-contrast";
+import { cosmicRadiusReference } from "@/lib/cosmic-radius-reference";
 
 type Props = { genesis: CosmicGenesis; earthView: EarthView; colors: string[]; language: Language; birthPlace: string; onCapture: (capture: Capture | null) => void };
 type Point = { x: number; y: number };
@@ -549,8 +550,10 @@ function paintSizeComparison(ctx: CanvasRenderingContext2D, size: number, genesi
     const planetIndex = item.id === "sun" ? -1 : genesis.planets.findIndex((planet) => planet.id === item.id);
     const name = item.id === "sun" ? SUN_LABELS[language] : PLANET_LABELS[language][planetIndex] ?? item.id;
     ctx.textAlign = "center";
-    paintCosmicText(ctx, size, name, item.x, size * .967, 'name', size * .10);
-    paintCosmicText(ctx, size, `${Math.round(item.physicalRadiusKm).toLocaleString()} km`, item.x, size * .984, 'data', size * .10);
+    const reference = cosmicRadiusReference(item.id, language, name);
+    paintCosmicText(ctx, size, reference.name, item.x, size * .955, 'name', size * .104);
+    paintCosmicText(ctx, size, reference.value, item.x, size * .974, 'name', size * .104);
+    paintCosmicText(ctx, size, reference.category, item.x, size * .991, 'name', size * .104);
   });
   ctx.restore();
 }
