@@ -3,7 +3,9 @@ import ProfileEditor from "./ProfileEditor";
 import SelfCoreCard from "./SelfCoreCard";
 import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
-import { AgolmenLoading, AgolmenLogo, SpiralLines } from "./AgolmenSpiral";
+import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
+import { NautilusIcon } from './NautilusIcon';
+import { AppearanceMotif } from './AppearanceMotif';
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -511,9 +513,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     return () => { active = false; };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
-  const [automaticAppearance, setAutomaticAppearance] = useState(true);
-  useEffect(() => { try { setAutomaticAppearance(sessionStorage.getItem("onore-appearance-auto") !== "false"); } catch { /* private browsing */ } }, []);
-  const changeAutomaticAppearance = (value: boolean) => { setAutomaticAppearance(value); try { sessionStorage.setItem("onore-appearance-auto", String(value)); } catch { /* private browsing */ } };
   useEffect(() => { try { const saved = sessionStorage.getItem("onore-design"); if (saved && designCopy.ja.names[saved as DesignMode] && canPreviewDesign(previewPlan, saved as DesignMode)) setDesignMode(saved as DesignMode); } catch { /* private browsing */ } }, []);
   useEffect(() => { try { sessionStorage.setItem("onore-design", designMode); } catch { /* private browsing */ } }, [designMode]);
   const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
@@ -535,10 +534,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
   return (
     <>
-    <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={automaticAppearance ? appearanceForPlan(previewPlan) : undefined} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
+    <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={appearanceForPlan(previewPlan)} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       {tab === "home" && <LanguageSelector language={language} onChange={onLanguageChange} />}
-      <SpiralLines className="agolmen-background-spiral pointer-events-none absolute right-[-14rem] top-20 z-0 size-[min(88vw,44rem)] text-primary sm:right-[-8rem]" />
+      <AppearanceMotif background />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
           <div className="flex h-10 items-center justify-between pr-28 sm:pr-36">
@@ -592,7 +591,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         ) : (
           <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
             <div className="mb-8 text-center">
-              <Sparkles className="mx-auto size-6 text-primary" strokeWidth={1} />
+              <NautilusIcon className="mx-auto size-12 text-primary" />
               <h2 className="mt-3 font-serif text-2xl text-gradient-gold">
                 {navigation.find((n) => n.id === tab)?.label}
               </h2>
@@ -605,7 +604,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 <section className="design-compass-section text-center" aria-label={t.today}>
                   <div className="flex items-center justify-center gap-3 text-primary/70">
                     <span className="h-px w-8 bg-primary/30" />
-                    <Sparkles className="size-3" />
+                    <NautilusIcon className="size-5" />
                     <span className="h-px w-8 bg-primary/30" />
                   </div>
                   <h2 className="mt-2 font-serif text-xl text-gradient-gold sm:text-2xl">{t.today}</h2>
@@ -646,8 +645,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 onDebugPlanChanged={(p) => setActualPlan(p)}
                 onPlanChange={applyDevOverride}
                 designMode={designMode}
-                automaticAppearance={automaticAppearance}
-                onAutomaticAppearanceChange={changeAutomaticAppearance}
                 onDesignModeChange={setDesignMode}
                 signedIn={signedIn}
                 onLanguageChange={onLanguageChange}
@@ -673,7 +670,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               aria-current={tab === item.id ? "page" : undefined}
               className={`flex h-14 min-w-0 flex-col gap-1 rounded-xl px-0.5 text-[9px] sm:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
             >
-              <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} />
+              {item.id === 'home' ? <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} /> : <NautilusIcon className="size-5 shrink-0" />}
               <span className="max-w-full whitespace-normal text-center leading-none"><span className="sm:hidden">{item.mobileLabel}</span><span className="hidden sm:inline">{item.label}</span></span>
             </Button>
           ))}
