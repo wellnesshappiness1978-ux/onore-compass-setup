@@ -1,3 +1,8 @@
+## Desktop/mobile parity and six integrated perspectives
+- [x] Contain birth-color cards and scroll long details on both widths; 320/390/1280px dialogs have no horizontal overflow and all seven colors/all three steps were exercised in development Standard preview.
+- [x] Integrate name grids and split controls into six interactive personal reading dialogs, preserving existing calculated methods and seven languages. All six real signed-in personal readings and existing name grids were opened; no personal profile edits were made.
+- [x] Verify appearance persistence across widths/reload, same-browser tab synchronization, locked previews without applying, all six views, consultation y=0 and unchanged astronomy/export regressions. 31 tests pass, latest build OK, no browser page errors. Separate-device cloud appearance sync is not implemented in this presentation-only change; exact equal device performance is not claimed.
+
 ## Compact manual app design
 - [x] Consolidate four family thumbnails and all 15 existing palettes into one compact view with isolated locked previews; preserve saved IDs and combinations.
 - [x] Apply coordinated background, parts, icons and palette only on unlocked family taps; plan upgrades/downgrades leave the applied design unchanged.
