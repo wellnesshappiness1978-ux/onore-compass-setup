@@ -19,17 +19,17 @@ export default function BirthColorGuide({ profile, plan, language, onUpgrade }: 
   const full = canUse(plan, "birthColorsFull");
   if (!palette) return null;
 
-  return <section className="border-y border-primary/25 py-7" aria-labelledby="birth-color-title">
-    <div className="flex items-start gap-3"><Palette className="mt-1 size-5 shrink-0 text-primary" aria-hidden="true" /><div><h3 id="birth-color-title" className="font-serif text-xl text-primary">{copy.title}</h3><p className="mt-2 text-sm leading-7 text-muted-foreground">{copy.intro}</p></div></div>
+  return <section className="min-w-0 border-y border-primary/25 py-7" aria-labelledby="birth-color-title">
+    <div className="flex items-start gap-3"><Palette className="mt-1 size-5 shrink-0 text-primary" aria-hidden="true" /><div className="min-w-0 [overflow-wrap:anywhere]"><h3 id="birth-color-title" className="font-serif text-xl text-primary">{copy.title}</h3><p className="mt-2 text-sm leading-7 text-muted-foreground">{copy.intro}</p></div></div>
     <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
       {roles.map((role, index) => {
         const color = palette[role];
         const roleCopy = copy.roles[role];
         const unlocked = index === 0 || full;
-        return unlocked ? <Button key={role} type="button" variant="outline" onClick={() => setSelected(role)} aria-label={`${roleCopy.label}: ${localizeBirthColorName(color.name, language)}. ${copy.open}`} className="h-auto min-h-40 flex-col items-stretch justify-start gap-3 rounded-md border-primary/25 bg-background/35 p-4 text-left hover:border-primary/60 hover:bg-primary/5">
-          <span className="flex items-center gap-3"><span className="size-11 shrink-0 rounded-full border border-primary/35 shadow-[0_0_18px_var(--gold-glow)]" style={{ backgroundColor: color.code }} aria-hidden="true" /><span className="min-w-0"><span className="block text-xs text-muted-foreground">{roleCopy.label}</span><strong className="mt-0.5 block break-words text-sm text-primary">{localizeBirthColorName(color.name, language)}</strong></span></span>
-          <span className="block text-xs leading-6 text-foreground">{roleCopy.summary}</span><span className="mt-auto flex items-center gap-1 text-[11px] text-primary"><Sparkles className="size-3" aria-hidden="true" />{copy.open}</span>
-        </Button> : <div key={role} className="flex min-h-40 flex-col items-center justify-center gap-2 rounded-md border border-dashed border-primary/25 p-4 text-center"><LockKeyhole className="size-5 text-primary" aria-hidden="true" /><p className="text-sm text-foreground">{roleCopy.label}</p><p className="text-xs leading-5 text-muted-foreground">{copy.locked}</p>{onUpgrade && <Button type="button" variant="link" onClick={onUpgrade} className="h-auto p-0 text-xs">{copy.upgrade}</Button>}</div>;
+        return unlocked ? <Button key={role} type="button" variant="outline" onClick={() => setSelected(role)} aria-label={`${roleCopy.label}: ${localizeBirthColorName(color.name, language)}. ${copy.open}`} className="h-auto min-h-40 min-w-0 whitespace-normal [overflow-wrap:anywhere] flex-col items-stretch justify-start gap-3 rounded-md border-primary/25 bg-background/35 p-4 text-left hover:border-primary/60 hover:bg-primary/5">
+          <span className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-2"><span className="size-11 shrink-0 rounded-full border border-primary/35 shadow-[0_0_18px_var(--gold-glow)]" style={{ backgroundColor: color.code }} aria-hidden="true" /><span className="min-w-0"><span className="block text-xs text-muted-foreground">{roleCopy.label}</span><strong className="mt-0.5 block break-words text-sm text-primary">{localizeBirthColorName(color.name, language)}</strong></span></span>
+          <span className="block max-h-36 overflow-y-auto overscroll-contain whitespace-normal text-xs leading-6 text-foreground">{roleCopy.summary}</span><span className="mt-auto flex min-w-0 items-center gap-1 whitespace-normal text-[11px] text-primary"><Sparkles className="size-3" aria-hidden="true" />{copy.open}</span>
+        </Button> : <div key={role} className="flex min-h-40 min-w-0 [overflow-wrap:anywhere] flex-col items-center justify-center gap-2 rounded-md border border-dashed border-primary/25 p-4 text-center"><LockKeyhole className="size-5 text-primary" aria-hidden="true" /><p className="text-sm text-foreground">{roleCopy.label}</p><p className="text-xs leading-5 text-muted-foreground">{copy.locked}</p>{onUpgrade && <Button type="button" variant="link" onClick={onUpgrade} className="h-auto p-0 text-xs">{copy.upgrade}</Button>}</div>;
       })}
     </div>
     <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}>

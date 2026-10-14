@@ -1,3 +1,8 @@
+## Desktop/mobile parity and six integrated perspectives
+- [ ] Contain birth-color cards and scroll long details on both widths.
+- [ ] Integrate name grids and split controls into six interactive personal reading dialogs, preserving existing calculated methods and seven languages.
+- [ ] Verify appearance persistence across widths, locked previews, all six views, consultation top scroll and unchanged astronomy/export regressions. Separate-device cloud appearance sync is outside this presentation-only change.
+
 ## Compact manual app design
 - [x] Consolidate four family thumbnails and all 15 existing palettes into one compact view with isolated locked previews; preserve saved IDs and combinations.
 - [x] Apply coordinated background, parts, icons and palette only on unlocked family taps; plan upgrades/downgrades leave the applied design unchanged.
