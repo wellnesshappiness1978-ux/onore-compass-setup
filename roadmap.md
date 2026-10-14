@@ -1,3 +1,8 @@
+## Catchphrase, available readings and circular shell refresh
+- [x] Add personal catchphrase and approximately 400-character closing summary; show only available nonempty reading cards with tap-to-open details. Blood/sibling passages remain explicitly symbolic entertainment, not factual personality claims.
+- [x] Prioritize color qualities, refine shared 90%-circular shell jewelry and remove visible Business terminology without changing IDs or membership.
+- [x] Verify signed-in live generation (402-character summary), desktop/390px wrapping, reading dialogs, color-first detail and locked theme preview; 28 focused tests pass and latest build OK. First review found overly defensive symbolic prose and an unframed catchphrase; refined both and visually rechecked. No page errors. Separate-device synchronization, paid entitlement checks and a new 2048 download were not re-tested; their code is unchanged. Unrelated historical open tasks remain outside this request.
+
 ## Respectful companion persona
 - [x] Refine shared generation voice and remove contradictory analogy restrictions without changing models or output contracts.
 - [x] Align deterministic daily, rhythm and color practice prose in seven languages; keep symbolic and measured-health boundaries separate.

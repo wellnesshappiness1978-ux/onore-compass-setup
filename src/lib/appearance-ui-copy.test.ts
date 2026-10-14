@@ -12,6 +12,12 @@ describe('localized appearance controls', () => {
       expect(Object.values(appearanceTabLabels(language)).flat().sort()).toEqual(Object.values(copy.plans).sort());
     }
   });
+  it('uses Family display labels while keeping legacy aliases independent', () => {
+    for (const copy of Object.values(appearanceUiCopy)) {
+      expect(copy.plans.business).toBe(copy.plans.b2b);
+      expect(copy.plans.corporate).toBe(copy.plans['b2b-premium']);
+    }
+  });
   it('keeps Family designs and Corporate independent', () => {
     expect(appearanceForPlan('b2b')).toBe('harmony');
     expect(appearanceForPlan('b2b-premium')).toBe('sovereign');

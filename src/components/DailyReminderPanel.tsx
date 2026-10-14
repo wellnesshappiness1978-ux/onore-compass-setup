@@ -24,7 +24,7 @@ const templates: Record<"ja" | "en", Record<Slot, Record<Tier, Template>>> = {
     morning: {
       free: { title: "🧭 今日のあなたの「開運テーマ」が届きました", body: "今日の地球暦バイオリズムを更新。あなたが今日向くべき最高の方角をコンパスで確認しましょう！", open: "compass" },
       vip: { title: "🔮 今日の吉方位をチェック！最高の一日にする直感ナビ", body: "デスクの向きや移動の吉方位を合わせて、潜在能力を全開にしましょう。", open: "compass" },
-      business: { title: "💼 【ビジネス羅針盤】本日のチーム動向＆推奨アクション", body: "本日のチームバイオリズムと商談・1on1の最適タイミングをチェック！", open: "compass" },
+      business: { title: "💼 【ファミリー羅針盤】本日のチーム動向＆推奨アクション", body: "本日のチームバイオリズムと商談・1on1の最適タイミングをチェック！", open: "compass" },
     },
     night: {
       free: { title: "🕊️ 今日1日のエネルギーリセット。心を調律する夜の時間", body: "今日の振り返りと、明日のバイオリズムの波を事前にチェックしておきましょう。", open: "compass" },
@@ -36,7 +36,7 @@ const templates: Record<"ja" | "en", Record<Slot, Record<Tier, Template>>> = {
     morning: {
       free: { title: "🧭 Your lucky theme for today has arrived", body: "Today's Earth Calendar biorhythm is updated. Check your best direction on the compass!", open: "compass" },
       vip: { title: "🔮 Check today's lucky direction — your intuition nav", body: "Align your desk and travel with today's lucky direction and unlock your potential.", open: "compass" },
-      business: { title: "💼 [Business compass] Today's team trends & actions", body: "Check today's team biorhythm and the best timing for deals and 1on1s!", open: "compass" },
+      business: { title: "💼 [Family compass] Today's team trends & actions", body: "Check today's team biorhythm and the best timing for deals and 1on1s!", open: "compass" },
     },
     night: {
       free: { title: "🕊️ Reset today's energy — time to tune your heart", body: "Reflect on today and preview tomorrow's biorhythm wave.", open: "compass" },

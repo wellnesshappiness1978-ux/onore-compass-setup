@@ -78,7 +78,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "天球儀・軌道",
       "宝石・神聖幾何学",
       "試着のみ · 契約や利用権限は変わりません",
-      "法人向け · 試着のみ"
+      "ファミリープレミアム · 試着のみ"
     ]
   },
   "en": {
@@ -155,7 +155,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "Astrolabe & orbits",
       "Gems & sacred geometry",
       "Fitting only · membership and access stay unchanged",
-      "Corporate · fitting only"
+      "Family Premium · fitting only"
     ]
   },
   "zh-CN": {
@@ -232,7 +232,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "天球仪与轨道",
       "宝石与神圣几何",
       "仅试穿·不改变会员和权限",
-      "法人·仅试穿"
+      "家庭尊享·仅试穿"
     ]
   },
   "zh-TW": {
@@ -309,7 +309,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "天球儀與軌道",
       "寶石與神聖幾何",
       "僅試穿·不改變會員和權限",
-      "法人·僅試穿"
+      "家庭尊享·僅試穿"
     ]
   },
   "ko": {
@@ -386,7 +386,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "천구의와 궤도",
       "보석과 신성 기하학",
       "피팅만 · 회원 권한은 바뀌지 않습니다",
-      "법인 · 피팅만"
+      "패밀리 프리미엄 · 피팅만"
     ]
   },
   "es": {
@@ -463,7 +463,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "Astrolabio y órbitas",
       "Gemas y geometría sagrada",
       "Solo prueba · sin cambiar acceso ni membresía",
-      "Empresa · solo prueba"
+      "Familia Premium · solo prueba"
     ]
   },
   "fr": {
@@ -540,7 +540,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "Astrolabe et orbites",
       "Gemmes et géométrie sacrée",
       "Essayage seulement · accès et abonnement inchangés",
-      "Entreprise · essayage seulement"
+      "Famille Premium · essayage seulement"
     ]
   }
 };

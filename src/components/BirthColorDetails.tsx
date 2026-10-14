@@ -30,10 +30,11 @@ export function BirthColorDetails({ profile, role, full, language }: { profile: 
       <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-5 pb-7 sm:px-8">
         <TabsContent value="0" className="space-y-6">
           <h3 className="flex items-center gap-2 font-serif text-lg"><Orbit className="size-5 text-primary" />{copy.titles[0]}</h3>
+          <section className="border-l-2 border-primary pl-4"><h4 className="text-sm text-primary">{copy.labels[1]}</h4><p className="mt-3 font-serif text-lg leading-8">{copy.psych[essence.index]}</p><h4 className="mt-5 text-sm text-primary">{copy.labels[3]}</h4><p className="mt-2 font-serif text-lg">{copy.elements[essence.index]}</p><p className="mt-2 text-xs leading-6">{copy.symbolNote}</p></section>
           <section className="border-b border-primary/20 pb-5"><h4 className="text-sm text-primary">{reference.light}</h4><p className="mt-2 text-sm leading-7">{reference.note}</p><p className="mt-3 font-mono text-sm text-primary">{essence.wavelength && essence.frequency ? `${essence.wavelength} nm · ${essence.frequency.toExponential(4)} Hz` : copy.nonSpectral}</p></section>
           <section><h4 className="text-sm text-primary">{reference.trigger}</h4><p className="mt-2 text-sm leading-7">{reference.cues[essence.index]}</p></section>
           <section><h4 className="text-sm text-primary">{reference.chakra}</h4><p className="mt-2 text-sm leading-7">{reference.areas[essence.chakra - 1]}</p></section>
-          <section className="border-t border-primary/20 pt-5"><h4 className="text-sm text-primary">{copy.labels[3]}</h4><p className="mt-2 font-serif text-lg">{copy.elements[essence.index]}</p><p className="mt-2 text-xs leading-6">{copy.symbolNote}</p></section>
+
         </TabsContent>
         <TabsContent value="1" className="space-y-5">
           <h3 className="flex items-center gap-2 font-serif text-lg"><Sparkles className="size-5 text-primary" />{copy.titles[1]}</h3>
