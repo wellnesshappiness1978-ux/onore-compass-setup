@@ -509,4 +509,4 @@
 ## Five-stage manual appearance collection
 - [x] Add cumulative Free/Standard/VIP/Family/Family Premium themes, localized compact thumbnails and isolated locked previews; preserve stored palette/parts and corporate independence.
 - [x] Bundle four original cosmic photographic artworks and tier-specific nautilus jewelry, shared between previews and applied app backgrounds.
-- [ ] Verify selection, persistence, plan-change stability, localized compact layout and preserved regression suites.
+- [x] Verify five cards, locked preview isolation, all four image loads, manual application, reload/plan-change stability, Consultation y=0, and 390/695/1280-width layouts using synthetic guest/development preview. All 50 focused regressions pass; build diagnostics clean. Paid membership and a new actual 2048 download were not re-tested; astronomy/export code unchanged. Background sources are 1920px, not claimed native 4K.

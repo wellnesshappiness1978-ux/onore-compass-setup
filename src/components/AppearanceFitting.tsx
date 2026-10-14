@@ -24,7 +24,7 @@ export function AppearanceFitting({ plan, language, selection, onSave, onModeCha
           onModeChange(familyModes[family]);
         }} className={`theme-choice min-w-0 h-auto flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 ${selected ? 'ring-2 ring-primary' : ''}`}>
           <ThemeSample mode={familyModes[family]} tier={appearancePlan[family]} name={copy.families[family]} family={family} compact />
-          <span className="grid min-h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-1 px-2 py-1 text-left text-[11px] leading-4">
+          <span className="grid min-h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-1 px-2 py-1 text-left text-[11px] leading-4">
             <span className="min-w-0 whitespace-normal"><span className="block font-semibold text-primary">{copy.plans[appearancePlan[family]]}</span><span className="block">{copy.families[family]}</span></span>
             {!available ? <LockKeyhole className="size-3.5 shrink-0 text-primary" aria-label={dc.requires} /> : selected ? <Check className="size-3.5 shrink-0 text-primary" aria-label={copy.current} /> : null}
           </span>

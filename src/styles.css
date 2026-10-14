@@ -1333,4 +1333,6 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 [data-icons=minimal] .nautilus-chamber, .nautilus-icon[data-nautilus=minimal] .nautilus-chamber { display: none; }
 .appearance-selection .theme-choice { transition: border-color .2s ease; }
 .appearance-selection .theme-choice[aria-pressed=true] { border-color: var(--primary); }
+.appearance-selection .theme-sample--compact { height: 54px; }
+.appearance-selection .theme-sample--compact .theme-sample-dial { width: 38px; height: 38px; }
 @media (prefers-reduced-motion: reduce) { .appearance-selection .theme-choice { transition: none; } }
