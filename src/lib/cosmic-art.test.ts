@@ -114,6 +114,22 @@ describe("Cosmic Genesis artwork layout", () => {
     for (let index = 1; index < display.length; index++) expect(display[index - 1]).toBeGreaterThan(display[index] ?? 0);
   });
 
+  it("uses the same logarithmic radius transform for every planet and keeps small bodies readable", () => {
+    const genesis = cosmicGenesis("1990-04-15", "08:30", false);
+    if (!genesis) return;
+    const planets = cosmicPlacements(genesis, 1024);
+    const jupiter = planets.find((planet) => planet.id === 'jupiter');
+    const earth = planets.find((planet) => planet.id === 'earth');
+    if (!jupiter || !earth) return;
+    expect(jupiter.radius / earth.radius).toBeGreaterThan(4);
+    planets.forEach((planet) => {
+      expect(planet.radius).toBeGreaterThan(5);
+      expect(planet.radius / jupiter.radius).toBeCloseTo(Math.log1p(planet.meanRadiusKm / 10000) / Math.log1p(69911 / 10000), 12);
+      const doubled = cosmicPlacements(genesis, 2048).find((candidate) => candidate.id === planet.id);
+      expect(doubled?.radius).toBeCloseTo(planet.radius * 2, 12);
+    });
+  });
+
   it("retains all seven exact birth colors as strong artwork roles", () => {
     const colors = ["#110001", "#220002", "#330003", "#440004", "#550005", "#660006", "#770007"];
     expect(cosmicColorRoles(colors).all).toEqual(colors);
