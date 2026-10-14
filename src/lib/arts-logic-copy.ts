@@ -1,3 +1,4 @@
+import { theoryCopy } from "./theory-copy";
 import type { Language } from "./translations";
 
 // Stable IDs for the 15 analysis logics; display text is resolved per language at render time.
@@ -123,4 +124,4 @@ const fr: Record<ArtsLogicId, Logic> = {
 const logicsByLanguage: Record<Language, Record<ArtsLogicId, Logic>> = { ja, en, "zh-CN": zhCN, "zh-TW": zhTW, ko, es, fr };
 
 export const artsLogics = (language: Language): (Logic & { id: ArtsLogicId })[] =>
-  artsLogicIds.map((id) => ({ id, ...logicsByLanguage[language][id] }));
+  artsLogicIds.map((id) => ({ id, ...logicsByLanguage[language][id], ...(id === "birthColor" ? { background: theoryCopy[language].birthColor, scope: theoryCopy[language].colorScope } : {}) }));

@@ -1,3 +1,8 @@
+## Theory explanations and first-year middle-school companion voice
+- [ ] Update seven-language gravity/life and birth-color theory with affirmative, scientifically separated symbolism.
+- [ ] Enrich color essence and remove discouraging negation while preserving accurate light references.
+- [ ] Align shared AI and daily/reference prose to simple warm concrete conversation; preserve existing reading UI, astronomy, appearance and exports.
+- [ ] Run focused tests and verify updated explanations and one real AI flow.
 ## Catchphrase, available readings and circular shell refresh
 - [x] Add personal catchphrase and approximately 400-character closing summary; show only available nonempty reading cards with tap-to-open details. Blood/sibling passages remain explicitly symbolic entertainment, not factual personality claims.
 - [x] Prioritize color qualities, refine shared 90%-circular shell jewelry and remove visible Business terminology without changing IDs or membership.
