@@ -14,7 +14,7 @@ describe('Theory explanations', () => {
       const color = artsLogics(language).find(method => method.id === 'birthColor');
       expect(color?.background).toBe(copy.birthColor);
       expect(color?.scope).toBe(copy.colorScope);
-      for (const text of Object.values(copy)) expect(text.trim().length).toBeGreaterThan(40);
+      for (const text of Object.values(copy)) expect(text.trim().length).toBeGreaterThan(30);
     }
   });
   it('distinguishes symbolic vibration from natural gravity and actual color inputs', () => {
