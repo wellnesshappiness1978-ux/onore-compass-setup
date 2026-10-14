@@ -36,5 +36,8 @@ export function NautilusIcon({ className = '', family }: { className?: string; f
     <g className="nautilus-diamonds"><path d="M76 27l4 6-4 6-4-6Z M26 59l3 4-3 4-3-4Z" />
       <path className="nautilus-glints" d="M76 20v26M65 33h22M76 33l-6-6m6 6 6 6M23 63h6M26 60v6" />
     </g>
+    <g className="nautilus-jewels">
+      {[0, 1, 2, 3, 4, 5].map(i => { const p = point(turn + (i + 13) / 21 * turn); return <g key={i} transform={`translate(${p.x} ${p.y})`}><path d="M0 -2.5L2 0L0 2.5L-2 0Z" /><path className="nautilus-jewel-facet" d="M0 -2.5V2.5M-2 0H2" /></g>; })}
+    </g>
   </svg>;
 }

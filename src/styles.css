@@ -1291,3 +1291,46 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .theme-sample--compact .theme-sample-body { margin: 0; padding: 4px; border: 0; background: transparent; justify-content: center; }
 .theme-sample--compact .theme-sample-dial { width: 46px; height: 46px; }
 .palette-chip { background: var(--background); border-top: 6px solid var(--primary); }
+
+/* Five independently chosen grades; photographic decoration never enters natal art. */
+.appearance-photo { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.appearance-photo img { display: none; width: 100%; height: 100%; object-fit: cover; object-position: right center; }
+[data-background=celestial] > .appearance-photo [data-photo=celestial],
+[data-background=sacred] > .appearance-photo [data-photo=sacred],
+[data-background=harmony] > .appearance-photo [data-photo=harmony],
+[data-background=sovereign] > .appearance-photo [data-photo=sovereign] { display: block; }
+.design-canvas > .appearance-photo { position: absolute; height: 100dvh; min-height: 600px; opacity: .42; mask-image: linear-gradient(to bottom, black 0 68%, transparent 100%); }
+.theme-sample > .appearance-photo { opacity: .85; }
+.theme-sample > .appearance-photo img { object-position: right center; }
+.theme-sample--compact > .appearance-photo img { object-fit: cover; object-position: 90% 50%; }
+.design-canvas[data-background=minimal] { background-image: linear-gradient(170deg, var(--background), color-mix(in oklab, var(--background) 90%, var(--nebula))); }
+.theme-sample[data-appearance=minimal] .theme-sample-sky { opacity: 1; background: linear-gradient(170deg, var(--background), var(--card)); }
+.theme-sample[data-appearance=minimal] .theme-sample-sky::after { display: none; }
+.appearance-background .harmony-engraving, .appearance-background .sovereign-engraving,
+.appearance-motif .harmony-engraving, .appearance-motif .sovereign-engraving { display: none; }
+[data-background=harmony] > .appearance-background .harmony-engraving,
+[data-appearance=harmony] .appearance-motif .harmony-engraving,
+[data-background=sovereign] > .appearance-background .sovereign-engraving,
+[data-appearance=sovereign] .appearance-motif .sovereign-engraving { display: block; }
+[data-background=harmony] > .appearance-background .sacred-engraving { opacity: .35; }
+[data-background=sovereign] > .appearance-background { opacity: .19; }
+[data-appearance=celestial] .appearance-motif .harmony-engraving { display: none; }
+[data-appearance=harmony] .appearance-part-icon, [data-appearance=harmony] .theme-sample-dial { border: 3px double var(--cosmic-foil-light); border-radius: 50%; box-shadow: 0 0 15px color-mix(in oklab, var(--rose-glow) 30%, transparent); }
+[data-appearance=sovereign] .appearance-part-icon, [data-appearance=sovereign] .theme-sample-dial { border: 5px double var(--cosmic-foil-gold); border-radius: 50%; outline: 1px solid var(--cosmic-foil-light); outline-offset: 4px; box-shadow: inset 0 0 12px color-mix(in oklab, var(--gold-glow) 35%, transparent), 0 0 24px color-mix(in oklab, var(--primary) 28%, transparent); }
+.design-canvas[data-appearance=harmony] .design-navigation { border: 3px double color-mix(in oklab, var(--cosmic-foil-light) 50%, transparent); }
+.design-canvas[data-appearance=sovereign] .design-navigation { border: 3px double var(--cosmic-foil-gold); box-shadow: 0 0 20px color-mix(in oklab, var(--gold-glow) 24%, transparent); }
+.design-canvas[data-appearance=sovereign] .design-header { border-bottom: 3px double var(--cosmic-foil-gold); }
+.nautilus-jewels { display: none; }
+:is([data-icons=sovereign], [data-nautilus=sovereign]) .nautilus-jewels { display: block; fill: var(--nebula); stroke: var(--cosmic-foil-light); stroke-width: .65; }
+.nautilus-jewels .nautilus-jewel-facet { fill: none; stroke-width: .35; }
+[data-icons=sovereign] .nautilus-icon, .nautilus-icon[data-nautilus=sovereign] { filter: drop-shadow(0 1px 1px var(--cosmic-text-outline)) drop-shadow(0 0 4px var(--gold-glow)); }
+[data-icons=sovereign] .nautilus-relief, .nautilus-icon[data-nautilus=sovereign] .nautilus-relief { display: block; opacity: 1; }
+[data-icons=sovereign] .nautilus-diamonds, .nautilus-icon[data-nautilus=sovereign] .nautilus-diamonds { display: block; fill: var(--cosmic-foil-light); stroke: var(--cosmic-foil-light); stroke-width: .7; }
+[data-icons=sovereign] .nautilus-chamber, .nautilus-icon[data-nautilus=sovereign] .nautilus-chamber { stroke: var(--gold-deep); stroke-width: 1.3; }
+[data-icons=harmony] .nautilus-icon, .nautilus-icon[data-nautilus=harmony] { color: var(--cosmic-foil-light); filter: drop-shadow(0 0 2px var(--rose-glow)); }
+[data-icons=harmony] .nautilus-relief, .nautilus-icon[data-nautilus=harmony] .nautilus-relief { display: block; opacity: .32; }
+[data-icons=harmony] .nautilus-chamber, .nautilus-icon[data-nautilus=harmony] .nautilus-chamber { stroke: var(--cosmic-foil-light); }
+[data-icons=minimal] .nautilus-chamber, .nautilus-icon[data-nautilus=minimal] .nautilus-chamber { display: none; }
+.appearance-selection .theme-choice { transition: border-color .2s ease; }
+.appearance-selection .theme-choice[aria-pressed=true] { border-color: var(--primary); }
+@media (prefers-reduced-motion: reduce) { .appearance-selection .theme-choice { transition: none; } }
