@@ -1,6 +1,6 @@
 import type { Language } from "./translations";
 export type ColorExperienceCopy = {
- steps: string[]; titles: string[]; labels: string[]; science: string; brain: string; basis: string; provisional: string; symbolNote: string; protect: string; protectNote: string; psych: string[]; elements: string[]; daily: string[]; scenes: string[]; sceneTips: string[]; nonSpectral: string; reference: string; palette: string; appearance: string[];
+ steps: string[]; titles: string[]; labels: string[]; science: string; basis: string; provisional: string; symbolNote: string; protect: string; protectNote: string; psych: string[]; elements: string[]; daily: string[]; scenes: string[]; sceneTips: string[]; nonSpectral: string; reference: string; palette: string; appearance: string[];
 };
 export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
   "ja": {
@@ -17,7 +17,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
     "labels": [
       "光の波長",
       "色彩心理",
-      "脳波への影響",
+      "対応チャクラ・領域（象徴）",
       "宇宙・五行の象徴",
       "算出の手がかり",
       "6つのテーマ",
@@ -25,7 +25,6 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "シーン別の活用"
     ],
     "science": "HEXは画面上のRGB混色です。この色に固有の単一波長はありません。可視光はおよそ380〜780 nmで、下記は色相に近い光の参考範囲です。",
-    "brain": "この色がα波・θ波を増やすことは確認されていません。感じ方は明るさ、環境、経験によって異なります。",
     "basis": "現在は生年月日・出生時刻・出生都道府県と太陽黄経から作る再現可能な参考パレットです。同じ入力なら同じ色になりますが、測定された固有波長ではありません。家系ルーツは算出に使っていません。",
     "provisional": "出生時刻が不明のため、正午を使った参考色です。",
     "symbolNote": "宇宙・五行は芸術的な連想です。伝統的な五行の確定対応や出生星座の判定ではありません。",
@@ -95,7 +94,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
     "labels": [
       "Light wavelength",
       "Color psychology",
-      "Brain waves",
+      "Chakra & region (symbolic)",
       "Cosmic & element symbolism",
       "How it is derived",
       "Six themes",
@@ -103,7 +102,6 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "Choose a scene"
     ],
     "science": "HEX is an RGB mixture on a screen, not a single physical wavelength. Visible light spans roughly 380–780 nm; the ranges below refer only to similar spectral hues.",
-    "brain": "This color has not been shown to increase alpha or theta waves. Responses vary with brightness, context and experience.",
     "basis": "This reproducible reference palette uses birth date, time, prefecture and solar longitude. Equal inputs give equal colors, not a measured lifelong frequency. Family roots are not used.",
     "provisional": "Unknown birth time: a noon reference is used.",
     "symbolNote": "Cosmic and five-element associations are artistic, not verified traditional correspondences or a natal zodiac reading.",
@@ -173,7 +171,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
     "labels": [
       "光的波长",
       "色彩心理",
-      "脑波影响",
+      "脉轮与领域（象征）",
       "宇宙与五行象征",
       "计算依据",
       "六大主题",
@@ -181,7 +179,6 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "选择场景"
     ],
     "science": "HEX是屏幕RGB混色，并非单一波长。可见光约380–780 nm，下方仅为相近光谱色的参考范围。",
-    "brain": "尚未证实此色会增加α波或θ波。感受随亮度、环境和经验而异。",
     "basis": "目前根据出生日期、时间、都道府县和太阳黄经生成可重复的参考色盘。相同输入得到相同颜色，并非测量所得的终身固有波长。家系根源未参与计算。",
     "provisional": "出生时间未知，采用正午参考。",
     "symbolNote": "宇宙和五行仅是艺术联想，不是确定的传统对应或出生星座判断。",
@@ -251,7 +248,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
     "labels": [
       "光的波長",
       "色彩心理",
-      "腦波影響",
+      "脈輪與領域（象徵）",
       "宇宙與五行象徵",
       "計算依據",
       "六大主題",
@@ -259,7 +256,6 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "選擇情境"
     ],
     "science": "HEX是螢幕RGB混色，並非單一波長。可見光約380–780 nm，下方僅為相近光譜色的參考範圍。",
-    "brain": "尚未證實此色會增加α波或θ波。感受隨亮度、環境和經驗而異。",
     "basis": "目前根據出生日期、時間、都道府縣和太陽黃經產生可重複的參考色盤。相同輸入得到相同顏色，並非測量所得的終身固有波長。家系根源未參與計算。",
     "provisional": "出生時間未知，採用正午參考。",
     "symbolNote": "宇宙和五行僅是藝術聯想，不是確定的傳統對應或出生星座判斷。",
@@ -329,7 +325,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
     "labels": [
       "빛의 파장",
       "색채 심리",
-      "뇌파 영향",
+      "차크라·영역 (상징)",
       "우주와 오행 상징",
       "산출 근거",
       "여섯 주제",
@@ -337,7 +333,6 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "상황 선택"
     ],
     "science": "HEX는 화면의 RGB 혼색이며 단일 파장이 아닙니다. 가시광선은 약 380–780 nm이며 아래는 유사한 스펙트럼 색의 참고 범위입니다.",
-    "brain": "이 색이 알파파나 세타파를 증가시킨다는 근거는 없습니다. 느낌은 밝기, 환경과 경험에 따라 달라집니다.",
     "basis": "생년월일, 시간, 도도부현과 태양 황경으로 재현 가능한 참고 팔레트를 만듭니다. 같은 입력은 같은 색이지만 측정된 평생 고유 파장은 아닙니다. 가계 뿌리는 사용하지 않습니다.",
     "provisional": "출생 시각을 모르면 정오를 참고합니다.",
     "symbolNote": "우주와 오행은 예술적 연상이며 검증된 전통 대응이나 출생 별자리 판정이 아닙니다.",
@@ -407,7 +402,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
     "labels": [
       "Longitud de onda",
       "Psicología del color",
-      "Ondas cerebrales",
+      "Chakra y región (simbólicos)",
       "Simbolismo cósmico",
       "Cómo se obtiene",
       "Seis temas",
@@ -415,7 +410,6 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "Elige una situación"
     ],
     "science": "HEX mezcla RGB en pantalla, no una sola longitud de onda. La luz visible abarca unos 380–780 nm; abajo se indican tonos espectrales similares.",
-    "brain": "No se ha demostrado que este color aumente ondas alfa o theta. Influyen el brillo, el contexto y la experiencia.",
     "basis": "Paleta reproducible basada en fecha, hora, prefectura natal y longitud solar. Los mismos datos dan los mismos colores, no una frecuencia personal medida. No se usan raíces familiares.",
     "provisional": "Hora desconocida: referencia del mediodía.",
     "symbolNote": "El cosmos y los elementos son asociaciones artísticas, no correspondencias tradicionales verificadas ni un zodiaco natal.",
@@ -485,7 +479,7 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
     "labels": [
       "Longueur d’onde",
       "Psychologie des couleurs",
-      "Ondes cérébrales",
+      "Chakra et région (symboliques)",
       "Symbolisme cosmique",
       "Méthode de calcul",
       "Six thèmes",
@@ -493,7 +487,6 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
       "Choisir une situation"
     ],
     "science": "HEX est un mélange RGB à l’écran, pas une longueur d’onde unique. La lumière visible couvre environ 380–780 nm ; les plages ci-dessous concernent des teintes spectrales proches.",
-    "brain": "Il n’est pas démontré que cette couleur augmente les ondes alpha ou thêta. Le ressenti dépend de la luminosité, du contexte et de l’expérience.",
     "basis": "Palette reproductible issue de la date, de l’heure, de la préfecture de naissance et de la longitude solaire. Les mêmes données donnent les mêmes couleurs, pas une fréquence personnelle mesurée. Les racines familiales ne sont pas utilisées.",
     "provisional": "Heure inconnue : référence de midi.",
     "symbolNote": "Cosmos et éléments sont des associations artistiques, non des correspondances traditionnelles vérifiées ni un zodiaque natal.",

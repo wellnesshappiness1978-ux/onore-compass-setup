@@ -1,3 +1,8 @@
+## Independent customization and color references
+- [ ] Replace brain-wave copy with localized spectral references, symbolic chakras and distinct practical cues.
+- [ ] Add saved independent backgrounds, frames/parts and icons; upgrades unlock options without changing saved selections.
+- [ ] Fix consultation entry scrolling and verify mobile, saved combinations, upgrade behavior and focused regressions.
+
 ## Nautilus app-design refresh
 - [x] Simplify appearance settings: remove explanatory paragraphs, comparison cards and automatic/manual controls; use seven-language plan/family labels without changing prices or membership.
 - [x] Replace menu ornaments and background spirals with shared golden-ratio chambered nautilus geometry, gold-leaf/diamond VIP jewelry, sacred flower geometry and royal preview crests. Independent Corporate remains visual fitting only; legacy Family IDs never grant corporate access.

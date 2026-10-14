@@ -76,20 +76,17 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
     messages: initialMessages,
     transport,
     onError: () => setNotice(t.error),
-    onFinish: () => textareaRef.current?.focus(),
+    onFinish: () => textareaRef.current?.focus({ preventScroll: true }),
   });
   useEffect(() => { setMessages(initialMessages); clearError(); }, [targetId, language, setMessages, clearError, initialMessages]);
   const busy = status === "submitted" || status === "streaming";
 
-  useEffect(() => {
-    textareaRef.current?.focus();
-  }, []);
 
   const submit = async (text: string) => {
     const prompt = text.trim();
     if (!prompt) {
       setNotice(t.empty);
-      textareaRef.current?.focus();
+      textareaRef.current?.focus({ preventScroll: true });
       return;
     }
     if (remaining <= 0) {
@@ -103,7 +100,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
       return;
     }
     void sendMessage({ text: prompt });
-    requestAnimationFrame(() => textareaRef.current?.focus());
+    requestAnimationFrame(() => textareaRef.current?.focus({ preventScroll: true }));
   };
 
   return (

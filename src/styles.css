@@ -371,13 +371,13 @@
 
 /* Design previews use the same semantic roles as the original dark theme. */
 /* Rank rewards apply even when the appearance picker has not been touched. */
-.design-canvas:where([data-tier="free"], [data-tier="standard"]) {
+.design-canvas:where([data-decoration-tier="free"], [data-decoration-tier="standard"]) {
   background-image: none; --design-texture: none; --design-stroke: 1px;
   --design-line: color-mix(in oklab, var(--primary) 20%, transparent);
 }
-.design-canvas[data-tier="free"] .celestial-stars,
-.design-canvas[data-tier="standard"] .celestial-stars { opacity: .04; }
-.design-canvas:where([data-tier="vip"]) {
+.design-canvas[data-background-tier="free"] .celestial-stars,
+.design-canvas[data-background-tier="standard"] .celestial-stars { opacity: .04; }
+.design-canvas:where([data-decoration-tier="vip"]) {
   --background: oklch(.12 .025 265); --card: oklch(.19 .035 265);
   --primary: oklch(.86 .135 90); --primary-foreground: oklch(.13 .02 260);
   --gold-glow: oklch(.96 .055 92); --gold-deep: oklch(.65 .11 80);
@@ -385,11 +385,11 @@
   --design-surface: var(--card); --design-stroke: 1px;
   background-image: linear-gradient(155deg, var(--card), var(--background) 45%);
 }
-.design-canvas[data-tier="vip"] .celestial-stars {
+.design-canvas[data-background-tier="vip"] .celestial-stars {
   opacity: .75; position: fixed; animation: rank-starlight 16s ease-in-out infinite alternate;
 }
 @keyframes rank-starlight { from { transform: translateY(0); opacity: .4; } to { transform: translateY(-28px); opacity: .85; } }
-.design-canvas:where([data-tier="b2b"], [data-tier="b2b-premium"]) {
+.design-canvas:where([data-decoration-tier="b2b"], [data-decoration-tier="b2b-premium"]) {
   --background: oklch(.12 .004 260); --card: oklch(.2 .008 260);
   --foreground: oklch(.95 .009 95); --card-foreground: var(--foreground);
   --primary: oklch(.85 .09 90); --primary-foreground: oklch(.13 .003 260);
@@ -400,8 +400,8 @@
   --design-texture: repeating-linear-gradient(90deg, transparent 0 119px, color-mix(in oklab, var(--gold-glow) 4%, transparent) 120px 121px);
   background-image: linear-gradient(145deg, var(--card), var(--background) 55%);
 }
-.design-canvas:where([data-tier="b2b-premium"]) { --design-line: color-mix(in oklab, var(--gold-glow) 65%, transparent); }
-.design-canvas[data-tier="b2b"] .card-lux, .design-canvas[data-tier="b2b-premium"] .card-lux {
+.design-canvas:where([data-decoration-tier="b2b-premium"]) { --design-line: color-mix(in oklab, var(--gold-glow) 65%, transparent); }
+.design-canvas[data-decoration-tier="b2b"] .card-lux, .design-canvas[data-decoration-tier="b2b-premium"] .card-lux {
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--gold-glow) 30%, transparent), inset 0 -2px 0 var(--background), 0 16px 30px color-mix(in oklab, var(--background) 65%, transparent);
   border-top: 2px solid var(--design-line);
 }
@@ -819,7 +819,7 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
   .audio-controller { bottom: 90px; padding: 10px 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .design-canvas[data-tier="vip"] .celestial-stars { animation: none; }
+  .design-canvas[data-background-tier="vip"] .celestial-stars { animation: none; }
 }
 
 /* Expanded tier themes: VIP luxe trio, Business quartet, Premium sacred five. */
@@ -994,7 +994,7 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas[data-design="aura-gold-luxe"], .design-canvas[data-design="deepsea-luxe"], .design-canvas[data-design="shion-luxe"] {
   background-image: radial-gradient(circle at 50% 260px, color-mix(in oklab, var(--gold-glow) 24%, transparent), transparent 420px), linear-gradient(160deg, var(--celestial-ink), var(--background) 65%);
 }
-.design-canvas[data-tier="b2b-premium"][data-design^="business-"] .card-lux { box-shadow: 0 0 32px color-mix(in oklab, var(--primary) 22%, transparent); }
+.design-canvas[data-decoration-tier="b2b-premium"][data-design^="business-"] .card-lux { box-shadow: 0 0 32px color-mix(in oklab, var(--primary) 22%, transparent); }
 .design-canvas[data-design="business-cosmos"], .design-canvas[data-design="business-geometry"], .design-canvas[data-design="business-zero"] {
   background-image: repeating-conic-gradient(from 0deg at 50% 300px, color-mix(in oklab, var(--primary) 5%, transparent) 0deg 1deg, transparent 1deg 12deg), radial-gradient(circle at 50% 300px, color-mix(in oklab, var(--nebula) 60%, transparent), transparent 480px), var(--background);
 }
@@ -1126,13 +1126,13 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-canvas[data-design="classic"] { background-image: radial-gradient(ellipse 35rem 20rem at 50% 0%, color-mix(in oklab, var(--rose-glow) 12%, transparent), transparent 76%), var(--design-texture); }
 .design-canvas[data-design="masculine-luxe"]::before { animation: theme-spiral 24s linear infinite; transform-origin: center 290px; }
 @keyframes theme-spiral { to { transform: rotate(360deg); } }
-.design-canvas[data-tier="vip"] .design-title, .design-canvas[data-tier="b2b"] .design-title, .design-canvas[data-tier="b2b-premium"] .design-title { font-family: "Cormorant Garamond", "Noto Serif JP", serif; }
-.design-canvas:where([data-tier="vip"], [data-tier="b2b"], [data-tier="b2b-premium"]) .design-main .bg-primary, .design-canvas:where([data-tier="vip"], [data-tier="b2b"], [data-tier="b2b-premium"]) .design-main .bg-champagne-gradient { box-shadow: inset 0 1px 0 var(--gold-glow), 0 0 22px color-mix(in oklab, var(--primary) 32%, transparent); }
-.design-canvas:where([data-tier="b2b"], [data-tier="b2b-premium"]) .card-lux { backdrop-filter: blur(18px); border-image: linear-gradient(125deg, var(--gold-glow), var(--nebula), var(--primary)) 1; background: color-mix(in oklab, var(--card) 82%, transparent); }
-.design-canvas[data-tier="b2b-premium"] .celestial-stars { animation: premium-stars 18s ease-in-out infinite alternate; opacity: .7; }
-.design-canvas[data-tier="b2b-premium"] .design-header { background-image: radial-gradient(ellipse at 20% 40%, color-mix(in oklab, var(--nebula) 38%, transparent), transparent 65%), radial-gradient(ellipse at 80% 20%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 60%); }
+.design-canvas[data-decoration-tier="vip"] .design-title, .design-canvas[data-decoration-tier="b2b"] .design-title, .design-canvas[data-decoration-tier="b2b-premium"] .design-title { font-family: "Cormorant Garamond", "Noto Serif JP", serif; }
+.design-canvas:where([data-decoration-tier="vip"], [data-decoration-tier="b2b"], [data-decoration-tier="b2b-premium"]) .design-main .bg-primary, .design-canvas:where([data-decoration-tier="vip"], [data-decoration-tier="b2b"], [data-decoration-tier="b2b-premium"]) .design-main .bg-champagne-gradient { box-shadow: inset 0 1px 0 var(--gold-glow), 0 0 22px color-mix(in oklab, var(--primary) 32%, transparent); }
+.design-canvas:where([data-decoration-tier="b2b"], [data-decoration-tier="b2b-premium"]) .card-lux { backdrop-filter: blur(18px); border-image: linear-gradient(125deg, var(--gold-glow), var(--nebula), var(--primary)) 1; background: color-mix(in oklab, var(--card) 82%, transparent); }
+.design-canvas[data-background-tier="b2b-premium"] .celestial-stars { animation: premium-stars 18s ease-in-out infinite alternate; opacity: .7; }
+.design-canvas[data-decoration-tier="b2b-premium"] .design-header { background-image: radial-gradient(ellipse at 20% 40%, color-mix(in oklab, var(--nebula) 38%, transparent), transparent 65%), radial-gradient(ellipse at 80% 20%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 60%); }
 @keyframes premium-stars { to { transform: translateY(-32px) scale(1.035); opacity: 1; } }
-.design-canvas[data-tier="b2b-premium"] .design-main .bg-primary { box-shadow: 0 0 30px color-mix(in oklab, var(--primary) 48%, transparent), inset 0 1px 0 var(--gold-glow); }
+.design-canvas[data-decoration-tier="b2b-premium"] .design-main .bg-primary { box-shadow: 0 0 30px color-mix(in oklab, var(--primary) 48%, transparent), inset 0 1px 0 var(--gold-glow); }
 .agolmen-brand-logo, .agolmen-loading-logo { border-radius: 50%; clip-path: circle(43% at center); mask-image: radial-gradient(circle at center, black 0 91%, transparent 100%); filter: none; }
 .agolmen-logo-aura .agolmen-aura { animation: agolmen-aura-drift 9s ease-in-out infinite alternate; }
 .agolmen-logo-aura .agolmen-aura-purple { animation-delay: -4s; }
@@ -1164,9 +1164,9 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .theme-sample-actions { display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 5px; }
 .theme-sample-actions .theme-sample-cta { display: grid; place-items: center; background: var(--primary); color: var(--primary-foreground); width: 55px; height: 18px; min-height: 18px; padding: 0; border-radius: 3px; font-size: 10px; }
 .theme-sample-actions > span:not(.theme-sample-cta) { width: 18px; height: 12px; border: 1px solid var(--primary); border-radius: 2px; }
-.theme-sample[data-tier="vip"] .theme-sample-cta, .theme-sample[data-tier="b2b"] .theme-sample-cta, .theme-sample[data-tier="b2b-premium"] .theme-sample-cta { background: linear-gradient(140deg, var(--gold-glow), var(--primary) 65%, var(--gold-deep)); box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 50%, transparent); }
-.theme-sample[data-tier="b2b"] .theme-sample-body, .theme-sample[data-tier="b2b-premium"] .theme-sample-body { backdrop-filter: blur(12px); border-image: linear-gradient(135deg, var(--primary), var(--nebula)) 1; }
-.theme-sample[data-tier="b2b-premium"] .theme-sample-sky { animation: premium-stars 16s ease-in-out infinite alternate; }
+.theme-sample[data-decoration-tier="vip"] .theme-sample-cta, .theme-sample[data-decoration-tier="b2b"] .theme-sample-cta, .theme-sample[data-decoration-tier="b2b-premium"] .theme-sample-cta { background: linear-gradient(140deg, var(--gold-glow), var(--primary) 65%, var(--gold-deep)); box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 50%, transparent); }
+.theme-sample[data-decoration-tier="b2b"] .theme-sample-body, .theme-sample[data-decoration-tier="b2b-premium"] .theme-sample-body { backdrop-filter: blur(12px); border-image: linear-gradient(135deg, var(--primary), var(--nebula)) 1; }
+.theme-sample[data-background-tier="b2b-premium"] .theme-sample-sky { animation: premium-stars 16s ease-in-out infinite alternate; }
 .theme-sample[data-design="pure-white"] { color-scheme: light; }
 .theme-sample--large { height: min(65dvh, 600px); min-height: 300px; padding: clamp(20px, 4vw, 48px); }
 .theme-sample--large .theme-sample-top { font-size: 16px; padding-bottom: 12px; }
@@ -1179,7 +1179,7 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .theme-sample--large .theme-sample-actions .theme-sample-cta { width: 130px; height: 40px; }
 .theme-sample--large .theme-sample-actions > span:not(.theme-sample-cta) { width: 40px; height: 32px; }
 .theme-preview-dialog { border-radius: 6px; }
-@media (prefers-reduced-motion: reduce) { .design-canvas[data-design="masculine-luxe"]::before, .design-canvas[data-tier="b2b-premium"] .celestial-stars, .theme-sample-sky { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .design-canvas[data-design="masculine-luxe"]::before, .design-canvas[data-background-tier="b2b-premium"] .celestial-stars, .theme-sample-sky { animation: none !important; } }
 
 /* Plan identity is separate from the fifteen preserved palette choices. */
 .color-detail-dialog {
@@ -1204,7 +1204,7 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .color-step[data-state=active] { background: color-mix(in oklab, var(--cosmic-foil-gold) 12%, var(--cosmic-space-ink)); color: var(--cosmic-text-main); border-color: var(--cosmic-foil-gold); }
 [data-appearance=minimal] .theme-sample-dial,
 [data-appearance=minimal] .appearance-part-icon { border: 1px solid var(--border); box-shadow: none; }
-.design-canvas[data-appearance=minimal] .celestial-stars { opacity: 0; }
+.design-canvas[data-background=minimal] .celestial-stars { opacity: 0; }
 .design-canvas[data-appearance=minimal] .agolmen-background-spiral { opacity: .035; }
 .design-canvas[data-appearance=minimal] main .font-serif { font-family: var(--font-sans); }
 .theme-sample[data-appearance=minimal] .theme-sample-sky { opacity: 0; }
@@ -1237,33 +1237,33 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .nautilus-icon .nautilus-spiral { stroke-width: 1.7; }
 .nautilus-icon .nautilus-chamber { stroke-width: .8; }
 .nautilus-relief, .nautilus-diamonds { display: none; }
-:is([data-appearance=sacred], [data-appearance=royal]) .nautilus-icon,
+:is([data-icons=sacred], [data-icons=royal]) .nautilus-icon,
 .nautilus-icon:is([data-nautilus=sacred], [data-nautilus=royal]) { filter: drop-shadow(0 1px 1px var(--cosmic-text-outline)) drop-shadow(0 0 3px var(--gold-glow)); }
-:is([data-appearance=sacred], [data-appearance=royal]) .nautilus-icon .nautilus-relief,
+:is([data-icons=sacred], [data-icons=royal]) .nautilus-icon .nautilus-relief,
 .nautilus-icon:is([data-nautilus=sacred], [data-nautilus=royal]) .nautilus-relief { display: block; opacity: .8; }
-:is([data-appearance=sacred], [data-appearance=royal]) .nautilus-icon .nautilus-diamonds,
+:is([data-icons=sacred], [data-icons=royal]) .nautilus-icon .nautilus-diamonds,
 .nautilus-icon:is([data-nautilus=sacred], [data-nautilus=royal]) .nautilus-diamonds { display: block; fill: var(--cosmic-foil-light); stroke: var(--cosmic-foil-light); stroke-width: .7; }
 .nautilus-icon .nautilus-glints { fill: none; }
-:is([data-appearance=sacred], [data-appearance=royal]) .nautilus-icon .nautilus-chamber { stroke: var(--gold-deep); stroke-width: 1.2; }
+:is([data-icons=sacred], [data-icons=royal]) .nautilus-icon .nautilus-chamber { stroke: var(--gold-deep); stroke-width: 1.2; }
 .nautilus-icon[data-nautilus=minimal] .nautilus-relief,
 .nautilus-icon[data-nautilus=minimal] .nautilus-diamonds,
 .nautilus-icon[data-nautilus=celestial] .nautilus-relief,
 .nautilus-icon[data-nautilus=celestial] .nautilus-diamonds { display: none; }
 .nautilus-icon:is([data-nautilus=minimal], [data-nautilus=celestial]) { filter: none; }
 .nautilus-icon:is([data-nautilus=minimal], [data-nautilus=celestial]) .nautilus-chamber { stroke: currentColor; stroke-width: .8; }
-[data-appearance=minimal] .nautilus-icon { color: var(--primary); }
+[data-icons=minimal] .nautilus-icon { color: var(--primary); }
 .appearance-background { position: absolute; top: 110px; right: -140px; width: min(850px, 110vw); height: auto; pointer-events: none; color: var(--cosmic-foil-gold); opacity: .13; z-index: 0; }
 .appearance-background :is(path, circle) { fill: none; stroke: currentColor; stroke-width: .23; }
 .appearance-background .nautilus-spiral { stroke-width: .5; }
 .appearance-background .nautilus-chamber { stroke-width: .18; }
 .appearance-background .royal-engraving { display: none; }
-[data-appearance=minimal] > .appearance-background { display: none; }
-[data-appearance=celestial] > .appearance-background .sacred-engraving { display: none; }
-[data-appearance=sacred] > .appearance-background { opacity: .16; }
-[data-appearance=sacred] > .appearance-background .cosmic-shell-engraving { opacity: .38; }
-[data-appearance=royal] > .appearance-background .royal-engraving { display: block; }
-[data-appearance=royal] > .appearance-background .sacred-engraving { opacity: .4; }
-[data-appearance=royal] > .appearance-background .cosmic-shell-engraving { opacity: .5; }
+[data-background=minimal] > .appearance-background { display: none; }
+[data-background=celestial] > .appearance-background .sacred-engraving { display: none; }
+[data-background=sacred] > .appearance-background { opacity: .16; }
+[data-background=sacred] > .appearance-background .cosmic-shell-engraving { opacity: .38; }
+[data-background=royal] > .appearance-background .royal-engraving { display: block; }
+[data-background=royal] > .appearance-background .sacred-engraving { opacity: .4; }
+[data-background=royal] > .appearance-background .cosmic-shell-engraving { opacity: .5; }
 .appearance-motif .royal-engraving { display: none; }
 [data-appearance=royal] .appearance-motif .royal-engraving { display: block; }
 .appearance-motif .cosmic-shell-engraving { opacity: .45; }
