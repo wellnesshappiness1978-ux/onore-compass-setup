@@ -46,8 +46,6 @@ type Props = {
   designMode: DesignMode;
   onDesignModeChange: (mode: DesignMode) => void;
   signedIn?: boolean;
-  automaticAppearance: boolean;
-  onAutomaticAppearanceChange: (value: boolean) => void;
 };
 
 const card = "border-b border-primary/20 py-6";
@@ -66,8 +64,6 @@ export default function SettingsPanel({
   designMode,
   onDesignModeChange,
   signedIn = false,
-  automaticAppearance,
-  onAutomaticAppearanceChange,
 }: Props) {
   const t = settingsTranslations[language];
   const dc = designCopy[language];

@@ -513,9 +513,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     return () => { active = false; };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
-  const [automaticAppearance, setAutomaticAppearance] = useState(true);
-  useEffect(() => { try { setAutomaticAppearance(sessionStorage.getItem("onore-appearance-auto") !== "false"); } catch { /* private browsing */ } }, []);
-  const changeAutomaticAppearance = (value: boolean) => { setAutomaticAppearance(value); try { sessionStorage.setItem("onore-appearance-auto", String(value)); } catch { /* private browsing */ } };
   useEffect(() => { try { const saved = sessionStorage.getItem("onore-design"); if (saved && designCopy.ja.names[saved as DesignMode] && canPreviewDesign(previewPlan, saved as DesignMode)) setDesignMode(saved as DesignMode); } catch { /* private browsing */ } }, []);
   useEffect(() => { try { sessionStorage.setItem("onore-design", designMode); } catch { /* private browsing */ } }, [designMode]);
   const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
@@ -648,8 +645,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 onDebugPlanChanged={(p) => setActualPlan(p)}
                 onPlanChange={applyDevOverride}
                 designMode={designMode}
-                automaticAppearance={automaticAppearance}
-                onAutomaticAppearanceChange={changeAutomaticAppearance}
                 onDesignModeChange={setDesignMode}
                 signedIn={signedIn}
                 onLanguageChange={onLanguageChange}
