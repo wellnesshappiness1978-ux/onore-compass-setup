@@ -522,6 +522,15 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     setAppearanceLoaded(true);
   }, []);
   useEffect(() => {
+    const syncAppearance = (event: StorageEvent) => {
+      if (event.storageArea !== localStorage) return;
+      if (event.key === "onore-design") setDesignMode(readDesign(event.newValue));
+      if (event.key === appearanceStorageKey) setAppearance(readAppearance(event.newValue));
+    };
+    window.addEventListener("storage", syncAppearance);
+    return () => window.removeEventListener("storage", syncAppearance);
+  }, []);
+  useEffect(() => {
     if (!appearanceLoaded) return;
     try { sessionStorage.setItem("onore-design", designMode); localStorage.setItem("onore-design", designMode); } catch { /* private browsing */ }
   }, [designMode, appearanceLoaded]);

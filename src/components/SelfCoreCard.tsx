@@ -43,7 +43,7 @@ const nameCopy: Record<Language, { title: string; grids: [string, string, string
 };
 
 type LayerReading = Awaited<ReturnType<typeof generateHomeReading>>;
-function CoreLayersPanel({ layers: c, profile, language, reading, loading, nameDetails }: { layers: CoreLayers; profile: UserProfile; language: Language; reading?: LayerReading; loading: boolean; nameDetails: ReactNode }) {
+function CoreLayersPanel({ layers: c, profile, language, reading, loading, nameDetails }: { layers: CoreLayers; profile: UserProfile; language: Language; reading: LayerReading | undefined; loading: boolean; nameDetails: ReactNode }) {
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
   const copy = homeReadingCopy[language];
@@ -142,7 +142,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const icons = [Dna, Fingerprint, Orbit, Heart, Sparkles];
 
   const nameDetails = (
-<section aria-label={n.title} className="my-6 rounded-lg border border-primary/40 bg-primary/5 p-4 sm:p-6">
+<section aria-label={n.title} className="my-6 border-y border-primary/25 py-5">
             <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
             {localLayers?.name ? <>
               <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
