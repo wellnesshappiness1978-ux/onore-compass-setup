@@ -1,3 +1,8 @@
+## Current birth-color and appearance request
+- [ ] Replace color details with three accessible steps, six role readings, practical scene switches and seven-language copy; separate science from symbolism and preserve Free restrictions.
+- [ ] Add automatic plan-mapped visual families and isolated live fitting with motif comparisons; preserve all prices, storage, membership gates, 15 palette choices and existing audio.
+- [ ] Verify the complete guest UI flow, plan mapping, responsive fitting, localization and artwork regression tests.
+
 - [x] Build the celestial home dashboard with an interactive compass and daily status.
 - [x] Add usable navigation, profile access, and notification feedback while preserving language selection.
 - [x] Verify the onboarding-to-dashboard flow and mobile layout.
