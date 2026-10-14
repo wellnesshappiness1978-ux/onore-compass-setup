@@ -1,3 +1,8 @@
+## Nautilus app-design refresh
+- [ ] Simplify appearance settings and localize plan labels in seven languages without changing prices or membership.
+- [ ] Replace menu ornaments and background spirals with shared tier-aware nautilus and sacred geometry.
+- [ ] Verify settings, isolated fitting, palette selection, localization and regression tests.
+
 ## Current birth-color and appearance request
 - [x] Replace color details with three accessible steps, six role readings, practical scene switches and seven-language copy; separate science from symbolism and preserve Free restrictions.
 - [x] Add automatic plan-mapped visual families and isolated live fitting with motif comparisons; preserve all prices, storage, membership gates, 15 palette choices and existing audio. The five existing membership IDs are mapped; Royal Sovereign is available as a Corporate visual specimen only because no independent Business contract exists in the current membership model.
