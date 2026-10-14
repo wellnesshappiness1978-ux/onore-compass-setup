@@ -1228,3 +1228,4 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 [data-appearance=celestial] .appearance-motif .sacred-engraving { display: none; }
 [data-appearance=sacred] .appearance-motif { filter: drop-shadow(0 0 2px var(--gold-glow)); }
 @media (prefers-reduced-motion: reduce) { .theme-sample *, .appearance-part * { animation: none !important; transition: none !important; } }
+.color-detail-dialog { z-index: 200; }
