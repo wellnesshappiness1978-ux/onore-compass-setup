@@ -1,30 +1,45 @@
-import { useEffect, useState } from 'react';
-import { Check, LockKeyhole, Save } from 'lucide-react';
+import { useState } from 'react';
+import { Check, LockKeyhole } from 'lucide-react';
 import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from './ui/dialog';
 import { ThemeSample } from './ThemeSample';
-import { NautilusIcon } from './NautilusIcon';
-import { appearanceFamilies } from '@/lib/appearance-families';
+import { appearanceFamilies, type AppearanceFamily } from '@/lib/appearance-families';
 import { appearanceUiCopy } from '@/lib/appearance-ui-copy';
 import { canUseAppearance, type AppearanceSelection } from '@/lib/appearance-customization';
-import { customizationCopy } from '@/lib/customization-copy';
-import type { Plan, DesignMode } from '@/lib/design-modes';
+import { designCopy, type Plan, type DesignMode } from '@/lib/design-modes';
 import type { Language } from '@/lib/translations';
-export function AppearanceFitting({ plan, mode, language, selection, onSave }: { plan: Plan; mode: DesignMode; language: Language; selection: AppearanceSelection; onSave: (selection: AppearanceSelection) => void }) {
-  const [draft, setDraft] = useState(selection);
-  const [saved, setSaved] = useState(false);
-  useEffect(() => { setDraft(selection); setSaved(false); }, [selection.background, selection.parts, selection.icons]);
+const familyModes: Record<AppearanceFamily, DesignMode> = { minimal: 'classic', celestial: 'feminine', sacred: 'masculine-luxe', royal: 'business-emperor' };
+export function AppearanceFitting({ plan, language, selection, onSave, onModeChange, onUpgrade }: { plan: Plan; language: Language; selection: AppearanceSelection; onSave: (selection: AppearanceSelection) => void; onModeChange: (mode: DesignMode) => void; onUpgrade: () => void }) {
+  const [preview, setPreview] = useState<AppearanceFamily | null>(null);
   const copy = appearanceUiCopy[language];
-  const ui = customizationCopy[language];
-  const valid = Object.values(draft).every(family => canUseAppearance(plan, family));
-  return <div className="mt-5 border-b border-primary/20 pb-6">
-    <ThemeSample mode={mode} tier={plan} name={ui.preview} family={draft.parts} background={draft.background} icons={draft.icons} large />
-    {(['background', 'parts', 'icons'] as const).map(category => <fieldset key={category} className="mt-5 min-w-0"><legend className="mb-2 text-sm text-primary">{ui[category]}</legend><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-      {appearanceFamilies.map(family => { const available = canUseAppearance(plan, family), selected = draft[category] === family;
-        return <Button key={family} variant="outline" aria-pressed={selected} aria-label={`${ui[category]} · ${copy.families[family]}`} onClick={() => { setDraft(prev => ({ ...prev, [category]: family })); setSaved(false); }} className={`h-auto min-h-24 flex-col gap-2 whitespace-normal px-2 py-3 text-xs ${selected ? 'border-primary bg-primary/10' : 'border-primary/20'}`}>
-          <NautilusIcon className="size-8" family={family} /><span className="leading-5">{copy.families[family]}</span><span className="flex items-center gap-1 text-muted-foreground">{!available ? <><LockKeyhole className="size-3" />{ui.locked} · {ui.preview}</> : selected ? <Check className="size-3 text-primary" /> : null}</span>
+  const dc = designCopy[language];
+  return <>
+    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-label={dc.title}>
+      {appearanceFamilies.map(family => {
+        const available = canUseAppearance(plan, family);
+        const selected = Object.values(selection).every(value => value === family);
+        return <Button key={family} variant="outline" aria-pressed={selected} aria-label={copy.families[family]} onClick={() => {
+          if (!available) { setPreview(family); return; }
+          onSave({ background: family, parts: family, icons: family });
+          onModeChange(familyModes[family]);
+        }} className={`theme-choice min-w-0 h-auto flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 ${selected ? 'ring-2 ring-primary' : ''}`}>
+          <ThemeSample mode={familyModes[family]} tier={plan} name={copy.families[family]} family={family} compact />
+          <span className="grid min-h-10 grid-cols-[minmax(0,1fr)_auto] items-center gap-1 px-2 py-1 text-left text-[11px] leading-4">
+            <span className="min-w-0 whitespace-normal">{copy.families[family]}</span>
+            {!available ? <LockKeyhole className="size-3.5 shrink-0 text-primary" aria-label={dc.requires} /> : selected ? <Check className="size-3.5 shrink-0 text-primary" aria-label={copy.current} /> : null}
+          </span>
         </Button>;
       })}
-    </div></fieldset>)}
-    <div className="mt-5 flex flex-wrap items-center gap-3"><Button disabled={!valid} onClick={() => { onSave(draft); setSaved(true); }}><Save className="size-4" />{ui.save}</Button>{saved && <span role="status" className="text-xs text-primary">{ui.saved}</span>}</div>
-  </div>;
+    </div>
+    <Dialog open={preview !== null} onOpenChange={open => { if (!open) setPreview(null); }}>
+      <DialogContent className="max-w-md gap-3 border-primary/30 bg-card p-4 text-foreground">
+        {preview && <>
+          <DialogTitle className="font-serif text-lg text-primary">{copy.families[preview]}</DialogTitle>
+          <ThemeSample mode={familyModes[preview]} tier={plan} name={copy.preview} family={preview} />
+          <DialogDescription>{dc.locked(preview === 'royal' ? `${copy.plans.business} / ${copy.plans.corporate}` : copy.plans[preview === 'celestial' ? 'standard' : 'vip'])}</DialogDescription>
+          <div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setPreview(null)}>{dc.later}</Button><Button onClick={() => { setPreview(null); onUpgrade(); }}>{dc.upgrade}</Button></div>
+        </>}
+      </DialogContent>
+    </Dialog>
+  </>;
 }

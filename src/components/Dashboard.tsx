@@ -51,7 +51,7 @@ import { homeReadingCopy } from "@/lib/home-reading-copy";
 import DailyLifeGuide from "./DailyLifeGuide";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
-import { allowedAppearance, allowedDesign, canUseAppearance, decorationTier, appearanceStorageKey, defaultAppearance, readAppearance, readDesign, type AppearanceSelection } from "@/lib/appearance-customization";
+import { canUseAppearance, decorationTier, appearanceStorageKey, defaultAppearance, readAppearance, readDesign, type AppearanceSelection } from "@/lib/appearance-customization";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -530,8 +530,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     setAppearance(next);
     try { localStorage.setItem(appearanceStorageKey, JSON.stringify(next)); } catch { /* private browsing */ }
   };
-  const effectiveDesign = allowedDesign(designMode, previewPlan);
-  const effectiveAppearance = allowedAppearance(appearance, previewPlan);
+  const effectiveDesign = designMode;
+  const effectiveAppearance = appearance;
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   
   

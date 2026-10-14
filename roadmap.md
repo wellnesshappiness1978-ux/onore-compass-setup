@@ -1,3 +1,8 @@
+## Compact manual app design
+- [x] Consolidate four family thumbnails and all 15 existing palettes into one compact view with isolated locked previews; preserve saved IDs and combinations.
+- [x] Apply coordinated background, parts, icons and palette only on unlocked family taps; plan upgrades/downgrades leave the applied design unchanged.
+- [x] Browser-verify explicit selection, locked Royal preview without changes, reload persistence, VIP/Family Premium/Free/Standard transitions, legacy swatches, consultation y=0, Japanese 390px and 695px compact views and English desktop; no page errors or horizontal overflow. Synthetic guest and development plan previews used, not paid membership changes. Astronomy, color references, VIP gates and shared 2048 renderer unchanged.
+
 ## Independent customization and color references
 - [x] Replace brain-wave copy with seven-language hue-based wavelength/frequency references, symbolic chakra/body regions and distinct practical cues. Mixed colors retain no-single-wavelength labels; no medical or measured personal-wave claims.
 - [x] Add independent local-persistent backgrounds, frames/parts and icons with isolated draft, preview-only locked choices and save confirmation. Migrate the legacy palette session choice without changing IDs; upgrades preserve saved selections and downgrades apply non-mutating safe fallbacks. Remove remaining membership-driven CSS decoration links; Royal stays preview-only without a corporate contract.

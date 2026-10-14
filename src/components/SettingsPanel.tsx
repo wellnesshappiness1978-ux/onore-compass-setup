@@ -194,45 +194,24 @@ export default function SettingsPanel({
 
       {planOrder.indexOf(plan) >= planOrder.indexOf("vip") && <section className={card}><SolfeggioPlayer language={language} /></section>}
 
-      <section className="border-y border-primary/20 py-6" aria-labelledby="design-heading">
+      <section className="border-y border-primary/20 py-4" aria-labelledby="design-heading">
         <div className="flex items-center gap-2">
           <NautilusIcon className="size-7 text-primary" />
           <h3 id="design-heading" className="font-serif text-xl text-primary">{dc.title}</h3>
         </div>
-        <AppearanceFitting plan={plan} mode={designMode} language={language} selection={appearance} onSave={onAppearanceSave} />
-        <h4 className="mt-5 text-sm text-primary">{appearanceCopy.palettes}</h4>
-        <div className="mt-5 space-y-5">
-          {(["free", "standard", "vip", "b2b", "b2b-premium"] as Plan[]).map((tier, index) => (
-            <div key={tier}>
-              <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="h-px w-5 bg-primary/40" />{appearanceCopy.plans[tier]}
-              </div>
-              <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-2">
-                {designModes.filter((mode) => mode.tier === tier).map((mode) => {
-                  const available = canPreviewDesign(plan, mode.id);
-                  const selected = designMode === mode.id;
-                  return (
-                    <Button
-                      key={mode.id}
-                      type="button"
-                      variant="outline"
-                      aria-pressed={selected}
-                       aria-label={`${dc.names[mode.id]} · ${appearanceCopy.plans[tier]}`}
-                      title={dc.names[mode.id]}
-                      onClick={() => available ? onDesignModeChange(mode.id) : setLockedMode(mode.id)}
-                      className={`theme-choice h-auto min-h-48 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left ${selected ? "ring-2 ring-primary" : ""}`}
-                    >
-                      <ThemeSample mode={mode.id} tier={mode.tier} name={dc.names[mode.id]} />
-                      <span className="flex w-full items-center justify-between gap-2 px-3 py-2 text-xs text-foreground">
-                         <span className="min-w-0 whitespace-normal leading-5">{dc.names[mode.id]}<span className="mt-0.5 block text-[10px] text-muted-foreground">{appearanceCopy.plans[tier]}</span></span>
-                        {selected ? <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} /> : !available ? <LockKeyhole className="size-4 shrink-0 text-primary" aria-label={dc.requires} /> : null}
-                      </span>
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+        <AppearanceFitting plan={plan} language={language} selection={appearance} onSave={onAppearanceSave} onModeChange={onDesignModeChange} onUpgrade={() => setUpgradePlan(t.plansHeading)} />
+        <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+          <h4 className="min-w-0 text-xs text-muted-foreground">{appearanceCopy.palettes}</h4>
+          <span className="max-w-48 truncate text-[11px] text-primary">{dc.names[designMode]}</span>
+        </div>
+        <div className="mt-2 grid grid-cols-8 gap-1.5 sm:grid-cols-15" role="group" aria-label={appearanceCopy.palettes}>
+          {designModes.map(mode => {
+            const available = canPreviewDesign(plan, mode.id);
+            return <Button key={mode.id} variant="outline" title={`${dc.names[mode.id]} · ${appearanceCopy.plans[mode.tier]}`} aria-label={`${dc.names[mode.id]} · ${appearanceCopy.plans[mode.tier]}`} aria-pressed={designMode === mode.id} onClick={() => available ? onDesignModeChange(mode.id) : setLockedMode(mode.id)} className={`relative h-8 min-w-0 overflow-hidden rounded-md p-0 ${designMode === mode.id ? 'ring-2 ring-primary' : ''}`}>
+              <span data-design={mode.id} className="palette-chip absolute inset-0" />
+              {!available ? <LockKeyhole className="relative size-3 text-foreground" aria-label={dc.requires} /> : designMode === mode.id ? <Check className="relative size-3 text-foreground" /> : null}
+            </Button>;
+          })}
         </div>
       </section>
 
