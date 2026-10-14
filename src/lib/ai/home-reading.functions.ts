@@ -8,6 +8,8 @@ import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { helioPhase } from "./helio-phase";
 import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 import { distinctTraitChapters, supportiveWritingVoice } from "./writing-voice";
+import { approachKeys, approachStatuses, traitReadingPrompt } from "@/lib/trait-reading";
+import { nineStarProfile } from "@/lib/calendar-traditions";
 
 const profileSchema = z.object({
   nameKanji: z.string().max(40), nameKana: z.string().max(60), nameRomaji: z.string().max(60),
@@ -20,6 +22,9 @@ const inputSchema = z.object({
   language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]),
 });
 const readingSchema = z.object({
+  essence: z.object({ outward: z.string(), inner: z.string(), growth: z.string(), resilience: z.string(), relationships: z.string(), gift: z.string() }),
+  approaches: z.object({ western: z.string(), indian: z.string(), ziwei: z.string(), earth: z.string(), pillars: z.string(), sanmei: z.string(), nineStars: z.string(), lunarMansion: z.string(), animal: z.string(), numerology: z.string(), maya: z.string(), color: z.string(), blood: z.string(), siblings: z.string(), region: z.string() }),
+  axisSummary: z.string(),
   synthesis: z.string().min(60).max(1100),
   name: z.string().min(30).max(750),
   mind: z.string().min(30).max(750),
@@ -58,6 +63,8 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     const color = birthColorSpectrum(profile);
     const helio = helioPhase(profile.birthDate);
     const gua = mingGua(profile.birthDate, profile.gender ?? "undisclosed");
+    const nineStars = nineStarProfile(profile.birthDate, profile.birthTime, profile.birthTimeUnknown, profile.gender);
+    const approachAvailability = approachStatuses({ core: Boolean(layers), earth: Boolean(helio), nineStars: Boolean(nineStars), color: Boolean(color), blood: Boolean(elements.blood), siblings: Boolean(profile.siblingOrder), region: Boolean(profile.birthPlace || profile.birthCity) });
     let runId: string | undefined;
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
@@ -119,8 +126,18 @@ pillarsTiming: about 120 chars. From the five-element excess/lack and day master
 animalSwitch: about 120 chars. From the core animal character and its group: interpret decision habits as a traditional reference. The other three displayed layers use the original shifted-day model, not the official classification; never treat them as personality evidence.
 colorPractice: about 120 chars. Daily ways to use the birth colors: one small item, one interior idea, one focus of attention, naming the color names.
 helioGuide: about 120 chars. State the phase explicitly and what to do in this phase this week/month, plus (a)(b)(c). Describe as an earth-calendar reflection, not verified luck.
-Do not mention any birth-color names, HEX codes, or color themes outside colorPractice; colorPractice is displayed behind a separate plan gate. Include a practical feng-shui environmental reflection in manualTiming when relevant: clearing a walkway before a task, adjusting glare at the desk, or choosing an entered Gua direction; never promise health, wealth or outcomes. Return only the structured object.`,
+Do not mention any birth-color names, HEX codes, or color themes outside colorPractice; colorPractice is displayed behind a separate plan gate. Include a practical feng-shui environmental reflection in manualTiming when relevant: clearing a walkway before a task, adjusting glare at the desk, or choosing an entered Gua direction; never promise health, wealth or outcomes.
+FINAL NEW FIELD CONTRACT:
+${traitReadingPrompt}
+Availability (server-authoritative): ${JSON.stringify(approachAvailability)}.
+Nine Star reference: ${nineStars ? `honmei ${nineStars.honmei}, getsumei ${nineStars.getsumei}, keisha ${nineStars.keisha}; boundary ${nineStars.nearBoundary}; traditional reference, not measured personality or auspicious timing` : "unavailable"}.
+Supplied family context: ${profile.siblingOrder || "missing"}. Supplied birth location: ${profile.birthPlace} ${profile.birthCity}; do not infer upbringing.
+Return only the structured object.`,
       providerOptions: { openai: { store: false, forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", include: ["reasoning.encrypted_content"] } },
     });
-    return { ...readingSchema.parse(await result.output), elements, layers, helio };
+    const reading = readingSchema.parse(await result.output);
+    for (const key of approachKeys) {
+      if (approachAvailability[key] === "unavailable") reading.approaches[key] = "";
+    }
+    return { ...reading, approachAvailability, elements, layers, helio };
   });
