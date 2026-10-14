@@ -133,6 +133,8 @@ ${traitReadingPrompt}
 Availability (server-authoritative): ${JSON.stringify(approachAvailability)}.
 Nine Star reference: ${nineStars ? `honmei ${nineStars.honmei}, getsumei ${nineStars.getsumei}, keisha ${nineStars.keisha}; boundary ${nineStars.nearBoundary}; traditional reference, not measured personality or auspicious timing` : "unavailable"}.
 Supplied family context: ${profile.siblingOrder || "missing"}. Supplied birth location: ${profile.birthPlace} ${profile.birthCity}; do not infer upbringing.
+FINAL VOICE PRIORITY (applies to ALL fields; preserve schema, lengths and availability):
+${supportiveWritingVoice}
 Return only the structured object.`,
       providerOptions: { openai: { store: false, forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", include: ["reasoning.encrypted_content"] } },
     });
