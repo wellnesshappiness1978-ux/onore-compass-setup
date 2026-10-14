@@ -24,8 +24,9 @@ describe("Localized companion prose", () => {
   });
 
   it("separates reference numbers from measured health and color effects", () => {
-    expect(companionCopy.ja.rhythm("身体")).toContain("体調や能力を測った値ではありません");
-    expect(companionCopy.ja.colorScenes.join(" ")).toContain("治療や睡眠改善の代わりではありません");
+    expect(companionCopy.ja.rhythm("身体")).toContain("振り返り用のカーブ");
+    expect(companionCopy.ja.rhythm("身体")).toContain("実際の症状");
+    expect(companionCopy.ja.colorScenes.join(" ")).toContain("医療の相談");
     expect(companionCopy.ja.day.fire).toContain("参考テーマ");
     expect(companionCopy.ja.advance[1]).toContain("15分");
   });
