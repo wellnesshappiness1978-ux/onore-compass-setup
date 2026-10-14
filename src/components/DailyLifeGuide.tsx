@@ -10,6 +10,7 @@ import { directionEnergy, localIso, personal } from "@/lib/day-compass";
 import { dayElement, relation, type Element, type TeamMember } from "@/lib/team-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import ShareCardButton from "./ShareCardButton";
+import { companionCopy } from "@/lib/companion-copy";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 
 // Deterministic daily guide from birth date + today's day element. Reference values, not verified readings.
@@ -50,6 +51,7 @@ type Props = { profile: UserProfile; language: Language; plan: Plan; signedIn: b
 
 export default function DailyLifeGuide({ profile, language, plan, signedIn, onUpgrade }: Props) {
   const isJa = language === "ja";
+  const voice = companionCopy[language];
   const t = isJa ? ja : en;
   const open = planOrder.indexOf(plan) >= planOrder.indexOf("standard");
   const today = new Date();
@@ -92,7 +94,7 @@ export default function DailyLifeGuide({ profile, language, plan, signedIn, onUp
     <div className="border-y border-primary/20 py-6">
       {open && <section aria-label="今日の具体的決断" className="mb-6">
         <div className="flex flex-wrap items-baseline justify-between gap-3"><h2 className="font-serif text-2xl text-primary">{isJa ? "今日の具体的決断" : "Today's concrete decision"}</h2><span className="text-sm text-muted-foreground">{iso} · {isJa ? "3周期の参考値" : "Three-cycle reference"} {Math.round(rhythm.total)}</span></div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2"><article className="border-l-2 border-primary pl-4"><h3 className="font-serif text-xl text-primary">{isJa ? "攻めるなら" : "Advance"}</h3><p className="mt-2 text-base leading-8">{isJa ? (rhythm.total >= 55 ? "準備済みの提案を1件届ける。送る前に目的・相手の利点・次の一歩を3行で確認。まず小さく反応を確かめる。" : "大きな賭けではなく、小さな試作を1件進める。15分だけ着手して、不明点を1つ解消する。") : (rhythm.total >= 55 ? "Send one prepared proposal. State the goal, benefit and next step; test the response before committing." : "Build one small prototype. Work for 15 minutes and resolve one uncertainty.")}</p></article><article className="border-l border-primary/30 pl-4"><h3 className="font-serif text-xl text-primary">{isJa ? "守るなら" : "Protect"}</h3><p className="mt-2 text-base leading-8">{isJa ? (rhythm.total < 45 ? "費用と期限が大きい判断は、事実・代替案・撤退条件を紙に整理。判断を急がず、信頼できる人の確認を1回入れる。" : "引き受ける前に所要時間と締切を確認。予定に30分の余白を残し、返事は確約できる範囲で伝える。") : "Check costs, deadlines and alternatives. Leave room in your schedule and seek a second review for high-stakes decisions."}</p></article></div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2"><article className="border-l-2 border-primary pl-4"><h3 className="font-serif text-xl text-primary">{isJa ? "攻めるなら" : "Advance"}</h3><p className="mt-2 text-base leading-8">{voice.advance[rhythm.total >= 55 ? 0 : 1]}</p></article><article className="border-l border-primary/30 pl-4"><h3 className="font-serif text-xl text-primary">{isJa ? "守るなら" : "Protect"}</h3><p className="mt-2 text-base leading-8">{voice.protect[rhythm.total < 45 ? 0 : 1]}</p></article></div>
         <p className="mt-3 text-xs text-muted-foreground">{isJa ? "周期を使った振り返りの提案です。決断・健康・取引の結果を予測しません。" : "Reflection prompts, not predictions of decisions, health or transactions."}</p>
         <ShareCardButton language={language} autoOpen={false} label={isJa ? "今日の占いを1タップでシェア" : "Share today's guide"} data={{ kicker: isJa ? "今日の占い" : "Today's guide", title: iso, score: Math.round(rhythm.total), names: profile.nameKanji ? [profile.nameKanji] : [], lines: [rhythm.total >= 55 ? (isJa ? "準備した一歩を小さく試す日" : "A day to test one prepared step") : (isJa ? "急がず、確認と余白を整える日" : "A day to verify and leave space"), best ? `${t.dir}: ${t.dirs[best.dir]}` : ""].filter(Boolean), kind: "daily", palette: color ? [{ label: isJa ? "守護バースカラー" : "Guardian color", code: color.code }] : [] }} />
       </section>}

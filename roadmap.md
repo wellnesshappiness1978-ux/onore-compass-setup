@@ -1,3 +1,8 @@
+## Respectful companion persona
+- [x] Refine shared generation voice and remove contradictory analogy restrictions without changing models or output contracts.
+- [ ] Align deterministic daily, rhythm and color practice prose in seven languages.
+- [ ] Run regression tests and live personal reading/consultation checks; preserve appearance, astronomy and exports.
+
 ## Desktop/mobile parity and six integrated perspectives
 - [x] Contain birth-color cards and scroll long details on both widths; 320/390/1280px dialogs have no horizontal overflow and all seven colors/all three steps were exercised in development Standard preview.
 - [x] Integrate name grids and split controls into six interactive personal reading dialogs, preserving existing calculated methods and seven languages. All six real signed-in personal readings and existing name grids were opened; no personal profile edits were made.

@@ -1,4 +1,5 @@
 import type { Language } from "./translations";
+import { companionCopy } from "./companion-copy";
 export type ColorExperienceCopy = {
  steps: string[]; titles: string[]; labels: string[]; science: string; basis: string; provisional: string; symbolNote: string; protect: string; protectNote: string; psych: string[]; elements: string[]; daily: string[]; scenes: string[]; sceneTips: string[]; nonSpectral: string; reference: string; palette: string; appearance: string[];
 };
@@ -543,3 +544,9 @@ export const colorExperienceCopy: Record<Language, ColorExperienceCopy> = {
     ]
   }
 };
+
+// Keep educational color science intact; only practice prose uses the companion voice.
+for (const language of Object.keys(colorExperienceCopy) as Language[]) {
+  colorExperienceCopy[language].daily = companionCopy[language].colorDaily;
+  colorExperienceCopy[language].sceneTips = companionCopy[language].colorScenes;
+}
