@@ -1,7 +1,7 @@
 ## Nautilus app-design refresh
-- [ ] Simplify appearance settings and localize plan labels in seven languages without changing prices or membership.
-- [ ] Replace menu ornaments and background spirals with shared tier-aware nautilus and sacred geometry.
-- [ ] Verify settings, isolated fitting, palette selection, localization and regression tests.
+- [x] Simplify appearance settings: remove explanatory paragraphs, comparison cards and automatic/manual controls; use seven-language plan/family labels without changing prices or membership.
+- [x] Replace menu ornaments and background spirals with shared golden-ratio chambered nautilus geometry, gold-leaf/diamond VIP jewelry, sacred flower geometry and royal preview crests. Independent Corporate remains visual fitting only; legacy Family IDs never grant corporate access.
+- [x] Verify Japanese/English settings, isolated VIP/royal fitting, all 15 palette choices, selected palette, automatic family mapping after reload, 390px layout with no horizontal overflow and no page errors. All 33 focused localization/appearance/astronomy/optics tests pass; clean build diagnostics. Synthetic guest and development Standard preview used; no authenticated membership or paid entitlement verification claimed. Foreground astronomy, VIP gates and shared 2048 renderer were not edited.
 
 ## Current birth-color and appearance request
 - [x] Replace color details with three accessible steps, six role readings, practical scene switches and seven-language copy; separate science from symbolism and preserve Free restrictions.
