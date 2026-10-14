@@ -15,6 +15,7 @@ import {
 import type { Element } from "@/lib/team-analysis";
 import ShareCardButton from "./ShareCardButton";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
+import { companionCopy } from "@/lib/companion-copy";
 import { rokuyo } from "@/lib/calendar-traditions";
 
 const ja = {
@@ -127,7 +128,7 @@ const rank = (p: Plan) => planOrder.indexOf(p);
 type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void };
 
 export default function DayCompass({ profile, language, plan, onUpgrade }: Props) {
-  const c = translatedCopy[language];
+  const c = { ...translatedCopy[language], elDay: companionCopy[language].day, rel: companionCopy[language].relation, bodyTip: companionCopy[language].rhythm };
   const names = teamCopy[language].planNames;
   const now = useMemo(() => new Date(), []);
   const minDate = useMemo(() => new Date(now.getFullYear() - 100, 0, 1), [now]);

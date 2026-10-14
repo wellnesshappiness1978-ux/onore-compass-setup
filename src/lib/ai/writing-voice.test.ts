@@ -13,4 +13,16 @@ describe("AI writing voice", () => {
     expect(distinctTraitChapters).toContain("relationship style");
     expect(distinctTraitChapters).toContain("Do not reuse");
   });
+
+  it("requires respectful, accessible, perceptive and actionable guidance", () => {
+    for (const rule of ["desu/masu", "ninth-grade", "everyday analogy", "at least two available reference values", "today or tomorrow", "when and what", "Portrait-only fields"]) {
+      expect(supportiveWritingVoice).toContain(rule);
+    }
+  });
+
+  it("limits humor and preserves interpretation and health boundaries", () => {
+    for (const rule of ["never AT them", "Omit humor for grief", "not verified psychology or mind-reading", "Missing inputs stay missing", "biorhythm never establishes health"]) {
+      expect(supportiveWritingVoice).toContain(rule);
+    }
+  });
 });

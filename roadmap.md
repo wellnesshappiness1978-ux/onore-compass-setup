@@ -1,3 +1,8 @@
+## Respectful companion persona
+- [x] Refine shared generation voice and remove contradictory analogy restrictions without changing models or output contracts.
+- [x] Align deterministic daily, rhythm and color practice prose in seven languages; keep symbolic and measured-health boundaries separate.
+- [x] Verify a real signed-in personal reading and completed consultation with actual input; confirm respectful prose and a concrete tomorrow step, no request failures or page errors, consultation entry at y=0, and the same reading dialog at desktop/390px without horizontal overflow. All 46 focused voice/localization/appearance/astronomy/mandala/rendering regression tests pass and latest build is OK. Models, schemas, output limits, appearance, astronomy and export code remain unchanged. Existing cross-device cloud appearance synchronization is not added by this prose-only request.
+
 ## Desktop/mobile parity and six integrated perspectives
 - [x] Contain birth-color cards and scroll long details on both widths; 320/390/1280px dialogs have no horizontal overflow and all seven colors/all three steps were exercised in development Standard preview.
 - [x] Integrate name grids and split controls into six interactive personal reading dialogs, preserving existing calculated methods and seven languages. All six real signed-in personal readings and existing name grids were opened; no personal profile edits were made.
