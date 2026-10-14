@@ -1229,3 +1229,57 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 [data-appearance=sacred] .appearance-motif { filter: drop-shadow(0 0 2px var(--gold-glow)); }
 @media (prefers-reduced-motion: reduce) { .theme-sample *, .appearance-part * { animation: none !important; transition: none !important; } }
 .color-detail-dialog { z-index: 200; }
+
+/* Shared nautilus jewelry: palettes remain independent of membership ornaments. */
+.nautilus-icon { display: inline-block; flex: none; overflow: visible; color: var(--cosmic-foil-gold); }
+.nautilus-icon .nautilus-shell, .nautilus-icon .nautilus-spiral, .nautilus-icon .nautilus-chamber { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.nautilus-icon .nautilus-shell { stroke-width: 1.4; }
+.nautilus-icon .nautilus-spiral { stroke-width: 1.7; }
+.nautilus-icon .nautilus-chamber { stroke-width: .8; }
+.nautilus-relief, .nautilus-diamonds { display: none; }
+:is([data-appearance=sacred], [data-appearance=royal]) .nautilus-icon,
+.nautilus-icon:is([data-nautilus=sacred], [data-nautilus=royal]) { filter: drop-shadow(0 1px 1px var(--cosmic-text-outline)) drop-shadow(0 0 3px var(--gold-glow)); }
+:is([data-appearance=sacred], [data-appearance=royal]) .nautilus-icon .nautilus-relief,
+.nautilus-icon:is([data-nautilus=sacred], [data-nautilus=royal]) .nautilus-relief { display: block; opacity: .8; }
+:is([data-appearance=sacred], [data-appearance=royal]) .nautilus-icon .nautilus-diamonds,
+.nautilus-icon:is([data-nautilus=sacred], [data-nautilus=royal]) .nautilus-diamonds { display: block; fill: var(--cosmic-foil-light); stroke: var(--cosmic-foil-light); stroke-width: .7; }
+.nautilus-icon .nautilus-glints { fill: none; }
+:is([data-appearance=sacred], [data-appearance=royal]) .nautilus-icon .nautilus-chamber { stroke: var(--gold-deep); stroke-width: 1.2; }
+.nautilus-icon[data-nautilus=minimal] .nautilus-relief,
+.nautilus-icon[data-nautilus=minimal] .nautilus-diamonds,
+.nautilus-icon[data-nautilus=celestial] .nautilus-relief,
+.nautilus-icon[data-nautilus=celestial] .nautilus-diamonds { display: none; }
+.nautilus-icon:is([data-nautilus=minimal], [data-nautilus=celestial]) { filter: none; }
+.nautilus-icon:is([data-nautilus=minimal], [data-nautilus=celestial]) .nautilus-chamber { stroke: currentColor; stroke-width: .8; }
+[data-appearance=minimal] .nautilus-icon { color: var(--primary); }
+.appearance-background { position: absolute; top: 110px; right: -140px; width: min(850px, 110vw); height: auto; pointer-events: none; color: var(--cosmic-foil-gold); opacity: .13; z-index: 0; }
+.appearance-background :is(path, circle) { fill: none; stroke: currentColor; stroke-width: .23; }
+.appearance-background .nautilus-spiral { stroke-width: .5; }
+.appearance-background .nautilus-chamber { stroke-width: .18; }
+.appearance-background .royal-engraving { display: none; }
+[data-appearance=minimal] > .appearance-background { display: none; }
+[data-appearance=celestial] > .appearance-background .sacred-engraving { display: none; }
+[data-appearance=sacred] > .appearance-background { opacity: .16; }
+[data-appearance=sacred] > .appearance-background .cosmic-shell-engraving { opacity: .38; }
+[data-appearance=royal] > .appearance-background .royal-engraving { display: block; }
+[data-appearance=royal] > .appearance-background .sacred-engraving { opacity: .4; }
+[data-appearance=royal] > .appearance-background .cosmic-shell-engraving { opacity: .5; }
+.appearance-motif .royal-engraving { display: none; }
+[data-appearance=royal] .appearance-motif .royal-engraving { display: block; }
+.appearance-motif .cosmic-shell-engraving { opacity: .45; }
+.design-canvas[data-appearance]::before { display: none; animation: none; }
+.design-canvas[data-appearance] { background-image: none; }
+.theme-sample[data-appearance] .theme-sample-sky { background-image: none; }
+.theme-sample > .appearance-background { width: 95%; top: 10%; right: -25%; opacity: .19; }
+.theme-sample--large > .appearance-background { width: 90%; top: 5%; right: -17%; }
+.appearance-plan-tab[data-state=active] { border-color: var(--primary); background: color-mix(in oklab, var(--primary) 10%, var(--card)); box-shadow: inset 0 -2px 0 var(--primary); }
+.appearance-plan-tab { transition: border-color .2s ease, background-color .2s ease; }
+.theme-sample--large .theme-sample-heading { font-size: 22px; }
+@media (max-width: 480px) {
+  .theme-sample--large { height: 350px; min-height: 350px; padding: 20px 16px; }
+  .theme-sample--large .theme-sample-body { min-height: 130px; padding: 16px; gap: 16px; }
+  .theme-sample--large .theme-sample-dial { width: 82px; height: 82px; }
+  .theme-sample--large .theme-sample-heading { font-size: 18px; }
+  .appearance-background { right: -90px; top: 150px; }
+}
+@media (prefers-reduced-motion: reduce) { .appearance-plan-tab { transition: none; } }
