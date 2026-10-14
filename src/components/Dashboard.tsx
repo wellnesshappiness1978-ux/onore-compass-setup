@@ -37,7 +37,7 @@ import SettingsPanel from "@/components/SettingsPanel";
 import TeamStudio from "@/components/team/TeamStudio";
 import BusinessFeaturePreview from "@/components/BusinessFeaturePreview";
 import LanguageSelector from "@/components/LanguageSelector";
-import { canPreviewDesign, designCopy, type DesignMode, type Plan } from "@/lib/design-modes";
+import { type DesignMode, type Plan } from "@/lib/design-modes";
 import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { useDailyUsage } from "@/hooks/use-daily-usage";
@@ -51,7 +51,7 @@ import { homeReadingCopy } from "@/lib/home-reading-copy";
 import DailyLifeGuide from "./DailyLifeGuide";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
-import { appearanceForPlan } from "@/lib/appearance-families";
+import { allowedAppearance, allowedDesign, canUseAppearance, decorationTier, appearanceStorageKey, defaultAppearance, readAppearance, readDesign, type AppearanceSelection } from "@/lib/appearance-customization";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -475,9 +475,9 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   }, []);
   useEffect(() => {
     if (tab !== "consult") return;
-    window.scrollTo({ top: 0, behavior: "auto" });
-    const frame = requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
-    const timer = window.setTimeout(() => window.scrollTo({ top: 0, behavior: "auto" }), 120);
+    window.scrollTo({ top: 0, behavior: "instant" });
+    const frame = requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    const timer = window.setTimeout(() => window.scrollTo({ top: 0, behavior: "instant" }), 120);
     return () => { cancelAnimationFrame(frame); window.clearTimeout(timer); };
   }, [tab]);
   // Strict entitlement: the read-only membership row decides access. The switch may only preview equal or lower plans.
@@ -487,7 +487,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const applyDevOverride = (next: Plan) => {
     selectPlan(next);
     setPreviewPlan(next);
-    if (!canPreviewDesign(next, designMode)) setDesignMode("classic");
   };
   const actualPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : serverPlan;
   // Test preview only: plan cards switch the plan and jump to the newly unlocked feature.
@@ -513,10 +512,26 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     return () => { active = false; };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
-  useEffect(() => { try { const saved = sessionStorage.getItem("onore-design"); if (saved && designCopy.ja.names[saved as DesignMode] && canPreviewDesign(previewPlan, saved as DesignMode)) setDesignMode(saved as DesignMode); } catch { /* private browsing */ } }, []);
-  useEffect(() => { try { sessionStorage.setItem("onore-design", designMode); } catch { /* private browsing */ } }, [designMode]);
-  const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
-  useEffect(() => { if (!canPreviewDesign(previewPlan, designMode)) setDesignMode("classic"); }, [previewPlan, designMode]);
+  const [appearance, setAppearance] = useState<AppearanceSelection>(defaultAppearance);
+  const [appearanceLoaded, setAppearanceLoaded] = useState(false);
+  useEffect(() => {
+    try {
+      setDesignMode(readDesign(localStorage.getItem("onore-design") ?? sessionStorage.getItem("onore-design")));
+      setAppearance(readAppearance(localStorage.getItem(appearanceStorageKey)));
+    } catch { /* private browsing */ }
+    setAppearanceLoaded(true);
+  }, []);
+  useEffect(() => {
+    if (!appearanceLoaded) return;
+    try { sessionStorage.setItem("onore-design", designMode); localStorage.setItem("onore-design", designMode); } catch { /* private browsing */ }
+  }, [designMode, appearanceLoaded]);
+  const saveAppearance = (next: AppearanceSelection) => {
+    if (!Object.values(next).every(family => canUseAppearance(previewPlan, family))) return;
+    setAppearance(next);
+    try { localStorage.setItem(appearanceStorageKey, JSON.stringify(next)); } catch { /* private browsing */ }
+  };
+  const effectiveDesign = allowedDesign(designMode, previewPlan);
+  const effectiveAppearance = allowedAppearance(appearance, previewPlan);
   const [modal, setModal] = useState<"profile" | "notifications" | "vip" | "timing" | null>(null);
   
   
@@ -534,7 +549,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
   return (
     <>
-    <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={appearanceForPlan(previewPlan)} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
+    <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       {tab === "home" && <LanguageSelector language={language} onChange={onLanguageChange} />}
       <AppearanceMotif background />
@@ -646,6 +661,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 onPlanChange={applyDevOverride}
                 designMode={designMode}
                 onDesignModeChange={setDesignMode}
+                appearance={effectiveAppearance}
+                onAppearanceSave={saveAppearance}
                 signedIn={signedIn}
                 onLanguageChange={onLanguageChange}
                 onEdit={() => setModal("profile")}
@@ -665,7 +682,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               variant="ghost"
               onClick={() => {
                 setTab(item.id);
-                window.scrollTo({ top: 0, behavior: item.id === "consult" ? "auto" : "smooth" });
+                window.scrollTo({ top: 0, behavior: item.id === "consult" ? "instant" : "smooth" });
               }}
               aria-current={tab === item.id ? "page" : undefined}
               className={`flex h-14 min-w-0 flex-col gap-1 rounded-xl px-0.5 text-[9px] sm:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}

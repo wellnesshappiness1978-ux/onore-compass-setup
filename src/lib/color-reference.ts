@@ -1,0 +1,35 @@
+import { colorEssence } from './color-essence';
+import type { Language } from './translations';
+
+/** Educational hue reference, not a measurement of an RGB mixture or person. */
+export function colorReference(code: string) {
+  const essence = colorEssence(code);
+  const rgb = [1, 3, 5].map(i => parseInt(code.slice(i, i + 2), 16) / 255);
+  const [r = 0, g = 0, b = 0] = rgb;
+  const max = Math.max(...rgb), min = Math.min(...rgb), d = max - min;
+  let hue = d === 0 ? 0 : max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  hue = (hue * 60 + 360) % 360;
+  const anchors: [number, number][] = [[0, 680], [30, 605], [60, 580], [120, 530], [180, 500], [240, 460], [270, 410]];
+  let wavelength: number | null = null;
+  if (essence.spectral && hue <= 270) {
+    for (let i = 1; i < anchors.length; i++) {
+      const left = anchors[i - 1], right = anchors[i];
+      if (left && right && hue <= right[0]) {
+        wavelength = Math.round(left[1] + (right[1] - left[1]) * (hue - left[0]) / (right[0] - left[0]));
+        break;
+      }
+    }
+  }
+  const chakra = [1, 2, 3, 4, 5, 6, 7, 4][essence.index] ?? 4;
+  return { ...essence, wavelength, frequency: wavelength ? 299792458 / (wavelength * 1e-9) : null, chakra };
+}
+type ReferenceCopy = { light: string; chakra: string; trigger: string; note: string; areas: string[]; cues: string[] };
+export const colorReferenceCopy: Record<Language, ReferenceCopy> = {
+  ja: { light: '光波長・振動数の参考値', chakra: '対応チャクラ・領域（象徴）', trigger: '感情・行動のきっかけ', note: '波長は近い色相の光を表す参考モデル、Hzは c ÷ 波長です。画面色や個人の実測値ではありません。チャクラ・身体領域は象徴的な対応で、生理作用や治療効果を示しません。', areas: ['第1 · ルート／足・骨盤／安定', '第2 · 仙骨／下腹部／創造', '第3 · 太陽神経叢／腹部／意志', '第4 · ハート／胸／つながり', '第5 · スロート／喉／表現', '第6 · サードアイ／額／洞察', '第7 · クラウン／頭頂／広い視点'], cues: ['迷ったら優先順位を一つ決め、最初の一歩を書き出す。', '新しい発想を三つ書き、人に一つ話してみる。', '複雑な課題を短い言葉にし、今日の目標を一つ選ぶ。', 'ひと息ついて、無理のないペースに整える。', '伝えたいことを一文にまとめ、落ち着いて声にする。', '情報を整理し、判断の前に事実を確かめる。', '浮かんだイメージを記録し、別の角度から見直す。', '自分へのいたわりを言葉にし、相手への感謝を伝える。'] },
+  en: { light: 'Light wavelength & frequency reference', chakra: 'Chakra & region (symbolic)', trigger: 'Emotional & action cue', note: 'Wavelength is a model for a similar spectral hue; Hz = c / wavelength. Neither is a screen-color or personal measurement. Chakra and body associations are symbolic, not physiological or treatment claims.', areas: ['1 · Root / feet & pelvis / stability', '2 · Sacral / lower abdomen / creativity', '3 · Solar plexus / abdomen / intention', '4 · Heart / chest / connection', '5 · Throat / throat / expression', '6 · Third eye / forehead / insight', '7 · Crown / top of head / perspective'], cues: ['Choose one priority and write your first step.', 'Write three ideas and share one with someone.', 'Summarize a complex task and choose one goal for today.', 'Pause and return to a comfortable pace.', 'Put your message into one sentence and say it calmly.', 'Organize information and check facts before deciding.', 'Record an image or idea and revisit it from another angle.', 'Express kindness to yourself and gratitude to someone.'] },
+  'zh-CN': { light: '光波长与频率参考', chakra: '脉轮与领域（象征）', trigger: '情绪与行动提示', note: '波长是相近光谱色的参考模型，Hz = c ÷ 波长，并非屏幕颜色或个人实测值。脉轮和身体领域仅为象征，不表示生理作用或治疗效果。', areas: ['1 · 海底轮／脚与骨盆／稳定', '2 · 生殖轮／下腹／创造', '3 · 太阳轮／腹部／意志', '4 · 心轮／胸部／连接', '5 · 喉轮／喉咙／表达', '6 · 眉心轮／额头／洞察', '7 · 顶轮／头顶／视野'], cues: ['确定一个优先事项，写下第一步。', '写出三个想法，与人分享一个。', '简化复杂任务，选择今天的一个目标。', '稍作休息，回到舒适的节奏。', '用一句话整理信息，平静地说出来。', '整理资料，在决定前核实事实。', '记录灵感，从另一角度重新审视。', '善待自己，向他人表达感谢。'] },
+  'zh-TW': { light: '光波長與頻率參考', chakra: '脈輪與領域（象徵）', trigger: '情緒與行動提示', note: '波長是相近光譜色的參考模型，Hz = c ÷ 波長，並非螢幕色彩或個人實測值。脈輪和身體領域僅為象徵，不表示生理作用或治療效果。', areas: ['1 · 海底輪／腳與骨盆／穩定', '2 · 生殖輪／下腹／創造', '3 · 太陽輪／腹部／意志', '4 · 心輪／胸部／連結', '5 · 喉輪／喉嚨／表達', '6 · 眉心輪／額頭／洞察', '7 · 頂輪／頭頂／視野'], cues: ['確定一個優先事項，寫下第一步。', '寫出三個想法，與人分享一個。', '簡化複雜任務，選擇今天的一個目標。', '稍作休息，回到舒適的節奏。', '用一句話整理訊息，平靜地說出來。', '整理資料，在決定前核實事實。', '記錄靈感，從另一角度重新審視。', '善待自己，向他人表達感謝。'] },
+  ko: { light: '빛의 파장·주파수 참고값', chakra: '차크라·영역 (상징)', trigger: '감정·행동의 계기', note: '파장은 유사한 스펙트럼 색의 참고 모델이며 Hz = c / 파장입니다. 화면색이나 개인의 실측값이 아닙니다. 차크라와 신체 영역은 상징이며 생리 작용이나 치료 효과를 뜻하지 않습니다.', areas: ['1 · 루트 / 발·골반 / 안정', '2 · 천골 / 하복부 / 창조', '3 · 태양신경총 / 복부 / 의지', '4 · 하트 / 가슴 / 연결', '5 · 목 / 목 / 표현', '6 · 제3의 눈 / 이마 / 통찰', '7 · 크라운 / 정수리 / 시야'], cues: ['우선순위 하나를 정하고 첫걸음을 적으세요.', '아이디어 세 가지를 적고 하나를 나누세요.', '복잡한 일을 요약하고 오늘의 목표 하나를 고르세요.', '잠시 쉬고 편안한 속도로 돌아오세요.', '메시지를 한 문장으로 정리해 차분히 말하세요.', '정보를 정리하고 결정 전에 사실을 확인하세요.', '영감을 기록하고 다른 관점에서 살펴보세요.', '자신을 다독이고 다른 사람에게 감사를 전하세요.'] },
+  es: { light: 'Referencia de longitud de onda y frecuencia', chakra: 'Chakra y región (simbólicos)', trigger: 'Señal emocional y de acción', note: 'La longitud de onda modela un tono espectral similar; Hz = c / longitud de onda. No es una medición del color en pantalla ni personal. Las asociaciones corporales y de chakras son simbólicas, no efectos fisiológicos ni tratamientos.', areas: ['1 · Raíz / pies y pelvis / estabilidad', '2 · Sacro / abdomen inferior / creatividad', '3 · Plexo solar / abdomen / voluntad', '4 · Corazón / pecho / conexión', '5 · Garganta / garganta / expresión', '6 · Tercer ojo / frente / intuición', '7 · Corona / coronilla / perspectiva'], cues: ['Elige una prioridad y escribe el primer paso.', 'Escribe tres ideas y comparte una.', 'Resume una tarea compleja y elige una meta para hoy.', 'Haz una pausa y retoma un ritmo cómodo.', 'Resume tu mensaje en una frase y dilo con calma.', 'Organiza la información y comprueba los hechos.', 'Anota una idea y mírala desde otro ángulo.', 'Trátate con amabilidad y agradece a alguien.'] },
+  fr: { light: 'Référence de longueur d’onde et fréquence', chakra: 'Chakra et région (symboliques)', trigger: 'Repère émotionnel et d’action', note: 'La longueur d’onde modélise une teinte spectrale proche ; Hz = c / longueur d’onde. Ce n’est une mesure ni de la couleur à l’écran ni de la personne. Les chakras et régions du corps sont symboliques, sans effet physiologique ou thérapeutique revendiqué.', areas: ['1 · Racine / pieds et bassin / stabilité', '2 · Sacré / bas-ventre / créativité', '3 · Plexus solaire / abdomen / volonté', '4 · Cœur / poitrine / lien', '5 · Gorge / gorge / expression', '6 · Troisième œil / front / discernement', '7 · Couronne / sommet du crâne / perspective'], cues: ['Choisissez une priorité et notez le premier pas.', 'Notez trois idées et partagez-en une.', 'Résumez une tâche complexe et choisissez un objectif.', 'Faites une pause et retrouvez un rythme confortable.', 'Résumez votre message en une phrase et dites-le calmement.', 'Organisez les informations et vérifiez les faits.', 'Notez une idée et revisitez-la sous un autre angle.', 'Soyez bienveillant envers vous-même et remerciez quelqu’un.'] },
+};

@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import { birthColorCopy, type BirthColorRole } from '@/lib/birth-color-copy';
 import { birthColorSpectrum, localizeBirthColorName } from '@/lib/birth-color-spectrum';
 import { colorExperienceCopy } from '@/lib/color-experience-copy';
-import { colorEssence } from '@/lib/color-essence';
+import { colorReference, colorReferenceCopy } from '@/lib/color-reference';
 import type { UserProfile } from './Onboarding';
 import type { Language } from '@/lib/translations';
 const sixRoles: BirthColorRole[] = ['main', 'money', 'work', 'love', 'health', 'mind'];
@@ -15,7 +15,7 @@ export function BirthColorDetails({ profile, role, full, language }: { profile: 
   const palette = birthColorSpectrum(profile);
   if (!palette) return null;
   const color = palette[role], copy = colorExperienceCopy[language], old = birthColorCopy[language];
-  const essence = colorEssence(color.code);
+  const essence = colorReference(color.code), reference = colorReferenceCopy[language];
   const sceneRoles: BirthColorRole[] = ['work', 'health', 'love'];
   const sceneRole = sceneRoles[scene] ?? 'main';
   return <DialogContent className="color-detail-dialog flex max-h-[90dvh] w-[calc(100%-1.5rem)] max-w-3xl flex-col gap-0 overflow-hidden p-0" style={{ '--selected-birth-color': color.code } as CSSProperties}>
@@ -30,9 +30,9 @@ export function BirthColorDetails({ profile, role, full, language }: { profile: 
       <div className="min-h-0 overflow-y-auto px-5 pb-7 sm:px-8">
         <TabsContent value="0" className="space-y-6">
           <h3 className="flex items-center gap-2 font-serif text-lg"><Orbit className="size-5 text-primary" />{copy.titles[0]}</h3>
-          <section className="border-b border-primary/20 pb-5"><h4 className="text-sm text-primary">{copy.labels[0]}</h4><p className="mt-2 text-sm leading-7">{copy.science}</p><p className="mt-3 font-mono text-sm text-primary">{essence.spectral ? `${copy.reference} · ${essence.spectral} nm` : copy.nonSpectral}</p></section>
-          <section><h4 className="text-sm text-primary">{copy.labels[1]}</h4><p className="mt-2 text-sm leading-7">{copy.psych[essence.index]}</p></section>
-          <section><h4 className="text-sm text-primary">{copy.labels[2]}</h4><p className="mt-2 text-sm leading-7">{copy.brain}</p></section>
+          <section className="border-b border-primary/20 pb-5"><h4 className="text-sm text-primary">{reference.light}</h4><p className="mt-2 text-sm leading-7">{reference.note}</p><p className="mt-3 font-mono text-sm text-primary">{essence.wavelength && essence.frequency ? `${essence.wavelength} nm · ${essence.frequency.toExponential(4)} Hz` : copy.nonSpectral}</p></section>
+          <section><h4 className="text-sm text-primary">{reference.trigger}</h4><p className="mt-2 text-sm leading-7">{reference.cues[essence.index]}</p></section>
+          <section><h4 className="text-sm text-primary">{reference.chakra}</h4><p className="mt-2 text-sm leading-7">{reference.areas[essence.chakra - 1]}</p></section>
           <section className="border-t border-primary/20 pt-5"><h4 className="text-sm text-primary">{copy.labels[3]}</h4><p className="mt-2 font-serif text-lg">{copy.elements[essence.index]}</p><p className="mt-2 text-xs leading-6">{copy.symbolNote}</p></section>
         </TabsContent>
         <TabsContent value="1" className="space-y-5">

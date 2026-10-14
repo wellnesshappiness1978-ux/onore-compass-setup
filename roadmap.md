@@ -1,3 +1,8 @@
+## Independent customization and color references
+- [x] Replace brain-wave copy with seven-language hue-based wavelength/frequency references, symbolic chakra/body regions and distinct practical cues. Mixed colors retain no-single-wavelength labels; no medical or measured personal-wave claims.
+- [x] Add independent local-persistent backgrounds, frames/parts and icons with isolated draft, preview-only locked choices and save confirmation. Migrate the legacy palette session choice without changing IDs; upgrades preserve saved selections and downgrades apply non-mutating safe fallbacks. Remove remaining membership-driven CSS decoration links; Royal stays preview-only without a corporate contract.
+- [x] Remove consultation mount focus and use instant entry scrolling; verify 390px first/repeated consultation entry at y=0, saved combination/reload/VIP-to-Family-Premium preservation, locked-save prevention, Japanese color details, desktop and English settings, no horizontal overflow or page errors. 38 focused tests pass and build OK. Checks used a synthetic guest and development preview, not actual paid entitlement changes. Foreground artwork, astronomy, VIP gates and 2048 renderer unchanged.
+
 ## Nautilus app-design refresh
 - [x] Simplify appearance settings: remove explanatory paragraphs, comparison cards and automatic/manual controls; use seven-language plan/family labels without changing prices or membership.
 - [x] Replace menu ornaments and background spirals with shared golden-ratio chambered nautilus geometry, gold-leaf/diamond VIP jewelry, sacred flower geometry and royal preview crests. Independent Corporate remains visual fitting only; legacy Family IDs never grant corporate access.

@@ -30,6 +30,7 @@ import { profileUiCopy } from "@/lib/profile-ui-copy";
 import SolfeggioPlayer from "./SolfeggioPlayer";
 import { AppearanceFitting } from "./AppearanceFitting";
 import { NautilusIcon } from './NautilusIcon';
+import type { AppearanceSelection } from '@/lib/appearance-customization';
 import { appearanceUiCopy } from '@/lib/appearance-ui-copy';
 
 type Props = {
@@ -45,6 +46,8 @@ type Props = {
   onPlanChange: (plan: Plan) => void;
   designMode: DesignMode;
   onDesignModeChange: (mode: DesignMode) => void;
+  appearance: AppearanceSelection;
+  onAppearanceSave: (selection: AppearanceSelection) => void;
   signedIn?: boolean;
 };
 
@@ -63,6 +66,8 @@ export default function SettingsPanel({
   onPlanChange,
   designMode,
   onDesignModeChange,
+  appearance,
+  onAppearanceSave,
   signedIn = false,
 }: Props) {
   const t = settingsTranslations[language];
@@ -194,7 +199,7 @@ export default function SettingsPanel({
           <NautilusIcon className="size-7 text-primary" />
           <h3 id="design-heading" className="font-serif text-xl text-primary">{dc.title}</h3>
         </div>
-        <AppearanceFitting plan={plan} mode={designMode} language={language} />
+        <AppearanceFitting plan={plan} mode={designMode} language={language} selection={appearance} onSave={onAppearanceSave} />
         <h4 className="mt-5 text-sm text-primary">{appearanceCopy.palettes}</h4>
         <div className="mt-5 space-y-5">
           {(["free", "standard", "vip", "b2b", "b2b-premium"] as Plan[]).map((tier, index) => (
