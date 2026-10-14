@@ -17,6 +17,10 @@ describe('Theory explanations', () => {
       for (const text of Object.values(copy)) expect(text.trim().length).toBeGreaterThan(30);
     }
   });
+  it('names traditional ten bodies with accurate astronomical context', () => {
+    for (const name of ['太陽', '月', '水星', '金星', '火星', '木星', '土星', '天王星', '海王星', '冥王星', '準惑星', '重さと距離', '主に月と太陽']) expect(theoryCopy.ja.origin).toContain(name);
+    expect(theoryCopy.ja.origin).not.toContain('強く受けて生を得');
+  });
   it('distinguishes symbolic vibration from natural gravity and actual color inputs', () => {
     expect(theoryCopy.ja.origin).toContain('引力');
     expect(theoryCopy.ja.birthColor).toContain('固有波動');

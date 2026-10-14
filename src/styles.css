@@ -130,6 +130,28 @@
 }
 
 .share-card-modal { background: var(--share-midnight); z-index: 100; }
+/* Shared sacred detail surfaces stay legible across every appearance family. */
+.sacred-overlay { background: color-mix(in oklab, var(--cosmic-space-ink) 80%, transparent); }
+.sacred-modal.sacred-modal, .sacred-accordion {
+  --background: var(--cosmic-space-ink);
+  --card: var(--cosmic-space-ink);
+  --foreground: var(--cosmic-text-data);
+  --primary: var(--cosmic-text-main);
+  --muted-foreground: var(--cosmic-text-data);
+  background: var(--cosmic-space-ink);
+  color: var(--cosmic-text-data);
+  border-color: color-mix(in oklab, var(--cosmic-foil-gold) 55%, transparent);
+  border-radius: 8px;
+  box-shadow: inset 0 1px color-mix(in oklab, var(--cosmic-foil-light) 18%, transparent), 0 16px 48px color-mix(in oklab, var(--cosmic-space-ink) 75%, transparent);
+  animation-duration: 300ms;
+}
+.sacred-modal.sacred-modal { z-index: 200; }
+.sacred-modal-close, .sacred-inline-close { color: var(--cosmic-text-main); background: var(--cosmic-space-ink); }
+.sacred-modal > :not(.sacred-modal-close) { grid-column: 1; }
+.sacred-modal > :first-child { grid-row: 1; }
+.sacred-accordion-content { animation-duration: 300ms; }
+.sacred-disclosure-scroll { max-height: 65dvh; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) { .sacred-modal, .sacred-overlay, .sacred-accordion-content { animation: none !important; transition: none !important; } }
 .agolmen-story-dialog {
   background-color: var(--card);
   background-image: radial-gradient(ellipse at 8% 0%, color-mix(in oklab, var(--rose-glow) 18%, transparent), transparent 56%), radial-gradient(ellipse at 95% 84%, color-mix(in oklab, var(--amethyst) 20%, transparent), transparent 56%), linear-gradient(145deg, var(--card), var(--background));
