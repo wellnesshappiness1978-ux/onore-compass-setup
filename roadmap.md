@@ -1,8 +1,8 @@
 ## Ten-body explanation, sacred details and natural browser narration
-- [ ] Update seven-language origin text with ten traditional bodies and accurate gravitational/energy context.
-- [ ] Unify explanatory dialogs and disclosures with gold cosmic frames, 300ms motion and internal scrolling.
-- [ ] Prioritize natural locale voices, wait for voice loading, and add cancellable punctuation pauses at 0.95/1.05/1.0.
-- [ ] Run focused tests and verify desktop/mobile detail and narration controls; preserve reading, appearance and artwork behavior.
+- [x] Update seven-language origin text with ten traditional bodies and accurate gravitational/energy context.
+- [x] Unify explanatory dialogs and disclosures with gold cosmic frames, 300ms motion and internal scrolling.
+- [x] Prioritize natural locale voices, wait for voice loading, and add cancellable punctuation pauses at 0.95/1.05/1.0.
+- [x] 26 focused tests pass; signed-in theory/layer/color details verified at desktop and 390px, including X/Escape/outside dismissal and no horizontal overflow. A real consultation response supports narration start/stop with development VIP viewing. Latest build OK. Installed-voice listening quality, separate-device synchronization and a fresh 2048 download were not re-tested; astronomy, appearance and export logic are unchanged.
 
 ## Theory explanations and first-year middle-school companion voice
 - [x] Update seven-language gravity/life and birth-color theory with affirmative, scientifically separated symbolism.
