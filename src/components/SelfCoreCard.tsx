@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, Heart, Orbit, Sparkles, Sprout } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import ShareCardButton from "./ShareCardButton";
 import GrandSummaryCard from "./GrandSummaryCard";
 import { AgolmenLoading } from "./AgolmenSpiral";
@@ -42,8 +42,17 @@ const nameCopy: Record<Language, { title: string; grids: [string, string, string
   fr: { title: "Lecture du nom (cinq cadres)", grids: ["Ciel", "Personne", "Terre", "Extérieur", "Total"], fortune: "Forces sociales suggérées par votre nom", split: "Choisissez la fin du nom de famille pour calculer et enregistrer", save: "Enregistrer", note: "Valeurs de référence avec traits modernes et une table courante de 81 nombres." },
 };
 
-function CoreLayersPanel({ layers: c, profile, language }: { layers: CoreLayers; profile: UserProfile; language: Language }) {
+type LayerReading = Awaited<ReturnType<typeof generateHomeReading>>;
+function CoreLayersPanel({ layers: c, profile, language, reading, loading, nameDetails }: { layers: CoreLayers; profile: UserProfile; language: Language; reading?: LayerReading; loading: boolean; nameDetails: ReactNode }) {
   const [selected, setSelected] = useState(0);
+  const [open, setOpen] = useState(false);
+  const copy = homeReadingCopy[language];
+  const passages = reading ? [
+    [reading.nameNature, reading.nameGuide], [reading.numerologyNature, reading.numerologyGuide],
+    [reading.westernNature, reading.westernGuide], [reading.pillarsNature, reading.pillarsGuide],
+    [reading.animalNature, reading.animalGuide], [reading.fengNature, reading.fengGuide],
+  ] : [];
+  const passage = passages[selected];
   const gua = mingGua(profile.birthDate, profile.gender)?.branches[0] ?? null;
   const N = fengDirectionNames;
   const lp = c.numerology.lifePath;
@@ -67,11 +76,30 @@ function CoreLayersPanel({ layers: c, profile, language }: { layers: CoreLayers;
   ] : lc.summaries;
   return (
     <section aria-label={lc.title} className="border-b border-primary/20 py-6">
-      <h3 className="font-serif text-xl text-primary">{lc.title}</h3>
-      <div role="tablist" aria-label={lc.choose} className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {rows.map(([k], i) => <Button key={k} type="button" role="tab" aria-selected={selected === i} aria-controls="core-layer-detail" variant={selected === i ? "default" : "outline"} onClick={() => setSelected(i)} className="h-auto min-h-12 whitespace-normal px-2 text-sm">{k}</Button>)}
+      <div aria-label={lc.choose} className="grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3">
+        {rows.map(([label], i) => <Button key={label} type="button" aria-haspopup="dialog" variant="outline" onClick={() => { setSelected(i); setOpen(true); }} className="h-auto min-h-28 min-w-0 flex-col items-start justify-start whitespace-normal border-primary/30 bg-background/35 p-4 text-left [overflow-wrap:anywhere]">
+          <span className="flex w-full items-center justify-between text-primary"><span className="font-mono text-xs">0{i + 1}</span><ArrowUpRight aria-hidden="true" /></span>
+          <span className="font-serif text-sm text-primary">{lc.names[i]}</span>
+          <span className="text-xs leading-6 text-muted-foreground">{lc.summaries[i]}</span>
+        </Button>)}
       </div>
-      <div id="core-layer-detail" role="tabpanel" className="mt-3 rounded-md border border-primary/30 bg-primary/5 p-4" aria-live="polite"><h4 className="font-serif text-lg text-primary">{rows[selected]?.[0]}</h4><p className="mt-2 break-words text-base leading-8 text-foreground">{rows[selected]?.[1]}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{details[selected]}</p></div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="z-[200] flex max-h-[88dvh] w-[calc(100%-1.5rem)] max-w-2xl min-w-0 flex-col gap-0 overflow-hidden rounded-lg border-primary/40 bg-card p-0 [overflow-wrap:anywhere]">
+          <header className="shrink-0 border-b border-primary/20 p-5 pr-12 sm:p-6 sm:pr-12">
+            <DialogTitle className="font-serif text-xl leading-7 text-primary">{lc.names[selected]}</DialogTitle>
+            <DialogDescription className="mt-2 text-sm leading-6">{lc.summaries[selected]}</DialogDescription>
+          </header>
+          <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain p-5 sm:p-6">
+            {passage ? <div className="space-y-6">
+              <section><h4 className="font-serif text-lg text-primary">{copy.gift}</h4><p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{passage[0]}</p></section>
+              <section className="border-l-2 border-primary pl-4"><h4 className="text-sm text-primary">{copy.guide}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{passage[1]}</p></section>
+            </div> : loading ? <AgolmenLoading compact label={copy.loading} /> : <p role="status" className="text-sm leading-7 text-muted-foreground">{copy.error}</p>}
+            {selected === 0 && nameDetails}
+            <details className="mt-6 border-t border-primary/20 pt-4"><summary className="cursor-pointer text-sm text-primary">{copy.basis}</summary><p className="mt-3 text-sm leading-7 text-foreground">{rows[selected]?.[1]}</p><p className="mt-2 text-xs leading-6 text-muted-foreground">{details[selected]}</p></details>
+            <p className="mt-6 border-t border-primary/20 pt-4 text-xs leading-6 text-muted-foreground">{copy.preview}</p>
+          </div>
+        </DialogContent>
+      </Dialog>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <div className="rounded-md border border-primary/30 p-3"><p className="text-xs text-primary">{lc.surface}</p><p className="mt-1 text-sm text-foreground">{language === "ja" ? c.surface.join(" / ") : lc.summaries[0]}</p></div>
         <div className="rounded-md border border-primary/30 bg-primary/10 p-3"><p className="text-xs text-primary">{lc.inner}</p><p className="mt-1 text-sm text-foreground">{language === "ja" ? c.inner.join(" / ") : lc.summaries[1]}</p></div>
@@ -97,7 +125,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const generate = useServerFn(generateHomeReading);
   const n = nameCopy[language];
   const chars = splittableName(profile.nameKanji);
-  const localLayers = computeCoreLayers(profile);
+  const localLayers = useMemo(() => computeCoreLayers(profile), [profile]);
   const gua = mingGua(profile.birthDate, profile.gender);
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
@@ -112,6 +140,27 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const sections = data ? [data.synthesis, data.name, data.mind, data.instinct, data.strength] : [];
   const coreSections = language === "ja" ? ["コアアイデンティティ", "思考バイアス", "前進と静観の内的な差"] : ["Core identity", "Decision patterns", "Advance and pause tendencies"];
   const icons = [Dna, Fingerprint, Orbit, Heart, Sparkles];
+
+  const nameDetails = (
+<section aria-label={n.title} className="my-6 rounded-lg border border-primary/40 bg-primary/5 p-4 sm:p-6">
+            <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
+            {localLayers?.name ? <>
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {(["sky", "person", "earth", "outer", "total"] as const).map((k, i) => { const l = localLayers.name?.luck[k]; return <div key={k} className="rounded-md border border-primary/25 bg-background/40 p-3 text-center">
+                  <p className="text-[11px] leading-4 text-muted-foreground">{n.grids[i]}</p>
+                  <p className="mt-1 font-serif text-2xl text-primary">{localLayers.name?.[k]}<span className="text-xs">画</span></p>
+                  <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] ${l === "吉" ? "bg-primary text-primary-foreground" : l === "半吉" ? "border border-primary/50 text-primary" : "border border-muted-foreground/40 text-muted-foreground"}`}>{l}</span>
+                </div>; })}
+              </div>
+              {data?.nameFortune && <><h4 className="mt-5 font-serif text-sm text-primary">{n.fortune}</h4><p className="mt-2 whitespace-pre-line text-sm leading-8 text-foreground sm:text-base">{data?.nameFortune}</p></>}
+              <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{n.note}</p>
+            </> : chars && onProfileChange ? <div className="mt-3">
+              <p className="text-sm text-muted-foreground">{n.split}</p>
+              <div className="mt-3 flex flex-wrap gap-2">{chars.slice(0, -1).map((_, i) => <Button key={i} size="sm" variant={cut === i + 1 ? "default" : "outline"} onClick={() => setCut(i + 1)}>{chars.slice(0, i + 1).join("")}　{chars.slice(i + 1).join("")}</Button>)}</div>
+              <Button className="mt-3" disabled={saving} onClick={async () => { setSaving(true); try { await onProfileChange({ ...profile, nameKanji: `${chars.slice(0, cut).join("")} ${chars.slice(cut).join("")}` }); } finally { setSaving(false); } }}>{n.save}</Button>
+            </div> : <p className="mt-3 text-sm text-muted-foreground">{f.nameNote}</p>}
+          </section>
+  );
 
   return (
     <section aria-label={t.title} className="min-w-0 overflow-hidden rounded-lg border border-primary/35 bg-card/75 shadow-champagne backdrop-blur-md">
@@ -138,8 +187,8 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
           {data && <details className="mt-5"><summary className="cursor-pointer text-primary">{language === "ja" ? "思考と内面の構造" : "Thought and inner patterns"}</summary>{[data.manualDecision, data.manualTiming].map((body, i) => <article key={i} className="border-t border-primary/20 py-5"><h3 className="font-serif text-xl text-primary">{coreSections[i + 1]}</h3><p className="mt-3 text-base leading-8 text-foreground">{body}</p></article>)}</details>}
           <ShareCardButton language={language} loading={isPending} data={data?.keySummary && data.caution ? { kicker: "", title: "", names: profile.nameKanji ? [profile.nameKanji] : [], lines: [data.keySummary], caution: data.caution, palette: palette ? (activePlan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.love, palette.health, palette.mind]).map((color, i) => ({ label: (language === "ja" ? ["メイン", "サブ", "金運", "愛情", "健康", "内面"] : language === "zh-TW" ? ["主色", "副色", "財運", "愛情", "健康", "內在"] : ["Main", "Secondary", "Money", "Love", "Health", "Inner"])[i] ?? "", code: color.code })) : [], score: localLayers?.numerology.lifePath ?? 0, kind: "identity" } : null} />
         </section>
-        <details open className="border-t border-primary/20 py-5"><summary className="cursor-pointer font-serif text-lg text-primary">{experienceOnly ? (language === "ja" ? "あなたを形づくる6つの視点" : "Six views shaping you") : (language === "ja" ? "6大占術と詳しい分析" : "Six layers and detailed reading")}</summary>
-        {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} language={language} />}
+        <details open className="border-t border-primary/20 py-5"><summary className="cursor-pointer font-serif text-lg text-primary">{t.views}</summary>
+        {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} language={language} reading={data} loading={isPending} nameDetails={nameDetails} />}
         {!experienceOnly && <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜生まれ持った吉方位タイプ（本命卦）" : "Feng shui · Your birth direction type (Ming Gua)"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性" : "女性"}の計算式 · 方位タイプ ${b.number}` : `${b.branch === "male" ? "Male" : "Female"} calculation · Type ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `活動を広げる方角 ${fengDirectionNames[b.shengQi]} · 休息を整える方角 ${fengDirectionNames[b.tianYi]} · 関係を育てる方角 ${fengDirectionNames[b.yanNian]}` : `Expansion ${b.shengQi} · Restoration ${b.tianYi} · Relationships ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "プロフィールの性別区分と立春基準の生年から求める、伝統的な方位の参考値です。住まいごとの吉凶や効果を保証しません。" : "A traditional direction reference based on the profile's gender category and solar year, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "この方位タイプの算出には生年月日と性別の入力が必要です。マイページで設定できます。" : "Add birth date and gender in your profile to view this direction type."}</p>}</section>}
          {isPending ? <AgolmenLoading compact label={t.loading} /> : isError || !data ? (
           <div className="flex min-h-40 flex-col items-start justify-center gap-3" role="alert"><p className="text-sm text-muted-foreground">{t.error}</p><Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>
@@ -147,33 +196,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
           <div className="grid grid-cols-2 gap-x-4 gap-y-4 border-b border-primary/20 py-6 sm:grid-cols-5 sm:gap-5">
             {f.axes.map((label, i) => <div key={label} className="min-w-0 border-l border-primary/35 pl-3"><p className="text-xs text-primary">{label}</p><p className="mt-2 break-words font-serif text-sm leading-6 text-foreground">{values[i] ?? f.missing}</p></div>)}
           </div>
-          <section aria-label={n.title} className="my-6 rounded-lg border border-primary/40 bg-primary/5 p-4 sm:p-6">
-            <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
-            {e?.name ? <>
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {(["sky", "person", "earth", "outer", "total"] as const).map((k, i) => { const l = e.name?.luck[k]; return <div key={k} className="rounded-md border border-primary/25 bg-background/40 p-3 text-center">
-                  <p className="text-[11px] leading-4 text-muted-foreground">{n.grids[i]}</p>
-                  <p className="mt-1 font-serif text-2xl text-primary">{e.name?.[k]}<span className="text-xs">画</span></p>
-                  <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] ${l === "吉" ? "bg-primary text-primary-foreground" : l === "半吉" ? "border border-primary/50 text-primary" : "border border-muted-foreground/40 text-muted-foreground"}`}>{l}</span>
-                </div>; })}
-              </div>
-              {data.nameFortune && <><h4 className="mt-5 font-serif text-sm text-primary">{n.fortune}</h4><p className="mt-2 whitespace-pre-line text-sm leading-8 text-foreground sm:text-base">{data.nameFortune}</p></>}
-              <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{n.note}</p>
-            </> : chars && onProfileChange ? <div className="mt-3">
-              <p className="text-sm text-muted-foreground">{n.split}</p>
-              <div className="mt-3 flex flex-wrap gap-2">{chars.slice(0, -1).map((_, i) => <Button key={i} size="sm" variant={cut === i + 1 ? "default" : "outline"} onClick={() => setCut(i + 1)}>{chars.slice(0, i + 1).join("")}　{chars.slice(i + 1).join("")}</Button>)}</div>
-              <Button className="mt-3" disabled={saving} onClick={async () => { setSaving(true); try { await onProfileChange({ ...profile, nameKanji: `${chars.slice(0, cut).join("")} ${chars.slice(cut).join("")}` }); } finally { setSaving(false); } }}>{n.save}</Button>
-            </div> : <p className="mt-3 text-sm text-muted-foreground">{f.nameNote}</p>}
-          </section>
           {data.keySummary && <section aria-label="本質の交差点" className="my-6 rounded-lg border border-primary/50 bg-gradient-to-b from-primary/15 to-transparent p-5 sm:p-6"><p className="text-xs text-primary">{language === "ja" ? "複数の参考レイヤーが交差する人物像" : "A portrait across the reference layers"}</p><p className="mt-3 font-serif text-lg leading-9 text-foreground sm:text-xl">{data.keySummary}</p></section>}
-          {experienceOnly && <section aria-label={language === "ja" ? "あなたを形づくる6つの視点" : "Six views shaping you"} className="my-6 border-y border-primary/25">
-            {([
-              ["01", data.nameNature, data.nameGuide], ["02", data.numerologyNature, data.numerologyGuide],
-              ["03", data.westernNature, data.westernGuide], ["04", data.pillarsNature, data.pillarsGuide],
-              ["05", data.animalNature, data.animalGuide], ["06", data.fengNature, data.fengGuide],
-            ] as const).map(([title, nature, guide], index) => <article key={title} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9"><div className="flex items-center gap-3"><span className="font-serif text-xs text-primary/65">{title}</span><h3 className="font-serif text-xl text-primary">{language === "ja" ? ["人から見える強み", "心が大切にするもの", "伝え方と人との距離", "行動と休息のリズム", "決断するときの癖", "心地よさを支える環境"][index] : ["Visible strengths", "What your heart values", "Communication and closeness", "Action and rest rhythm", "Decision patterns", "Supportive spaces"][index]}</h3></div><div className="mt-5 grid gap-5 sm:grid-cols-2"><div><p className="text-xs text-primary">{language === "ja" ? "本質・特性" : "Nature"}</p><p className="mt-2 text-base leading-8 text-foreground">{nature}</p></div><div className="border-l-2 border-primary/50 bg-primary/5 px-4 py-3"><p className="text-xs text-primary">{language === "ja" ? "今のあなたへの道標" : "Your guide"}</p><p className="mt-2 text-base leading-8 text-foreground">{guide}</p></div></div></article>)}
-          </section>
-          }
           {!experienceOnly && sections.map((text, i) => {
             const Icon = icons[i] ?? Sparkles;
             return <article key={i} className="border-b border-primary/20 py-7 last:border-b-0 sm:py-9">

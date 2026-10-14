@@ -33,3 +33,5 @@
 
 - Read directory-specific AGENTS.md in src/components and src/lib before changes there. Keep the dimmed fixed uploaded cosmic background and rear-only body-bound contrast masks in shared Canvas modules separate from foreground astronomy; cache decoded assets and use the same image in live and export rendering. Why: replace artistic direction without changing birth calculations or export consistency.
 - App appearance uses five cumulative manually applied decorative families with bundled specimen/background imagery; preserve legacy palette and corporate IDs separately from membership. Why: unlock richer choices without changing stored selections or artwork rendering.
+
+- Six personal perspectives use the shared home-reading result and local core calculations in responsive dialogs; name grids and split controls exist only inside the name perspective. Why: avoid duplicate menus, new computations and width-dependent feature state.
