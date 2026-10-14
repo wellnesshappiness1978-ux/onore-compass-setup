@@ -29,6 +29,8 @@ import type { UserProfile } from "./Onboarding";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
 import SolfeggioPlayer from "./SolfeggioPlayer";
 import { AppearanceFitting } from "./AppearanceFitting";
+import { NautilusIcon } from './NautilusIcon';
+import { appearanceUiCopy } from '@/lib/appearance-ui-copy';
 
 type Props = {
   profile: UserProfile;
@@ -69,6 +71,7 @@ export default function SettingsPanel({
 }: Props) {
   const t = settingsTranslations[language];
   const dc = designCopy[language];
+  const appearanceCopy = appearanceUiCopy[language];
   const profileUi = profileUiCopy[language];
   const [yearly, setYearly] = useState(false);
   const [cardPlan, setCardPlan] = useState<PaidPlanId>("vip");
@@ -91,8 +94,7 @@ export default function SettingsPanel({
   const lockedTheme = designModes.find(mode => mode.id === lockedMode);
   const lockedTierName = lockedTheme?.tier === "free" ? t.planFree : lockedTheme ? teamCopy[language].planNames[lockedTheme.tier] : "";
   const pc = planCardsCopy[language];
-  const planTabName = (id: PaidPlanId) =>
-    id === "standard" ? t.standard : id === "vip" ? "VIP" : id === "b2b" ? t.planB2b : tc.planNames["b2b-premium"];
+  const planTabName = (id: PaidPlanId) => appearanceCopy.plans[id];
   const planIcon: Record<PaidPlanId, typeof Crown> = {
     standard: Sprout,
     vip: Gem,
@@ -117,14 +119,7 @@ export default function SettingsPanel({
   const upgradeCards = pc.cards.filter(c => isUpgradePlan(plan, c.id));
   const selectedCard = upgradeCards.find(c => c.id === cardPlan) ?? upgradeCards[0];
   const selectedTier = allTiers.find(tr => tr.id === selectedCard?.id);
-  const planLabel =
-    plan === "b2b-premium" ? tc.planNames["b2b-premium"] : plan === "vip"
-      ? t.planVip
-      : plan === "b2b"
-        ? t.planB2b
-        : plan === "standard"
-          ? t.planStandard
-          : t.planFree;
+  const planLabel = appearanceCopy.plans[plan];
   const birth = [
     profile.birthDate || "—",
     profile.birthTimeUnknown ? "--:--" : profile.birthTime || "--:--",
@@ -184,7 +179,7 @@ export default function SettingsPanel({
                 onClick={() => onPlanChange(p)}
                 className={`text-[10px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
               >
-                {p === "free" ? t.free : p === "standard" ? t.standard : p === "vip" ? "VIP" : p === "b2b" ? t.planB2b : tc.planNames["b2b-premium"]}
+                {appearanceCopy.plans[p]}
               </Button>
             ))}
           </div>
@@ -200,16 +195,16 @@ export default function SettingsPanel({
 
       <section className="border-y border-primary/20 py-6" aria-labelledby="design-heading">
         <div className="flex items-center gap-2">
-          <Sparkles className="size-5 text-primary" aria-hidden="true" />
+          <NautilusIcon className="size-7 text-primary" />
           <h3 id="design-heading" className="font-serif text-xl text-primary">{dc.title}</h3>
         </div>
-        <p className="mt-2 text-xs leading-5 text-muted-foreground">{dc.note}</p>
-        <AppearanceFitting plan={plan} mode={designMode} language={language} automatic={automaticAppearance} onAutomaticChange={onAutomaticAppearanceChange} />
+        <AppearanceFitting plan={plan} mode={designMode} language={language} />
+        <h4 className="mt-5 text-sm text-primary">{appearanceCopy.palettes}</h4>
         <div className="mt-5 space-y-5">
           {(["free", "standard", "vip", "b2b", "b2b-premium"] as Plan[]).map((tier, index) => (
             <div key={tier}>
               <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="h-px w-5 bg-primary/40" />{dc.groups[index]}
+                <span className="h-px w-5 bg-primary/40" />{appearanceCopy.plans[tier]}
               </div>
               <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-2">
                 {designModes.filter((mode) => mode.tier === tier).map((mode) => {
@@ -221,14 +216,14 @@ export default function SettingsPanel({
                       type="button"
                       variant="outline"
                       aria-pressed={selected}
-                      aria-label={`${dc.names[mode.id]} · ${dc.groups[index]}`}
+                       aria-label={`${dc.names[mode.id]} · ${appearanceCopy.plans[tier]}`}
                       title={dc.names[mode.id]}
                       onClick={() => available ? onDesignModeChange(mode.id) : setLockedMode(mode.id)}
                       className={`theme-choice h-auto min-h-48 flex-col items-stretch gap-0 overflow-hidden rounded-md p-0 text-left ${selected ? "ring-2 ring-primary" : ""}`}
                     >
                       <ThemeSample mode={mode.id} tier={mode.tier} name={dc.names[mode.id]} />
                       <span className="flex w-full items-center justify-between gap-2 px-3 py-2 text-xs text-foreground">
-                        <span className="min-w-0 whitespace-normal leading-5">{dc.names[mode.id]}<span className="mt-0.5 block text-[10px] text-muted-foreground">{dc.groups[index]}</span></span>
+                         <span className="min-w-0 whitespace-normal leading-5">{dc.names[mode.id]}<span className="mt-0.5 block text-[10px] text-muted-foreground">{appearanceCopy.plans[tier]}</span></span>
                         {selected ? <Check className="size-4 shrink-0 text-primary" aria-label={dc.selected} /> : !available ? <LockKeyhole className="size-4 shrink-0 text-primary" aria-label={dc.requires} /> : null}
                       </span>
                     </Button>
@@ -309,7 +304,7 @@ export default function SettingsPanel({
             <div
               key={item.id}
               role="tabpanel"
-              aria-label={tier.name}
+               aria-label={appearanceCopy.plans[item.id]}
               className={`relative mt-4 overflow-hidden rounded-2xl border p-5 transition-all ${
                 isVip
                   ? "border-primary/70 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent shadow-[0_0_34px_-8px_var(--gold-glow)]"
@@ -323,7 +318,7 @@ export default function SettingsPanel({
                 <div className="flex items-center gap-3">
                   {(() => { const CardIcon = planIcon[item.id]; return <CardIcon className="size-7 shrink-0 text-primary" aria-hidden="true" />; })()}
                   <div className="min-w-0">
-                    <p className={`font-serif text-base ${isVip ? "text-gradient-gold" : "text-foreground"}`}>{tier.name}</p>
+                     <p className={`font-serif text-base ${isVip ? "text-gradient-gold" : "text-foreground"}`}>{appearanceCopy.plans[item.id]}</p>
                     <p className="mt-0.5 text-xs text-primary/80">{item.tagline}</p>
                   </div>
                 </div>
