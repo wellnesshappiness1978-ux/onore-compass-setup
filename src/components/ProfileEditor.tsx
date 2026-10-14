@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SacredDisclosure } from "./ui/sacred-disclosure";
 import { Check, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
@@ -46,12 +47,11 @@ export default function ProfileEditor({
   };
 
   return (
-    <details className="card-lux group mb-6 rounded-2xl p-5 text-left">
-      <summary className="flex cursor-pointer list-none items-center gap-3">
+    <SacredDisclosure className="mb-6 text-left" title={<span className="flex min-w-0 flex-1 items-center gap-3">
         <UserRound className="size-5 text-primary" strokeWidth={1.4} />
         <span className="font-serif text-base text-gradient-gold">{t.cardTitle}</span>
         <span className="ml-auto truncate text-xs text-muted-foreground">{profile.nameKanji || profile.nameRomaji}</span>
-      </summary>
+      </span>}>
       <p className="mt-3 text-xs text-muted-foreground">{t.cardHint}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div><label className={label} htmlFor="pe-kanji">{t.nameKanji}</label>
@@ -81,7 +81,7 @@ export default function ProfileEditor({
       {error && <p role="alert" className="mt-3 text-xs text-destructive">{error === "required" ? ui.requiredFieldsError : error === "kana" ? ui.kanaError : error === "romaji" ? t.romajiError : storage.saveError}</p>}
       {saved && <p role="status" className="mt-3 flex items-center gap-1 text-xs text-primary"><Check className="size-3.5" />{t.saved}</p>}
        <Button type="button" variant="champagne" onClick={save} disabled={saving} className="mt-4 h-12 w-full rounded-lg font-bold">{saving ? storage.saving : t.save}</Button>
-    </details>
+    </SacredDisclosure>
   );
 }
 

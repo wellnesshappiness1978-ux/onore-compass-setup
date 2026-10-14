@@ -21,6 +21,7 @@ import type { Plan } from "@/lib/design-modes";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 import BirthColorGuide from "./BirthColorGuide";
+import { SacredDisclosure } from "./ui/sacred-disclosure";
 import { essenceKeys, traitReadingCopy } from "@/lib/trait-reading";
 
 const layerCopy: Record<Language, { title: string; choose: string; names: string[]; summaries: string[]; surface: string; inner: string; moreTime: string; birthplace: string; regional: string; prefectural: string; source: string }> = {
@@ -96,7 +97,7 @@ function CoreLayersPanel({ layers: c, profile, language, reading, loading, nameD
               <section className="border-l-2 border-primary pl-4"><h4 className="text-sm text-primary">{copy.guide}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{passage[1]}</p></section>
             </div> : loading ? <AgolmenLoading compact label={copy.loading} /> : <p role="status" className="text-sm leading-7 text-muted-foreground">{copy.error}</p>}
             {selected === 0 && nameDetails}
-            <details className="mt-6 border-t border-primary/20 pt-4"><summary className="cursor-pointer text-sm text-primary">{copy.basis}</summary><p className="mt-3 text-sm leading-7 text-foreground">{rows[selected]?.[1]}</p><p className="mt-2 text-xs leading-6 text-muted-foreground">{details[selected]}</p></details>
+            <SacredDisclosure className="mt-6" title={copy.basis}><p className="mt-3 text-sm leading-7 text-foreground">{rows[selected]?.[1]}</p><p className="mt-2 text-xs leading-6 text-muted-foreground">{details[selected]}</p></SacredDisclosure>
             <p className="mt-6 border-t border-primary/20 pt-4 text-xs leading-6 text-muted-foreground">{copy.preview}</p>
           </div>
         </DialogContent>
@@ -193,7 +194,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
           {palette && <div className="mt-6"><BirthColorGuide profile={profile} plan={activePlan} language={language} /></div>}
           <ShareCardButton language={language} loading={isPending} data={data?.keySummary && data.caution ? { kicker: "", title: "", names: profile.nameKanji ? [profile.nameKanji] : [], lines: [data.keySummary], caution: data.caution, palette: palette ? (activePlan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.love, palette.health, palette.mind]).map((color, i) => ({ label: (language === "ja" ? ["メイン", "サブ", "金運", "愛情", "健康", "内面"] : language === "zh-TW" ? ["主色", "副色", "財運", "愛情", "健康", "內在"] : ["Main", "Secondary", "Money", "Love", "Health", "Inner"])[i] ?? "", code: color.code })) : [], score: localLayers?.numerology.lifePath ?? 0, kind: "identity" } : null} />
         </section>
-        <details open className="border-t border-primary/20 py-5"><summary className="cursor-pointer font-serif text-lg text-primary">{t.views}</summary>
+        <SacredDisclosure defaultOpen className="my-5" title={t.views}>
         {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} language={language} reading={data} loading={isPending} nameDetails={nameDetails} />}
         {!experienceOnly && <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜生まれ持った吉方位タイプ（本命卦）" : "Feng shui · Your birth direction type (Ming Gua)"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性" : "女性"}の計算式 · 方位タイプ ${b.number}` : `${b.branch === "male" ? "Male" : "Female"} calculation · Type ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `活動を広げる方角 ${fengDirectionNames[b.shengQi]} · 休息を整える方角 ${fengDirectionNames[b.tianYi]} · 関係を育てる方角 ${fengDirectionNames[b.yanNian]}` : `Expansion ${b.shengQi} · Restoration ${b.tianYi} · Relationships ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "プロフィールの性別区分と立春基準の生年から求める、伝統的な方位の参考値です。住まいごとの吉凶や効果を保証しません。" : "A traditional direction reference based on the profile's gender category and solar year, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "この方位タイプの算出には生年月日と性別の入力が必要です。マイページで設定できます。" : "Add birth date and gender in your profile to view this direction type."}</p>}</section>}
          {isPending ? <AgolmenLoading compact label={t.loading} /> : isError || !data ? (
@@ -221,7 +222,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
               [`地球暦｜今のフェーズ${data.helio ? `「${data.helio.phase}」` : ""}`, data.helioGuide],
             ] as const).filter(([, body]) => body).map(([title, body]) => <article key={title}><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{body}</p></article>)}</div></section>}
         </>}
-        </details>
+        </SacredDisclosure>
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>
       <GrandSummaryCard profile={profile} language={language} plan={activePlan} embedded />
