@@ -1180,3 +1180,52 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .theme-sample--large .theme-sample-actions > span:not(.theme-sample-cta) { width: 40px; height: 32px; }
 .theme-preview-dialog { border-radius: 6px; }
 @media (prefers-reduced-motion: reduce) { .design-canvas[data-design="masculine-luxe"]::before, .design-canvas[data-tier="b2b-premium"] .celestial-stars, .theme-sample-sky { animation: none !important; } }
+
+/* Plan identity is separate from the fifteen preserved palette choices. */
+.color-detail-dialog {
+  --background: var(--cosmic-space-ink);
+  --foreground: var(--cosmic-text-data);
+  --primary: var(--cosmic-text-main);
+  --muted-foreground: var(--cosmic-text-data);
+  background: var(--cosmic-space-ink);
+  color: var(--cosmic-text-data);
+  border-color: color-mix(in oklab, var(--cosmic-foil-gold) 45%, transparent);
+}
+.color-detail-dialog :is(p, h2, h3, h4, h5, li, button, span) {
+  text-shadow: 0 0 2px var(--cosmic-text-outline), 0 0 6px var(--cosmic-text-outline);
+}
+.color-detail-header { background: radial-gradient(ellipse at 0% 20%, color-mix(in oklab, var(--selected-birth-color) 17%, transparent), transparent 75%); }
+.birth-color-jewel {
+  background: var(--selected-birth-color);
+  border: 1px solid var(--cosmic-foil-light);
+  box-shadow: inset 0 0 15px color-mix(in oklab, var(--cosmic-star-core) 30%, transparent), 0 0 24px color-mix(in oklab, var(--selected-birth-color) 45%, transparent);
+}
+.color-step { border-bottom: 1px solid color-mix(in oklab, var(--cosmic-foil-gold) 25%, transparent); }
+.color-step[data-state=active] { background: color-mix(in oklab, var(--cosmic-foil-gold) 12%, var(--cosmic-space-ink)); color: var(--cosmic-text-main); border-color: var(--cosmic-foil-gold); }
+[data-appearance=minimal] .theme-sample-dial,
+[data-appearance=minimal] .appearance-part-icon { border: 1px solid var(--border); box-shadow: none; }
+.design-canvas[data-appearance=minimal] .celestial-stars { opacity: 0; }
+.design-canvas[data-appearance=minimal] .agolmen-background-spiral { opacity: .035; }
+.design-canvas[data-appearance=minimal] main .font-serif { font-family: var(--font-sans); }
+.theme-sample[data-appearance=minimal] .theme-sample-sky { opacity: 0; }
+[data-appearance=celestial] .theme-sample-dial,
+[data-appearance=celestial] .appearance-part-icon { border: 1px solid var(--primary); outline: 1px solid color-mix(in oklab, var(--primary) 28%, transparent); outline-offset: 5px; border-radius: 50%; box-shadow: 0 0 18px color-mix(in oklab, var(--gold-glow) 12%, transparent); }
+[data-appearance=sacred] .theme-sample-dial,
+[data-appearance=sacred] .appearance-part-icon { border: 5px double var(--cosmic-foil-gold); outline: 1px solid var(--cosmic-foil-light); outline-offset: 5px; border-radius: 50%; background: repeating-conic-gradient(from 0deg, color-mix(in oklab, var(--cosmic-foil-gold) 12%, transparent) 0deg 1deg, transparent 1deg 30deg); box-shadow: inset 0 0 10px color-mix(in oklab, var(--cosmic-foil-gold) 28%, transparent), 0 0 22px color-mix(in oklab, var(--gold-glow) 22%, transparent); }
+.design-canvas[data-appearance=sacred] .design-header { border-bottom: 3px double color-mix(in oklab, var(--cosmic-foil-gold) 65%, transparent); }
+.design-canvas[data-appearance=sacred] .design-navigation { border: 3px double var(--primary); box-shadow: 0 0 18px color-mix(in oklab, var(--gold-glow) 20%, transparent); }
+.design-canvas[data-appearance=sacred] main h2 { text-shadow: 0 0 2px var(--cosmic-text-outline), 0 0 6px var(--cosmic-text-outline); }
+[data-appearance=royal] .appearance-part-icon,
+[data-appearance=royal] .theme-sample-dial { border: 4px double var(--primary); border-radius: 4px; box-shadow: inset 0 0 18px color-mix(in oklab, var(--primary) 18%, transparent); }
+.theme-sample[data-appearance=sacred] .theme-sample-sky { opacity: .9; }
+.theme-sample[data-appearance=sacred] .theme-sample-heading { text-shadow: 0 0 2px var(--cosmic-text-outline), 0 0 6px var(--cosmic-text-outline); }
+.appearance-part-icon { position: relative; }
+.appearance-part { min-width: 0; }
+.appearance-motif { position: absolute; inset: -11px; width: calc(100% + 22px); height: calc(100% + 22px); pointer-events: none; color: var(--primary); }
+.appearance-motif path { fill: none; stroke: currentColor; stroke-width: .65; }
+.appearance-motif circle { fill: none; stroke: currentColor; stroke-width: .45; }
+[data-appearance=minimal] .appearance-motif { display: none; }
+[data-appearance=celestial] .appearance-motif .sacred-engraving { display: none; }
+[data-appearance=sacred] .appearance-motif { filter: drop-shadow(0 0 2px var(--gold-glow)); }
+@media (prefers-reduced-motion: reduce) { .theme-sample *, .appearance-part * { animation: none !important; transition: none !important; } }
+.color-detail-dialog { z-index: 200; }

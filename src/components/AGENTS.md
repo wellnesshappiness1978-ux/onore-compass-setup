@@ -10,3 +10,5 @@
 - Reuse HelioCalendar on Home/My Page and BirthColorGuide for color output rather than independent panels. Why: avoid tier-gate bypasses.
 - Dashboard has one gesture-started ambient-piano player. Why: no overlapping audio.
 - The ambient-piano player renders only inside Settings for VIP and above. Why: keep mobile workflows clear while preserving one gesture-started audio instance.
+- Color details use three accessible steps and shared seven-language copy, with six illustrative roles and Free showing only its main color; no measured wavelength, therapeutic or family-root calculation claims. Why: distinguish educational color science from personalized symbolism.
+- Appearance families overlay existing palette tokens through a separate data attribute; automatic plan mapping is session-local and fitting is confined to the sample. Legacy Family IDs never activate Corporate automatically. Why: retain all fifteen palettes and prevent fitting from granting access.

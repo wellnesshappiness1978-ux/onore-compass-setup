@@ -49,6 +49,7 @@ import { homeReadingCopy } from "@/lib/home-reading-copy";
 import DailyLifeGuide from "./DailyLifeGuide";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
+import { appearanceForPlan } from "@/lib/appearance-families";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import {
   dashboardTranslations,
@@ -510,6 +511,9 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     return () => { active = false; };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
+  const [automaticAppearance, setAutomaticAppearance] = useState(true);
+  useEffect(() => { try { setAutomaticAppearance(sessionStorage.getItem("onore-appearance-auto") !== "false"); } catch { /* private browsing */ } }, []);
+  const changeAutomaticAppearance = (value: boolean) => { setAutomaticAppearance(value); try { sessionStorage.setItem("onore-appearance-auto", String(value)); } catch { /* private browsing */ } };
   useEffect(() => { try { const saved = sessionStorage.getItem("onore-design"); if (saved && designCopy.ja.names[saved as DesignMode] && canPreviewDesign(previewPlan, saved as DesignMode)) setDesignMode(saved as DesignMode); } catch { /* private browsing */ } }, []);
   useEffect(() => { try { sessionStorage.setItem("onore-design", designMode); } catch { /* private browsing */ } }, [designMode]);
   const effectiveDesign = canPreviewDesign(previewPlan, designMode) ? designMode : "classic";
@@ -531,7 +535,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
   return (
     <>
-    <div data-design={effectiveDesign} data-tier={previewPlan} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
+    <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={automaticAppearance ? appearanceForPlan(previewPlan) : undefined} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       {tab === "home" && <LanguageSelector language={language} onChange={onLanguageChange} />}
       <SpiralLines className="agolmen-background-spiral pointer-events-none absolute right-[-14rem] top-20 z-0 size-[min(88vw,44rem)] text-primary sm:right-[-8rem]" />
@@ -642,6 +646,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 onDebugPlanChanged={(p) => setActualPlan(p)}
                 onPlanChange={applyDevOverride}
                 designMode={designMode}
+                automaticAppearance={automaticAppearance}
+                onAutomaticAppearanceChange={changeAutomaticAppearance}
                 onDesignModeChange={setDesignMode}
                 signedIn={signedIn}
                 onLanguageChange={onLanguageChange}
