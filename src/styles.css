@@ -1283,3 +1283,11 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
   .appearance-background { right: -90px; top: 150px; }
 }
 @media (prefers-reduced-motion: reduce) { .appearance-plan-tab { transition: none; } }
+
+/* Compact settings specimens keep every choice within one view. */
+.theme-sample--compact { height: 66px; padding: 5px 8px; }
+.theme-sample--compact .theme-sample-top, .theme-sample--compact .theme-sample-heading, .theme-sample--compact .theme-sample-lines, .theme-sample--compact .theme-sample-actions { display: none; }
+.theme-sample--compact .theme-sample-content { padding: 0; }
+.theme-sample--compact .theme-sample-body { margin: 0; padding: 4px; border: 0; background: transparent; justify-content: center; }
+.theme-sample--compact .theme-sample-dial { width: 46px; height: 46px; }
+.palette-chip { background: var(--background); border-top: 6px solid var(--primary); }

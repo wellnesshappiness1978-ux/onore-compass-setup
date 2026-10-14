@@ -1,3 +1,8 @@
+## Compact manual app design
+- [ ] Consolidate design families and existing palettes into one compact view with locked isolated previews.
+- [ ] Apply coordinated themes only on explicit unlocked selection; preserve applied appearance across all plan changes.
+- [ ] Verify selection, locked previews, persistence, mobile compact layout and consultation top; run relevant regressions.
+
 ## Independent customization and color references
 - [x] Replace brain-wave copy with seven-language hue-based wavelength/frequency references, symbolic chakra/body regions and distinct practical cues. Mixed colors retain no-single-wavelength labels; no medical or measured personal-wave claims.
 - [x] Add independent local-persistent backgrounds, frames/parts and icons with isolated draft, preview-only locked choices and save confirmation. Migrate the legacy palette session choice without changing IDs; upgrades preserve saved selections and downgrades apply non-mutating safe fallbacks. Remove remaining membership-driven CSS decoration links; Royal stays preview-only without a corporate contract.
