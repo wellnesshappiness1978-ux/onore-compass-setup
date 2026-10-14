@@ -1,9 +1,11 @@
 import { Compass, Sparkles } from "lucide-react";
 import type { DesignMode, Plan } from "@/lib/design-modes";
+import type { AppearanceFamily } from "@/lib/appearance-families";
+import { appearanceForPlan } from "@/lib/appearance-families";
 
 /** One miniature screen, fed by the same theme tokens as the actual dashboard. */
-export function ThemeSample({ mode, tier, name, large = false }: { mode: DesignMode; tier: Plan; name: string; large?: boolean }) {
-  return <div data-design={mode} data-tier={tier} className={`theme-sample theme-sample--${mode} ${large ? "theme-sample--large" : ""}`} aria-label={name}>
+export function ThemeSample({ mode, tier, name, large = false, family = appearanceForPlan(tier) }: { mode: DesignMode; tier: Plan; name: string; large?: boolean; family?: AppearanceFamily }) {
+  return <div data-design={mode} data-tier={tier} data-appearance={family} className={`theme-sample theme-sample--${mode} ${large ? "theme-sample--large" : ""}`} aria-label={name}>
     <div className="theme-sample-sky" aria-hidden="true" />
     <div className="theme-sample-top"><span className="theme-sample-symbol">✦</span><span>AGOLMEN'S COMPASS</span><span className="theme-sample-symbol">✦</span></div>
     <div className="theme-sample-content">

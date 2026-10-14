@@ -28,6 +28,7 @@ import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
 import SolfeggioPlayer from "./SolfeggioPlayer";
+import { AppearanceFitting } from "./AppearanceFitting";
 
 type Props = {
   profile: UserProfile;
@@ -43,6 +44,8 @@ type Props = {
   designMode: DesignMode;
   onDesignModeChange: (mode: DesignMode) => void;
   signedIn?: boolean;
+  automaticAppearance: boolean;
+  onAutomaticAppearanceChange: (value: boolean) => void;
 };
 
 const card = "border-b border-primary/20 py-6";
@@ -61,6 +64,8 @@ export default function SettingsPanel({
   designMode,
   onDesignModeChange,
   signedIn = false,
+  automaticAppearance,
+  onAutomaticAppearanceChange,
 }: Props) {
   const t = settingsTranslations[language];
   const dc = designCopy[language];
@@ -199,6 +204,7 @@ export default function SettingsPanel({
           <h3 id="design-heading" className="font-serif text-xl text-primary">{dc.title}</h3>
         </div>
         <p className="mt-2 text-xs leading-5 text-muted-foreground">{dc.note}</p>
+        <AppearanceFitting plan={plan} mode={designMode} language={language} automatic={automaticAppearance} onAutomaticChange={onAutomaticAppearanceChange} />
         <div className="mt-5 space-y-5">
           {(["free", "standard", "vip", "b2b", "b2b-premium"] as Plan[]).map((tier, index) => (
             <div key={tier}>

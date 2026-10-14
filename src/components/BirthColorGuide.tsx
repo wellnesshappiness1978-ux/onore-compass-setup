@@ -7,7 +7,8 @@ import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 import { canUse } from "@/lib/plans";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
+import { Dialog } from "./ui/dialog";
+import { BirthColorDetails } from "./BirthColorDetails";
 
 const roles: BirthColorRole[] = ["main", "sub", "money", "work", "love", "health", "mind"];
 
@@ -34,9 +35,7 @@ export default function BirthColorGuide({ profile, plan, language, onUpgrade }: 
       })}
     </div>
     <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}>
-      <DialogContent className="w-[calc(100%-2rem)] max-w-md rounded-lg border-primary/35 bg-card text-foreground">
-        {selectedColor && selectedCopy && <><div className="flex items-center gap-4 pr-8"><span className="size-16 shrink-0 rounded-full border border-primary/40 shadow-[0_0_24px_var(--gold-glow)]" style={{ backgroundColor: selectedColor.code }} aria-hidden="true" /><div><DialogTitle className="font-serif text-xl text-gradient-gold">{selectedCopy.label}</DialogTitle><p className="mt-1 text-sm text-primary">{localizeBirthColorName(selectedColor.name, language)} · {selectedColor.code}</p></div></div><DialogDescription className="text-base leading-8 text-foreground">{selectedCopy.detail}</DialogDescription><p className="border-t border-primary/20 pt-3 text-xs leading-6 text-muted-foreground">{copy.dialogNote}</p></>}
-      </DialogContent>
+      {selected && <BirthColorDetails key={selected} profile={profile} role={selected} full={full} language={language} />}
     </Dialog>
   </section>;
 }
