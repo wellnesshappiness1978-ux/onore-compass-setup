@@ -1336,3 +1336,11 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .appearance-selection .theme-sample--compact { height: 54px; }
 .appearance-selection .theme-sample--compact .theme-sample-dial { width: 38px; height: 38px; }
 @media (prefers-reduced-motion: reduce) { .appearance-selection .theme-choice { transition: none; } }
+
+/* Fine parallel engraving progresses independently of membership and saved palettes. */
+.nautilus-icon .nautilus-shell { stroke-width: 1.8; }
+.nautilus-icon[data-nautilus=minimal] .nautilus-shell { stroke-width: 1.1; }
+:is([data-icons=harmony], [data-icons=sovereign]) .nautilus-spiral,
+.nautilus-icon:is([data-nautilus=harmony], [data-nautilus=sovereign]) .nautilus-spiral { stroke: var(--cosmic-foil-light); stroke-width: 2; }
+:is([data-icons=harmony], [data-icons=sovereign]) .nautilus-diamonds,
+.nautilus-icon:is([data-nautilus=harmony], [data-nautilus=sovereign]) .nautilus-diamonds { display: block; fill: var(--cosmic-foil-light); stroke: var(--cosmic-foil-light); stroke-width: .65; }

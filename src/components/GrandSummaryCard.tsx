@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Sparkles } from "lucide-react";
+import { ArrowUpRight, Sparkles } from "lucide-react";
 import ShareCardButton from "./ShareCardButton";
 import type { UserProfile } from "./Onboarding";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
@@ -9,7 +9,10 @@ import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 import { AgolmenLoading } from "./AgolmenSpiral";
-import { approachKeys, traitReadingCopy } from "@/lib/trait-reading";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
+import { approachKeys, visibleApproachKeys, type ApproachKey, traitReadingCopy } from "@/lib/trait-reading";
 
 const titles: Record<Language, [string, string]> = {
   ja: ["多層総合診断", "あなたの診断カードをSNSでシェア"],
@@ -22,9 +25,10 @@ const titles: Record<Language, [string, string]> = {
 };
 
 export default function GrandSummaryCard({ profile, language, plan, embedded = false }: { profile: UserProfile; language: Language; plan: Plan; embedded?: boolean }) {
+  const [selected, setSelected] = useState<ApproachKey | null>(null);
   const generate = useServerFn(generateHomeReading);
   const { data, isPending, isError } = useQuery({
-    queryKey: ["home-reading-six-v12", profile, language],
+    queryKey: ["home-reading-six-v13", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
@@ -43,14 +47,19 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
 
       </div>
       {isPending ? <AgolmenLoading compact label={copy.loading} /> : data ? <>
-        <div className="mt-6 divide-y divide-primary/20">
-          {approachKeys.map((key, i) => { const status = data.approachAvailability[key]; return <article key={key} className="min-w-0 py-5 [overflow-wrap:anywhere]">
-            <h3 className="font-serif text-lg leading-8 text-primary">{String(i + 1).padStart(2, "0")} · {traits.methods[i]}</h3>
-            <p className="mt-1 text-xs text-muted-foreground">{traits.statuses[status]}</p>
-            <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{status === "unavailable" ? traits.missing : data.approaches[key]}</p>
-            {status === "context" && <p className="mt-2 text-xs leading-6 text-muted-foreground">{traits.context}</p>}
-          </article>; })}
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {visibleApproachKeys(data.approachAvailability, data.approaches).map((key, i) => <Button key={key} variant="outline" aria-haspopup="dialog" onClick={() => setSelected(key)} className="h-auto min-h-24 min-w-0 flex-col items-start justify-between whitespace-normal border-primary/30 p-4 text-left [overflow-wrap:anywhere]">
+            <span className="flex w-full items-center justify-between text-primary"><span className="font-mono text-xs">{String(i + 1).padStart(2, "0")}</span><ArrowUpRight className="size-4 shrink-0" aria-hidden="true" /></span>
+            <span className="mt-3 font-serif text-sm leading-6 text-primary">{traits.methods[approachKeys.indexOf(key)]}</span>
+          </Button>)}
         </div>
+        <Dialog open={selected !== null} onOpenChange={open => { if (!open) setSelected(null); }}>
+          <DialogContent className="z-[200] max-h-[85dvh] w-[calc(100%-1.5rem)] min-w-0 overflow-y-auto border-primary/40 bg-card [overflow-wrap:anywhere]">
+            <DialogTitle className="pr-6 font-serif text-xl leading-8 text-primary">{selected ? traits.methods[approachKeys.indexOf(selected)] : ""}</DialogTitle>
+            <DialogDescription>{selected && data.approachAvailability[selected] === "context" ? traits.symbolic : traits.statuses.reference}</DialogDescription>
+            <p className="whitespace-pre-line text-base leading-8 text-foreground">{selected ? data.approaches[selected] : ""}</p>
+          </DialogContent>
+        </Dialog>
         <section className="mt-6 border-y border-primary/40 py-6 [overflow-wrap:anywhere]">
           <h3 className="font-serif text-xl leading-9 text-primary">{traits.final}</h3>
           <p className="mt-4 whitespace-pre-line text-lg leading-9 text-foreground">{text}</p>

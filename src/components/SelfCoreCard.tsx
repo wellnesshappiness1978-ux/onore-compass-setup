@@ -132,7 +132,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-six-v12", profile, language],
+    queryKey: ["home-reading-six-v13", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
@@ -171,6 +171,10 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">AGOLMEN'S COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{t.title}</h2></div>
       </header>
       <div className="px-5 sm:px-8">
+        {data?.catchphrase && <section aria-label={traits.catchphrase} className="my-6 rounded-md border-2 border-primary/60 px-4 py-6 sm:px-6 sm:py-8 [overflow-wrap:anywhere]">
+          <p className="flex items-center gap-2 text-sm text-primary"><Sparkles className="size-4" aria-hidden="true" />{traits.catchphrase}</p>
+          <p className="mt-4 border-l-2 border-primary pl-4 font-serif text-2xl leading-relaxed text-gradient-gold sm:pl-6 sm:text-3xl">{data.catchphrase}</p>
+        </section>}
         {!experienceOnly && localLayers && <section aria-label="診断の根拠サマリー" className="border-b border-primary/20 py-4"><dl className="flex flex-wrap gap-x-5 gap-y-3">{[
           ["名前の中心数", localLayers.name ? `${localLayers.name.person}画` : "姓・名の区切りを設定"],
           ["生年月日の基本数", String(localLayers.numerology.lifePath)],

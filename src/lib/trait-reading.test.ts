@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { approachKeys, approachStatuses, essenceKeys, traitReadingCopy, traitReadingPrompt } from "./trait-reading";
+import { approachKeys, approachStatuses, essenceKeys, traitReadingCopy, traitReadingPrompt, visibleApproachKeys } from "./trait-reading";
 
 describe("distinct personal reading contract", () => {
   it("has six unique angles and fifteen methods in all seven languages", () => {
@@ -20,6 +20,14 @@ describe("distinct personal reading contract", () => {
     for (const key of ["blood", "siblings", "region"] as const) expect(statuses[key]).toBe("context");
     const missing = approachStatuses({ core: false, earth: false, nineStars: false, color: false, blood: false, siblings: false, region: false });
     expect(Object.values(missing).every(s => s === "unavailable")).toBe(true);
+  });
+  it("filters unavailable and empty perspectives without renumbering domain IDs", () => {
+    const statuses = approachStatuses({ core: true, earth: true, nineStars: true, color: true, blood: true, siblings: false, region: false });
+    const passages = Object.fromEntries(approachKeys.map(key => [key, key === "earth" ? " " : "reading"])) as Record<typeof approachKeys[number], string>;
+    expect(visibleApproachKeys(statuses, passages)).toEqual(["western", "pillars", "nineStars", "animal", "numerology", "color", "blood"]);
+    expect(traitReadingPrompt).toContain("360–440");
+    expect(traitReadingPrompt).toContain("catchphrase");
+    for (const copy of Object.values(traitReadingCopy)) { expect(copy.catchphrase).toBeTruthy(); expect(copy.symbolic).toBeTruthy(); }
   });
   it("keeps plain speech, non-repetition, source boundaries and actionable closure", () => {
     for (const text of ["No headings or method names", "different central observation", "everyday analogies", "Missing context MUST be empty", "Do not claim fifteen methods", "optional small tomorrow step", "not evidence of upbringing"]) expect(traitReadingPrompt).toContain(text);

@@ -22,6 +22,7 @@ const inputSchema = z.object({
   language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]),
 });
 const readingSchema = z.object({
+  catchphrase: z.string(),
   essence: z.object({ outward: z.string(), inner: z.string(), growth: z.string(), resilience: z.string(), relationships: z.string(), gift: z.string() }),
   approaches: z.object({ western: z.string(), indian: z.string(), ziwei: z.string(), earth: z.string(), pillars: z.string(), sanmei: z.string(), nineStars: z.string(), lunarMansion: z.string(), animal: z.string(), numerology: z.string(), maya: z.string(), color: z.string(), blood: z.string(), siblings: z.string(), region: z.string() }),
   axisSummary: z.string(),
