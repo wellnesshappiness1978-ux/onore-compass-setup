@@ -12,7 +12,7 @@ describe("helio almanac 2026", () => {
     expect(d.lunarMonthName).toBe("皐月");
   });
   it("zassetsu and moon", () => {
-    expect(almanacDay(new Date(2026, 6, 1)).zassetsu).toContain("半夏生");
+    expect(almanacDay(new Date(2026, 6, 2)).zassetsu).toContain("半夏生");
     expect(almanacDay(new Date(2026, 5, 11)).zassetsu).toContain("入梅");
     expect(almanacDay(new Date(2026, 5, 25)).lunarDayLabel).toBe("新月");
     expect(almanacDay(new Date(2026, 6, 6)).apsis).toBe("遠日点");
