@@ -250,8 +250,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     <p className="mb-2 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>
     <h4 className="mb-1 font-serif text-sm text-primary">{ja ? "個人のバイオリズム" : "Personal biorhythm"}</h4>
     {content.biorhythm365.body}
-    <h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "カレンダー" : "Calendar"}</h4>
-    <HelioCalendar date={today} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} />
     <h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "ファミリーのロードマップとバイオリズム" : "Family roadmap & biorhythm"}</h4>
     {planOrder.indexOf(plan) >= planOrder.indexOf(familyRoadmapMin) ? content.familyRoadmap.body : (
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/25 p-3 text-sm">
