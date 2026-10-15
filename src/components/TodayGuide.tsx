@@ -34,7 +34,7 @@ const titles: Record<TodayFeature, Pair> = {
   monthlyLucky: P("今月の3ラッキー", "This month's three lucky picks"),
   directionExtended: P("吉方位（生まれ持った方位タイプと今年の方位）", "Birth direction type & this year's direction"),
   helio: P("地球暦・コンパス・当日詳細・バイオリズム（当日分）", "Earth Calendar, compass & biorhythm (today)"),
-  biorhythm365: P("個人・ファミリーのバイオリズムとカレンダー（当日・前後1ヶ月・前後1年・無期限）", "Personal & family biorhythm and calendar"),
+  biorhythm365: P("個人・ファミリーのバイオリズム", "Personal & family biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
 const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
