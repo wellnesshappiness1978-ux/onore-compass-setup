@@ -125,9 +125,9 @@ const polar = (deg: number, r: number) => {
 };
 const rank = (p: Plan) => planOrder.indexOf(p);
 
-type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void };
+type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void; dialOnly?: boolean };
 
-export default function DayCompass({ profile, language, plan, onUpgrade }: Props) {
+export default function DayCompass({ profile, language, plan, onUpgrade, dialOnly = false }: Props) {
   const c = { ...translatedCopy[language], elDay: companionCopy[language].day, rel: companionCopy[language].relation, bodyTip: companionCopy[language].rhythm };
   const names = teamCopy[language].planNames;
   const now = useMemo(() => new Date(), []);
@@ -313,6 +313,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
           </div>
         </Card>
 
+        {!dialOnly && <>
         {rank(plan) >= rank("standard") && <Card icon={Compass} title={c.personalTitle} tier="standard">
           <Lock min="standard">
             {me ? (
@@ -387,9 +388,10 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
             </Lock>
           </Card>
         </div>}
+        </>}
       </div>
       <HelioCalendar date={date} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} />
-      {rank(plan) < rank("b2b") && <section className="mx-auto mt-7 max-w-4xl border-t border-primary/25 pt-6 text-left" aria-label={language === "ja" ? "未開放の占い" : "Locked guidance"}>
+      {!dialOnly && rank(plan) < rank("b2b") && <section className="mx-auto mt-7 max-w-4xl border-t border-primary/25 pt-6 text-left" aria-label={language === "ja" ? "未開放の占い" : "Locked guidance"}>
         <h3 className="mb-4 font-serif text-lg text-primary">{language === "ja" ? "未開放の占い" : "More guidance"}</h3>
         <div className="grid gap-4 md:grid-cols-2">
           {rank(plan) < rank("standard") && <Card icon={Compass} title={c.personalTitle} tier="standard"><Lock min="standard"><span /></Lock></Card>}
@@ -398,7 +400,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
           {rank(plan) < rank("b2b") && <Card icon={BriefcaseBusiness} title={c.bizTitle} tier="b2b"><Lock min="b2b"><span /></Lock></Card>}
         </div>
       </section>}
-      <FengShuiGuide profile={profile} date={date} language={language} />
+      {!dialOnly && <FengShuiGuide profile={profile} date={date} language={language} />}
     </div>
   );
 }

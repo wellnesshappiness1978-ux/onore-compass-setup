@@ -1397,3 +1397,12 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
   .design-canvas .compass-center strong { font-size: 16px; line-height: 1.4; }
   .design-canvas .compass-center span { font-size: 10px !important; line-height: 1.35; }
 }
+
+/* White theme legibility: opaque frosted surfaces so background motifs never show through text. */
+.design-canvas[data-design="pure-white"] :is(.card-lux, .design-daily-panel, .today-feature, .sacred-disclosure) {
+  background: color-mix(in oklab, white 93%, transparent);
+  box-shadow: 0 4px 6px -1px oklch(0.2 0.03 270 / .10), 0 2px 4px -2px oklch(0.2 0.03 270 / .08);
+  color: oklch(.21 .04 265);
+}
+.design-canvas[data-design="pure-white"] :is(.card-lux, .design-daily-panel, .today-feature) :is(.text-muted-foreground) { color: oklch(.36 .03 265); }
+.design-canvas[data-design="pure-white"] :is(.card-lux, .design-daily-panel, .today-feature) :is(.text-primary) { color: oklch(.47 .11 70); }
