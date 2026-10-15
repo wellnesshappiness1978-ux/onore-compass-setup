@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { BellRing } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Language } from "@/lib/translations";
 
 type Setting = { on: boolean; time: string };
@@ -34,6 +36,7 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
   const t = language === "ja" ? copy.ja : copy.en;
   const [s, setS] = useState<Setting>({ on: false, time: "07:00" });
   const [msg, setMsg] = useState("");
+  const [help, setHelp] = useState(false);
   useEffect(() => { const v = readAll()[id]; if (v) setS({ on: !!v.on, time: times.includes(v.time) ? v.time : "07:00" }); }, [id]);
   const save = (next: Setting) => { setS(next); try { localStorage.setItem(KEY, JSON.stringify({ ...readAll(), [id]: next })); } catch { /* storage disabled */ } };
 
@@ -54,29 +57,39 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
   const toggle = async (on: boolean) => {
     setMsg("");
     if (on) {
-      if (typeof Notification === "undefined") { setMsg(t.unsupported); return; }
+      if (typeof Notification === "undefined") { setMsg(t.unsupported); setHelp(true); return; }
       if (Notification.permission !== "granted") {
+        if (Notification.permission === "denied") { setHelp(true); return; }
         if (window.top !== window.self) { setMsg(t.tab); return; }
-        if ((await Notification.requestPermission()) !== "granted") { setMsg(t.allow); return; }
+        if ((await Notification.requestPermission()) !== "granted") { setHelp(true); return; }
       }
     }
     save({ ...s, on });
   };
 
   return (
-    <div className="feature-notify mt-3 border-t border-primary/20 pt-3">
+    <div className="feature-notify mt-3 rounded-lg border-2 border-primary/60 bg-background/90 p-2.5 text-foreground shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <label className="flex items-center gap-2 text-sm text-foreground"><BellRing className="size-4 text-primary" />{t.label}
-          <Switch checked={s.on && !disabled} disabled={disabled} onCheckedChange={(v) => void toggle(v)} aria-label={`${title} · ${t.label}`} />
+        <label className="flex items-center gap-2 text-sm text-foreground"><span className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground"><BellRing className="size-4" /></span><span className="font-medium">{t.label}</span>
+          <Switch className="border-2 border-primary/70 data-[state=unchecked]:bg-muted" checked={s.on && !disabled} disabled={disabled} onCheckedChange={(v) => void toggle(v)} aria-label={`${title} · ${t.label}`} />
         </label>
         <label className="flex items-center gap-1.5 text-xs text-muted-foreground">{t.time}
-          <select value={s.time} disabled={disabled} onChange={(e) => save({ ...s, time: e.target.value })} className="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground">
+          <select value={s.time} disabled={disabled} onChange={(e) => save({ ...s, time: e.target.value })} className="h-8 rounded-md border-2 border-primary/60 bg-background px-2 text-sm font-medium text-foreground">
             {times.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
         </label>
       </div>
       <p className="mt-1 text-[11px] leading-4 text-muted-foreground">{disabled ? t.locked : t.note}</p>
       {msg && <p role="status" className="mt-1 text-xs text-primary">{msg}</p>}
+      <Dialog open={help} onOpenChange={setHelp}>
+        <DialogContent className="w-[calc(100%-1.5rem)] rounded-lg border-primary/40 sm:max-w-md">
+          <DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif"><BellRing className="size-5 text-primary" />{language === "ja" ? "通知を有効にするには" : "Turn on notifications"}</DialogTitle>
+            <DialogDescription>{language === "ja" ? "通知を有効にするには、端末またはブラウザの設定で通知を許可してください。" : "To turn on notifications, allow them in your device or browser settings."}</DialogDescription></DialogHeader>
+          <ol className="list-decimal space-y-1.5 pl-5 text-sm leading-6">{(language === "ja" ? ["パソコン：アドレスバー左の鍵（またはサイト情報）マーク →「通知」を「許可」にします。", "iPhone：ホーム画面に追加したアプリを開き、設定 → 通知 → このアプリ → 「通知を許可」をオンにします。", "Android：設定 → アプリ → ブラウザ（Chromeなど）→ 通知 → このサイトを許可します。", "許可したら画面を読み込み直し、もう一度スイッチをオンにしてください。"] : ["Desktop: click the lock/site-info icon in the address bar → set Notifications to Allow.", "iPhone: open the app from your Home Screen, then Settings → Notifications → this app → Allow.", "Android: Settings → Apps → your browser → Notifications → allow this site.", "Reload the page and turn the switch on again."]).map((x) => <li key={x}>{x}</li>)}</ol>
+          <p className="text-xs text-muted-foreground">{t.note}</p>
+          <Button variant="champagne" onClick={() => setHelp(false)}>{language === "ja" ? "わかりました" : "Got it"}</Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

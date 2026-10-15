@@ -33,13 +33,10 @@ const titles: Record<TodayFeature, Pair> = {
   monthlyLucky: P("今月の3ラッキー", "This month's three lucky picks"),
   directionExtended: P("吉方位（生まれ持った方位タイプと今年の方位）", "Birth direction type & this year's direction"),
   helio: P("地球暦・コンパス・当日詳細・バイオリズム（当日分）", "Earth Calendar, compass & biorhythm (today)"),
-  helioMonth: P("地球暦・カレンダー・バイオリズムの期間拡張（前後1ヶ月）", "Calendar & biorhythm range: ±1 month"),
-  helioYear: P("地球暦・カレンダー・バイオリズムの期間拡張（前後1年）", "Calendar & biorhythm range: ±1 year"),
-  helioUnlimited: P("地球暦・カレンダー・バイオリズムの無制限拡張（全期間）", "Calendar & biorhythm range: unlimited"),
   biorhythm365: P("365日の個人バイオリズム", "365-day personal biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
-const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, helioMonth: CalendarRange, helioYear: CalendarRange, helioUnlimited: CalendarRange, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
+const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
 
 const words: Record<Element, Pair[]> = {
   wood: [P("朝の散歩で新しい道を選ぶ", "Take a new route on a morning walk"), P("「まず芽を出す」", "\"Plant the first seed\""), P("ストレッチとヨガ", "Stretching and yoga")],
@@ -48,12 +45,12 @@ const words: Record<Element, Pair[]> = {
   metal: [P("要らない物を一つ手放す", "Let go of one unneeded item"), P("「選ぶことは磨くこと」", "\"Choosing is polishing\""), P("姿勢を整える筋トレ", "Posture-building strength work")],
   water: [P("気になる人に一言連絡する", "Send a short note to someone you miss"), P("「流れに乗って柔らかく」", "\"Flow softly with the current\""), P("水泳やゆったり入浴", "Swimming or a slow bath")],
 };
-const foods: Record<Element, Pair> = {
-  wood: P("ほうれん草とツナの和え物／小松菜と油揚げの味噌汁／鶏むね肉のレモン蒸し", "Spinach and tuna salad / komatsuna miso soup / lemon-steamed chicken"),
-  fire: P("トマトと卵の炒め物／パプリカの肉詰め／ゴーヤチャンプルー", "Tomato and egg stir-fry / stuffed peppers / bitter-melon champuru"),
-  earth: P("かぼちゃの煮物／さつまいもご飯／根菜たっぷり豚汁", "Simmered pumpkin / sweet-potato rice / root-vegetable pork soup"),
-  metal: P("ぶり大根／白身魚の塩焼き／れんこんのきんぴら", "Yellowtail with radish / salt-grilled white fish / lotus-root kinpira"),
-  water: P("わかめと豆腐の味噌汁／鮭のホイル焼き／ひじきと黒豆の煮物", "Wakame tofu miso soup / foil-baked salmon / hijiki and black beans"),
+const foods: Record<Element, Pair[]> = {
+  wood: [P("ほうれん草とツナの和え物", "Spinach and tuna salad"), P("小松菜と油揚げの味噌汁", "Komatsuna and fried-tofu miso soup"), P("鶏むね肉のレモン蒸し", "Lemon-steamed chicken breast"), P("ブロッコリーのごま和え", "Sesame broccoli"), P("きゅうりの浅漬け", "Quick-pickled cucumber")],
+  fire: [P("トマトと卵の炒め物", "Tomato and egg stir-fry"), P("パプリカの肉詰め", "Stuffed bell peppers"), P("ゴーヤチャンプルー", "Bitter-melon champuru"), P("にんじんしりしり", "Carrot and egg shiri-shiri"), P("いちごヨーグルト", "Strawberry yogurt")],
+  earth: [P("かぼちゃの煮物", "Simmered pumpkin"), P("さつまいもご飯", "Sweet-potato rice"), P("根菜たっぷり豚汁", "Root-vegetable pork soup"), P("肉じゃが", "Nikujaga (meat and potato stew)"), P("とうもろこしのかき揚げ", "Corn kakiage fritters")],
+  metal: [P("ぶり大根", "Yellowtail with radish"), P("白身魚の塩焼き", "Salt-grilled white fish"), P("れんこんのきんぴら", "Lotus-root kinpira"), P("大根と豚バラの煮物", "Daikon and pork belly stew"), P("白菜と豆腐のスープ", "Napa cabbage and tofu soup")],
+  water: [P("わかめと豆腐の味噌汁", "Wakame and tofu miso soup"), P("鮭のホイル焼き", "Foil-baked salmon"), P("ひじきと黒豆の煮物", "Hijiki and black beans"), P("なめこおろし", "Nameko mushrooms with grated radish"), P("しじみの味噌汁", "Shijimi clam miso soup")],
 };
 const shop: Record<Element, Pair> = {
   wood: P("観葉植物・ノート・新しい文房具。午前中の買い物が好相性。予算を先に決めると満足度が上がります。", "Plants, notebooks, stationery. Morning shopping suits today; set a budget first."),
@@ -140,7 +137,17 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const phases: Record<Phase, Pair> = { attack: P("攻め", "Advance"), defend: P("守り", "Protect"), newBiz: P("新規", "New"), contract: P("契約", "Sign") };
 
   const rangeLabel = Number.isFinite(helioRangeDays[plan]) ? (helioRangeDays[plan] === 0 ? (ja ? "当日分" : "Today") : helioRangeDays[plan] <= 31 ? (ja ? "前後1ヶ月" : "±1 month") : (ja ? "前後1年" : "±1 year")) : (ja ? "全期間" : "Unlimited");
-  const rangeCard = (label: string, text: string) => ({ notify: ja ? `地球暦を${label}で確認しましょう` : `Browse the calendar (${label})`, body: <p className="text-sm leading-6"><strong className="text-primary">✓ {label}</strong> · {text}</p> });
+  const rangeBanner = (
+    <div className="helio-range-pr mx-auto mt-4 w-full max-w-md rounded-lg border border-primary/40 bg-primary/10 p-3 text-left shadow-champagne">
+      <p className="flex items-center gap-1.5 font-serif text-sm text-primary"><CalendarRange className="size-4" />{ja ? "地球暦の閲覧期間" : "Earth Calendar browsing range"}</p>
+      <ul className="mt-2 grid grid-cols-2 gap-1.5 text-[11px] sm:grid-cols-4">
+        {([["free", ja ? "当日分" : "Today"], ["standard", ja ? "前後1ヶ月" : "±1 month"], ["vip", ja ? "前後1年" : "±1 year"], ["b2b", ja ? "全期間無制限" : "Unlimited"]] as const).map(([p, v]) => (
+          <li key={p} className={`rounded-md border px-2 py-1.5 text-center ${plan === p || (p === "b2b" && plan === "b2b-premium") ? "border-primary bg-primary/20 font-bold text-primary" : "border-primary/20 text-foreground"}`}>{names[p]}<br /><span className="text-xs">{v}</span></li>
+        ))}
+      </ul>
+      {plan !== "b2b" && plan !== "b2b-premium" && <Button size="sm" variant="champagne" className="mt-2 w-full" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る・期間を広げる" : "View plans"}</Button>}
+    </div>
+  );
   const content: Record<TodayFeature, { body: ReactNode; notify: string }> = {
     decision: {
       notify: rhythm.total >= 55 ? (ja ? "今日は準備した一歩を小さく試す日" : "Test one prepared step today") : (ja ? "今日は確認と余白を整える日" : "Verify and leave space today"),
@@ -157,7 +164,9 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       body: <ul className="space-y-2 text-sm leading-6">
         <li className="flex items-start gap-2"><span className="mt-1 size-4 shrink-0 rounded-full border border-primary/40" style={{ background: luckyColor?.code }} /><span><strong className="text-primary">{ja ? "ラッキーカラー" : "Lucky color"}</strong>：{luckyColor ? `${localizeBirthColorName(luckyColor.name, language)}（${luckyColor.code}）` : (ja ? "生年月日の登録で表示されます" : "Add your birth date")}</span></li>
         <li><strong className="text-primary">{ja ? "ラッキーワード" : "Lucky word"}</strong>：{L(word)}</li>
-        <li><strong className="text-primary">{ja ? "ラッキーフード" : "Lucky food"}</strong>：{L(foods[el])}</li>
+        <li><strong className="text-primary">{ja ? "運気アップフード 選りすぐり5品" : "5 lucky foods"}</strong>
+          <ol className="mt-1 list-decimal space-y-0.5 pl-5">{foods[el].map((f, i) => <li key={i}>{L(f)}</li>)}</ol>
+          <span className="text-[11px] opacity-90">{ja ? "スーパーの食材で手軽に作れる、今日の気分を明るくする参考メニューです。" : "Easy reference dishes from everyday ingredients."}</span></li>
       </ul>,
     },
     direction: {
@@ -195,10 +204,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <li><strong className="text-primary">{ja ? "ラッキーアイテム" : "Lucky item"}</strong>：{L(month.item)}</li>
       </ul>,
     },
-    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p><DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /></> },
-    helioMonth: rangeCard(ja ? "前後1ヶ月" : "±1 month", ja ? "上の円盤を回すと、前後1ヶ月の地球暦とバイオリズムを見られます。" : "Turn the dial above to browse ±1 month."),
-    helioYear: rangeCard(ja ? "前後1年" : "±1 year", ja ? "上の円盤で、前後1年の流れを見渡せます。旅行や記念日の計画に便利です。" : "Browse ±1 year on the dial above — handy for planning."),
-    helioUnlimited: rangeCard(ja ? "全期間" : "Unlimited", ja ? "過去も未来も自由に。家族の誕生日や節目の日もさかのぼって確かめられます。" : "Browse any date, past or future."),
+    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p><DayCompass dialOnly afterDial={rangeBanner} rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /></> },
     biorhythm365: {
       notify: `${ja ? "今日のバイオリズム" : "Today's biorhythm"} ${Math.round(rhythm.total)}`,
       body: yearCurve.length ? <>
@@ -231,9 +237,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const teaser: Partial<Record<TodayFeature, string | undefined>> = {
     shopping: ja ? "今日の運気を上げるお買い物、ひとつだけ選ぶなら？" : "One purchase to lift today's luck?",
     health: ja ? "今日のからだが喜ぶ、小さな習慣があります。" : "A small habit your body will enjoy today.",
-    helioMonth: ja ? "来週の大切な日、先に確かめてみませんか？" : "Peek at the days ahead.",
-    helioYear: ja ? "一年先まで、あなたの流れを見渡せます。" : "See your flow a full year ahead.",
-    helioUnlimited: ja ? "過去も未来も、すべての日があなたの手に。" : "Every date, past and future.",
     helio: ja ? `今日は地球暦で一年の${dayIdx + 1}日目。あなたの円盤に今日の位置が灯ります。` : `Day ${dayIdx + 1} on your Earth Calendar dial.`,
     relations: ja ? `今日のあなたの大勝負の時間帯は${hour}時！` : `Your key moment today is around ${hour}:00!`,
     biorhythm365: birth ? (ja ? `${peak + 1}月は人生の転機バイオリズム。` : `${monthLabels[peak]} is your turning-point rhythm.`) : undefined,
@@ -253,7 +256,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     lines: [
       rhythm.total >= 55 ? (ja ? "決断：準備した一歩を小さく試す日" : "Decision: test one prepared step") : (ja ? "決断：確認と余白を整える日" : "Decision: verify and leave space"),
       ...(luckyColor ? [`${ja ? "ラッキーカラー" : "Lucky color"}: ${localizeBirthColorName(luckyColor.name, language)}`] : []),
-      `${ja ? "ラッキーフード" : "Lucky food"}: ${L(foods[el]).split("／")[0]!.split(" / ")[0]}`,
+      `${ja ? "ラッキーフード" : "Lucky food"}: ${L(foods[el][0]!)}`,
       `${ja ? "吉方位" : "Direction"}: ${L(dirNames[best.dir])}`,
     ],
     palette: luckyColor ? [{ label: ja ? "ラッキーカラー" : "Lucky color", code: luckyColor.code }] : [],

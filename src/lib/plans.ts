@@ -54,7 +54,7 @@ export const canUse = (plan: Plan, feature: ContentFeature) => rank(plan) >= ran
 export const minPlanFor = (feature: ContentFeature) => contentMin[feature];
 
 /** Ordered "Today" screen features (cheapest plan first; personal before family) and the minimum plan for each. */
-export type TodayFeature = "decision" | "dailyLucky" | "direction" | "helio" | "shopping" | "health" | "helioMonth" | "monthlyLucky" | "directionExtended" | "relations" | "biorhythm365" | "helioYear" | "familyRoadmap" | "helioUnlimited";
+export type TodayFeature = "decision" | "dailyLucky" | "direction" | "helio" | "shopping" | "health" | "monthlyLucky" | "directionExtended" | "relations" | "biorhythm365" | "familyRoadmap";
 export const todayFeatures: readonly { id: TodayFeature; min: Plan }[] = [
   { id: "decision", min: "free" },
   { id: "dailyLucky", min: "free" },
@@ -62,14 +62,11 @@ export const todayFeatures: readonly { id: TodayFeature; min: Plan }[] = [
   { id: "helio", min: "free" },
   { id: "shopping", min: "standard" },
   { id: "health", min: "standard" },
-  { id: "helioMonth", min: "standard" },
   { id: "monthlyLucky", min: "vip" },
   { id: "directionExtended", min: "vip" },
   { id: "relations", min: "vip" },
   { id: "biorhythm365", min: "vip" },
-  { id: "helioYear", min: "vip" },
   { id: "familyRoadmap", min: "b2b" },
-  { id: "helioUnlimited", min: "b2b" },
 ];
 /** Extended birth direction type and this year's direction. */
 export const directionExtendedMin: Plan = "vip";
