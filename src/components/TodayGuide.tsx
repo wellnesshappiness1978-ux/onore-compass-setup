@@ -110,8 +110,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     const aspEn = ["For millennia people have looked to the stars to find their way, and that aspiration still lights your path", "The care our predecessors built step by step is handed to today as a signpost to the future", "Countless small aspirations have joined into humanity's great path of light", "Great figures, too, honored each day while unsure, and gave their aspirations form"][seed % 4];
     const elJa: Record<string, string> = { wood: "まっすぐ伸びる心で、ひとつ新しい芽を育てて", fire: "胸の灯を大切に、誰かを温めるひと言を届けて", earth: "足元をととのえ、安心できる場所を育んで", metal: "大切なものを見極め、澄んだ選択をひとつ重ねて", water: "しなやかな心で流れを読み、深い気づきを味わって" };
     const elEn: Record<string, string> = { wood: "grow one new sprout with an upright heart", fire: "cherish your inner flame and offer someone a warm word", earth: "tend your footing and nurture a place of calm", metal: "see what matters and make one clear choice", water: "read the flow with a supple heart and savor a deep insight" };
-    const wishJa = `今日という尊い一日、あなたは${elJa[el] ?? elJa.earth}ください。あなたの歩みが、明日の誰かの道標になりますように。`;
-    const wishEn = `On this precious day, may you ${elEn[el] ?? elEn.earth}. May your steps become a signpost for someone tomorrow.`;
+    const wishJa = `今日という尊い一日、あなたは${elJa[el] ?? elJa["earth"]}ください。あなたの歩みが、明日の誰かの道標になりますように。`;
+    const wishEn = `On this precious day, may you ${elEn[el] ?? elEn["earth"]}. May your steps become a signpost for someone tomorrow.`;
     return ja
       ? { text: `${seasonJa}。\n${aspJa}。\n${wishJa}`, notify: wishJa.slice(0, 60) }
       : { text: `${seasonEn}.\n${aspEn}.\n${wishEn}`, notify: wishEn };

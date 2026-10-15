@@ -178,7 +178,7 @@ function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdi
       <form onSubmit={submit} className={`${card} grid gap-2 sm:grid-cols-2`}>
         <Input required aria-label={t.name} placeholder={`${t.name} *`} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <Input aria-label={x.kana} placeholder={x.kana} value={form.nameKana} maxLength={60} onChange={(e) => setForm({ ...form, nameKana: e.target.value })} />
-        <Input aria-label={t.birthDate} type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
+        <Input required aria-label={`${t.birthDate} *`} type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
         <Input aria-label={x.time} type="time" disabled={form.birthTimeUnknown} value={form.birthTime} onChange={(e) => setForm({ ...form, birthTime: e.target.value })} />
         <label className="flex min-h-11 items-center gap-2 text-xs"><input type="checkbox" checked={form.birthTimeUnknown} onChange={(e) => setForm({ ...form, birthTimeUnknown: e.target.checked, birthTime: e.target.checked ? "" : form.birthTime })} />{x.timeUnknown}</label>
         <Input aria-label={x.place} placeholder={x.place} value={form.birthPlace} maxLength={80} onChange={(e) => setForm({ ...form, birthPlace: e.target.value })} />
