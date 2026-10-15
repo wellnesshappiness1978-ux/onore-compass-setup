@@ -67,6 +67,15 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
     save({ ...s, on });
   };
 
+  /** Retries the permission prompt; browsers cannot open OS settings directly, so a denied state keeps the step guide visible. */
+  const retry = async () => {
+    if (typeof Notification === "undefined") { setMsg(t.unsupported); return; }
+    if (window.top !== window.self) { window.open(window.location.href, "_blank", "noopener"); return; }
+    const p = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
+    if (p === "granted") { save({ ...s, on: true }); setHelp(false); setMsg(""); }
+    else setMsg(language === "ja" ? "ブラウザが再確認を止めています。上の手順で「許可」に切り替えてから、もう一度押してくださいね。" : "Your browser paused the prompt. Switch to Allow using the steps above, then tap again.");
+  };
+
   return (
     <div className="feature-notify mt-3 rounded-lg border-2 border-primary/60 bg-background/90 p-2.5 text-foreground shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -86,6 +95,8 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
           <DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif"><BellRing className="size-5 text-primary" />{language === "ja" ? "通知を有効にするには" : "Turn on notifications"}</DialogTitle>
             <DialogDescription>{language === "ja" ? "通知を有効にするには、端末またはブラウザの設定で通知を許可してください。" : "To turn on notifications, allow them in your device or browser settings."}</DialogDescription></DialogHeader>
           <ol className="list-decimal space-y-1.5 pl-5 text-sm leading-6">{(language === "ja" ? ["パソコン：アドレスバー左の鍵（またはサイト情報）マーク →「通知」を「許可」にします。", "iPhone：ホーム画面に追加したアプリを開き、設定 → 通知 → このアプリ → 「通知を許可」をオンにします。", "Android：設定 → アプリ → ブラウザ（Chromeなど）→ 通知 → このサイトを許可します。", "許可したら画面を読み込み直し、もう一度スイッチをオンにしてください。"] : ["Desktop: click the lock/site-info icon in the address bar → set Notifications to Allow.", "iPhone: open the app from your Home Screen, then Settings → Notifications → this app → Allow.", "Android: Settings → Apps → your browser → Notifications → allow this site.", "Reload the page and turn the switch on again."]).map((x) => <li key={x}>{x}</li>)}</ol>
+          <Button variant="outline" className="border-2 border-primary/60" onClick={() => void retry()}>{language === "ja" ? "ワンタップで通知設定を開く" : "Open notification settings"}</Button>
+          {msg && <p role="status" className="text-xs text-primary">{msg}</p>}
           <p className="text-xs text-muted-foreground">{t.note}</p>
           <Button variant="champagne" onClick={() => setHelp(false)}>{language === "ja" ? "わかりました" : "Got it"}</Button>
         </DialogContent>
