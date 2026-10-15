@@ -125,7 +125,7 @@ const polar = (deg: number, r: number) => {
 };
 const rank = (p: Plan) => planOrder.indexOf(p);
 
-type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void; dialOnly?: boolean; rangeDays?: number; afterDial?: React.ReactNode };
+type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void; dialOnly?: boolean; rangeDays?: number; afterDial?: import("react").ReactNode };
 
 export default function DayCompass({ profile, language, plan, onUpgrade, dialOnly = false, rangeDays = Infinity, afterDial }: Props) {
   const c = { ...translatedCopy[language], elDay: companionCopy[language].day, rel: companionCopy[language].relation, bodyTip: companionCopy[language].rhythm };
