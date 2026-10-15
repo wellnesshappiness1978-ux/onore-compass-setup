@@ -43,7 +43,7 @@ export function ArtsGuide({ language = "ja" }: { language?: Language }) {
   const [selected, setSelected] = useState<(typeof words.methods)[number] | null>(null);
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-primary/30 bg-card/60 backdrop-blur">
-      <div className="relative px-6 py-14 text-center">
+      <div className="relative px-4 py-4 text-center md:px-6 md:py-14">
         <IntroStars />
         <div aria-hidden className="pointer-events-none absolute inset-0 opacity-70" style={{ backgroundImage: "radial-gradient(1px 1px at 12% 20%, var(--primary), transparent), radial-gradient(1.5px 1.5px at 78% 30%, var(--primary), transparent), radial-gradient(1px 1px at 40% 70%, var(--foreground), transparent), radial-gradient(1px 1px at 88% 82%, var(--primary), transparent), radial-gradient(1px 1px at 24% 88%, var(--foreground), transparent), radial-gradient(ellipse at 50% 0%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 70%)" }} />
         <p className="arts-rise relative text-[11px] tracking-[0.55em] text-primary/80">{words.introduction}</p>
@@ -55,7 +55,7 @@ export function ArtsGuide({ language = "ja" }: { language?: Language }) {
         <h3 className="arts-rise relative mt-4 font-serif text-3xl" style={{ animationDelay: "0.15s", textShadow: "0 0 24px color-mix(in oklab, var(--gold-glow) 35%, transparent)" }}>
           <span className="arts-shimmer">{words.originTitle}</span>
         </h3>
-        <div className="relative mx-auto mt-8 max-w-2xl space-y-6 font-serif text-xl leading-[2.1] text-foreground/90 sm:text-2xl">
+        <div className="relative mx-auto mt-4 max-w-2xl space-y-4 font-serif text-base leading-normal text-foreground/90 md:mt-8 md:space-y-6 md:text-2xl md:leading-[2.1]">
           <p className="arts-rise" style={{ animationDelay: "0.3s" }}>{words.origin}</p>
           <div className="flex items-center justify-center gap-3 pt-2" aria-hidden>
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-primary/50" />
@@ -65,7 +65,7 @@ export function ArtsGuide({ language = "ja" }: { language?: Language }) {
           <div className="arts-rise border-t border-primary/25 pt-8 text-left" style={{ animationDelay: "0.75s" }}><h4 className="text-center font-serif text-3xl text-primary">{words.nameOrigin}</h4><p className="mt-6">{words.nameOrigin1}</p><p className="mt-5">{words.nameOrigin2}</p></div><p className="arts-rise text-lg text-primary sm:text-xl" style={{ animationDelay: "0.85s" }}>{words.summary}</p>
         </div>
       </div>
-      <div className="space-y-6 border-t border-primary/20 px-5 py-6">
+      <div className="space-y-4 border-t border-primary/20 px-4 py-4 md:space-y-6 md:px-5 md:py-6">
         <div>
           <h4 className="font-serif text-lg text-primary">{words.logicTitle}</h4>
           <dl className="mt-3 grid gap-3 sm:grid-cols-2">
