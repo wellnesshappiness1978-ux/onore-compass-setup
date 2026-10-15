@@ -251,9 +251,9 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const lum = luckyColor ? luminance(luckyColor.code) : 0;
   const luckyStyle = luckyColor ? ({
     background: `linear-gradient(135deg, ${luckyColor.code} 0%, ${luckyColor.code}E6 55%, ${luckyColor.code}B3 100%)`,
-    "--lucky-fg": lum > 0.42 ? "#0B132B" : "#FFFFFF",
-    "--lucky-accent": lum > 0.42 ? "#0B132B" : "#F4D03F",
-    "--lucky-muted": lum > 0.42 ? "rgba(11,19,43,.78)" : "rgba(255,255,255,.85)",
+    "--lucky-fg": lum > 0.3 ? "#0B132B" : "#FFFFFF",
+    "--lucky-accent": lum > 0.3 ? "#0B132B" : "#F4D03F",
+    "--lucky-muted": lum > 0.3 ? "rgba(11,19,43,.78)" : "rgba(255,255,255,.85)",
   } as CSSProperties) : undefined;
 
   return (
