@@ -64,6 +64,7 @@ export function useCompletionHold(pending: boolean, ms = 3000) {
       return () => window.clearTimeout(id);
     }
     wasPending.current = pending;
+    return undefined;
   }, [pending, ms]);
   return hold;
 }
