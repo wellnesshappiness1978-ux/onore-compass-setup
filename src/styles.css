@@ -1366,3 +1366,34 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .nautilus-icon:is([data-nautilus=harmony], [data-nautilus=sovereign]) .nautilus-spiral { stroke: var(--cosmic-foil-light); stroke-width: 2; }
 :is([data-icons=harmony], [data-icons=sovereign]) .nautilus-diamonds,
 .nautilus-icon:is([data-nautilus=harmony], [data-nautilus=sovereign]) .nautilus-diamonds { display: block; fill: var(--cosmic-foil-light); stroke: var(--cosmic-foil-light); stroke-width: .65; }
+
+/* Bounded daily grids: scrollable tables must never widen their parent track. */
+.design-main, .tab-content, #day-compass, .daily-card-grid > *, .daily-life-guide section { min-width: 0; max-width: 100%; box-sizing: border-box; }
+#day-compass > section, #day-compass > div:not(.compass-wheel) { min-width: 0; max-width: 100%; }
+.mobile-fixed-header { top: var(--preview-bar-height); height: calc(56px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); }
+
+@media (max-width: 767px) {
+  html { scroll-padding-top: calc(var(--preview-bar-height) + 64px + env(safe-area-inset-top)); }
+  body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 8px + env(safe-area-inset-top)); left: 64px; right: 64px; max-width: none; display: flex; justify-content: center; }
+  body:has(.design-canvas) .account-controls > button { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .design-canvas .language-controls { top: calc(var(--preview-bar-height) + 64px + env(safe-area-inset-top)); right: 12px; }
+  .design-canvas .design-header { padding-top: calc(56px + env(safe-area-inset-top)); }
+  .design-canvas .design-header > div { padding: 8px 12px 12px; }
+  .design-canvas:not([data-tab=home]) .design-header { height: calc(56px + env(safe-area-inset-top)); border: 0; }
+  .design-canvas:not([data-tab=home]) .design-header > div { display: none; }
+  .design-canvas .design-heading { margin-top: 4px; }
+  .design-canvas .design-heading > .agolmen-logo-aura { width: 64px; height: 64px; }
+  .design-canvas .design-main { padding: 12px 12px 0; width: 100%; overflow-x: clip; }
+  .design-canvas .design-main p, .design-canvas .design-main li { line-height: 1.6; }
+  .design-canvas .design-main :is(.py-8, .py-12) { padding-block: 12px; }
+  .design-canvas .design-main :is(.pt-6, .pt-8, .pt-10, .pt-12) { padding-top: 12px; }
+  .design-canvas .design-main :is(.mt-6, .mt-7, .mt-8, .mt-10, .mt-12) { margin-top: 16px; }
+  .design-canvas .design-main :is(.mb-6, .mb-8, .mb-10, .mb-12) { margin-bottom: 16px; }
+  .design-canvas .design-main :is(.space-y-6, .space-y-8) > :not(:last-child) { margin-block-end: 16px; }
+  .design-canvas .design-navigation { bottom: calc(8px + env(safe-area-inset-bottom)); width: calc(100% - 16px); max-width: 560px; padding: 4px; }
+  .design-canvas .design-navigation .nav-label { font-size: 11px !important; line-height: 1.25; overflow-wrap: anywhere; }
+  .design-canvas .design-compass-section::before, .design-canvas .design-compass-section::after { max-width: 100%; }
+  .design-canvas .design-daily-panel h3 { line-height: 1.4; }
+  .design-canvas .compass-center strong { font-size: 16px; line-height: 1.4; }
+  .design-canvas .compass-center span { font-size: 10px !important; line-height: 1.35; }
+}

@@ -177,17 +177,17 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
     );
 
   const Card = ({ icon: Icon, title, tier, children }: { icon: typeof Compass; title: string; tier: Plan; children: React.ReactNode }) => (
-    <section className="design-daily-panel card-lux rounded-lg p-5 text-left">
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <h3 className="flex items-center gap-2 font-serif text-base text-foreground"><Icon className="size-4 text-primary" />{title}</h3>
-        {rank(plan) < rank(tier) && <span className="rounded-full border border-primary/25 px-2 py-0.5 text-[10px] text-primary">{names[tier]}+</span>}
+    <section className="design-daily-panel card-lux min-w-0 w-full max-w-full rounded-lg p-3 text-left md:p-5">
+      <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 md:mb-4">
+        <h3 className="flex min-w-0 items-start gap-2 font-serif text-base text-foreground"><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className="min-w-0 break-words">{title}</span></h3>
+        {rank(plan) < rank(tier) && <span className="max-w-24 shrink-0 rounded-md border border-primary/25 px-2 py-0.5 text-[10px] text-primary">{names[tier]}+</span>}
       </div>
       {children}
     </section>
   );
 
   return (
-    <div id="day-compass" className="scroll-mt-4">
+    <div id="day-compass" className="box-border min-w-0 w-full max-w-full scroll-mt-4">
       <div
         ref={wheel}
         className="compass-wheel relative mx-auto mt-3 aspect-square w-full max-w-[430px] touch-none select-none"
@@ -295,7 +295,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
         <Button size="sm" variant="ghost" className="mt-1 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => choose(now)}>{c.today}</Button>
       )}
       <p className="mt-1 text-[10px] text-muted-foreground/80">{c.preview}</p>
-      <div className="mx-auto mt-6 grid max-w-4xl gap-4 md:grid-cols-2">
+      <div className="daily-card-grid mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 md:mt-6 md:grid-cols-[repeat(2,minmax(0,1fr))] md:gap-4">
         <Card icon={Sparkles} title={c.dayTitle} tier="free">
           <p className="text-sm leading-7 text-foreground">{c.elDay[day.element]}</p>
           <p className="mt-4 text-xs text-primary/80">{c.earthTitle}</p>
@@ -306,7 +306,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
               <circle cx="30" cy="30" r="5" className="fill-primary/80" />
               {(() => { const p = polar(day.yearProgress * 360, 24); return <circle cx={(p.x - 50) * 1 + 30} cy={(p.y - 50) * 1 + 30} r="2.6" className="fill-gold-glow" />; })()}
             </svg>
-            <div className="text-xs leading-6 text-muted-foreground">
+            <div className="min-w-0 text-xs leading-6 text-muted-foreground">
               <p><strong className="text-lg text-primary">{day.doy + 1}</strong> / {day.total}</p>
               <p>{c.seasons[day.season]} · {Math.round(day.yearProgress * 100)}%</p>
             </div>
@@ -363,11 +363,11 @@ export default function DayCompass({ profile, language, plan, onUpgrade }: Props
           </Lock>
         </Card>}
 
-        {rank(plan) >= rank("b2b") && <div className="md:col-span-2">
+        {rank(plan) >= rank("b2b") && <div className="min-w-0 md:col-span-2">
           <Card icon={BriefcaseBusiness} title={c.bizTitle} tier="b2b">
             <Lock min="b2b">
               {map ? (
-                <div className="overflow-x-auto">
+                <div className="max-w-full overflow-x-auto">
                   <div className="min-w-[520px] text-[10px]">
                     <div className="grid grid-cols-[72px_repeat(12,1fr)] gap-0.5 text-muted-foreground">
                       <span />
