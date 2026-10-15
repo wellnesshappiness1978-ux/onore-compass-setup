@@ -1,3 +1,4 @@
+import * as React from "react";
 import logoAsset from "@/assets/agolmen-v10-compass-final.png.asset.json";
 
 const logo = logoAsset.url;

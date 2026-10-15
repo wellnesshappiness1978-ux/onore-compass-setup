@@ -4,7 +4,7 @@ import { ArrowUpRight, Sparkles } from "lucide-react";
 import ShareCardButton from "./ShareCardButton";
 import type { UserProfile } from "./Onboarding";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
-import { homeReadingCopy } from "@/lib/home-reading-copy";
+import { homeReadingCopy, readingLoadingSteps } from "@/lib/home-reading-copy";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
@@ -46,7 +46,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
         <h2 className="mt-3 font-serif text-2xl text-gradient-gold sm:text-3xl">{title}</h2>
 
       </div>
-      {isPending ? <AgolmenLoading compact label={copy.loading} /> : data ? <>
+      {isPending ? <AgolmenLoading compact label={copy.loading} steps={readingLoadingSteps[language]} /> : data ? <>
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {visibleApproachKeys(data.approachAvailability, data.approaches).map((key, i) => <Button key={key} variant="outline" aria-haspopup="dialog" onClick={() => setSelected(key)} className="h-auto min-h-24 min-w-0 flex-col items-start justify-between whitespace-normal border-primary/30 p-4 text-left [overflow-wrap:anywhere]">
             <span className="flex w-full items-center justify-between text-primary"><span className="font-mono text-xs">{String(i + 1).padStart(2, "0")}</span><ArrowUpRight className="size-4 shrink-0" aria-hidden="true" /></span>
