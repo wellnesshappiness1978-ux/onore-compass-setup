@@ -96,10 +96,10 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
     <div className={`feature-notify mt-3 rounded-xl border-2 p-3 text-foreground transition-all ${s.on && !disabled ? "border-primary bg-background/95 shadow-champagne ring-2 ring-primary/40" : "border-primary/70 bg-background/95 shadow-md"}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <label className="flex items-center gap-2 text-sm text-foreground">
-          <span className={`grid size-9 place-items-center rounded-full border-2 ${s.on && !disabled ? "border-primary bg-primary text-primary-foreground shadow-champagne" : "border-muted-foreground/60 bg-muted text-muted-foreground"}`}><BellRing className="size-5" /></span>
+          <span className={`grid size-9 place-items-center rounded-full border-2 ${s.on && !disabled ? "notify-on border-primary bg-primary text-primary-foreground shadow-champagne" : "border-muted-foreground/60 bg-muted text-muted-foreground"}`}><BellRing className="size-5" /></span>
           <span className="font-semibold">{t.label}</span>
           <Switch className="h-7 w-12 border-2 border-primary data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground/40" checked={s.on && !disabled} disabled={disabled} onCheckedChange={(v) => void toggle(v)} aria-label={`${title} · ${t.label}`} />
-          <span className={`min-w-10 rounded-md border-2 px-1.5 py-0.5 text-center text-xs font-bold ${s.on && !disabled ? "border-primary bg-primary text-primary-foreground" : "border-destructive/70 bg-background text-destructive"}`}>{s.on && !disabled ? "ON" : "OFF"}</span>
+          <span className={`min-w-10 rounded-md border-2 px-1.5 py-0.5 text-center text-xs font-bold ${s.on && !disabled ? "notify-on border-primary bg-primary text-primary-foreground" : "notify-off border-destructive/70 bg-background text-destructive"}`}>{s.on && !disabled ? "ON" : "OFF"}</span>
         </label>
         <label className="flex items-center gap-1.5 text-xs font-medium text-foreground">{t.time}
           <select value={s.time} disabled={disabled} onChange={(e) => save({ ...s, time: e.target.value })} className="h-9 rounded-md border-2 border-primary bg-background px-2 text-base font-bold text-foreground">
