@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { BriefcaseBusiness, CalendarHeart, Compass, Crown, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Swords } from "lucide-react";
+import { BriefcaseBusiness, CalendarHeart, Compass, Crown, Eye, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { UserProfile } from "./Onboarding";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
-import { canUseToday, directionExtendedMin, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
+import { canUseToday, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
 import { dateAt, daysInYear, directionEnergy, localIso, personal, roadmap, type Direction, type Phase } from "@/lib/day-compass";
 import { dayElement, relation, type Element, type TeamMember } from "@/lib/team-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
@@ -30,11 +31,12 @@ const titles: Record<TodayFeature, Pair> = {
   health: P("健康アドバイス（心身のメンテナンス）", "Health tip"),
   relations: P("クイック対人ガイド", "Quick relationship guide"),
   monthlyLucky: P("今月の3ラッキー", "This month's three lucky picks"),
+  directionExtended: P("吉方位（生まれ持った方位タイプと今年の方位）", "Birth direction type & this year's direction"),
   helio: P("地球暦の円盤カレンダーと詳細", "Earth Calendar dial & details"),
   biorhythm365: P("365日の個人バイオリズム", "365-day personal biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
-const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
+const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
 
 const words: Record<Element, Pair[]> = {
   wood: [P("朝の散歩で新しい道を選ぶ", "Take a new route on a morning walk"), P("「まず芽を出す」", "\"Plant the first seed\""), P("ストレッチとヨガ", "Stretching and yoga")],
@@ -143,7 +145,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
           <article className="border-l-2 border-primary pl-3"><h4 className="font-serif text-base text-primary">{ja ? "攻めるなら" : "Advance"}</h4><p className="mt-1 text-sm leading-6">{voice.advance[rhythm.total >= 55 ? 0 : 1]}</p></article>
           <article className="border-l border-primary/40 pl-3"><h4 className="font-serif text-base text-primary">{ja ? "守るなら" : "Protect"}</h4><p className="mt-1 text-sm leading-6">{voice.protect[rhythm.total < 45 ? 0 : 1]}</p></article>
         </div>
-        <ShareCardButton language={language} autoOpen={false} label={ja ? "今日の占いを1タップでシェア" : "Share today's guide"} data={{ kicker: ja ? "今日の占い" : "Today's guide", title: iso, score: Math.round(rhythm.total), names: profile.nameKanji ? [profile.nameKanji] : [], lines: [rhythm.total >= 55 ? (ja ? "準備した一歩を小さく試す日" : "A day to test one prepared step") : (ja ? "急がず、確認と余白を整える日" : "A day to verify and leave space"), `${ja ? "吉方位" : "Direction"}: ${L(dirNames[best.dir])}`], kind: "daily", palette: spectrum ? [{ label: ja ? "守護バースカラー" : "Guardian color", code: spectrum.main.code }] : [] }} />
       </>,
     },
     dailyLucky: {
@@ -159,13 +160,14 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       body: <>
         <p className="text-sm">{ja ? "今日の吉方位" : "Today's lucky direction"}：<strong className="text-lg text-primary">{L(dirNames[best.dir])}</strong>（{best.score}）</p>
         <div className="mt-2 grid grid-cols-4 gap-1.5">{energy.slice(0, 8).map((e) => <span key={e.dir} className="rounded-md border border-primary/20 px-1 py-1.5 text-center text-[11px]">{L(dirNames[e.dir])}<br />{e.score}</span>)}</div>
-        <div className="mt-3 rounded-md border border-primary/20 p-2.5 text-sm">
-          {rank(plan) >= rank(directionExtendedMin) ? <>
-            <p>{ja ? "生まれ持った吉方位タイプ" : "Birth direction type"}：{gua ? `${gua.group === "east" ? (ja ? "東四命" : "East group") : (ja ? "西四命" : "West group")} · ${L(dirNames[gua.shengQi])}` : (ja ? "性別（男性／女性）の登録で表示されます" : "Shown when gender is set to male or female")}</p>
-            <p className="mt-1">{ja ? `${stars.year}年の大開運方位` : `${stars.year} favorable direction`}：<strong className="text-primary">{yearDir ? L(dirNames[yearDir]) : "—"}</strong></p>
-          </> : <p className="flex items-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-3.5 text-primary" />{ja ? `生まれ持った方位タイプと今年の方位は${names[directionExtendedMin]}以上で開放` : `Birth type and this year's direction open with ${names[directionExtendedMin]}+`}</p>}
-        </div>
       </>,
+    },
+    directionExtended: {
+      notify: `${ja ? `${stars.year}年の大開運方位` : `${stars.year} direction`}: ${yearDir ? L(dirNames[yearDir]) : "—"}`,
+      body: <div className="space-y-1 text-sm">
+        <p>{ja ? "生まれ持った吉方位タイプ" : "Birth direction type"}：{gua ? `${gua.group === "east" ? (ja ? "東四命" : "East group") : (ja ? "西四命" : "West group")} · ${L(dirNames[gua.shengQi])}` : (ja ? "性別（男性／女性）の登録で表示されます" : "Shown when gender is set to male or female")}</p>
+        <p>{ja ? `${stars.year}年の大開運方位` : `${stars.year} favorable direction`}：<strong className="text-primary">{yearDir ? L(dirNames[yearDir]) : "—"}</strong></p>
+      </div>,
     },
     shopping: { notify: L(shop[el]), body: <p className="text-sm leading-6">{L(shop[el])}</p> },
     health: { notify: L(health[el]), body: <><p className="text-sm leading-6">{L(health[el])}</p><p className="mt-2 text-[11px] text-muted-foreground">{ja ? "生活習慣の参考です。体調が気になる時は専門家にご相談くださいね。" : "Lifestyle reference only; consult a professional for health concerns."}</p></> },
