@@ -149,6 +149,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       {plan !== "b2b" && plan !== "b2b-premium" && <Button size="sm" variant="champagne" className="mt-2 w-full" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る・期間を広げる" : "View plans"}</Button>}
     </div>
   );
+  const notifyEmoji: Partial<Record<TodayFeature, string>> = { decision: "💡", dailyLucky: "🎨", direction: "🧭", helio: "🌍", shopping: "🛍️", health: "🌿", monthlyLucky: "🌸", directionExtended: "🧭", relations: "🤝", biorhythm365: "📈", familyRoadmap: "👨‍👩‍👧" };
   const content: Record<TodayFeature, { body: ReactNode; notify: string }> = {
     decision: {
       notify: rhythm.total >= 55 ? (ja ? "今日は準備した一歩を小さく試す日" : "Test one prepared step today") : (ja ? "今日は確認と余白を整える日" : "Verify and leave space today"),
@@ -174,7 +175,16 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       notify: `${ja ? "今日の吉方位" : "Today's direction"}: ${L(dirNames[best.dir])}`,
       body: <>
         <p className="text-sm">{ja ? "今日の吉方位" : "Today's lucky direction"}：<strong className="text-lg text-primary">{L(dirNames[best.dir])}</strong>（{best.score}）</p>
-        <div className="mt-2 grid grid-cols-4 gap-1.5">{energy.slice(0, 8).map((e) => <span key={e.dir} className="rounded-md border border-primary/20 px-1 py-1.5 text-center text-[11px]">{L(dirNames[e.dir])}<br />{e.score}</span>)}</div>
+        <div className="mt-2 grid grid-cols-4 gap-1.5">{energy.slice(0, 8).map((e) => { const lv = e.score >= 80 ? "great" : e.score >= 60 ? "good" : e.score >= 40 ? "mid" : "care"; return <span key={e.dir} className={`rounded-md border-2 px-1 py-1.5 text-center text-[11px] font-medium ${lv === "great" ? "border-primary bg-primary text-primary-foreground shadow-champagne" : lv === "good" ? "border-fortune-good bg-fortune-good/15 text-foreground" : lv === "mid" ? "border-muted-foreground/40 bg-muted/40 text-foreground" : "border-destructive/60 bg-destructive/10 text-foreground"}`}>{L(dirNames[e.dir])}<br /><strong className="text-sm">{e.score}</strong></span>; })}</div>
+        <div className="mt-3 rounded-md border border-primary/30 bg-background/60 p-2.5 text-[11px] leading-5">
+          <p className="font-medium text-foreground">{ja ? "数値＝開運エネルギーの強さ（参考値）" : "Number = luck-energy strength (reference)"}</p>
+          <ul className="mt-1 grid grid-cols-2 gap-1 sm:grid-cols-4">
+            <li className="flex items-center gap-1.5"><span className="size-3 rounded-sm bg-primary" />{ja ? "80以上：大吉方位" : "80+: Excellent"}</li>
+            <li className="flex items-center gap-1.5"><span className="size-3 rounded-sm bg-fortune-good" />{ja ? "60〜79：吉方位" : "60–79: Good"}</li>
+            <li className="flex items-center gap-1.5"><span className="size-3 rounded-sm bg-muted-foreground/50" />{ja ? "40〜59：中立" : "40–59: Neutral"}</li>
+            <li className="flex items-center gap-1.5"><span className="size-3 rounded-sm border border-destructive bg-destructive/30" />{ja ? "39以下：ひと呼吸" : "≤39: Take it gently"}</li>
+          </ul>
+        </div>
       </>,
     },
     directionExtended: {
@@ -268,9 +278,20 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     kicker: ja ? "今日の占い" : "Today's guide", title: iso, score: Math.round(rhythm.total), names: profile.nameKanji ? [profile.nameKanji] : [], kind: "daily" as const,
     lines: [
       rhythm.total >= 55 ? (ja ? "決断：準備した一歩を小さく試す日" : "Decision: test one prepared step") : (ja ? "決断：確認と余白を整える日" : "Decision: verify and leave space"),
-      ...(luckyColor ? [`${ja ? "ラッキーカラー" : "Lucky color"}: ${localizeBirthColorName(luckyColor.name, language)}`] : []),
-      `${ja ? "ラッキーフード" : "Lucky food"}: ${L(foods[el][0]!)}`,
-      `${ja ? "吉方位" : "Direction"}: ${L(dirNames[best.dir])}`,
+      `${ja ? "3ラッキー" : "3 lucky"}: ${luckyColor ? localizeBirthColorName(luckyColor.name, language) : "—"} / ${L(word)} / ${L(foods[el][0]!)}`,
+      `${ja ? "吉方位" : "Direction"}: ${L(dirNames[best.dir])}（${best.score}）`,
+      ...(rank(plan) >= rank("standard") ? [
+        `${ja ? "買い物" : "Shopping"}: ${firstSentence(L(shop[el]))}`,
+        `${ja ? "健康" : "Health"}: ${firstSentence(L(health[el]))}`,
+        `${ja ? "地球暦" : "Earth Calendar"}: ${ja ? `一年の${dayIdx + 1}日目` : `day ${dayIdx + 1}`}`,
+      ] : []),
+      ...(rank(plan) >= rank("vip") ? [
+        `${ja ? "今月の3ラッキー" : "Monthly lucky"}: ${L(month.flower)} / ${L(month.action)} / ${L(month.item)}`,
+        ...(yearDir ? [`${ja ? `${stars.year}年の大開運方位` : `${stars.year} direction`}: ${L(dirNames[yearDir])}`] : []),
+        `${ja ? "対人" : "Relations"}: ${advice ? L(advice[0]) : (ja ? "感謝をひとつ具体的に伝える" : "Share one specific thanks")}`,
+        `${ja ? "バイオリズム" : "Biorhythm"}: ${Math.round(rhythm.total)}`,
+      ] : []),
+      ...(rank(plan) >= rank("b2b") && members.length ? [`${ja ? "ファミリー運気" : "Family rhythm"}: ${ja ? `${members.length}名の平均` : `avg of ${members.length}`} ${Math.round(members.reduce((t, m) => t + personal(m.birthDate, today).total, 0) / members.length)}`] : []),
     ],
     palette: luckyColor ? [{ label: ja ? "ラッキーカラー" : "Lucky color", code: luckyColor.code }] : [],
   };
@@ -321,7 +342,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
                 </div>
               </div>
             )}
-            <FeatureNotifySwitch id={id} title={`🧭 ${L(titles[id])}`} body={content[id].notify} language={language} disabled={!open} color={id === "dailyLucky" ? luckyColor?.code : undefined} />
+            <FeatureNotifySwitch id={id} title={`${notifyEmoji[id] ?? "🧭"} ${L(titles[id])}`} body={content[id].notify} language={language} disabled={!open} color={id === "dailyLucky" ? luckyColor?.code : undefined} />
           </section>
           {i === lastOpen && share("share-open")}
         </Fragment>);
