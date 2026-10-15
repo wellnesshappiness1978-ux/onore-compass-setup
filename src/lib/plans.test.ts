@@ -21,4 +21,13 @@ describe('plan value display', () => {
     expect(planOrder.map(plan => canUse(plan, 'mandalaArt'))).toEqual([false, true, true, true, true]);
     expect(planOrder.map(plan => canUse(plan, 'cosmicGenesisArt'))).toEqual([false, false, true, true, true]);
   });
+});describe('today features', () => {
+  it('keeps the requested order and plan gates', async () => {
+    const { todayFeatures, canUseToday } = await import('./plans');
+    expect(todayFeatures.map(f => f.id)).toEqual(['decision','dailyLucky','direction','shopping','health','relations','monthlyLucky','helio','biorhythm365','familyRoadmap']);
+    expect(canUseToday('standard', 'relations')).toBe(false);
+    expect(canUseToday('vip', 'relations')).toBe(true);
+    expect(canUseToday('vip', 'monthlyLucky')).toBe(false);
+    expect(canUseToday('free', 'dailyLucky')).toBe(true);
+  });
 });
