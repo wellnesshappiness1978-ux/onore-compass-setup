@@ -17,6 +17,7 @@ import ShareCardButton from "./ShareCardButton";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { companionCopy } from "@/lib/companion-copy";
 import { rokuyo } from "@/lib/calendar-traditions";
+import HelioAlmanacStrip from "./HelioAlmanacStrip";
 
 const ja = {
   hint: "盤面をなぞって前後100年の日付を巡れます。指の位置で8方位も切り替わります。",
@@ -298,6 +299,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
         <Button size="sm" variant="ghost" className="mt-1 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => choose(now)}>{c.today}</Button>
       )}
       <p className="mt-1 text-[10px] text-muted-foreground/80">{c.preview}</p>
+      {dialOnly && <HelioAlmanacStrip date={date} language={language} onPick={choose} minDate={minDate} maxDate={maxDate} />}
       {afterDial}
       <div className="daily-card-grid mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 md:mt-6 md:grid-cols-[repeat(2,minmax(0,1fr))] md:gap-4">
         <Card icon={Sparkles} title={c.dayTitle} tier="free">
