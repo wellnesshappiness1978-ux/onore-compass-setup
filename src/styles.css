@@ -10,6 +10,7 @@
  */
 
 @theme inline {
+  --color-fortune-good: oklch(0.72 0.17 150);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -1418,3 +1419,10 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .feature-notify select, .today-feature.lucky-themed .feature-notify select { background: rgba(255,255,255,.88) !important; color: #0B132B !important; border-color: rgba(11,19,43,.35) !important; }
 .feature-notify select option { background: #ffffff; color: #0B132B; }
 .today-feature.lucky-themed .border-primary\/20 { border-color: color-mix(in srgb, var(--lucky-fg) 30%, transparent) !important; }
+
+/* Notification panel keeps its own high-contrast palette on every card/theme. */
+.today-feature .feature-notify :is(p, span, label, strong), .today-feature.lucky-themed .feature-notify :is(p, span, label, strong) { color: var(--foreground) !important; }
+.today-feature .feature-notify .text-muted-foreground { color: var(--muted-foreground) !important; }
+.today-feature .feature-notify .notify-on, .today-feature .feature-notify .notify-on * { color: var(--primary-foreground) !important; }
+.today-feature .feature-notify .notify-off { color: var(--destructive) !important; }
+.fortune-great, .fortune-great * { color: var(--primary-foreground) !important; }
