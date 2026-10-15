@@ -1,7 +1,6 @@
 import { ArtsGuide } from "./ArtsGuide";
 import ProfileEditor from "./ProfileEditor";
 import SelfCoreCard from "./SelfCoreCard";
-import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
 import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
 import { NautilusIcon } from './NautilusIcon';
