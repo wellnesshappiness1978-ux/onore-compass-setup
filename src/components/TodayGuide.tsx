@@ -205,7 +205,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <li><strong className="text-primary">{ja ? "ラッキーアイテム" : "Lucky item"}</strong>：{L(month.item)}</li>
       </ul>,
     },
-    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>{rangeBanner}<DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /></> },
+    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>{rangeBanner}<DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /><<h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "今日のカレンダー（どなたでも閲覧できます）" : "Today's calendar (open to everyone)"}</h4><HelioCalendar date={today} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} /></> },
     biorhythm365: {
       notify: `${ja ? "今日のバイオリズム" : "Today's biorhythm"} ${Math.round(rhythm.total)}`,
       body: yearCurve.length ? <>
