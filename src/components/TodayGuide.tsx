@@ -333,10 +333,6 @@ function neonOf(hex: string) {
   return { h, light: h >= 40 && h <= 200 };
 }
 
-function luminance(hex: string) {
-  const v = hex.replace("#", ""); const n = (i: number) => { const c = parseInt(v.slice(i, i + 2), 16) / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
-  return 0.2126 * n(0) + 0.7152 * n(2) + 0.0722 * n(4);
-}
 
 function SampleVip({ ja }: { ja: boolean }) {
   const rows = [
