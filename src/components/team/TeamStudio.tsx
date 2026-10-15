@@ -176,7 +176,7 @@ function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdi
     <div className="space-y-4">
       {!signedIn && <p className="text-[11px] text-muted-foreground">{previewOnly ? x.preview : t.guestNote}</p>}
       <form onSubmit={submit} className={`${card} grid gap-2 sm:grid-cols-2`}>
-        <Input aria-label={t.name} placeholder={t.name} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <Input required aria-label={t.name} placeholder={`${t.name} *`} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <Input aria-label={x.kana} placeholder={x.kana} value={form.nameKana} maxLength={60} onChange={(e) => setForm({ ...form, nameKana: e.target.value })} />
         <Input aria-label={t.birthDate} type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
         <Input aria-label={x.time} type="time" disabled={form.birthTimeUnknown} value={form.birthTime} onChange={(e) => setForm({ ...form, birthTime: e.target.value })} />

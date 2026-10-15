@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { BriefcaseBusiness, CalendarHeart, CalendarRange, Compass, Crown, Eye, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Swords } from "lucide-react";
+import { BriefcaseBusiness, CalendarHeart, CalendarRange, Compass, Crown, Eye, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Stars, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { UserProfile } from "./Onboarding";
@@ -26,6 +26,7 @@ const P = (ja: string, en: string): Pair => ({ ja, en });
 
 const titles: Record<TodayFeature, Pair> = {
   decision: P("今日の具体的決断（攻める／守る）", "Today's concrete decision"),
+  starPath: P("本日の星巡りと志の導き", "Today's star path & guiding aspiration"),
   dailyLucky: P("本日の3ラッキー", "Today's three lucky picks"),
   direction: P("吉方位・開運エネルギー", "Lucky direction"),
   shopping: P("総合運気を上げる買い物ガイド", "Shopping guide"),
@@ -37,7 +38,7 @@ const titles: Record<TodayFeature, Pair> = {
   biorhythm365: P("個人・ファミリーのバイオリズム", "Personal & family biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
-const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
+const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, starPath: Stars, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
 
 const words: Record<Element, Pair[]> = {
   wood: [P("朝の散歩で新しい道を選ぶ", "Take a new route on a morning walk"), P("「まず芽を出す」", "\"Plant the first seed\""), P("ストレッチとヨガ", "Stretching and yoga")],
@@ -99,6 +100,22 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const today = useMemo(() => new Date(), []);
   const iso = localIso(today);
   const el = dayElement(iso);
+  const starPoem = useMemo(() => {
+    const m = today.getMonth();
+    const doy = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
+    const seed = doy + Number((profile.birthDate ?? "").replace(/-/g, "").slice(-4) || 0);
+    const seasonJa = ["凍てつく澄んだ空気に、春を待つ土の匂いが眠る", "梅の香りがかすかに漂い、光が少しずつ伸びてゆく", "芽吹きの青い匂いが、地球を淡くつつみはじめる", "花の香りと若葉の風が、地球を明るく満たす", "新緑の息吹が濃くなり、光が力強く降りそそぐ", "雨の匂いが土をうるおし、命が静かに深まる", "夏の陽が地球を照らし、雲が高く湧き立つ", "熱をおびた大気に、実りへの予感が満ちてゆく", "澄みはじめた風に、稲穂と秋の気配が香る", "深まる秋の光が、木々を金色に染めてゆく", "冷たく澄んだ空に、星々がひときわ近く瞬く", "冬至へ向かう静けさの中、地球は光の再生を待つ"][m];
+    const seasonEn = ["Crisp winter air holds the sleeping scent of soil", "A hint of plum blossom rides the lengthening light", "The green scent of new buds softly wraps the Earth", "Blossoms and young leaves fill the Earth with brightness", "Fresh green deepens as strong light pours down", "The scent of rain nourishes the soil and life deepens", "Summer sun lights the Earth as clouds rise high", "Warm air carries the promise of harvest", "Clearing winds bring the scent of ripening grain", "Deep autumn light turns the trees to gold", "In the cold clear sky the stars feel close", "In the stillness before the solstice, the Earth awaits returning light"][m];
+    const aspJa = ["幾千年、人は星を見上げて道を描き、その志は今もあなたの足元を照らしています", "先人たちが一歩ずつ積み重ねた想いは、未来への道標として今日へ受け継がれています", "名もなき人々の小さな志が重なり、人類の歩みは大きな光の道となりました", "偉人たちもまた、迷いながら一日を大切に重ね、志を形にしてきました"][seed % 4];
+    const aspEn = ["For millennia people have looked to the stars to find their way, and that aspiration still lights your path", "The care our predecessors built step by step is handed to today as a signpost to the future", "Countless small aspirations have joined into humanity's great path of light", "Great figures, too, honored each day while unsure, and gave their aspirations form"][seed % 4];
+    const elJa: Record<string, string> = { wood: "まっすぐ伸びる心で、ひとつ新しい芽を育てて", fire: "胸の灯を大切に、誰かを温めるひと言を届けて", earth: "足元をととのえ、安心できる場所を育んで", metal: "大切なものを見極め、澄んだ選択をひとつ重ねて", water: "しなやかな心で流れを読み、深い気づきを味わって" };
+    const elEn: Record<string, string> = { wood: "grow one new sprout with an upright heart", fire: "cherish your inner flame and offer someone a warm word", earth: "tend your footing and nurture a place of calm", metal: "see what matters and make one clear choice", water: "read the flow with a supple heart and savor a deep insight" };
+    const wishJa = `今日という尊い一日、あなたは${elJa[el] ?? elJa.earth}ください。あなたの歩みが、明日の誰かの道標になりますように。`;
+    const wishEn = `On this precious day, may you ${elEn[el] ?? elEn.earth}. May your steps become a signpost for someone tomorrow.`;
+    return ja
+      ? { text: `${seasonJa}。\n${aspJa}。\n${wishJa}`, notify: wishJa.slice(0, 60) }
+      : { text: `${seasonEn}.\n${aspEn}.\n${wishEn}`, notify: wishEn };
+  }, [today, profile.birthDate, el, ja]);
   const birth = profile.birthDate;
   const rhythm = personal(birth, today);
   const spectrum = birthColorSpectrum(profile);
@@ -149,7 +166,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       {plan !== "b2b" && plan !== "b2b-premium" && <Button size="sm" variant="champagne" className="mt-2 w-full" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る・期間を広げる" : "View plans"}</Button>}
     </div>
   );
-  const notifyEmoji: Partial<Record<TodayFeature, string>> = { decision: "💡", dailyLucky: "🎨", direction: "🧭", helio: "🌍", shopping: "🛍️", health: "🌿", monthlyLucky: "🌸", directionExtended: "🧭", relations: "🤝", biorhythm365: "📈", familyRoadmap: "👨‍👩‍👧" };
+  const notifyEmoji: Partial<Record<TodayFeature, string>> = { decision: "💡", starPath: "✨", dailyLucky: "🎨", direction: "🧭", helio: "🌍", shopping: "🛍️", health: "🌿", monthlyLucky: "🌸", directionExtended: "🧭", relations: "🤝", biorhythm365: "📈", familyRoadmap: "👨‍👩‍👧" };
   const content: Record<TodayFeature, { body: ReactNode; notify: string }> = {
     decision: {
       notify: rhythm.total >= 55 ? (ja ? "今日は準備した一歩を小さく試す日" : "Test one prepared step today") : (ja ? "今日は確認と余白を整える日" : "Verify and leave space today"),
@@ -160,6 +177,10 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
           <article className="border-l border-primary/40 pl-3"><h4 className="font-serif text-base text-primary">{ja ? "守るなら" : "Protect"}</h4><p className="mt-1 text-sm leading-6">{voice.protect[rhythm.total < 45 ? 0 : 1]}</p></article>
         </div>
       </>,
+    },
+    starPath: {
+      notify: starPoem.notify,
+      body: <p className="whitespace-pre-line font-serif text-sm leading-7">{starPoem.text}</p>,
     },
     dailyLucky: {
       notify: `${luckyColor ? localizeBirthColorName(luckyColor.name, language) : ""} / ${L(word)}`,

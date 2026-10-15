@@ -54,9 +54,10 @@ export const canUse = (plan: Plan, feature: ContentFeature) => rank(plan) >= ran
 export const minPlanFor = (feature: ContentFeature) => contentMin[feature];
 
 /** Ordered "Today" screen features (cheapest plan first; personal before family) and the minimum plan for each. */
-export type TodayFeature = "decision" | "dailyLucky" | "direction" | "helio" | "shopping" | "health" | "monthlyLucky" | "directionExtended" | "relations" | "biorhythm365" | "familyRoadmap";
+export type TodayFeature = "decision" | "starPath" | "dailyLucky" | "direction" | "helio" | "shopping" | "health" | "monthlyLucky" | "directionExtended" | "relations" | "biorhythm365" | "familyRoadmap";
 export const todayFeatures: readonly { id: TodayFeature; min: Plan }[] = [
   { id: "decision", min: "free" },
+  { id: "starPath", min: "free" },
   { id: "dailyLucky", min: "free" },
   { id: "direction", min: "free" },
   { id: "helio", min: "free" },
