@@ -52,7 +52,7 @@ function SacredRadiance() {
   </span>;
 }
 
-export function AgolmenLoading({ label, compact = false, steps }: { label: string; compact?: boolean; steps?: readonly string[] }) {
+export function AgolmenLoading({ label, compact = false, steps }: { label: string; compact?: boolean; steps?: readonly string[] | undefined }) {
   const [step, setStep] = React.useState(0);
   React.useEffect(() => {
     if (!steps?.length) return;
