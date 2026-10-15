@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import type { UserProfile } from "./Onboarding";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
-import { canUseToday, helioRangeDays, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
+import { canUseToday, familyRoadmapMin, helioRangeDays, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
 import { dateAt, daysInYear, directionEnergy, localIso, personal, roadmap, type Direction, type Phase } from "@/lib/day-compass";
 import { dayElement, relation, type Element, type TeamMember } from "@/lib/team-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
@@ -33,7 +33,7 @@ const titles: Record<TodayFeature, Pair> = {
   monthlyLucky: P("今月の3ラッキー", "This month's three lucky picks"),
   directionExtended: P("吉方位（生まれ持った方位タイプと今年の方位）", "Birth direction type & this year's direction"),
   helio: P("地球暦・コンパス・当日詳細・バイオリズム（当日分）", "Earth Calendar, compass & biorhythm (today)"),
-  biorhythm365: P("365日の個人バイオリズム", "365-day personal biorhythm"),
+  biorhythm365: P("個人・ファミリーのバイオリズムとカレンダー（当日・前後1ヶ月・前後1年・無期限）", "Personal & family biorhythm and calendar"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
 const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
@@ -245,8 +245,20 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     familyRoadmap: map ? (ja ? `今年の攻め月は${map.attack.slice(0, 2).map((m) => `${m + 1}月`).join("・")}。` : `Advance months: ${map.attack.slice(0, 2).map((m) => monthLabels[m]).join(", ")}.`) : undefined,
   };
 
+  content.biorhythm365 = { ...content.biorhythm365, body: <>
+    <p className="mb-2 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>
+    <h4 className="mb-1 font-serif text-sm text-primary">{ja ? "個人のバイオリズム" : "Personal biorhythm"}</h4>
+    {content.biorhythm365.body}
+    <h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "ファミリーのロードマップとバイオリズム" : "Family roadmap & biorhythm"}</h4>
+    {planOrder.indexOf(plan) >= planOrder.indexOf(familyRoadmapMin) ? content.familyRoadmap.body : (
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/25 p-3 text-sm">
+        <span>{teaser.familyRoadmap ?? (ja ? "ファミリーの1年の流れを一緒に見られます。" : "See your family's year together.")}</span>
+        <span className="flex gap-2"><Button size="sm" variant="outline" className="border-primary/40" onClick={() => setSample("familyRoadmap")}>{ja ? "サンプルを見る" : "See sample"}</Button><Button size="sm" variant="champagne" onClick={onUpgrade}>{ja ? "プランを見る" : "See plans"}</Button></span>
+      </div>)}
+  </> };
+
   const [sample, setSample] = useState<TodayFeature | null>(null);
-  const sampleMin = sample ? todayFeatures.find((f) => f.id === sample)!.min : "vip";
+  const sampleMin = sample === "familyRoadmap" ? familyRoadmapMin : sample ? todayFeatures.find((f) => f.id === sample)!.min : "vip";
   const openCount = todayFeatures.filter((f) => canUseToday(plan, f.id)).length;
   const lastOpen = todayFeatures.map((f) => canUseToday(plan, f.id)).lastIndexOf(true);
   const nextLocked = todayFeatures.find((f) => !canUseToday(plan, f.id));
