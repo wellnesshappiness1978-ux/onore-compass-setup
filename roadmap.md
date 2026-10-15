@@ -1,3 +1,8 @@
+## Mobile navigation and bounded daily layout
+- [ ] Move Home/Settings to a fixed phone header, retain five localized bottom tabs and desktop access.
+- [ ] Compact mobile spacing and prose; fix intrinsic-width overflow throughout daily guidance.
+- [ ] Verify real-account navigation, daily content, scrolling and desktop/mobile layouts; retain reading, narration, appearance and artwork logic.
+
 ## Ten-body explanation, sacred details and natural browser narration
 - [x] Update seven-language origin text with ten traditional bodies and accurate gravitational/energy context.
 - [x] Unify explanatory dialogs and disclosures with gold cosmic frames, 300ms motion and internal scrolling.

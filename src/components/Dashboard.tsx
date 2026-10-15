@@ -547,19 +547,32 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   
     const navigation: { id: Tab; label: string; mobileLabel: string; icon: typeof Home }[] = [
     { id: "home", label: t.home, mobileLabel: t.home, icon: Home },
-    { id: "traits", label: language === "ja" ? "あなたの特性" : t.traits, mobileLabel: t.traits, icon: Compass },
-    { id: "today", label: language === "ja" ? "今日の占い" : t.today, mobileLabel: t.today, icon: Clock3 },
-    { id: "consult", label: language === "ja" ? "相談" : t.consult, mobileLabel: language === "ja" ? "相談" : t.consult, icon: WandSparkles },
+    { id: "traits", label: language === "ja" ? "あなたの特性" : t.traits, mobileLabel: language === "ja" ? "あなたの特性" : t.traits, icon: Compass },
+    { id: "today", label: language === "ja" ? "今日の占い" : t.today, mobileLabel: language === "ja" ? "今日の占い" : t.today, icon: Clock3 },
+    { id: "consult", label: language === "ja" ? "AI相談" : t.consult, mobileLabel: language === "ja" ? "AI相談" : t.consult, icon: WandSparkles },
     { id: "art", label: t.art, mobileLabel: t.art, icon: Palette },
-    { id: "business", label: t.business, mobileLabel: language === "ja" ? "仕事" : t.business, icon: Building2 },
+    { id: "business", label: t.business, mobileLabel: t.business, icon: HeartHandshake },
     { id: "settings", label: t.settings, mobileLabel: t.settings, icon: Settings2 },
   ];
+  const goToTab = (next: Tab) => {
+    setTab(next);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  };
 
 
   return (
     <>
-    <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-hidden bg-background pb-32 text-foreground">
+    <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
+      <div className="mobile-fixed-header fixed inset-x-0 z-40 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center border-b border-primary/25 bg-background/95 px-3 backdrop-blur-xl md:hidden">
+        <Button size="icon" variant="ghost" onClick={() => goToTab("home")} aria-label={t.home} title={t.home} aria-current={tab === "home" ? "page" : undefined} className="size-11 shrink-0 text-primary">
+          <Home className="size-5" />
+        </Button>
+        <span aria-hidden="true" />
+        <Button size="icon" variant="ghost" onClick={() => goToTab("settings")} aria-label={t.settings} title={t.settings} aria-current={tab === "settings" ? "page" : undefined} className="size-11 shrink-0 text-primary">
+          <Settings2 className="size-5" />
+        </Button>
+      </div>
       {tab === "home" && <LanguageSelector language={language} onChange={onLanguageChange} />}
       <AppearanceMotif background />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
@@ -613,10 +626,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         {tab === "home" ? (
           <ArtsGuide language={language} />
         ) : (
-          <section className="mx-auto max-w-3xl pt-6 sm:pt-10">
-            <div className="mb-8 text-center">
-              <NautilusIcon className="mx-auto size-12 text-primary" />
-              <h2 className="mt-3 font-serif text-2xl text-gradient-gold">
+          <section className="tab-content mx-auto min-w-0 max-w-3xl pt-3 md:pt-10">
+            <div className="tab-heading mb-4 text-center md:mb-8">
+              <NautilusIcon className="mx-auto hidden size-12 text-primary md:block" />
+              <h2 className="mt-1 font-serif text-2xl text-gradient-gold md:mt-3">
                 {navigation.find((n) => n.id === tab)?.label}
               </h2>
             </div>
@@ -625,13 +638,13 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             ) : tab === "today" ? (
               <>
                 {previewPlan !== "free" && <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>}
-                <section className="design-compass-section text-center" aria-label={t.today}>
+                <section className="design-compass-section min-w-0 w-full max-w-full text-center" aria-label={t.today}>
                   <div className="flex items-center justify-center gap-3 text-primary/70">
                     <span className="h-px w-8 bg-primary/30" />
                     <NautilusIcon className="size-5" />
                     <span className="h-px w-8 bg-primary/30" />
                   </div>
-                  <h2 className="mt-2 font-serif text-xl text-gradient-gold sm:text-2xl">{t.today}</h2>
+                  <h2 className="mt-2 hidden font-serif text-xl text-gradient-gold md:block md:text-2xl">{t.today}</h2>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {new Intl.DateTimeFormat(language, {
                       year: "numeric",
@@ -684,20 +697,18 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         className="design-navigation fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"
         aria-label={language === "ja" ? "メインナビゲーション" : "Main navigation"}
       >
-        <div className="grid grid-cols-7">
+        <div className="grid grid-cols-5 md:grid-cols-7">
           {navigation.map((item) => (
             <Button
               key={item.id}
               variant="ghost"
-              onClick={() => {
-                setTab(item.id);
-                window.scrollTo({ top: 0, behavior: item.id === "consult" ? "instant" : "smooth" });
-              }}
+              onClick={() => goToTab(item.id)}
+              aria-label={item.mobileLabel}
               aria-current={tab === item.id ? "page" : undefined}
-              className={`flex h-14 min-w-0 flex-col gap-1 rounded-xl px-0.5 text-[9px] sm:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
+              className={`${item.id === "home" || item.id === "settings" ? "hidden md:flex" : "flex"} h-14 min-w-0 flex-col gap-1 rounded-lg px-0.5 text-[9px] md:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
             >
-              {item.id === 'home' ? <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} /> : <NautilusIcon className="size-5 shrink-0" />}
-              <span className="max-w-full whitespace-normal text-center leading-none"><span className="sm:hidden">{item.mobileLabel}</span><span className="hidden sm:inline">{item.label}</span></span>
+              <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} />
+              <span className="nav-label max-w-full whitespace-normal text-center leading-tight"><span className="md:hidden">{item.mobileLabel}</span><span className="hidden md:inline">{item.label}</span></span>
             </Button>
           ))}
         </div>
