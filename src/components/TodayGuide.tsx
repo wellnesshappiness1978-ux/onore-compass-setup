@@ -220,7 +220,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const hour = 9 + ([...birth].reduce((a, ch) => a + (Number(ch) || 0), 0) + dayIdx) % 9;
   const peak = monthAvg.indexOf(Math.max(...monthAvg));
   const firstSentence = (s: string) => s.split(/(?<=[。.])/)[0] ?? s;
-  const teaser: Partial<Record<TodayFeature, string>> = {
+  const teaser: Partial<Record<TodayFeature, string | undefined>> = {
     shopping: firstSentence(L(shop[el])),
     health: firstSentence(L(health[el])),
     helio: ja ? `今日は地球暦で一年の${dayIdx + 1}日目。あなたの円盤に今日の位置が灯ります。` : `Day ${dayIdx + 1} on your Earth Calendar dial.`,

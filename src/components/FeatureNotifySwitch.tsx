@@ -30,7 +30,7 @@ function colorIcon(color?: string) {
 }
 
 /** Per-feature daily reminder. Delivers only while the app is open; no background push provider is connected. */
-export default function FeatureNotifySwitch({ id, title, body, language, disabled, color }: { id: string; title: string; body: string; language: Language; disabled?: boolean; color?: string }) {
+export default function FeatureNotifySwitch({ id, title, body, language, disabled, color }: { id: string; title: string; body: string; language: Language; disabled?: boolean; color?: string | undefined }) {
   const t = language === "ja" ? copy.ja : copy.en;
   const [s, setS] = useState<Setting>({ on: false, time: "07:00" });
   const [msg, setMsg] = useState("");
