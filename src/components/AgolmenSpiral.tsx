@@ -51,7 +51,14 @@ function SacredRadiance() {
   </span>;
 }
 
-export function AgolmenLoading({ label, compact = false }: { label: string; compact?: boolean }) {
+export function AgolmenLoading({ label, compact = false, steps }: { label: string; compact?: boolean; steps?: readonly string[] }) {
+  const [step, setStep] = React.useState(0);
+  React.useEffect(() => {
+    if (!steps?.length) return;
+    const id = window.setInterval(() => setStep((s) => Math.min(s + 1, steps.length - 1)), 1500);
+    return () => window.clearInterval(id);
+  }, [steps]);
+  const text = steps?.length ? steps[step] : label;
   return <div className={`agolmen-loading flex flex-col items-center justify-center text-center ${compact ? "min-h-36" : "min-h-screen"}`} role="status" aria-live="polite">
     <div className={`agolmen-loading-art relative ${compact ? "size-24" : "size-48"}`} aria-hidden="true">
       <SacredRadiance />
@@ -63,7 +70,7 @@ export function AgolmenLoading({ label, compact = false }: { label: string; comp
       <span className="agolmen-loading-core absolute inset-[34%] rounded-full" />
       <img src={logo} alt="" width={512} height={512} className="agolmen-loading-logo absolute inset-[16%] size-[68%] object-contain" />
     </div>
-    <p className="mt-3 px-4 font-serif text-sm text-primary">{label}</p>
+    <p key={text} className="mt-3 px-4 font-serif text-sm text-primary animate-in fade-in duration-500">{text}</p>
   </div>;
 }
 
