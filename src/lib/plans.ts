@@ -52,3 +52,21 @@ const contentMin: Record<ContentFeature, Plan> = {
 };
 export const canUse = (plan: Plan, feature: ContentFeature) => rank(plan) >= rank(contentMin[feature]);
 export const minPlanFor = (feature: ContentFeature) => contentMin[feature];
+
+/** Ordered "Today" screen features and the minimum plan for each; drives order and gating. */
+export type TodayFeature = "decision" | "dailyLucky" | "direction" | "shopping" | "health" | "relations" | "monthlyLucky" | "helio" | "biorhythm365" | "familyRoadmap";
+export const todayFeatures: readonly { id: TodayFeature; min: Plan }[] = [
+  { id: "decision", min: "free" },
+  { id: "dailyLucky", min: "free" },
+  { id: "direction", min: "free" },
+  { id: "shopping", min: "standard" },
+  { id: "health", min: "standard" },
+  { id: "relations", min: "vip" },
+  { id: "monthlyLucky", min: "b2b" },
+  { id: "helio", min: "standard" },
+  { id: "biorhythm365", min: "vip" },
+  { id: "familyRoadmap", min: "b2b" },
+];
+/** Extended birth direction type and this year's direction inside the free direction card. */
+export const directionExtendedMin: Plan = "b2b";
+export const canUseToday = (plan: Plan, feature: TodayFeature) => rank(plan) >= rank(todayFeatures.find((f) => f.id === feature)!.min);

@@ -1,7 +1,6 @@
 import { ArtsGuide } from "./ArtsGuide";
 import ProfileEditor from "./ProfileEditor";
 import SelfCoreCard from "./SelfCoreCard";
-import DayCompass from "./DayCompass";
 import ShareCardButton from "./ShareCardButton";
 import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
 import { NautilusIcon } from './NautilusIcon';
@@ -48,7 +47,7 @@ import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
-import DailyLifeGuide from "./DailyLifeGuide";
+import TodayGuide from "./TodayGuide";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
 import { canUseAppearance, decorationTier, appearanceStorageKey, defaultAppearance, readAppearance, readDesign, type AppearanceSelection } from "@/lib/appearance-customization";
@@ -637,7 +636,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               <SelfCoreCard experienceOnly profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => undefined} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} />
             ) : tab === "today" ? (
               <>
-                {previewPlan !== "free" && <div className="mb-5"><DailyLifeGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /></div>}
                 <section className="design-compass-section min-w-0 w-full max-w-full text-center" aria-label={t.today}>
                   <div className="flex items-center justify-center gap-3 text-primary/70">
                     <span className="h-px w-8 bg-primary/30" />
@@ -652,7 +650,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                       day: "numeric",
                     }).format(new Date())}
                   </p>
-                  <DayCompass profile={profile} language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+                  <TodayGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
                 </section>
               </>
             ) : tab === "consult" ? (
