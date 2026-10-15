@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { almanacDay } from "./helio-almanac";
 
-describe("helio almanac 2026", () => {
+describe("helio almanac 2025", () => {
   it("summer solstice", () => {
-    const d = almanacDay(new Date(2026, 5, 21));
+    const d = almanacDay(new Date(2025, 5, 21));
     expect(d.term).toBe("夏至");
     expect(d.half).toBe("上半期");
     expect(d.halfLength).toBe(187);
@@ -12,9 +12,9 @@ describe("helio almanac 2026", () => {
     expect(d.lunarMonthName).toBe("皐月");
   });
   it("zassetsu and moon", () => {
-    expect(almanacDay(new Date(2026, 6, 2)).zassetsu).toContain("半夏生");
-    expect(almanacDay(new Date(2026, 5, 11)).zassetsu).toContain("入梅");
-    expect(almanacDay(new Date(2026, 5, 25)).lunarDayLabel).toBe("新月");
-    expect(almanacDay(new Date(2026, 6, 6)).apsis).toBe("遠日点");
+    expect(almanacDay(new Date(2025, 6, 1)).zassetsu).toContain("半夏生");
+    expect(almanacDay(new Date(2025, 5, 11)).zassetsu).toContain("入梅");
+    expect(almanacDay(new Date(2025, 5, 25)).lunarDayLabel).toBe("新月");
+    expect(almanacDay(new Date(2025, 6, 6)).apsis).toBe("遠日点");
   });
 });
