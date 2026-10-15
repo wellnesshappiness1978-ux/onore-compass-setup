@@ -16,8 +16,21 @@ function readAll(): Record<string, Setting> {
   try { const v = JSON.parse(localStorage.getItem(KEY) ?? "{}"); return v && typeof v === "object" ? v : {}; } catch { return {}; }
 }
 
+/** Small round icon tinted with today's lucky color; falls back to the brand icon. */
+function colorIcon(color?: string) {
+  if (!color) return "/favicon.png";
+  try {
+    const c = document.createElement("canvas"); c.width = c.height = 128;
+    const g = c.getContext("2d"); if (!g) return "/favicon.png";
+    const grad = g.createRadialGradient(48, 44, 8, 64, 64, 64); grad.addColorStop(0, "#FFFFFF"); grad.addColorStop(0.35, color); grad.addColorStop(1, color);
+    g.fillStyle = grad; g.beginPath(); g.arc(64, 64, 60, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = "#F4D03F"; g.lineWidth = 6; g.stroke();
+    return c.toDataURL("image/png");
+  } catch { return "/favicon.png"; }
+}
+
 /** Per-feature daily reminder. Delivers only while the app is open; no background push provider is connected. */
-export default function FeatureNotifySwitch({ id, title, body, language, disabled }: { id: string; title: string; body: string; language: Language; disabled?: boolean }) {
+export default function FeatureNotifySwitch({ id, title, body, language, disabled, color }: { id: string; title: string; body: string; language: Language; disabled?: boolean; color?: string }) {
   const t = language === "ja" ? copy.ja : copy.en;
   const [s, setS] = useState<Setting>({ on: false, time: "07:00" });
   const [msg, setMsg] = useState("");
@@ -32,11 +45,11 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
       const sent = `${KEY}-sent-${id}`;
       if (hm !== s.time || localStorage.getItem(sent) === day) return;
       localStorage.setItem(sent, day);
-      try { const n = new Notification(title, { body, icon: "/favicon.png", tag: `onore-feature-${id}` }); n.onclick = () => { window.focus(); window.dispatchEvent(new CustomEvent("onore-open", { detail: "compass" })); n.close(); }; } catch { /* unsupported */ }
+      try { const n = new Notification(title, { body, icon: colorIcon(color), badge: colorIcon(color), tag: `onore-feature-${id}` }); n.onclick = () => { window.focus(); window.dispatchEvent(new CustomEvent("onore-open", { detail: "compass" })); n.close(); }; } catch { /* unsupported */ }
     };
     tick(); const timer = setInterval(tick, 30_000);
     return () => clearInterval(timer);
-  }, [s, id, title, body, disabled]);
+  }, [s, id, title, body, disabled, color]);
 
   const toggle = async (on: boolean) => {
     setMsg("");
