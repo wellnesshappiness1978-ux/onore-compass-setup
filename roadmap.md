@@ -1,7 +1,7 @@
 ## Mobile navigation and bounded daily layout
-- [ ] Move Home/Settings to a fixed phone header, retain five localized bottom tabs and desktop access.
-- [ ] Compact mobile spacing and prose; fix intrinsic-width overflow throughout daily guidance.
-- [ ] Verify real-account navigation, daily content, scrolling and desktop/mobile layouts; retain reading, narration, appearance and artwork logic.
+- [x] Move Home/Settings to a fixed phone header, retain five localized bottom tabs and desktop access.
+- [x] Compact mobile spacing and prose; constrain daily grid tracks, cards and the locally scrollable family roadmap without clipping content.
+- [x] Real-account navigation, fixed controls, Home scroll reset and daily content verified at 320/390/695/768/1280px; all five phone tabs open with no page overflow or runtime errors. Family roadmap checked using development Family viewing; production membership unchanged. Eleven existing explanation/narration/appearance/icon tests pass and latest build OK. Astronomy, narration, reading data, theme synchronization and 2048 export logic unchanged; a fresh PNG export and separate-device sync were not re-tested.
 
 ## Ten-body explanation, sacred details and natural browser narration
 - [x] Update seven-language origin text with ten traditional bodies and accurate gravitational/energy context.
