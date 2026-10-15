@@ -21,6 +21,15 @@ const stars = [
   { top: "74%", left: "88%", size: 1.5, delay: "2.4s", soft: true },
 ];
 
+const jaWelcome = [
+  "ようこそ、アゴルメンの羅針盤へ。",
+  "私たちは誰もが、誕生したその瞬間から\n太陽系10天体をはじめとする星々の壮大な引力と、\n自然の巡りの中で生を得ています。",
+  "このアプリは、単なる運勢の良し悪しを占うものではありません。",
+  "西洋占星術や易学、数秘術、バースカラーなど、\n多層に及ぶ伝統的視点と最新テクノロジーを融合し、\nあなたの中に眠る固有の波動と『絶対自分軸』を明晰に映し出す\n人生の象徴的なナビゲーションシステムです。",
+  "迷いが生じたとき、己の真の輝きを思い出したいとき、\nどうぞこの羅針盤を開いてください。",
+  "あなただけの美しく確かな航路が、ここから始まります。",
+];
+
 function IntroStars() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -56,7 +65,7 @@ export function ArtsGuide({ language = "ja" }: { language?: Language }) {
           <span className="arts-shimmer">{words.originTitle}</span>
         </h3>
         <div className="relative mx-auto mt-4 max-w-2xl space-y-4 font-serif text-base leading-normal text-foreground/90 md:mt-8 md:space-y-6 md:text-2xl md:leading-[2.1]">
-          <p className="arts-rise" style={{ animationDelay: "0.3s" }}>{words.origin}</p>
+          {language === "ja" ? <div className="arts-rise space-y-4 md:space-y-6" style={{ animationDelay: "0.3s" }}>{jaWelcome.map((para, i) => <p key={i} className="whitespace-pre-line">{para}</p>)}</div> : <p className="arts-rise" style={{ animationDelay: "0.3s" }}>{words.origin}</p>}
           <div className="flex items-center justify-center gap-3 pt-2" aria-hidden>
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-primary/50" />
             <span className="text-primary/80" style={{ fontSize: 9 }}>✧</span>
