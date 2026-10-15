@@ -9,7 +9,7 @@ const label: Record<string, { title: string; note: string; sun: string; earth: s
 };
 
 export default function HelioAlmanacStrip({ date, language, onPick, minDate, maxDate }: { date: Date; language: Language; onPick: (d: Date) => void; minDate: Date; maxDate: Date }) {
-  const t = label[language] ?? label.en!;
+  const t = label[language] ?? label["en"]!;
   const wd = WD[language] ?? new Array(7).fill(0).map((_, i) => new Intl.DateTimeFormat(language, { weekday: "narrow" }).format(new Date(2024, 0, 7 + i)));
   const days = useMemo(() => Array.from({ length: 31 }, (_, i) => { const d = new Date(date.getFullYear(), date.getMonth(), date.getDate() + i - 15); return { d, a: almanacDay(d) }; }), [date.getFullYear(), date.getMonth(), date.getDate()]);
   const sel = days[15]!.a;
