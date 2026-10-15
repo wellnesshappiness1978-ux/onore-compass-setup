@@ -545,3 +545,5 @@
 ## Essence and multi-approach reading refresh
 - [x] Add six distinct plain-language essence passages, fifteen server-statused perspectives and a final personal-axis message in the existing shared reading. Five unimplemented charts stay explicitly uncalculated; blood, sibling and birthplace information remain non-diagnostic context. No replacement or invented chart calculations.
 - [x] Verify a real generated reading using the requesting user's signed-in saved profile: all six headings, fifteen perspectives, five unavailable labels and a 158-character closing message with a tomorrow step. Desktop/390px screenshots confirm readable wrapping and no horizontal overflow or page errors. All 32 focused localization/voice/appearance/astronomy/Earth/export/mandala regression tests pass; latest build OK. Appearance synchronization scope, astronomy and 2048 export code are unchanged; no new separate-device synchronization or full fifteen-method calculation engine is claimed.
+
+- [x] Today: ten ordered plan-gated cards, per-card daily notifications, white-theme legibility, feng shui method

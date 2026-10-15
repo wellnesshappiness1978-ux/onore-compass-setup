@@ -15,3 +15,5 @@
 - Consultation entry never auto-focuses the composer; explicit focus preserves page scroll and tab entry resets instantly after render. Why: avoid mobile keyboard/focus moving the page away from its top.
 
 - Explanatory overlays use shared DialogContent and inline details use SacredDisclosure/Accordion. Browser-narration owns locale voice ranking, voice discovery, punctuation pauses and cancellation. Why: accessible detail surfaces and one device-native speech contract without external services.
+
+- Today screen order and plan gates come from `todayFeatures` in plans.ts; each card ends with FeatureNotifySwitch (local, open-app-only reminders). Why: one source for order/gating and no false background-push promise.
