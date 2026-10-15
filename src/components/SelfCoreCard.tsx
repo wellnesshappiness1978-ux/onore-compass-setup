@@ -138,6 +138,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
     staleTime: Infinity,
     retry: false,
   });
+  const holding = useCompletionHold(isPending);
   const e = data?.elements;
   const values = e ? [e.name ? `${e.name.sky} · ${e.name.person} · ${e.name.earth} · ${e.name.outer} · ${e.name.total}` : null, e.zodiac, e.eto, e.blood, e.animal] : [];
   const sections = data ? [data.synthesis, data.name, data.mind, data.instinct, data.strength] : [];
