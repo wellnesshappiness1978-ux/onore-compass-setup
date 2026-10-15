@@ -24,13 +24,15 @@ describe('plan value display', () => {
 });describe('today features', () => {
   it('keeps the requested order and plan gates', async () => {
     const { todayFeatures, canUseToday } = await import('./plans');
-    expect(todayFeatures.map(f => f.id)).toEqual(['decision','dailyLucky','direction','shopping','health','helio','relations','biorhythm365','monthlyLucky','directionExtended','familyRoadmap']);
+    expect(todayFeatures.map(f => f.id)).toEqual(['decision','dailyLucky','direction','helio','shopping','health','helioMonth','monthlyLucky','directionExtended','relations','biorhythm365','helioYear','familyRoadmap','helioUnlimited']);
     const order = ['free','standard','vip','b2b','b2b-premium'];
     const ranks = todayFeatures.map(f => order.indexOf(f.min));
     expect([...ranks].sort((a, b) => a - b)).toEqual(ranks);
     expect(canUseToday('standard', 'relations')).toBe(false);
     expect(canUseToday('vip', 'relations')).toBe(true);
-    expect(canUseToday('vip', 'monthlyLucky')).toBe(false);
+    expect(canUseToday('standard', 'monthlyLucky')).toBe(false);
+    expect(canUseToday('vip', 'monthlyLucky')).toBe(true);
+    expect(canUseToday('free', 'helio')).toBe(true);
     expect(canUseToday('free', 'dailyLucky')).toBe(true);
   });
 });
