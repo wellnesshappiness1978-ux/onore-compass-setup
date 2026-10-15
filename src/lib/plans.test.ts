@@ -24,7 +24,7 @@ describe('plan value display', () => {
 });describe('today features', () => {
   it('keeps the requested order and plan gates', async () => {
     const { todayFeatures, canUseToday } = await import('./plans');
-    expect(todayFeatures.map(f => f.id)).toEqual(['decision','dailyLucky','direction','helio','shopping','health','helioMonth','monthlyLucky','directionExtended','relations','biorhythm365','helioYear','familyRoadmap','helioUnlimited']);
+    expect(todayFeatures.map(f => f.id)).toEqual(['decision','dailyLucky','direction','helio','shopping','health','monthlyLucky','directionExtended','relations','biorhythm365','familyRoadmap']);
     const order = ['free','standard','vip','b2b','b2b-premium'];
     const ranks = todayFeatures.map(f => order.indexOf(f.min));
     expect([...ranks].sort((a, b) => a - b)).toEqual(ranks);

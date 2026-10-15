@@ -33,13 +33,10 @@ const titles: Record<TodayFeature, Pair> = {
   monthlyLucky: P("今月の3ラッキー", "This month's three lucky picks"),
   directionExtended: P("吉方位（生まれ持った方位タイプと今年の方位）", "Birth direction type & this year's direction"),
   helio: P("地球暦・コンパス・当日詳細・バイオリズム（当日分）", "Earth Calendar, compass & biorhythm (today)"),
-  helioMonth: P("地球暦・カレンダー・バイオリズムの期間拡張（前後1ヶ月）", "Calendar & biorhythm range: ±1 month"),
-  helioYear: P("地球暦・カレンダー・バイオリズムの期間拡張（前後1年）", "Calendar & biorhythm range: ±1 year"),
-  helioUnlimited: P("地球暦・カレンダー・バイオリズムの無制限拡張（全期間）", "Calendar & biorhythm range: unlimited"),
   biorhythm365: P("365日の個人バイオリズム", "365-day personal biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
-const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, helioMonth: CalendarRange, helioYear: CalendarRange, helioUnlimited: CalendarRange, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
+const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
 
 const words: Record<Element, Pair[]> = {
   wood: [P("朝の散歩で新しい道を選ぶ", "Take a new route on a morning walk"), P("「まず芽を出す」", "\"Plant the first seed\""), P("ストレッチとヨガ", "Stretching and yoga")],
@@ -196,9 +193,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       </ul>,
     },
     helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p><DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /></> },
-    helioMonth: rangeCard(ja ? "前後1ヶ月" : "±1 month", ja ? "上の円盤を回すと、前後1ヶ月の地球暦とバイオリズムを見られます。" : "Turn the dial above to browse ±1 month."),
-    helioYear: rangeCard(ja ? "前後1年" : "±1 year", ja ? "上の円盤で、前後1年の流れを見渡せます。旅行や記念日の計画に便利です。" : "Browse ±1 year on the dial above — handy for planning."),
-    helioUnlimited: rangeCard(ja ? "全期間" : "Unlimited", ja ? "過去も未来も自由に。家族の誕生日や節目の日もさかのぼって確かめられます。" : "Browse any date, past or future."),
     biorhythm365: {
       notify: `${ja ? "今日のバイオリズム" : "Today's biorhythm"} ${Math.round(rhythm.total)}`,
       body: yearCurve.length ? <>
@@ -231,9 +225,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const teaser: Partial<Record<TodayFeature, string | undefined>> = {
     shopping: ja ? "今日の運気を上げるお買い物、ひとつだけ選ぶなら？" : "One purchase to lift today's luck?",
     health: ja ? "今日のからだが喜ぶ、小さな習慣があります。" : "A small habit your body will enjoy today.",
-    helioMonth: ja ? "来週の大切な日、先に確かめてみませんか？" : "Peek at the days ahead.",
-    helioYear: ja ? "一年先まで、あなたの流れを見渡せます。" : "See your flow a full year ahead.",
-    helioUnlimited: ja ? "過去も未来も、すべての日があなたの手に。" : "Every date, past and future.",
     helio: ja ? `今日は地球暦で一年の${dayIdx + 1}日目。あなたの円盤に今日の位置が灯ります。` : `Day ${dayIdx + 1} on your Earth Calendar dial.`,
     relations: ja ? `今日のあなたの大勝負の時間帯は${hour}時！` : `Your key moment today is around ${hour}:00!`,
     biorhythm365: birth ? (ja ? `${peak + 1}月は人生の転機バイオリズム。` : `${monthLabels[peak]} is your turning-point rhythm.`) : undefined,
