@@ -52,6 +52,23 @@ function SacredRadiance() {
   </span>;
 }
 
+/** Keeps a "complete" state for `ms` after a real pending -> done transition. */
+export function useCompletionHold(pending: boolean, ms = 3000) {
+  const [hold, setHold] = React.useState(false);
+  const wasPending = React.useRef(pending);
+  React.useEffect(() => {
+    if (wasPending.current && !pending) {
+      setHold(true);
+      const id = window.setTimeout(() => setHold(false), ms);
+      wasPending.current = pending;
+      return () => window.clearTimeout(id);
+    }
+    wasPending.current = pending;
+    return undefined;
+  }, [pending, ms]);
+  return hold;
+}
+
 export function AgolmenLoading({ label, compact = false, steps }: { label: string; compact?: boolean; steps?: readonly string[] | undefined }) {
   const [step, setStep] = React.useState(0);
   React.useEffect(() => {
