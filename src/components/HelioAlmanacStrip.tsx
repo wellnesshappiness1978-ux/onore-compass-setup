@@ -1,17 +1,12 @@
 import { useMemo } from "react";
 import { almanacDay, SOLAR_TERM_KANA } from "@/lib/helio-almanac";
 import type { Language } from "@/lib/translations";
-import { gloss, word } from "@/lib/almanac-i18n";
+import { almanacUi, gloss, word } from "@/lib/almanac-i18n";
 
-const WD: Record<string, string[]> = { ja: ["日", "月", "火", "水", "木", "金", "土"] };
-const label: Record<string, { title: string; note: string; sun: string; earth: string; day: string }> = {
-  ja: { title: "地球暦の拡大窓", note: "旧暦・月相・二十四節気・雑節・通し日数・黄経は天文計算による参考値です。", sun: "太陽黄経", earth: "地球", day: "日目" },
-  en: { title: "Earth calendar zoom", note: "Lunar dates, moon phases, solar terms and longitudes are calculated reference values.", sun: "Sun longitude", earth: "Earth", day: "day" },
-};
 
 export default function HelioAlmanacStrip({ date, language, onPick, minDate, maxDate }: { date: Date; language: Language; onPick: (d: Date) => void; minDate: Date; maxDate: Date }) {
-  const t = label[language] ?? label["en"]!;
-  const wd = WD[language] ?? new Array(7).fill(0).map((_, i) => new Intl.DateTimeFormat(language, { weekday: "narrow" }).format(new Date(2024, 0, 7 + i)));
+  const t = almanacUi[language];
+  const wd = language === "ja" ? ["日", "月", "火", "水", "木", "金", "土"] : new Array(7).fill(0).map((_, i) => new Intl.DateTimeFormat(language, { weekday: "narrow" }).format(new Date(2024, 0, 7 + i)));
   const days = useMemo(() => Array.from({ length: 31 }, (_, i) => { const d = new Date(date.getFullYear(), date.getMonth(), date.getDate() + i - 15); return { d, a: almanacDay(d) }; }), [date.getFullYear(), date.getMonth(), date.getDate()]);
   const sel = days[15]!.a;
   const ja = language === "ja";
@@ -24,7 +19,7 @@ export default function HelioAlmanacStrip({ date, language, onPick, minDate, max
           const out = d < minDate || d > maxDate; const cur = i === 15;
           return <button key={a.iso} type="button" disabled={out} onClick={() => onPick(d)} aria-pressed={cur} title={[gloss(a.lunarMonthName, language), a.term && gloss(a.term, language), ...a.zassetsu.map(z => gloss(z, language))].filter(Boolean).join(" · ")} aria-label={`${a.iso} ${a.lunarMonthName}${a.lunarDayLabel} ${a.term ?? ""}`}
             className={`flex w-8 shrink-0 flex-col items-center gap-0.5 border-l border-primary/15 py-1 text-[11px] leading-tight ${cur ? "bg-primary/25 ring-1 ring-primary" : ""} ${out ? "opacity-35" : "hover:bg-primary/10"}`}>
-            {d.getDate() === 1 && <span className="text-[10px] font-bold text-primary">{d.getMonth() + 1}月</span>}
+            {d.getDate() === 1 && <span className="text-[10px] font-bold text-primary">{t.month(d.getMonth() + 1)}</span>}
             <span className="font-serif text-sm text-foreground">{d.getDate()}</span>
             <span className={`${a.weekday === 0 ? "text-destructive" : "text-muted-foreground"}`}>{wd[a.weekday]}</span>
             <span className="text-[10px] text-muted-foreground [writing-mode:vertical-rl]">{a.lunarDay === 1 ? a.lunarMonthName : ""}{a.lunarDayLabel}</span>
@@ -37,7 +32,7 @@ export default function HelioAlmanacStrip({ date, language, onPick, minDate, max
       </div>
     </div>
     <p className="mt-2 text-sm leading-7 text-foreground">
-      <strong className="text-primary">{sel.iso}</strong>（{wd[sel.weekday]}） · {word("旧暦", language)} {gloss(sel.lunarMonthName, language)} {sel.lunarDayLabel}{marks && ` · ${marks}`} · {gloss(sel.half, language)} {sel.halfDay}/{sel.halfLength} · {word("太陽黄経", language)} {sel.sunLon}°（{word("地球", language)} {sel.earthLon}°）
+      <strong className="text-primary">{sel.iso}</strong>（{wd[sel.weekday]}） · {word("旧暦", language)} {gloss(sel.lunarMonthName, language)} {sel.lunarDayLabel}{marks && ` · ${marks}`} · {gloss(sel.half, language)} {sel.halfDay}{language === "ja" ? t.day : ` ${t.day}`}/{sel.halfLength} · {word("太陽黄経", language)} {sel.sunLon}°（{word("地球", language)} {sel.earthLon}°）
     </p>
     <p className="mt-1 text-[10px] text-muted-foreground">{t.note}</p>
   </section>;

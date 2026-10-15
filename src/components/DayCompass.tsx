@@ -19,7 +19,7 @@ import { companionCopy } from "@/lib/companion-copy";
 import { rokuyo } from "@/lib/calendar-traditions";
 import HelioAlmanacStrip from "./HelioAlmanacStrip";
 import { almanacYear } from "@/lib/helio-almanac";
-import { gloss } from "@/lib/almanac-i18n";
+import { almanacUi, gloss } from "@/lib/almanac-i18n";
 
 const ja = {
   hint: "盤面をなぞって前後100年の日付を巡れます。指の位置で8方位も切り替わります。",
@@ -271,13 +271,13 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
             {dialOnly && almanac.map((a, d) => {
               const deg = localDeg(d);
               const out: React.ReactNode[] = [];
-              if (a.term) { const p = polar(deg, 39.6), q = polar(deg, 38); const major = ["春分", "夏至", "秋分", "冬至"].includes(a.term);
-                out.push(<line key="tl" x1={q.x} y1={q.y} x2={polar(deg, 38.8).x} y2={polar(deg, 38.8).y} className="stroke-primary" strokeWidth={major ? 0.5 : 0.25} />);
-                out.push(<text key="t" x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize={major ? 1.9 : 1.45} className={major ? "fill-primary font-serif font-bold" : "fill-primary/75 font-serif"} transform={`rotate(${deg} ${p.x} ${p.y})`}><title>{gloss(a.term, language)}</title>{a.term}</text>); }
+              if (a.term) { const p = polar(deg, 39.2), q = polar(deg, 37.6); const major = ["春分", "夏至", "秋分", "冬至"].includes(a.term);
+                out.push(<line key="tl" x1={q.x} y1={q.y} x2={polar(deg, 38.2).x} y2={polar(deg, 38.2).y} className="stroke-primary" strokeWidth={major ? 0.5 : 0.25} />);
+                out.push(<text key="t" x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize={major ? 2.5 : 1.95} className={major ? "fill-primary font-serif font-bold" : "fill-primary/75 font-serif"} transform={`rotate(${deg} ${p.x} ${p.y})`}><title>{gloss(a.term, language)}</title>{a.term}</text>); }
               if (a.quarter) { const p = polar(deg, 43.4); const full = a.quarter === "満月", fresh = a.quarter === "新月";
-                out.push(<circle key="m" cx={p.x} cy={p.y} r="0.55" className={full ? "fill-gold-glow" : fresh ? "fill-background stroke-primary/70" : "fill-primary/50"} strokeWidth="0.15"><title>{gloss(a.quarter, language)}</title></circle>); }
-              if (a.lunarDay === 1) { const p = polar(deg, 36.4); out.push(<text key="l" x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="1.3" className="fill-foreground/60 font-serif" transform={`rotate(${deg} ${p.x} ${p.y})`}><title>{gloss(a.lunarMonthName, language)}</title>{a.lunarMonthName}</text>); }
-              if (a.apsis) { const p = polar(deg, 46); out.push(<text key="a" x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="1.6" className="fill-primary font-bold"><title>{gloss(a.apsis, language)}</title>{a.apsis === "遠日点" ? "遠" : "近"}</text>); }
+                out.push(<circle key="m" cx={p.x} cy={p.y} r="0.85" className={full ? "fill-gold-glow" : fresh ? "fill-background stroke-primary/70" : "fill-primary/50"} strokeWidth="0.22"><title>{gloss(a.quarter, language)}</title></circle>); }
+              if (a.lunarDay === 1) { const p = polar(deg, 36.2); out.push(<text key="l" x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="1.8" className="fill-foreground/80 font-serif" transform={`rotate(${deg} ${p.x} ${p.y})`}><title>{gloss(a.lunarMonthName, language)}</title>{a.lunarMonthName}</text>); }
+              if (a.apsis) { const p = polar(deg, 46); out.push(<text key="a" x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="2.2" className="fill-primary font-bold"><title>{gloss(a.apsis, language)}</title>{a.apsis === "遠日点" ? "遠" : "近"}</text>); }
               return out.length ? <g key={`al-${d}`}>{out}</g> : null;
             })}
             {dialOnly && <circle cx="50" cy="50" r="37.3" className="stroke-primary/20" fill="none" strokeWidth="0.2" />}
@@ -339,13 +339,14 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
         {dialOnly && (() => {
           const age = (((date.getTime() - Date.UTC(2000, 0, 6, 18, 14)) / 86400000) % 29.530589 + 29.530589) % 29.530589;
           const ja = language === "ja";
-          const moon = age < 1.8 ? (ja ? "新月" : "New moon") : age < 7.4 ? (ja ? "三日月〜上弦へ" : "Waxing crescent") : age < 9.2 ? (ja ? "上弦の月" : "First quarter") : age < 14 ? (ja ? "満ちていく月" : "Waxing gibbous") : age < 16 ? (ja ? "満月" : "Full moon") : age < 22 ? (ja ? "欠けていく月" : "Waning gibbous") : age < 23.8 ? (ja ? "下弦の月" : "Last quarter") : (ja ? "新月へ向かう月" : "Waning crescent");
+          const u = almanacUi[language];
+          const moon = u.moons[age < 1.8 ? 0 : age < 7.4 ? 1 : age < 9.2 ? 2 : age < 14 ? 3 : age < 16 ? 4 : age < 22 ? 5 : age < 23.8 ? 6 : 7];
           const active = map ? (Object.keys(c.phases) as Phase[]).filter((ph) => map[ph].includes(date.getMonth())) : [];
-          return <Card icon={Moon} title={ja ? "フェーズ" : "Phase"} tier="free">
-            <p className="text-sm leading-7 text-foreground">{ja ? "月のめぐり" : "Moon cycle"}：<strong className="text-primary">{moon}</strong>（{ja ? "月齢" : "age"} {age.toFixed(1)}）</p>
-            <p className="mt-1 text-sm leading-7 text-foreground">{ja ? "地球の季節" : "Season"}：<strong className="text-primary">{c.seasons[day.season]}</strong> · {Math.round(day.yearProgress * 100)}%</p>
-            <p className="mt-1 text-sm leading-7 text-foreground">{ja ? "あなたの今月のフェーズ" : "Your phase this month"}：{map ? (active.length ? active.map((ph) => <strong key={ph} className="mr-2 text-primary">{c.phases[ph]}</strong>) : <strong className="text-primary">{ja ? "ととのえ期" : "Steady"}</strong>) : <span className="text-muted-foreground">{c.needBirth}</span>}</p>
-            <p className="mt-2 text-[10px] text-muted-foreground">{ja ? "月齢は計算上の目安、フェーズは参考値です。" : "Moon age is approximate; phases are reference values."}</p>
+          return <Card icon={Moon} title={u.phase} tier="free">
+            <p className="text-sm leading-7 text-foreground">{u.moonCycle}：<strong className="text-primary">{moon}</strong>（{u.age} {age.toFixed(1)}）</p>
+            <p className="mt-1 text-sm leading-7 text-foreground">{u.season}：<strong className="text-primary">{c.seasons[day.season]}</strong> · {Math.round(day.yearProgress * 100)}%</p>
+            <p className="mt-1 text-sm leading-7 text-foreground">{u.myPhase}：{map ? (active.length ? active.map((ph) => <strong key={ph} className="mr-2 text-primary">{c.phases[ph]}</strong>) : <strong className="text-primary">{u.steady}</strong>) : <span className="text-muted-foreground">{c.needBirth}</span>}</p>
+            <p className="mt-2 text-[10px] text-muted-foreground">{u.phaseNote}</p>
           </Card>;
         })()}
 
