@@ -214,32 +214,124 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     },
   };
 
+  // One-line personal teasers for locked cards, computed from the user's own reference values.
+  const hour = 9 + ([...birth].reduce((a, ch) => a + (Number(ch) || 0), 0) + dayIdx) % 9;
+  const peak = monthAvg.indexOf(Math.max(...monthAvg));
+  const firstSentence = (s: string) => s.split(/(?<=[。.])/)[0] ?? s;
+  const teaser: Partial<Record<TodayFeature, string>> = {
+    shopping: firstSentence(L(shop[el])),
+    health: firstSentence(L(health[el])),
+    helio: ja ? `今日は地球暦で一年の${dayIdx + 1}日目。あなたの円盤に今日の位置が灯ります。` : `Day ${dayIdx + 1} on your Earth Calendar dial.`,
+    relations: ja ? `今日のあなたの大勝負の時間帯は${hour}時！` : `Your key moment today is around ${hour}:00!`,
+    biorhythm365: birth ? (ja ? `${peak + 1}月は人生の転機バイオリズム。` : `${monthLabels[peak]} is your turning-point rhythm.`) : undefined,
+    monthlyLucky: ja ? `今月のあなたの花は「${L(month.flower)}」。` : `Your flower this month: ${L(month.flower)}.`,
+    directionExtended: gua ? (ja ? `あなたは${gua.group === "east" ? "東四命" : "西四命"}タイプ。` : `You are ${gua.group === "east" ? "East" : "West"} group.`) : (ja ? `${stars.year}年のあなたの大開運方位が分かります。` : `See your ${stars.year} favorable direction.`),
+    familyRoadmap: map ? (ja ? `今年の攻め月は${map.attack.slice(0, 2).map((m) => `${m + 1}月`).join("・")}。` : `Advance months: ${map.attack.slice(0, 2).map((m) => monthLabels[m]).join(", ")}.`) : undefined,
+  };
+
+  const [sample, setSample] = useState<Plan | null>(null);
+  const openCount = todayFeatures.filter((f) => canUseToday(plan, f.id)).length;
+  const lastOpen = todayFeatures.map((f) => canUseToday(plan, f.id)).lastIndexOf(true);
+  const nextLocked = todayFeatures.find((f) => !canUseToday(plan, f.id));
+
+  const shareData = {
+    kicker: ja ? "今日の占い" : "Today's guide", title: iso, score: Math.round(rhythm.total), names: profile.nameKanji ? [profile.nameKanji] : [], kind: "daily" as const,
+    lines: [
+      rhythm.total >= 55 ? (ja ? "決断：準備した一歩を小さく試す日" : "Decision: test one prepared step") : (ja ? "決断：確認と余白を整える日" : "Decision: verify and leave space"),
+      ...(luckyColor ? [`${ja ? "ラッキーカラー" : "Lucky color"}: ${localizeBirthColorName(luckyColor.name, language)}`] : []),
+      `${ja ? "ラッキーフード" : "Lucky food"}: ${L(foods[el]).split("／")[0]!.split(" / ")[0]}`,
+      `${ja ? "吉方位" : "Direction"}: ${L(dirNames[best.dir])}`,
+    ],
+    palette: luckyColor ? [{ label: ja ? "ラッキーカラー" : "Lucky color", code: luckyColor.code }] : [],
+  };
+  const share = (key: string) => <div key={key} className="flex justify-center"><ShareCardButton language={language} autoOpen={false} label={ja ? "今日の占いを1タップでシェア" : "Share today's guide"} className="h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto" data={shareData} /></div>;
+
+  const lum = luckyColor ? luminance(luckyColor.code) : 0;
+  const luckyStyle = luckyColor ? ({
+    background: `linear-gradient(135deg, ${luckyColor.code} 0%, ${luckyColor.code}E6 55%, ${luckyColor.code}B3 100%)`,
+    "--lucky-fg": lum > 0.42 ? "#0B132B" : "#FFFFFF",
+    "--lucky-accent": lum > 0.42 ? "#0B132B" : "#F4D03F",
+    "--lucky-muted": lum > 0.42 ? "rgba(11,19,43,.78)" : "rgba(255,255,255,.85)",
+  } as CSSProperties) : undefined;
+
   return (
     <div className="today-guide mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 text-left md:gap-4">
+      <section className="card-lux design-daily-panel rounded-lg p-3 md:p-4" aria-label={ja ? "プラン特典の解放状況" : "Plan unlock progress"}>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+          <p className="min-w-0 text-foreground">{ja ? "現在のプラン" : "Current plan"}：<strong className="text-primary">{names[plan]}</strong>
+            {nextLocked && <span className="text-muted-foreground"> ｜ {ja ? `あと1ステップで${L(titles[nextLocked.id])}（${names[nextLocked.min]}）解放！` : `One step to ${L(titles[nextLocked.id])} (${names[nextLocked.min]})!`}</span>}
+          </p>
+          {nextLocked && <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プラン詳細・アップグレード" : "Plans & upgrade"}</Button>}
+        </div>
+        <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-primary/10" role="progressbar" aria-valuemin={0} aria-valuemax={todayFeatures.length} aria-valuenow={openCount}><div className="h-full rounded-full bg-champagne-gradient transition-all" style={{ width: `${(openCount / todayFeatures.length) * 100}%` }} /></div>
+        <p className="mt-1 text-[11px] text-muted-foreground">{ja ? `${todayFeatures.length}機能中 ${openCount}機能を解放中` : `${openCount} of ${todayFeatures.length} unlocked`}</p>
+      </section>
       {todayFeatures.map(({ id, min }, i) => {
         const open = canUseToday(plan, id);
         const Icon = icons[id];
-        return (
-          <section key={id} id={`today-${id}`} className="today-feature design-daily-panel card-lux min-w-0 w-full max-w-full rounded-lg p-3 md:p-5" aria-label={L(titles[id])}>
+        const lucky = id === "dailyLucky" && open && luckyStyle;
+        return (<Fragment key={id}>
+          <section id={`today-${id}`} style={lucky ? luckyStyle : undefined} className={`today-feature design-daily-panel card-lux min-w-0 w-full max-w-full rounded-lg p-3 md:p-5 ${lucky ? "lucky-themed" : ""}`} aria-label={L(titles[id])}>
             <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
               <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className="min-w-0 break-words">{L(titles[id])}</span></h3>
               {!open && <span className="shrink-0 rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">{names[min]}+</span>}
             </div>
             {open ? content[id].body : (
-              <div className="relative">
-                <div aria-hidden="true" inert className="pointer-events-none max-h-40 select-none overflow-hidden opacity-70 blur-[5px]">{id === "helio" || id === "relations" ? <p className="text-sm leading-7">{L(titles[id])} · {L(words[el][0]!)} · {L(shop[el])}</p> : content[id].body}</div>
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
-                  <LockKeyhole className="size-5 text-primary" />
-                  <p className="text-sm text-foreground">{ja ? `${names[min]}以上で開放されます` : `Opens with ${names[min]} or higher`}</p>
-                  <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "View plans"}</Button>
+              <div>
+                {teaser[id] && <p className="mb-2 text-sm font-medium text-foreground">✦ {teaser[id]}</p>}
+                <div className="relative">
+                  <div aria-hidden="true" inert className="pointer-events-none max-h-40 select-none overflow-hidden opacity-70 blur-[5px]">{id === "helio" || id === "relations" ? <p className="text-sm leading-7">{L(titles[id])} · {L(words[el][0]!)} · {L(shop[el])}</p> : content[id].body}</div>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
+                    <LockKeyhole className="size-5 text-primary drop-shadow" />
+                    <p className="text-sm text-foreground">{ja ? `${names[min]}以上で開放されます` : `Opens with ${names[min]} or higher`}</p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      <Button size="sm" variant="outline" className="border-primary/40" onClick={() => setSample(rank(min) >= rank("b2b") ? "b2b" : "vip")}><Eye className="size-3.5" />{ja ? "サンプルを見る" : "See sample"}</Button>
+                      <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "View plans"}</Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
-            <FeatureNotifySwitch id={id} title={`🧭 ${L(titles[id])}`} body={content[id].notify} language={language} disabled={!open} />
+            <FeatureNotifySwitch id={id} title={`🧭 ${L(titles[id])}`} body={content[id].notify} language={language} disabled={!open} color={id === "dailyLucky" ? luckyColor?.code : undefined} />
           </section>
-        );
+          {i === lastOpen && share("share-open")}
+        </Fragment>);
       })}
       <FengShuiGuide profile={profile} date={today} language={language} />
+      {share("share-bottom")}
+      <Dialog open={sample !== null} onOpenChange={(v) => !v && setSample(null)}>
+        <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 sm:max-w-lg">
+          <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{ja ? "体験サンプル（架空のデータです）" : "Sample preview (fictional data)"}</DialogDescription><DialogTitle className="font-serif text-xl">{sample === "b2b" ? (ja ? `${names.b2b}で家族のリズムを重ね合わせ` : `Overlay your family's rhythm with ${names.b2b}`) : (ja ? `${names.vip}で対人ヒントが一瞬で` : `Instant relationship tips with ${names.vip}`)}</DialogTitle></DialogHeader>
+          {sample === "b2b" ? <SampleFamily ja={ja} /> : <SampleVip ja={ja} />}
+          <Button variant="champagne" className="w-full" onClick={() => { setSample(null); onUpgrade(); }}><Crown className="size-4" />{ja ? "プラン詳細を見る" : "View plan details"}</Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+}
+
+function luminance(hex: string) {
+  const v = hex.replace("#", ""); const n = (i: number) => { const c = parseInt(v.slice(i, i + 2), 16) / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+  return 0.2126 * n(0) + 0.7152 * n(2) + 0.0722 * n(4);
+}
+
+function SampleVip({ ja }: { ja: boolean }) {
+  const rows = [
+    { name: ja ? "パートナー（例）" : "Partner (sample)", good: ja ? "「いつもありがとう」と具体的に伝える" : "Thank them for something specific", score: 86 },
+    { name: ja ? "お子さま（例）" : "Child (sample)", good: ja ? "結論より気持ちを先に受け止める" : "Receive feelings first", score: 74 },
+    { name: ja ? "同僚（例）" : "Colleague (sample)", good: ja ? "役割を分けて得意を活かし合う" : "Split roles by strengths", score: 68 },
+  ];
+  return <ul className="space-y-2">{rows.map((r) => <li key={r.name} className="rounded-md border border-primary/25 p-3 text-sm"><div className="flex items-center justify-between"><strong className="text-primary">{r.name}</strong><span className="text-xs">{ja ? "今日の相性" : "Today"} {r.score}</span></div><p className="mt-1 leading-6">◎ {r.good}</p></li>)}</ul>;
+}
+
+function SampleFamily({ ja }: { ja: boolean }) {
+  const members = [ja ? "わたし" : "Me", ja ? "パートナー" : "Partner", ja ? "長女" : "Daughter", ja ? "長男" : "Son"];
+  const cls = ["stroke-primary", "stroke-chart-2", "stroke-chart-3", "stroke-chart-4"];
+  return <div>
+    <svg viewBox="0 0 120 50" className="h-36 w-full" role="img" aria-label={ja ? "家族4人のバイオリズム重ね合わせ（例）" : "Four-person biorhythm overlay (sample)"}>
+      {members.map((_, k) => <polyline key={k} fill="none" className={cls[k]} strokeWidth="1" points={Array.from({ length: 61 }, (_, x) => `${x * 2},${25 - 18 * Math.sin((x + k * 9) / (5 + k))}`).join(" ")} />)}
+    </svg>
+    <ul className="mt-2 grid grid-cols-2 gap-1 text-xs">{members.map((m, k) => <li key={m} className="flex items-center gap-2"><span className={`h-0.5 w-5 border-t-2 ${cls[k]!.replace("stroke", "border")}`} />{m}</li>)}</ul>
+    <p className="mt-2 text-xs text-muted-foreground">{ja ? "ファミリーは最大30名、ファミリープレミアムは最大100名まで重ねて比べられます。" : "Family compares up to 30 people; Family Premium up to 100."}</p>
+  </div>;
 }
