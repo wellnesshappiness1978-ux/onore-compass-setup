@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { BriefcaseBusiness, Compass, Crown, LockKeyhole, Navigation, Sparkles, UsersRound } from "lucide-react";
+import { BriefcaseBusiness, Compass, Crown, Moon, LockKeyhole, Navigation, Sparkles, UsersRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Plan } from "@/lib/design-modes";
 import { planOrder } from "@/lib/plans";
@@ -317,6 +317,19 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
           </div>
         </Card>
 
+        {dialOnly && (() => {
+          const age = (((date.getTime() - Date.UTC(2000, 0, 6, 18, 14)) / 86400000) % 29.530589 + 29.530589) % 29.530589;
+          const ja = language === "ja";
+          const moon = age < 1.8 ? (ja ? "新月" : "New moon") : age < 7.4 ? (ja ? "三日月〜上弦へ" : "Waxing crescent") : age < 9.2 ? (ja ? "上弦の月" : "First quarter") : age < 14 ? (ja ? "満ちていく月" : "Waxing gibbous") : age < 16 ? (ja ? "満月" : "Full moon") : age < 22 ? (ja ? "欠けていく月" : "Waning gibbous") : age < 23.8 ? (ja ? "下弦の月" : "Last quarter") : (ja ? "新月へ向かう月" : "Waning crescent");
+          const active = map ? (Object.keys(c.phases) as Phase[]).filter((ph) => map[ph].includes(date.getMonth())) : [];
+          return <Card icon={Moon} title={ja ? "フェーズ" : "Phase"} tier="free">
+            <p className="text-sm leading-7 text-foreground">{ja ? "月のめぐり" : "Moon cycle"}：<strong className="text-primary">{moon}</strong>（{ja ? "月齢" : "age"} {age.toFixed(1)}）</p>
+            <p className="mt-1 text-sm leading-7 text-foreground">{ja ? "地球の季節" : "Season"}：<strong className="text-primary">{c.seasons[day.season]}</strong> · {Math.round(day.yearProgress * 100)}%</p>
+            <p className="mt-1 text-sm leading-7 text-foreground">{ja ? "あなたの今月のフェーズ" : "Your phase this month"}：{map ? (active.length ? active.map((ph) => <strong key={ph} className="mr-2 text-primary">{c.phases[ph]}</strong>) : <strong className="text-primary">{ja ? "ととのえ期" : "Steady"}</strong>) : <span className="text-muted-foreground">{c.needBirth}</span>}</p>
+            <p className="mt-2 text-[10px] text-muted-foreground">{ja ? "月齢は計算上の目安、フェーズは参考値です。" : "Moon age is approximate; phases are reference values."}</p>
+          </Card>;
+        })()}
+
         {!dialOnly && <>
         {rank(plan) >= rank("standard") && <Card icon={Compass} title={c.personalTitle} tier="standard">
           <Lock min="standard">
@@ -394,7 +407,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
         </div>}
         </>}
       </div>
-      <HelioCalendar date={date} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} />
+      {!dialOnly && <HelioCalendar date={date} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} />}
       {!dialOnly && rank(plan) < rank("b2b") && <section className="mx-auto mt-7 max-w-4xl border-t border-primary/25 pt-6 text-left" aria-label={language === "ja" ? "未開放の占い" : "Locked guidance"}>
         <h3 className="mb-4 font-serif text-lg text-primary">{language === "ja" ? "未開放の占い" : "More guidance"}</h3>
         <div className="grid gap-4 md:grid-cols-2">

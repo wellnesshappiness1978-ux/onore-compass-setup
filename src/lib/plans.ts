@@ -66,8 +66,9 @@ export const todayFeatures: readonly { id: TodayFeature; min: Plan }[] = [
   { id: "directionExtended", min: "vip" },
   { id: "relations", min: "vip" },
   { id: "biorhythm365", min: "vip" },
-  { id: "familyRoadmap", min: "b2b" },
 ];
+/** The family roadmap renders inside the combined biorhythm & calendar card from this plan. */
+export const familyRoadmapMin: Plan = "b2b";
 /** Extended birth direction type and this year's direction. */
 export const directionExtendedMin: Plan = "vip";
 export const canUseToday = (plan: Plan, feature: TodayFeature) => rank(plan) >= rank(todayFeatures.find((f) => f.id === feature)!.min);
