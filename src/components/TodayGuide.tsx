@@ -138,7 +138,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
 
   const rangeLabel = Number.isFinite(helioRangeDays[plan]) ? (helioRangeDays[plan] === 0 ? (ja ? "当日分" : "Today") : helioRangeDays[plan] <= 31 ? (ja ? "前後1ヶ月" : "±1 month") : (ja ? "前後1年" : "±1 year")) : (ja ? "全期間" : "Unlimited");
   const rangeBanner = (
-    <div className="helio-range-pr mx-auto mt-4 w-full max-w-md rounded-lg border border-primary/40 bg-primary/10 p-3 text-left shadow-champagne">
+    <div className="helio-range-pr mx-auto mb-3 w-full max-w-md rounded-lg border border-primary/40 bg-primary/10 p-3 text-left shadow-champagne">
       <p className="flex items-center gap-1.5 font-serif text-sm text-primary"><CalendarRange className="size-4" />{ja ? "地球暦の閲覧期間" : "Earth Calendar browsing range"}</p>
       <ul className="mt-2 grid grid-cols-2 gap-1.5 text-[11px] sm:grid-cols-4">
         {([["free", ja ? "当日分" : "Today"], ["standard", ja ? "前後1ヶ月" : "±1 month"], ["vip", ja ? "前後1年" : "±1 year"], ["b2b", ja ? "全期間無制限" : "Unlimited"]] as const).map(([p, v]) => (
@@ -204,7 +204,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <li><strong className="text-primary">{ja ? "ラッキーアイテム" : "Lucky item"}</strong>：{L(month.item)}</li>
       </ul>,
     },
-    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p><DayCompass dialOnly afterDial={rangeBanner} rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /></> },
+    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>{rangeBanner}<DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /></> },
     biorhythm365: {
       notify: `${ja ? "今日のバイオリズム" : "Today's biorhythm"} ${Math.round(rhythm.total)}`,
       body: yearCurve.length ? <>
