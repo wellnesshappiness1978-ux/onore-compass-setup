@@ -79,3 +79,12 @@ export function almanacDay(date: Date): AlmanacDay {
     half, halfDay: dayDiff(from, iso) + 1, halfLength: dayDiff(from, to),
   };
 }
+
+const yearDays = new Map<number, AlmanacDay[]>();
+/** Whole-year almanac (cached), index = day of year. */
+export function almanacYear(year: number): AlmanacDay[] {
+  const hit = yearDays.get(year); if (hit) return hit;
+  const n = new Date(year, 1, 29).getMonth() === 1 ? 366 : 365;
+  const list = Array.from({ length: n }, (_, i) => almanacDay(new Date(year, 0, 1 + i)));
+  yearDays.set(year, list); return list;
+}
