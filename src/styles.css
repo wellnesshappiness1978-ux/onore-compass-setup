@@ -1412,4 +1412,9 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .today-feature.lucky-themed :is(.text-foreground, h3, li, p, span, label, strong) { color: var(--lucky-fg) !important; }
 .today-feature.lucky-themed :is(.text-primary, strong.text-primary, svg.text-primary) { color: var(--lucky-accent) !important; }
 .today-feature.lucky-themed .text-muted-foreground { color: var(--lucky-muted) !important; }
+.today-feature.lucky-themed .lucky-shine-title { background: linear-gradient(100deg, #8a6a12 0%, #f4d03f 22%, #fffbe6 40%, #f4d03f 58%, #b8860b 80%, #fff3b0 100%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent !important; -webkit-text-fill-color: transparent; filter: drop-shadow(0 1px 0 rgba(11,19,43,.85)) drop-shadow(0 0 6px rgba(255,243,176,.7)); font-weight: 700; animation: lucky-shine 4s linear infinite; }
+@keyframes lucky-shine { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .today-feature.lucky-themed .lucky-shine-title { animation: none; } }
+.feature-notify select, .today-feature.lucky-themed .feature-notify select { background: rgba(255,255,255,.88) !important; color: #0B132B !important; border-color: rgba(11,19,43,.35) !important; }
+.feature-notify select option { background: #ffffff; color: #0B132B; }
 .today-feature.lucky-themed .border-primary\/20 { border-color: color-mix(in srgb, var(--lucky-fg) 30%, transparent) !important; }

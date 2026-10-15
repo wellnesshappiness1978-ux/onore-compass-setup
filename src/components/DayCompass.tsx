@@ -125,14 +125,14 @@ const polar = (deg: number, r: number) => {
 };
 const rank = (p: Plan) => planOrder.indexOf(p);
 
-type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void; dialOnly?: boolean };
+type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void; dialOnly?: boolean; rangeDays?: number };
 
-export default function DayCompass({ profile, language, plan, onUpgrade, dialOnly = false }: Props) {
+export default function DayCompass({ profile, language, plan, onUpgrade, dialOnly = false, rangeDays = Infinity }: Props) {
   const c = { ...translatedCopy[language], elDay: companionCopy[language].day, rel: companionCopy[language].relation, bodyTip: companionCopy[language].rhythm };
   const names = teamCopy[language].planNames;
   const now = useMemo(() => new Date(), []);
-  const minDate = useMemo(() => new Date(now.getFullYear() - 100, 0, 1), [now]);
-  const maxDate = useMemo(() => new Date(now.getFullYear() + 100, 11, 31), [now]);
+  const minDate = useMemo(() => Number.isFinite(rangeDays) ? new Date(now.getFullYear(), now.getMonth(), now.getDate() - rangeDays) : new Date(now.getFullYear() - 100, 0, 1), [now, rangeDays]);
+  const maxDate = useMemo(() => Number.isFinite(rangeDays) ? new Date(now.getFullYear(), now.getMonth(), now.getDate() + rangeDays) : new Date(now.getFullYear() + 100, 11, 31), [now, rangeDays]);
   const [selectedDate, setSelectedDate] = useState(() => new Date(now.getFullYear(), now.getMonth(), now.getDate()));
   const year = selectedDate.getFullYear();
   const total = daysInYear(year);
@@ -142,7 +142,10 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
   const wheel = useRef<HTMLDivElement>(null);
 
   const selectedIdx = dayOfYear(selectedDate);
-  const offset = Math.round((angle / 360) * total);
+  const rawOffset = Math.round((angle / 360) * total);
+  const dayMs = 864e5;
+  const lo = Math.round((minDate.getTime() - selectedDate.getTime()) / dayMs), hi = Math.round((maxDate.getTime() - selectedDate.getTime()) / dayMs);
+  const offset = Math.min(hi, Math.max(lo, rawOffset));
   const idx = (((selectedIdx + offset) % total) + total) % total;
   const date = dateAt(year, idx);
   const day = dayProfile(date);

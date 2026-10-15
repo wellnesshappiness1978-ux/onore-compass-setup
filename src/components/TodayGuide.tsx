@@ -1,12 +1,12 @@
 import { Fragment, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { BriefcaseBusiness, CalendarHeart, Compass, Crown, Eye, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Swords } from "lucide-react";
+import { BriefcaseBusiness, CalendarHeart, CalendarRange, Compass, Crown, Eye, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { UserProfile } from "./Onboarding";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
-import { canUseToday, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
+import { canUseToday, helioRangeDays, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
 import { dateAt, daysInYear, directionEnergy, localIso, personal, roadmap, type Direction, type Phase } from "@/lib/day-compass";
 import { dayElement, relation, type Element, type TeamMember } from "@/lib/team-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
@@ -32,11 +32,14 @@ const titles: Record<TodayFeature, Pair> = {
   relations: P("クイック対人ガイド", "Quick relationship guide"),
   monthlyLucky: P("今月の3ラッキー", "This month's three lucky picks"),
   directionExtended: P("吉方位（生まれ持った方位タイプと今年の方位）", "Birth direction type & this year's direction"),
-  helio: P("地球暦の円盤カレンダーと詳細", "Earth Calendar dial & details"),
+  helio: P("地球暦・コンパス・当日詳細・バイオリズム（当日分）", "Earth Calendar, compass & biorhythm (today)"),
+  helioMonth: P("地球暦・カレンダー・バイオリズムの期間拡張（前後1ヶ月）", "Calendar & biorhythm range: ±1 month"),
+  helioYear: P("地球暦・カレンダー・バイオリズムの期間拡張（前後1年）", "Calendar & biorhythm range: ±1 year"),
+  helioUnlimited: P("地球暦・カレンダー・バイオリズムの無制限拡張（全期間）", "Calendar & biorhythm range: unlimited"),
   biorhythm365: P("365日の個人バイオリズム", "365-day personal biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
-const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
+const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, helioMonth: CalendarRange, helioYear: CalendarRange, helioUnlimited: CalendarRange, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
 
 const words: Record<Element, Pair[]> = {
   wood: [P("朝の散歩で新しい道を選ぶ", "Take a new route on a morning walk"), P("「まず芽を出す」", "\"Plant the first seed\""), P("ストレッチとヨガ", "Stretching and yoga")],
@@ -136,6 +139,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const monthLabels = ja ? ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"] : ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
   const phases: Record<Phase, Pair> = { attack: P("攻め", "Advance"), defend: P("守り", "Protect"), newBiz: P("新規", "New"), contract: P("契約", "Sign") };
 
+  const rangeLabel = Number.isFinite(helioRangeDays[plan]) ? (helioRangeDays[plan] === 0 ? (ja ? "当日分" : "Today") : helioRangeDays[plan] <= 31 ? (ja ? "前後1ヶ月" : "±1 month") : (ja ? "前後1年" : "±1 year")) : (ja ? "全期間" : "Unlimited");
+  const rangeCard = (label: string, text: string) => ({ notify: ja ? `地球暦を${label}で確認しましょう` : `Browse the calendar (${label})`, body: <p className="text-sm leading-6"><strong className="text-primary">✓ {label}</strong> · {text}</p> });
   const content: Record<TodayFeature, { body: ReactNode; notify: string }> = {
     decision: {
       notify: rhythm.total >= 55 ? (ja ? "今日は準備した一歩を小さく試す日" : "Test one prepared step today") : (ja ? "今日は確認と余白を整える日" : "Verify and leave space today"),
@@ -190,7 +195,10 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <li><strong className="text-primary">{ja ? "ラッキーアイテム" : "Lucky item"}</strong>：{L(month.item)}</li>
       </ul>,
     },
-    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <DayCompass dialOnly profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /> },
+    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p><DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /></> },
+    helioMonth: rangeCard(ja ? "前後1ヶ月" : "±1 month", ja ? "上の円盤を回すと、前後1ヶ月の地球暦とバイオリズムを見られます。" : "Turn the dial above to browse ±1 month."),
+    helioYear: rangeCard(ja ? "前後1年" : "±1 year", ja ? "上の円盤で、前後1年の流れを見渡せます。旅行や記念日の計画に便利です。" : "Browse ±1 year on the dial above — handy for planning."),
+    helioUnlimited: rangeCard(ja ? "全期間" : "Unlimited", ja ? "過去も未来も自由に。家族の誕生日や節目の日もさかのぼって確かめられます。" : "Browse any date, past or future."),
     biorhythm365: {
       notify: `${ja ? "今日のバイオリズム" : "Today's biorhythm"} ${Math.round(rhythm.total)}`,
       body: yearCurve.length ? <>
@@ -221,8 +229,11 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const peak = monthAvg.indexOf(Math.max(...monthAvg));
   const firstSentence = (s: string) => s.split(/(?<=[。.])/)[0] ?? s;
   const teaser: Partial<Record<TodayFeature, string | undefined>> = {
-    shopping: firstSentence(L(shop[el])),
-    health: firstSentence(L(health[el])),
+    shopping: ja ? "今日の運気を上げるお買い物、ひとつだけ選ぶなら？" : "One purchase to lift today's luck?",
+    health: ja ? "今日のからだが喜ぶ、小さな習慣があります。" : "A small habit your body will enjoy today.",
+    helioMonth: ja ? "来週の大切な日、先に確かめてみませんか？" : "Peek at the days ahead.",
+    helioYear: ja ? "一年先まで、あなたの流れを見渡せます。" : "See your flow a full year ahead.",
+    helioUnlimited: ja ? "過去も未来も、すべての日があなたの手に。" : "Every date, past and future.",
     helio: ja ? `今日は地球暦で一年の${dayIdx + 1}日目。あなたの円盤に今日の位置が灯ります。` : `Day ${dayIdx + 1} on your Earth Calendar dial.`,
     relations: ja ? `今日のあなたの大勝負の時間帯は${hour}時！` : `Your key moment today is around ${hour}:00!`,
     biorhythm365: birth ? (ja ? `${peak + 1}月は人生の転機バイオリズム。` : `${monthLabels[peak]} is your turning-point rhythm.`) : undefined,
@@ -231,7 +242,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     familyRoadmap: map ? (ja ? `今年の攻め月は${map.attack.slice(0, 2).map((m) => `${m + 1}月`).join("・")}。` : `Advance months: ${map.attack.slice(0, 2).map((m) => monthLabels[m]).join(", ")}.`) : undefined,
   };
 
-  const [sample, setSample] = useState<Plan | null>(null);
+  const [sample, setSample] = useState<TodayFeature | null>(null);
+  const sampleMin = sample ? todayFeatures.find((f) => f.id === sample)!.min : "vip";
   const openCount = todayFeatures.filter((f) => canUseToday(plan, f.id)).length;
   const lastOpen = todayFeatures.map((f) => canUseToday(plan, f.id)).lastIndexOf(true);
   const nextLocked = todayFeatures.find((f) => !canUseToday(plan, f.id));
@@ -248,12 +260,13 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   };
   const share = (key: string) => <div key={key} className="flex justify-center"><ShareCardButton language={language} autoOpen={false} label={ja ? "今日の占いを1タップでシェア" : "Share today's guide"} className="h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto" data={shareData} /></div>;
 
-  const lum = luckyColor ? luminance(luckyColor.code) : 0;
-  const luckyStyle = luckyColor ? ({
-    background: `linear-gradient(135deg, ${luckyColor.code} 0%, ${luckyColor.code}E6 55%, ${luckyColor.code}B3 100%)`,
-    "--lucky-fg": lum > 0.3 ? "#0B132B" : "#FFFFFF",
-    "--lucky-accent": lum > 0.3 ? "#0B132B" : "#F4D03F",
-    "--lucky-muted": lum > 0.3 ? "rgba(11,19,43,.78)" : "rgba(255,255,255,.85)",
+  const neon = luckyColor ? neonOf(luckyColor.code) : null;
+  const luckyStyle = neon ? ({
+    background: `radial-gradient(120% 90% at 0% 0%, hsl(${neon.h} 100% 72% / .95), transparent 60%), linear-gradient(135deg, hsl(${neon.h} 100% 55%) 0%, hsl(${(neon.h + 25) % 360} 100% 50%) 55%, hsl(${(neon.h + 330) % 360} 100% 45%) 100%)`,
+    boxShadow: `0 0 24px hsl(${neon.h} 100% 55% / .55), inset 0 0 0 1px hsl(${neon.h} 100% 85% / .7)`,
+    "--lucky-fg": neon.light ? "#0B132B" : "#FFFFFF",
+    "--lucky-accent": neon.light ? "#0B132B" : "#FFF3B0",
+    "--lucky-muted": neon.light ? "rgba(11,19,43,.8)" : "rgba(255,255,255,.88)",
   } as CSSProperties) : undefined;
 
   return (
@@ -275,21 +288,19 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         return (<Fragment key={id}>
           <section id={`today-${id}`} style={lucky ? luckyStyle : undefined} className={`today-feature design-daily-panel card-lux min-w-0 w-full max-w-full rounded-lg p-3 md:p-5 ${lucky ? "lucky-themed" : ""}`} aria-label={L(titles[id])}>
             <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
-              <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className="min-w-0 break-words">{L(titles[id])}</span></h3>
+              <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className={`min-w-0 break-words ${lucky ? "lucky-shine-title" : ""}`}>{L(titles[id])}</span></h3>
               {!open && <span className="shrink-0 rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">{names[min]}+</span>}
             </div>
             {open ? content[id].body : (
-              <div>
-                {teaser[id] && <p className="mb-2 text-sm font-medium text-foreground">✦ {teaser[id]}</p>}
-                <div className="relative">
-                  <div aria-hidden="true" inert className="pointer-events-none max-h-40 select-none overflow-hidden opacity-70 blur-[5px]">{id === "helio" || id === "relations" ? <p className="text-sm leading-7">{L(titles[id])} · {L(words[el][0]!)} · {L(shop[el])}</p> : content[id].body}</div>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
-                    <LockKeyhole className="size-5 text-primary drop-shadow" />
-                    <p className="text-sm text-foreground">{ja ? `${names[min]}以上で開放されます` : `Opens with ${names[min]} or higher`}</p>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      <Button size="sm" variant="outline" className="border-primary/40" onClick={() => setSample(rank(min) >= rank("b2b") ? "b2b" : "vip")}><Eye className="size-3.5" />{ja ? "サンプルを見る" : "See sample"}</Button>
-                      <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "View plans"}</Button>
-                    </div>
+              <div className="relative overflow-hidden rounded-md border border-primary/20 p-3">
+                <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-champagne-gradient opacity-10 blur-sm" />
+                <div className="relative flex flex-col items-center gap-2 text-center">
+                  <LockKeyhole className="size-5 text-primary" />
+                  {teaser[id] && <p className="text-sm font-medium text-foreground">✦ {teaser[id]}</p>}
+                  <p className="text-xs text-muted-foreground">{ja ? `${names[min]}以上でお楽しみいただけます` : `Enjoy with ${names[min]} or higher`}</p>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <Button size="sm" variant="outline" className="border-primary/40" onClick={() => setSample(id)}><Eye className="size-3.5" />{ja ? "サンプルを見る" : "See sample"}</Button>
+                    <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "View plans"}</Button>
                   </div>
                 </div>
               </div>
@@ -303,8 +314,9 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       {share("share-bottom")}
       <Dialog open={sample !== null} onOpenChange={(v) => !v && setSample(null)}>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 sm:max-w-lg">
-          <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{ja ? "体験サンプル（架空のデータです）" : "Sample preview (fictional data)"}</DialogDescription><DialogTitle className="font-serif text-xl">{sample === "b2b" ? (ja ? `${names.b2b}で家族のリズムを重ね合わせ` : `Overlay your family's rhythm with ${names.b2b}`) : (ja ? `${names.vip}で対人ヒントが一瞬で` : `Instant relationship tips with ${names.vip}`)}</DialogTitle></DialogHeader>
-          {sample === "b2b" ? <SampleFamily ja={ja} /> : <SampleVip ja={ja} />}
+          <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{sample === "relations" || sample === "familyRoadmap" ? (ja ? "診断例（架空のデータです）" : "Sample (fictional data)") : (ja ? "診断例（あなたの今日の参考値）" : "Sample (your reference values today)")}</DialogDescription><DialogTitle className="font-serif text-xl">{sample ? L(titles[sample]) : ""}</DialogTitle></DialogHeader>
+          <div className="text-foreground">{sample === "familyRoadmap" ? <SampleFamily ja={ja} /> : sample === "relations" ? <SampleVip ja={ja} /> : sample ? content[sample].body : null}</div>
+          <p className="text-sm text-primary">{ja ? `${names[sampleMin]}になると、これが毎日・詳細に占えます。` : `With ${names[sampleMin]}, this arrives daily in detail.`}</p>
           <Button variant="champagne" className="w-full" onClick={() => { setSample(null); onUpgrade(); }}><Crown className="size-4" />{ja ? "プラン詳細を見る" : "View plan details"}</Button>
         </DialogContent>
       </Dialog>
@@ -312,10 +324,15 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   );
 }
 
-function luminance(hex: string) {
-  const v = hex.replace("#", ""); const n = (i: number) => { const c = parseInt(v.slice(i, i + 2), 16) / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
-  return 0.2126 * n(0) + 0.7152 * n(2) + 0.0722 * n(4);
+/** Vivid neon variant of a lucky color: same hue, full saturation; `light` picks dark text for bright hues. */
+function neonOf(hex: string) {
+  const v = hex.replace("#", ""); const [r, g, b] = [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16) / 255) as [number, number, number];
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+  let h = 0; if (d) h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  h = Math.round((h * 60 + 360) % 360);
+  return { h, light: h >= 40 && h <= 200 };
 }
+
 
 function SampleVip({ ja }: { ja: boolean }) {
   const rows = [
