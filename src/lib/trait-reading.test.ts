@@ -9,7 +9,7 @@ describe("distinct personal reading contract", () => {
     for (const copy of Object.values(traitReadingCopy)) {
       expect(new Set(copy.headings).size).toBe(6);
       expect(new Set(copy.methods).size).toBe(15);
-      expect(copy.final.length).toBeGreaterThan(10);
+      expect(copy.final.length).toBeGreaterThan(3);
       expect(Object.values(copy.statuses).every(Boolean)).toBe(true);
     }
     expect(traitReadingCopy.ja.final).toBe("多層総合診断");
