@@ -1406,3 +1406,10 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 }
 .design-canvas[data-design="pure-white"] :is(.card-lux, .design-daily-panel, .today-feature) :is(.text-muted-foreground) { color: oklch(.36 .03 265); }
 .design-canvas[data-design="pure-white"] :is(.card-lux, .design-daily-panel, .today-feature) :is(.text-primary) { color: oklch(.47 .11 70); }
+
+/* Today's lucky card: background follows the lucky color; text flips by luminance. */
+.today-feature.lucky-themed, .design-canvas .today-feature.lucky-themed { color: var(--lucky-fg) !important; border-color: color-mix(in srgb, var(--lucky-accent) 45%, transparent) !important; }
+.today-feature.lucky-themed :is(.text-foreground, h3, li, p, span, label, strong) { color: var(--lucky-fg) !important; }
+.today-feature.lucky-themed :is(.text-primary, strong.text-primary, svg.text-primary) { color: var(--lucky-accent) !important; }
+.today-feature.lucky-themed .text-muted-foreground { color: var(--lucky-muted) !important; }
+.today-feature.lucky-themed .border-primary\/20 { border-color: color-mix(in srgb, var(--lucky-fg) 30%, transparent) !important; }

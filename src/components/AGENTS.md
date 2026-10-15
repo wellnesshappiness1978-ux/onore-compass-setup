@@ -16,4 +16,4 @@
 
 - Explanatory overlays use shared DialogContent and inline details use SacredDisclosure/Accordion. Browser-narration owns locale voice ranking, voice discovery, punctuation pauses and cancellation. Why: accessible detail surfaces and one device-native speech contract without external services.
 
-- Today screen order and plan gates come from `todayFeatures` in plans.ts; each card ends with FeatureNotifySwitch (local, open-app-only reminders). Why: one source for order/gating and no false background-push promise.
+- Today screen order (cheapest plan first, personal before family) and gates come from `todayFeatures` in plans.ts; locked cards show a one-line personal teaser plus a fictional sample dialog; share appears after the last unlocked card and at the bottom; each card ends with FeatureNotifySwitch (local, open-app-only reminders). Why: one source for order/gating and no false background-push promise.
