@@ -125,9 +125,9 @@ const polar = (deg: number, r: number) => {
 };
 const rank = (p: Plan) => planOrder.indexOf(p);
 
-type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void; dialOnly?: boolean; rangeDays?: number };
+type Props = { profile: UserProfile; language: Language; plan: Plan; onUpgrade: () => void; dialOnly?: boolean; rangeDays?: number; afterDial?: React.ReactNode };
 
-export default function DayCompass({ profile, language, plan, onUpgrade, dialOnly = false, rangeDays = Infinity }: Props) {
+export default function DayCompass({ profile, language, plan, onUpgrade, dialOnly = false, rangeDays = Infinity, afterDial }: Props) {
   const c = { ...translatedCopy[language], elDay: companionCopy[language].day, rel: companionCopy[language].relation, bodyTip: companionCopy[language].rhythm };
   const names = teamCopy[language].planNames;
   const now = useMemo(() => new Date(), []);
@@ -298,6 +298,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
         <Button size="sm" variant="ghost" className="mt-1 text-primary hover:bg-primary/10 hover:text-primary" onClick={() => choose(now)}>{c.today}</Button>
       )}
       <p className="mt-1 text-[10px] text-muted-foreground/80">{c.preview}</p>
+      {afterDial}
       <div className="daily-card-grid mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 md:mt-6 md:grid-cols-[repeat(2,minmax(0,1fr))] md:gap-4">
         <Card icon={Sparkles} title={c.dayTitle} tier="free">
           <p className="text-sm leading-7 text-foreground">{c.elDay[day.element]}</p>
