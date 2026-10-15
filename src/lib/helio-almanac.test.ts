@@ -15,6 +15,6 @@ describe("helio almanac 2025", () => {
     expect(almanacDay(new Date(2025, 6, 1)).zassetsu).toContain("半夏生");
     expect(almanacDay(new Date(2025, 5, 11)).zassetsu).toContain("入梅");
     expect(almanacDay(new Date(2025, 5, 25)).lunarDayLabel).toBe("新月");
-    expect(almanacDay(new Date(2025, 6, 6)).apsis).toBe("遠日点");
+    expect(almanacDay(new Date(2025, 6, 4)).apsis).toBe("遠日点");
   });
 });
