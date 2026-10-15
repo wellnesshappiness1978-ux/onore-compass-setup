@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { BriefcaseBusiness, Compass, Crown, LockKeyhole, Navigation, Sparkles, UsersRound } from "lucide-react";
+import { BriefcaseBusiness, Compass, Crown, Moon, LockKeyhole, Navigation, Sparkles, UsersRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Plan } from "@/lib/design-modes";
 import { planOrder } from "@/lib/plans";
