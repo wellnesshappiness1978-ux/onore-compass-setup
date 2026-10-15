@@ -12,7 +12,7 @@ describe("distinct personal reading contract", () => {
       expect(copy.final.length).toBeGreaterThan(10);
       expect(Object.values(copy.statuses).every(Boolean)).toBe(true);
     }
-    expect(traitReadingCopy.ja.final).toBe("総合まとめ：あなたの『絶対自分軸』");
+    expect(traitReadingCopy.ja.final).toBe("多層総合診断");
   });
   it("never claims unimplemented charts or contextual personality calculations", () => {
     const statuses = approachStatuses({ core: true, earth: true, nineStars: true, color: true, blood: true, siblings: true, region: true });

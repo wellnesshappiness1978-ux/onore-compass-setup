@@ -4,7 +4,7 @@ import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, 
 import { useMemo, useState, type ReactNode } from "react";
 import ShareCardButton from "./ShareCardButton";
 import GrandSummaryCard from "./GrandSummaryCard";
-import { AgolmenLoading } from "./AgolmenSpiral";
+import { AgolmenLoading, useCompletionHold } from "./AgolmenSpiral";
 import { usePlan } from "./PlanProvider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
