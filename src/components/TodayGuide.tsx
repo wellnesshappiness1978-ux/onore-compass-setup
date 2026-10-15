@@ -34,7 +34,7 @@ const titles: Record<TodayFeature, Pair> = {
   monthlyLucky: P("今月の3ラッキー", "This month's three lucky picks"),
   directionExtended: P("吉方位（生まれ持った方位タイプと今年の方位）", "Birth direction type & this year's direction"),
   helio: P("地球暦・コンパス・当日詳細・バイオリズム（当日分）", "Earth Calendar, compass & biorhythm (today)"),
-  biorhythm365: P("個人・ファミリーのバイオリズムとカレンダー（当日・前後1ヶ月・前後1年・無期限）", "Personal & family biorhythm and calendar"),
+  biorhythm365: P("個人・ファミリーのバイオリズム", "Personal & family biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
 const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
@@ -250,8 +250,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     <p className="mb-2 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>
     <h4 className="mb-1 font-serif text-sm text-primary">{ja ? "個人のバイオリズム" : "Personal biorhythm"}</h4>
     {content.biorhythm365.body}
-    <h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "カレンダー" : "Calendar"}</h4>
-    <HelioCalendar date={today} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} />
     <h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "ファミリーのロードマップとバイオリズム" : "Family roadmap & biorhythm"}</h4>
     {planOrder.indexOf(plan) >= planOrder.indexOf(familyRoadmapMin) ? content.familyRoadmap.body : (
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/25 p-3 text-sm">
