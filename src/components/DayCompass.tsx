@@ -18,6 +18,8 @@ import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { companionCopy } from "@/lib/companion-copy";
 import { rokuyo } from "@/lib/calendar-traditions";
 import HelioAlmanacStrip from "./HelioAlmanacStrip";
+import { almanacYear } from "@/lib/helio-almanac";
+import { gloss } from "@/lib/almanac-i18n";
 
 const ja = {
   hint: "盤面をなぞって前後100年の日付を巡れます。指の位置で8方位も切り替わります。",
@@ -167,6 +169,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
   const current = energy.find((e) => e.dir === heading)!;
   const map = useMemo(() => (birth ? roadmap(birth, year) : null), [birth, year]);
   const shareColor = birthColorSpectrum(profile)?.main;
+  const almanac = useMemo(() => dialOnly ? almanacYear(year) : [], [dialOnly, year]);
   const fmt = new Intl.DateTimeFormat(language, { month: "long", day: "numeric", weekday: "short" });
 
   const Lock = ({ min, children }: { min: Plan; children: React.ReactNode }) =>
@@ -264,6 +267,20 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
               const p = polar(localDeg(d), 41.5);
               return <text key={m} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="2.8" className="fill-foreground/80 font-serif" transform={`rotate(${localDeg(d)} ${p.x} ${p.y})`}>{m}</text>;
             })}
+            {/* almanac rings: solar terms, lunar month starts, moon quarters, apsides */}
+            {dialOnly && almanac.map((a, d) => {
+              const deg = localDeg(d);
+              const out: React.ReactNode[] = [];
+              if (a.term) { const p = polar(deg, 39.6), q = polar(deg, 38); const major = ["春分", "夏至", "秋分", "冬至"].includes(a.term);
+                out.push(<line key="tl" x1={q.x} y1={q.y} x2={polar(deg, 38.8).x} y2={polar(deg, 38.8).y} className="stroke-primary" strokeWidth={major ? 0.5 : 0.25} />);
+                out.push(<text key="t" x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize={major ? 1.9 : 1.45} className={major ? "fill-primary font-serif font-bold" : "fill-primary/75 font-serif"} transform={`rotate(${deg} ${p.x} ${p.y})`}><title>{gloss(a.term, language)}</title>{a.term}</text>); }
+              if (a.quarter) { const p = polar(deg, 43.4); const full = a.quarter === "満月", fresh = a.quarter === "新月";
+                out.push(<circle key="m" cx={p.x} cy={p.y} r="0.55" className={full ? "fill-gold-glow" : fresh ? "fill-background stroke-primary/70" : "fill-primary/50"} strokeWidth="0.15"><title>{gloss(a.quarter, language)}</title></circle>); }
+              if (a.lunarDay === 1) { const p = polar(deg, 36.4); out.push(<text key="l" x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="1.3" className="fill-foreground/60 font-serif" transform={`rotate(${deg} ${p.x} ${p.y})`}><title>{gloss(a.lunarMonthName, language)}</title>{a.lunarMonthName}</text>); }
+              if (a.apsis) { const p = polar(deg, 46); out.push(<text key="a" x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle" fontSize="1.6" className="fill-primary font-bold"><title>{gloss(a.apsis, language)}</title>{a.apsis === "遠日点" ? "遠" : "近"}</text>); }
+              return out.length ? <g key={`al-${d}`}>{out}</g> : null;
+            })}
+            {dialOnly && <circle cx="50" cy="50" r="37.3" className="stroke-primary/20" fill="none" strokeWidth="0.2" />}
             {/* zodiac monuments */}
             {zodiacSigns.map((s, i) => {
               const deg = localDeg(dayOfYear(new Date(year, s.m - 1, s.d)) + 15);
