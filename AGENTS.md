@@ -35,3 +35,4 @@
 - App appearance uses five cumulative manually applied families, bundled imagery and same-origin storage-event synchronization; keep legacy palette/corporate IDs separate from membership. Why: synchronize browser tabs without changing entitlements or artwork.
 
 - Personal readings share one versioned home-reading query: six essence angles, existing method dialogs, server-statused approaches filtered to available nonempty tap-to-open cards, a catchphrase and one closing axis summary; name grids remain in the name dialog. Why: prevent duplicate AI calls, fabricated charts and repeated prose.
+

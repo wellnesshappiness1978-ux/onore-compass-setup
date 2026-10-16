@@ -5,8 +5,12 @@ import type { Plan } from "@/lib/design-modes";
 
 export type UsageFeature = "consultation" | "compatibility";
 const localDay = () => new Date().toLocaleDateString("en-CA");
-const localKey = (feature: UsageFeature, plan: Plan) => `onore-usage:${feature}:${plan}:${localDay()}`;
-export const msUntilMidnight = () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1).getTime() - n.getTime(); };
+const localKey = (feature: UsageFeature, plan: Plan) =>
+  `onore-usage:${feature}:${plan}:${localDay()}`;
+export const msUntilMidnight = () => {
+  const n = new Date();
+  return new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1).getTime() - n.getTime();
+};
 
 /**
  * One shared daily counter for consultation and compatibility.
@@ -23,16 +27,29 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
     const today = localDay();
     setDay(today);
     if (serverCounted) {
-      const { data } = await supabase.from("daily_usage").select("used").eq("feature", feature).eq("usage_day", today).maybeSingle();
+      const { data } = await supabase
+        .from("daily_usage")
+        .select("used")
+        .eq("feature", feature)
+        .eq("usage_day", today)
+        .maybeSingle();
       setUsed(data?.used ?? 0);
     } else {
-      try { setUsed(Number(localStorage.getItem(localKey(feature, plan))) || 0); } catch { setUsed(0); }
+      try {
+        setUsed(Number(localStorage.getItem(localKey(feature, plan))) || 0);
+      } catch {
+        setUsed(0);
+      }
     }
   }, [feature, plan, serverCounted]);
 
-  useEffect(() => { void refresh(); }, [refresh]);
   useEffect(() => {
-    const id = window.setInterval(() => { if (localDay() !== day) void refresh(); }, 1000);
+    void refresh();
+  }, [refresh]);
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      if (localDay() !== day) void refresh();
+    }, 1000);
     return () => window.clearInterval(id);
   }, [day, refresh]);
 
@@ -40,17 +57,34 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
   const consume = useCallback(async () => {
     if (unlimited) return true;
     if (serverCounted) {
-      const { data, error } = await supabase.rpc("consume_daily_usage", { p_feature: feature, p_day: localDay() });
-      if (error) { await refresh(); return false; }
+      const { data, error } = await supabase.rpc("consume_daily_usage", {
+        p_feature: feature,
+        p_day: localDay(),
+      });
+      if (error) {
+        await refresh();
+        return false;
+      }
       setUsed(Number(data) || 0);
       return true;
     }
     if (used >= limit) return false;
     const next = used + 1;
-    try { localStorage.setItem(localKey(feature, plan), String(next)); } catch { /* private browsing */ }
+    try {
+      localStorage.setItem(localKey(feature, plan), String(next));
+    } catch {
+      /* private browsing */
+    }
     setUsed(next);
     return true;
   }, [unlimited, serverCounted, feature, refresh, used, limit, plan]);
 
-  return { used, limit, unlimited, remaining: unlimited ? Infinity : Math.max(0, limit - used), consume };
+  return {
+    used,
+    limit,
+    unlimited,
+    remaining: unlimited ? Infinity : Math.max(0, limit - used),
+    consume,
+    refresh,
+  };
 }

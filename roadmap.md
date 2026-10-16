@@ -1,3 +1,9 @@
+## Consultation room enhancement
+- [ ] Enrich available birth/daily context and four-part seven-language responses.
+- [ ] Add contextual composer chips, private favorites and portrait PNG sharing.
+- [ ] Enforce signed-in daily usage at the request boundary; improve remaining badge and informational upgrade dialog.
+- [ ] Verify real consultation, favorite reload/removal, PNG download and 320px/desktop layouts.
+
 ## Mobile navigation and bounded daily layout
 - [x] Move Home/Settings to a fixed phone header, retain five localized bottom tabs and desktop access.
 - [x] Compact mobile spacing and prose; constrain daily grid tracks, cards and the locally scrollable family roadmap without clipping content.
@@ -547,3 +553,10 @@
 - [x] Verify a real generated reading using the requesting user's signed-in saved profile: all six headings, fifteen perspectives, five unavailable labels and a 158-character closing message with a tomorrow step. Desktop/390px screenshots confirm readable wrapping and no horizontal overflow or page errors. All 32 focused localization/voice/appearance/astronomy/Earth/export/mandala regression tests pass; latest build OK. Appearance synchronization scope, astronomy and 2048 export code are unchanged; no new separate-device synchronization or full fifteen-method calculation engine is claimed.
 
 - [x] Today: ten ordered plan-gated cards, per-card daily notifications, white-theme legibility, feng shui method
+
+
+## AI consultation enhancement
+- [x] Shared available-only birth references, ten-body sky and illustrative daily rhythms/directions, four localized response sections. Unavailable charts stay omitted.
+- [x] Four horizontal composer questions, authenticated private bookmarks and summary-only local 1080×1920 sharing.
+- [x] Atomic signed-in daily-usage consumption, actual-membership badge and informational upgrade dialog; preserve 1/3/10/30/unlimited caps.
+- [x] Verify real signed-in four-section AI response, private bookmark reload, actual 1080×1920 PNG, server 429 daily-cap rejection and VIP informational modal. Desktop and 320px screenshots show usable composer and no horizontal overflow or browser errors; 13 focused tests pass and build OK. Existing unimplemented charts remain unavailable; paid billing is not added.
