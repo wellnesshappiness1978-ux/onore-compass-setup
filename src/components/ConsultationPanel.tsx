@@ -99,7 +99,7 @@ export default function ConsultationPanel({
     if (targetId !== "owner" && !members.some((m) => m.id === targetId)) setTargetId("owner");
   }, [members, targetId]);
   const target = members.find((m) => m.id === targetId);
-  const targetProfile = target
+  const targetProfile = useMemo(() => target
     ? {
         ...profile,
         nameKanji: target.name,
@@ -114,7 +114,7 @@ export default function ConsultationPanel({
         siblingOrder: target.siblingOrder ?? "",
         gender: target.gender ?? "undisclosed",
       }
-    : profile;
+    : profile, [target, profile]);
   const targetLabel = target?.name ?? consultationTranslations[language].ownerLabel;
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;

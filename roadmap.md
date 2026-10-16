@@ -559,4 +559,4 @@
 - [x] Shared available-only birth references, ten-body sky and illustrative daily rhythms/directions, four localized response sections. Unavailable charts stay omitted.
 - [x] Four horizontal composer questions, authenticated private bookmarks and summary-only local 1080×1920 sharing.
 - [x] Atomic signed-in daily-usage consumption, actual-membership badge and informational upgrade dialog; preserve 1/3/10/30/unlimited caps.
-- [ ] Verify daily-cap rejection, limit-dialog guidance and final card/mobile screenshots; 13 focused tests and real signed-in response, bookmark reload, PNG download already pass.
+- [x] Verify real signed-in four-section AI response, private bookmark reload, actual 1080×1920 PNG, server 429 daily-cap rejection and VIP informational modal. Desktop and 320px screenshots show usable composer and no horizontal overflow or browser errors; 13 focused tests pass and build OK. Existing unimplemented charts remain unavailable; paid billing is not added.
