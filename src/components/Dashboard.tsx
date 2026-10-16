@@ -41,6 +41,10 @@ import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions"
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { useDailyUsage } from "@/hooks/use-daily-usage";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
+import { listTeamMembers } from "@/lib/team-members.functions";
+import { readPreviewMembers } from "@/lib/consultation-targets";
+import { personal } from "@/lib/day-compass";
+import type { TeamMember } from "@/lib/team-analysis";
 import { compatibilityContextCopy, readingThemes, relationshipKinds, type ReadingTheme } from "@/lib/compatibility-context";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
