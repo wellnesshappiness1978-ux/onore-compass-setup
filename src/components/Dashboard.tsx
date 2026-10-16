@@ -277,6 +277,25 @@ function TorisetsuPanel({
           <section className="card-lux mt-6 rounded-lg p-5 sm:p-7" aria-label={language === "ja" ? "アゴルメン相性診断" : t.compatibility}>
             <div className="space-y-5">
               <div>
+                <div className="grid grid-cols-2 gap-2" role="tablist" aria-label={q.pickMember}>
+                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "members"} onClick={() => setEntryMode("members")} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "members" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UsersRound className="size-4 shrink-0" aria-hidden="true" />{q.pickMember}</Button>
+                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "manual"} onClick={() => setEntryMode("manual")} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "manual" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UserRound className="size-4 shrink-0" aria-hidden="true" />{q.manualEntry}</Button>
+                </div>
+                {entryMode === "members" && (
+                  <div className="mt-3">
+                    {members.length ? (
+                      <div className="flex flex-wrap gap-2">
+                        {members.map((m) => (
+                          <Button key={m.id} type="button" size="sm" variant="outline" onClick={() => pickMember(m)} className={`min-h-10 ${partnerDate === m.birthDate && partnerName === m.name ? "border-primary bg-primary/15 text-primary" : "border-primary/25"}`}>{m.name}</Button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="rounded-md border border-primary/20 bg-background/40 p-3 text-xs leading-5 text-muted-foreground">{q.noMembers}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div>
                 <label
                   htmlFor="partner-name"
                   className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary"
