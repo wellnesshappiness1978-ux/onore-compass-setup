@@ -325,7 +325,7 @@ export default function SettingsPanel({
                   ))}
                 </ul>
                 {item.id !== "free" && <Button
-                  onClick={() => devOverrideEnabled ? onPlanChange(item.id as Plan) : toast(demoCopy[language].toast, { description: name })}
+                  onClick={() => toast(demoCopy[language].toast, { description: name })}
                   disabled={isCurrent}
                   size="sm" variant={isVip ? "default" : "outline"}
                   className="mt-4 h-10 w-full whitespace-normal text-xs">
