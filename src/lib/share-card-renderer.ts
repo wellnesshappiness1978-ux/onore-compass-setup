@@ -3,7 +3,7 @@ import logoAsset from "@/assets/agolmen-v10-compass-final.png.asset.json";
 
 const logoUrl = logoAsset.url;
 
-export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility" | "daily" | "biorhythm"; caution?: string; palette?: { label: string; code: string }[] };
+export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility" | "daily" | "biorhythm" | "consultation"; caution?: string; palette?: { label: string; code: string }[] };
 export type CardFormat = "story" | "x";
 export const shareCopy = {
   ja: { cta: "あなたの診断カードをSNSでシェア", title: "あなたの本質を、一枚に。", description: "あなたの診断カード", essence: "あなたの本質", bias: "陥りがちな罠・思考バイアス", palette: "バースカラーパレット", roles: ["メイン", "サブ", "金運", "愛情", "健康", "内面"], reference: "自己理解のための参考解釈・参考色", search: "アゴルメンの羅針盤で検索", hashtags: "#アゴルメンの羅針盤 #バースカラー #自己理解", name: "名前を載せる", privacy: "名前・出生情報は初期設定で非表示", save: "画像を保存", share: "端末でシェア", story: "縦型 9:16", x: "横型 16:9", note: "共有先は端末で選択します。Instagram・TikTokへの直接投稿は保証されません。画像共有に未対応の場合は保存し、各アプリで画像を選んでください。Xの投稿画面には画像は自動添付されません。", saved: "画像を保存しました", shared: "端末の共有画面を開きました", error: "画像を作成・共有できませんでした。もう一度お試しください。", loading: "選択した言語の診断カードを作成中…", match: "相性スコア" },
@@ -17,6 +17,8 @@ export const shareCopy = {
 export const cardCopy = (language: Language) => shareCopy[language];
 
 const kindLabel = (kind: ShareCardData["kind"], language: Language) => {
+  const consultation: Record<Language, string> = { ja: "AI相談の道標", en: "AI consultation insight", "zh-CN": "AI咨询指引", "zh-TW": "AI諮詢指引", ko: "AI 상담 길잡이", es: "Consejo de tu consulta IA", fr: "Conseil de votre consultation IA" };
+  if (kind === "consultation") return consultation[language];
   const daily: Record<Language, string> = { ja: "今日の占い", en: "Today's guide", "zh-CN": "今日运势", "zh-TW": "今日運勢", ko: "오늘의 운세", es: "Guía de hoy", fr: "Guide du jour" };
   const rhythm: Record<Language, string> = { ja: "今日のバイオリズム", en: "Today's rhythm", "zh-CN": "今日生物节律", "zh-TW": "今日生物節律", ko: "오늘의 바이오리듬", es: "Biorritmo de hoy", fr: "Biorythme du jour" };
   if (kind === "daily") return daily[language];

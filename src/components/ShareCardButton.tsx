@@ -8,7 +8,7 @@ import { cardCopy, renderShareCard, type CardFormat, type ShareCardData } from "
 import { AgolmenLoading } from "./AgolmenSpiral";
 export type { ShareCardData } from "@/lib/share-card-renderer";
 
-export default function ShareCardButton({ data, language, className, loading = false, label, autoOpen = true }: { data: ShareCardData | null; language: Language; className?: string; loading?: boolean; label?: string; autoOpen?: boolean }) {
+export default function ShareCardButton({ data, language, className, loading = false, label, autoOpen = true, iconOnly = false }: { data: ShareCardData | null; language: Language; className?: string; loading?: boolean; label?: string; autoOpen?: boolean; iconOnly?: boolean }) {
   const t = cardCopy(language);
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState<CardFormat>("story");
@@ -75,13 +75,13 @@ export default function ShareCardButton({ data, language, className, loading = f
     window.open(href, "_blank", "noopener,noreferrer"); save();
   };
   return <>
-    <Button type="button" variant="champagne" className={className ?? "mt-6 h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto"} onClick={() => { setFormat("story"); setOpen(true); }}><Smartphone className="size-4 shrink-0" />{label ?? t.cta}</Button>
+    <Button type="button" variant={iconOnly ? "ghost" : "champagne"} size={iconOnly ? "icon" : "default"} title={label ?? t.cta} aria-label={label ?? t.cta} className={className ?? "mt-6 h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto"} onClick={() => { setFormat("story"); setIncludeName(false); setOpen(true); }}><Share2 className="size-4 shrink-0" />{!iconOnly && (label ?? t.cta)}</Button>
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="share-card-modal max-h-[92dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 p-5 sm:max-w-4xl sm:p-7">
          <DialogHeader className="pr-6 text-left"><DialogDescription className="text-xs text-primary">AGOLMEN'S COMPASS · {t.description}</DialogDescription><DialogTitle className="font-serif text-xl leading-relaxed sm:text-2xl">{t.title}</DialogTitle></DialogHeader>
         <div className="grid min-w-0 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
           <div className="min-w-0">
-            <div role="radiogroup" aria-label={t.description} className="mb-3 grid grid-cols-2 gap-2">{(["story", "x"] as const).map(f => <Button key={f} type="button" role="radio" aria-checked={format === f} variant={format === f ? "default" : "outline"} size="sm" onClick={() => setFormat(f)}><Image className="size-4" />{t[f]}</Button>)}</div>
+            {data?.kind !== "consultation" && <div role="radiogroup" aria-label={t.description} className="mb-3 grid grid-cols-2 gap-2">{(["story", "x"] as const).map(f => <Button key={f} type="button" role="radio" aria-checked={format === f} variant={format === f ? "default" : "outline"} size="sm" onClick={() => setFormat(f)}><Image className="size-4" />{t[f]}</Button>)}</div>}
             <div className={`relative mx-auto flex w-full items-center justify-center overflow-hidden border border-primary/25 bg-background ${format === "story" ? "aspect-[9/16] max-w-[330px]" : "aspect-video"}`}>
               {url && <img src={url} alt={t.description} className="h-full w-full object-contain" />}
               {!url && ((rendering || loading) ? <AgolmenLoading compact label={status || t.loading} /> : <div role="status" className="px-5 text-center text-sm text-muted-foreground">{status || t.loading}</div>)}
@@ -89,7 +89,7 @@ export default function ShareCardButton({ data, language, className, loading = f
             <p className="mt-2 text-center text-xs text-muted-foreground">{format === "story" ? "1080 × 1920" : "1200 × 675"} · PNG</p>
           </div>
           <div className="flex min-w-0 flex-col gap-5 md:pt-1">
-            <div className="border-b border-primary/20 pb-5"><label htmlFor="share-card-name" className="flex items-center justify-between gap-3 text-sm text-foreground">{t.name}<Switch id="share-card-name" checked={includeName} onCheckedChange={setIncludeName} /></label><p className="mt-2 text-xs leading-6 text-muted-foreground">{t.privacy}</p></div>
+            <div className="border-b border-primary/20 pb-5">{data?.kind !== "consultation" && <label htmlFor="share-card-name" className="flex items-center justify-between gap-3 text-sm text-foreground">{t.name}<Switch id="share-card-name" checked={includeName} onCheckedChange={setIncludeName} /></label>}<p className="mt-2 text-xs leading-6 text-muted-foreground">{t.privacy}</p></div>
             <div className="grid gap-2"><Button disabled={!ready} onClick={save} className="min-h-12"><Download className="size-4" />{t.save}</Button><Button variant="outline" disabled={!ready || sharing} onClick={() => void share()} className="min-h-12"><Share2 className="size-4" />{t.share}</Button></div>
             <div className="grid grid-cols-3 gap-2"><Button variant="outline" disabled={!ready || sharing} onClick={() => void share()} className="min-h-11"><Smartphone className="size-4" />Instagram</Button><Button variant="outline" disabled={!ready || sharing} onClick={() => void share()} className="min-h-11"><Smartphone className="size-4" />TikTok</Button><Button variant="outline" disabled={!ready} onClick={post} className="min-h-11"><Send className="size-4" />X</Button></div>
             <p className="text-xs leading-6 text-muted-foreground">{t.note}</p>
