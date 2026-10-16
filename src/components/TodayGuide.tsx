@@ -8,6 +8,7 @@ import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
 import { canUseToday, familyRoadmapMin, helioRangeDays, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
 import { dateAt, daysInYear, directionEnergy, localIso, personal, roadmap, type Direction, type Phase } from "@/lib/day-compass";
+import { almanacDay } from "@/lib/helio-almanac";
 import { dayElement, relation, type Element, type TeamMember } from "@/lib/team-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
