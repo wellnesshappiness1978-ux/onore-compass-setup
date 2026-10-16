@@ -182,6 +182,10 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     </div>
   );
   const notifyEmoji: Partial<Record<TodayFeature, string>> = { decision: "💡", starPath: "✨", dailyLucky: "🎨", direction: "🧭", helio: "🌍", shopping: "🛍️", health: "🌿", monthlyLucky: "🌸", directionExtended: "🧭", relations: "🤝", biorhythm365: "📈", familyRoadmap: "👨‍👩‍👧" };
+  const extBody = <div className="space-y-1 text-sm">
+        <p>{ja ? "生まれ持った吉方位タイプ" : "Birth direction type"}：{gua ? `${gua.group === "east" ? (ja ? "東四命" : "East group") : (ja ? "西四命" : "West group")} · ${L(dirNames[gua.shengQi])}` : (ja ? "性別（男性／女性）の登録で表示されます" : "Shown when gender is set to male or female")}</p>
+        <p>{ja ? `${stars.year}年の大開運方位` : `${stars.year} favorable direction`}：<strong className="text-primary">{yearDir ? L(dirNames[yearDir]) : "—"}</strong></p>
+      </div>;
   const content: Record<TodayFeature, { body: ReactNode; notify: string }> = {
     decision: {
       notify: rhythm.total >= 55 ? (ja ? "今日は準備した一歩を小さく試す日" : "Test one prepared step today") : (ja ? "今日は確認と余白を整える日" : "Verify and leave space today"),
@@ -239,16 +243,13 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         </div>
         <div className="mt-3 border-t border-primary/20 pt-3">
           <h4 className="mb-1 font-serif text-sm text-primary">{L(titles.directionExtended)}</h4>
-          {canUseToday(plan, "directionExtended") ? content_ext() : <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"><span>{names.vip}+</span><Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "See plans"}</Button></div>}
+          {canUseToday(plan, "directionExtended") ? extBody : <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"><span>{names.vip}+</span><Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "See plans"}</Button></div>}
         </div>
       </>,
     },
     directionExtended: {
       notify: `${ja ? `${stars.year}年の大開運方位` : `${stars.year} direction`}: ${yearDir ? L(dirNames[yearDir]) : "—"}`,
-      body: <div className="space-y-1 text-sm">
-        <p>{ja ? "生まれ持った吉方位タイプ" : "Birth direction type"}：{gua ? `${gua.group === "east" ? (ja ? "東四命" : "East group") : (ja ? "西四命" : "West group")} · ${L(dirNames[gua.shengQi])}` : (ja ? "性別（男性／女性）の登録で表示されます" : "Shown when gender is set to male or female")}</p>
-        <p>{ja ? `${stars.year}年の大開運方位` : `${stars.year} favorable direction`}：<strong className="text-primary">{yearDir ? L(dirNames[yearDir]) : "—"}</strong></p>
-      </div>,
+      body: extBody,
     },
     shopping: { notify: L(shop[el]), body: <p className="text-sm leading-6">{L(shop[el])}</p> },
     health: { notify: L(health[el]), body: <><p className="text-sm leading-6">{L(health[el])}</p><p className="mt-2 text-[11px] text-muted-foreground">{ja ? "生活習慣の参考です。体調が気になる時は専門家にご相談くださいね。" : "Lifestyle reference only; consult a professional for health concerns."}</p></> },
