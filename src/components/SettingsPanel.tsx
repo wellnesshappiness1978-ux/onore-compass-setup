@@ -24,7 +24,7 @@ import { settingsTranslations, type SettingsTranslation, type PricingTier } from
 import DebugPlanSwitcher from "@/components/DebugPlanSwitcher";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
-import { isUpgradePlan, memberLimit, planOrder } from "@/lib/plans";
+import { memberLimit, planOrder } from "@/lib/plans";
 import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
@@ -76,7 +76,6 @@ export default function SettingsPanel({
   const appearanceCopy = appearanceUiCopy[language];
   const profileUi = profileUiCopy[language];
   const [yearly, setYearly] = useState(false);
-  const [cardPlan, setCardPlan] = useState<PaidPlanId>("vip");
   const [upgradePlan, setUpgradePlan] = useState<string | null>(null);
   const [notifyTiming, setNotifyTiming] = useState(true);
   const [notifyBio, setNotifyBio] = useState(false);
@@ -147,9 +146,6 @@ export default function SettingsPanel({
     es: { badge: "La suscripción a los planes llegará pronto (solo vista previa)", toast: "Modo demo de vista previa. No se realiza ningún pago ni contrato." },
     fr: { badge: "L’inscription aux forfaits arrive bientôt (aperçu uniquement)", toast: "Mode démo d’aperçu. Aucun paiement ni contrat n’est effectué." },
   };
-  const upgradeCards = pc.cards.filter(c => isUpgradePlan(plan, c.id));
-  const selectedCard = upgradeCards.find(c => c.id === cardPlan) ?? upgradeCards[0];
-  const selectedTier = allTiers.find(tr => tr.id === selectedCard?.id);
   const planLabel = appearanceCopy.plans[plan];
   const birth = [
     profile.birthDate || "—",
@@ -245,7 +241,7 @@ export default function SettingsPanel({
         </div>
       </section>
 
-      {<section id="membership-plans" className={card}>
+      <section id="membership-plans" className={card}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             <h3 className="font-serif text-xl text-gradient-gold">{pc.sectionTitle}</h3>
@@ -344,7 +340,7 @@ export default function SettingsPanel({
         </div>
 
         {!devOverrideEnabled && <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>}
-      </section>}
+      </section>
 
       <section className={card}>
         <h3 className="mb-3 font-serif text-lg text-primary">{t.account}</h3>
