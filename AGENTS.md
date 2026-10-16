@@ -36,3 +36,4 @@
 
 - Personal readings share one versioned home-reading query: six essence angles, existing method dialogs, server-statused approaches filtered to available nonempty tap-to-open cards, a catchphrase and one closing axis summary; name grids remain in the name dialog. Why: prevent duplicate AI calls, fabricated charts and repeated prose.
 
+- The traits page runs a small separate catchphrase+essence AI call ahead of the full home-reading query. Why: show the top of the page first while the long reading generates.
