@@ -133,7 +133,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-six-v15", profile, language],
+    queryKey: ["home-reading-six-v16", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,

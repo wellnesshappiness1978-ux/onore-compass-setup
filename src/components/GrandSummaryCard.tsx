@@ -28,7 +28,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
   const [selected, setSelected] = useState<ApproachKey | null>(null);
   const generate = useServerFn(generateHomeReading);
   const { data, isPending, isError } = useQuery({
-    queryKey: ["home-reading-six-v15", profile, language],
+    queryKey: ["home-reading-six-v16", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,
