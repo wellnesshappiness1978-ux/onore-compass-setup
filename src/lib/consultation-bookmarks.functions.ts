@@ -26,17 +26,15 @@ export const saveConsultationBookmark = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase
-      .from("consultation_bookmarks")
-      .upsert(
-        {
-          user_id: context.userId,
-          message_id: data.messageId,
-          content: data.content,
-          language: data.language,
-        },
-        { onConflict: "user_id,message_id", ignoreDuplicates: true },
-      );
+    const { error } = await context.supabase.from("consultation_bookmarks").upsert(
+      {
+        user_id: context.userId,
+        message_id: data.messageId,
+        content: data.content,
+        language: data.language,
+      },
+      { onConflict: "user_id,message_id", ignoreDuplicates: true },
+    );
     if (error) throw error;
     return { ok: true };
   });
