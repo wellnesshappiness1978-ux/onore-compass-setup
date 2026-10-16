@@ -52,5 +52,5 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
     return true;
   }, [unlimited, serverCounted, feature, refresh, used, limit, plan]);
 
-  return { used, limit, unlimited, remaining: unlimited ? Infinity : Math.max(0, limit - used), consume };
+  return { used, limit, unlimited, remaining: unlimited ? Infinity : Math.max(0, limit - used), consume, refresh };
 }
