@@ -445,30 +445,52 @@ function TorisetsuPanel({
           </section>
            {remaining <= 0 && !analyzed && <div role="status" className="mt-3 text-center"><p className="text-sm text-primary">{q.refresh}</p>{plan !== "b2b-premium" && <Button type="button" variant="champagne" onClick={onVip} className="mt-3 text-xs">{q.limit} →</Button>}</div>}
           {analyzed && result ? (
-            <section className="py-8 text-center" aria-live="polite">
+            <section className="py-8" aria-live="polite">
               {partnerName ? (
-                <p className="mb-4 text-sm text-muted-foreground">{partnerName}</p>
+                <p className="mb-4 text-center text-sm text-muted-foreground">{partnerName}</p>
               ) : null}
-              <div
-                className="compatibility-meter relative mx-auto flex size-44 items-center justify-center rounded-full p-2 shadow-champagne"
-                style={{ "--compatibility-score": `${score * 3.6}deg` } as CSSProperties}
-              >
-                <div className="flex size-full flex-col items-center justify-center rounded-full border border-primary/15 bg-background">
-                  <span className="text-xs text-muted-foreground">{t.score}</span>
-                  <strong className="mt-1 font-serif text-4xl text-gradient-gold">{score}%</strong>
+              <article className="rounded-lg border border-primary/25 bg-card/50 p-5 text-center sm:p-7">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">01 / 04 · {q.blocks[0]}</p>
+                <div
+                  className="compatibility-meter relative mx-auto mt-4 flex size-44 items-center justify-center rounded-full p-2 shadow-champagne"
+                  style={{ "--compatibility-score": `${score * 3.6}deg` } as CSSProperties}
+                >
+                  <div className="flex size-full flex-col items-center justify-center rounded-full border border-primary/15 bg-background">
+                    <span className="text-xs text-muted-foreground">{t.score}</span>
+                    <strong className="mt-1 font-serif text-4xl text-gradient-gold">{score}%</strong>
+                  </div>
                 </div>
-              </div>
-              <div className="mx-auto mt-6 max-w-lg rounded-lg border border-primary/20 bg-primary/5 px-5 py-4 text-left">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">
-                  {t.coreLabel}
-                </p>
-                <p className="mt-2 text-sm leading-7 text-foreground">
+                <p className="mx-auto mt-5 max-w-lg text-sm leading-7 text-foreground">
                   {t.coreDynamics[relation ?? 0]}
                 </p>
-              </div>
-                <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-5"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
+                <div className="mt-4 flex justify-center gap-3">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs text-muted-foreground"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>
+              </article>
+              <article className="mt-4 rounded-lg border border-primary/25 bg-card/50 p-5 text-left sm:p-7">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">02 / 04 · {q.blocks[1]}</p>
+                <h4 className="mt-2 font-serif text-lg text-primary">{result.titles[0]}</h4>
+                <p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[0]}</p>
+                <h4 className="mt-5 font-serif text-lg text-primary">{result.titles[1]}</h4>
+                <p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[1]}</p>
+              </article>
+              <article className="mt-4 rounded-lg border border-primary/25 bg-card/50 p-5 text-left sm:p-7">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">03 / 04 · {q.blocks[2]}</p>
+                <h4 className="mt-2 font-serif text-lg text-primary">{result.titles[2]}</h4>
+                <p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[2]}</p>
+              </article>
+              <article className="mt-4 rounded-lg border border-primary/25 bg-card/50 p-5 text-left sm:p-7">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">04 / 04 · {q.blocks[3]}</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {([[q.rhythmYou, rhythmYou], [q.rhythmPartner, rhythmPartner]] as const).map(([label, value]) => (
+                    <div key={label} className="rounded-md border border-primary/20 bg-background/50 p-3">
+                      <p className="flex items-center justify-between text-sm"><span className="text-muted-foreground">{label}</span><strong className="font-serif text-xl text-gradient-gold">{value ?? "—"}</strong></p>
+                      <span className="mt-2 block h-1.5 rounded-full bg-primary/10"><span className="block h-full rounded-full bg-primary" style={{ width: `${value ?? 0}%` }} /></span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-sm leading-7 text-foreground">{q.weekAction}</p>
+              </article>
                <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
-              <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
+              <ShareCardButton className="mt-6" language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: language === "ja" ? "アゴルメン相性診断" : "Agolmen compatibility", title: q.title, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""], palette: result.colors.filter((c): c is string => Boolean(c)).map((code, i) => ({ label: i === 0 ? q.rhythmYou : q.rhythmPartner, code })), caution: result.note }} />
             </section>
           ) : null}
           {plan === "free" && <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
