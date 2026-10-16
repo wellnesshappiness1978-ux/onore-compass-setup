@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { ArrowUpRight, Crown, Radio } from "lucide-react";
+import { ArrowUpRight, Bookmark, BookmarkCheck, Crown, Radio, Trash2 } from "lucide-react";
 
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
-import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
+import { Message, MessageAction, MessageActions, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
   PromptInput,
   PromptInputFooter,
@@ -19,7 +19,7 @@ import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
 import type { Plan } from "@/lib/design-modes";
-import { consultationDailyLimit, nextPlan, planOrder } from "@/lib/plans";
+import { nextPlan, planOrder } from "@/lib/plans";
 import { useDailyUsage, msUntilMidnight } from "@/hooks/use-daily-usage";
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
@@ -30,6 +30,11 @@ import { listTeamMembers } from "@/lib/team-members.functions";
 import { readPreviewMembers } from "@/lib/consultation-targets";
 import { useServerFn } from "@tanstack/react-start";
 import type { TeamMember } from "@/lib/team-analysis";
+import { supabase } from "@/integrations/supabase/client";
+import { listConsultationBookmarks, saveConsultationBookmark, deleteConsultationBookmark } from "@/lib/consultation-bookmarks.functions";
+import { consultationCard } from "@/lib/consultation-card";
+import ShareCardButton from "./ShareCardButton";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type Props = { profile: UserProfile; language: Language; plan: Plan; actualPlan: Plan; signedIn: boolean; onVip: () => void };
 
@@ -44,7 +49,23 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
     let active = true;
     if (signedIn && plan === actualPlan) listMembers().then(rows => { if (active) setMembers(rows); }).catch(() => { if (active) setMembers([]); });
     else setMembers(readPreviewMembers());
-    return () => { active = false; };
+    const toggleFavorite = async (messageId: string, content: string) => {
+    if (!signedIn) { setNotice(t.bookmarkSignIn); return; }
+    if (savingId) return;
+    setSavingId(messageId);
+    try {
+      if (favorites.some(f => f.message_id === messageId)) {
+        await deleteFavorite({ data: { messageId } });
+        setFavorites(rows => rows.filter(row => row.message_id !== messageId));
+      } else {
+        await saveFavorite({ data: { messageId, content, language } });
+        setFavorites(await listFavorites());
+      }
+    } catch { setNotice(t.bookmarkError); }
+    finally { setSavingId(null); }
+  };
+
+  return () => { active = false; };
   }, [signedIn, plan, actualPlan, listMembers]);
   useEffect(() => { if (targetId !== "owner" && !members.some(m => m.id === targetId)) setTargetId("owner"); }, [members, targetId]);
   const target = members.find(m => m.id === targetId);
@@ -52,31 +73,51 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
   const targetLabel = target?.name ?? (language === "ja" ? "本人（登録オーナー）" : language === "zh-TW" ? "本人（帳戶擁有人）" : "You (owner)");
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
-  const isJa = language === "ja";
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const usage = useDailyUsage("consultation", plan, signedIn && plan === actualPlan);
+  const usagePlan = signedIn ? actualPlan : plan;
+  const usage = useDailyUsage("consultation", usagePlan, signedIn);
   const { limit, unlimited, remaining } = usage;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
     return () => window.clearInterval(id);
   }, []);
-  const upgradeTo = nextPlan(plan);
+  const upgradeTo = planOrder.indexOf(usagePlan) < planOrder.indexOf("vip") ? "vip" : nextPlan(usagePlan);
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [favoritesOpen, setFavoritesOpen] = useState(false);
+  const [favorites, setFavorites] = useState<Awaited<ReturnType<typeof listConsultationBookmarks>>>([]);
+  const [savingId, setSavingId] = useState<string | null>(null);
+  const listFavorites = useServerFn(listConsultationBookmarks);
+  const saveFavorite = useServerFn(saveConsultationBookmark);
+  const deleteFavorite = useServerFn(deleteConsultationBookmark);
+  useEffect(() => {
+    let active = true;
+    setFavorites([]);
+    if (signedIn) void listFavorites().then(rows => { if (active) setFavorites(rows); }).catch(() => { if (active) setNotice(t.bookmarkError); });
+    return () => { active = false; };
+  }, [signedIn, listFavorites, t.bookmarkError]);
   const [notice, setNotice] = useState<string | null>(null);
   const initialMessages = useMemo<UIMessage[]>(
     () => [{ id: "welcome", role: "assistant", parts: [{ type: "text", text: t.greeting }] }],
     [t.greeting],
   );
   const transport = useMemo(
-    () => new DefaultChatTransport({ api: "/api/consultation", body: { profile: targetProfile, ownerProfile: target ? profile : undefined, targetLabel, language } }),
+    () => new DefaultChatTransport({ api: "/api/consultation", headers: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {};
+    }, body: () => ({ profile: targetProfile, ownerProfile: target ? profile : undefined, targetLabel, language, day: new Date().toLocaleDateString("en-CA") }) }),
     [targetProfile, profile, targetLabel, language],
   );
   const { messages, sendMessage, status, stop, error, clearError, setMessages } = useChat({
     id: `onore-consult-${targetId}-${language}`,
     messages: initialMessages,
     transport,
-    onError: () => setNotice(t.error),
-    onFinish: () => textareaRef.current?.focus({ preventScroll: true }),
+    onError: (failure) => {
+      let message = failure.message;
+      try { const detail = JSON.parse(message); message = detail.message ?? message; if (detail.code === "daily_limit") setLimitOpen(true); } catch { /* Already human-readable. */ }
+      setNotice(message || t.error); void usage.refresh();
+    },
+    onFinish: () => { void usage.refresh(); textareaRef.current?.focus({ preventScroll: true }); },
   });
   useEffect(() => { setMessages(initialMessages); clearError(); }, [targetId, language, setMessages, clearError, initialMessages]);
   const busy = status === "submitted" || status === "streaming";
@@ -84,22 +125,23 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
 
   const submit = async (text: string) => {
     const prompt = text.trim();
+    if (busy) return;
     if (!prompt) {
       setNotice(t.empty);
       textareaRef.current?.focus({ preventScroll: true });
       return;
     }
     if (remaining <= 0) {
-      setNotice(t.limit);
+      setNotice(t.limit); setLimitOpen(true);
       return;
     }
     setNotice(null);
     clearError();
-    if (!(await usage.consume())) {
-      setNotice(t.limit);
+    if (!signedIn && !(await usage.consume())) {
+      setNotice(t.limit); setLimitOpen(true);
       return;
     }
-    void sendMessage({ text: prompt });
+    await sendMessage({ text: prompt });
     requestAnimationFrame(() => textareaRef.current?.focus({ preventScroll: true }));
   };
 
@@ -136,65 +178,16 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
         </select>
         {target && <p className="mt-2 text-xs text-muted-foreground">{target.birthDate}{target.birthTimeUnknown === false && target.birthTime ? ` · ${target.birthTime}` : ""}{target.birthPlace ? ` · ${target.birthPlace}${target.birthCity ? ` ${target.birthCity}` : ""}` : ""}</p>}
       </div>
-      <div className="mt-6 grid gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
-        <div className="flex items-center gap-3">
-          <Radio className="size-5 shrink-0 text-primary" />
-          <div>
-            <p className="text-sm font-semibold text-foreground">
-              {unlimited
-                ? (isJa ? `${planNames[plan]}：アゴルメン相談室は無制限` : `${planNames[plan]}: unlimited consultations`)
-                : (isJa ? `本日あと ${remaining} 回（${planNames[plan]}・1日 ${limit} 回）` : `${remaining} left today (${planNames[plan]} · ${limit}/day)`)}
-            </p>
-            <p className="mt-0.5 text-[10px] text-muted-foreground">
-              {isJa ? `次回リセットまで ${hms(countdown)} · 表示テスト（課金未実装）` : `Resets in ${hms(countdown)} · display test (no billing)`}
-            </p>
-          </div>
+      <div className="mt-4 flex min-w-0 flex-wrap items-center justify-between gap-3 border-b border-primary/20 pb-4">
+        <div role="status" className="flex min-w-0 items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">
+          <Radio className="size-4 shrink-0" /><span>{unlimited ? t.unlimitedBadge : t.badge(remaining)}</span>
         </div>
-        {upgradeTo && (
-          <Button
-            variant="outline"
-            onClick={onVip}
-            className="min-h-10 whitespace-normal border-primary/30 bg-background/40 px-3 text-xs text-primary hover:bg-primary/10 hover:text-primary"
-          >
-            <Crown className="size-4" />
-            {isJa ? `${planNames[upgradeTo]}で1日${Number.isFinite(consultationDailyLimit[upgradeTo]) ? `${consultationDailyLimit[upgradeTo]}回` : "無制限"}に` : `${planNames[upgradeTo]}: ${Number.isFinite(consultationDailyLimit[upgradeTo]) ? `${consultationDailyLimit[upgradeTo]}/day` : "unlimited"}`}
-          </Button>
-        )}
-      </div>
-      {!unlimited && remaining <= 0 && (
-        <div role="status" className="mt-3 rounded-lg border border-primary/40 bg-card/70 p-4 text-center">
-          <p className="font-serif text-base text-gradient-gold">{isJa ? "本日の相談上限に達しました" : "Today's limit reached"}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{isJa ? "次回更新まで" : "Next refresh in"}</p>
-          <p className="mt-1 font-mono text-2xl text-primary">{hms(countdown)}</p>
-          {upgradeTo && (
-            <Button variant="champagne" onClick={onVip} className="mt-3 text-xs">
-              <Crown className="size-4" />
-              {isJa ? `${planNames[upgradeTo]}プランを見る` : `View ${planNames[upgradeTo]}`}
-            </Button>
-          )}
-        </div>
-      )}
-
-      <div className="mt-6">
-        <p className="mb-3 text-xs font-medium text-primary/80">{t.quickLabel}</p>
-        <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0">
-          {t.quick.map((prompt) => (
-            <Button
-              key={prompt}
-              type="button"
-              variant="outline"
-              disabled={busy || remaining <= 0}
-              onClick={() => void submit(prompt)}
-              className="h-auto min-w-60 snap-start justify-between whitespace-normal rounded-lg border-primary/20 bg-card/55 px-4 py-3 text-left text-xs leading-5 text-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
-            >
-              <span>{prompt}</span>
-              <ArrowUpRight className="size-4 shrink-0 text-primary" />
-            </Button>
-          ))}
-        </div>
+        <Button variant="outline" size="sm" onClick={() => setFavoritesOpen(true)}><Bookmark className="size-4" />{t.bookmarked} · {favorites.length}</Button>
+        {!unlimited && <p className="w-full text-xs text-muted-foreground">{planNames[usagePlan]} · {remaining}/{limit} · {hms(countdown)}</p>}
+        {!unlimited && remaining <= 0 && <Button variant="champagne" onClick={() => setLimitOpen(true)}><Crown className="size-4" />{t.modalTitle}</Button>}
       </div>
 
-      <div className="card-lux mt-5 flex h-[min(58vh,610px)] min-h-[430px] flex-col overflow-hidden rounded-lg">
+      <div className="card-lux mt-5 flex h-[min(76dvh,850px)] min-h-[530px] min-w-0 flex-col overflow-hidden rounded-lg">
         <Conversation className="min-h-0">
           <ConversationContent className="gap-5 px-4 py-6 sm:px-6">
             {messages.map((message) => (
@@ -225,6 +218,12 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
                     ) : null,
                   )}
                 </MessageContent>
+                {message.role === "assistant" && message.id !== "welcome" && status === "ready" && <MessageActions className="ml-auto justify-end">
+                  <MessageAction tooltip={favorites.some(f => f.message_id === message.id) ? t.bookmarked : t.bookmark} disabled={savingId !== null} onClick={() => void toggleFavorite(message.id, message.parts.filter(part => part.type === "text").map(part => part.text).join("\n"))} aria-pressed={favorites.some(f => f.message_id === message.id)}>
+                    {favorites.some(f => f.message_id === message.id) ? <BookmarkCheck className="size-4 text-primary" /> : <Bookmark className="size-4" />}
+                  </MessageAction>
+                  <ShareCardButton iconOnly autoOpen={false} className="size-9 shrink-0 text-primary" label={t.shareCard} language={language} data={consultationCard(message.parts.filter(part => part.type === "text").map(part => part.text).join("\n"), targetProfile, language, plan)} />
+                </MessageActions>}
                 {message.role === "assistant" && message.id !== "welcome" && planOrder.indexOf(plan) >= planOrder.indexOf("vip") && status === "ready" && <ConsultationVoice key={`${message.id}-${language}`} text={message.parts.filter(part => part.type === "text").map(part => part.text).join(" ")} language={language} />}
               </Message>
             ))}
@@ -245,9 +244,12 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
           <ConversationScrollButton className="border-primary/30 bg-card text-primary hover:bg-primary/10" />
         </Conversation>
 
-        <div className="border-t border-primary/15 bg-background/70 p-3 backdrop-blur-xl sm:p-4">
+        <div className="min-w-0 border-t border-primary/15 bg-background/70 p-3 backdrop-blur-xl sm:p-4">
+          <div aria-label={t.quickLabel} className="mb-3 flex snap-x gap-2 overflow-x-auto pb-2 [scrollbar-width:thin]">
+            {t.quickTopics.map((prompt, index) => <Button key={prompt} type="button" variant="outline" disabled={busy} onClick={() => void submit(index === 1 && target ? `${prompt} · ${target.name}` : prompt)} className="h-auto min-h-11 w-60 shrink-0 snap-start justify-between whitespace-normal border-primary/30 px-3 py-2 text-left text-xs leading-5"><span>{prompt}</span><ArrowUpRight className="size-4 shrink-0" /></Button>)}
+          </div>
           <PromptInput
-            onSubmit={({ text }) => void submit(text)}
+            onSubmit={({ text }) => submit(text)}
             className="rounded-lg border-primary/30 bg-card/80 shadow-champagne"
           >
             <PromptInputTextarea
@@ -256,20 +258,37 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
               disabled={remaining <= 0}
               className="min-h-20 text-sm text-foreground placeholder:text-muted-foreground"
             />
-            <PromptInputFooter className="justify-between px-3 pb-2">
-              <span className="text-[10px] text-muted-foreground">{t.disclaimer}</span>
+            <PromptInputFooter className="items-end justify-between gap-3 px-3 pb-2">
+              <span className="min-w-0 text-[10px] leading-4 text-muted-foreground">{t.disclaimer}</span>
               <PromptInputSubmit
                 status={status}
                 onStop={stop}
                 disabled={!busy && remaining <= 0}
                 aria-label={t.send}
-                className="size-9 rounded-full bg-champagne-gradient text-primary-foreground shadow-champagne hover:brightness-110"
+                className="size-9 shrink-0 rounded-full bg-champagne-gradient text-primary-foreground shadow-champagne hover:brightness-110"
               />
             </PromptInputFooter>
           </PromptInput>
         </div>
       </div>
       <p className="mt-3 text-center text-[10px] leading-5 text-muted-foreground">{t.disclaimer}</p>
+      <Dialog open={limitOpen} onOpenChange={setLimitOpen}>
+        <DialogContent className="max-w-md border-primary/40">
+          <DialogHeader><Crown className="mb-2 size-8 text-primary" /><DialogTitle className="font-serif leading-7">{t.modalTitle}</DialogTitle><DialogDescription className="leading-6">{planOrder.indexOf(usagePlan) < planOrder.indexOf("vip") ? t.modalBody : t.limit}</DialogDescription></DialogHeader>
+          <p className="text-center font-mono text-2xl text-primary">{hms(countdown)}</p>
+          {upgradeTo && <Button variant="champagne" onClick={() => { setLimitOpen(false); onVip(); }}><Crown className="size-4" />{planOrder.indexOf(usagePlan) < planOrder.indexOf("vip") ? t.modalCta : planNames[upgradeTo]}</Button>}
+          <Button variant="outline" onClick={() => setLimitOpen(false)}>{t.modalClose}</Button><p className="text-xs leading-5 text-muted-foreground">{t.modalNote}</p>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={favoritesOpen} onOpenChange={setFavoritesOpen}>
+        <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader><DialogTitle>{t.bookmarked} · {favorites.length}</DialogTitle><DialogDescription>{signedIn ? t.disclaimer : t.bookmarkSignIn}</DialogDescription></DialogHeader>
+          {favorites.map(favorite => <div key={favorite.message_id} className="min-w-0 border-b border-primary/20 pb-4">
+            <MessageResponse className="text-sm leading-7">{favorite.content}</MessageResponse>
+            <div className="mt-2 flex justify-end"><Button variant="ghost" size="icon" title={t.bookmarked} aria-label={t.bookmarked} disabled={savingId !== null} onClick={() => void toggleFavorite(favorite.message_id, favorite.content)}><Trash2 className="size-4" /></Button></div>
+          </div>)}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
