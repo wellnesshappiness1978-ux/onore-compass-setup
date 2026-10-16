@@ -58,7 +58,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
     kicker: "", title: "", names: [] as string[],
     lines: [data.catchphrase, data.keySummary || (text ?? "").slice(0, 120)].filter(Boolean),
     caution: data.caution,
-    keywords: available.slice(0, 6).map(k => traits.methods[approachKeys.indexOf(k)]),
+    keywords: available.slice(0, 6).map(k => traits.methods[approachKeys.indexOf(k)] ?? ""),
     palette: colors.slice(0, 6).map(c => ({ label: localizeBirthColorName(c.name, language), code: c.code })),
     score: 0, kind: "identity" as const,
   } : null;
