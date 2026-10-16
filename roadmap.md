@@ -553,3 +553,10 @@
 - [x] Verify a real generated reading using the requesting user's signed-in saved profile: all six headings, fifteen perspectives, five unavailable labels and a 158-character closing message with a tomorrow step. Desktop/390px screenshots confirm readable wrapping and no horizontal overflow or page errors. All 32 focused localization/voice/appearance/astronomy/Earth/export/mandala regression tests pass; latest build OK. Appearance synchronization scope, astronomy and 2048 export code are unchanged; no new separate-device synchronization or full fifteen-method calculation engine is claimed.
 
 - [x] Today: ten ordered plan-gated cards, per-card daily notifications, white-theme legibility, feng shui method
+
+
+## AI consultation enhancement
+- [x] Shared available-only birth references, ten-body sky and illustrative daily rhythms/directions, four localized response sections. Unavailable charts stay omitted.
+- [x] Four horizontal composer questions, authenticated private bookmarks and summary-only local 1080×1920 sharing.
+- [x] Atomic signed-in daily-usage consumption, actual-membership badge and informational upgrade dialog; preserve 1/3/10/30/unlimited caps.
+- [ ] Verify daily-cap rejection, limit-dialog guidance and final card/mobile screenshots; 13 focused tests and real signed-in response, bookmark reload, PNG download already pass.
