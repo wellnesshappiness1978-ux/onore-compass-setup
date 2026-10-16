@@ -99,22 +99,26 @@ export default function ConsultationPanel({
     if (targetId !== "owner" && !members.some((m) => m.id === targetId)) setTargetId("owner");
   }, [members, targetId]);
   const target = members.find((m) => m.id === targetId);
-  const targetProfile = useMemo(() => target
-    ? {
-        ...profile,
-        nameKanji: target.name,
-        nameKana: target.nameKana ?? "",
-        nameRomaji: "",
-        birthDate: target.birthDate,
-        birthTime: target.birthTime ?? "",
-        birthTimeUnknown: target.birthTimeUnknown ?? true,
-        birthPlace: target.birthPlace ?? "",
-        birthCity: target.birthCity ?? "",
-        bloodType: target.bloodType,
-        siblingOrder: target.siblingOrder ?? "",
-        gender: target.gender ?? "undisclosed",
-      }
-    : profile, [target, profile]);
+  const targetProfile = useMemo(
+    () =>
+      target
+        ? {
+            ...profile,
+            nameKanji: target.name,
+            nameKana: target.nameKana ?? "",
+            nameRomaji: "",
+            birthDate: target.birthDate,
+            birthTime: target.birthTime ?? "",
+            birthTimeUnknown: target.birthTimeUnknown ?? true,
+            birthPlace: target.birthPlace ?? "",
+            birthCity: target.birthCity ?? "",
+            bloodType: target.bloodType,
+            siblingOrder: target.siblingOrder ?? "",
+            gender: target.gender ?? "undisclosed",
+          }
+        : profile,
+    [target, profile],
+  );
   const targetLabel = target?.name ?? consultationTranslations[language].ownerLabel;
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
