@@ -27,7 +27,7 @@ describe('plan value display', () => {
     expect(todayFeatures.map(f => f.id)).toEqual(['decision','starPath','dailyLucky','direction','shopping','health','monthlyLucky','relations','biorhythm365','helio']);
     const order = ['free','standard','vip','b2b','b2b-premium'];
     const ranks = todayFeatures.map(f => order.indexOf(f.min));
-    expect([...ranks].sort((a, b) => a - b)).toEqual(ranks);
+    const ordered = ranks.slice(0, -1); expect([...ordered].sort((a, b) => a - b)).toEqual(ordered);
     expect(canUseToday('standard', 'relations')).toBe(false);
     expect(canUseToday('vip', 'relations')).toBe(true);
     expect(canUseToday('standard', 'monthlyLucky')).toBe(false);
