@@ -522,6 +522,16 @@ function TorisetsuPanel({
             </div>
           </section>}
           <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
+          <Dialog open={limitOpen} onOpenChange={setLimitOpen}>
+            <DialogContent className="max-w-md border-primary/40">
+              <DialogTitle className="font-serif leading-7 text-gradient-gold">{q.modalTitle}</DialogTitle>
+              <DialogDescription className="leading-6">{q.modalBody} {q.refresh}</DialogDescription>
+              <div className="mt-4 grid gap-2">
+                <Button variant="champagne" onClick={() => { setLimitOpen(false); onVip(); }} className="min-h-11"><Crown className="size-4" />{q.modalCta}</Button>
+                <Button variant="outline" onClick={() => setLimitOpen(false)} className="min-h-11">{q.modalClose}</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       )}
     </div>
@@ -726,7 +736,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </>
             ) : tab === "consult" ? (
               <>
-                <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+                <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} signedIn={signedIn} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
                 <ConsultationPanel
                   profile={profile}
                   language={language}
