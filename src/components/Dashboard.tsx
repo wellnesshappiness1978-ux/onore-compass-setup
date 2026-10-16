@@ -5,7 +5,7 @@ import ShareCardButton from "./ShareCardButton";
 import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
 import { NautilusIcon } from './NautilusIcon';
 import { AppearanceMotif } from './AppearanceMotif';
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type TouchEvent as ReactTouchEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -640,12 +640,12 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   };
   const swipeOrder: Tab[] = ["home", "traits", "today", "consult", "art", "business", "settings"];
   const swipeStart = useRef<{ x: number; y: number; t: number } | null>(null);
-  const onSwipeStart = (e: React.TouchEvent) => {
+  const onSwipeStart = (e: ReactTouchEvent) => {
     const target = e.target as HTMLElement;
     if (window.innerWidth >= 768 || target.closest("input,textarea,select,canvas,[data-no-swipe],.overflow-x-auto,[role=dialog]")) { swipeStart.current = null; return; }
     const p = e.touches[0]; if (p) swipeStart.current = { x: p.clientX, y: p.clientY, t: Date.now() };
   };
-  const onSwipeEnd = (e: React.TouchEvent) => {
+  const onSwipeEnd = (e: ReactTouchEvent) => {
     const s = swipeStart.current; swipeStart.current = null; const p = e.changedTouches[0];
     if (!s || !p) return;
     const dx = p.clientX - s.x, dy = p.clientY - s.y;
