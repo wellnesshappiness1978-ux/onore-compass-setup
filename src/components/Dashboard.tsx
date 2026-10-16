@@ -26,6 +26,7 @@ import {
   Settings2,
   Sparkles,
   UserRound,
+  UsersRound,
   WandSparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -433,9 +434,9 @@ function TorisetsuPanel({
               <Button
                 type="button"
                 variant="champagne"
-                disabled={!canAnalyze || remaining <= 0}
-                onClick={async () => { if (!canAnalyze || remaining <= 0) return; const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language, { relationship: relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern }); if (!analysis) return; if (!(await usage.consume())) return; setResult(analysis); setAnalyzed(true); }}
-                className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
+                disabled={!canAnalyze}
+                onClick={async () => { if (!canAnalyze) return; if (remaining <= 0) { setLimitOpen(true); return; } const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language, { relationship: relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern }); if (!analysis) return; if (!(await usage.consume())) { setLimitOpen(true); return; } setResult(analysis); setAnalyzed(true); }}
+                 className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
               >
                 <Sparkles className="size-4 shrink-0" aria-hidden="true" />
                  {remaining <= 0 ? q.limit : q.action}
