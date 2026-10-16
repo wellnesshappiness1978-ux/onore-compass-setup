@@ -31,16 +31,19 @@ export type ConsultationTranslation = {
   modalCta: string;
   modalClose: string;
   modalNote: string;
+  ownerLabel: string;
+  targetLabel: string;
 };
 
 export const consultationTranslations: Record<Language, ConsultationTranslation> = {
   ja: {
+    ownerLabel: "本人（登録オーナー）", targetLabel: "相談する人の個人データ",
     title: "アゴルメン相談室",
     subtitle: "決断の輪郭を、静かに照らす",
     active: "稼働中",
     engine: "多層統合占術×動物占い クロス解析AI",
     remaining: (count) => `本日あと ${count} 回 無料で相談可能`,
-    vip: "無制限でAI相談を利用する（VIP特典）",
+    vip: "1日10回のAI相談を利用する（VIP特典）",
     quickLabel: "クイック質問",
     quick: [
       "今月の勝負時期は？",
@@ -54,7 +57,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     send: "相談を送る",
     thinking: "方角を読み解いています…",
     empty: "相談内容を入力してください",
-    limit: "本日の無料相談回数を使い切りました。",
+    limit: "本日のAI相談回数を使い切りました。",
     disclaimer: "AIによる内省サポートです。占術の実計算・未来の保証・専門家の助言ではありません。",
     error: "相談を受け取れませんでした。表示された内容を確認して、もう一度お試しください。",
     quickTopics: ["🎯 今日の決断・勝負時のアドバイス", "🤝 特定の相手（チーム/家族）との円滑な接し方", "🧭 本日の吉方位とおすすめ開運アクション", "🧘 今日のエネルギーを整えるリセット法"],
@@ -62,12 +65,13 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     modalTitle: "本日のAI相談枠を使い切りました", modalBody: "VIPなら1日10回まで、気になることを続けて相談できます。今日の回数は日付が変わると戻ります。", modalCta: "VIPプランを見る", modalClose: "明日また相談する", modalNote: "現在はプランのご案内のみで、決済は行われません。",
   },
   en: {
+    ownerLabel: "You (owner)", targetLabel: "Person to consult about",
     title: "Agolmen AI Chamber",
     subtitle: "Bring quiet clarity to your next decision",
     active: "Online",
     engine: "multi-layer arts × animal horoscope reflective AI",
     remaining: (count) => `${count} free consultations remaining today`,
-    vip: "Unlimited AI consultations (VIP)",
+    vip: "10 AI consultations per day (VIP)",
     quickLabel: "Quick questions",
     quick: [
       "When is my key window this month?",
@@ -81,7 +85,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     send: "Send consultation",
     thinking: "Reading the direction…",
     empty: "Enter a consultation first.",
-    limit: "You have used today's free consultations.",
+    limit: "You have used today's AI consultations.",
     disclaimer:
       "AI reflection support only—not a calculated reading, prediction, or professional advice.",
     error: "The consultation could not be completed. Review the message shown and try again.",
@@ -90,6 +94,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     modalTitle: "Today's AI consultations are complete", modalBody: "VIP gives you up to 10 consultations a day for follow-up questions. Your count refreshes when the date changes.", modalCta: "View VIP", modalClose: "Consult again tomorrow", modalNote: "This currently shows plan information only; no payment is taken.",
   },
   "zh-CN": {
+    ownerLabel: "本人（账户所有者）", targetLabel: "咨询对象的个人资料",
     title: "AI自我咨询室",
     subtitle: "静静照亮你的下一步决定",
     active: "运行中",
@@ -117,6 +122,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     modalTitle: "今日AI咨询次数已用完", modalBody: "VIP每天最多可咨询10次，方便继续追问。日期变更后次数会恢复。", modalCta: "查看VIP", modalClose: "明天再咨询", modalNote: "目前仅提供方案介绍，不会扣款。",
   },
   "zh-TW": {
+    ownerLabel: "本人（帳戶擁有人）", targetLabel: "諮詢對象的個人資料",
     title: "AI自我諮詢室",
     subtitle: "靜靜照亮你的下一步決定",
     active: "運行中",
@@ -144,6 +150,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     modalTitle: "今日AI諮詢次數已用完", modalBody: "VIP每天最多可諮詢10次，方便繼續追問。日期變更後次數會恢復。", modalCta: "查看VIP", modalClose: "明天再諮詢", modalNote: "目前僅提供方案介紹，不會扣款。",
   },
   ko: {
+    ownerLabel: "본인(계정 소유자)", targetLabel: "상담 대상의 개인 정보",
     title: "아골멘 AI 상담실",
     subtitle: "다음 결정을 차분히 비춰드립니다",
     active: "가동 중",
@@ -171,6 +178,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     modalTitle: "오늘의 AI 상담을 모두 이용했습니다", modalBody: "VIP는 하루 최대 10회까지 이어서 상담할 수 있습니다. 날짜가 바뀌면 횟수가 다시 채워집니다.", modalCta: "VIP 보기", modalClose: "내일 다시 상담하기", modalNote: "현재는 플랜 안내만 제공하며 결제는 진행되지 않습니다.",
   },
   es: {
+    ownerLabel: "Tú (titular)", targetLabel: "Persona sobre la que consultar",
     title: "Sala IA Agolmen",
     subtitle: "Ilumina con calma tu próxima decisión",
     active: "Activa",
@@ -199,6 +207,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     modalTitle: "Has completado las consultas IA de hoy", modalBody: "Con VIP puedes hacer hasta 10 consultas al día y seguir preguntando. El contador se renueva al cambiar la fecha.", modalCta: "Ver VIP", modalClose: "Consultar mañana", modalNote: "Por ahora solo se muestra información del plan; no se realiza ningún pago.",
   },
   fr: {
+    ownerLabel: "Vous (titulaire)", targetLabel: "Personne concernée par la consultation",
     title: "Salon IA Agolmen",
     subtitle: "Éclairer calmement votre prochaine décision",
     active: "Actif",

@@ -49,28 +49,12 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
     let active = true;
     if (signedIn && plan === actualPlan) listMembers().then(rows => { if (active) setMembers(rows); }).catch(() => { if (active) setMembers([]); });
     else setMembers(readPreviewMembers());
-    const toggleFavorite = async (messageId: string, content: string) => {
-    if (!signedIn) { setNotice(t.bookmarkSignIn); return; }
-    if (savingId) return;
-    setSavingId(messageId);
-    try {
-      if (favorites.some(f => f.message_id === messageId)) {
-        await deleteFavorite({ data: { messageId } });
-        setFavorites(rows => rows.filter(row => row.message_id !== messageId));
-      } else {
-        await saveFavorite({ data: { messageId, content, language } });
-        setFavorites(await listFavorites());
-      }
-    } catch { setNotice(t.bookmarkError); }
-    finally { setSavingId(null); }
-  };
-
   return () => { active = false; };
   }, [signedIn, plan, actualPlan, listMembers]);
   useEffect(() => { if (targetId !== "owner" && !members.some(m => m.id === targetId)) setTargetId("owner"); }, [members, targetId]);
   const target = members.find(m => m.id === targetId);
-  const targetProfile = target ? { ...profile, nameKanji: target.name, nameKana: target.nameKana ?? "", nameRomaji: "", birthDate: target.birthDate, birthTime: target.birthTime ?? "", birthTimeUnknown: target.birthTimeUnknown ?? true, birthPlace: target.birthPlace ?? "", birthCity: target.birthCity ?? "", bloodType: target.bloodType, siblingOrder: target.siblingOrder ?? "", gender: target.gender as UserProfile["gender"] } : profile;
-  const targetLabel = target?.name ?? (language === "ja" ? "本人（登録オーナー）" : language === "zh-TW" ? "本人（帳戶擁有人）" : "You (owner)");
+  const targetProfile = target ? { ...profile, nameKanji: target.name, nameKana: target.nameKana ?? "", nameRomaji: "", birthDate: target.birthDate, birthTime: target.birthTime ?? "", birthTimeUnknown: target.birthTimeUnknown ?? true, birthPlace: target.birthPlace ?? "", birthCity: target.birthCity ?? "", bloodType: target.bloodType, siblingOrder: target.siblingOrder ?? "", gender: target.gender ?? "undisclosed" } : profile;
+  const targetLabel = target?.name ?? (consultationTranslations[language].ownerLabel);
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -106,7 +90,7 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
       const { data } = await supabase.auth.getSession();
       return data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {};
     }, body: () => ({ profile: targetProfile, ownerProfile: target ? profile : undefined, targetLabel, language, day: new Date().toLocaleDateString("en-CA") }) }),
-    [targetProfile, profile, targetLabel, language],
+    [targetProfile, profile, targetLabel, language, target],
   );
   const { messages, sendMessage, status, stop, error, clearError, setMessages } = useChat({
     id: `onore-consult-${targetId}-${language}`,
@@ -145,6 +129,22 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
     requestAnimationFrame(() => textareaRef.current?.focus({ preventScroll: true }));
   };
 
+  const toggleFavorite = async (messageId: string, content: string) => {
+    if (!signedIn) { setNotice(t.bookmarkSignIn); return; }
+    if (savingId) return;
+    setSavingId(messageId);
+    try {
+      if (favorites.some(f => f.message_id === messageId)) {
+        await deleteFavorite({ data: { messageId } });
+        setFavorites(rows => rows.filter(row => row.message_id !== messageId));
+      } else {
+        await saveFavorite({ data: { messageId, content, language } });
+        setFavorites(await listFavorites());
+      }
+    } catch { setNotice(t.bookmarkError); }
+    finally { setSavingId(null); }
+  };
+
   return (
     <section className="mx-auto max-w-4xl pb-8" aria-label={t.title}>
       <div className="text-center">
@@ -171,9 +171,9 @@ export default function ConsultationPanel({ profile, language, plan, actualPlan,
       </div>
 
       <div className="mt-6 border-y border-primary/20 py-4">
-        <label htmlFor="consult-target" className="mb-2 block font-serif text-sm text-primary">{language === "ja" ? "相談する人の個人データ" : language === "zh-TW" ? "諮詢對象的個人資料" : "Person to consult about"}</label>
+        <label htmlFor="consult-target" className="mb-2 block font-serif text-sm text-primary">{t.targetLabel}</label>
         <select id="consult-target" className="w-full rounded-md border border-primary/30 bg-card px-3 py-3 text-foreground" value={targetId} onChange={e => { stop(); setTargetId(e.target.value); setNotice(null); }}>
-          <option value="owner">{language === "ja" ? "本人（登録オーナー）" : language === "zh-TW" ? "本人（帳戶擁有人）" : "You (owner)"}</option>
+          <option value="owner">{consultationTranslations[language].ownerLabel}</option>
           {members.map(m => <option key={m.id} value={m.id}>{m.name} · {m.role || m.birthDate}</option>)}
         </select>
         {target && <p className="mt-2 text-xs text-muted-foreground">{target.birthDate}{target.birthTimeUnknown === false && target.birthTime ? ` · ${target.birthTime}` : ""}{target.birthPlace ? ` · ${target.birthPlace}${target.birthCity ? ` ${target.birthCity}` : ""}` : ""}</p>}
