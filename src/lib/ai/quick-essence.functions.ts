@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createOpenAI } from "@ai-sdk/openai";
-import { generateText, Output } from "ai";
+import { streamText, Output } from "ai";
 import { z } from "zod";
 import { getFiveElements } from "./five-elements";
 import { computeCoreLayers, coreLayersPrompt } from "./core-layers";
@@ -31,9 +31,10 @@ export const generateQuickEssence = createServerFn({ method: "POST" })
     const { profile, language } = data;
     const elements = getFiveElements(profile);
     const core = coreLayersPrompt(computeCoreLayers(profile));
-    const provider = createOpenAI({ baseURL: "https://ai.gateway.lovable.dev/v1", apiKey, headers: { "Lovable-API-Key": apiKey } });
-    const { output } = await generateText({
-      model: provider.chat("google/gemini-3-flash-preview"),
+    const provider = createOpenAI({ baseURL: "https://ai.gateway.lovable.dev/v1", apiKey, headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" } });
+    const result = streamText({
+      model: provider.responses("openai/gpt-6-astra"),
+      providerOptions: { openai: { store: false, forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", include: ["reasoning.encrypted_content"] } },
       output: Output.object({ schema: quickSchema }),
       prompt: `Write in ${language}. Return only catchphrase and essence.
 ${supportiveWritingVoice}
@@ -43,5 +44,5 @@ Keep specialist labels out of the prose.
 ${traitReadingPrompt}
 Only catchphrase and essence are requested now; ignore rules for other fields.`,
     });
-    return quickSchema.parse(output);
+    return quickSchema.parse(await result.output);
   });
