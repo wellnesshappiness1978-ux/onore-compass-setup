@@ -2,6 +2,7 @@ import DailyReminderPanel from "./DailyReminderPanel";
 import { ThemeSample } from "./ThemeSample";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { usePlan } from "./PlanProvider";
 import {
   Bell,
   HeartHandshake,
@@ -137,6 +138,7 @@ export default function SettingsPanel({
     if (el && c) el.scrollTo({ left: c.offsetLeft - (el.clientWidth - c.offsetWidth) / 2, behavior: "smooth" });
     setActiveIndex(index);
   };
+  const previewPlan = usePlan();
   const demoCopy: Record<Language, { badge: string; toast: string }> = {
     ja: { badge: "各プランの登録受付は準備中です（表示確認用）", toast: "現在は表示確認用のデモモードです。決済・契約は行われません。" },
     en: { badge: "Plan sign-up is coming soon (preview only)", toast: "This is a preview demo. No payment or contract is made." },
@@ -325,7 +327,7 @@ export default function SettingsPanel({
                   ))}
                 </ul>
                 {item.id !== "free" && <Button
-                  onClick={() => toast(demoCopy[language].toast, { description: name })}
+                  onClick={() => previewPlan.enabled ? previewPlan.selectPlan(item.id as Plan) : toast(demoCopy[language].toast, { description: name })}
                   disabled={isCurrent}
                   size="sm" variant={isVip ? "default" : "outline"}
                   className="mt-4 h-10 w-full whitespace-normal text-xs">
