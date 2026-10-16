@@ -1,3 +1,9 @@
+## Consultation room enhancement
+- [ ] Enrich available birth/daily context and four-part seven-language responses.
+- [ ] Add contextual composer chips, private favorites and portrait PNG sharing.
+- [ ] Enforce signed-in daily usage at the request boundary; improve remaining badge and informational upgrade dialog.
+- [ ] Verify real consultation, favorite reload/removal, PNG download and 320px/desktop layouts.
+
 ## Mobile navigation and bounded daily layout
 - [x] Move Home/Settings to a fixed phone header, retain five localized bottom tabs and desktop access.
 - [x] Compact mobile spacing and prose; constrain daily grid tracks, cards and the locally scrollable family roadmap without clipping content.
