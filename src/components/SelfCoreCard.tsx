@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, Heart, Orbit, Sparkles, Sprout } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
-import ShareCardButton from "./ShareCardButton";
 import GrandSummaryCard from "./GrandSummaryCard";
 import { AgolmenLoading, useCompletionHold } from "./AgolmenSpiral";
 import { usePlan } from "./PlanProvider";

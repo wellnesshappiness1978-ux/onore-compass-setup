@@ -638,6 +638,21 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     setTab(next);
     window.scrollTo({ top: 0, behavior: "instant" });
   };
+  const swipeOrder: Tab[] = ["home", "traits", "today", "consult", "art", "business", "settings"];
+  const swipeStart = useRef<{ x: number; y: number; t: number } | null>(null);
+  const onSwipeStart = (e: React.TouchEvent) => {
+    const target = e.target as HTMLElement;
+    if (window.innerWidth >= 768 || target.closest("input,textarea,select,canvas,[data-no-swipe],.overflow-x-auto,[role=dialog]")) { swipeStart.current = null; return; }
+    const p = e.touches[0]; if (p) swipeStart.current = { x: p.clientX, y: p.clientY, t: Date.now() };
+  };
+  const onSwipeEnd = (e: React.TouchEvent) => {
+    const s = swipeStart.current; swipeStart.current = null; const p = e.changedTouches[0];
+    if (!s || !p) return;
+    const dx = p.clientX - s.x, dy = p.clientY - s.y;
+    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8 || Date.now() - s.t > 700) return;
+    const i = swipeOrder.indexOf(tab); const next = swipeOrder[i + (dx < 0 ? 1 : -1)];
+    if (next) goToTab(next);
+  };
 
 
   return (
@@ -645,12 +660,12 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <div className="mobile-fixed-header fixed inset-x-0 z-40 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center border-b border-primary/25 bg-background/95 px-3 backdrop-blur-xl md:hidden">
-        <Button size="icon" variant="ghost" onClick={() => goToTab("home")} aria-label={t.home} title={t.home} aria-current={tab === "home" ? "page" : undefined} className="size-11 shrink-0 text-primary">
-          <Home className="size-5" />
+        <Button size="icon" variant="ghost" onClick={() => goToTab("home")} aria-label={t.home} title={t.home} aria-current={tab === "home" ? "page" : undefined} className="size-14 shrink-0 text-primary [&_svg]:size-7">
+          <Home className="size-7" strokeWidth={1.8} />
         </Button>
         <span aria-hidden="true" />
-        <Button size="icon" variant="ghost" onClick={() => goToTab("settings")} aria-label={t.settings} title={t.settings} aria-current={tab === "settings" ? "page" : undefined} className="size-11 shrink-0 text-primary">
-          <Settings2 className="size-5" />
+        <Button size="icon" variant="ghost" onClick={() => goToTab("settings")} aria-label={t.settings} title={t.settings} aria-current={tab === "settings" ? "page" : undefined} className="size-14 shrink-0 text-primary [&_svg]:size-7">
+          <Settings2 className="size-7" strokeWidth={1.8} />
         </Button>
       </div>
       {tab === "home" && <LanguageSelector language={language} onChange={onLanguageChange} />}
@@ -702,11 +717,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         </div>
       </header>
 
-      <main className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
+      <main onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <ArtsGuide language={language} />
         ) : (
-          <section className="tab-content mx-auto min-w-0 max-w-3xl pt-3 md:pt-10">
+          <section key={tab} className="tab-content animate-in fade-in slide-in-from-bottom-1 duration-300 mx-auto min-w-0 max-w-3xl pt-3 md:pt-10">
             <div className="tab-heading mb-4 text-center md:mb-8">
               <NautilusIcon className="mx-auto hidden size-12 text-primary md:block" />
               <h2 className="mt-1 font-serif text-2xl text-gradient-gold md:mt-3">
