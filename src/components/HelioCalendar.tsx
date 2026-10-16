@@ -53,7 +53,7 @@ function Gate({ plan, feature, children }: { plan: Plan; feature: ContentFeature
   return null;
 }
 
-export default function HelioCalendar({ date, profile, plan, language, onUpgrade }: { date: Date; profile: UserProfile; plan: Plan; language: Language; onUpgrade?: () => void }) {
+export default function HelioCalendar({ date, profile, plan, language, onUpgrade, hideDirections = false }: { date: Date; profile: UserProfile; plan: Plan; language: Language; onUpgrade?: () => void; hideDirections?: boolean }) {
   const t = helioCopy[language];
   const markLabel: Record<DayMark, string> = { high: t.high, turn: t.turn, low: t.low };
   const iso = localIso(date);
