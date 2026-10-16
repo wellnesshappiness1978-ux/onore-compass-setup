@@ -119,6 +119,7 @@ function TorisetsuPanel({
   plan,
   only,
   serverCounted = false,
+  signedIn = false,
 }: {
   profile: UserProfile;
   language: Language;
@@ -127,6 +128,7 @@ function TorisetsuPanel({
   plan: Plan;
   only?: "manual" | "compatibility";
   serverCounted?: boolean;
+  signedIn?: boolean;
 }) {
   const t = torisetsuTranslations[language];
   const base = translations[language];
@@ -149,6 +151,26 @@ function TorisetsuPanel({
   const [analyzed, setAnalyzed] = useState(false);
   const [readingTheme, setReadingTheme] = useState<ReadingTheme>("connection");
   const [concern, setConcern] = useState("");
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [entryMode, setEntryMode] = useState<"members" | "manual">("manual");
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const listMembers = useServerFn(listTeamMembers);
+  useEffect(() => {
+    let active = true;
+    if (signedIn) listMembers().then((v) => { if (active) setMembers(v); }).catch(() => { if (active) setMembers([]); });
+    else setMembers(readPreviewMembers());
+    return () => { active = false; };
+  }, [signedIn, listMembers]);
+  const pickMember = (m: TeamMember) => {
+    setPartnerName(m.name); setPartnerKana(m.nameKana ?? "");
+    setPartnerGender((m.gender as UserProfile["gender"]) || "undisclosed");
+    setPartnerDate(m.birthDate);
+    setPartnerTime(m.birthTimeUnknown ? "" : (m.birthTime ?? "")); setPartnerTimeUnknown(Boolean(m.birthTimeUnknown));
+    setPartnerPlace(m.birthPlace ?? ""); setPartnerCity(m.birthCity ?? "");
+    setPartnerBlood((m.bloodType as "" | "A" | "B" | "O" | "AB") || "");
+    setPartnerSibling((m.siblingOrder as "" | "first" | "middle" | "last" | "only") || "");
+    setAnalyzed(false);
+  };
   const contextCopy = compatibilityContextCopy[language];
   const usage = useDailyUsage("compatibility", plan, serverCounted);
   const remaining = usage.remaining;
@@ -156,6 +178,9 @@ function TorisetsuPanel({
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
   const score = result?.score ?? 0;
   const today = new Date().toLocaleDateString("en-CA");
+  const todayDate = new Date();
+  const rhythmYou = profile.birthDate ? Math.round(personal(profile.birthDate, todayDate).total) : null;
+  const rhythmPartner = partnerSchema.safeParse(partnerInput).success ? Math.round(personal(partnerDate, todayDate).total) : null;
   useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, readingTheme, concern, profile, language]);
 
   return (
