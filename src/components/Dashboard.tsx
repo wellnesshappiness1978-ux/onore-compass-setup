@@ -26,6 +26,7 @@ import {
   Settings2,
   Sparkles,
   UserRound,
+  UsersRound,
   WandSparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,10 @@ import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions"
 import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { useDailyUsage } from "@/hooks/use-daily-usage";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
+import { listTeamMembers } from "@/lib/team-members.functions";
+import { readPreviewMembers } from "@/lib/consultation-targets";
+import { personal } from "@/lib/day-compass";
+import type { TeamMember } from "@/lib/team-analysis";
 import { compatibilityContextCopy, readingThemes, relationshipKinds, type ReadingTheme } from "@/lib/compatibility-context";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
@@ -119,6 +124,7 @@ function TorisetsuPanel({
   plan,
   only,
   serverCounted = false,
+  signedIn = false,
 }: {
   profile: UserProfile;
   language: Language;
@@ -127,6 +133,7 @@ function TorisetsuPanel({
   plan: Plan;
   only?: "manual" | "compatibility";
   serverCounted?: boolean;
+  signedIn?: boolean;
 }) {
   const t = torisetsuTranslations[language];
   const base = translations[language];
@@ -149,6 +156,26 @@ function TorisetsuPanel({
   const [analyzed, setAnalyzed] = useState(false);
   const [readingTheme, setReadingTheme] = useState<ReadingTheme>("connection");
   const [concern, setConcern] = useState("");
+  const [limitOpen, setLimitOpen] = useState(false);
+  const [entryMode, setEntryMode] = useState<"members" | "manual">("manual");
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const listMembers = useServerFn(listTeamMembers);
+  useEffect(() => {
+    let active = true;
+    if (signedIn) listMembers().then((v) => { if (active) setMembers(v); }).catch(() => { if (active) setMembers([]); });
+    else setMembers(readPreviewMembers());
+    return () => { active = false; };
+  }, [signedIn, listMembers]);
+  const pickMember = (m: TeamMember) => {
+    setPartnerName(m.name); setPartnerKana(m.nameKana ?? "");
+    setPartnerGender((m.gender as UserProfile["gender"]) || "undisclosed");
+    setPartnerDate(m.birthDate);
+    setPartnerTime(m.birthTimeUnknown ? "" : (m.birthTime ?? "")); setPartnerTimeUnknown(Boolean(m.birthTimeUnknown));
+    setPartnerPlace(m.birthPlace ?? ""); setPartnerCity(m.birthCity ?? "");
+    setPartnerBlood((m.bloodType as "" | "A" | "B" | "O" | "AB") || "");
+    setPartnerSibling((m.siblingOrder as "" | "first" | "middle" | "last" | "only") || "");
+    setAnalyzed(false);
+  };
   const contextCopy = compatibilityContextCopy[language];
   const usage = useDailyUsage("compatibility", plan, serverCounted);
   const remaining = usage.remaining;
@@ -156,6 +183,9 @@ function TorisetsuPanel({
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
   const score = result?.score ?? 0;
   const today = new Date().toLocaleDateString("en-CA");
+  const todayDate = new Date();
+  const rhythmYou = profile.birthDate ? Math.round(personal(profile.birthDate, todayDate).total) : null;
+  const rhythmPartner = partnerSchema.safeParse(partnerInput).success ? Math.round(personal(partnerDate, todayDate).total) : null;
   useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, readingTheme, concern, profile, language]);
 
   return (
@@ -247,6 +277,25 @@ function TorisetsuPanel({
           </div>
           <section className="card-lux mt-6 rounded-lg p-5 sm:p-7" aria-label={language === "ja" ? "アゴルメン相性診断" : t.compatibility}>
             <div className="space-y-5">
+              <div>
+                <div className="grid grid-cols-2 gap-2" role="tablist" aria-label={q.pickMember}>
+                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "members"} onClick={() => setEntryMode("members")} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "members" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UsersRound className="size-4 shrink-0" aria-hidden="true" />{q.pickMember}</Button>
+                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "manual"} onClick={() => setEntryMode("manual")} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "manual" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UserRound className="size-4 shrink-0" aria-hidden="true" />{q.manualEntry}</Button>
+                </div>
+                {entryMode === "members" && (
+                  <div className="mt-3">
+                    {members.length ? (
+                      <div className="flex flex-wrap gap-2">
+                        {members.map((m) => (
+                          <Button key={m.id} type="button" size="sm" variant="outline" onClick={() => pickMember(m)} className={`min-h-10 ${partnerDate === m.birthDate && partnerName === m.name ? "border-primary bg-primary/15 text-primary" : "border-primary/25"}`}>{m.name}</Button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="rounded-md border border-primary/20 bg-background/40 p-3 text-xs leading-5 text-muted-foreground">{q.noMembers}</p>
+                    )}
+                  </div>
+                )}
+              </div>
               <div>
                 <label
                   htmlFor="partner-name"
@@ -385,9 +434,9 @@ function TorisetsuPanel({
               <Button
                 type="button"
                 variant="champagne"
-                disabled={!canAnalyze || remaining <= 0}
-                onClick={async () => { if (!canAnalyze || remaining <= 0) return; const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language, { relationship: relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern }); if (!analysis) return; if (!(await usage.consume())) return; setResult(analysis); setAnalyzed(true); }}
-                className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
+                disabled={!canAnalyze}
+                onClick={async () => { if (!canAnalyze) return; if (remaining <= 0) { setLimitOpen(true); return; } const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language, { relationship: relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern }); if (!analysis) return; if (!(await usage.consume())) { setLimitOpen(true); return; } setResult(analysis); setAnalyzed(true); }}
+                 className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
               >
                 <Sparkles className="size-4 shrink-0" aria-hidden="true" />
                  {remaining <= 0 ? q.limit : q.action}
@@ -396,30 +445,52 @@ function TorisetsuPanel({
           </section>
            {remaining <= 0 && !analyzed && <div role="status" className="mt-3 text-center"><p className="text-sm text-primary">{q.refresh}</p>{plan !== "b2b-premium" && <Button type="button" variant="champagne" onClick={onVip} className="mt-3 text-xs">{q.limit} →</Button>}</div>}
           {analyzed && result ? (
-            <section className="py-8 text-center" aria-live="polite">
+            <section className="py-8" aria-live="polite">
               {partnerName ? (
-                <p className="mb-4 text-sm text-muted-foreground">{partnerName}</p>
+                <p className="mb-4 text-center text-sm text-muted-foreground">{partnerName}</p>
               ) : null}
-              <div
-                className="compatibility-meter relative mx-auto flex size-44 items-center justify-center rounded-full p-2 shadow-champagne"
-                style={{ "--compatibility-score": `${score * 3.6}deg` } as CSSProperties}
-              >
-                <div className="flex size-full flex-col items-center justify-center rounded-full border border-primary/15 bg-background">
-                  <span className="text-xs text-muted-foreground">{t.score}</span>
-                  <strong className="mt-1 font-serif text-4xl text-gradient-gold">{score}%</strong>
+              <article className="rounded-lg border border-primary/25 bg-card/50 p-5 text-center sm:p-7">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">01 / 04 · {q.blocks[0]}</p>
+                <div
+                  className="compatibility-meter relative mx-auto mt-4 flex size-44 items-center justify-center rounded-full p-2 shadow-champagne"
+                  style={{ "--compatibility-score": `${score * 3.6}deg` } as CSSProperties}
+                >
+                  <div className="flex size-full flex-col items-center justify-center rounded-full border border-primary/15 bg-background">
+                    <span className="text-xs text-muted-foreground">{t.score}</span>
+                    <strong className="mt-1 font-serif text-4xl text-gradient-gold">{score}%</strong>
+                  </div>
                 </div>
-              </div>
-              <div className="mx-auto mt-6 max-w-lg rounded-lg border border-primary/20 bg-primary/5 px-5 py-4 text-left">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">
-                  {t.coreLabel}
-                </p>
-                <p className="mt-2 text-sm leading-7 text-foreground">
+                <p className="mx-auto mt-5 max-w-lg text-sm leading-7 text-foreground">
                   {t.coreDynamics[relation ?? 0]}
                 </p>
-              </div>
-                <div className="mt-6 grid gap-3 text-left">{result.titles.map((title, i) => <article key={title} className="rounded-md border border-primary/25 bg-card/50 p-5"><h4 className="font-serif text-lg text-primary">{title}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[i]}</p>{i === 0 && <div className="mt-3 flex gap-2">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>}</article>)}</div>
+                <div className="mt-4 flex justify-center gap-3">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs text-muted-foreground"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>
+              </article>
+              <article className="mt-4 rounded-lg border border-primary/25 bg-card/50 p-5 text-left sm:p-7">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">02 / 04 · {q.blocks[1]}</p>
+                <h4 className="mt-2 font-serif text-lg text-primary">{result.titles[0]}</h4>
+                <p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[0]}</p>
+                <h4 className="mt-5 font-serif text-lg text-primary">{result.titles[1]}</h4>
+                <p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[1]}</p>
+              </article>
+              <article className="mt-4 rounded-lg border border-primary/25 bg-card/50 p-5 text-left sm:p-7">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">03 / 04 · {q.blocks[2]}</p>
+                <h4 className="mt-2 font-serif text-lg text-primary">{result.titles[2]}</h4>
+                <p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[2]}</p>
+              </article>
+              <article className="mt-4 rounded-lg border border-primary/25 bg-card/50 p-5 text-left sm:p-7">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">04 / 04 · {q.blocks[3]}</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {([[q.rhythmYou, rhythmYou], [q.rhythmPartner, rhythmPartner]] as const).map(([label, value]) => (
+                    <div key={label} className="rounded-md border border-primary/20 bg-background/50 p-3">
+                      <p className="flex items-center justify-between text-sm"><span className="text-muted-foreground">{label}</span><strong className="font-serif text-xl text-gradient-gold">{value ?? "—"}</strong></p>
+                      <span className="mt-2 block h-1.5 rounded-full bg-primary/10"><span className="block h-full rounded-full bg-primary" style={{ width: `${value ?? 0}%` }} /></span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-sm leading-7 text-foreground">{q.weekAction}</p>
+              </article>
                <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
-              <ShareCardButton className="mt-6" language={language} data={{ kicker: language === "ja" ? "ソウルマッチ相性診断" : "Soul match", title: t.compatibility, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""] }} />
+              <ShareCardButton className="mt-6" language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: language === "ja" ? "アゴルメン相性診断" : "Agolmen compatibility", title: q.title, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""], palette: result.colors.filter((c): c is string => Boolean(c)).map((code, i) => ({ label: i === 0 ? q.rhythmYou : q.rhythmPartner, code })), caution: result.note }} />
             </section>
           ) : null}
           {plan === "free" && <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
@@ -451,6 +522,16 @@ function TorisetsuPanel({
             </div>
           </section>}
           <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
+          <Dialog open={limitOpen} onOpenChange={setLimitOpen}>
+            <DialogContent className="max-w-md border-primary/40">
+              <DialogTitle className="font-serif leading-7 text-gradient-gold">{q.modalTitle}</DialogTitle>
+              <DialogDescription className="leading-6">{q.modalBody} {q.refresh}</DialogDescription>
+              <div className="mt-4 grid gap-2">
+                <Button variant="champagne" onClick={() => { setLimitOpen(false); onVip(); }} className="min-h-11"><Crown className="size-4" />{q.modalCta}</Button>
+                <Button variant="outline" onClick={() => setLimitOpen(false)} className="min-h-11">{q.modalClose}</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       )}
     </div>
@@ -655,7 +736,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </>
             ) : tab === "consult" ? (
               <>
-                <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+                <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} signedIn={signedIn} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
                 <ConsultationPanel
                   profile={profile}
                   language={language}

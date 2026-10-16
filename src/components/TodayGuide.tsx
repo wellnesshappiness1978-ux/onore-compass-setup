@@ -8,6 +8,7 @@ import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
 import { canUseToday, familyRoadmapMin, helioRangeDays, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
 import { dateAt, daysInYear, directionEnergy, localIso, personal, roadmap, type Direction, type Phase } from "@/lib/day-compass";
+import { almanacDay } from "@/lib/helio-almanac";
 import { dayElement, relation, type Element, type TeamMember } from "@/lib/team-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
@@ -116,6 +117,20 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       ? { text: `${seasonJa}。\n${aspJa}。\n${wishJa}`, notify: wishJa.slice(0, 60) }
       : { text: `${seasonEn}.\n${aspEn}.\n${wishEn}`, notify: wishEn };
   }, [today, profile.birthDate, el, ja]);
+  // Seasonal guidance for the star path: current solar term plus three prepare/mindset blocks.
+  const seasonGuide = useMemo(() => {
+    const alm = almanacDay(today);
+    const m = today.getMonth();
+    const adjustJa = ["寒暖差で自律神経が揺れやすい時期。ぬるめの湯に浸かり、朝の光を5分浴びて体内時計を整えましょう。", "乾燥と寒さの境目。白湯で体を温め、首元を守る服装で気持ちも落ち着きます。", "芽吹きの気が動き、心もそわそわしやすい時。深呼吸を日に3回、肩の力を抜く時間を。", "環境の変化で疲れが出やすい季節。睡眠を15分早め、緑に触れる散歩で心身をリセット。", "日差しが強まり活動量が増える時期。こまめな水分と、正午の少しの休憩で波に乗りましょう。", "湿気で体が重くなりがち。換気と軽いストレッチ、消化にやさしい温かい食事で整えて。", "暑さで消耗しやすい季節。涼しい朝に動き、夜は照明を落として休息の質を高めましょう。", "残暑と秋の気配が混ざる境目。冷やしすぎを見直し、足元を温めると心も安定します。", "空気が澄み、集中力が戻る時期。朝のルーティンを一つ整えると一日が軽やかに。", "日照が短くなり気持ちが沈みがち。夕方の散歩と温かい汁物で、心に火を灯して。", "冷え込みで体がこわばる季節。入浴で芯から温め、早めの就寝でエネルギーを蓄えて。", "一年で最も静かな時期。部屋を整え、温かい飲み物とともに内側を休ませましょう。"][m];
+    const adjustEn = ["Temperature swings can unsettle your rhythm. Take a lukewarm bath and greet the morning light for five minutes.", "Between dryness and cold, warm yourself with hot water and protect your neck to settle the mind.", "Sprouting energy can make you restless. Three deep breaths a day and time to drop your shoulders.", "Seasonal change tires easily. Sleep 15 minutes earlier and reset with a walk among green.", "As sunlight strengthens, hydrate often and take a short midday pause to ride the wave.", "Humidity weighs the body down. Ventilate, stretch gently, and choose warm, easy meals.", "Heat drains energy. Move in the cool morning and dim the lights at night for deeper rest.", "Late heat mixes with autumn air. Ease off cold drinks and warm your feet to steady the heart.", "Clear air brings focus back. Tidy one morning routine and the whole day lightens.", "Shorter days can dim the mood. An evening walk and warm soup keep your inner flame lit.", "Cold tightens the body. Warm to the core with a bath and store energy with earlier sleep.", "The quietest season of the year. Tidy your room and rest inwardly with a warm drink."][m];
+    const prepareJa = ["次の季節の種まきの時期。今年の目標を一行で書き、不要な予定を一つ手放しましょう。", "春の準備期。使わない物を一つ手放し、新しい計画のための空間をつくりましょう。", "始まりの季節。新しい習慣は小さく始め、三日続いた自分をまず認めましょう。", "人との縁が動く時期。会いたい人に連絡し、夏までの計画を軽く書き出して。", "勢いが増す季節。挑戦したいことを一つ選び、最初の一歩の日付を決めましょう。", "土台を固める時期。家計や持ち物を見直し、夏の忙しさに備える余白を。", "実りに向かう季節。進んでいることを一つ仕上げ、次の目標を静かに描いて。", "収穫と整理の季節。夏の疲れを労い、秋に始めたい学びを一つ選びましょう。", "実りを味わう時期。感謝を伝えると同時に、冬に向けて体を整える習慣を。", "深まりの季節。今年の成果を振り返り、大切な人と過ごす時間を確保して。", "備えの季節。一年の締めくくりに向け、やり残しを一つ片づけましょう。", "再生の季節。来年の志を一行書き、心身を休めることを最優先に。"][m];
+    const prepareEn = ["A time to sow next season's seeds. Write one line for this year's goal and release one needless commitment.", "Preparation for spring. Let go of one unused thing and make space for a new plan.", "A season of beginnings. Start a new habit small and honor yourself for three days of it.", "Connections stir now. Message someone you miss and sketch light plans toward summer.", "Momentum grows. Choose one challenge and set a date for its first step.", "Time to firm the ground. Review spending and belongings, leaving margin for summer's rush.", "A season toward harvest. Finish one thing in motion and quietly picture the next goal.", "A season of harvest and order. Thank yourself for summer's effort and pick one autumn study.", "Time to savor the yield. Express gratitude and begin a habit that steadies you toward winter.", "A deepening season. Review this year's fruits and protect time with those you love.", "A season of readiness. Clear one leftover task as the year turns toward its close.", "A season of renewal. Write one line of aspiration for next year and make rest the priority."][m];
+    const mindsetJa = `今日は「${alm.term ?? alm.zassetsu[0] ?? "季節の巡り"}」の気が満ちる日。急がず、しかし止まらず。星の巡りと地球の呼吸に合わせ、目の前の一つを丁寧に仕上げることが、あなたの志をいちばん確かに育てます。`;
+    const mindsetEn = `Today carries the spirit of "${alm.term ?? alm.zassetsu[0] ?? "the turning season"}". Unhurried, yet never still — align with the stars and the Earth's breath, and finish one thing before you with care. That is the surest way to grow your aspiration.`;
+    return ja
+      ? { term: alm.term, zassetsu: alm.zassetsu, adjust: adjustJa, prepare: prepareJa, mindset: mindsetJa, headings: ["🌱 季節の変わり目のエネルギー調整", "🧭 今の時期に向けた準備と行動", "✨ 本日の志と心構え"] as const }
+      : { term: alm.term, zassetsu: alm.zassetsu, adjust: adjustEn, prepare: prepareEn, mindset: mindsetEn, headings: ["🌱 Seasonal energy adjustment", "🧭 Preparation & action for this season", "✨ Today's aspiration & mindset"] as const };
+  }, [today, ja]);
   const birth = profile.birthDate;
   const rhythm = personal(birth, today);
   const spectrum = birthColorSpectrum(profile);
@@ -180,7 +195,23 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     },
     starPath: {
       notify: starPoem.notify,
-      body: <p className="whitespace-pre-line font-serif text-sm leading-7">{starPoem.text}</p>,
+      body: <div>
+        <p className="whitespace-pre-line font-serif text-sm leading-7">{starPoem.text}</p>
+        {(seasonGuide.term || seasonGuide.zassetsu.length > 0) && (
+          <p className="mt-3 inline-flex flex-wrap gap-1.5 text-[11px]">
+            {seasonGuide.term && <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-1 text-primary">{seasonGuide.term}</span>}
+            {seasonGuide.zassetsu.map((z) => <span key={z} className="rounded-full border border-primary/25 px-2.5 py-1 text-muted-foreground">{z}</span>)}
+          </p>
+        )}
+        <div className="mt-4 space-y-3">
+          {[seasonGuide.headings[0], seasonGuide.headings[1], seasonGuide.headings[2]].map((h, i) => (
+            <article key={h} className="rounded-md border border-primary/25 bg-card/50 p-4">
+              <h4 className="font-serif text-sm text-primary">{h}</h4>
+              <p className="mt-1.5 text-sm leading-7 text-foreground">{[seasonGuide.adjust, seasonGuide.prepare, seasonGuide.mindset][i]}</p>
+            </article>
+          ))}
+        </div>
+      </div>,
     },
     dailyLucky: {
       notify: `${luckyColor ? localizeBirthColorName(luckyColor.name, language) : ""} / ${L(word)}`,
