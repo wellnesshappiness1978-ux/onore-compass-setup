@@ -36,4 +36,3 @@
 
 - Personal readings share one versioned home-reading query: six essence angles, existing method dialogs, server-statused approaches filtered to available nonempty tap-to-open cards, a catchphrase and one closing axis summary; name grids remain in the name dialog. Why: prevent duplicate AI calls, fabricated charts and repeated prose.
 
-- Consultation uses a shared availability-aware birth/day context and four localized answer sections; bookmarks alone persist in owner-only private rows, while summary-only story cards reuse the local share renderer. Signed-in AI requests consume the existing atomic daily-usage RPC exactly once, never a preview entitlement. Why: improve relevance, preserve privacy, and keep count enforcement authoritative.
