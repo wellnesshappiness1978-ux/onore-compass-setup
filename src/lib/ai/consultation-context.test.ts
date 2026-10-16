@@ -5,8 +5,8 @@ const profile = { nameKanji: "", nameKana: "", nameRomaji: "", birthDate: "1990-
 describe("consultation context boundaries", () => {
   it("injects ten celestial bodies and the selected day without inventing unavailable charts", () => {
     const data = consultationContext(profile, "2026-10-16");
-    expect(data.sky.bodies).toHaveLength(10);
-    expect(data.sky.approximate).toBe(true);
+    expect(data.sky?.bodies).toHaveLength(10);
+    expect(data.sky?.approximate).toBe(true);
     expect(data.today.day).toBe("2026-10-16");
     expect(data.today.directions).toHaveLength(8);
     expect(data.boundaries).toContain("NOT fifteen computed charts");
