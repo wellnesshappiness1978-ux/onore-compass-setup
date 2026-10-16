@@ -60,18 +60,17 @@ export const todayFeatures: readonly { id: TodayFeature; min: Plan }[] = [
   { id: "starPath", min: "free" },
   { id: "dailyLucky", min: "free" },
   { id: "direction", min: "free" },
-  { id: "helio", min: "free" },
   { id: "shopping", min: "standard" },
   { id: "health", min: "standard" },
   { id: "monthlyLucky", min: "vip" },
-  { id: "directionExtended", min: "vip" },
   { id: "relations", min: "vip" },
   { id: "biorhythm365", min: "vip" },
+  { id: "helio", min: "free" },
 ];
 /** The family roadmap renders inside the combined biorhythm & calendar card from this plan. */
 export const familyRoadmapMin: Plan = "b2b";
 /** Extended birth direction type and this year's direction. */
 export const directionExtendedMin: Plan = "vip";
-export const canUseToday = (plan: Plan, feature: TodayFeature) => rank(plan) >= rank(todayFeatures.find((f) => f.id === feature)!.min);
+export const canUseToday = (plan: Plan, feature: TodayFeature) => rank(plan) >= rank(feature === "directionExtended" ? directionExtendedMin : feature === "familyRoadmap" ? familyRoadmapMin : todayFeatures.find((f) => f.id === feature)!.min);
 /** Earth-calendar / biorhythm browsing window in days around today (Infinity = unlimited). */
 export const helioRangeDays: Record<Plan, number> = { free: 0, standard: 31, vip: 366, b2b: Infinity, "b2b-premium": Infinity };

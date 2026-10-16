@@ -53,7 +53,7 @@ function Gate({ plan, feature, children }: { plan: Plan; feature: ContentFeature
   return null;
 }
 
-export default function HelioCalendar({ date, profile, plan, language, onUpgrade }: { date: Date; profile: UserProfile; plan: Plan; language: Language; onUpgrade?: () => void }) {
+export default function HelioCalendar({ date, profile, plan, language, onUpgrade, hideDirections = false }: { date: Date; profile: UserProfile; plan: Plan; language: Language; onUpgrade?: () => void; hideDirections?: boolean }) {
   const t = helioCopy[language];
   const markLabel: Record<DayMark, string> = { high: t.high, turn: t.turn, low: t.low };
   const iso = localIso(date);
@@ -158,11 +158,11 @@ export default function HelioCalendar({ date, profile, plan, language, onUpgrade
         </TabsContent>
       </Tabs>
     </Gate>
-    <h4 className="mt-6 font-serif text-lg text-primary">{t.directionTitle}</h4>
+    {!hideDirections && <><h4 className="mt-6 font-serif text-lg text-primary">{t.directionTitle}</h4>
     <Gate plan={plan} feature="helioDirections" onUpgrade={onUpgrade}>
       <ol className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{dirs.map((d, i) => <li key={d.dir} className={`border p-3 text-center ${i === 0 ? "border-primary bg-primary/10" : "border-primary/20"}`}><p className="font-serif text-lg text-primary">{directionLabels[language][d.dir]}</p><p className="text-sm text-foreground">{d.score}</p></li>)}</ol>
       <p className="mt-2 text-sm text-muted-foreground">{t.directionNote}</p>
-    </Gate>
+    </Gate></>}
     <h4 className="mt-6 font-serif text-lg text-primary">{t.businessTitle}</h4>
     <Gate plan={plan} feature="helioBusiness" onUpgrade={onUpgrade}>
       <p className="mt-2 text-sm text-muted-foreground">{t.businessIntro(members.length)}</p>

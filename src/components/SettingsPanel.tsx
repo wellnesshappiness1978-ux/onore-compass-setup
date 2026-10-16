@@ -1,3 +1,5 @@
+import { planDetails } from "@/lib/plan-details";
+import { planOrder as tierOrder } from "@/lib/plans";
 import DailyReminderPanel from "./DailyReminderPanel";
 import { ThemeSample } from "./ThemeSample";
 import { useRef, useState } from "react";
@@ -123,6 +125,10 @@ export default function SettingsPanel({
     ...(freeTier ? [{ id: "free" as const, features: freeTier.features }] : []),
     ...pc.cards,
   ];
+  const [showAllPlans, setShowAllPlans] = useState(false);
+  const pd = planDetails[language];
+  const hiddenLower = carouselCards.filter(c => tierOrder.indexOf(c.id as Plan) < tierOrder.indexOf(plan)).length;
+  const visibleCards = showAllPlans ? carouselCards : carouselCards.filter(c => tierOrder.indexOf(c.id as Plan) >= tierOrder.indexOf(plan));
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const onCarouselScroll = () => {
@@ -278,7 +284,7 @@ export default function SettingsPanel({
         </div>
 
         <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={t.plansHeading}>
-          {carouselCards.map((item, index) => {
+          {visibleCards.map((item, index) => {
             const active = activeIndex === index;
             const TabIcon = item.id === "free" ? User : planIcon[item.id];
             return (
@@ -291,7 +297,7 @@ export default function SettingsPanel({
         </div>
         <p className="mt-2 inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] text-primary">{demoCopy[language].badge}</p>
         <div ref={carouselRef} onScroll={onCarouselScroll} className="plan-carousel -mx-1 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-1 pb-3">
-          {carouselCards.map((item) => {
+          {visibleCards.map((item) => {
             const tier = allTiers.find(tr => tr.id === item.id);
             if (!tier) return null;
             const isVip = item.id === "vip";
@@ -326,6 +332,10 @@ export default function SettingsPanel({
                     </li>
                   ))}
                 </ul>
+                <details className="group mt-3 rounded-lg border border-primary/25 bg-background/40">
+                  <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-2 px-3 text-xs font-semibold text-primary">{pd.label}<span className="transition-transform group-open:rotate-180" aria-hidden="true">▾</span></summary>
+                  <ul className="space-y-1.5 px-3 pb-3 text-xs leading-5 text-foreground/90">{pd.items[item.id as Plan].map(d => <li key={d}>・{d}</li>)}</ul>
+                </details>
                 {(item.id !== "free" || previewPlan.enabled) && <Button
                   onClick={() => previewPlan.enabled ? previewPlan.selectPlan(item.id as Plan) : toast(demoCopy[language].toast, { description: name })}
                   disabled={isCurrent}
@@ -338,9 +348,10 @@ export default function SettingsPanel({
           })}
         </div>
         <div className="mt-1 flex justify-center gap-1.5" aria-hidden="true">
-          {carouselCards.map((item, index) => <span key={item.id} className={`h-1.5 rounded-full transition-all ${activeIndex === index ? "w-5 bg-primary" : "w-1.5 bg-primary/30"}`} />)}
+          {visibleCards.map((item, index) => <span key={item.id} className={`h-1.5 rounded-full transition-all ${activeIndex === index ? "w-5 bg-primary" : "w-1.5 bg-primary/30"}`} />)}
         </div>
 
+        {hiddenLower > 0 && <div className="mt-2 text-center"><Button variant="ghost" size="sm" className="text-xs text-primary" onClick={() => { setShowAllPlans(v => !v); setActiveIndex(0); }}>{showAllPlans ? pd.hideLower : `${pd.showAll} (+${hiddenLower})`}</Button></div>}
         {!devOverrideEnabled && <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>}
       </section>
 

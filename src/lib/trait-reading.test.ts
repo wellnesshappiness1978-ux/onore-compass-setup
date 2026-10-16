@@ -25,7 +25,7 @@ describe("distinct personal reading contract", () => {
     const statuses = approachStatuses({ core: true, earth: true, nineStars: true, color: true, blood: true, siblings: false, region: false });
     const passages = Object.fromEntries(approachKeys.map(key => [key, key === "earth" ? " " : "reading"])) as Record<typeof approachKeys[number], string>;
     expect(visibleApproachKeys(statuses, passages)).toEqual(["western", "pillars", "nineStars", "animal", "numerology", "color", "blood"]);
-    expect(traitReadingPrompt).toContain("360–440");
+    expect(traitReadingPrompt).toContain("540–660");
     expect(traitReadingPrompt).toContain("catchphrase");
     for (const copy of Object.values(traitReadingCopy)) { expect(copy.catchphrase).toBeTruthy(); expect(copy.symbolic).toBeTruthy(); }
   });

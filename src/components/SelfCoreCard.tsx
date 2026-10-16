@@ -8,6 +8,7 @@ import { usePlan } from "./PlanProvider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
+import { generateQuickEssence } from "@/lib/ai/quick-essence.functions";
 import { fiveElementsCopy } from "@/lib/five-elements-copy";
 import { homeReadingCopy, readingCompleteMessage } from "@/lib/home-reading-copy";
 import { computeCoreLayers, type CoreLayers } from "@/lib/ai/core-layers";
@@ -138,6 +139,16 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
     retry: false,
   });
   const holding = useCompletionHold(isPending);
+  const quickGen = useServerFn(generateQuickEssence);
+  // Priority 1: a small, fast call for catchphrase + essence so the top appears first.
+  const quick = useQuery({
+    queryKey: ["home-quick-essence-v1", profile, language],
+    queryFn: () => quickGen({ data: { profile, language } }),
+    staleTime: Infinity,
+    retry: false,
+  });
+  const top = quick.data ?? (data ? { catchphrase: data.catchphrase, essence: data.essence } : undefined);
+  const topLoading = !top && (quick.isPending || isPending);
   const e = data?.elements;
   const values = e ? [e.name ? `${e.name.sky} · ${e.name.person} · ${e.name.earth} · ${e.name.outer} · ${e.name.total}` : null, e.zodiac, e.eto, e.blood, e.animal] : [];
   const sections = data ? [data.synthesis, data.name, data.mind, data.instinct, data.strength] : [];
@@ -172,9 +183,10 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">AGOLMEN'S COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{t.title}</h2></div>
       </header>
       <div className="px-5 sm:px-8">
-        {data?.catchphrase && !holding && <section aria-label={traits.catchphrase} className="my-6 rounded-md border-2 border-primary/60 px-4 py-6 sm:px-6 sm:py-8 [overflow-wrap:anywhere]">
+        {topLoading && <div aria-hidden="true" className="my-6 space-y-3 rounded-md border-2 border-primary/30 px-4 py-6"><div className="h-3 w-24 animate-pulse rounded bg-primary/20" /><div className="h-7 w-4/5 animate-pulse rounded bg-primary/15" /></div>}
+        {top?.catchphrase && <section aria-label={traits.catchphrase} className="my-6 rounded-md border-2 border-primary/60 px-4 py-6 sm:px-6 sm:py-8 [overflow-wrap:anywhere]">
           <p className="flex items-center gap-2 text-sm text-primary"><Sparkles className="size-4" aria-hidden="true" />{traits.catchphrase}</p>
-          <p className="mt-4 border-l-2 border-primary pl-4 font-serif text-2xl leading-relaxed text-gradient-gold sm:pl-6 sm:text-3xl">{data.catchphrase}</p>
+          <p className="mt-4 border-l-2 border-primary pl-4 font-serif text-2xl leading-relaxed text-gradient-gold sm:pl-6 sm:text-3xl">{top.catchphrase}</p>
         </section>}
         {!experienceOnly && localLayers && <section aria-label="診断の根拠サマリー" className="border-b border-primary/20 py-4"><dl className="flex flex-wrap gap-x-5 gap-y-3">{[
           ["名前の中心数", localLayers.name ? `${localLayers.name.person}画` : "姓・名の区切りを設定"],
@@ -184,13 +196,13 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
         ].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-1 text-sm font-semibold text-primary">{value}</dd></div>)}</dl></section>}
         <section aria-label="自分を知る・今日のダイジェスト" className="py-6">
           <h3 className="font-serif text-xl text-primary">{traits.essence}</h3>
-          {isPending || holding ? <AgolmenLoading compact label={holding ? readingCompleteMessage[language] : t.loading} /> : data ? <div className="mt-4 divide-y divide-primary/20">
+          {topLoading ? <AgolmenLoading compact label={t.loading} /> : top ? <div className="mt-4 divide-y divide-primary/20">
             {essenceKeys.map((key, i) => <article key={key} className="min-w-0 py-5 [overflow-wrap:anywhere]">
               <h4 className="flex items-start gap-3 font-serif text-lg leading-8 text-primary"><span className="shrink-0 font-mono text-xs leading-8">0{i + 1}</span><span>{traits.headings[i]}</span></h4>
-              <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{data.essence[key]}</p>
+              <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{top.essence[key]}</p>
             </article>)}
           </div> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
-          {isError && <Button variant="outline" className="mt-3" onClick={() => void refetch()}>{t.retry}</Button>}
+          {!top && isError && quick.isError && <Button variant="outline" className="mt-3" onClick={() => { void quick.refetch(); void refetch(); }}>{t.retry}</Button>}
         </section>
         <SacredDisclosure defaultOpen className="my-5" title={t.views}>
         {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} language={language} reading={data} loading={isPending} nameDetails={nameDetails} />}
