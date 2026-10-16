@@ -1,6 +1,7 @@
 import DailyReminderPanel from "./DailyReminderPanel";
 import { ThemeSample } from "./ThemeSample";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import {
   Bell,
   HeartHandshake,
@@ -117,6 +118,35 @@ export default function SettingsPanel({
     cta: tc.switchPlan,
   };
   const allTiers = [...t.tiers, premiumTier];
+  const freeTier = allTiers.find(tr => tr.id === "free");
+  const carouselCards: { id: PaidPlanId | "free"; badge?: string; tagline?: string; features: string[] }[] = [
+    ...(freeTier ? [{ id: "free" as const, features: freeTier.features }] : []),
+    ...pc.cards,
+  ];
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const onCarouselScroll = () => {
+    const el = carouselRef.current; if (!el) return;
+    const cards = Array.from(el.querySelectorAll<HTMLElement>("[data-plan-card]"));
+    const center = el.scrollLeft + el.clientWidth / 2;
+    let best = 0, dist = Infinity;
+    cards.forEach((c, i) => { const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - center); if (d < dist) { dist = d; best = i; } });
+    setActiveIndex(best);
+  };
+  const scrollToCard = (index: number) => {
+    const el = carouselRef.current; const c = el?.querySelectorAll<HTMLElement>("[data-plan-card]")[index];
+    if (el && c) el.scrollTo({ left: c.offsetLeft - (el.clientWidth - c.offsetWidth) / 2, behavior: "smooth" });
+    setActiveIndex(index);
+  };
+  const demoCopy: Record<Language, { badge: string; toast: string }> = {
+    ja: { badge: "各プランの登録受付は準備中です（表示確認用）", toast: "現在は表示確認用のデモモードです。決済・契約は行われません。" },
+    en: { badge: "Plan sign-up is coming soon (preview only)", toast: "This is a preview demo. No payment or contract is made." },
+    "zh-CN": { badge: "各方案的注册即将开放（仅供预览）", toast: "当前为预览演示模式，不会进行付款或签约。" },
+    "zh-TW": { badge: "各方案的註冊即將開放（僅供預覽）", toast: "目前為預覽示範模式，不會進行付款或簽約。" },
+    ko: { badge: "각 플랜 가입은 준비 중입니다 (표시 확인용)", toast: "현재 표시 확인용 데모 모드입니다. 결제나 계약은 진행되지 않습니다." },
+    es: { badge: "La suscripción a los planes llegará pronto (solo vista previa)", toast: "Modo demo de vista previa. No se realiza ningún pago ni contrato." },
+    fr: { badge: "L’inscription aux forfaits arrive bientôt (aperçu uniquement)", toast: "Mode démo d’aperçu. Aucun paiement ni contrat n’est effectué." },
+  };
   const upgradeCards = pc.cards.filter(c => isUpgradePlan(plan, c.id));
   const selectedCard = upgradeCards.find(c => c.id === cardPlan) ?? upgradeCards[0];
   const selectedTier = allTiers.find(tr => tr.id === selectedCard?.id);
@@ -215,7 +245,7 @@ export default function SettingsPanel({
         </div>
       </section>
 
-      {upgradeCards.length > 0 && <section id="membership-plans" className={card}>
+      {<section id="membership-plans" className={card}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             <h3 className="font-serif text-xl text-gradient-gold">{pc.sectionTitle}</h3>
@@ -250,107 +280,68 @@ export default function SettingsPanel({
         </div>
 
         <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={t.plansHeading}>
-          {upgradeCards.map((item) => {
-            const active = cardPlan === item.id;
-            const TabIcon = planIcon[item.id];
+          {carouselCards.map((item, index) => {
+            const active = activeIndex === index;
+            const TabIcon = item.id === "free" ? User : planIcon[item.id];
             return (
-              <Button
-                variant="outline"
-                key={item.id}
-                role="tab"
-                aria-selected={active}
-                onClick={() => setCardPlan(item.id)}
-                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs transition-all ${
-                  active
-                    ? "border-primary bg-primary/20 text-primary shadow-[0_0_18px_-4px_var(--gold-glow)]"
-                    : "border-primary/15 bg-background/40 text-muted-foreground hover:text-primary"
-                }`}
-              >
-                <TabIcon className={`size-3.5 ${active ? "text-primary" : "text-muted-foreground"}`} aria-hidden="true" />
-                {planTabName(item.id)}
+              <Button variant="outline" key={item.id} role="tab" aria-selected={active} onClick={() => scrollToCard(index)}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs ${active ? "border-primary bg-primary/20 text-primary" : "border-primary/15 bg-background/40 text-muted-foreground"}`}>
+                <TabIcon className="size-3.5" aria-hidden="true" />{item.id === "free" ? t.planFree : planTabName(item.id)}
               </Button>
             );
           })}
         </div>
-
-        {(() => {
-          const item = selectedCard;
-          const tier = selectedTier;
-          if (!item || !tier) return null;
-          const isVip = item.id === "vip";
-          const price = yearly ? tier.priceYearly : tier.priceMonthly;
-          const period = yearly ? t.perYear : t.perMonth;
-          return (
-            <div
-              key={item.id}
-              role="tabpanel"
-               aria-label={appearanceCopy.plans[item.id]}
-              className={`relative mt-4 overflow-hidden rounded-2xl border p-5 transition-all ${
-                isVip
-                  ? "border-primary/70 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent shadow-[0_0_34px_-8px_var(--gold-glow)]"
-                  : item.id === "b2b-premium"
-                    ? "border-primary/50 bg-gradient-to-br from-primary/15 via-card/60 to-background/40"
-                    : "border-primary/25 bg-gradient-to-br from-primary/10 via-card/60 to-background/40"
-              }`}
-            >
-              <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-primary/10 blur-2xl" />
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  {(() => { const CardIcon = planIcon[item.id]; return <CardIcon className="size-7 shrink-0 text-primary" aria-hidden="true" />; })()}
-                  <div className="min-w-0">
-                     <p className={`font-serif text-base ${isVip ? "text-gradient-gold" : "text-foreground"}`}>{appearanceCopy.plans[item.id]}</p>
-                    <p className="mt-0.5 text-xs text-primary/80">{item.tagline}</p>
+        <p className="mt-2 inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] text-primary">{demoCopy[language].badge}</p>
+        <div ref={carouselRef} onScroll={onCarouselScroll} className="plan-carousel -mx-1 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-1 pb-3">
+          {carouselCards.map((item) => {
+            const tier = allTiers.find(tr => tr.id === item.id);
+            if (!tier) return null;
+            const isVip = item.id === "vip";
+            const isCurrent = plan === item.id;
+            const price = yearly ? tier.priceYearly : tier.priceMonthly;
+            const period = yearly ? t.perYear : t.perMonth;
+            const CardIcon = item.id === "free" ? User : planIcon[item.id];
+            const name = item.id === "free" ? t.planFree : appearanceCopy.plans[item.id];
+            return (
+              <div key={item.id} data-plan-card aria-label={name}
+                className={`relative flex w-[85%] min-w-0 max-w-[340px] shrink-0 snap-center flex-col overflow-hidden rounded-2xl border p-4 sm:p-5 ${isVip ? "border-primary/70 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent shadow-[0_0_34px_-8px_var(--gold-glow)]" : "border-primary/25 bg-gradient-to-br from-primary/10 via-card/60 to-background/40"}`}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <CardIcon className="size-6 shrink-0 text-primary" aria-hidden="true" />
+                    <div className="min-w-0">
+                      <p className={`truncate font-serif text-base ${isVip ? "text-gradient-gold" : "text-foreground"}`}>{name}</p>
+                      {item.tagline && <p className="mt-0.5 text-[11px] text-primary/80">{item.tagline}</p>}
+                    </div>
                   </div>
+                  {(isCurrent || item.badge) && <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${isVip ? "bg-champagne-gradient text-primary-foreground" : "border border-primary/40 bg-primary/10 text-primary"}`}>{isCurrent ? profileUi.settings.active : item.badge}</span>}
                 </div>
-                {item.badge && (
-                  <span
-                    className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-                      isVip
-                        ? "bg-champagne-gradient text-primary-foreground shadow-champagne"
-                        : "border border-primary/40 bg-primary/10 text-primary"
-                    }`}
-                  >
-                    {isVip && <Crown className="size-3" />} {item.badge}
-                  </span>
-                )}
+                <p className="mt-3 flex flex-wrap items-baseline gap-1">
+                  <span className={`text-2xl font-semibold ${isVip ? "text-gradient-gold" : "text-foreground"}`}>{price}</span>
+                  <span className="text-[11px] text-muted-foreground">{tier.id === "b2b" ? tier.priceNote : period}</span>
+                  {tier.priceNote && tier.id !== "b2b" && <span className="text-[10px] text-primary">{tier.priceNote}</span>}
+                </p>
+                <ul className="mt-3 flex-1 space-y-2">
+                  {item.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-xs leading-5">
+                      <span className="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-primary/15 text-primary"><Check className="size-2.5" strokeWidth={3} /></span>
+                      <span className="min-w-0 break-words text-foreground/90">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                {item.id !== "free" && <Button
+                  onClick={() => devOverrideEnabled ? onPlanChange(item.id as Plan) : toast(demoCopy[language].toast, { description: name })}
+                  disabled={isCurrent}
+                  size="sm" variant={isVip ? "default" : "outline"}
+                  className="mt-4 h-10 w-full whitespace-normal text-xs">
+                  <Sparkles className="size-4 shrink-0" /> {isCurrent ? profileUi.settings.active : pc.unlockCta}
+                </Button>}
               </div>
-              <p className="mt-3 flex items-baseline gap-1">
-                <span className={`text-2xl font-semibold ${isVip ? "text-gradient-gold" : "text-foreground"}`}>
-                  {price}
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  {tier.id === "b2b" ? tier.priceNote : period}
-                </span>
-                {tier.priceNote && tier.id !== "b2b" && (
-                  <span className="ml-1 text-[10px] text-primary">{tier.priceNote}</span>
-                )}
-              </p>
-              <ul className="mt-4 space-y-2">
-                {item.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-xs leading-5">
-                    <span
-                      className={`mt-0.5 grid size-4 shrink-0 place-items-center rounded-full ${
-                        isVip ? "bg-champagne-gradient text-primary-foreground" : "bg-primary/15 text-primary"
-                      }`}
-                    >
-                      <Check className="size-2.5" strokeWidth={3} />
-                    </span>
-                    <span className="text-foreground/90">{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button
-                onClick={() => devOverrideEnabled ? onPlanChange(item.id as Plan) : setUpgradePlan(tier.name)}
-                disabled={devOverrideEnabled && plan === item.id}
-                size="sm"
-                className={`mt-5 h-10 w-full text-sm ${isVip ? "shadow-champagne-strong" : ""}`}
-                variant={isVip ? "default" : "outline"}
-              >
-                <Sparkles className="size-4" /> {devOverrideEnabled && plan === item.id ? profileUi.settings.active : pc.unlockCta}
-              </Button>
-            </div>
-          );
-        })()}
+            );
+          })}
+        </div>
+        <div className="mt-1 flex justify-center gap-1.5" aria-hidden="true">
+          {carouselCards.map((item, index) => <span key={item.id} className={`h-1.5 rounded-full transition-all ${activeIndex === index ? "w-5 bg-primary" : "w-1.5 bg-primary/30"}`} />)}
+        </div>
 
         {!devOverrideEnabled && <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>}
       </section>}
