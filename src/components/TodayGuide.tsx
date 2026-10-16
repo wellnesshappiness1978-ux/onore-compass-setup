@@ -35,7 +35,7 @@ const titles: Record<TodayFeature, Pair> = {
   relations: P("クイック対人ガイド", "Quick relationship guide"),
   monthlyLucky: P("今月の3ラッキー", "This month's three lucky picks"),
   directionExtended: P("吉方位（生まれ持った方位タイプと今年の方位）", "Birth direction type & this year's direction"),
-  helio: P("地球暦・コンパス・当日詳細・バイオリズム（当日分）", "Earth Calendar, compass & biorhythm (today)"),
+  helio: P("当日詳細", "Today's details"),
   biorhythm365: P("個人・ファミリーのバイオリズム", "Personal & family biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
@@ -237,6 +237,10 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
             <li className="flex items-center gap-1.5"><span className="size-3 rounded-sm border border-destructive bg-destructive/30" />{ja ? "39以下：ひと呼吸" : "≤39: Take it gently"}</li>
           </ul>
         </div>
+        <div className="mt-3 border-t border-primary/20 pt-3">
+          <h4 className="mb-1 font-serif text-sm text-primary">{L(titles.directionExtended)}</h4>
+          {canUseToday(plan, "directionExtended") ? content_ext() : <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"><span>{names.vip}+</span><Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "See plans"}</Button></div>}
+        </div>
       </>,
     },
     directionExtended: {
@@ -267,7 +271,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <li><strong className="text-primary">{ja ? "ラッキーアイテム" : "Lucky item"}</strong>：{L(month.item)}</li>
       </ul>,
     },
-    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>{rangeBanner}<DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /><h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "今日のカレンダー（どなたでも閲覧できます）" : "Today's calendar (open to everyone)"}</h4><HelioCalendar date={today} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} /></> },
+    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>{rangeBanner}<DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /><h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "今日のカレンダー（どなたでも閲覧できます）" : "Today's calendar (open to everyone)"}</h4><HelioCalendar hideDirections date={today} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} /></> },
     biorhythm365: {
       notify: `${ja ? "今日のバイオリズム" : "Today's biorhythm"} ${Math.round(rhythm.total)}`,
       body: yearCurve.length ? <>
