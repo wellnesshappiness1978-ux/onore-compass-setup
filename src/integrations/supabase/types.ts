@@ -129,11 +129,15 @@ export type Database = {
           blood_type: string
           design_mode: string
           gender: string
+          goal: string
+          goal_preset: string
           name_kana: string
           name_kanji: string
           name_romaji: string
           profile_version: string
           sibling_order: string
+          target_id: string | null
+          target_kind: string
           updated_at: string
           user_id: string
         }
@@ -146,11 +150,15 @@ export type Database = {
           blood_type?: string
           design_mode?: string
           gender?: string
+          goal?: string
+          goal_preset?: string
           name_kana?: string
           name_kanji?: string
           name_romaji?: string
           profile_version?: string
           sibling_order?: string
+          target_id?: string | null
+          target_kind?: string
           updated_at?: string
           user_id: string
         }
@@ -163,11 +171,15 @@ export type Database = {
           blood_type?: string
           design_mode?: string
           gender?: string
+          goal?: string
+          goal_preset?: string
           name_kana?: string
           name_kanji?: string
           name_romaji?: string
           profile_version?: string
           sibling_order?: string
+          target_id?: string | null
+          target_kind?: string
           updated_at?: string
           user_id?: string
         }
@@ -203,6 +215,33 @@ export type Database = {
         }
         Relationships: []
       }
+      team_groups: {
+        Row: {
+          created_at: string
+          id: string
+          member_ids: string[]
+          name: string
+          nickname: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_ids?: string[]
+          name?: string
+          nickname?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_ids?: string[]
+          name?: string
+          nickname?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       team_members: {
         Row: {
           birth_city: string
@@ -216,6 +255,7 @@ export type Database = {
           id: string
           name: string
           name_kana: string
+          nickname: string
           relationship: string
           relationship_type: string
           role: string
@@ -235,6 +275,7 @@ export type Database = {
           id?: string
           name: string
           name_kana?: string
+          nickname?: string
           relationship?: string
           relationship_type?: string
           role?: string
@@ -254,6 +295,7 @@ export type Database = {
           id?: string
           name?: string
           name_kana?: string
+          nickname?: string
           relationship?: string
           relationship_type?: string
           role?: string
