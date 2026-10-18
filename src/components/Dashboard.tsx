@@ -5,7 +5,7 @@ import ShareCardButton from "./ShareCardButton";
 import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
 import { NautilusIcon } from './NautilusIcon';
 import { AppearanceMotif } from './AppearanceMotif';
-import { useEffect, useRef, useState, type CSSProperties, type TouchEvent as ReactTouchEvent } from "react";
+import { useEffect, useRef, useState, type ReactNode, type CSSProperties, type TouchEvent as ReactTouchEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -547,7 +547,7 @@ function FocusGoalBridge({ onChange, language }: { onChange: (memberId: string |
   useEffect(() => { onChange(id, g); }, [id, g]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
-function FocusedTraits({ language, render }: { language: Language; render: (p: UserProfile, title: string, goal: string, isSelf: boolean) => React.ReactNode }) {
+function FocusedTraits({ language, render }: { language: Language; render: (p: UserProfile, title: string, goal: string, isSelf: boolean) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx) return null;
   const t = focusCopy[language];
@@ -555,7 +555,7 @@ function FocusedTraits({ language, render }: { language: Language; render: (p: U
   if (ctx.group) return <><SubjectBanner language={language} /><GroupFocusCard language={language} /></>;
   return <><SubjectBanner language={language} />{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</>;
 }
-function FocusedToday({ language, render }: { language: Language; render: (p: UserProfile) => React.ReactNode }) {
+function FocusedToday({ language, render }: { language: Language; render: (p: UserProfile) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx) return null;
   return <><SubjectBanner language={language} />{ctx.group && <GroupFocusCard language={language} />}{render(ctx.readingProfile)}</>;
@@ -565,6 +565,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const t = dashboardTranslations[language];
   const base = translations[language];
   const [tab, setTab] = useState<Tab>("home");
+  const [focusMemberId, setFocusMemberId] = useState<string | null>(null);
+  const [focusGoal, setFocusGoal] = useState("");
   useEffect(() => {
     const open = (target: string | null) => {
       if (target === "compass") { setTab("today"); window.scrollTo({ top: 0 }); }
