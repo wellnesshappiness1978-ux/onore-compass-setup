@@ -84,6 +84,7 @@ export const generateHomeReading = createServerFn({ method: "POST" })
       model: provider.responses("openai/gpt-6-astra"),
       output: Output.object({ schema: readingSchema }),
       prompt: `Write a vivid, personal five-layer INTERPRETIVE reading in ${language}. Return exactly the fields in the schema; no headings in field values. This is available in FULL to every user including free users. No paywall or upsell in the reading.
+${goalLine ? goalLine + " In axisSummary, add one paragraph of concrete ideas, advice and cautions for reaching this goal." : ""}
 
 SHARED VOICE:
 ${supportiveWritingVoice}
