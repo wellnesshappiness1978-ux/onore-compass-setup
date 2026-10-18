@@ -1,10 +1,11 @@
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
+import { groupLimit } from "@/lib/plans";
 
 type Detail = { label: string; showAll: string; hideLower: string; items: Record<Plan, string[]> };
 
 /** Tap-to-open "benefits & how to use" copy for each plan card. Upgrades remain preview-only. */
-export const planDetails: Record<Language, Detail> = {
+const baseDetails: Record<Language, Detail> = {
   ja: {
     label: "具体的なメリットと使い方", showAll: "すべてのプランを表示", hideLower: "下位プランを隠す",
     items: {
@@ -76,3 +77,21 @@ export const planDetails: Record<Language, Detail> = {
     },
   },
 };
+
+const groupLine: Record<Language, (n: number) => string> = {
+  ja: n => n ? `グループ登録は最大${n}件。家族・職場・友人などをまとめ、グループカラーと調和度、平均リズムを確認できます。` : "グループ登録はスタンダード以上で利用できます（1件〜）。",
+  en: n => n ? `Register up to ${n} group(s) to see a group color, harmony score and average rhythm.` : "Group registration starts with Standard (1 group).",
+  "zh-CN": n => n ? `最多可登记${n}个群组，查看群组色、协调度与平均节律。` : "标准方案起可登记群组（1个起）。",
+  "zh-TW": n => n ? `最多可登記${n}個群組，查看群組色、協調度與平均節律。` : "標準方案起可登記群組（1個起）。",
+  ko: n => n ? `그룹을 최대 ${n}개 등록해 그룹 컬러·조화도·평균 리듬을 볼 수 있습니다.` : "그룹 등록은 스탠다드부터 가능합니다(1개부터).",
+  es: n => n ? `Registra hasta ${n} grupo(s) y consulta su color, armonía y ritmo medio.` : "El registro de grupos empieza en Standard (1 grupo).",
+  fr: n => n ? `Enregistrez jusqu'à ${n} groupe(s) : couleur, harmonie et rythme moyen.` : "Les groupes commencent avec Standard (1 groupe).",
+};
+/** Plan card details with the group-registration cap appended from `groupLimit`. */
+export const planDetails: Record<Language, Detail> = Object.fromEntries(
+  (Object.keys(baseDetails) as Language[]).map(lang => {
+    const d = baseDetails[lang];
+    const items = Object.fromEntries((Object.keys(d.items) as Plan[]).map(plan => [plan, [...d.items[plan], groupLine[lang](groupLimit[plan])]])) as Record<Plan, string[]>;
+    return [lang, { ...d, items }];
+  }),
+) as Record<Language, Detail>;
