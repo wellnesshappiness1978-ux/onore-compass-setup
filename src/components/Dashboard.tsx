@@ -53,6 +53,9 @@ import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
+import { FocusProvider, useFocus } from "./FocusProvider";
+import { ArtOwnerOnlyNotice, FamilyGroupButtons, FocusSettingsCard, GroupFocusCard, SubjectBanner } from "./FocusPanels";
+import { focusCopy, goalText } from "@/lib/focus";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
 import { canUseAppearance, decorationTier, appearanceStorageKey, defaultAppearance, readAppearance, readDesign, type AppearanceSelection } from "@/lib/appearance-customization";
@@ -538,6 +541,26 @@ function TorisetsuPanel({
   );
 }
 
+function FocusGoalBridge({ onChange, language }: { onChange: (memberId: string | null, goal: string) => void; language: Language }) {
+  const ctx = useFocus();
+  const id = ctx?.member?.id ?? null; const g = ctx ? goalText(ctx.focus, language) : "";
+  useEffect(() => { onChange(id, g); }, [id, g]); // eslint-disable-line react-hooks/exhaustive-deps
+  return null;
+}
+function FocusedTraits({ language, render }: { language: Language; render: (p: UserProfile, title: string, goal: string, isSelf: boolean) => React.ReactNode }) {
+  const ctx = useFocus();
+  if (!ctx) return null;
+  const t = focusCopy[language];
+  const goal = goalText(ctx.focus, language);
+  if (ctx.group) return <><SubjectBanner language={language} /><GroupFocusCard language={language} /></>;
+  return <><SubjectBanner language={language} />{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</>;
+}
+function FocusedToday({ language, render }: { language: Language; render: (p: UserProfile) => React.ReactNode }) {
+  const ctx = useFocus();
+  if (!ctx) return null;
+  return <><SubjectBanner language={language} />{ctx.group && <GroupFocusCard language={language} />}{render(ctx.readingProfile)}</>;
+}
+
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
   const t = dashboardTranslations[language];
   const base = translations[language];
@@ -656,7 +679,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
 
   return (
-    <>
+    <FocusProvider owner={profile} serverBacked={signedIn && !devOverrideEnabled}>
+    <FocusGoalBridge onChange={(id, g) => { setFocusMemberId(id); setFocusGoal(g); }} language={language} />
     <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <div className="mobile-fixed-header fixed inset-x-0 z-40 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center border-b border-primary/25 bg-background/95 px-3 backdrop-blur-xl md:hidden">
@@ -729,7 +753,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </h2>
             </div>
             {tab === "traits" ? (
-              <SelfCoreCard experienceOnly profile={profile} language={language} onProfileChange={onProfileChange} onDiagnosis={() => undefined} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} />
+              <FocusedTraits language={language} render={(p, title, goal, isSelf) => <SelfCoreCard experienceOnly profile={p} title={title} goal={goal} language={language} {...(isSelf ? { onProfileChange } : {})} onDiagnosis={() => undefined} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} />} />
             ) : tab === "today" ? (
               <>
                 <section className="design-compass-section min-w-0 w-full max-w-full text-center" aria-label={t.today}>
@@ -746,7 +770,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                       day: "numeric",
                     }).format(new Date())}
                   </p>
-                  <TodayGuide profile={profile} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+                  <FocusedToday language={language} render={(p) => <TodayGuide profile={p} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />} />
                 </section>
               </>
             ) : tab === "consult" ? (
@@ -754,6 +778,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} signedIn={signedIn} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
                 <ConsultationPanel
                   profile={profile}
+                  focusTargetId={focusMemberId}
+                  goal={focusGoal}
                   language={language}
                   plan={previewPlan}
                   actualPlan={serverPlan}
@@ -762,11 +788,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 />
               </>
             ) : tab === "business" ? (
-              <><BusinessFeaturePreview language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>
+              <><FamilyGroupButtons language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><BusinessFeaturePreview language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>
             ) : tab === "art" ? (
-              <NineStarsPanel language={language} profile={profile} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} />
+              <><ArtOwnerOnlyNotice language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /><NineStarsPanel language={language} profile={profile} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /></>
             ) : tab === "settings" ? (
-              <SettingsPanel
+              <><FocusSettingsCard language={language} /><div className="h-6" /><SettingsPanel
                 profile={profile}
                 language={language}
                 plan={previewPlan}
@@ -782,7 +808,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 signedIn={signedIn}
                 onLanguageChange={onLanguageChange}
                 onEdit={() => setModal("profile")}
-              />
+              /></>
             ) : null}
           </section>
         )}      </main>
@@ -862,6 +888,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         </DialogContent>
       </Dialog>
     </div>
-    </>
+    </FocusProvider>
   );
 }
