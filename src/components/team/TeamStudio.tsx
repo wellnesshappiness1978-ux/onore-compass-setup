@@ -177,7 +177,7 @@ function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdi
   return (
     <div className="space-y-4">
       {!signedIn && <p className="text-[11px] text-muted-foreground">{previewOnly ? x.preview : t.guestNote}</p>}
-      <form onSubmit={submit} className={`${card} grid gap-2 sm:grid-cols-2`}>
+      <form id="family-roster-form" onSubmit={submit} className={`${card} grid gap-2 sm:grid-cols-2`}>
         <Input required aria-label={t.name} placeholder={`${t.name} *`} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <Input aria-label={focusCopy[language].nickname} placeholder={focusCopy[language].nickname} value={form.nickname} maxLength={40} onChange={(e) => setForm({ ...form, nickname: e.target.value })} />
         <Input aria-label={x.kana} placeholder={x.kana} value={form.nameKana} maxLength={60} onChange={(e) => setForm({ ...form, nameKana: e.target.value })} />
