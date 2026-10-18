@@ -12,6 +12,8 @@ import {
   biorhythm, dayElement, dayScore, elements, lifePath, matrixPoint, orgBalance, pairScore, purposes, roleOf, teamDiagnosis, teamRoles, todayIso,
   type Purpose, type TeamMember, type TeamRole,
 } from "@/lib/team-analysis";
+import { focusCopy, memberDisplayName, memberToProfile } from "@/lib/focus";
+import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { addTeamMember, deleteTeamMember, listTeamMembers, updateTeamMember } from "@/lib/team-members.functions";
 import { analyzeCandidate, draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
 import ShareCardButton from "@/components/ShareCardButton";
@@ -152,7 +154,7 @@ const rosterExtra: Record<Language, { kana: string; time: string; timeUnknown: s
   es: { kana: "Lectura del nombre", time: "Hora de nacimiento", timeUnknown: "Hora desconocida", place: "Región / país de nacimiento", city: "Ciudad de nacimiento", sibling: "Orden entre hermanos", gender: "Género", blood: "Grupo sanguíneo", relationship: "Relación / función", relationType: "Tipo de relación", types: ["Sin especificar", "Pareja", "Familia", "Amistad", "Colega", "Empleado", "Otro"], genders: ["Sin indicar", "Mujer", "Hombre", "Otro"], edit: "Editar", cancel: "Cancelar", saved: "Actualizar", preview: "Los miembros de prueba se guardan solo en este dispositivo y no cambian el límite real." },
   fr: { kana: "Lecture du nom", time: "Heure de naissance", timeUnknown: "Heure inconnue", place: "Région / pays de naissance", city: "Ville de naissance", sibling: "Rang dans la fratrie", gender: "Genre", blood: "Groupe sanguin", relationship: "Lien / fonction", relationType: "Type de relation", types: ["Non précisé", "Partenaire", "Famille", "Ami·e", "Professionnel", "Employé·e", "Autre"], genders: ["Non renseigné", "Femme", "Homme", "Autre"], edit: "Modifier", cancel: "Annuler", saved: "Mettre à jour", preview: "Les membres de prévisualisation restent sur cet appareil et ne modifient pas la limite réelle." },
 };
-const emptyMemberForm = { name: "", nameKana: "", birthDate: "", birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", siblingOrder: "", gender: "undisclosed", bloodType: "", relationship: "", relationshipType: "", role: "", skills: "" };
+const emptyMemberForm = { name: "", nickname: "", nameKana: "", birthDate: "", birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", siblingOrder: "", gender: "undisclosed", bloodType: "", relationship: "", relationshipType: "", role: "", skills: "" };
 
 function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdit, onRemove }: { t: TeamCopy; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void }) {
   const x = rosterExtra[language];
@@ -166,17 +168,18 @@ function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdi
     setBusy(true);
     setError(false);
     try {
-      const member = { name: form.name.trim(), nameKana: form.nameKana.trim(), birthDate: form.birthDate, birthTime: form.birthTimeUnknown ? "" : form.birthTime, birthTimeUnknown: form.birthTimeUnknown, birthPlace: form.birthPlace.trim(), birthCity: form.birthCity.trim(), siblingOrder: form.siblingOrder.trim(), gender: form.gender, bloodType: form.bloodType, relationship: form.relationship.trim(), relationshipType: form.relationshipType, role: form.role.trim(), skills: form.skills.split(/[,、，]/).map((s) => s.trim()).filter(Boolean).slice(0, 12) };
+      const member = { name: form.name.trim(), nickname: form.nickname.trim(), nameKana: form.nameKana.trim(), birthDate: form.birthDate, birthTime: form.birthTimeUnknown ? "" : form.birthTime, birthTimeUnknown: form.birthTimeUnknown, birthPlace: form.birthPlace.trim(), birthCity: form.birthCity.trim(), siblingOrder: form.siblingOrder.trim(), gender: form.gender, bloodType: form.bloodType, relationship: form.relationship.trim(), relationshipType: form.relationshipType, role: form.role.trim(), skills: form.skills.split(/[,、，]/).map((s) => s.trim()).filter(Boolean).slice(0, 12) };
       const ok = editingId ? await onEdit({ ...member, id: editingId }) : await onAdd(member);
-      if (ok) { setForm(emptyMemberForm); setEditingId(null); }
+      if (ok) { setForm(emptyMemberForm); setEditingId(null); window.dispatchEvent(new Event("onore-focus-reload")); }
     } catch { setError(true);
     } finally { setBusy(false); }
   };
   return (
     <div className="space-y-4">
       {!signedIn && <p className="text-[11px] text-muted-foreground">{previewOnly ? x.preview : t.guestNote}</p>}
-      <form onSubmit={submit} className={`${card} grid gap-2 sm:grid-cols-2`}>
+      <form id="family-roster-form" onSubmit={submit} className={`${card} grid gap-2 sm:grid-cols-2`}>
         <Input required aria-label={t.name} placeholder={`${t.name} *`} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <Input aria-label={focusCopy[language].nickname} placeholder={focusCopy[language].nickname} value={form.nickname} maxLength={40} onChange={(e) => setForm({ ...form, nickname: e.target.value })} />
         <Input aria-label={x.kana} placeholder={x.kana} value={form.nameKana} maxLength={60} onChange={(e) => setForm({ ...form, nameKana: e.target.value })} />
         <Input required aria-label={`${t.birthDate} *`} type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
         <Input aria-label={x.time} type="time" disabled={form.birthTimeUnknown} value={form.birthTime} onChange={(e) => setForm({ ...form, birthTime: e.target.value })} />
@@ -196,12 +199,13 @@ function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdi
       {members.length === 0 ? <p className="text-sm text-muted-foreground">{t.empty}</p> : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {members.map((m) => (
-            <li key={m.id} className={`${card} flex items-center gap-2 p-3`}>
+            <li key={m.id} className={`${card} flex items-center gap-2 border-l-4 p-3`} style={(() => { const c = birthColorSpectrum(memberToProfile(m))?.main.code; return c ? { borderLeftColor: c, backgroundImage: `linear-gradient(90deg, ${c}55, transparent 70%)` } : undefined; })()}>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm">{m.name} <RoleBadge role={roleOf(m)} t={t} /></p>
+                <p className="truncate text-base font-bold text-outline">{memberDisplayName(m)} <RoleBadge role={roleOf(m)} t={t} /></p>
+                {m.nickname && <p className="truncate text-[11px] text-muted-foreground">{m.name}</p>}
                 <p className="truncate text-[11px] text-muted-foreground">{m.birthDate} · {m.relationship || m.role || "—"}</p>
               </div>
-              <Button size="icon" variant="ghost" aria-label={`${x.edit} ${m.name}`} onClick={() => { setEditingId(m.id); setForm({ name: m.name, nameKana: m.nameKana ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", birthCity: m.birthCity ?? "", siblingOrder: m.siblingOrder ?? "", gender: m.gender || "undisclosed", bloodType: m.bloodType || "", relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", role: m.role, skills: m.skills.join(", ") }); }}><Pencil className="size-4" /></Button>
+              <Button size="icon" variant="ghost" aria-label={`${x.edit} ${m.name}`} onClick={() => { setEditingId(m.id); setForm({ name: m.name, nickname: m.nickname ?? "", nameKana: m.nameKana ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", birthCity: m.birthCity ?? "", siblingOrder: m.siblingOrder ?? "", gender: m.gender || "undisclosed", bloodType: m.bloodType || "", relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", role: m.role, skills: m.skills.join(", ") }); }}><Pencil className="size-4" /></Button>
               <Button size="icon" variant="ghost" aria-label={`${t.remove} ${m.name}`} onClick={() => onRemove(m.id)}><Trash2 className="size-4" /></Button>
             </li>
           ))}

@@ -11,3 +11,7 @@
 ## あなたの特性 再編 (2026-10-16) — 完了
 - [x] ホーム/設定ボタン拡大、モバイル横スワイプでタブ移動
 - [x] ①特性→②6視点→③15占術2段アコーディオン→④7バースカラー→⑤多層総合診断(1.5倍・行間狭め)→⑥シェア
+
+## Goal / subject / groups (2026-10-18) — done
+- Goal & subject card in Settings, subject-aware traits/today/consult, owner-only art notice
+- Nicknames, group registration with plan caps (0/1/3/10/30), outlined lucky-color text

@@ -76,7 +76,9 @@ export default function ConsultationPanel({
   actualPlan,
   signedIn,
   onVip,
-}: Props) {
+  focusTargetId = null,
+  goal = "",
+}: Props & { focusTargetId?: string | null; goal?: string }) {
   const listMembers = useServerFn(listTeamMembers);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [targetId, setTargetId] = useState("owner");
@@ -98,6 +100,9 @@ export default function ConsultationPanel({
   useEffect(() => {
     if (targetId !== "owner" && !members.some((m) => m.id === targetId)) setTargetId("owner");
   }, [members, targetId]);
+  useEffect(() => {
+    if (focusTargetId && members.some((m) => m.id === focusTargetId)) setTargetId(focusTargetId);
+  }, [focusTargetId, members]);
   const target = members.find((m) => m.id === targetId);
   const targetProfile = useMemo(
     () =>
@@ -174,11 +179,12 @@ export default function ConsultationPanel({
           profile: targetProfile,
           ownerProfile: target ? profile : undefined,
           targetLabel,
+          goal: goal || undefined,
           language,
           day: new Date().toLocaleDateString("en-CA"),
         }),
       }),
-    [targetProfile, profile, targetLabel, language, target],
+    [targetProfile, profile, targetLabel, language, target, goal],
   );
   const { messages, sendMessage, status, stop, error, clearError, setMessages } = useChat({
     id: `onore-consult-${targetId}-${language}`,
