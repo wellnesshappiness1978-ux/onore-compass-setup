@@ -12,7 +12,8 @@ import {
   biorhythm, dayElement, dayScore, elements, lifePath, matrixPoint, orgBalance, pairScore, purposes, roleOf, teamDiagnosis, teamRoles, todayIso,
   type Purpose, type TeamMember, type TeamRole,
 } from "@/lib/team-analysis";
-import { focusCopy } from "@/lib/focus";
+import { focusCopy, memberDisplayName, memberToProfile } from "@/lib/focus";
+import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { addTeamMember, deleteTeamMember, listTeamMembers, updateTeamMember } from "@/lib/team-members.functions";
 import { analyzeCandidate, draftProjectTeam, generateOneOnOneGuide } from "@/lib/ai/team-ai.functions";
 import ShareCardButton from "@/components/ShareCardButton";
@@ -198,9 +199,10 @@ function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdi
       {members.length === 0 ? <p className="text-sm text-muted-foreground">{t.empty}</p> : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {members.map((m) => (
-            <li key={m.id} className={`${card} flex items-center gap-2 p-3`}>
+            <li key={m.id} className={`${card} flex items-center gap-2 border-l-4 p-3`} style={(() => { const c = birthColorSpectrum(memberToProfile(m))?.main.code; return c ? { borderLeftColor: c, backgroundImage: `linear-gradient(90deg, ${c}55, transparent 70%)` } : undefined; })()}>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm">{m.name} <RoleBadge role={roleOf(m)} t={t} /></p>
+                <p className="truncate text-base font-bold text-outline">{memberDisplayName(m)} <RoleBadge role={roleOf(m)} t={t} /></p>
+                {m.nickname && <p className="truncate text-[11px] text-muted-foreground">{m.name}</p>}
                 <p className="truncate text-[11px] text-muted-foreground">{m.birthDate} · {m.relationship || m.role || "—"}</p>
               </div>
               <Button size="icon" variant="ghost" aria-label={`${x.edit} ${m.name}`} onClick={() => { setEditingId(m.id); setForm({ name: m.name, nickname: m.nickname ?? "", nameKana: m.nameKana ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", birthCity: m.birthCity ?? "", siblingOrder: m.siblingOrder ?? "", gender: m.gender || "undisclosed", bloodType: m.bloodType || "", relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", role: m.role, skills: m.skills.join(", ") }); }}><Pencil className="size-4" /></Button>
