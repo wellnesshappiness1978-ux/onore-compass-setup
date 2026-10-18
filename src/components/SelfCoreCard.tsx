@@ -115,7 +115,7 @@ function CoreLayersPanel({ layers: c, profile, language, reading, loading, nameD
 
 const planIcons: Record<HomePlanId, typeof Sprout> = { standard: Sprout, vip: Gem, b2b: Building2, "b2b-premium": Crown };
 
-export default function SelfCoreCard({ profile, language, onDiagnosis, onProfileChange, currentPlan, onSelectPlan, experienceOnly = false }: { onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; currentPlan?: Plan; onSelectPlan?: (plan: HomePlanId) => void; experienceOnly?: boolean }) {
+export default function SelfCoreCard({ title, goal = "", profile, language, onDiagnosis, onProfileChange, currentPlan, onSelectPlan, experienceOnly = false }: { title?: string; goal?: string; onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; currentPlan?: Plan; onSelectPlan?: (plan: HomePlanId) => void; experienceOnly?: boolean }) {
   const { override, enabled } = usePlan();
   const activePlan = enabled && override ? override : currentPlan ?? "free";
   const palette = birthColorSpectrum(profile);
@@ -133,8 +133,8 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-six-v16", profile, language],
-    queryFn: () => generate({ data: { profile, language } }),
+    queryKey: ["home-reading-six-v16", profile, language, goal],
+    queryFn: () => generate({ data: { profile, language, goal } }),
     staleTime: Infinity,
     retry: false,
   });
@@ -142,8 +142,8 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
   const quickGen = useServerFn(generateQuickEssence);
   // Priority 1: a small, fast call for catchphrase + essence so the top appears first.
   const quick = useQuery({
-    queryKey: ["home-quick-essence-v1", profile, language],
-    queryFn: () => quickGen({ data: { profile, language } }),
+    queryKey: ["home-quick-essence-v1", profile, language, goal],
+    queryFn: () => quickGen({ data: { profile, language, goal } }),
     staleTime: Infinity,
     retry: false,
   });
@@ -180,7 +180,7 @@ export default function SelfCoreCard({ profile, language, onDiagnosis, onProfile
     <section aria-label={t.title} className="min-w-0 overflow-hidden rounded-lg border border-primary/35 bg-card/75 shadow-champagne backdrop-blur-md">
       <header className="flex items-start gap-3 border-b border-primary/20 bg-primary/5 p-5 sm:p-8">
         <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/35 bg-primary/10 text-primary"><Compass className="size-5" aria-hidden="true" /></div>
-        <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">AGOLMEN'S COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{t.title}</h2></div>
+        <div className="min-w-0"><p className="text-[10px] uppercase text-primary/75">AGOLMEN'S COMPASS · {t.openToAll}</p><h2 className="mt-2 break-words font-serif text-xl leading-snug text-gradient-gold sm:text-2xl">{title ?? t.title}</h2></div>
       </header>
       <div className="px-5 sm:px-8">
         {topLoading && <div aria-hidden="true" className="my-6 space-y-3 rounded-md border-2 border-primary/30 px-4 py-6"><div className="h-3 w-24 animate-pulse rounded bg-primary/20" /><div className="h-7 w-4/5 animate-pulse rounded bg-primary/15" /></div>}
