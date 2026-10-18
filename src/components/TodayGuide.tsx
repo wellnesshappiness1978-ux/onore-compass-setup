@@ -361,6 +361,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     "--lucky-fg": neon.light ? "#0B132B" : "#FFFFFF",
     "--lucky-accent": neon.light ? "#0B132B" : "#FFF3B0",
     "--lucky-muted": neon.light ? "rgba(11,19,43,.8)" : "rgba(255,255,255,.88)",
+    "--lucky-outline": neon.light ? "rgba(255,255,255,.95)" : "rgba(5,8,20,.95)",
   } as CSSProperties) : undefined;
 
   return (
