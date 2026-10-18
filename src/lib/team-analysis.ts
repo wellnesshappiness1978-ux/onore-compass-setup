@@ -4,6 +4,7 @@
 export type TeamMember = {
   id: string;
   name: string;
+  nickname?: string;
   nameKana?: string;
   birthDate: string; // YYYY-MM-DD
   birthTime?: string;

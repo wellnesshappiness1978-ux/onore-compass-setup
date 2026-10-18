@@ -73,4 +73,7 @@ export const familyRoadmapMin: Plan = "b2b";
 export const directionExtendedMin: Plan = "vip";
 export const canUseToday = (plan: Plan, feature: TodayFeature) => rank(plan) >= rank(feature === "directionExtended" ? directionExtendedMin : feature === "familyRoadmap" ? familyRoadmapMin : todayFeatures.find((f) => f.id === feature)!.min);
 /** Earth-calendar / biorhythm browsing window in days around today (Infinity = unlimited). */
+/** Registered-group caps per plan; the database trigger mirrors these. */
+export const groupLimit: Record<Plan, number> = { free: 0, standard: 1, vip: 3, b2b: 10, "b2b-premium": 30 };
+/** Earth-calendar range */
 export const helioRangeDays: Record<Plan, number> = { free: 0, standard: 31, vip: 366, b2b: Infinity, "b2b-premium": Infinity };
