@@ -9,8 +9,7 @@ import { useFocus } from "./FocusProvider";
 import { addTeamGroup, deleteTeamGroup, updateTeamGroup } from "@/lib/team-groups.functions";
 import { canAddGroup, focusCopy, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, mixHex, type TargetKind, type TeamGroup } from "@/lib/focus";
 import { groupLimit } from "@/lib/plans";
-import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
-import { localizeBirthColorName } from "@/lib/birth-color-names";
+import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
 import { biorhythm, pairScore, type TeamMember } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
@@ -21,10 +20,10 @@ const mainColor = (m: TeamMember) => birthColorSpectrum(memberToProfile(m))?.mai
 export function FocusSettingsCard({ language }: { language: Language }) {
   const ctx = useFocus();
   const t = focusCopy[language];
-  const [draft, setDraft] = useState(ctx?.focus);
+  const [draft, setDraft] = useState<import("@/lib/focus").Focus | undefined>(undefined);
   const [saving, setSaving] = useState(false);
   if (!ctx) return null;
-  const f = draft && draft !== ctx.focus && draft.targetKind ? draft : ctx.focus;
+  const f = draft ?? ctx.focus;
   const set = (patch: Partial<typeof f>) => setDraft({ ...f, ...patch });
   const kinds: TargetKind[] = ["self", "family", "group"];
   return (
