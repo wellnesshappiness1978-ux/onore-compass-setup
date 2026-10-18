@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CalendarDays, ChevronLeft, ChevronRight, Download, ExternalLink, Orbit } from "lucide-react";
 import { helioPhase } from "@/lib/ai/helio-phase";
 import { biorhythm, type TeamMember } from "@/lib/team-analysis";
-import { canUse, type ContentFeature } from "@/lib/plans";
+import { canUse, helioRangeDays, type ContentFeature } from "@/lib/plans";
 import type { Plan } from "@/lib/design-modes";
 import { supabase } from "@/integrations/supabase/client";
 import { listTeamMembers } from "@/lib/team-members.functions";
@@ -57,6 +57,11 @@ export default function HelioCalendar({ date, profile, plan, language, onUpgrade
   const t = helioCopy[language];
   const markLabel: Record<DayMark, string> = { high: t.high, turn: t.turn, low: t.low };
   const iso = localIso(date);
+  const rangeDays = helioRangeDays[plan];
+  const dayDiff = (value: string) => Math.round((new Date(`${value}T12:00:00`).getTime() - new Date(`${iso}T12:00:00`).getTime()) / 86400000);
+  const inRange = (value: string) => Math.abs(dayDiff(value)) <= rangeDays;
+  const minIso = Number.isFinite(rangeDays) ? localIso(addDays(date, -rangeDays)) : undefined;
+  const maxIso = Number.isFinite(rangeDays) ? localIso(addDays(date, rangeDays)) : undefined;
   const { enabled: testMode } = usePlan();
   const [eventIso, setEventIso] = useState(iso);
   const [calendarView, setCalendarView] = useState<"calendar" | "detail">("calendar");
@@ -126,7 +131,7 @@ export default function HelioCalendar({ date, profile, plan, language, onUpgrade
     </svg>
     {phase && <div className="border-t border-primary/20 pt-5"><p className="text-sm text-muted-foreground">{t.phaseAngle(phase.degrees)}</p><p className="mt-1 font-serif text-lg text-primary">{t.phaseNow(t.phases[phase.phase])}</p><p className="mt-1 text-base leading-8 text-foreground">{t.phaseNotes[phase.phase]}</p></div>}
     <h4 className="mt-6 font-serif text-lg text-primary">{t.personalYear}</h4>
-    <Gate plan={plan} feature="helioPersonal" onUpgrade={onUpgrade}>
+    <>
       <p className="mt-2 text-sm text-muted-foreground">{t.yearIntro(year)}</p>
       <Tabs value={calendarView} onValueChange={(value) => setCalendarView(value as "calendar" | "detail")} className="mt-4">
         <TabsList className="grid h-11 w-full grid-cols-2 border border-primary/20 bg-background/50">
@@ -143,8 +148,8 @@ export default function HelioCalendar({ date, profile, plan, language, onUpgrade
             {(() => { const month = calendarMonths[visibleMonth]; if (!month) return null; return <>
               <div className="mt-2 grid grid-cols-7 gap-0.5 text-center text-[10px] text-muted-foreground">{t.weekdays.map(d => <span key={d}>{d}</span>)}</div>
               <div className="mt-1 grid grid-cols-7 gap-0.5">{Array.from({ length: month.offset }, (_, i) => <span key={`empty-${i}`} className="aspect-square" />)}{month.days.map(d => {
-                const kind = marks.get(d.index); const current = d.iso === eventIso;
-                return <Button key={d.iso} type="button" size="icon" variant="ghost" title={`${d.iso} · ${curve[d.index] ?? 50} / 100${kind ? ` · ${markLabel[kind]}` : ""}`} aria-label={`${d.iso} ${kind ? markLabel[kind] : t.reference} ${curve[d.index] ?? 50}`} aria-pressed={current} onClick={() => { setEventIso(d.iso); setCalendarView("detail"); }} className={`aspect-square size-auto min-h-8 min-w-0 rounded-sm p-0 text-xs ${current ? "ring-2 ring-primary" : ""} ${kind === "high" ? "bg-primary text-primary-foreground" : kind === "low" ? "border border-destructive/60 text-destructive" : kind === "turn" ? "border border-primary/50 text-primary" : "text-muted-foreground"}`}>{d.day}</Button>;
+                const kind = marks.get(d.index); const current = d.iso === eventIso; const allowed = inRange(d.iso);
+                return <Button key={d.iso} type="button" size="icon" variant="ghost" title={`${d.iso} · ${curve[d.index] ?? 50} / 100${kind ? ` · ${markLabel[kind]}` : ""}`} aria-label={`${d.iso} ${kind ? markLabel[kind] : t.reference} ${curve[d.index] ?? 50}`} aria-pressed={current} disabled={!allowed} onClick={() => { if (!allowed) return; setEventIso(d.iso); setCalendarView("detail"); }} className={`aspect-square size-auto min-h-8 min-w-0 rounded-sm p-0 text-xs ${current ? "ring-2 ring-primary" : ""} ${kind === "high" ? "bg-primary text-primary-foreground" : kind === "low" ? "border border-destructive/60 text-destructive" : kind === "turn" ? "border border-primary/50 text-primary" : "text-muted-foreground"}`}>{d.day}</Button>;
               })}</div>
             </>; })()}
           </div>
@@ -152,23 +157,23 @@ export default function HelioCalendar({ date, profile, plan, language, onUpgrade
         </TabsContent>
         <TabsContent value="detail" className="mt-4">
           <div role="status" className="border-l-2 border-primary bg-primary/5 px-4 py-4"><h5 className="font-serif text-base text-primary">{eventIso} · {selectedMark ? markLabel[selectedMark] : t.reference} · {selectedValue.total}/100</h5><p className="mt-1 text-sm text-foreground">{t.metrics(Math.round((selectedValue.physical + 1) * 50), Math.round((selectedValue.emotional + 1) * 50), Math.round((selectedValue.intellectual + 1) * 50))}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{rhythmNote} {t.healthNotice}</p></div>
-          <label className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">{t.scheduleDate}<input aria-label={t.addDateLabel} type="date" value={eventIso} onChange={e => { if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) { setEventIso(e.target.value); const next = new Date(`${e.target.value}T12:00:00`); if (next.getFullYear() === year) setVisibleMonth(next.getMonth()); } }} className="rounded-md border border-primary/30 bg-background px-3 py-2 text-foreground" /></label>
+          <label className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">{t.scheduleDate}<input aria-label={t.addDateLabel} type="date" min={minIso} max={maxIso} value={eventIso} onChange={e => { if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value) && inRange(e.target.value)) { setEventIso(e.target.value); const next = new Date(`${e.target.value}T12:00:00`); if (next.getFullYear() === year) setVisibleMonth(next.getMonth()); } }} className="rounded-md border border-primary/30 bg-background px-3 py-2 text-foreground" /></label>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><p className="text-base text-foreground">{eventIso} · {label}</p><div className="flex flex-wrap gap-2"><Button variant="outline" asChild><a href={google} target="_blank" rel="noopener noreferrer"><CalendarDays className="size-4" />{t.googleCalendar}<ExternalLink className="size-3" /></a></Button><Button variant="outline" onClick={download}><Download className="size-4" />iOS / .ics</Button></div></div>
           <p className="mt-2 text-xs text-muted-foreground">{t.manualSync}</p>
         </TabsContent>
       </Tabs>
-    </Gate>
+    </>
     {!hideDirections && <><h4 className="mt-6 font-serif text-lg text-primary">{t.directionTitle}</h4>
     <Gate plan={plan} feature="helioDirections" onUpgrade={onUpgrade}>
       <ol className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{dirs.map((d, i) => <li key={d.dir} className={`border p-3 text-center ${i === 0 ? "border-primary bg-primary/10" : "border-primary/20"}`}><p className="font-serif text-lg text-primary">{directionLabels[language][d.dir]}</p><p className="text-sm text-foreground">{d.score}</p></li>)}</ol>
       <p className="mt-2 text-sm text-muted-foreground">{t.directionNote}</p>
     </Gate></>}
-    <h4 className="mt-6 font-serif text-lg text-primary">{t.businessTitle}</h4>
+    {canUse(plan, "helioBusiness") && <h4 className="mt-6 font-serif text-lg text-primary">{t.businessTitle}</h4>}
     <Gate plan={plan} feature="helioBusiness" onUpgrade={onUpgrade}>
       <p className="mt-2 text-sm text-muted-foreground">{t.businessIntro(members.length)}</p>
       <div className="mt-3 overflow-x-auto"><table className="w-full min-w-[560px] border-collapse text-xs"><thead><tr><th className="p-1 text-left text-primary">{year}</th>{t.months(year).map((month, index) => <th key={index} className="p-1 text-primary">{month}</th>)}</tr></thead><tbody>{gantt.map(g => <tr key={g.name}><th scope="row" className="whitespace-nowrap p-1 text-left font-normal text-foreground">{g.name}</th>{g.months.map((v, m) => <td key={m} className="p-0.5"><div title={`${v}`} className={`h-5 rounded-sm ${v >= 55 ? "bg-primary" : v >= 48 ? "bg-primary/40" : "bg-muted"}`} /></td>)}</tr>)}</tbody></table></div>
       <p className="mt-1 text-xs text-muted-foreground">{t.chartLegend}</p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">{bestDays.map(b => <div key={b.name} className="border border-primary/25 p-3"><p className="text-sm text-primary">{b.name} {t.candidateDays}</p><div className="mt-2 flex flex-wrap gap-2">{b.days.map(di => <Button key={di} size="sm" variant={eventIso === di ? "default" : "outline"} onClick={() => setEventIso(di)} aria-pressed={eventIso === di}>{di}</Button>)}</div></div>)}</div>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">{bestDays.map(b => <div key={b.name} className="border border-primary/25 p-3"><p className="text-sm text-primary">{b.name} {t.candidateDays}</p><div className="mt-2 flex flex-wrap gap-2">{b.days.map(di => <Button key={di} size="sm" variant={eventIso === di ? "default" : "outline"} onClick={() => { if (inRange(di)) setEventIso(di); }} disabled={!inRange(di)} aria-pressed={eventIso === di}>{di}</Button>)}</div></div>)}</div>
       <h5 className="mt-5 font-serif text-base text-primary">{t.alertTitle}</h5>
       <ul className="mt-2 space-y-2">{weeks.map(w => { const level = w.v >= 55 ? "high" : w.v <= 45 ? "low" : "mid"; return <li key={w.start} className="border-l-2 border-primary/50 pl-3 text-sm leading-7 text-foreground"><span className="text-primary">{w.start} · {t.periods[level]}</span>: {t.periodAdvice[level]}</li>; })}</ul>
       {!members.length && <p className="mt-2 text-xs text-muted-foreground">{t.addMembers}</p>}
