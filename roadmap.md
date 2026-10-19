@@ -1,9 +1,10 @@
 # Roadmap
 
-## BGM sound quality (2026-10-19)
-- [ ] Smooth start/stop/volume/tuning transitions and remove clipping sources
-- [ ] Refine all nine timbres and clean ambient reverb
-- [ ] Audio regression tests and browser playback verification (physical listening unavailable)
+## BGM sound quality (2026-10-19) — done
+- [x] Smooth start/stop/volume/tuning transitions and remove clipping sources
+- [x] Refine all nine timbres and clean ambient reverb
+- [x] All nine offline 48kHz renders: finite output, peak <0.44, silent post-fade tail; live tuning/mute/volume/stop without page errors; physical listening unavailable
+- [x] Audio regression and unchanged 20-second sample lifecycle tests
 
 ## Fixed controls / Today depth (2026-10-19) — done
 - [x] Fixed Home/Settings on every device and one adjacent BGM dropdown
