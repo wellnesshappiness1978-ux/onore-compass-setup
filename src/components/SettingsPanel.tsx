@@ -79,6 +79,7 @@ export default function SettingsPanel({
   const dc = designCopy[language];
   const appearanceCopy = appearanceUiCopy[language];
   const profileUi = profileUiCopy[language];
+  const [pianoUpsell, setPianoUpsell] = useState(false);
   const [yearly, setYearly] = useState(false);
   const [upgradePlan, setUpgradePlan] = useState<string | null>(null);
   const [notifyTiming, setNotifyTiming] = useState(true);
