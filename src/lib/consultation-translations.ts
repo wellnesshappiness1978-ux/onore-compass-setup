@@ -38,7 +38,7 @@ export type ConsultationTranslation = {
 export const consultationTranslations: Record<Language, ConsultationTranslation> = {
   ja: {
     ownerLabel: "本人（登録オーナー）",
-    targetLabel: "相談する人の個人データ",
+    targetLabel: "相談する対象",
     title: "アゴルメン相談室",
     subtitle: "決断の輪郭を、静かに照らす",
     active: "稼働中",
@@ -84,7 +84,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
   },
   en: {
     ownerLabel: "You (owner)",
-    targetLabel: "Person to consult about",
+    targetLabel: "Consultation subject",
     title: "Agolmen AI Chamber",
     subtitle: "Bring quiet clarity to your next decision",
     active: "Online",
@@ -131,7 +131,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
   },
   "zh-CN": {
     ownerLabel: "本人（账户所有者）",
-    targetLabel: "咨询对象的个人资料",
+    targetLabel: "咨询对象",
     title: "AI自我咨询室",
     subtitle: "静静照亮你的下一步决定",
     active: "运行中",
@@ -171,7 +171,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
   },
   "zh-TW": {
     ownerLabel: "本人（帳戶擁有人）",
-    targetLabel: "諮詢對象的個人資料",
+    targetLabel: "諮詢對象",
     title: "AI自我諮詢室",
     subtitle: "靜靜照亮你的下一步決定",
     active: "運行中",
@@ -211,7 +211,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
   },
   ko: {
     ownerLabel: "본인(계정 소유자)",
-    targetLabel: "상담 대상의 개인 정보",
+    targetLabel: "상담 대상",
     title: "아골멘 AI 상담실",
     subtitle: "다음 결정을 차분히 비춰드립니다",
     active: "가동 중",
@@ -257,7 +257,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
   },
   es: {
     ownerLabel: "Tú (titular)",
-    targetLabel: "Persona sobre la que consultar",
+    targetLabel: "Persona de la consulta",
     title: "Sala IA Agolmen",
     subtitle: "Ilumina con calma tu próxima decisión",
     active: "Activa",
@@ -304,7 +304,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
   },
   fr: {
     ownerLabel: "Vous (titulaire)",
-    targetLabel: "Personne concernée par la consultation",
+    targetLabel: "Personne concernée",
     title: "Salon IA Agolmen",
     subtitle: "Éclairer calmement votre prochaine décision",
     active: "Actif",
