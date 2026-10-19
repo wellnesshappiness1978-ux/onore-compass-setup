@@ -70,7 +70,7 @@ export const todayFeatures: readonly { id: TodayFeature; min: Plan }[] = [
 /** The family roadmap renders inside the combined biorhythm & calendar card from this plan. */
 export const familyRoadmapMin: Plan = "b2b";
 /** Extended birth direction type and this year's direction. */
-export const directionExtendedMin: Plan = "vip";
+export const directionExtendedMin: Plan = "standard";
 export const canUseToday = (plan: Plan, feature: TodayFeature) => rank(plan) >= rank(feature === "directionExtended" ? directionExtendedMin : feature === "familyRoadmap" ? familyRoadmapMin : todayFeatures.find((f) => f.id === feature)!.min);
 /** Earth-calendar / biorhythm browsing window in days around today (Infinity = unlimited). */
 /** Registered-group caps per plan; the database trigger mirrors these. */
