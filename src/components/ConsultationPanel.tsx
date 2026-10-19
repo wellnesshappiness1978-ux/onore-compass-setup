@@ -335,6 +335,15 @@ export default function ConsultationPanel({
             </optgroup>
           )}
         </select>
+        {selGroup && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {selGroupMembers.length
+              ? selGroupMembers.map((m) => m.name).join(language === "ja" ? "・" : ", ")
+              : language === "ja"
+                ? "このグループにはまだメンバーがいません。"
+                : "This group has no members yet."}
+          </p>
+        )}
         {target && (
           <p className="mt-2 text-xs text-muted-foreground">
             {target.birthDate}
