@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Pencil, Target, Trash2, Users, UserRound } from "lucide-react";
+import { Pencil, Sparkles, Target, Trash2, Users, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +33,7 @@ export function FocusSettingsCard({ language }: { language: Language }) {
         <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
       </summary>
       <div className="border-t border-primary/15 p-4 sm:p-5">
-      <p className="mt-1 text-xs leading-6 text-muted-foreground">{t.cardIntro}</p>
+      <div role="note" className="relative overflow-hidden rounded-lg border-2 border-primary/70 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent p-4 shadow-champagne"><span className="mb-2 inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground"><Sparkles className="size-3" aria-hidden="true" />{t.targetLabel}</span><p className="text-sm font-bold leading-6 text-foreground">{t.cardIntro}</p></div>
       <p className="mt-4 text-sm text-primary">{t.goalLabel}</p>
       <div className="mt-2 flex flex-wrap gap-2">{goalPresets.map(p => <Button key={p} type="button" size="sm" variant={f.goalPreset === p ? "default" : "outline"} aria-pressed={f.goalPreset === p} onClick={() => set({ goalPreset: f.goalPreset === p ? "" : p })}>{t.presets[p]}</Button>)}</div>
       <Input className="mt-2" aria-label={t.goalLabel} placeholder={t.goalPlaceholder} maxLength={200} value={f.goal} onChange={e => set({ goal: e.target.value })} />
