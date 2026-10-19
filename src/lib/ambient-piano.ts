@@ -1,20 +1,17 @@
-// Gesture-started Web Audio instrument. Frequencies are artistic tunings, not treatments.
+// Gesture-started artistic tunings, not treatments. The same graph powers offline checks.
 export type AmbientPiano = { stop: () => Promise<void>; setVolume: (value: number) => void };
 export const pianoTones = [174, 285, 396, 417, 528, 639, 741, 852, 963] as const;
-
-// Each tuning is an original composition, not a therapeutic frequency claim.
-type Style = { partials: number[]; attack: number; decay: number; wet: number; pad: number; padWave: OscillatorType; padCutoff: number; bells: number; drops: number; melodyEvery: number };
-// Each tuning gets its own colour: timbre, sustained pad, sparkle and water textures.
-export const pianoStyles: Record<number, Style & { mood: string }> = {
-  174: { mood: "deep-earth", partials: [1, .3, .12, .04], attack: .02, decay: 7, wet: .28, pad: .07, padWave: "triangle", padCutoff: 500, bells: 0, drops: 0, melodyEvery: 2 },
-  285: { mood: "soft-dawn", partials: [1, .18, .06], attack: .04, decay: 6, wet: .24, pad: .05, padWave: "sine", padCutoff: 900, bells: .2, drops: 0, melodyEvery: 1 },
-  396: { mood: "grounding-meditation", partials: [1, .25, .1, .03], attack: .012, decay: 6.5, wet: .3, pad: .08, padWave: "sawtooth", padCutoff: 420, bells: 0, drops: 0, melodyEvery: 2 },
-  417: { mood: "flowing-water", partials: [1, .12, .04], attack: .006, decay: 4.5, wet: .32, pad: .04, padWave: "sine", padCutoff: 1100, bells: 0, drops: .6, melodyEvery: 1 },
-  528: { mood: "warm-piano", partials: [1, .22, .08, .025], attack: .009, decay: 5.2, wet: .18, pad: .035, padWave: "triangle", padCutoff: 1400, bells: 0, drops: 0, melodyEvery: 1 },
-  639: { mood: "starry-sky", partials: [1, .08, .3, .02, .12], attack: .004, decay: 6, wet: .36, pad: .045, padWave: "sine", padCutoff: 2200, bells: .7, drops: 0, melodyEvery: 1 },
-  741: { mood: "crystal-clarity", partials: [1, 0, .35, 0, .18], attack: .003, decay: 3.8, wet: .26, pad: .03, padWave: "square", padCutoff: 800, bells: .4, drops: .2, melodyEvery: 1 },
-  852: { mood: "mystic-temple", partials: [1, .4, .2, .1, .05], attack: .05, decay: 8, wet: .4, pad: .07, padWave: "sawtooth", padCutoff: 650, bells: .3, drops: 0, melodyEvery: 2 },
-  963: { mood: "celestial-light", partials: [1, .05, .2, .02, .1, .05], attack: .03, decay: 9, wet: .45, pad: .06, padWave: "sine", padCutoff: 3000, bells: .9, drops: 0, melodyEvery: 1 },
+type Style = { partials: number[]; attack: number; decay: number; wet: number; pad: number; padCutoff: number; bells: number; drops: number; melodyEvery: number; mood: string };
+export const pianoStyles: Record<number, Style> = {
+  174: { mood: 'deep-earth', partials: [1,.24,.08], attack: .12, decay: 7, wet: .28, pad: .055, padCutoff: 650, bells: 0, drops: 0, melodyEvery: 2 },
+  285: { mood: 'soft-dawn', partials: [1,.16,.04], attack: .09, decay: 6, wet: .24, pad: .045, padCutoff: 1100, bells: .2, drops: 0, melodyEvery: 1 },
+  396: { mood: 'grounding-meditation', partials: [1,.2,.06], attack: .12, decay: 6.5, wet: .3, pad: .06, padCutoff: 650, bells: 0, drops: 0, melodyEvery: 2 },
+  417: { mood: 'flowing-water', partials: [1,.1,.025], attack: .065, decay: 4.5, wet: .32, pad: .04, padCutoff: 1300, bells: 0, drops: .6, melodyEvery: 1 },
+  528: { mood: 'warm-piano', partials: [1,.18,.055,.015], attack: .055, decay: 5.2, wet: .22, pad: .035, padCutoff: 1600, bells: 0, drops: 0, melodyEvery: 1 },
+  639: { mood: 'starry-sky', partials: [1,.06,.16,.015,.05], attack: .08, decay: 6, wet: .36, pad: .045, padCutoff: 2000, bells: .7, drops: 0, melodyEvery: 1 },
+  741: { mood: 'crystal-clarity', partials: [1,0,.18,0,.055], attack: .075, decay: 4.4, wet: .28, pad: .035, padCutoff: 1400, bells: .4, drops: .2, melodyEvery: 1 },
+  852: { mood: 'mystic-temple', partials: [1,.24,.1,.04], attack: .14, decay: 8, wet: .4, pad: .055, padCutoff: 1000, bells: .3, drops: 0, melodyEvery: 2 },
+  963: { mood: 'celestial-light', partials: [1,.04,.12,.015,.04], attack: .12, decay: 9, wet: .42, pad: .045, padCutoff: 2400, bells: .9, drops: 0, melodyEvery: 1 },
 };
 const scores: Record<number, { chords: number[][]; melody: number[]; pace: number; register: number }> = {
   174: { chords: [[0,3,7,10],[-5,0,3,7],[-7,-2,3,5]], melody: [7,10,12,10,7,3,5,3,0,3,7,5], pace: .98, register: 2 },
@@ -27,108 +24,134 @@ const scores: Record<number, { chords: number[][]; melody: number[]; pace: numbe
   852: { chords: [[0,4,9,12],[-5,0,5,9],[-7,0,4,7]], melody: [9,12,16,12,9,7,4,7,9,12,7,4], pace: .95, register: 4 },
   963: { chords: [[0,4,7,12],[-4,0,5,9],[-7,-2,4,7]], melody: [12,16,19,16,12,9,7,4,7,12,16,9], pace: 1.05, register: 4 },
 };
-
-export async function createAmbientPiano(hz: number, volume: number): Promise<AmbientPiano> {
-  const ctx = new AudioContext();
-  try { await ctx.resume(); } catch (error) { await ctx.close(); throw error; }
-  const master = ctx.createGain();
-  master.gain.setValueAtTime(0, ctx.currentTime);
-  master.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.8);
+export const safePianoVolume = (value: number) => Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0;
+export function normalizedPartials(weights: number[], frequency: number, sampleRate: number) {
+  const valid = weights.map((w, i) => frequency * (i + 1) * (1 + i * i * .00012) < Math.min(7000, sampleRate * .45) ? Math.max(0, w) : 0);
+  const sum = valid.reduce((a, b) => a + b, 0);
+  return valid.map(w => sum > 0 ? w / sum : 0);
+}
+// Raised-cosine attack/release reaches exact zero with zero endpoint slope.
+function envelopeCurve(peak: number, attack: number, duration: number) {
+  return Float32Array.from({ length: 512 }, (_, i) => {
+    const t = i / 511 * duration;
+    const rise = .5 - .5 * Math.cos(Math.PI * Math.min(1, t / attack));
+    const release = t > duration - .4 ? .5 - .5 * Math.cos(Math.PI * (duration - t) / .4) : 1;
+    return peak * rise * Math.exp(-4.5 * Math.max(0, t - attack) / duration) * release;
+  });
+}
+/** Browser-safe graph factory; the caller owns the context and scheduling lifetime. */
+export function createAmbientGraph(ctx: BaseAudioContext, hz: number, volume: number) {
+  const style = pianoStyles[hz] ?? pianoStyles[528];
+  const score = scores[hz] ?? scores[528];
+  if (!style || !score) throw new Error('BGM score unavailable');
+  const start = ctx.currentTime;
+  const bus = ctx.createGain();
+  const highpass = ctx.createBiquadFilter(); highpass.type = 'highpass'; highpass.frequency.value = 25; highpass.Q.value = .5;
+  const lowpass = ctx.createBiquadFilter(); lowpass.type = 'lowpass'; lowpass.frequency.value = 6200; lowpass.Q.value = .5;
   const compressor = ctx.createDynamicsCompressor();
-  compressor.threshold.value = -16; compressor.ratio.value = 4; compressor.knee.value = 8;
-  master.connect(compressor).connect(ctx.destination);
-  const dry = ctx.createGain(); dry.gain.value = 0.62; dry.connect(master);
-  const reverb = ctx.createConvolver();
-  const impulse = ctx.createBuffer(2, ctx.sampleRate * 3, ctx.sampleRate);
-  let seed = 1789;
+  compressor.threshold.value = -12; compressor.knee.value = 12; compressor.ratio.value = 3; compressor.attack.value = .015; compressor.release.value = .3;
+  const master = ctx.createGain();
+  // Headroom precedes output volume; never use a hard-clipping waveshaper.
+  const headroom = ctx.createGain(); headroom.gain.value = .8;
+  bus.connect(highpass).connect(lowpass).connect(compressor).connect(headroom).connect(master).connect(ctx.destination);
+  master.gain.setValueAtTime(0, start);
+  master.gain.linearRampToValueAtTime(safePianoVolume(volume), start + .9);
+  const dry = ctx.createGain(); dry.gain.value = .85; dry.connect(bus);
+  const reverb = ctx.createConvolver(); reverb.normalize = false;
+  const impulse = ctx.createBuffer(2, Math.ceil(ctx.sampleRate * 3), ctx.sampleRate);
+  // Bounded, deterministic diffuse reflections. No continuous noise generator or feedback loop.
   for (let ch = 0; ch < 2; ch++) {
     const samples = impulse.getChannelData(ch);
-    for (let i = 0; i < samples.length; i++) {
-      seed = (seed * 16807) % 2147483647;
-      samples[i] = (seed / 2147483647 * 2 - 1) * Math.pow(1 - i / samples.length, 3);
+    for (let tap = 0; tap < 96; tap++) {
+      const time = .035 + tap * .0289 + ((tap * 17 + ch * 11) % 23) * .0007;
+      const index = Math.round(time * ctx.sampleRate);
+      if (index < samples.length) samples[index] = (tap % 2 ? -1 : 1) * .016 * Math.exp(-time * 1.5);
     }
   }
   reverb.buffer = impulse;
-  const style = pianoStyles[hz] ?? pianoStyles[528]!;
-  const wet = ctx.createGain(); wet.gain.value = style.wet;
-  reverb.connect(wet).connect(master);
-  const delay = ctx.createDelay(2); delay.delayTime.value = 0.72;
-  const echo = ctx.createGain(); echo.gain.value = 0.13;
-  delay.connect(echo).connect(reverb);
+  const wet = ctx.createGain(); wet.gain.value = style.wet; reverb.connect(wet).connect(bus);
+  const delay = ctx.createDelay(2); delay.delayTime.value = .72;
+  const echo = ctx.createGain(); echo.gain.value = .12; delay.connect(echo).connect(reverb);
   const active = new Set<OscillatorNode>();
-  const note = (frequency: number, at: number, strength: number, pan: number, partialsOverride?: number[]) => {
-    const envelope = ctx.createGain();
-    envelope.gain.setValueAtTime(0, at);
-    envelope.gain.linearRampToValueAtTime(strength, at + style.attack);
-    envelope.gain.exponentialRampToValueAtTime(strength * .42, at + style.attack + .17);
-    envelope.gain.exponentialRampToValueAtTime(0.001, at + style.decay);
+  let seed = hz;
+  const random = () => { seed = seed * 16807 % 2147483647; return seed / 2147483647; };
+  const note = (frequency: number, at: number, strength: number, pan: number, weights = style.partials, duration = style.decay, attack = style.attack, water = false) => {
+    if (strength <= 0) return;
+    const partials = normalizedPartials(weights, frequency, ctx.sampleRate);
+    const env = ctx.createGain(); env.gain.setValueAtTime(0, start);
+    env.gain.setValueCurveAtTime(envelopeCurve(strength, attack, duration), at, duration);
     const stereo = ctx.createStereoPanner(); stereo.pan.value = pan;
-    envelope.connect(stereo); stereo.connect(dry); stereo.connect(reverb); stereo.connect(delay);
-    const partials = partialsOverride ?? style.partials;
-    let remaining = partials.length;
+    env.connect(stereo); stereo.connect(dry); stereo.connect(reverb); stereo.connect(delay);
+    let remaining = partials.filter(w => w > 0).length;
+    if (!remaining) { env.disconnect(); stereo.disconnect(); return; }
     partials.forEach((weight, index) => {
+      if (weight <= 0) return;
       const oscillator = ctx.createOscillator(); oscillator.type = 'sine';
-      oscillator.frequency.value = frequency * (index + 1) * (1 + index * index * 0.00012);
+      const f = frequency * (index + 1) * (1 + index * index * .00012);
+      oscillator.frequency.setValueAtTime(f, at);
+      if (water) oscillator.frequency.exponentialRampToValueAtTime(f * 1.35, at + .22);
       const partial = ctx.createGain(); partial.gain.value = weight;
-      oscillator.connect(partial).connect(envelope);
-      active.add(oscillator);
-      oscillator.onended = () => {
-        active.delete(oscillator); oscillator.disconnect(); partial.disconnect();
-        remaining -= 1;
-        if (remaining === 0) { envelope.disconnect(); stereo.disconnect(); }
-      };
-      oscillator.start(at); oscillator.stop(at + style.decay + .1);
+      oscillator.connect(partial).connect(env); active.add(oscillator);
+      oscillator.onended = () => { active.delete(oscillator); oscillator.disconnect(); partial.disconnect(); if (--remaining === 0) { env.disconnect(); stereo.disconnect(); } };
+      oscillator.start(at); oscillator.stop(at + duration + .025);
     });
   };
-  const score = scores[hz] ?? scores[528];
-  if (!score) throw new Error("Piano score unavailable");
-  let step = 0;
-  let next = ctx.currentTime + 0.06;
-  let stopped = false;
-  // Sustained ambient pad: slowly breathing filtered chord, retuned per chord change.
-  const padFilter = ctx.createBiquadFilter(); padFilter.type = "lowpass"; padFilter.frequency.value = style.padCutoff; padFilter.Q.value = .7;
-  const padGain = ctx.createGain(); padGain.gain.setValueAtTime(0, ctx.currentTime); padGain.gain.linearRampToValueAtTime(style.pad, ctx.currentTime + 4);
+  const padFilter = ctx.createBiquadFilter(); padFilter.type = 'lowpass'; padFilter.frequency.value = style.padCutoff; padFilter.Q.value = .5;
+  const padGain = ctx.createGain(); padGain.gain.setValueAtTime(0, start); padGain.gain.linearRampToValueAtTime(style.pad, start + 4);
   padFilter.connect(padGain); padGain.connect(reverb); padGain.connect(dry);
-  const lfo = ctx.createOscillator(); lfo.frequency.value = .07; const lfoDepth = ctx.createGain(); lfoDepth.gain.value = style.padCutoff * .35;
-  lfo.connect(lfoDepth).connect(padFilter.frequency); lfo.start();
-  const padVoices = [0, 1, 2, 3].map(i => { const o = ctx.createOscillator(); o.type = style.padWave; o.detune.value = (i % 2 ? 6 : -6); o.connect(padFilter); o.start(); return o; });
-  const retunePad = (chord: number[], at: number) => padVoices.forEach((o, i) => o.frequency.setTargetAtTime(hz / score.register / 2 * 2 ** ((chord[i % chord.length] ?? 0) / 12), at, 1.2));
-  const bell = (at: number) => { const f = hz * 2 * 2 ** ([0, 4, 7, 12, 16][Math.floor(Math.random() * 5)]! / 12); note(f, at, .035 * style.bells, Math.random() * 1.4 - .7, [1, 0, .4, 0, .15]); };
-  const drop = (at: number) => {
-    const o = ctx.createOscillator(); o.type = "sine"; const g = ctx.createGain(); const f = hz * (1.5 + Math.random());
-    o.frequency.setValueAtTime(f, at); o.frequency.exponentialRampToValueAtTime(f * 1.8, at + .12);
-    g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(.05 * style.drops, at + .005); g.gain.exponentialRampToValueAtTime(.0008, at + .25);
-    o.connect(g); g.connect(reverb); g.connect(delay); o.start(at); o.stop(at + .3); o.onended = () => { o.disconnect(); g.disconnect(); };
-  };
-  const schedule = () => {
-    if (stopped || ctx.state !== 'running') return;
-    // Schedule against the audio clock, not callback arrival time.
-    if (next < ctx.currentTime) next = ctx.currentTime + 0.04;
-    while (next < ctx.currentTime + 0.4) {
-      const chord = score.chords[Math.floor(step / 8) % score.chords.length];
-      if (chord && step % 8 === 0) retunePad(chord, next);
-      if (style.bells && Math.random() < style.bells * .35) bell(next + Math.random() * score.pace);
-      if (style.drops && Math.random() < style.drops * .5) drop(next + Math.random() * score.pace);
-      if (chord && step % 4 === 0) chord.forEach((semitone, i) => note(hz / score.register * 2 ** (semitone / 12), next + i * 0.09, 0.095, (i - 1.5) * 0.28));
-      const pitch = score.melody[step % score.melody.length] ?? 0;
-      if (step % style.melodyEvery === 0) note(hz / (score.register / 2) * 2 ** (pitch / 12), next, step % 4 === 3 ? .11 : .14, step % 2 ? .24 : -.24);
-      if (step % 8 === 5) note(hz / score.register * 2 ** ((pitch + 7) / 12), next + .22, .052, -.33);
-      next += score.pace; step += 1;
-    }
-  };
-  schedule();
-  const timer = window.setInterval(schedule, 100);
+  const initialChord = score.chords[0] ?? [0,4,7,12];
+  const padVoices = [0,1,2,3].map(i => {
+    const o = ctx.createOscillator(); o.type = 'sine'; o.detune.value = i % 2 ? 3 : -3;
+    o.frequency.value = hz / score.register / 2 * 2 ** ((initialChord[i] ?? 0) / 12);
+    const gain = ctx.createGain(); gain.gain.value = .25; o.connect(gain).connect(padFilter); o.start(start); return o;
+  });
+  let step = 0; let next = start + .08; let stopping = false;
   return {
-    setVolume(value) { if (!stopped) master.gain.setTargetAtTime(value, ctx.currentTime, 0.15); },
-    async stop() {
-      if (stopped) return;
-      stopped = true; window.clearInterval(timer);
-      master.gain.cancelScheduledValues(ctx.currentTime);
-      master.gain.setTargetAtTime(0, ctx.currentTime, 0.08);
-      await new Promise(resolve => window.setTimeout(resolve, 350));
-      [lfo, ...padVoices].forEach(o => { try { o.stop(); } catch { /* ended */ } });
-      active.forEach(source => { try { source.stop(); } catch { /* Already ended. */ } });
-      if (ctx.state !== 'closed') await ctx.close();
+    scheduleUntil(until: number) {
+      if (stopping) return;
+      if (next < ctx.currentTime) next = ctx.currentTime + .06;
+      while (next < until) {
+        const chord = score.chords[Math.floor(step / 8) % score.chords.length];
+        if (chord && step % 8 === 0) padVoices.forEach((o,i) => o.frequency.setTargetAtTime(hz / score.register / 2 * 2 ** ((chord[i] ?? 0) / 12), next, 1.2));
+        if (style.bells && random() < style.bells * .35) note(hz * 2 * 2 ** (([0,4,7,12,16][Math.floor(random()*5)] ?? 0)/12), next + random()*score.pace, .07*style.bells, random()*1.4-.7, [1,0,.16,0,.04], 4.5, .1);
+        if (style.drops && random() < style.drops*.5) note(hz*(1.5+random()), next+random()*score.pace, .08*style.drops, random()-.5, [1], .85, .06, true);
+        if (chord && step % 4 === 0) chord.forEach((semitone,i) => note(hz/score.register*2**(semitone/12), next+i*.09, .19, (i-1.5)*.28));
+        const pitch = score.melody[step % score.melody.length] ?? 0;
+        if (step % style.melodyEvery === 0) note(hz/(score.register/2)*2**(pitch/12), next, step%4===3 ? .22 : .28, step%2 ? .24 : -.24);
+        if (step%8===5) note(hz/score.register*2**((pitch+7)/12), next+.22, .1, -.33);
+        next += score.pace; step++;
+      }
+    },
+    setVolume(value: number) {
+      if (stopping) return;
+      master.gain.cancelAndHoldAtTime(ctx.currentTime);
+      master.gain.linearRampToValueAtTime(safePianoVolume(value), ctx.currentTime + .25);
+    },
+    fadeOut(at = ctx.currentTime) {
+      if (stopping) return;
+      stopping = true;
+      master.gain.cancelAndHoldAtTime(at);
+      master.gain.linearRampToValueAtTime(0, at + .6);
+      [...padVoices, ...active].forEach(o => { try { o.stop(at + .65); } catch { /* Already ended. */ } });
     },
   };
+}
+export async function createAmbientPiano(hz: number, volume: number): Promise<AmbientPiano> {
+  const ctx = new AudioContext();
+  try {
+    await ctx.resume();
+    const graph = createAmbientGraph(ctx, hz, volume);
+    graph.scheduleUntil(ctx.currentTime + .5);
+    const timer = window.setInterval(() => { if (ctx.state === 'running') graph.scheduleUntil(ctx.currentTime + .5); }, 100);
+    let stopping: Promise<void> | undefined;
+    return {
+      setVolume: graph.setVolume,
+      stop() {
+        if (stopping) return stopping;
+        window.clearInterval(timer); graph.fadeOut();
+        stopping = new Promise<void>(resolve => window.setTimeout(resolve, 750)).then(async () => { if (ctx.state !== 'closed') await ctx.close(); });
+        return stopping;
+      },
+    };
+  } catch (error) { await ctx.close(); throw error; }
 }
