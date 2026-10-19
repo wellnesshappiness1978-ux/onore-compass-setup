@@ -162,6 +162,7 @@ function TorisetsuPanel({
   const [limitOpen, setLimitOpen] = useState(false);
   const [entryMode, setEntryMode] = useState<"members" | "manual">("manual");
   const [members, setMembers] = useState<TeamMember[]>([]);
+  const [pickedId, setPickedId] = useState("");
   const listMembers = useServerFn(listTeamMembers);
   useEffect(() => {
     let active = true;
@@ -170,6 +171,7 @@ function TorisetsuPanel({
     return () => { active = false; };
   }, [signedIn, listMembers]);
   const pickMember = (m: TeamMember) => {
+    setPickedId(m.id);
     setPartnerName(m.name); setPartnerKana(m.nameKana ?? "");
     setPartnerGender((m.gender as UserProfile["gender"]) || "undisclosed");
     setPartnerDate(m.birthDate);
