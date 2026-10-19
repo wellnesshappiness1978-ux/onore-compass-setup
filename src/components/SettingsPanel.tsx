@@ -31,8 +31,6 @@ import { memberLimit, planOrder } from "@/lib/plans";
 import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
-import SolfeggioPlayer from "./SolfeggioPlayer";
-import { pianoExtraCopy } from "@/lib/piano-copy";
 import { AppearanceFitting } from "./AppearanceFitting";
 import { NautilusIcon } from './NautilusIcon';
 import type { AppearanceSelection } from '@/lib/appearance-customization';
@@ -79,7 +77,6 @@ export default function SettingsPanel({
   const dc = designCopy[language];
   const appearanceCopy = appearanceUiCopy[language];
   const profileUi = profileUiCopy[language];
-  const [pianoUpsell, setPianoUpsell] = useState(false);
   const [yearly, setYearly] = useState(false);
   const [upgradePlan, setUpgradePlan] = useState<string | null>(null);
   const [notifyTiming, setNotifyTiming] = useState(true);
@@ -166,7 +163,6 @@ export default function SettingsPanel({
   return (
     <div className="space-y-5">
       <h2 className="font-serif text-2xl text-gradient-gold">{t.title}</h2>
-      <section className="sticky top-2 z-20 rounded-xl border border-primary/30 bg-card/95 p-3 shadow-lg backdrop-blur"><SolfeggioPlayer language={language} sampleOnly={planOrder.indexOf(plan) < planOrder.indexOf("vip")} onSampleEnd={() => setPianoUpsell(true)} /></section>
 
       <section className={card}>
         <div className="flex items-center gap-4">
@@ -228,14 +224,6 @@ export default function SettingsPanel({
       </section>
 
       {signedIn && debugAllowed && <DebugPlanSwitcher plan={actualPlan} language={language} onChanged={onDebugPlanChanged} />}
-
-      <Dialog open={pianoUpsell} onOpenChange={setPianoUpsell}>
-        <DialogContent className="z-[200] w-[calc(100%-1.5rem)] max-w-sm border-primary/40">
-          <DialogTitle className="font-serif text-primary">{pianoExtraCopy[language].upgradeTitle}</DialogTitle>
-          <DialogDescription>{pianoExtraCopy[language].upgradeBody}</DialogDescription>
-          <Button onClick={() => { setPianoUpsell(false); window.setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80); }}>{pianoExtraCopy[language].seePlans}</Button>
-        </DialogContent>
-      </Dialog>
 
       <section className="border-y border-primary/20 py-4" aria-labelledby="design-heading">
         <div className="flex items-center gap-2">

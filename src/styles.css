@@ -832,14 +832,7 @@ html[data-test-preview="true"] { --preview-bar-height: 104px; }
 html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 
 .audio-controller {
-  position: fixed; z-index: 40; right: max(16px, env(safe-area-inset-right)); bottom: 108px;
-  width: min(360px, calc(100vw - 32px)); border: 1px solid var(--design-line);
-  border-radius: 8px; padding: 12px 14px; background: color-mix(in oklab, var(--card) 94%, transparent);
-  backdrop-filter: blur(20px); box-shadow: 0 8px 30px color-mix(in oklab, var(--background) 70%, transparent);
-}
-.design-canvas:has(.audio-controller) { padding-bottom: 230px; }
-@media (max-width: 600px) {
-  .audio-controller { bottom: 90px; padding: 10px 12px; }
+  position: relative; width: 100%; min-width: 0;
 }
 @media (prefers-reduced-motion: reduce) {
   .design-canvas[data-background-tier="vip"] .celestial-stars { animation: none; }
@@ -1372,15 +1365,21 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .design-main, .tab-content, #day-compass, .daily-card-grid > *, .daily-life-guide section { min-width: 0; max-width: 100%; box-sizing: border-box; }
 #day-compass > section, #day-compass > div:not(.compass-wheel) { min-width: 0; max-width: 100%; }
 .mobile-fixed-header { top: var(--preview-bar-height); height: calc(56px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); }
+html { scroll-padding-top: calc(var(--preview-bar-height) + 72px + env(safe-area-inset-top)); }
+body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 64px + env(safe-area-inset-top)); left: 12px; right: auto; max-width: calc(100vw - 160px); }
+.design-canvas .language-controls { top: calc(var(--preview-bar-height) + 64px + env(safe-area-inset-top)); right: 12px; }
+.design-canvas .design-header { padding-top: calc(104px + env(safe-area-inset-top)); }
+.design-canvas:not([data-tab=home]) .design-header { height: calc(104px + env(safe-area-inset-top)); border: 0; }
+.design-canvas:not([data-tab=home]) .design-header > div { display: none; }
 
 @media (max-width: 767px) {
   html { scroll-padding-top: calc(var(--preview-bar-height) + 64px + env(safe-area-inset-top)); }
-  body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 8px + env(safe-area-inset-top)); left: 64px; right: 64px; max-width: none; display: flex; justify-content: center; }
+  body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 64px + env(safe-area-inset-top)); left: 12px; right: auto; max-width: calc(100vw - 160px); display: flex; }
   body:has(.design-canvas) .account-controls > button { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .design-canvas .language-controls { top: calc(var(--preview-bar-height) + 64px + env(safe-area-inset-top)); right: 12px; }
-  .design-canvas .design-header { padding-top: calc(56px + env(safe-area-inset-top)); }
+  .design-canvas .design-header { padding-top: calc(104px + env(safe-area-inset-top)); }
   .design-canvas .design-header > div { padding: 8px 12px 12px; }
-  .design-canvas:not([data-tab=home]) .design-header { height: calc(56px + env(safe-area-inset-top)); border: 0; }
+  .design-canvas:not([data-tab=home]) .design-header { height: calc(104px + env(safe-area-inset-top)); border: 0; }
   .design-canvas:not([data-tab=home]) .design-header > div { display: none; }
   .design-canvas .design-heading { margin-top: 4px; }
   .design-canvas .design-heading > .agolmen-logo-aura { width: 64px; height: 64px; }

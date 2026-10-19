@@ -8,7 +8,7 @@ import { getPianoState, playPiano, setPianoHz, setPianoMuted, setPianoVolume, st
 import { pianoExtraCopy } from "@/lib/piano-copy";
 import type { Language } from "@/lib/translations";
 
-export default function SolfeggioPlayer({ language, compact = false, sampleOnly = false, onSampleEnd }: { language: Language; compact?: boolean; sampleOnly?: boolean; onSampleEnd?: () => void }) {
+export default function SolfeggioPlayer({ language, compact = false, controlsOnly = false, sampleOnly = false, onSampleEnd }: { language: Language; compact?: boolean; controlsOnly?: boolean; sampleOnly?: boolean; onSampleEnd?: () => void }) {
   const labels: Record<Language, { region: string; stop: string; play: string; toggle: string; title: string; ambient: string; unmute: string; mute: string; settings: string; frequency: string; volume: string; bgmVolume: string; note: string; error: string }> = {
     ja: { region: "星音のBGM", stop: "BGMを停止", play: "BGMを再生", toggle: "再生・停止", title: "星音のBGM", ambient: "アンビエント", unmute: "消音を解除", mute: "消音", settings: "音楽の設定", frequency: "周波数", volume: "音量", bgmVolume: "BGM音量", note: "周波数を基音にした創作音楽です。DNA修復・治療などの効果は保証しません。", error: "音声を開始できませんでした。再生を押して再試行してください。" },
     en: { region: "Ambient piano", stop: "Stop music", play: "Play music", toggle: "Play or stop", title: "Celestial BGM", ambient: "Ambient", unmute: "Unmute", mute: "Mute", settings: "Audio settings", frequency: "Frequency", volume: "Volume", bgmVolume: "Music volume", note: "Original music tuned to a reference frequency; no therapeutic or DNA-repair effects are claimed.", error: "Audio could not start. Try Play again." },
@@ -30,12 +30,12 @@ export default function SolfeggioPlayer({ language, compact = false, sampleOnly 
     else void playPiano(hz, sampleOnly ? 20 : undefined, onSampleEnd);
   };
   return <section aria-label={text.region} className={`audio-controller ${compact ? "audio-controller--compact" : ""}`}>
-    <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-label={text.settings} className="flex w-full items-center gap-3 text-left">
+    {!controlsOnly && <Button variant="ghost" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-label={text.settings} className="h-auto w-full justify-start gap-3 whitespace-normal p-0 text-left">
       <Music2 className="size-5 shrink-0 text-primary" />
       <span className="min-w-0 flex-1"><span className="block font-serif text-base text-primary">{text.title}</span><span className="block text-xs text-muted-foreground">{playing && <span className="mr-1 inline-block size-2 animate-pulse rounded-full bg-primary align-middle" />}{hz} Hz · {extra.moods[hz] ?? text.ambient}</span></span>
       <ChevronDown className={`size-5 shrink-0 text-primary transition-transform ${expanded ? "rotate-180" : ""}`} />
-    </button>
-    {expanded && <div className="mt-3 space-y-3 border-t border-primary/20 pt-3">
+    </Button>}
+    {(expanded || controlsOnly) && <div className="space-y-3">
       <div className="flex items-center gap-3">
         <Button size="icon" variant="default" onClick={toggle} disabled={busy} aria-label={playing ? text.stop : text.play} aria-pressed={playing} title={text.toggle} className="size-11 shrink-0 rounded-full">{playing ? <Pause /> : <Play />}</Button>
         <label className="flex min-w-0 flex-1 items-center gap-2 text-xs text-muted-foreground">{text.volume}<input aria-label={text.bgmVolume} type="range" min={0} max={1} step={0.01} value={volume} onChange={e => setPianoVolume(Number(e.target.value))} className="min-w-0 flex-1 accent-primary" /></label>
