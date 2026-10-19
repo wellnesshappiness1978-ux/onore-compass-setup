@@ -137,7 +137,11 @@ export default function ConsultationPanel({
         : profile,
     [target, profile],
   );
-  const targetLabel = target?.name ?? consultationTranslations[language].ownerLabel;
+  const targetLabel = target?.name ?? (selGroup ? groupDisplayName(selGroup, selGroupIndex, language) : consultationTranslations[language].ownerLabel);
+  const groupContext = selGroup
+    ? `${language === "ja" ? "グループ相談" : "Group consultation"}: ${targetLabel}（${language === "ja" ? "メンバー" : "members"}: ${selGroupMembers.map((m) => `${m.name} ${m.birthDate}`).join(", ") || "—"}）`
+    : "";
+  const effectiveGoal = [goal, groupContext].filter(Boolean).join(" / ");
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
