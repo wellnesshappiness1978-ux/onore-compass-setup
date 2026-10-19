@@ -1,6 +1,6 @@
 // App-wide playback state for the Celestial BGM. Lives outside React so
 // switching tabs (which unmounts the player UI) never stops the music.
-import { createAmbientPiano, type AmbientPiano } from "./ambient-piano";
+import { createAmbientPiano, safePianoVolume, type AmbientPiano } from "./ambient-piano";
 
 export type PianoState = { hz: number; playing: boolean; busy: boolean; muted: boolean; volume: number; error: boolean; sample: boolean };
 let state: PianoState = { hz: 528, playing: false, busy: false, muted: false, volume: 0.6, error: false, sample: false };
@@ -35,7 +35,7 @@ export async function playPiano(hz: number, sampleSeconds?: number, sampleEnd?: 
 }
 
 export function setPianoHz(hz: number) { set({ hz }); }
-export function setPianoVolume(volume: number) { set({ volume }); engine?.setVolume(state.muted ? 0 : volume); }
+export function setPianoVolume(volume: number) { const bounded = safePianoVolume(volume); set({ volume: bounded }); engine?.setVolume(state.muted ? 0 : bounded); }
 export function setPianoMuted(muted: boolean) { set({ muted }); engine?.setVolume(muted ? 0 : state.volume); }
 
 if (typeof window !== "undefined") window.addEventListener("onore-voice-start", () => { if (state.playing) stopPiano(); });
