@@ -34,6 +34,8 @@ import compassAvatar from "@/assets/onore-ai-compass.png";
 import ConsultationVoice from "./ConsultationVoice";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import { readPreviewMembers } from "@/lib/consultation-targets";
+import { useFocus } from "./FocusProvider";
+import { groupDisplayName } from "@/lib/focus";
 import { useServerFn } from "@tanstack/react-start";
 import type { TeamMember } from "@/lib/team-analysis";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,6 +84,8 @@ export default function ConsultationPanel({
   const listMembers = useServerFn(listTeamMembers);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [targetId, setTargetId] = useState("owner");
+  const focusCtx = useFocus();
+  const groups = focusCtx?.groups ?? [];
   useEffect(() => {
     let active = true;
     if (signedIn && plan === actualPlan)
