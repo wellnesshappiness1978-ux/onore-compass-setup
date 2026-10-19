@@ -36,6 +36,7 @@ import { listTeamMembers } from "@/lib/team-members.functions";
 import { readPreviewMembers } from "@/lib/consultation-targets";
 import { useFocus } from "./FocusProvider";
 import { groupDisplayName } from "@/lib/focus";
+import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { useServerFn } from "@tanstack/react-start";
 import type { TeamMember } from "@/lib/team-analysis";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,6 +61,7 @@ type Props = {
   plan: Plan;
   actualPlan: Plan;
   signedIn: boolean;
+  previewMode?: boolean;
   onVip: () => void;
 };
 
@@ -77,6 +79,7 @@ export default function ConsultationPanel({
   plan,
   actualPlan,
   signedIn,
+  previewMode = false,
   onVip,
   focusTargetId = null,
   goal = "",
@@ -112,7 +115,7 @@ export default function ConsultationPanel({
   }, [focusTargetId, members]);
   const target = members.find((m) => m.id === targetId);
   const selGroupIndex = targetId.startsWith("group:") ? groups.findIndex((g) => g.id === targetId.slice(6)) : -1;
-  const selGroup = selGroupIndex >= 0 ? groups[selGroupIndex]! : null;
+  const selGroup = selGroupIndex >= 0 ? groups[selGroupIndex] ?? null : null;
   const selGroupMembers = useMemo(
     () => (selGroup ? (focusCtx?.members ?? members).filter((m) => selGroup.memberIds.includes(m.id)) : []),
     [selGroup, focusCtx?.members, members],
@@ -145,16 +148,20 @@ export default function ConsultationPanel({
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const usagePlan = signedIn ? actualPlan : plan;
-  const usage = useDailyUsage("consultation", usagePlan, signedIn);
+  const ux = consultationUxCopy[language];
+  const usagePlan = signedIn && !previewMode ? actualPlan : plan;
+  const actualUsage = useDailyUsage("consultation", signedIn ? actualPlan : plan, signedIn);
+  const previewUsage = useDailyUsage("consultation", plan, false);
+  const usage = previewMode && signedIn ? previewUsage : actualUsage;
   const { limit, unlimited, remaining } = usage;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
     return () => window.clearInterval(id);
   }, []);
+  const limitPlan = signedIn && actualUsage.remaining <= 0 ? actualPlan : usagePlan;
   const upgradeTo =
-    planOrder.indexOf(usagePlan) < planOrder.indexOf("vip") ? "vip" : nextPlan(usagePlan);
+    planOrder.indexOf(limitPlan) < planOrder.indexOf("vip") ? "vip" : nextPlan(limitPlan);
   const [limitOpen, setLimitOpen] = useState(false);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [favorites, setFavorites] = useState<Awaited<ReturnType<typeof listConsultationBookmarks>>>(
@@ -218,9 +225,11 @@ export default function ConsultationPanel({
       }
       setNotice(message || t.error);
       void usage.refresh();
+      void actualUsage.refresh();
     },
     onFinish: () => {
       void usage.refresh();
+      void actualUsage.refresh();
       textareaRef.current?.focus({ preventScroll: true });
     },
   });
@@ -238,14 +247,14 @@ export default function ConsultationPanel({
       textareaRef.current?.focus({ preventScroll: true });
       return;
     }
-    if (remaining <= 0) {
+    if (remaining <= 0 || (signedIn && actualUsage.remaining <= 0)) {
       setNotice(t.limit);
       setLimitOpen(true);
       return;
     }
     setNotice(null);
     clearError();
-    if (!signedIn && !(await usage.consume())) {
+    if ((!signedIn || previewMode) && !(await usage.consume())) {
       setNotice(t.limit);
       setLimitOpen(true);
       return;
@@ -368,9 +377,10 @@ export default function ConsultationPanel({
         </Button>
         {!unlimited && (
           <p className="w-full text-xs text-muted-foreground">
-            {planNames[usagePlan]} · {remaining}/{limit} · {hms(countdown)}
+            {planNames[usagePlan]} · {remaining}/{limit}<br />{ux.reset(hms(countdown))}
           </p>
         )}
+        {previewMode && signedIn && <p className="w-full text-xs leading-5 text-muted-foreground">{ux.preview}<br />{planNames[actualPlan]} · {actualUsage.unlimited ? t.unlimitedBadge : t.badge(actualUsage.remaining)}</p>}
         {!unlimited && remaining <= 0 && (
           <Button variant="champagne" onClick={() => setLimitOpen(true)}>
             <Crown className="size-4" />
@@ -539,10 +549,10 @@ export default function ConsultationPanel({
             <Crown className="mb-2 size-8 text-primary" />
             <DialogTitle className="font-serif leading-7">{t.modalTitle}</DialogTitle>
             <DialogDescription className="leading-6">
-              {planOrder.indexOf(usagePlan) < planOrder.indexOf("vip") ? t.modalBody : t.limit}
+              {planOrder.indexOf(limitPlan) < planOrder.indexOf("vip") ? t.modalBody : t.limit}
             </DialogDescription>
           </DialogHeader>
-          <p className="text-center font-mono text-2xl text-primary">{hms(countdown)}</p>
+          <p className="text-center text-sm leading-6 text-primary">{ux.reset(hms(countdown))}</p>
           {upgradeTo && (
             <Button
               variant="champagne"
@@ -552,7 +562,7 @@ export default function ConsultationPanel({
               }}
             >
               <Crown className="size-4" />
-              {planOrder.indexOf(usagePlan) < planOrder.indexOf("vip")
+              {planOrder.indexOf(limitPlan) < planOrder.indexOf("vip")
                 ? t.modalCta
                 : planNames[upgradeTo]}
             </Button>

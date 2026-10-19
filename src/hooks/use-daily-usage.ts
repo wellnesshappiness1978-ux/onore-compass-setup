@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { dailyUsageLimit } from "@/lib/plans";
+import { consultationDailyLimit, dailyUsageLimit } from "@/lib/plans";
 import type { Plan } from "@/lib/design-modes";
 
 export type UsageFeature = "consultation" | "compatibility";
@@ -18,7 +18,7 @@ export const msUntilMidnight = () => {
  * guests and preview-plan views use a device-local counter. Resets at local midnight.
  */
 export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: boolean) {
-  const limit = dailyUsageLimit[plan];
+  const limit = feature === "consultation" ? consultationDailyLimit[plan] : dailyUsageLimit[plan];
   const unlimited = !Number.isFinite(limit);
   const [used, setUsed] = useState(0);
   const [day, setDay] = useState(localDay);
@@ -55,7 +55,6 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
 
   /** Returns true when one use was recorded; false when the daily cap is reached. */
   const consume = useCallback(async () => {
-    if (unlimited) return true;
     if (serverCounted) {
       const { data, error } = await supabase.rpc("consume_daily_usage", {
         p_feature: feature,
@@ -68,6 +67,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
       setUsed(Number(data) || 0);
       return true;
     }
+    if (unlimited) return true;
     if (used >= limit) return false;
     const next = used + 1;
     try {

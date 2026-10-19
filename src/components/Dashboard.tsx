@@ -55,7 +55,9 @@ import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
 import { FocusProvider, useFocus } from "./FocusProvider";
 import { ArtOwnerOnlyNotice, FamilyGroupButtons, FocusSettingsCard, GroupFocusCard, SubjectBanner } from "./FocusPanels";
-import { focusCopy, goalText } from "@/lib/focus";
+import { focusCopy, goalText, groupDisplayName, memberDisplayName } from "@/lib/focus";
+import { savedPartner, savedGroupMembers } from "@/lib/saved-compatibility";
+import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
 import { canUseAppearance, decorationTier, appearanceStorageKey, defaultAppearance, readAppearance, readDesign, type AppearanceSelection } from "@/lib/appearance-customization";
@@ -163,6 +165,11 @@ function TorisetsuPanel({
   const [entryMode, setEntryMode] = useState<"members" | "manual">("manual");
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [pickedId, setPickedId] = useState("");
+  const focusContext = useFocus();
+  const groups = focusContext?.groups ?? [];
+  const ux = consultationUxCopy[language];
+  const [groupResults, setGroupResults] = useState<{ name: string; reading: NonNullable<ReturnType<typeof analyzeCompatibility>> }[]>([]);
+  const [analyzing, setAnalyzing] = useState(false);
   const listMembers = useServerFn(listTeamMembers);
   useEffect(() => {
     let active = true;
@@ -175,7 +182,7 @@ function TorisetsuPanel({
     setPartnerName(m.name); setPartnerKana(m.nameKana ?? "");
     setPartnerGender((m.gender as UserProfile["gender"]) || "undisclosed");
     setPartnerDate(m.birthDate);
-    setPartnerTime(m.birthTimeUnknown ? "" : (m.birthTime ?? "")); setPartnerTimeUnknown(Boolean(m.birthTimeUnknown));
+    setPartnerTime(savedPartner(m).birthTime); setPartnerTimeUnknown(!savedPartner(m).birthTime);
     setPartnerPlace(m.birthPlace ?? ""); setPartnerCity(m.birthCity ?? "");
     setPartnerBlood((m.bloodType as "" | "A" | "B" | "O" | "AB") || "");
     setPartnerSibling((m.siblingOrder as "" | "first" | "middle" | "last" | "only") || "");
@@ -187,12 +194,30 @@ function TorisetsuPanel({
   const partnerInput: PartnerInput = { name: partnerName, nameKana: partnerKana, gender: partnerGender, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
   const pickedMember = entryMode === "members" ? members.find((m) => m.id === pickedId) ?? null : null;
+  const pickedGroup = entryMode === "members" ? groups.find(g => `group:${g.id}` === pickedId) : undefined;
   const score = result?.score ?? 0;
   const today = new Date().toLocaleDateString("en-CA");
   const todayDate = new Date();
   const rhythmYou = profile.birthDate ? Math.round(personal(profile.birthDate, todayDate).total) : null;
   const rhythmPartner = partnerSchema.safeParse(partnerInput).success ? Math.round(personal(partnerDate, todayDate).total) : null;
-  useEffect(() => { setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, readingTheme, concern, profile, language]);
+  useEffect(() => { if (entryMode === "manual") setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, readingTheme, concern, profile, language, entryMode]);
+
+  const runAnalysis = async (inputs: { name: string; input: PartnerInput }[], saved = false, group = false) => {
+    if (analyzing || !inputs.length) return;
+    if (remaining <= 0) { setLimitOpen(true); return; }
+    setAnalyzing(true);
+    try {
+      const readings = inputs.flatMap(item => {
+        const reading = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, item.input, language, { relationship: saved ? "close" : relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern });
+        return reading ? [{ name: item.name, reading }] : [];
+      });
+      if (!readings.length) return;
+      if (!(await usage.consume())) { setLimitOpen(true); return; }
+      setGroupResults(group ? readings : []);
+      setResult(readings[0]?.reading ?? null);
+      setAnalyzed(true);
+    } finally { setAnalyzing(false); }
+  };
 
   return (
     <div>
@@ -286,11 +311,11 @@ function TorisetsuPanel({
               <div>
                 <div className="grid grid-cols-2 gap-2" role="tablist" aria-label={q.pickMember}>
                   <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "members"} onClick={() => setEntryMode("members")} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "members" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UsersRound className="size-4 shrink-0" aria-hidden="true" />{q.pickMember}</Button>
-                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "manual"} onClick={() => { setEntryMode("manual"); setPickedId(""); }} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "manual" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UserRound className="size-4 shrink-0" aria-hidden="true" />{q.manualEntry}</Button>
+                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "manual"} onClick={() => { setEntryMode("manual"); setPickedId(""); setGroupResults([]); }} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "manual" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UserRound className="size-4 shrink-0" aria-hidden="true" />{q.manualEntry}</Button>
                 </div>
                 {entryMode === "members" && (
                   <div className="mt-3">
-                     {members.length ? (
+                     {members.length || groups.length ? (
                       <>
                         <select
                           aria-label={q.pickMember}
@@ -298,13 +323,23 @@ function TorisetsuPanel({
                           value={pickedId}
                           onChange={(event) => {
                             const m = members.find((x) => x.id === event.target.value);
-                            if (m) pickMember(m); else setPickedId("");
+                            setAnalyzed(false);
+                            setGroupResults([]);
+                            if (m) {
+                              pickMember(m);
+                              void runAnalysis([{ name: memberDisplayName(m), input: savedPartner(m) }], true);
+                            } else {
+                              setPickedId(event.target.value);
+                              const g = groups.find(x => `group:${x.id}` === event.target.value);
+                              if (g) void runAnalysis(savedGroupMembers(g, focusContext?.members ?? members).map(member => ({ name: memberDisplayName(member), input: savedPartner(member) })), true, true);
+                            }
                           }}
                         >
                           <option value="">{q.pickMember}…</option>
-                          {members.map((m) => (
-                            <option key={m.id} value={m.id}>{m.name} · {m.birthDate}</option>
-                          ))}
+                          <optgroup label={ux.family}>{members.map((m) => (
+                            <option key={m.id} value={m.id}>{memberDisplayName(m)}</option>
+                          ))}</optgroup>
+                          <optgroup label={ux.groups}>{groups.map((g, i) => <option key={g.id} value={`group:${g.id}`} disabled={!g.memberIds.length}>{groupDisplayName(g, i, language)}</option>)}</optgroup>
                         </select>
                         {pickedMember && (
                           <p className="mt-2 rounded-md border border-primary/30 bg-primary/10 p-3 text-xs leading-5 text-foreground">
@@ -312,7 +347,7 @@ function TorisetsuPanel({
                             {` · ${pickedMember.birthDate}`}
                             {pickedMember.birthTimeUnknown === false && pickedMember.birthTime ? ` · ${pickedMember.birthTime}` : ""}
                             {pickedMember.birthPlace ? ` · ${pickedMember.birthPlace}` : ""}
-                            <span className="mt-1 block text-muted-foreground">{language === "ja" ? "登録情報をそのまま使って診断します。再入力は不要です。" : "Registered details are used as-is — no re-entry needed."}</span>
+                            <span className="mt-1 block text-muted-foreground">{ux.saved}</span>
                           </p>
                         )}
                       </>
@@ -322,7 +357,7 @@ function TorisetsuPanel({
                   </div>
                  )}
               </div>
-              {!pickedMember && (<>
+              {entryMode === "manual" && (<>
               <div>
                 <label
                   htmlFor="partner-name"
@@ -430,7 +465,7 @@ function TorisetsuPanel({
                 <label className="text-sm text-primary">{base.siblingOrder}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.siblingOrder} className={`${inputClass} mt-2`} value={partnerSibling} onChange={e => setPartnerSibling(e.target.value as typeof partnerSibling)}><option value="">—</option>{["first","middle","last","only"].map((x,i) => <option key={x} value={x}>{base.siblings[i]}</option>)}</select></label>
               </div>
               </>)}
-              <div>
+              {entryMode === "manual" && <><div>
                 <p className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <Network className="size-4 stroke-[1.4]" aria-hidden="true" />
                   {t.relationLabel}{" "}
@@ -464,16 +499,19 @@ function TorisetsuPanel({
                 type="button"
                 variant="champagne"
                 disabled={!canAnalyze}
-                onClick={async () => { if (!canAnalyze) return; if (remaining <= 0) { setLimitOpen(true); return; } const analysis = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, partnerInput, language, { relationship: relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern }); if (!analysis) return; if (!(await usage.consume())) { setLimitOpen(true); return; } setResult(analysis); setAnalyzed(true); }}
+                onClick={() => void runAnalysis([{ name: partnerName, input: partnerInput }])}
                  className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
               >
                 <Sparkles className="size-4 shrink-0" aria-hidden="true" />
                  {remaining <= 0 ? q.limit : q.action}
-              </Button>
+              </Button></>}
+              {pickedGroup && <p className="text-sm text-primary">{groupDisplayName(pickedGroup, groups.indexOf(pickedGroup), language)}</p>}
+              {analyzing && <AgolmenLoading compact label={q.action} />}
             </div>
           </section>
            {remaining <= 0 && !analyzed && <div role="status" className="mt-3 text-center"><p className="text-sm text-primary">{q.refresh}</p>{plan !== "b2b-premium" && <Button type="button" variant="champagne" onClick={onVip} className="mt-3 text-xs">{q.limit} →</Button>}</div>}
-          {analyzed && result ? (
+          {analyzed && groupResults.length > 0 && <section aria-live="polite" className="mt-6 space-y-4"><h3 className="font-serif text-xl text-primary">{ux.compatibility} · {ux.groups}</h3>{groupResults.map(item => <article key={item.name} className="rounded-lg border border-primary/25 p-4"><h4 className="font-semibold text-primary">{item.name} · {item.reading.score}%</h4><p className="mt-2 text-sm leading-7">{item.reading.sentences[0]}</p>{planOrder.indexOf(plan) >= planOrder.indexOf("vip") && <p className="mt-3 text-sm leading-7">{item.reading.sentences[2]}</p>}<p className="mt-3 text-xs text-muted-foreground">{item.reading.note}</p></article>)}</section>}
+          {analyzed && result && groupResults.length === 0 ? (
             <section className="py-8" aria-live="polite">
               {partnerName ? (
                 <p className="mb-4 text-center text-sm text-muted-foreground">{partnerName}</p>
@@ -593,6 +631,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const [tab, setTab] = useState<Tab>("home");
   const [focusMemberId, setFocusMemberId] = useState<string | null>(null);
   const [focusGoal, setFocusGoal] = useState("");
+  const [consultMode, setConsultMode] = useState<"compatibility" | "consultation">("consultation");
   useEffect(() => {
     const open = (target: string | null) => {
       if (target === "compass") { setTab("today"); window.scrollTo({ top: 0 }); }
@@ -803,8 +842,12 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </>
             ) : tab === "consult" ? (
               <>
-                <div className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} signedIn={signedIn} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
-                <ConsultationPanel
+                <div role="tablist" aria-label={consultationUxCopy[language].switchLabel} className="mb-5 grid grid-cols-2 gap-2" data-no-swipe>
+                  {(["compatibility", "consultation"] as const).map(mode => <Button key={mode} role="tab" aria-selected={consultMode === mode} aria-controls={`ai-${mode}`} variant={consultMode === mode ? "champagne" : "outline"} className="h-auto min-h-12 whitespace-normal px-2 py-2 text-xs sm:text-sm" onClick={() => setConsultMode(mode)}>{mode === "compatibility" ? <HeartHandshake className="size-4 shrink-0" /> : <WandSparkles className="size-4 shrink-0" />}{consultationUxCopy[language][mode]}</Button>)}
+                </div>
+                <div id="ai-compatibility" role="tabpanel" hidden={consultMode !== "compatibility"} className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} signedIn={signedIn} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+                <div id="ai-consultation" role="tabpanel" hidden={consultMode !== "consultation"}><ConsultationPanel
+                  previewMode={devOverrideEnabled}
                   profile={profile}
                   focusTargetId={focusMemberId}
                   goal={focusGoal}
@@ -813,7 +856,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                   actualPlan={serverPlan}
                   signedIn={signedIn}
                   onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                />
+                /></div>
               </>
             ) : tab === "business" ? (
               <><FamilyGroupButtons language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><BusinessFeaturePreview language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>
