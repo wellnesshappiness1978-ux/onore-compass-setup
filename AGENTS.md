@@ -18,14 +18,14 @@
 - Preserve legacy storage, event, and ICS identifiers and use the cropped brand logo. Why: avoid lost data and watermarks.
 - Keep support authenticated with owner-only RLS and legal content in shareable leaf pages. Why: protect personal information and avoid invented legal identity.
 - Keep reminders open-app only until a separate push provider is connected; do not add LINE integration. Why: browser timers stop when the app closes and LINE has been removed.
-- Keep Settings limited to account, plan, notification, theme, and language controls; place earth-calendar and team reference experiences in Plan Perks. Why: settings should remain operational and scannable.
+- Settings holds account, plan, notifications, theme and language; calendar/team references stay in Plan Perks. Why: keep operations scannable.
 - Birth-color mandala uses bundled neutral oil paint and local SVG/Canvas layers driven by seven exact colors, never external imagery. Why: private, offline, deterministic art without usage fees.
 - Mandala geometry exposes individually closed motif segments shared by color fills, masks, shadows, and top-layer gold outlines. Why: keep every birth color inside the jewelry pattern while live and exported art remain identical.
 - Related-person records share one backward-compatible extended shape across storage, preview, consultation and team tools. Why: retain birth context.
 - Keep user-facing localization in typed seven-language dictionaries and translate stable domain IDs only at render time. Why: calculations and stored data must remain language-independent while every locale stays complete.
 - Keep profile, settings-profile, and related-person copy in the typed profile UI dictionary; persisted prefecture IDs remain Japanese while labels localize at render time. Why: language switching must never alter saved data or leak fallback copy.
 - Keep Japanese compatibility prose in a pure signal-driven builder, with typed relationship/theme context and concern-topic matching; leave unknown comparisons unset. Why: content boundaries and topic relevance can be tested without inventing missing birth context.
-- Shared writing-voice owns final tone; companion-copy and theory-copy localize advice and theory. Preserve schemas. Why: consistent scientific/symbolic boundaries.
+- Shared writing-voice owns tone; companion/theory copy localizes advice. Preserve schemas. Why: consistent scientific/symbolic boundaries.
 - Keep legacy `b2b` plan IDs, `team_members`, and `onore-team` storage stable while rendering Family plan and Family roster terminology through localized copy. Why: rename the experience without breaking saved profiles, URLs, or entitlements.
 - Cosmic Genesis shares live/2048 rendering, birth astronomy, golden astrolabe and ring-clipped nautilus relief. Bodies stay foreground; scaled text has no plates. Birthplace-facing Earth stays outside the ring with daylight-independent display exposure. Physical-radius comparison keeps scale labels and the main Sun's visibility-scale note. Why: preserve scientific context and readable artwork.
 
