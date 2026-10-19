@@ -196,12 +196,12 @@ export default function ConsultationPanel({
           profile: targetProfile,
           ownerProfile: target ? profile : undefined,
           targetLabel,
-          goal: goal || undefined,
+          goal: effectiveGoal || undefined,
           language,
           day: new Date().toLocaleDateString("en-CA"),
         }),
       }),
-    [targetProfile, profile, targetLabel, language, target, goal],
+    [targetProfile, profile, targetLabel, language, target, effectiveGoal],
   );
   const { messages, sendMessage, status, stop, error, clearError, setMessages } = useChat({
     id: `onore-consult-${targetId}-${language}`,
@@ -316,11 +316,24 @@ export default function ConsultationPanel({
           }}
         >
           <option value="owner">{consultationTranslations[language].ownerLabel}</option>
-          {members.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.name} · {m.role || m.birthDate}
-            </option>
-          ))}
+          {members.length > 0 && (
+            <optgroup label={language === "ja" ? "登録ファミリー" : "Registered family"}>
+              {members.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} · {m.role || m.birthDate}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          {groups.length > 0 && (
+            <optgroup label={language === "ja" ? "登録グループ" : "Registered groups"}>
+              {groups.map((g, i) => (
+                <option key={g.id} value={`group:${g.id}`}>
+                  {groupDisplayName(g, i, language)} · {g.memberIds.length}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
         {target && (
           <p className="mt-2 text-xs text-muted-foreground">
