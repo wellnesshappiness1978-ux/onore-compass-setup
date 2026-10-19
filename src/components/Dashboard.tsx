@@ -341,6 +341,7 @@ function TorisetsuPanel({
                   onChange={(event) => setPartnerName(event.target.value)}
                   className={inputClass}
                 />
+                <p className="mt-1.5 text-[11px] leading-4 text-muted-foreground">{language === "ja" ? "姓と名の間にスペースを入れてください（例：山田 太郎）。ファミリー登録と同じ形式です。" : "Put a space between family and given name (e.g. John Smith) — same format as family registration."}</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="text-sm text-primary">{t.partnerKana}<span className="text-muted-foreground"> ({t.optional})</span><input aria-label={t.partnerKana} className={`${inputClass} mt-2`} maxLength={60} value={partnerKana} onChange={(event) => setPartnerKana(event.target.value)} /></label>
