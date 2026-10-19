@@ -111,6 +111,12 @@ export default function ConsultationPanel({
     if (focusTargetId && members.some((m) => m.id === focusTargetId)) setTargetId(focusTargetId);
   }, [focusTargetId, members]);
   const target = members.find((m) => m.id === targetId);
+  const selGroupIndex = targetId.startsWith("group:") ? groups.findIndex((g) => g.id === targetId.slice(6)) : -1;
+  const selGroup = selGroupIndex >= 0 ? groups[selGroupIndex]! : null;
+  const selGroupMembers = useMemo(
+    () => (selGroup ? (focusCtx?.members ?? members).filter((m) => selGroup.memberIds.includes(m.id)) : []),
+    [selGroup, focusCtx?.members, members],
+  );
   const targetProfile = useMemo(
     () =>
       target
