@@ -432,12 +432,15 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
           {i === lastOpen && share("share-open")}
         </Fragment>);
       })}
-      <FengShuiGuide profile={profile} date={today} language={language} />
       {share("share-bottom")}
       <Dialog open={sample !== null} onOpenChange={(v) => !v && setSample(null)}>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 sm:max-w-lg">
           <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{sample === "relations" || sample === "familyRoadmap" ? (ja ? "診断例（架空のデータです）" : "Sample (fictional data)") : (ja ? "診断例（あなたの今日の参考値）" : "Sample (your reference values today)")}</DialogDescription><DialogTitle className="font-serif text-xl">{sample ? L(titles[sample]) : ""}</DialogTitle></DialogHeader>
-          <div className="text-foreground">{sample === "familyRoadmap" ? <SampleFamily ja={ja} /> : sample === "relations" ? <SampleVip ja={ja} /> : sample ? content[sample].body : null}</div>
+          <div className="relative overflow-hidden rounded-md text-foreground">
+            <div className="max-h-44 overflow-hidden">{sample === "familyRoadmap" ? <SampleFamily ja={ja} /> : sample === "relations" ? <SampleVip ja={ja} /> : sample ? content[sample].body : null}</div>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-background/70 to-background backdrop-blur-[2px]" aria-hidden="true" />
+            <div className="absolute inset-x-0 bottom-2 flex items-center justify-center gap-2 text-xs text-primary"><LockKeyhole className="size-4" />{ja ? "続きは有料プランで毎日・詳細に表示されます" : "The full daily detail unlocks with a paid plan"}</div>
+          </div>
           <p className="text-sm text-primary">{ja ? `${names[sampleMin]}になると、これが毎日・詳細に占えます。` : `With ${names[sampleMin]}, this arrives daily in detail.`}</p>
           <Button variant="champagne" className="w-full" onClick={() => { setSample(null); onUpgrade(); }}><Crown className="size-4" />{ja ? "プラン詳細を見る" : "View plan details"}</Button>
         </DialogContent>
