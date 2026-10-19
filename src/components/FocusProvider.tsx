@@ -12,6 +12,7 @@ import { SELF_MEMBER_ID } from "@/lib/group-insight";
 export const ownerAsMember = (o: UserProfile): TeamMember => ({ id: SELF_MEMBER_ID, name: o.nameKanji || o.nameRomaji || "本人", nameKana: o.nameKana, birthDate: o.birthDate, birthTime: o.birthTime, birthTimeUnknown: o.birthTimeUnknown, birthPlace: o.birthPlace, birthCity: o.birthCity, siblingOrder: o.siblingOrder, gender: o.gender, bloodType: o.bloodType, role: "", skills: [] });
 
 type Ctx = {
+  owner: UserProfile;
   focus: Focus; setFocus: (f: Focus) => Promise<void>;
   members: TeamMember[]; groups: TeamGroup[]; reload: () => void; serverBacked: boolean;
   /** Selected family member (resolved), or null. */
@@ -62,7 +63,7 @@ export function FocusProvider({ owner, serverBacked, children }: { owner: UserPr
     const g = gi >= 0 ? groups[gi]! : null;
     const group = g ? { group: g, index: gi, members: [...(g.memberIds.includes(SELF_MEMBER_ID) && owner.birthDate ? [ownerAsMember(owner)] : []), ...members.filter(m => g.memberIds.includes(m.id))] } : null;
     return {
-      focus, setFocus, members, groups, reload, serverBacked, member, group,
+      owner, focus, setFocus, members, groups, reload, serverBacked, member, group,
       label: (language) => member ? memberDisplayName(member) : group ? groupDisplayName(group.group, group.index, language) : focusCopy[language].self,
       readingProfile: member ? memberToProfile(member) : owner,
     };

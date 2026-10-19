@@ -1,12 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-const groupInput = z.object({
-  name: z.string().trim().max(60),
-  nickname: z.string().trim().max(40),
-  memberIds: z.array(z.string().uuid()).max(100),
-});
+import { groupInput } from './family-capacity';
 type Row = { id: string; name: string; nickname: string; member_ids: string[] };
 const toGroup = (r: Row) => ({ id: r.id, name: r.name, nickname: r.nickname, memberIds: r.member_ids ?? [] });
 
@@ -23,7 +18,7 @@ export const addTeamGroup = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => groupInput.parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase.from("team_groups").insert({ user_id: context.userId, name: data.name, nickname: data.nickname, member_ids: data.memberIds }).select("id,name,nickname,member_ids").single();
-    if (error) throw new Error(error.code === "23514" ? "GROUP_LIMIT" : error.message);
+    if (error) throw new Error(error.code === "23514" ? (error.message.includes('GROUP_MEMBER_LIMIT') ? 'GROUP_MEMBER_LIMIT' : 'GROUP_LIMIT') : error.message);
     return toGroup(row);
   });
 
@@ -32,7 +27,7 @@ export const updateTeamGroup = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => groupInput.extend({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase.from("team_groups").update({ name: data.name, nickname: data.nickname, member_ids: data.memberIds }).eq("id", data.id).eq("user_id", context.userId).select("id,name,nickname,member_ids").single();
-    if (error) throw error;
+    if (error) throw new Error(error.code === "23514" ? (error.message.includes('GROUP_MEMBER_LIMIT') ? 'GROUP_MEMBER_LIMIT' : 'GROUP_LIMIT') : error.message);
     return toGroup(row);
   });
 

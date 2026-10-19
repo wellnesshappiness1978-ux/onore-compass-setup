@@ -1,5 +1,11 @@
 # Roadmap
 
+## Owner-excluded registration / BGM follow-up (2026-10-19) — done
+- [x] Show the signed-in owner without creating a family row or consuming a slot
+- [x] Exclude owner from group create/edit caps, retain default selection, apply authenticated database enforcement; actual paid writes unverified because this account has no membership
+- [x] Shared audio context, single harmonic voices, filtered reverb, more headroom; all nine offline renders peak <0.36 and exact silent tails; live controls without page errors; physical listening unavailable
+- [x] 194 tests pass; preview owner + 3 others fills exactly 3/3 slots; group saved and reopened with the same count; five-slot and 100-slot boundaries covered by tests
+
 ## BGM sound quality (2026-10-19) — done
 - [x] Smooth start/stop/volume/tuning transitions and remove clipping sources
 - [x] Refine all nine timbres and clean ambient reverb

@@ -1,5 +1,8 @@
 // Gesture-started artistic tunings, not treatments. The same graph powers offline checks.
 export type AmbientPiano = { stop: () => Promise<void>; setVolume: (value: number) => void };
+// All tuning transitions share one device context instead of reopening the audio driver.
+let playbackContext: AudioContext | undefined;
+let playbackUsers = 0;
 export const pianoTones = [174, 285, 396, 417, 528, 639, 741, 852, 963] as const;
 type Style = { partials: number[]; attack: number; decay: number; wet: number; pad: number; padCutoff: number; bells: number; drops: number; melodyEvery: number; mood: string };
 export const pianoStyles: Record<number, Style> = {
@@ -32,8 +35,8 @@ export function normalizedPartials(weights: number[], frequency: number, sampleR
 }
 // Raised-cosine attack/release reaches exact zero with zero endpoint slope.
 function envelopeCurve(peak: number, attack: number, duration: number) {
-  return Float32Array.from({ length: 512 }, (_, i) => {
-    const t = i / 511 * duration;
+  return Float32Array.from({ length: 2048 }, (_, i) => {
+    const t = i / 2047 * duration;
     const rise = .5 - .5 * Math.cos(Math.PI * Math.min(1, t / attack));
     const release = t > duration - .4 ? .5 - .5 * Math.cos(Math.PI * (duration - t) / .4) : 1;
     return peak * rise * Math.exp(-4.5 * Math.max(0, t - attack) / duration) * release;
@@ -52,7 +55,7 @@ export function createAmbientGraph(ctx: BaseAudioContext, hz: number, volume: nu
   compressor.threshold.value = -12; compressor.knee.value = 12; compressor.ratio.value = 3; compressor.attack.value = .015; compressor.release.value = .3;
   const master = ctx.createGain();
   // Headroom precedes output volume; never use a hard-clipping waveshaper.
-  const headroom = ctx.createGain(); headroom.gain.value = .8;
+  const headroom = ctx.createGain(); headroom.gain.value = .65;
   bus.connect(highpass).connect(lowpass).connect(compressor).connect(headroom).connect(master).connect(ctx.destination);
   master.gain.setValueAtTime(0, start);
   master.gain.linearRampToValueAtTime(safePianoVolume(volume), start + .9);
@@ -69,7 +72,9 @@ export function createAmbientGraph(ctx: BaseAudioContext, hz: number, volume: nu
     }
   }
   reverb.buffer = impulse;
-  const wet = ctx.createGain(); wet.gain.value = style.wet; reverb.connect(wet).connect(bus);
+  const wet = ctx.createGain(); wet.gain.value = style.wet;
+  const reverbFilter = ctx.createBiquadFilter(); reverbFilter.type = 'lowpass'; reverbFilter.frequency.value = 3200; reverbFilter.Q.value = .5;
+  reverb.connect(reverbFilter).connect(wet).connect(bus);
   const delay = ctx.createDelay(2); delay.delayTime.value = .72;
   const echo = ctx.createGain(); echo.gain.value = .12; delay.connect(echo).connect(reverb);
   const active = new Set<OscillatorNode>();
@@ -82,19 +87,17 @@ export function createAmbientGraph(ctx: BaseAudioContext, hz: number, volume: nu
     env.gain.setValueCurveAtTime(envelopeCurve(strength, attack, duration), at, duration);
     const stereo = ctx.createStereoPanner(); stereo.pan.value = pan;
     env.connect(stereo); stereo.connect(dry); stereo.connect(reverb); stereo.connect(delay);
-    let remaining = partials.filter(w => w > 0).length;
-    if (!remaining) { env.disconnect(); stereo.disconnect(); return; }
-    partials.forEach((weight, index) => {
-      if (weight <= 0) return;
-      const oscillator = ctx.createOscillator(); oscillator.type = 'sine';
-      const f = frequency * (index + 1) * (1 + index * index * .00012);
-      oscillator.frequency.setValueAtTime(f, at);
-      if (water) oscillator.frequency.exponentialRampToValueAtTime(f * 1.35, at + .22);
-      const partial = ctx.createGain(); partial.gain.value = weight;
-      oscillator.connect(partial).connect(env); active.add(oscillator);
-      oscillator.onended = () => { active.delete(oscillator); oscillator.disconnect(); partial.disconnect(); if (--remaining === 0) { env.disconnect(); stereo.disconnect(); } };
-      oscillator.start(at); oscillator.stop(at + duration + .025);
-    });
+    if (!partials.some(w => w > 0)) { env.disconnect(); stereo.disconnect(); return; }
+    // One normalized harmonic voice replaces multiple oscillators per note.
+    const oscillator = ctx.createOscillator();
+    const real = new Float32Array(partials.length + 1);
+    const imag = Float32Array.from([0, ...partials]);
+    oscillator.setPeriodicWave(ctx.createPeriodicWave(real, imag, { disableNormalization: true }));
+    oscillator.frequency.setValueAtTime(frequency, at);
+    if (water) oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.35, at + .22);
+    oscillator.connect(env); active.add(oscillator);
+    oscillator.onended = () => { active.delete(oscillator); oscillator.disconnect(); env.disconnect(); stereo.disconnect(); };
+    oscillator.start(at); oscillator.stop(at + duration + .025);
   };
   const padFilter = ctx.createBiquadFilter(); padFilter.type = 'lowpass'; padFilter.frequency.value = style.padCutoff; padFilter.Q.value = .5;
   const padGain = ctx.createGain(); padGain.gain.setValueAtTime(0, start); padGain.gain.linearRampToValueAtTime(style.pad, start + 4);
@@ -103,7 +106,9 @@ export function createAmbientGraph(ctx: BaseAudioContext, hz: number, volume: nu
   const padVoices = [0,1,2,3].map(i => {
     const o = ctx.createOscillator(); o.type = 'sine'; o.detune.value = i % 2 ? 3 : -3;
     o.frequency.value = hz / score.register / 2 * 2 ** ((initialChord[i] ?? 0) / 12);
-    const gain = ctx.createGain(); gain.gain.value = .25; o.connect(gain).connect(padFilter); o.start(start); return o;
+    const gain = ctx.createGain(); gain.gain.value = .25; o.connect(gain).connect(padFilter);
+    o.onended = () => { o.disconnect(); gain.disconnect(); };
+    o.start(start); return o;
   });
   let step = 0; let next = start + .08; let stopping = false;
   return {
@@ -134,10 +139,21 @@ export function createAmbientGraph(ctx: BaseAudioContext, hz: number, volume: nu
       master.gain.linearRampToValueAtTime(0, at + .6);
       [...padVoices, ...active].forEach(o => { try { o.stop(at + .65); } catch { /* Already ended. */ } });
     },
+    disconnect() {
+      [bus, highpass, lowpass, compressor, headroom, master, dry, reverb, reverbFilter, wet, delay, echo, padFilter, padGain].forEach(n => n.disconnect());
+    },
   };
 }
 export async function createAmbientPiano(hz: number, volume: number): Promise<AmbientPiano> {
-  const ctx = new AudioContext();
+  const ctx = playbackContext ?? new AudioContext();
+  playbackContext = ctx; playbackUsers++;
+  const release = async () => {
+    playbackUsers--;
+    if (playbackUsers === 0 && playbackContext === ctx) {
+      playbackContext = undefined;
+      if (ctx.state !== 'closed') await ctx.close();
+    }
+  };
   try {
     await ctx.resume();
     const graph = createAmbientGraph(ctx, hz, volume);
@@ -149,9 +165,9 @@ export async function createAmbientPiano(hz: number, volume: number): Promise<Am
       stop() {
         if (stopping) return stopping;
         window.clearInterval(timer); graph.fadeOut();
-        stopping = new Promise<void>(resolve => window.setTimeout(resolve, 750)).then(async () => { if (ctx.state !== 'closed') await ctx.close(); });
+        stopping = new Promise<void>(resolve => window.setTimeout(resolve, 750)).then(async () => { graph.disconnect(); await release(); });
         return stopping;
       },
     };
-  } catch (error) { await ctx.close(); throw error; }
+  } catch (error) { await release(); throw error; }
 }
