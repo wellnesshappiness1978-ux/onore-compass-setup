@@ -39,7 +39,7 @@ const requestSchema = z.object({
   goal: z.string().trim().max(240).optional(),
   language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]),
   day: z.string().date().optional(),
-  group: z.object({ name: z.string().trim().max(60), members: z.array(groupMemberSchema).max(100) }).optional(),
+  group: z.object({ name: z.string().trim().max(60), members: z.array(groupMemberSchema).max(101) }).optional(),
 });
 
 export async function handleConsultation(request: Request) {
