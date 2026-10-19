@@ -15,3 +15,9 @@
 ## Goal / subject / groups (2026-10-18) — done
 - Goal & subject card in Settings, subject-aware traits/today/consult, owner-only art notice
 - Nicknames, group registration with plan caps (0/1/3/10/30), outlined lucky-color text
+
+## Today guide / settings / compatibility / consultation update (2026-10-19) — done
+- Today: helio renamed "地球暦から読み解く"; feng shui moved into card 4 as Standard+ collapsible with frosted sample for Free; sample dialogs frosted-glass masked.
+- Settings: focus card renamed "目的・目標と診断対象設定" (7 languages) and collapsible.
+- Compatibility: member picker is now a dropdown; picked members skip re-entry; manual form shows family/given-name space hint.
+- Consultation: label renamed "相談する対象"; dropdown now offers owner / family / groups.
