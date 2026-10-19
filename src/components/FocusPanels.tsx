@@ -57,7 +57,7 @@ export function SubjectHeaderBadge({ language, ownerName, onOpen }: { language: 
   const t = focusCopy[language];
   const icon = ctx.group ? "👥" : ctx.member ? "👨‍👩‍👧" : "👤";
   const who = ctx.group ? ctx.label(language) : ctx.member ? `${ctx.label(language)}（${t.family}）` : `${t.self}${ownerName ? `（${ownerName}）` : ""}`;
-  return <button type="button" onClick={onOpen} title={t.cardTitle} className="mx-auto flex min-h-10 min-w-0 max-w-full items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary"><span aria-hidden="true">{icon}</span><span className="truncate"><span className="hidden sm:inline">{t.viewing("")}</span>{ctx.group || ctx.member ? who : (ownerName ? `${t.self}・${ownerName.split(/[\s　]/)[0]}` : t.self)}</span></button>;
+  return <button type="button" onClick={onOpen} title={t.cardTitle} aria-label={t.viewing(who)} className="mx-auto flex min-h-10 min-w-0 max-w-full items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary"><span aria-hidden="true">{icon}</span><span className="truncate"><span className="hidden sm:inline">{t.viewing("")}</span>{ctx.group || ctx.member ? who : (ownerName ? `${t.self}・${ownerName.split(/[\s　]/)[0]}` : t.self)}</span></button>;
 }
 
 /** Small strip showing the current subject with a way back to self. */
