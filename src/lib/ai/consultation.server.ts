@@ -1,3 +1,4 @@
+import { buildGroupContext, groupMemberSchema } from "@/lib/group-context";
 import { createOpenAI } from "@ai-sdk/openai";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { z } from "zod";
@@ -38,6 +39,7 @@ const requestSchema = z.object({
   goal: z.string().trim().max(240).optional(),
   language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]),
   day: z.string().date().optional(),
+  group: z.object({ name: z.string().trim().max(60), members: z.array(groupMemberSchema).max(100) }).optional(),
 });
 
 export async function handleConsultation(request: Request) {
@@ -62,6 +64,7 @@ export async function handleConsultation(request: Request) {
 
   const { messages, profile, ownerProfile, targetLabel, language, goal } = parsed.data;
   const day = parsed.data.day ?? new Date().toISOString().slice(0, 10);
+  const groupContext = parsed.data.group ? buildGroupContext(parsed.data.group.name, parsed.data.group.members, day) : "";
   const utcDay = new Date().toISOString().slice(0, 10);
   if (
     Math.abs(new Date(`${day}T00:00:00Z`).getTime() - new Date(`${utcDay}T00:00:00Z`).getTime()) >
@@ -140,6 +143,7 @@ Selected consultation subject: ${targetLabel ?? "registered owner"}. Discuss thi
 PRE-CALCULATED PARAMETERS (computed by the app — treat numbers as inputs, never treat their personality interpretation as verified facts, use exact numbers internally only, never recalculate or contradict them):
 ${params}
 ${ownerContext}
+${groupContext ? `\n${groupContext}\nWhen a group is selected, the profile above is only the account owner's reference; center every answer on the group, its pairs and members by name.` : ""}
 
 Rules:
 - Voice: an experienced companion at the user's eye level — clear, observant, warm, and never superior. Describe patterns as reference interpretations rather than fixed labels. BANNED Barnum phrases: "人それぞれ", "慎重に行動しましょう", "感謝を忘れずに", "無理せず", "バランスが大切", and any line that fits anyone.
