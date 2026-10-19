@@ -322,6 +322,7 @@ function TorisetsuPanel({
                   </div>
                  )}
               </div>
+              {!pickedMember && (<>
               <div>
                 <label
                   htmlFor="partner-name"
@@ -427,6 +428,7 @@ function TorisetsuPanel({
                 <label className="text-sm text-primary">{base.bloodType}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.bloodType} className={`${inputClass} mt-2`} value={partnerBlood} onChange={e => setPartnerBlood(e.target.value as typeof partnerBlood)}><option value="">—</option>{["A","B","O","AB"].map(x => <option key={x} value={x}>{x}</option>)}</select></label>
                 <label className="text-sm text-primary">{base.siblingOrder}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.siblingOrder} className={`${inputClass} mt-2`} value={partnerSibling} onChange={e => setPartnerSibling(e.target.value as typeof partnerSibling)}><option value="">—</option>{["first","middle","last","only"].map((x,i) => <option key={x} value={x}>{base.siblings[i]}</option>)}</select></label>
               </div>
+              </>)}
               <div>
                 <p className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <Network className="size-4 stroke-[1.4]" aria-hidden="true" />
