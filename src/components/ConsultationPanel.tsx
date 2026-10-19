@@ -159,8 +159,9 @@ export default function ConsultationPanel({
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
     return () => window.clearInterval(id);
   }, []);
+  const limitPlan = signedIn && actualUsage.remaining <= 0 ? actualPlan : usagePlan;
   const upgradeTo =
-    planOrder.indexOf(usagePlan) < planOrder.indexOf("vip") ? "vip" : nextPlan(usagePlan);
+    planOrder.indexOf(limitPlan) < planOrder.indexOf("vip") ? "vip" : nextPlan(limitPlan);
   const [limitOpen, setLimitOpen] = useState(false);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [favorites, setFavorites] = useState<Awaited<ReturnType<typeof listConsultationBookmarks>>>(
@@ -548,7 +549,7 @@ export default function ConsultationPanel({
             <Crown className="mb-2 size-8 text-primary" />
             <DialogTitle className="font-serif leading-7">{t.modalTitle}</DialogTitle>
             <DialogDescription className="leading-6">
-              {planOrder.indexOf(usagePlan) < planOrder.indexOf("vip") ? t.modalBody : t.limit}
+              {planOrder.indexOf(limitPlan) < planOrder.indexOf("vip") ? t.modalBody : t.limit}
             </DialogDescription>
           </DialogHeader>
           <p className="text-center text-sm leading-6 text-primary">{ux.reset(hms(countdown))}</p>
@@ -561,7 +562,7 @@ export default function ConsultationPanel({
               }}
             >
               <Crown className="size-4" />
-              {planOrder.indexOf(usagePlan) < planOrder.indexOf("vip")
+              {planOrder.indexOf(limitPlan) < planOrder.indexOf("vip")
                 ? t.modalCta
                 : planNames[upgradeTo]}
             </Button>
