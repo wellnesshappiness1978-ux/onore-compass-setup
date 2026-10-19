@@ -34,7 +34,8 @@ import compassAvatar from "@/assets/onore-ai-compass.png";
 import ConsultationVoice from "./ConsultationVoice";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import { readPreviewMembers } from "@/lib/consultation-targets";
-import { useFocus } from "./FocusProvider";
+import { ownerAsMember, useFocus } from "./FocusProvider";
+import { SELF_MEMBER_ID } from "@/lib/group-insight";
 import { groupDisplayName } from "@/lib/focus";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { useServerFn } from "@tanstack/react-start";
@@ -117,8 +118,8 @@ export default function ConsultationPanel({
   const selGroupIndex = targetId.startsWith("group:") ? groups.findIndex((g) => g.id === targetId.slice(6)) : -1;
   const selGroup = selGroupIndex >= 0 ? groups[selGroupIndex] ?? null : null;
   const selGroupMembers = useMemo(
-    () => (selGroup ? (focusCtx?.members ?? members).filter((m) => selGroup.memberIds.includes(m.id)) : []),
-    [selGroup, focusCtx?.members, members],
+    () => (selGroup ? [...(selGroup.memberIds.includes(SELF_MEMBER_ID) && profile.birthDate ? [ownerAsMember(profile)] : []), ...(focusCtx?.members ?? members).filter((m) => selGroup.memberIds.includes(m.id))] : []),
+    [selGroup, focusCtx?.members, members, profile],
   );
   const targetProfile = useMemo(
     () =>
@@ -206,9 +207,10 @@ export default function ConsultationPanel({
           goal: effectiveGoal || undefined,
           language,
           day: new Date().toLocaleDateString("en-CA"),
+          group: selGroup ? { name: targetLabel.slice(0, 60), members: selGroupMembers.filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.birthDate)).slice(0, 100).map((m) => ({ name: (m.nickname || m.name || "—").slice(0, 40), birthDate: m.birthDate, birthTime: m.birthTimeUnknown === false ? (m.birthTime ?? "").slice(0, 5) : "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: (m.birthPlace ?? "").slice(0, 80), bloodType: m.bloodType ?? "", gender: m.gender ?? "undisclosed", siblingOrder: (m.siblingOrder ?? "").slice(0, 40), relationship: (m.relationship ?? "").slice(0, 60) })) } : undefined,
         }),
       }),
-    [targetProfile, profile, targetLabel, language, target, effectiveGoal],
+    [targetProfile, profile, targetLabel, language, target, effectiveGoal, selGroup, selGroupMembers],
   );
   const { messages, sendMessage, status, stop, error, clearError, setMessages } = useChat({
     id: `onore-consult-${targetId}-${language}`,
@@ -347,7 +349,7 @@ export default function ConsultationPanel({
         {selGroup && (
           <p className="mt-2 text-xs text-muted-foreground">
             {selGroupMembers.length
-              ? selGroupMembers.map((m) => m.name).join(language === "ja" ? "・" : ", ")
+              ? selGroupMembers.map((m) => m.nickname || m.name).join(language === "ja" ? "・" : ", ")
               : language === "ja"
                 ? "このグループにはまだメンバーがいません。"
                 : "This group has no members yet."}

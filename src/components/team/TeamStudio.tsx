@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import SiblingSelect from "../SiblingSelect";
+import { siblingLabels } from "@/lib/sibling-order";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarPlus, Crown, Lock, Pencil, Sparkles, Trash2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -166,23 +168,11 @@ const rosterExtra: Record<Language, { kana: string; time: string; timeUnknown: s
   es: { kana: "Lectura del nombre", time: "Hora de nacimiento", timeUnknown: "Hora desconocida", place: "Región / país de nacimiento", city: "Ciudad de nacimiento", sibling: "Orden entre hermanos", gender: "Género", blood: "Grupo sanguíneo", relationship: "Relación / función", relationType: "Tipo de relación", types: ["Sin especificar", "Pareja", "Familia", "Amistad", "Colega", "Empleado", "Otro"], genders: ["Sin indicar", "Mujer", "Hombre", "Otro"], edit: "Editar", cancel: "Cancelar", saved: "Actualizar", preview: "Los miembros de prueba se guardan solo en este dispositivo y no cambian el límite real." },
   fr: { kana: "Lecture du nom", time: "Heure de naissance", timeUnknown: "Heure inconnue", place: "Région / pays de naissance", city: "Ville de naissance", sibling: "Rang dans la fratrie", gender: "Genre", blood: "Groupe sanguin", relationship: "Lien / fonction", relationType: "Type de relation", types: ["Non précisé", "Partenaire", "Famille", "Ami·e", "Professionnel", "Employé·e", "Autre"], genders: ["Non renseigné", "Femme", "Homme", "Autre"], edit: "Modifier", cancel: "Annuler", saved: "Mettre à jour", preview: "Les membres de prévisualisation restent sur cet appareil et ne modifient pas la limite réelle." },
 };
-const SIBLING_VALUES = ["長男", "長女", "次男", "次女", "三男", "三女", "末っ子", "一人っ子"] as const;
-const siblingLabels: Record<Language, { title: string; options: string[]; other: string; otherHint: string; relationTitle: string; relationOtherHint: string }> = {
-  ja: { title: "きょうだい順", options: ["長男", "長女", "次男", "次女", "三男", "三女", "末っ子", "一人っ子"], other: "その他", otherHint: "きょうだい順を入力", relationTitle: "関係性", relationOtherHint: "具体的な関係性を入力" },
-  en: { title: "Sibling order", options: ["Eldest son", "Eldest daughter", "Second son", "Second daughter", "Third son", "Third daughter", "Youngest", "Only child"], other: "Other", otherHint: "Enter sibling order", relationTitle: "Relationship", relationOtherHint: "Describe the relationship" },
-  "zh-CN": { title: "兄弟姐妹排行", options: ["长子", "长女", "次子", "次女", "三子", "三女", "老幺", "独生子女"], other: "其他", otherHint: "输入排行", relationTitle: "关系", relationOtherHint: "输入具体关系" },
-  "zh-TW": { title: "手足排行", options: ["長子", "長女", "次子", "次女", "三子", "三女", "老么", "獨生子女"], other: "其他", otherHint: "輸入排行", relationTitle: "關係", relationOtherHint: "輸入具體關係" },
-  ko: { title: "형제자매 순서", options: ["장남", "장녀", "차남", "차녀", "삼남", "삼녀", "막내", "외동"], other: "기타", otherHint: "형제 순서 입력", relationTitle: "관계", relationOtherHint: "구체적인 관계 입력" },
-  es: { title: "Orden entre hermanos", options: ["Hijo mayor", "Hija mayor", "Segundo hijo", "Segunda hija", "Tercer hijo", "Tercera hija", "Menor", "Hijo único"], other: "Otro", otherHint: "Escribe el orden", relationTitle: "Relación", relationOtherHint: "Describe la relación" },
-  fr: { title: "Rang dans la fratrie", options: ["Fils aîné", "Fille aînée", "Deuxième fils", "Deuxième fille", "Troisième fils", "Troisième fille", "Benjamin(e)", "Enfant unique"], other: "Autre", otherHint: "Saisir le rang", relationTitle: "Relation", relationOtherHint: "Préciser la relation" },
-};
-
 const emptyMemberForm = { name: "", nickname: "", nameKana: "", birthDate: "", birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", siblingOrder: "", gender: "undisclosed", bloodType: "", relationship: "", relationshipType: "", role: "", skills: "" };
 
 function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdit, onRemove }: { t: TeamCopy; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void }) {
   const x = rosterExtra[language];
   const [form, setForm] = useState(emptyMemberForm);
-  const [siblingOther, setSiblingOther] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
@@ -210,7 +200,7 @@ function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdi
         <label className="flex min-h-11 items-center gap-2 text-xs"><input type="checkbox" checked={form.birthTimeUnknown} onChange={(e) => setForm({ ...form, birthTimeUnknown: e.target.checked, birthTime: e.target.checked ? "" : form.birthTime })} />{x.timeUnknown}</label>
         <Input aria-label={x.place} placeholder={x.place} value={form.birthPlace} maxLength={80} onChange={(e) => setForm({ ...form, birthPlace: e.target.value })} />
         <Input aria-label={x.city} placeholder={x.city} value={form.birthCity} maxLength={80} onChange={(e) => setForm({ ...form, birthCity: e.target.value })} />
-        {(() => { const sl = siblingLabels[language]; const known = (SIBLING_VALUES as readonly string[]).includes(form.siblingOrder); const sel = form.siblingOrder === "" && !siblingOther ? "" : known ? form.siblingOrder : "__other"; return <div className="grid gap-2"><select aria-label={sl.title} value={sel} onChange={(e) => { const v = e.target.value; if (v === "__other") { setSiblingOther(true); setForm({ ...form, siblingOrder: known ? "" : form.siblingOrder }); } else { setSiblingOther(false); setForm({ ...form, siblingOrder: v }); } }} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="">{sl.title}</option>{SIBLING_VALUES.map((v, i) => <option key={v} value={v}>{sl.options[i]}</option>)}<option value="__other">{sl.other}</option></select>{sel === "__other" && <Input aria-label={sl.otherHint} placeholder={sl.otherHint} value={form.siblingOrder} maxLength={40} onChange={(e) => setForm({ ...form, siblingOrder: e.target.value })} />}</div>; })()}
+        <SiblingSelect key={editingId ?? "new"} language={language} value={form.siblingOrder} maxLength={40} onChange={(v) => setForm({ ...form, siblingOrder: v })} />
         <select aria-label={x.gender} value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as typeof form.gender })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm">{["undisclosed", "female", "male", "other"].map((value, i) => <option key={value} value={value}>{x.genders[i]}</option>)}</select>
         <select aria-label={x.blood} value={form.bloodType} onChange={(e) => setForm({ ...form, bloodType: e.target.value as typeof form.bloodType })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="">{x.blood}</option>{["A", "B", "O", "AB"].map(value => <option key={value} value={value}>{value}</option>)}</select>
         <select aria-label={x.relationType} value={form.relationshipType} onChange={(e) => setForm({ ...form, relationshipType: e.target.value })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm">{["", "partner", "family", "friend", "business", "employee", "other"].map((value, i) => <option key={value} value={value}>{i === 0 ? siblingLabels[language].relationTitle : x.types[i]}</option>)}</select>

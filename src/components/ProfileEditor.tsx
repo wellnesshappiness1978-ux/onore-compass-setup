@@ -2,6 +2,8 @@ import { useState } from "react";
 import { SacredDisclosure } from "./ui/sacred-disclosure";
 import { Check, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SiblingSelect from "./SiblingSelect";
+import { siblingLabels } from "@/lib/sibling-order";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
 import { prefecturesRomanized, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
@@ -75,6 +77,8 @@ export default function ProfileEditor({
             <option value="">—</option>
             {PREFECTURES.map((p, i) => <option key={p} value={p}>{localizePrefecture(language, i, p, prefecturesRomanized[i] ?? p)}</option>)}
           </select></div>
+        <div><label className={label} htmlFor="pe-sibling">{siblingLabels[language].title}</label>
+          <SiblingSelect id="pe-sibling" language={language} value={draft.siblingOrder} onChange={(v) => set("siblingOrder", v)} className={inputClass} /></div>
         <div><label className={label} htmlFor="pe-city">{t.city}</label>
           <input id="pe-city" className={inputClass} maxLength={80} placeholder={ui.placeholders.city} value={draft.birthCity} onChange={(e) => set("birthCity", e.target.value)} /></div>
       </div>
