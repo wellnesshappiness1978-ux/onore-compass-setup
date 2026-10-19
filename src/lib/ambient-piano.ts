@@ -35,9 +35,9 @@ export async function createAmbientPiano(hz: number, volume: number): Promise<Am
   master.gain.setValueAtTime(0, ctx.currentTime);
   master.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.8);
   const compressor = ctx.createDynamicsCompressor();
-  compressor.threshold.value = -20; compressor.ratio.value = 3;
+  compressor.threshold.value = -16; compressor.ratio.value = 4; compressor.knee.value = 8;
   master.connect(compressor).connect(ctx.destination);
-  const dry = ctx.createGain(); dry.gain.value = 0.32; dry.connect(master);
+  const dry = ctx.createGain(); dry.gain.value = 0.62; dry.connect(master);
   const reverb = ctx.createConvolver();
   const impulse = ctx.createBuffer(2, ctx.sampleRate * 3, ctx.sampleRate);
   let seed = 1789;

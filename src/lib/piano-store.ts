@@ -1,9 +1,9 @@
-// App-wide playback state for the Celestial piano. Lives outside React so
+// App-wide playback state for the Celestial BGM. Lives outside React so
 // switching tabs (which unmounts the player UI) never stops the music.
 import { createAmbientPiano, type AmbientPiano } from "./ambient-piano";
 
 export type PianoState = { hz: number; playing: boolean; busy: boolean; muted: boolean; volume: number; error: boolean; sample: boolean };
-let state: PianoState = { hz: 528, playing: false, busy: false, muted: false, volume: 0.25, error: false, sample: false };
+let state: PianoState = { hz: 528, playing: false, busy: false, muted: false, volume: 0.6, error: false, sample: false };
 const listeners = new Set<() => void>();
 let engine: AmbientPiano | null = null;
 let seq = 0;
