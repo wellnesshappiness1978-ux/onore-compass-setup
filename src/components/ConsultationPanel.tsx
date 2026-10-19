@@ -102,8 +102,11 @@ export default function ConsultationPanel({
     };
   }, [signedIn, plan, actualPlan, listMembers]);
   useEffect(() => {
-    if (targetId !== "owner" && !members.some((m) => m.id === targetId)) setTargetId("owner");
-  }, [members, targetId]);
+    if (targetId === "owner") return;
+    if (targetId.startsWith("group:")) {
+      if (!groups.some((g) => g.id === targetId.slice(6))) setTargetId("owner");
+    } else if (!members.some((m) => m.id === targetId)) setTargetId("owner");
+  }, [members, groups, targetId]);
   useEffect(() => {
     if (focusTargetId && members.some((m) => m.id === focusTargetId)) setTargetId(focusTargetId);
   }, [focusTargetId, members]);
