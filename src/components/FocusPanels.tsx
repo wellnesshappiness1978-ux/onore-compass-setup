@@ -44,7 +44,8 @@ export function FocusSettingsCard({ language }: { language: Language }) {
         return options.length ? <select aria-label={f.targetKind === "family" ? t.choosePerson : t.chooseGroup} value={f.targetId ?? ""} onChange={e => set({ targetId: e.target.value })} className="mt-2 min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm">{options.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}</select> : <p className="mt-2 text-xs text-muted-foreground">{t.none}</p>;
       })()}
       <Button className="mt-4 w-full" disabled={saving || (f.targetKind !== "self" && !f.targetId)} onClick={async () => { setSaving(true); try { await ctx.setFocus(f); setDraft(undefined); toast.success(t.saved); } catch { toast.error("Error"); } finally { setSaving(false); } }}>{t.save}</Button>
-    </section>
+      </div>
+    </details>
   );
 }
 
