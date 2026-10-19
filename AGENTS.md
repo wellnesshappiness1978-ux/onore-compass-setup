@@ -31,8 +31,10 @@
 
 - Artwork records compose the existing private local captures through one shared certificate renderer; disclosure starts off on every open, scientific birth captions are suppressed in shared captures, and random commemorative IDs never derive from personal data. Why: optional birth details must not leak through embedded artwork labels.
 
-- Read directory-specific AGENTS.md in src/components and src/lib before changes there. Keep the dimmed fixed uploaded cosmic background and rear-only body-bound contrast masks in shared Canvas modules separate from foreground astronomy; cache decoded assets and use the same image in live and export rendering. Why: replace artistic direction without changing birth calculations or export consistency.
+- Read src/components and src/lib AGENTS.md before edits there; shared Canvas caches the fixed cosmic background and rear-only contrast masks for live/export. Why: preserve astronomy and consistent art.
 - App appearance uses five cumulative manually applied families, bundled imagery and same-origin storage-event synchronization; keep legacy palette/corporate IDs separate from membership. Why: synchronize browser tabs without changing entitlements or artwork.
 
 - Personal readings share one versioned home-reading query (plus one small fast catchphrase+essence call shown first): six essence angles, existing method dialogs, server-statused approaches filtered to available nonempty tap-to-open cards, a catchphrase and one closing axis summary; name grids remain in the name dialog. Why: prevent duplicate AI calls, fabricated charts and repeated prose.
 
+
+- AI tabs preserve sessions while showing one panel; saved compatibility normalizes individual profiles and compares group members separately. Why: avoid invented group birth data.
