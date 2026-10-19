@@ -27,8 +27,12 @@ export function FocusSettingsCard({ language }: { language: Language }) {
   const set = (patch: Partial<typeof f>) => setDraft({ ...f, ...patch });
   const kinds: TargetKind[] = ["self", "family", "group"];
   return (
-    <section aria-label={t.cardTitle} className="rounded-lg border border-primary/30 bg-card/60 p-4 sm:p-5">
-      <h3 className="flex items-center gap-2 font-serif text-lg text-primary"><Target className="size-5" />{t.cardTitle}</h3>
+    <details className="group rounded-lg border border-primary/30 bg-card/60" aria-label={t.cardTitle}>
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center gap-2 font-serif text-lg text-primary"><Target className="size-5" />{t.cardTitle}</span>
+        <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
+      </summary>
+      <div className="border-t border-primary/15 p-4 sm:p-5">
       <p className="mt-1 text-xs leading-6 text-muted-foreground">{t.cardIntro}</p>
       <p className="mt-4 text-sm text-primary">{t.goalLabel}</p>
       <div className="mt-2 flex flex-wrap gap-2">{goalPresets.map(p => <Button key={p} type="button" size="sm" variant={f.goalPreset === p ? "default" : "outline"} aria-pressed={f.goalPreset === p} onClick={() => set({ goalPreset: f.goalPreset === p ? "" : p })}>{t.presets[p]}</Button>)}</div>
@@ -40,7 +44,8 @@ export function FocusSettingsCard({ language }: { language: Language }) {
         return options.length ? <select aria-label={f.targetKind === "family" ? t.choosePerson : t.chooseGroup} value={f.targetId ?? ""} onChange={e => set({ targetId: e.target.value })} className="mt-2 min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm">{options.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}</select> : <p className="mt-2 text-xs text-muted-foreground">{t.none}</p>;
       })()}
       <Button className="mt-4 w-full" disabled={saving || (f.targetKind !== "self" && !f.targetId)} onClick={async () => { setSaving(true); try { await ctx.setFocus(f); setDraft(undefined); toast.success(t.saved); } catch { toast.error("Error"); } finally { setSaving(false); } }}>{t.save}</Button>
-    </section>
+      </div>
+    </details>
   );
 }
 

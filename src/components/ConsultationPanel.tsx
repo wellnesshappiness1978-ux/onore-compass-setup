@@ -34,6 +34,8 @@ import compassAvatar from "@/assets/onore-ai-compass.png";
 import ConsultationVoice from "./ConsultationVoice";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import { readPreviewMembers } from "@/lib/consultation-targets";
+import { useFocus } from "./FocusProvider";
+import { groupDisplayName } from "@/lib/focus";
 import { useServerFn } from "@tanstack/react-start";
 import type { TeamMember } from "@/lib/team-analysis";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,6 +84,8 @@ export default function ConsultationPanel({
   const listMembers = useServerFn(listTeamMembers);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [targetId, setTargetId] = useState("owner");
+  const focusCtx = useFocus();
+  const groups = focusCtx?.groups ?? [];
   useEffect(() => {
     let active = true;
     if (signedIn && plan === actualPlan)
@@ -98,12 +102,21 @@ export default function ConsultationPanel({
     };
   }, [signedIn, plan, actualPlan, listMembers]);
   useEffect(() => {
-    if (targetId !== "owner" && !members.some((m) => m.id === targetId)) setTargetId("owner");
-  }, [members, targetId]);
+    if (targetId === "owner") return;
+    if (targetId.startsWith("group:")) {
+      if (!groups.some((g) => g.id === targetId.slice(6))) setTargetId("owner");
+    } else if (!members.some((m) => m.id === targetId)) setTargetId("owner");
+  }, [members, groups, targetId]);
   useEffect(() => {
     if (focusTargetId && members.some((m) => m.id === focusTargetId)) setTargetId(focusTargetId);
   }, [focusTargetId, members]);
   const target = members.find((m) => m.id === targetId);
+  const selGroupIndex = targetId.startsWith("group:") ? groups.findIndex((g) => g.id === targetId.slice(6)) : -1;
+  const selGroup = selGroupIndex >= 0 ? groups[selGroupIndex]! : null;
+  const selGroupMembers = useMemo(
+    () => (selGroup ? (focusCtx?.members ?? members).filter((m) => selGroup.memberIds.includes(m.id)) : []),
+    [selGroup, focusCtx?.members, members],
+  );
   const targetProfile = useMemo(
     () =>
       target
@@ -124,7 +137,11 @@ export default function ConsultationPanel({
         : profile,
     [target, profile],
   );
-  const targetLabel = target?.name ?? consultationTranslations[language].ownerLabel;
+  const targetLabel = target?.name ?? (selGroup ? groupDisplayName(selGroup, selGroupIndex, language) : consultationTranslations[language].ownerLabel);
+  const groupContext = selGroup
+    ? `${language === "ja" ? "グループ相談" : "Group consultation"}: ${targetLabel}（${language === "ja" ? "メンバー" : "members"}: ${selGroupMembers.map((m) => `${m.name} ${m.birthDate}`).join(", ") || "—"}）`
+    : "";
+  const effectiveGoal = [goal, groupContext].filter(Boolean).join(" / ");
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -179,12 +196,12 @@ export default function ConsultationPanel({
           profile: targetProfile,
           ownerProfile: target ? profile : undefined,
           targetLabel,
-          goal: goal || undefined,
+          goal: effectiveGoal || undefined,
           language,
           day: new Date().toLocaleDateString("en-CA"),
         }),
       }),
-    [targetProfile, profile, targetLabel, language, target, goal],
+    [targetProfile, profile, targetLabel, language, target, effectiveGoal],
   );
   const { messages, sendMessage, status, stop, error, clearError, setMessages } = useChat({
     id: `onore-consult-${targetId}-${language}`,
@@ -299,12 +316,34 @@ export default function ConsultationPanel({
           }}
         >
           <option value="owner">{consultationTranslations[language].ownerLabel}</option>
-          {members.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.name} · {m.role || m.birthDate}
-            </option>
-          ))}
+          {members.length > 0 && (
+            <optgroup label={language === "ja" ? "登録ファミリー" : "Registered family"}>
+              {members.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} · {m.role || m.birthDate}
+                </option>
+              ))}
+            </optgroup>
+          )}
+          {groups.length > 0 && (
+            <optgroup label={language === "ja" ? "登録グループ" : "Registered groups"}>
+              {groups.map((g, i) => (
+                <option key={g.id} value={`group:${g.id}`}>
+                  {groupDisplayName(g, i, language)} · {g.memberIds.length}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
+        {selGroup && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {selGroupMembers.length
+              ? selGroupMembers.map((m) => m.name).join(language === "ja" ? "・" : ", ")
+              : language === "ja"
+                ? "このグループにはまだメンバーがいません。"
+                : "This group has no members yet."}
+          </p>
+        )}
         {target && (
           <p className="mt-2 text-xs text-muted-foreground">
             {target.birthDate}

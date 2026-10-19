@@ -35,7 +35,7 @@ const titles: Record<TodayFeature, Pair> = {
   relations: P("クイック対人ガイド", "Quick relationship guide"),
   monthlyLucky: P("今月の3ラッキー", "This month's three lucky picks"),
   directionExtended: P("吉方位（生まれ持った方位タイプと今年の方位）", "Birth direction type & this year's direction"),
-  helio: P("当日詳細", "Today's details"),
+  helio: P("地球暦から読み解く", "Reading the Earth Calendar"),
   biorhythm365: P("個人・ファミリーのバイオリズム", "Personal & family biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
@@ -242,8 +242,35 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
           </ul>
         </div>
         <div className="mt-3 border-t border-primary/20 pt-3">
-          <h4 className="mb-1 font-serif text-sm text-primary">{L(titles.directionExtended)}</h4>
-          {canUseToday(plan, "directionExtended") ? extBody : <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"><span>{names.vip}+</span><Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "See plans"}</Button></div>}
+          {canUseToday(plan, "directionExtended") ? (
+            <details className="group rounded-md border border-primary/25 bg-card/40">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-serif text-sm text-primary [&::-webkit-details-marker]:hidden">
+                <span>{ja ? "風水：生まれ持った吉方位タイプと今年の方位" : "Feng shui: birth direction type & this year's direction"}</span>
+                <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
+              </summary>
+              <div className="space-y-3 border-t border-primary/15 px-3 pb-3 pt-3">
+                {extBody}
+                <FengShuiGuide profile={profile} date={today} language={language} />
+              </div>
+            </details>
+          ) : (
+            <div className="rounded-md border border-primary/25 p-3">
+              <h4 className="mb-1 font-serif text-sm text-primary">{ja ? "風水：生まれ持った吉方位タイプと今年の方位" : "Feng shui: birth direction type & this year's direction"}</h4>
+              <div className="relative mt-2 overflow-hidden rounded-md">
+                <div aria-hidden="true" className="pointer-events-none select-none space-y-1.5 text-xs blur-[3px]">
+                  <p>{ja ? "東四命・西四命タイプと今年の大開運方位、九星の配置を詳しく表示します。" : "East/West group, this year's favorable direction and flying-star layout."}</p>
+                  <div className="grid grid-cols-2 gap-2"><div className="h-10 rounded-md border border-primary/20" /><div className="h-10 rounded-md border border-primary/20" /></div>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-[2px]">
+                  <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <LockKeyhole className="size-4 text-primary" />
+                    <span>{names.standard}+</span>
+                    <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "See plans"}</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </>,
     },
@@ -405,12 +432,15 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
           {i === lastOpen && share("share-open")}
         </Fragment>);
       })}
-      <FengShuiGuide profile={profile} date={today} language={language} />
       {share("share-bottom")}
       <Dialog open={sample !== null} onOpenChange={(v) => !v && setSample(null)}>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 sm:max-w-lg">
           <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{sample === "relations" || sample === "familyRoadmap" ? (ja ? "診断例（架空のデータです）" : "Sample (fictional data)") : (ja ? "診断例（あなたの今日の参考値）" : "Sample (your reference values today)")}</DialogDescription><DialogTitle className="font-serif text-xl">{sample ? L(titles[sample]) : ""}</DialogTitle></DialogHeader>
-          <div className="text-foreground">{sample === "familyRoadmap" ? <SampleFamily ja={ja} /> : sample === "relations" ? <SampleVip ja={ja} /> : sample ? content[sample].body : null}</div>
+          <div className="relative overflow-hidden rounded-md text-foreground">
+            <div className="max-h-44 overflow-hidden">{sample === "familyRoadmap" ? <SampleFamily ja={ja} /> : sample === "relations" ? <SampleVip ja={ja} /> : sample ? content[sample].body : null}</div>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-background/70 to-background backdrop-blur-[2px]" aria-hidden="true" />
+            <div className="absolute inset-x-0 bottom-2 flex items-center justify-center gap-2 text-xs text-primary"><LockKeyhole className="size-4" />{ja ? "続きは有料プランで毎日・詳細に表示されます" : "The full daily detail unlocks with a paid plan"}</div>
+          </div>
           <p className="text-sm text-primary">{ja ? `${names[sampleMin]}になると、これが毎日・詳細に占えます。` : `With ${names[sampleMin]}, this arrives daily in detail.`}</p>
           <Button variant="champagne" className="w-full" onClick={() => { setSample(null); onUpgrade(); }}><Crown className="size-4" />{ja ? "プラン詳細を見る" : "View plan details"}</Button>
         </DialogContent>

@@ -162,6 +162,7 @@ function TorisetsuPanel({
   const [limitOpen, setLimitOpen] = useState(false);
   const [entryMode, setEntryMode] = useState<"members" | "manual">("manual");
   const [members, setMembers] = useState<TeamMember[]>([]);
+  const [pickedId, setPickedId] = useState("");
   const listMembers = useServerFn(listTeamMembers);
   useEffect(() => {
     let active = true;
@@ -170,6 +171,7 @@ function TorisetsuPanel({
     return () => { active = false; };
   }, [signedIn, listMembers]);
   const pickMember = (m: TeamMember) => {
+    setPickedId(m.id);
     setPartnerName(m.name); setPartnerKana(m.nameKana ?? "");
     setPartnerGender((m.gender as UserProfile["gender"]) || "undisclosed");
     setPartnerDate(m.birthDate);
@@ -184,6 +186,7 @@ function TorisetsuPanel({
   const remaining = usage.remaining;
   const partnerInput: PartnerInput = { name: partnerName, nameKana: partnerKana, gender: partnerGender, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
+  const pickedMember = entryMode === "members" ? members.find((m) => m.id === pickedId) ?? null : null;
   const score = result?.score ?? 0;
   const today = new Date().toLocaleDateString("en-CA");
   const todayDate = new Date();
@@ -283,22 +286,43 @@ function TorisetsuPanel({
               <div>
                 <div className="grid grid-cols-2 gap-2" role="tablist" aria-label={q.pickMember}>
                   <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "members"} onClick={() => setEntryMode("members")} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "members" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UsersRound className="size-4 shrink-0" aria-hidden="true" />{q.pickMember}</Button>
-                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "manual"} onClick={() => setEntryMode("manual")} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "manual" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UserRound className="size-4 shrink-0" aria-hidden="true" />{q.manualEntry}</Button>
+                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "manual"} onClick={() => { setEntryMode("manual"); setPickedId(""); }} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "manual" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UserRound className="size-4 shrink-0" aria-hidden="true" />{q.manualEntry}</Button>
                 </div>
                 {entryMode === "members" && (
                   <div className="mt-3">
-                    {members.length ? (
-                      <div className="flex flex-wrap gap-2">
-                        {members.map((m) => (
-                          <Button key={m.id} type="button" size="sm" variant="outline" onClick={() => pickMember(m)} className={`min-h-10 ${partnerDate === m.birthDate && partnerName === m.name ? "border-primary bg-primary/15 text-primary" : "border-primary/25"}`}>{m.name}</Button>
-                        ))}
-                      </div>
+                     {members.length ? (
+                      <>
+                        <select
+                          aria-label={q.pickMember}
+                          className={`${inputClass} appearance-none`}
+                          value={pickedId}
+                          onChange={(event) => {
+                            const m = members.find((x) => x.id === event.target.value);
+                            if (m) pickMember(m); else setPickedId("");
+                          }}
+                        >
+                          <option value="">{q.pickMember}…</option>
+                          {members.map((m) => (
+                            <option key={m.id} value={m.id}>{m.name} · {m.birthDate}</option>
+                          ))}
+                        </select>
+                        {pickedMember && (
+                          <p className="mt-2 rounded-md border border-primary/30 bg-primary/10 p-3 text-xs leading-5 text-foreground">
+                            <strong className="text-primary">{pickedMember.name}</strong>
+                            {` · ${pickedMember.birthDate}`}
+                            {pickedMember.birthTimeUnknown === false && pickedMember.birthTime ? ` · ${pickedMember.birthTime}` : ""}
+                            {pickedMember.birthPlace ? ` · ${pickedMember.birthPlace}` : ""}
+                            <span className="mt-1 block text-muted-foreground">{language === "ja" ? "登録情報をそのまま使って診断します。再入力は不要です。" : "Registered details are used as-is — no re-entry needed."}</span>
+                          </p>
+                        )}
+                      </>
                     ) : (
                       <p className="rounded-md border border-primary/20 bg-background/40 p-3 text-xs leading-5 text-muted-foreground">{q.noMembers}</p>
                     )}
                   </div>
-                )}
+                 )}
               </div>
+              {!pickedMember && (<>
               <div>
                 <label
                   htmlFor="partner-name"
@@ -317,6 +341,7 @@ function TorisetsuPanel({
                   onChange={(event) => setPartnerName(event.target.value)}
                   className={inputClass}
                 />
+                <p className="mt-1.5 text-[11px] leading-4 text-muted-foreground">{language === "ja" ? "姓と名の間にスペースを入れてください（例：山田 太郎）。ファミリー登録と同じ形式です。" : "Put a space between family and given name (e.g. John Smith) — same format as family registration."}</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="text-sm text-primary">{t.partnerKana}<span className="text-muted-foreground"> ({t.optional})</span><input aria-label={t.partnerKana} className={`${inputClass} mt-2`} maxLength={60} value={partnerKana} onChange={(event) => setPartnerKana(event.target.value)} /></label>
@@ -404,6 +429,7 @@ function TorisetsuPanel({
                 <label className="text-sm text-primary">{base.bloodType}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.bloodType} className={`${inputClass} mt-2`} value={partnerBlood} onChange={e => setPartnerBlood(e.target.value as typeof partnerBlood)}><option value="">—</option>{["A","B","O","AB"].map(x => <option key={x} value={x}>{x}</option>)}</select></label>
                 <label className="text-sm text-primary">{base.siblingOrder}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.siblingOrder} className={`${inputClass} mt-2`} value={partnerSibling} onChange={e => setPartnerSibling(e.target.value as typeof partnerSibling)}><option value="">—</option>{["first","middle","last","only"].map((x,i) => <option key={x} value={x}>{base.siblings[i]}</option>)}</select></label>
               </div>
+              </>)}
               <div>
                 <p className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
                   <Network className="size-4 stroke-[1.4]" aria-hidden="true" />
