@@ -166,7 +166,7 @@ export default function SettingsPanel({
   return (
     <div className="space-y-5">
       <h2 className="font-serif text-2xl text-gradient-gold">{t.title}</h2>
-      <section className={`${card} sticky top-2 z-20`}><SolfeggioPlayer language={language} sampleOnly={planOrder.indexOf(plan) < planOrder.indexOf("vip")} onSampleEnd={() => setPianoUpsell(true)} /></section>
+      <section className="sticky top-2 z-20 rounded-xl border border-primary/30 bg-card/95 p-3 shadow-lg backdrop-blur"><SolfeggioPlayer language={language} sampleOnly={planOrder.indexOf(plan) < planOrder.indexOf("vip")} onSampleEnd={() => setPianoUpsell(true)} /></section>
 
       <section className={card}>
         <div className="flex items-center gap-4">
