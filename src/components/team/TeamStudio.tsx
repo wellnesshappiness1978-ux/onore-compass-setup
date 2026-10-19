@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
+import { familySampleCopy } from "@/lib/family-sample-copy";
 import { hasFeature, memberLimit, planForCount, requiredPlanFor, type TeamFeature } from "@/lib/plans";
 import { teamCopy, type TeamCopy } from "@/lib/team-copy";
 import {
@@ -36,6 +37,7 @@ const summary = (m: TeamMember, t: TeamCopy) => ({
 
 export default function TeamStudio({ plan, actualPlan, language, signedIn, ownerBirthDate }: Props) {
   const t = teamCopy[language];
+  const sample = familySampleCopy[language];
   const profileUi = profileUiCopy[language];
   const [tab, setTab] = useState(0);
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -84,6 +86,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">{t.note}</p>
       {plan === "b2b-premium" && <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-primary"><Crown className="size-3" />{t.priority}</p>}
+      {plan === "b2b" && <div role="note" className="mt-2 rounded-md border border-primary/40 bg-primary/10 p-3 text-xs leading-5"><p className="flex items-center gap-1 font-bold text-primary"><Crown className="size-3" />{sample.premiumOnly}</p><p className="mt-1 text-foreground">{sample.premiumUpsell}</p></div>}
 
       <div role="tablist" className="mt-4 flex gap-1 overflow-x-auto pb-1">
         {tabFeatures.map((featureName, i) => { const label = featureName === "simulator" ? profileUi.team.simulator : t.tabs[i > 2 ? i - 1 : i]; return (
@@ -96,10 +99,19 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
 
       <div className="mt-4">
         {!unlocked && feature !== "roster" ? (
-          <div className={`${card} text-center`}>
-            <Lock className="mx-auto size-6 text-primary" />
-            <p className="mt-2 text-sm">{t.locked(t.planNames[requiredPlanFor(feature)])}</p>
-            <Button size="sm" className="mt-3" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.seePlans}</Button>
+          <div className={card}>
+            <span className="inline-flex rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground">{sample.badge}</span>
+            <h4 className="mt-2 font-serif text-base text-primary">{sample.title}</h4>
+            <p className="mt-2 text-sm leading-6 text-foreground">{sample.intro}</p>
+            <div className="relative mt-2 overflow-hidden rounded-md">
+              <p className="select-none text-sm leading-6 text-foreground blur-[6px]" aria-hidden="true">{sample.hidden}</p>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-background/40 p-3 text-center backdrop-blur-sm">
+                <Lock className="size-5 text-primary" />
+                <p className="text-sm font-bold text-primary">{sample.unlock}</p>
+                <p className="text-[11px] text-muted-foreground">{t.locked(t.planNames[requiredPlanFor(feature)])}</p>
+              </div>
+            </div>
+            <Button size="sm" className="mt-3 w-full" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.seePlans}</Button>
           </div>
         ) : feature === "roster" ? (
           <Roster t={t} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly} language={language} onAdd={addMember} onEdit={editMember} onRemove={removeMember} />

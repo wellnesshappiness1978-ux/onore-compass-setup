@@ -44,7 +44,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     active: "稼働中",
     engine: "多層統合占術×動物占い クロス解析AI",
     remaining: (count) => `本日あと ${count} 回 無料で相談可能`,
-    vip: "1日15回のAI相談を利用する（VIP特典）",
+    vip: "1日10回のAI相談を利用する（VIP特典）",
     quickLabel: "クイック質問",
     quick: [
       "今月の勝負時期は？",
@@ -77,7 +77,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     saved: "お気に入りに保存しました",
     modalTitle: "本日のAI相談枠を使い切りました",
     modalBody:
-      "VIPなら1日15回まで、気になることを続けて相談できます。今日の回数は日付が変わると戻ります。",
+      "VIPなら1日10回まで、気になることを続けて相談できます。今日の回数は日付が変わると戻ります。",
     modalCta: "VIPプランを見る",
     modalClose: "明日また相談する",
     modalNote: "現在はプランのご案内のみで、決済は行われません。",
@@ -90,7 +90,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     active: "Online",
     engine: "multi-layer arts × animal horoscope reflective AI",
     remaining: (count) => `${count} free consultations remaining today`,
-    vip: "15 AI consultations per day (VIP)",
+    vip: "10 AI consultations per day (VIP)",
     quickLabel: "Quick questions",
     quick: [
       "When is my key window this month?",
@@ -124,7 +124,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     saved: "Saved to favorites",
     modalTitle: "Today's AI consultations are complete",
     modalBody:
-      "VIP gives you up to 15 consultations a day for follow-up questions. Your count refreshes when the date changes.",
+      "VIP gives you up to 10 consultations a day for follow-up questions. Your count refreshes when the date changes.",
     modalCta: "View VIP",
     modalClose: "Consult again tomorrow",
     modalNote: "This currently shows plan information only; no payment is taken.",
@@ -137,7 +137,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     active: "运行中",
     engine: "多层统合占术×动物占卜 反思型AI",
     remaining: (count) => `今日还可免费咨询 ${count} 次`,
-    vip: "每天15次AI咨询（VIP特权）",
+    vip: "每天10次AI咨询（VIP特权）",
     quickLabel: "快捷提问",
     quick: ["本月的关键时期是？", "新事业的启动时机", "团队相性诊断", "A公司和B公司的签约时机？"],
     greeting:
@@ -164,7 +164,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     bookmarkSignIn: "登录后即可收藏。",
     saved: "已收藏",
     modalTitle: "今日AI咨询次数已用完",
-    modalBody: "VIP每天最多可咨询15次，方便继续追问。日期变更后次数会恢复。",
+    modalBody: "VIP每天最多可咨询10次，方便继续追问。日期变更后次数会恢复。",
     modalCta: "查看VIP",
     modalClose: "明天再咨询",
     modalNote: "目前仅提供方案介绍，不会扣款。",
@@ -177,7 +177,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     active: "運行中",
     engine: "多層統合占術×動物占卜 反思型AI",
     remaining: (count) => `今日還可免費諮詢 ${count} 次`,
-    vip: "每天15次AI諮詢（VIP特典）",
+    vip: "每天10次AI諮詢（VIP特典）",
     quickLabel: "快速提問",
     quick: ["本月的關鍵時期是？", "新事業的啟動時機", "團隊相性診斷", "A公司和B公司的簽約時機？"],
     greeting:
@@ -204,7 +204,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     bookmarkSignIn: "登入後即可收藏。",
     saved: "已收藏",
     modalTitle: "今日AI諮詢次數已用完",
-    modalBody: "VIP每天最多可諮詢15次，方便繼續追問。日期變更後次數會恢復。",
+    modalBody: "VIP每天最多可諮詢10次，方便繼續追問。日期變更後次數會恢復。",
     modalCta: "查看VIP",
     modalClose: "明天再諮詢",
     modalNote: "目前僅提供方案介紹，不會扣款。",
@@ -217,7 +217,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     active: "가동 중",
     engine: "다층 통합 점술×동물 운세 성찰형 AI",
     remaining: (count) => `오늘 무료 상담 ${count}회 남음`,
-    vip: "하루 15회 AI 상담 (VIP 혜택)",
+    vip: "하루 10회 AI 상담 (VIP 혜택)",
     quickLabel: "빠른 질문",
     quick: [
       "이번 달 승부 시기는?",
@@ -250,7 +250,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     saved: "즐겨찾기에 저장했습니다",
     modalTitle: "오늘의 AI 상담을 모두 이용했습니다",
     modalBody:
-      "VIP는 하루 최대 15회까지 이어서 상담할 수 있습니다. 날짜가 바뀌면 횟수가 다시 채워집니다.",
+      "VIP는 하루 최대 10회까지 이어서 상담할 수 있습니다. 날짜가 바뀌면 횟수가 다시 채워집니다.",
     modalCta: "VIP 보기",
     modalClose: "내일 다시 상담하기",
     modalNote: "현재는 플랜 안내만 제공하며 결제는 진행되지 않습니다.",
@@ -263,7 +263,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     active: "Activa",
     engine: "IA reflexiva · artes multicapa × horóscopo animal",
     remaining: (count) => `Te quedan ${count} consultas gratuitas hoy`,
-    vip: "15 consultas IA al día (VIP)",
+    vip: "10 consultas IA al día (VIP)",
     quickLabel: "Preguntas rápidas",
     quick: [
       "¿Cuál es mi momento clave este mes?",
@@ -297,7 +297,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     saved: "Guardado en favoritos",
     modalTitle: "Has completado las consultas IA de hoy",
     modalBody:
-      "Con VIP puedes hacer hasta 15 consultas al día y seguir preguntando. El contador se renueva al cambiar la fecha.",
+      "Con VIP puedes hacer hasta 10 consultas al día y seguir preguntando. El contador se renueva al cambiar la fecha.",
     modalCta: "Ver VIP",
     modalClose: "Consultar mañana",
     modalNote: "Por ahora solo se muestra información del plan; no se realiza ningún pago.",
@@ -310,7 +310,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     active: "Actif",
     engine: "IA réflexive · arts multicouches × horoscope animal",
     remaining: (count) => `Encore ${count} consultations gratuites aujourd’hui`,
-    vip: "15 consultations IA par jour (VIP)",
+    vip: "10 consultations IA par jour (VIP)",
     quickLabel: "Questions rapides",
     quick: [
       "Quel est mon moment clé ce mois-ci ?",
@@ -344,7 +344,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     saved: "Ajouté aux favoris",
     modalTitle: "Les consultations IA du jour sont utilisées",
     modalBody:
-      "Avec VIP, vous pouvez consulter jusqu’à 15 fois par jour et poursuivre vos questions. Le compteur se renouvelle au changement de date.",
+      "Avec VIP, vous pouvez consulter jusqu’à 10 fois par jour et poursuivre vos questions. Le compteur se renouvelle au changement de date.",
     modalCta: "Voir VIP",
     modalClose: "Revenir demain",
     modalNote:

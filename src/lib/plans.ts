@@ -37,7 +37,7 @@ export const requiredPlanFor = (feature: TeamFeature) => featureMin[feature];
 export const planForCount = (count: number): Plan | null => planOrder.find((p) => memberLimit[p] >= count) ?? null;
 /** Shared daily cap for consultation and compatibility (Infinity = unlimited); the database function mirrors it. */
 export const dailyUsageLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 10, b2b: 30, "b2b-premium": Infinity };
-export const consultationDailyLimit: Record<Plan, number> = { free: 1, standard: 5, vip: 15, b2b: 30, "b2b-premium": Infinity };
+export const consultationDailyLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 10, b2b: 30, "b2b-premium": Infinity };
 export { quickCompatibilityLimit };
 export const nextPlan = (plan: Plan): Plan | null => planOrder[rank(plan) + 1] ?? null;
 /** Minimum plan for birth-color and earth-calendar sections. */

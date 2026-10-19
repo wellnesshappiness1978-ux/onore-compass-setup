@@ -8,9 +8,9 @@ const memberSchema = z.object({
   siblingOrder: z.string().max(40).catch(""),
   gender: z.enum(["female", "male", "other", "undisclosed"]), bloodType: z.enum(["", "A", "B", "O", "AB"]),
   relationship: z.string().max(60).catch(""), relationshipType: z.string().max(30).catch(""),
-  role: z.string().max(60), skills: z.array(z.string().max(30)).max(12),
+  role: z.string().max(60).catch(""), skills: z.array(z.string().max(30)).max(12).catch([]),
 });
 export function readPreviewMembers(): TeamMember[] {
   if (typeof window === "undefined") return [];
-  try { return z.array(memberSchema).max(100).parse(JSON.parse(localStorage.getItem("onore-team") ?? "[]")); } catch { return []; }
+  try { const raw: unknown = JSON.parse(localStorage.getItem("onore-team") ?? "[]"); return (Array.isArray(raw) ? raw : []).slice(0, 100).flatMap(item => { const r = memberSchema.safeParse(item); return r.success ? [r.data as TeamMember] : []; }); } catch { return []; }
 }

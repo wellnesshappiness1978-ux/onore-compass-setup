@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { isUpgradePlan, planForCount, planOrder, canUse, consultationDailyLimit, dailyUsageLimit } from './plans';
+import { hasFeature, memberLimit, isUpgradePlan, planForCount, planOrder, canUse, consultationDailyLimit, dailyUsageLimit } from './plans';
 describe('consultation limits', () => {
-  it.each([['free', 1], ['standard', 5], ['vip', 15], ['b2b', 30], ['b2b-premium', Infinity]] as const)('%s allows %s consultations per day', (plan, cap) => {
+  it.each([['free', 1], ['standard', 3], ['vip', 10], ['b2b', 30], ['b2b-premium', Infinity]] as const)('%s allows %s consultations per day', (plan, cap) => {
     expect(consultationDailyLimit[plan]).toBe(cap);
   });
   it('does not change compatibility limits', () => {
@@ -42,5 +42,18 @@ describe('plan value display', () => {
     expect(canUseToday('vip', 'monthlyLucky')).toBe(true);
     expect(canUseToday('free', 'helio')).toBe(true);
     expect(canUseToday('free', 'dailyLucky')).toBe(true);
+  });
+});
+
+describe('unified AI daily caps', () => {
+  it('consultation and compatibility share 1/3/10/30/unlimited', () => {
+    expect(planOrder.map(p => consultationDailyLimit[p])).toEqual([1, 3, 10, 30, Infinity]);
+    expect(planOrder.map(p => dailyUsageLimit[p])).toEqual([1, 3, 10, 30, Infinity]);
+  });
+  it('Family tools need Family, 100 members only Premium', () => {
+    expect(hasFeature('vip', 'teamDiagnosis')).toBe(false);
+    expect(hasFeature('b2b', 'teamDiagnosis')).toBe(true);
+    expect(memberLimit.b2b).toBe(30);
+    expect(memberLimit['b2b-premium']).toBe(100);
   });
 });
