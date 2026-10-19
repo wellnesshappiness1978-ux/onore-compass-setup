@@ -1,5 +1,12 @@
 # Roadmap
 
+## Fixed controls / Today depth (2026-10-19)
+- [ ] Fixed Home/Settings on every device and one adjacent BGM dropdown
+- [ ] Twelve-category plan guidance and all higher-tier advice
+- [ ] Five individual recipe dialogs in seven languages
+- [ ] Deeper contextual paid daily readings without changing calculations
+- [ ] Rule tests and desktop/tablet/mobile interaction verification
+
 ## Consultation UX and limits (2026-10-19) — done
 - [x] Fixed readable samples with frosted continuation
 - [x] Consultation limits 1/5/15/30/unlimited, reset notice, secure preview handling
