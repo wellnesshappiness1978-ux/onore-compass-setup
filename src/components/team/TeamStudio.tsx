@@ -182,6 +182,7 @@ const emptyMemberForm = { name: "", nickname: "", nameKana: "", birthDate: "", b
 function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdit, onRemove }: { t: TeamCopy; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void }) {
   const x = rosterExtra[language];
   const [form, setForm] = useState(emptyMemberForm);
+  const [siblingOther, setSiblingOther] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
