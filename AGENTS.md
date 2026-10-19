@@ -38,3 +38,4 @@
 
 
 - AI tabs preserve sessions while showing one panel; saved compatibility normalizes individual profiles and compares group members separately. Why: avoid invented group birth data.
+- Today benefit progress is a separate cumulative twelve-category catalogue, never an access gate; recipes and expanded prose use browser-safe typed localized modules without extra AI calls. Why: keep marketing counts accurate without changing permissions or calculated values.
