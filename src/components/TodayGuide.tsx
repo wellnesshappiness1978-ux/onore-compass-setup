@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { BriefcaseBusiness, CalendarHeart, CalendarRange, Compass, Crown, Eye, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Stars, Swords } from "lucide-react";
+import { BriefcaseBusiness, CalendarHeart, CalendarRange, ChefHat, ChevronRight, Compass, Crown, Eye, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Stars, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { UserProfile } from "./Onboarding";
@@ -21,6 +21,11 @@ import DayCompass from "./DayCompass";
 import HelioCalendar from "./HelioCalendar";
 import FengShuiGuide from "./FengShuiGuide";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
+import { higherTodayBenefits, todayBenefitCategories, todayBenefitCopy, todayBenefitCount } from "@/lib/today-benefits";
+import { recipesForElement, recipeDetails } from "@/lib/lucky-recipes";
+import { buildTodayDepth, type DeepSection } from "@/lib/today-depth";
+import { useFocus } from "./FocusProvider";
+import { goalText } from "@/lib/focus";
 
 // Deterministic reference values from birth date and today's calendar; not verified readings or predictions.
 type Pair = { ja: string; en: string };
@@ -99,9 +104,15 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const L = (p: Pair) => (ja ? p.ja : p.en);
   const voice = companionCopy[language];
   const names = teamCopy[language].planNames;
+  const benefit = todayBenefitCopy[language];
+  const focus = useFocus();
+  const [recipeIndex, setRecipeIndex] = useState<number | null>(null);
   const today = useMemo(() => new Date(), []);
   const iso = localIso(today);
   const el = dayElement(iso);
+  const dailyRecipes = recipesForElement(el);
+  const selectedRecipe = recipeIndex === null ? null : dailyRecipes[recipeIndex];
+  const recipe = selectedRecipe ? recipeDetails(selectedRecipe, language) : null;
   const starPoem = useMemo(() => {
     const m = today.getMonth();
     const doy = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
@@ -224,7 +235,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <li className="flex items-start gap-2"><span className="mt-1 size-4 shrink-0 rounded-full border border-primary/40" style={{ background: luckyColor?.code }} /><span><strong className="text-primary">{ja ? "ラッキーカラー" : "Lucky color"}</strong>：{luckyColor ? `${localizeBirthColorName(luckyColor.name, language)}（${luckyColor.code}）` : (ja ? "生年月日の登録で表示されます" : "Add your birth date")}</span></li>
         <li><strong className="text-primary">{ja ? "ラッキーワード" : "Lucky word"}</strong>：{L(word)}</li>
         <li><strong className="text-primary">{ja ? "運気アップフード 選りすぐり5品" : "5 lucky foods"}</strong>
-          <ol className="mt-1 list-decimal space-y-0.5 pl-5">{foods[el].map((f, i) => <li key={i}>{L(f)}</li>)}</ol>
+          <p className="mt-1 flex items-center gap-1.5 text-xs"><ChefHat className="size-4 shrink-0" />{benefit.recipeHint}</p>
+          <ol className="mt-2 grid gap-2 sm:grid-cols-2">{dailyRecipes.map((f, i) => <li key={f.id}><Button variant="outline" onClick={() => setRecipeIndex(i)} className="grid h-auto min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] gap-2 whitespace-normal border-primary/35 bg-background/90 px-3 py-2 text-left text-foreground"><span className="min-w-0">{i + 1}. {f.names[language]}</span><ChevronRight className="size-4 shrink-0" /></Button></li>)}</ol>
           <span className="text-[11px] opacity-90">{ja ? "スーパーの食材で手軽に作れる、今日の気分を明るくする参考メニューです。" : "Easy reference dishes from everyday ingredients."}</span></li>
       </ul>,
     },
@@ -355,9 +367,13 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
 
   const [sample, setSample] = useState<TodayFeature | null>(null);
   const sampleMin = sample === "familyRoadmap" ? familyRoadmapMin : sample ? todayFeatures.find((f) => f.id === sample)!.min : "vip";
-  const openCount = todayFeatures.filter((f) => canUseToday(plan, f.id)).length;
+  const openCount = todayBenefitCount(plan);
   const lastOpen = todayFeatures.map((f) => canUseToday(plan, f.id)).lastIndexOf(true);
-  const nextLocked = todayFeatures.find((f) => !canUseToday(plan, f.id));
+  const higherBenefits = higherTodayBenefits(plan);
+  const renderDepth = (section: DeepSection) => {
+    const reading = buildTodayDepth(section, plan, language, {date: iso, day: dayIdx + 1, total: Math.round(rhythm.total), physical: Math.round(rhythm.physical * 100), emotional: Math.round(rhythm.emotional * 100), intellectual: Math.round(rhythm.intellectual * 100), goal: focus ? goalText(focus.focus, language) : "", members: members.length});
+    return reading ? <div data-reading-depth={section} className="mt-5 space-y-3 border-t border-primary/20 pt-4"><h4 className="font-serif text-sm text-primary">{reading.title}</h4>{reading.paragraphs.map((paragraph, index) => <p key={index} className="text-sm leading-7 text-foreground">{paragraph}</p>)}</div> : null;
+  };
 
   const shareData = {
     kicker: ja ? "今日の占い" : "Today's guide", title: iso, score: Math.round(rhythm.total), names: profile.nameKanji ? [profile.nameKanji] : [], kind: "daily" as const,
@@ -395,14 +411,17 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   return (
     <div className="today-guide mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 text-left md:gap-4">
       <section className="card-lux design-daily-panel rounded-lg p-3 md:p-4" aria-label={ja ? "プラン特典の解放状況" : "Plan unlock progress"}>
-        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-          <p className="min-w-0 text-foreground">{ja ? "現在のプラン" : "Current plan"}：<strong className="text-primary">{names[plan]}</strong>
-            {nextLocked && <span className="text-muted-foreground"> ｜ {ja ? `あと1ステップで${L(titles[nextLocked.id])}（${names[nextLocked.min]}）解放！` : `One step to ${L(titles[nextLocked.id])} (${names[nextLocked.min]})!`}</span>}
-          </p>
-          {nextLocked && <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プラン詳細・アップグレード" : "Plans & upgrade"}</Button>}
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm">
+          <p className="min-w-0 text-foreground">{benefit.current}：<strong className="text-primary">{names[plan]}</strong></p>
+          {higherBenefits.length > 0 && <Button size="icon" variant="champagne" onClick={onUpgrade} aria-label={benefit.plans} title={benefit.plans} className="size-11 shrink-0"><Crown className="size-4" /></Button>}
         </div>
-        <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-primary/10" role="progressbar" aria-valuemin={0} aria-valuemax={todayFeatures.length} aria-valuenow={openCount}><div className="h-full rounded-full bg-champagne-gradient transition-all" style={{ width: `${(openCount / todayFeatures.length) * 100}%` }} /></div>
-        <p className="mt-1 text-[11px] text-muted-foreground">{ja ? `${todayFeatures.length}機能中 ${openCount}機能を解放中` : `${openCount} of ${todayFeatures.length} unlocked`}</p>
+        <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-primary/10" role="progressbar" aria-label={benefit.catalogue} aria-valuemin={0} aria-valuemax={12} aria-valuenow={openCount}><div className="h-full rounded-full bg-champagne-gradient transition-all" style={{ width: `${(openCount / 12) * 100}%` }} /></div>
+        <p className="mt-2 text-sm font-medium text-primary">{openCount === 12 ? benefit.complete : benefit.progress.replace("{n}", String(openCount))}</p>
+        {plan === "vip" && <p className="mt-2 text-sm leading-6">{benefit.vipNext}</p>}
+        {plan === "b2b" && <p className="mt-2 text-sm leading-6">{benefit.familyNext}</p>}
+        <p className="mt-2 text-xs text-muted-foreground">{benefit.countNote}</p>
+        <details className="mt-3 border-t border-primary/20 pt-3"><summary className="cursor-pointer text-sm text-primary">{benefit.catalogue}</summary><ol className="mt-2 grid gap-1 text-xs sm:grid-cols-2">{todayBenefitCategories.map((c, i) => <li key={c.id} className={rank(plan) >= rank(c.min) ? "text-foreground" : "text-muted-foreground"}>{i + 1}. {benefit[c.id as keyof typeof benefit]} · {names[c.min]}</li>)}</ol></details>
+        {higherBenefits.length > 0 && <div className="mt-3 space-y-2 border-t border-primary/20 pt-3"><h4 className="text-xs text-primary">{benefit.higher}</h4>{higherBenefits.map(({tier, categories}) => <p key={tier} className="text-xs leading-6"><strong className="text-primary">{names[tier]}</strong>：{categories.map(c => benefit[c.id as keyof typeof benefit]).join(" / ")}</p>)}</div>}
       </section>
       {todayFeatures.map(({ id, min }, i) => {
         const open = canUseToday(plan, id);
@@ -414,7 +433,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
               <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className={`min-w-0 break-words ${lucky ? "lucky-shine-title" : ""}`}>{L(titles[id])}</span></h3>
               {!open && <span className="shrink-0 rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">{names[min]}+</span>}
             </div>
-            {open ? content[id].body : (
+            {open ? <>{content[id].body}{id === "decision" || id === "starPath" || id === "helio" ? renderDepth(id) : id === "biorhythm365" ? <>{renderDepth("biorhythm")}{renderDepth("family")}</> : null}</> : (
               <div className="relative overflow-hidden rounded-md border border-primary/20 p-3">
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-champagne-gradient opacity-10 blur-sm" />
                 <div className="relative flex flex-col items-center gap-2 text-center">
@@ -434,6 +453,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         </Fragment>);
       })}
       {share("share-bottom")}
+      <Dialog open={recipe !== null} onOpenChange={v => { if (!v) setRecipeIndex(null); }}><DialogContent className="max-h-[85dvh] w-[calc(100%-1.5rem)] max-w-lg overflow-y-auto border-primary/35 bg-card text-foreground"><DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif text-primary"><ChefHat className="size-5 shrink-0" />{recipe?.name}</DialogTitle><DialogDescription>{benefit.recipeNote}</DialogDescription></DialogHeader>{recipe && <div className="space-y-5 text-left"><section><h3 className="mb-2 font-serif text-primary">{benefit.ingredients}</h3><ul className="space-y-1 text-sm">{recipe.ingredients.map(item => <li key={item} className="border-b border-primary/10 py-1">{item}</li>)}</ul></section><section><h3 className="mb-2 font-serif text-primary">{benefit.steps}</h3><ol className="list-decimal space-y-3 pl-5 text-sm leading-7">{recipe.steps.map((step, i) => <li key={i}>{step}</li>)}</ol></section><section className="border-t border-primary/20 pt-3"><h3 className="font-serif text-primary">{benefit.luck}</h3><p className="mt-2 text-sm leading-7">{recipe.luck}</p></section></div>}<Button variant="outline" onClick={() => setRecipeIndex(null)}>{benefit.close}</Button></DialogContent></Dialog>
       <Dialog open={sample !== null} onOpenChange={(v) => !v && setSample(null)}>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 sm:max-w-lg">
           <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{consultationUxCopy[language].sample}</DialogDescription><DialogTitle className="font-serif text-xl">{sample ? L(titles[sample]) : ""}</DialogTitle></DialogHeader>
