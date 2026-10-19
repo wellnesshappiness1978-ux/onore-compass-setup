@@ -186,6 +186,7 @@ function TorisetsuPanel({
   const remaining = usage.remaining;
   const partnerInput: PartnerInput = { name: partnerName, nameKana: partnerKana, gender: partnerGender, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, bloodType: partnerBlood, siblingOrder: partnerSibling };
   const canAnalyze = partnerSchema.safeParse(partnerInput).success && relation !== null;
+  const pickedMember = entryMode === "members" ? members.find((m) => m.id === pickedId) ?? null : null;
   const score = result?.score ?? 0;
   const today = new Date().toLocaleDateString("en-CA");
   const todayDate = new Date();
@@ -285,7 +286,7 @@ function TorisetsuPanel({
               <div>
                 <div className="grid grid-cols-2 gap-2" role="tablist" aria-label={q.pickMember}>
                   <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "members"} onClick={() => setEntryMode("members")} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "members" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UsersRound className="size-4 shrink-0" aria-hidden="true" />{q.pickMember}</Button>
-                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "manual"} onClick={() => setEntryMode("manual")} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "manual" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UserRound className="size-4 shrink-0" aria-hidden="true" />{q.manualEntry}</Button>
+                  <Button type="button" variant="outline" role="tab" aria-selected={entryMode === "manual"} onClick={() => { setEntryMode("manual"); setPickedId(""); }} className={`min-h-11 whitespace-normal rounded-lg border px-2 text-xs font-medium transition-all duration-300 sm:text-sm ${entryMode === "manual" ? "border-primary/80 bg-primary/15 text-primary shadow-champagne" : "border-primary/15 bg-background/40 text-foreground hover:border-primary/45 hover:bg-primary/5"}`}><UserRound className="size-4 shrink-0" aria-hidden="true" />{q.manualEntry}</Button>
                 </div>
                 {entryMode === "members" && (
                   <div className="mt-3">
