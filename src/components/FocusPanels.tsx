@@ -13,6 +13,7 @@ import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-sp
 import { biorhythm, pairScore, type TeamMember } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
+import { groupColorMeaning, groupDayLine, groupInsightCopy, SELF_MEMBER_ID } from "@/lib/group-insight";
 
 const mainColor = (m: TeamMember) => birthColorSpectrum(memberToProfile(m))?.main ?? null;
 
@@ -27,7 +28,7 @@ export function FocusSettingsCard({ language }: { language: Language }) {
   const set = (patch: Partial<typeof f>) => setDraft({ ...f, ...patch });
   const kinds: TargetKind[] = ["self", "family", "group"];
   return (
-    <details className="group rounded-lg border border-primary/30 bg-card/60" aria-label={t.cardTitle}>
+    <details id="focus-settings" className="group scroll-mt-28 rounded-lg border border-primary/30 bg-card/60" aria-label={t.cardTitle}>
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
         <span className="flex items-center gap-2 font-serif text-lg text-primary"><Target className="size-5" />{t.cardTitle}</span>
         <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
@@ -47,6 +48,16 @@ export function FocusSettingsCard({ language }: { language: Language }) {
       </div>
     </details>
   );
+}
+
+/** Fixed header badge: who the readings are about; tap opens the focus settings. */
+export function SubjectHeaderBadge({ language, ownerName, onOpen }: { language: Language; ownerName: string; onOpen: () => void }) {
+  const ctx = useFocus();
+  if (!ctx) return <span aria-hidden="true" />;
+  const t = focusCopy[language];
+  const icon = ctx.group ? "👥" : ctx.member ? "👨‍👩‍👧" : "👤";
+  const who = ctx.group ? ctx.label(language) : ctx.member ? `${ctx.label(language)}（${t.family}）` : `${t.self}${ownerName ? `（${ownerName}）` : ""}`;
+  return <button type="button" onClick={onOpen} title={t.cardTitle} aria-label={t.viewing(who)} className="mx-auto flex min-h-10 min-w-0 max-w-full items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary"><span aria-hidden="true">{icon}</span><span className="truncate"><span className="hidden sm:inline">{t.viewing("")}</span>{ctx.group || ctx.member ? who : (ownerName ? `${t.self}・${ownerName.split(/[\s　]/)[0]}` : t.self)}</span></button>;
 }
 
 /** Small strip showing the current subject with a way back to self. */
@@ -69,12 +80,14 @@ export function GroupFocusCard({ language }: { language: Language }) {
     if (!g) return null;
     const colors = g.members.map(m => ({ m, c: mainColor(m) }));
     const groupHex = mixHex(colors.map(x => x.c?.code ?? ""));
-    const pairs: number[] = [];
-    for (let i = 0; i < g.members.length; i++) for (let j = i + 1; j < g.members.length; j++) pairs.push(pairScore(g.members[i]!, g.members[j]!));
-    const harmony = pairs.length ? Math.round(pairs.reduce((a, b) => a + b, 0) / pairs.length) : null;
+    const pairList: { a: TeamMember; b: TeamMember; score: number }[] = [];
+    for (let i = 0; i < g.members.length; i++) for (let j = i + 1; j < g.members.length; j++) pairList.push({ a: g.members[i]!, b: g.members[j]!, score: pairScore(g.members[i]!, g.members[j]!) });
+    pairList.sort((x, y) => y.score - x.score);
+    const harmony = pairList.length ? Math.round(pairList.reduce((a, p) => a + p.score, 0) / pairList.length) : null;
     const today = new Date().toLocaleDateString("en-CA");
-    const rhythm = g.members.length ? Math.round(g.members.reduce((a, m) => a + biorhythm(m.birthDate, today).total, 0) / g.members.length) : null;
-    return { colors, groupHex, harmony, rhythm };
+    const rhythms = g.members.map(m => ({ m, r: biorhythm(m.birthDate, today) })).sort((x, y) => y.r.total - x.r.total);
+    const rhythm = rhythms.length ? Math.round(rhythms.reduce((a, x) => a + x.r.total, 0) / rhythms.length) : null;
+    return { colors, groupHex, harmony, rhythm, pairList, rhythms };
   }, [g]);
   if (!g || !stats) return null;
   const name = groupDisplayName(g.group, g.index, language);
@@ -88,6 +101,14 @@ export function GroupFocusCard({ language }: { language: Language }) {
         <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupHarmony}</p><p className="font-serif text-2xl text-primary">{stats.harmony ?? "—"}{stats.harmony !== null && <span className="text-sm">/100</span>}</p></div>
         <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupRhythm}</p><p className="font-serif text-2xl text-primary">{stats.rhythm ?? "—"}<span className="text-sm">/100</span></p></div>
       </div>
+      {stats.groupHex && (() => { const gm = groupColorMeaning(stats.groupHex, language); const gi = groupInsightCopy[language]; return <div className="mt-3 rounded-md border border-primary/25 p-3 text-sm leading-6"><p className="font-serif text-lg font-bold text-primary">{gm.name}</p><dl className="mt-2 space-y-2"><div><dt className="text-xs font-bold text-primary">{gi.essence}</dt><dd>{gm.essence}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.energy}</dt><dd>{gm.energy}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.role}</dt><dd>{gm.role}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.advice}</dt><dd>{gm.advice}</dd></div></dl></div>; })()}
+      {(() => { const gi = groupInsightCopy[language]; const pct = (v: number) => Math.round((v + 1) * 50); const top = stats.rhythms[0]; const low = stats.rhythms[stats.rhythms.length - 1]; const best = stats.pairList[0]; return <>
+        <div className="mt-4 rounded-md border border-primary/25 p-3 text-sm leading-6"><h3 className="text-sm font-bold text-primary">{gi.today}</h3><p className="mt-1">{groupDayLine(stats.rhythm ?? 50, language)}</p>{top && <p className="mt-1">{gi.peak(memberDisplayName(top.m))}</p>}{low && low !== top && low.r.total < 45 && <p className="mt-1">{gi.care(memberDisplayName(low.m))}</p>}{best && <p className="mt-1">{gi.best(memberDisplayName(best.a), memberDisplayName(best.b))}</p>}</div>
+        <h3 className="mt-4 text-sm text-primary">{gi.rhythmTable}</h3>
+        <div className="mt-2 overflow-x-auto"><table className="w-full text-xs"><thead><tr className="text-muted-foreground"><th className="p-1 text-left"></th><th className="p-1">{gi.physical}</th><th className="p-1">{gi.emotional}</th><th className="p-1">{gi.intellectual}</th><th className="p-1">∑</th></tr></thead><tbody>{stats.rhythms.map(({ m, r }) => <tr key={m.id} className="border-t border-primary/15"><td className="max-w-28 truncate p-1 font-bold">{memberDisplayName(m)}</td><td className="p-1 text-center">{pct(r.physical)}</td><td className="p-1 text-center">{pct(r.emotional)}</td><td className="p-1 text-center">{pct(r.intellectual)}</td><td className="p-1 text-center text-primary">{r.total}</td></tr>)}</tbody></table></div>
+        {stats.pairList.length > 0 && <><h3 className="mt-4 text-sm text-primary">{gi.map}</h3><ul className="mt-2 space-y-1.5">{stats.pairList.map(p => <li key={p.a.id + p.b.id} className="text-xs"><div className="flex justify-between gap-2"><span className="truncate">{memberDisplayName(p.a)} × {memberDisplayName(p.b)}</span><span className="text-primary">{p.score}</span></div><div className="mt-0.5 h-1.5 rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${p.score}%` }} /></div></li>)}</ul></>}
+        <p className="mt-3 text-[11px] text-muted-foreground">{gi.note}</p>
+      </>; })()}
       <h3 className="mt-4 text-sm text-primary">{t.groupMembers}</h3>
       <ul className="mt-2 grid gap-2 sm:grid-cols-2">{stats.colors.map(({ m, c }) => <li key={m.id} className="flex items-center gap-3 rounded-md border border-primary/20 p-2"><span className="size-8 shrink-0 rounded-full border border-primary/40" style={{ background: c?.code }} /><span className="min-w-0"><span className="block truncate font-bold text-outline">{memberDisplayName(m)}</span><span className="block truncate text-xs text-muted-foreground">{c ? `${localizeBirthColorName(c.name, language)} ${c.code}` : "—"}</span></span></li>)}</ul>
     </>}
@@ -108,12 +129,12 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
   const [open, setOpen] = useState(false);
   const [limitOpen, setLimitOpen] = useState(false);
   const [editing, setEditing] = useState<TeamGroup | null>(null);
-  const [name, setName] = useState(""); const [nick, setNick] = useState(""); const [ids, setIds] = useState<string[]>([]);
+  const [name, setName] = useState(""); const [nick, setNick] = useState(""); const [ids, setIds] = useState<string[]>([SELF_MEMBER_ID]);
   const [busy, setBusy] = useState(false);
   const add = useServerFn(addTeamGroup); const upd = useServerFn(updateTeamGroup); const del = useServerFn(deleteTeamGroup);
   if (!ctx) return null;
   const limit = groupLimit[plan];
-  const reset = () => { setEditing(null); setName(""); setNick(""); setIds([]); };
+  const reset = () => { setEditing(null); setName(""); setNick(""); setIds([SELF_MEMBER_ID]); };
   const writeLocal = (groups: TeamGroup[]) => { localStorage.setItem(GROUPS_KEY, JSON.stringify(groups)); ctx.reload(); };
   const save = async () => {
     setBusy(true);
@@ -146,7 +167,7 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
           <label className="block text-sm text-primary" htmlFor="group-display-name">{t.groupName.replace(/（任意）| \(optional\)|（可选）|（選填）|（可選）|\(선택\)| \(opcional\)| \(facultatif\)/g, '')}</label>
           <Input id="group-display-name" maxLength={40} value={nick || name} onChange={e => { setNick(e.target.value); setName(e.target.value); }} />
           <p className="text-sm text-primary">{t.members}</p>
-          {ctx.members.length ? <div className="flex flex-wrap gap-2">{ctx.members.map(m => { const on = ids.includes(m.id); return <Button key={m.id} type="button" size="sm" variant={on ? "default" : "outline"} aria-pressed={on} onClick={() => setIds(on ? ids.filter(x => x !== m.id) : [...ids, m.id])}>{memberDisplayName(m)}</Button>; })}</div> : <p className="text-xs text-muted-foreground">{t.noMembers}</p>}
+          {<div className="flex flex-wrap gap-2">{[{ id: SELF_MEMBER_ID, label: groupInsightCopy[language].self }, ...ctx.members.map(m => ({ id: m.id, label: memberDisplayName(m) }))].map(m => { const on = ids.includes(m.id); return <Button key={m.id} type="button" size="sm" variant={on ? "default" : "outline"} aria-pressed={on} onClick={() => setIds(on ? ids.filter(x => x !== m.id) : [...ids, m.id])}>{m.label}</Button>; })}</div>}{!ctx.members.length && <p className="text-xs text-muted-foreground">{t.noMembers}</p>}
           <div className="flex gap-2"><Button className="flex-1" disabled={busy} onClick={save}>{editing ? t.save : t.add}</Button>{editing && <Button variant="outline" onClick={reset}>{t.close}</Button>}</div>
         </div>
       </DialogContent>

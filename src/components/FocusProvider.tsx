@@ -7,6 +7,9 @@ import type { TeamMember } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
 import { defaultFocus, FOCUS_KEY, focusCopy, groupDisplayName, memberDisplayName, memberToProfile, readLocalFocus, readLocalGroups, type Focus, type TeamGroup } from "@/lib/focus";
 import type { UserProfile } from "./Onboarding";
+import { SELF_MEMBER_ID } from "@/lib/group-insight";
+
+export const ownerAsMember = (o: UserProfile): TeamMember => ({ id: SELF_MEMBER_ID, name: o.nameKanji || o.nameRomaji || "本人", nameKana: o.nameKana, birthDate: o.birthDate, birthTime: o.birthTime, birthTimeUnknown: o.birthTimeUnknown, birthPlace: o.birthPlace, birthCity: o.birthCity, siblingOrder: o.siblingOrder, gender: o.gender, bloodType: o.bloodType, role: "", skills: [] });
 
 type Ctx = {
   focus: Focus; setFocus: (f: Focus) => Promise<void>;
@@ -57,7 +60,7 @@ export function FocusProvider({ owner, serverBacked, children }: { owner: UserPr
     const member = focus.targetKind === "family" ? members.find(m => m.id === focus.targetId) ?? null : null;
     const gi = focus.targetKind === "group" ? groups.findIndex(g => g.id === focus.targetId) : -1;
     const g = gi >= 0 ? groups[gi]! : null;
-    const group = g ? { group: g, index: gi, members: members.filter(m => g.memberIds.includes(m.id)) } : null;
+    const group = g ? { group: g, index: gi, members: [...(g.memberIds.includes(SELF_MEMBER_ID) && owner.birthDate ? [ownerAsMember(owner)] : []), ...members.filter(m => g.memberIds.includes(m.id))] } : null;
     return {
       focus, setFocus, members, groups, reload, serverBacked, member, group,
       label: (language) => member ? memberDisplayName(member) : group ? groupDisplayName(group.group, group.index, language) : focusCopy[language].self,
