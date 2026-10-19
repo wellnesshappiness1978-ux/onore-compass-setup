@@ -163,9 +163,11 @@ function TorisetsuPanel({
   const [concern, setConcern] = useState("");
   const [limitOpen, setLimitOpen] = useState(false);
   const [entryMode, setEntryMode] = useState<"members" | "manual">("manual");
-  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [fetchedMembers, setMembers] = useState<TeamMember[]>([]);
   const [pickedId, setPickedId] = useState("");
   const focusContext = useFocus();
+  // Same roster the Family tab edits (server or preview/local), falling back to the direct fetch.
+  const members = focusContext?.members.length ? focusContext.members : fetchedMembers;
   const groups = focusContext?.groups ?? [];
   const ux = consultationUxCopy[language];
   const [groupResults, setGroupResults] = useState<{ name: string; reading: NonNullable<ReturnType<typeof analyzeCompatibility>> }[]>([]);

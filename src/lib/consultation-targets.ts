@@ -12,5 +12,5 @@ const memberSchema = z.object({
 });
 export function readPreviewMembers(): TeamMember[] {
   if (typeof window === "undefined") return [];
-  try { return z.array(memberSchema).max(100).parse(JSON.parse(localStorage.getItem("onore-team") ?? "[]")); } catch { return []; }
+  try { const raw: unknown = JSON.parse(localStorage.getItem("onore-team") ?? "[]"); return (Array.isArray(raw) ? raw : []).slice(0, 100).flatMap(item => { const r = memberSchema.safeParse(item); return r.success ? [r.data as TeamMember] : []; }); } catch { return []; }
 }
