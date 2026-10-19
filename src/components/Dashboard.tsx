@@ -289,17 +289,37 @@ function TorisetsuPanel({
                 </div>
                 {entryMode === "members" && (
                   <div className="mt-3">
-                    {members.length ? (
-                      <div className="flex flex-wrap gap-2">
-                        {members.map((m) => (
-                          <Button key={m.id} type="button" size="sm" variant="outline" onClick={() => pickMember(m)} className={`min-h-10 ${partnerDate === m.birthDate && partnerName === m.name ? "border-primary bg-primary/15 text-primary" : "border-primary/25"}`}>{m.name}</Button>
-                        ))}
-                      </div>
+                     {members.length ? (
+                      <>
+                        <select
+                          aria-label={q.pickMember}
+                          className={`${inputClass} appearance-none`}
+                          value={pickedId}
+                          onChange={(event) => {
+                            const m = members.find((x) => x.id === event.target.value);
+                            if (m) pickMember(m); else setPickedId("");
+                          }}
+                        >
+                          <option value="">{q.pickMember}…</option>
+                          {members.map((m) => (
+                            <option key={m.id} value={m.id}>{m.name} · {m.birthDate}</option>
+                          ))}
+                        </select>
+                        {pickedMember && (
+                          <p className="mt-2 rounded-md border border-primary/30 bg-primary/10 p-3 text-xs leading-5 text-foreground">
+                            <strong className="text-primary">{pickedMember.name}</strong>
+                            {` · ${pickedMember.birthDate}`}
+                            {pickedMember.birthTimeUnknown === false && pickedMember.birthTime ? ` · ${pickedMember.birthTime}` : ""}
+                            {pickedMember.birthPlace ? ` · ${pickedMember.birthPlace}` : ""}
+                            <span className="mt-1 block text-muted-foreground">{language === "ja" ? "登録情報をそのまま使って診断します。再入力は不要です。" : "Registered details are used as-is — no re-entry needed."}</span>
+                          </p>
+                        )}
+                      </>
                     ) : (
                       <p className="rounded-md border border-primary/20 bg-background/40 p-3 text-xs leading-5 text-muted-foreground">{q.noMembers}</p>
                     )}
                   </div>
-                )}
+                 )}
               </div>
               <div>
                 <label
