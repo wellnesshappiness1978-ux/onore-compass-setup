@@ -1,5 +1,10 @@
 # Roadmap
 
+## Owner-excluded registration / BGM follow-up (2026-10-19)
+- [ ] Show the owner in family registration without consuming a slot
+- [ ] Exclude the owner from per-group caps in create/edit and retain default selection
+- [ ] Reduce audio transition load and verify all frequencies and owner count boundaries
+
 ## BGM sound quality (2026-10-19) — done
 - [x] Smooth start/stop/volume/tuning transitions and remove clipping sources
 - [x] Refine all nine timbres and clean ambient reverb

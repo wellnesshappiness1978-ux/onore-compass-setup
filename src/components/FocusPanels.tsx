@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { useFocus } from "./FocusProvider";
 import { addTeamGroup, deleteTeamGroup, updateTeamGroup } from "@/lib/team-groups.functions";
 import { canAddGroup, focusCopy, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, mixHex, type TargetKind, type TeamGroup } from "@/lib/focus";
-import { groupLimit } from "@/lib/plans";
+import { groupLimit, memberLimit } from "@/lib/plans";
+import { familyCapacityCopy, fitsMemberCapacity, registeredMemberCount } from '@/lib/family-capacity';
 import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
 import { biorhythm, pairScore, type TeamMember } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
@@ -134,9 +135,12 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
   const add = useServerFn(addTeamGroup); const upd = useServerFn(updateTeamGroup); const del = useServerFn(deleteTeamGroup);
   if (!ctx) return null;
   const limit = groupLimit[plan];
+  const capacity = memberLimit[plan];
+  const capacityText = familyCapacityCopy[language];
   const reset = () => { setEditing(null); setName(""); setNick(""); setIds([SELF_MEMBER_ID]); };
   const writeLocal = (groups: TeamGroup[]) => { localStorage.setItem(GROUPS_KEY, JSON.stringify(groups)); ctx.reload(); };
   const save = async () => {
+    if (!fitsMemberCapacity(ids, capacity)) { onUpgrade(); return; }
     setBusy(true);
     try {
       const payload = { name: name.trim(), nickname: nick.trim(), memberIds: ids };
@@ -148,7 +152,7 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
       }
       if (ctx.serverBacked) ctx.reload();
       reset();
-    } catch (e) { if (e instanceof Error && e.message.includes("GROUP_LIMIT")) setLimitOpen(true); else toast.error("Error"); }
+    } catch (e) { if (e instanceof Error && e.message.includes("GROUP_MEMBER_LIMIT")) onUpgrade(); else if (e instanceof Error && e.message.includes("GROUP_LIMIT")) setLimitOpen(true); else toast.error("Error"); }
     finally { setBusy(false); }
   };
   const remove = async (g: TeamGroup) => { if (ctx.serverBacked) { await del({ data: { id: g.id } }); ctx.reload(); } else writeLocal(ctx.groups.filter(x => x.id !== g.id)); };
@@ -166,8 +170,9 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
         <div className="space-y-2 border-t border-primary/20 pt-3">
           <label className="block text-sm text-primary" htmlFor="group-display-name">{t.groupName.replace(/（任意）| \(optional\)|（可选）|（選填）|（可選）|\(선택\)| \(opcional\)| \(facultatif\)/g, '')}</label>
           <Input id="group-display-name" maxLength={40} value={nick || name} onChange={e => { setNick(e.target.value); setName(e.target.value); }} />
-          <p className="text-sm text-primary">{t.members}</p>
-          {<div className="flex flex-wrap gap-2">{[{ id: SELF_MEMBER_ID, label: groupInsightCopy[language].self }, ...ctx.members.map(m => ({ id: m.id, label: memberDisplayName(m) }))].map(m => { const on = ids.includes(m.id); return <Button key={m.id} type="button" size="sm" variant={on ? "default" : "outline"} aria-pressed={on} onClick={() => setIds(on ? ids.filter(x => x !== m.id) : [...ids, m.id])}>{m.label}</Button>; })}</div>}{!ctx.members.length && <p className="text-xs text-muted-foreground">{t.noMembers}</p>}
+          <p className="text-sm text-primary">{t.members} · {capacityText.capacity(registeredMemberCount(ids), capacity)}</p>
+          <p className="text-xs text-muted-foreground">{capacityText.excluded}</p>
+          {<div className="flex flex-wrap gap-2">{[{ id: SELF_MEMBER_ID, label: groupInsightCopy[language].self }, ...ctx.members.map(m => ({ id: m.id, label: memberDisplayName(m) }))].map(m => { const on = ids.includes(m.id); return <Button key={m.id} type="button" size="sm" variant={on ? "default" : "outline"} aria-pressed={on} disabled={!on && m.id !== SELF_MEMBER_ID && registeredMemberCount(ids) >= capacity} onClick={() => setIds(on ? ids.filter(x => x !== m.id) : [...ids, m.id])}>{m.label}</Button>; })}</div>}{!ctx.members.length && <p className="text-xs text-muted-foreground">{t.noMembers}</p>}
           <div className="flex gap-2"><Button className="flex-1" disabled={busy} onClick={save}>{editing ? t.save : t.add}</Button>{editing && <Button variant="outline" onClick={reset}>{t.close}</Button>}</div>
         </div>
       </DialogContent>

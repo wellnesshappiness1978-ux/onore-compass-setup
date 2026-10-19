@@ -23,6 +23,8 @@ import ShareCardButton from "@/components/ShareCardButton";
 import GroupSimulator from "./GroupSimulator";
 import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
+import { useFocus, ownerAsMember } from '../FocusProvider';
+import { familyCapacityCopy } from '@/lib/family-capacity';
 
 type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
 const LOCAL = "onore-team";
@@ -38,6 +40,8 @@ const summary = (m: TeamMember, t: TeamCopy) => ({
 });
 
 export default function TeamStudio({ plan, actualPlan, language, signedIn, ownerBirthDate }: Props) {
+  const focus = useFocus();
+  const owner = focus ? ownerAsMember(focus.owner) : null;
   const t = teamCopy[language];
   const sample = familySampleCopy[language];
   const profileUi = profileUiCopy[language];
@@ -116,7 +120,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <Button size="sm" className="mt-3 w-full" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}>{t.seePlans}</Button>
           </div>
         ) : feature === "roster" ? (
-          <Roster t={t} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly} language={language} onAdd={addMember} onEdit={editMember} onRemove={removeMember} />
+          <Roster t={t} owner={owner} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly} language={language} onAdd={addMember} onEdit={editMember} onRemove={removeMember} />
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
@@ -170,7 +174,7 @@ const rosterExtra: Record<Language, { kana: string; time: string; timeUnknown: s
 };
 const emptyMemberForm = { name: "", nickname: "", nameKana: "", birthDate: "", birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", siblingOrder: "", gender: "undisclosed", bloodType: "", relationship: "", relationshipType: "", role: "", skills: "" };
 
-function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdit, onRemove }: { t: TeamCopy; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void }) {
+function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd, onEdit, onRemove }: { t: TeamCopy; owner: TeamMember | null; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void }) {
   const x = rosterExtra[language];
   const [form, setForm] = useState(emptyMemberForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -190,6 +194,7 @@ function Roster({ t, members, max, signedIn, previewOnly, language, onAdd, onEdi
   };
   return (
     <div className="space-y-4">
+      {owner && <ul aria-label={familyCapacityCopy[language].owner} className="grid gap-2 sm:grid-cols-2"><li className="flex items-center gap-3 rounded-md border border-primary/40 bg-primary/10 p-3"><div className="min-w-0 flex-1"><p className="truncate text-base font-bold text-primary">{memberDisplayName(owner)}</p><p className="text-xs text-primary">{familyCapacityCopy[language].owner}</p><p className="mt-1 text-xs text-muted-foreground">{familyCapacityCopy[language].excluded}</p></div></li></ul>}
       {!signedIn && <p className="text-[11px] text-muted-foreground">{previewOnly ? x.preview : t.guestNote}</p>}
       <form id="family-roster-form" onSubmit={submit} className={`${card} grid gap-2 sm:grid-cols-2`}>
         <Input required aria-label={t.name} placeholder={`${t.name} *`} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
