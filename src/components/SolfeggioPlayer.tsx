@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { ChevronDown, ChevronUp, Music2, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { createAmbientPiano, pianoTones, type AmbientPiano } from "@/lib/ambient-piano";
+import { pianoTones } from "@/lib/ambient-piano";
+import { getPianoState, playPiano, setPianoHz, setPianoMuted, setPianoVolume, stopPiano, subscribePiano } from "@/lib/piano-store";
+import { pianoExtraCopy } from "@/lib/piano-copy";
 import type { Language } from "@/lib/translations";
 
-export default function SolfeggioPlayer({ language, compact = false }: { language: Language; compact?: boolean }) {
+export default function SolfeggioPlayer({ language, compact = false, sampleOnly = false, onSampleEnd }: { language: Language; compact?: boolean; sampleOnly?: boolean; onSampleEnd?: () => void }) {
   const labels: Record<Language, { region: string; stop: string; play: string; toggle: string; title: string; ambient: string; unmute: string; mute: string; settings: string; frequency: string; volume: string; bgmVolume: string; note: string; error: string }> = {
     ja: { region: "アンビエントピアノ", stop: "BGMを停止", play: "BGMを再生", toggle: "再生・停止", title: "星音のピアノ", ambient: "アンビエント", unmute: "消音を解除", mute: "消音", settings: "音楽の設定", frequency: "周波数", volume: "音量", bgmVolume: "BGM音量", note: "周波数を基音にした創作音楽です。DNA修復・治療などの効果は保証しません。", error: "音声を開始できませんでした。再生を押して再試行してください。" },
     en: { region: "Ambient piano", stop: "Stop music", play: "Play music", toggle: "Play or stop", title: "Celestial piano", ambient: "Ambient", unmute: "Unmute", mute: "Mute", settings: "Audio settings", frequency: "Frequency", volume: "Volume", bgmVolume: "Music volume", note: "Original music tuned to a reference frequency; no therapeutic or DNA-repair effects are claimed.", error: "Audio could not start. Try Play again." },
@@ -15,51 +17,28 @@ export default function SolfeggioPlayer({ language, compact = false }: { languag
     fr: { region: "Piano d’ambiance", stop: "Arrêter la musique", play: "Lire la musique", toggle: "Lire ou arrêter", title: "Piano céleste", ambient: "Ambiance", unmute: "Rétablir le son", mute: "Couper le son", settings: "Réglages audio", frequency: "Fréquence", volume: "Volume", bgmVolume: "Volume de la musique", note: "Musique originale accordée sur une fréquence de référence, sans allégation thérapeutique ni réparation de l’ADN.", error: "Impossible de lancer le son. Réessayez." },
   };
   const text = labels[language];
-  const [hz, setHz] = useState(528);
-  const [playing, setPlaying] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const st = useSyncExternalStore(subscribePiano, getPianoState, getPianoState);
+  const { hz, playing, busy, muted, volume, error } = st;
   const [expanded, setExpanded] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const [volume, setVolume] = useState(0.25);
-  const [error, setError] = useState(false);
-  const engine = useRef<AmbientPiano | null>(null);
-  const sequence = useRef(0);
-  const level = useRef(volume);
-  level.current = muted ? 0 : volume;
-  useEffect(() => {
-    const pauseForVoice = () => { sequence.current += 1; void engine.current?.stop(); engine.current = null; setPlaying(false); };
-    window.addEventListener("onore-voice-start", pauseForVoice);
-    return () => window.removeEventListener("onore-voice-start", pauseForVoice);
-  }, []);
-  useEffect(() => () => { sequence.current += 1; void engine.current?.stop(); engine.current = null; }, []);
-  useEffect(() => engine.current?.setVolume(muted ? 0 : volume), [volume, muted]);
-  const start = async (frequency: number) => {
-    const token = ++sequence.current;
-    const old = engine.current; engine.current = null;
-    void old?.stop(); setBusy(true); setError(false);
-    try {
-      const next = await createAmbientPiano(frequency, level.current);
-      if (token !== sequence.current) { void next.stop(); return; }
-      engine.current = next; setPlaying(true);
-    } catch { if (token === sequence.current) { setError(true); setPlaying(false); } }
-    finally { if (token === sequence.current) setBusy(false); }
-  };
+  const extra = pianoExtraCopy[language];
   const toggle = () => {
-    if (playing) { sequence.current += 1; void engine.current?.stop(); engine.current = null; setPlaying(false); }
-    else void start(hz);
+    if (playing) stopPiano();
+    else void playPiano(hz, sampleOnly ? 20 : undefined, onSampleEnd);
   };
   return <section aria-label={text.region} className={`audio-controller ${compact ? "audio-controller--compact" : ""}`}>
     <div className="flex items-center gap-3">
       <Button size="icon" variant="default" onClick={toggle} disabled={busy} aria-label={playing ? text.stop : text.play} aria-pressed={playing} title={text.toggle} className="size-11 shrink-0 rounded-full">{playing ? <Pause /> : <Play />}</Button>
-      <div className="min-w-0 flex-1"><p className="flex items-center gap-2 font-serif text-sm text-primary"><Music2 className="size-4 shrink-0" />{text.title}</p><p className="text-xs text-muted-foreground">{hz} Hz · {text.ambient}</p></div>
-      <Button size="icon" variant="ghost" onClick={() => setMuted(!muted)} aria-label={muted ? text.unmute : text.mute} aria-pressed={muted} title={text.mute}>{muted ? <VolumeX /> : <Volume2 />}</Button>
+      <div className="min-w-0 flex-1"><p className="flex items-center gap-2 font-serif text-sm text-primary"><Music2 className="size-4 shrink-0" />{text.title}</p><p className="text-xs text-muted-foreground">{hz} Hz · {extra.moods[hz] ?? text.ambient}</p></div>
+      <Button size="icon" variant="ghost" onClick={() => setPianoMuted(!muted)} aria-label={muted ? text.unmute : text.mute} aria-pressed={muted} title={text.mute}>{muted ? <VolumeX /> : <Volume2 />}</Button>
       <Button size="icon" variant="ghost" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-label={text.settings} title={text.settings}>{expanded ? <ChevronDown /> : <ChevronUp />}</Button>
     </div>
     {expanded && <div className="mt-3 border-t border-primary/20 pt-3">
-      <div role="group" aria-label={text.frequency} className="grid grid-cols-3 gap-2">{pianoTones.map(f => <Button key={f} size="sm" variant={hz === f ? "default" : "outline"} aria-pressed={hz === f} disabled={busy} onClick={() => { setHz(f); if (playing) void start(f); }}>{f} Hz</Button>)}</div>
-      <label className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">{text.volume}<input aria-label={text.bgmVolume} type="range" min={0} max={0.6} step={0.01} value={volume} onChange={e => setVolume(Number(e.target.value))} className="min-w-0 flex-1 accent-primary" /></label>
+      <div role="group" aria-label={text.frequency} className="grid grid-cols-3 gap-2">{pianoTones.map(f => <Button key={f} size="sm" variant={hz === f ? "default" : "outline"} aria-pressed={hz === f} disabled={busy || (sampleOnly && f !== 528)} onClick={() => { setPianoHz(f); if (playing) void playPiano(f, sampleOnly ? 20 : undefined, onSampleEnd); }} className="h-auto flex-col py-1.5"><span>{f} Hz</span><span className="text-[10px] font-normal opacity-80">{extra.moods[f]}</span></Button>)}</div>
+      <label className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">{text.volume}<input aria-label={text.bgmVolume} type="range" min={0} max={0.6} step={0.01} value={volume} onChange={e => setPianoVolume(Number(e.target.value))} className="min-w-0 flex-1 accent-primary" /></label>
       <p className="mt-2 text-xs leading-6 text-muted-foreground">{text.note}</p>
     </div>}
+    {sampleOnly && <p className="mt-2 rounded-md border border-primary/30 bg-primary/10 p-2 text-xs leading-5 text-primary">{extra.sampleNote}</p>}
+    {!sampleOnly && playing && <p className="mt-2 text-[11px] text-muted-foreground">{extra.background}</p>}
     {error && <p role="alert" className="mt-2 text-sm text-destructive">{text.error}</p>}
   </section>;
 }

@@ -70,7 +70,6 @@ export async function createAmbientPiano(hz: number, volume: number): Promise<Am
       const oscillator = ctx.createOscillator(); oscillator.type = 'sine';
       oscillator.frequency.value = frequency * (index + 1) * (1 + index * index * 0.00012);
       const partial = ctx.createGain(); partial.gain.value = weight;
-      if (!weight) { oscillator.onended = null; }
       oscillator.connect(partial).connect(envelope);
       active.add(oscillator);
       oscillator.onended = () => {
