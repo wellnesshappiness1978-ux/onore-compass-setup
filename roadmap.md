@@ -1,5 +1,10 @@
 # Roadmap
 
+## BGM sound quality (2026-10-19)
+- [ ] Smooth start/stop/volume/tuning transitions and remove clipping sources
+- [ ] Refine all nine timbres and clean ambient reverb
+- [ ] Audio regression tests and browser playback verification (physical listening unavailable)
+
 ## Fixed controls / Today depth (2026-10-19) — done
 - [x] Fixed Home/Settings on every device and one adjacent BGM dropdown
 - [x] Twelve-category plan guidance and all higher-tier advice
