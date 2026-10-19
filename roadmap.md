@@ -1,5 +1,11 @@
 # Roadmap
 
+## Consultation UX and limits (2026-10-19)
+- [ ] Fixed readable samples with frosted continuation
+- [ ] Consultation limits 1/5/15/30/unlimited, reset notice, secure preview handling
+- [ ] Exclusive AI experience tabs and saved family/group compatibility selection
+- [ ] Group-name label and mobile/end-to-end checks
+
 ## 相性診断 & 今日の占い 強化 (2026-10-16) — 完了
 - [x] 相性診断: 4ブロック表示（総合スコア円形ゲージ/シナジー/摩擦/今日〜今週アクション）
 - [x] 相性診断: team_members ワンタップ選択タブ + 手入力フォーム切替
