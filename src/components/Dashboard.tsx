@@ -54,6 +54,7 @@ import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
+import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
 import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, SubjectBanner } from "./FocusPanels";
 import { focusCopy, goalText, groupDisplayName, memberDisplayName } from "@/lib/focus";
@@ -104,7 +105,7 @@ function ProfileRows({ profile, language }: { profile: UserProfile; language: La
     [t.bloodType, profile.bloodType ? `${profile.bloodType}${t.bloodSuffix}` : "—"],
     [
       t.siblingOrder,
-      t.siblings[["first", "middle", "last", "only"].indexOf(profile.siblingOrder)] || "—",
+      siblingDisplay(profile.siblingOrder, language) || "—",
     ],
   ];
   return (

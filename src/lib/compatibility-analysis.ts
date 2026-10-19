@@ -14,7 +14,7 @@ export const partnerSchema = z.object({
   birthTime: z.union([z.literal(""), z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/)]),
   birthPlace: z.string().max(20), birthCity: z.string().trim().max(80),
   bloodType: z.enum(["", "A", "B", "O", "AB"]),
-  siblingOrder: z.enum(["", "first", "middle", "last", "only"]),
+  siblingOrder: z.string().trim().max(20),
   gender: z.enum(["female", "male", "other", "undisclosed"]),
 });
 export type PartnerInput = z.infer<typeof partnerSchema>;

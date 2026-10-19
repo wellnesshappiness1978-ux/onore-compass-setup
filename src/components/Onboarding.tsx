@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import LanguageSelector from "./LanguageSelector";
+import SiblingSelect from "./SiblingSelect";
 import { ArrowRight, CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
@@ -35,7 +36,6 @@ export const PREFECTURES = [
 
 const BLOOD_TYPES = ["A", "B", "O", "AB"] as const;
 
-const SIBLING_ORDERS = ["first", "middle", "last", "only"] as const;
 
 export const inputClass =
   "field-luminous w-full rounded-lg border border-primary/15 bg-background/45 px-4 py-3 text-base text-foreground outline-none transition-all duration-300 placeholder:text-muted-foreground focus:border-primary/70 disabled:cursor-not-allowed disabled:opacity-40";
@@ -290,22 +290,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
                   <Network className="size-4 stroke-[1.4]" aria-hidden="true" />
                    {t.siblingOrder} <span className="text-xs font-normal text-primary/70">{t.required}</span>
                 </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {SIBLING_ORDERS.map((s) => (
-                    <Button
-                      key={s}
-                      type="button"
-                      variant="outline"
-                       onClick={() => set("siblingOrder", s)}
-                       aria-pressed={profile.siblingOrder === s}
-                      className={`${chipBase} ${
-                         profile.siblingOrder === s ? chipSelected : chipIdle
-                      }`}
-                    >
-                       {t.siblings[SIBLING_ORDERS.indexOf(s)]}
-                    </Button>
-                  ))}
-                </div>
+                <SiblingSelect language={language} value={profile.siblingOrder} onChange={(v) => set("siblingOrder", v)} className={inputClass} />
               </div>
             </div>
           )}

@@ -1,3 +1,4 @@
+import { siblingCategory } from "@/lib/sibling-order";
 import { Sparkles } from "lucide-react";
 import type { UserProfile } from "./Onboarding";
 import type { Language } from "@/lib/translations";
@@ -38,8 +39,8 @@ export default function PersonPortrait({ profile, language }: { profile: UserPro
   const index = month - (day < (boundaries[month] ?? 1) ? 1 : 0);
   const dateNumber = Array.from(profile.birthDate.replaceAll("-", "")).reduce((sum, digit) => sum + Number(digit), 0);
   const lifePath = dateNumber > 0 ? (dateNumber - 1) % 9 + 1 : 0;
-  const seed = year + month * 31 + day + (profile.bloodType.charCodeAt(0) || 0) + ["first", "middle", "last", "only"].indexOf(profile.siblingOrder);
-  const siblingIndex = ["first", "middle", "last", "only"].indexOf(profile.siblingOrder);
+  const seed = year + month * 31 + day + (profile.bloodType.charCodeAt(0) || 0) + ["first", "middle", "last", "only"].indexOf(siblingCategory(profile.siblingOrder));
+  const siblingIndex = ["first", "middle", "last", "only"].indexOf(siblingCategory(profile.siblingOrder));
   const chips = [
     [base.birthDate, profile.birthDate],
     [t.sign, ["ja", "zh-CN", "zh-TW"].includes(language) ? signs[index] : signEnglish[index]],

@@ -8,7 +8,7 @@ export function savedPartner(member: TeamMember): PartnerInput {
     birthDate: p.birthDate, birthTime: p.birthTimeUnknown ? '' : p.birthTime.slice(0, 5),
     birthPlace: p.birthPlace, birthCity: p.birthCity,
     bloodType: (['A', 'B', 'O', 'AB'] as const).find(v => v === p.bloodType) ?? '',
-    siblingOrder: (['first', 'middle', 'last', 'only'] as const).find(v => v === p.siblingOrder) ?? '' };
+    siblingOrder: String(p.siblingOrder ?? '').slice(0, 20) };
 }
 export const savedGroupMembers = (group: TeamGroup, members: TeamMember[]) =>
   members.filter(member => group.memberIds.includes(member.id));
