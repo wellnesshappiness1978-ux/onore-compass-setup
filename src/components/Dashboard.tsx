@@ -55,7 +55,7 @@ import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
 import { FocusProvider, useFocus } from "./FocusProvider";
-import { ArtOwnerOnlyNotice, FamilyGroupButtons, FocusSettingsCard, GroupFocusCard, SubjectBanner } from "./FocusPanels";
+import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, SubjectBanner } from "./FocusPanels";
 import { focusCopy, goalText, groupDisplayName, memberDisplayName } from "@/lib/focus";
 import { savedPartner, savedGroupMembers } from "@/lib/saved-compatibility";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
@@ -757,7 +757,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         <Button size="icon" variant="ghost" onClick={() => goToTab("home")} aria-label={t.home} title={t.home} aria-current={tab === "home" ? "page" : undefined} className="size-14 shrink-0 text-primary [&_svg]:size-7">
           <Home className="size-7" strokeWidth={1.8} />
         </Button>
-        <span aria-hidden="true" />
+        <SubjectHeaderBadge language={language} ownerName={profile.nameKanji || profile.nameRomaji} onOpen={() => { goToTab("settings"); window.setTimeout(() => { const el = document.getElementById("focus-settings") as HTMLDetailsElement | null; if (el) { el.open = true; el.scrollIntoView({ behavior: "smooth", block: "start" }); } }, 150); }} />
         <div className="flex min-w-0 items-center gap-1">
         <HeaderBgm language={language} plan={previewPlan} onUpgrade={() => { goToTab("settings"); window.setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100); }} />
         <Button size="icon" variant="ghost" onClick={() => goToTab("settings")} aria-label={t.settings} title={t.settings} aria-current={tab === "settings" ? "page" : undefined} className="size-14 shrink-0 text-primary [&_svg]:size-7">

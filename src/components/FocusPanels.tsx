@@ -28,7 +28,7 @@ export function FocusSettingsCard({ language }: { language: Language }) {
   const set = (patch: Partial<typeof f>) => setDraft({ ...f, ...patch });
   const kinds: TargetKind[] = ["self", "family", "group"];
   return (
-    <details className="group rounded-lg border border-primary/30 bg-card/60" aria-label={t.cardTitle}>
+    <details id="focus-settings" className="group scroll-mt-28 rounded-lg border border-primary/30 bg-card/60" aria-label={t.cardTitle}>
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
         <span className="flex items-center gap-2 font-serif text-lg text-primary"><Target className="size-5" />{t.cardTitle}</span>
         <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
@@ -48,6 +48,16 @@ export function FocusSettingsCard({ language }: { language: Language }) {
       </div>
     </details>
   );
+}
+
+/** Fixed header badge: who the readings are about; tap opens the focus settings. */
+export function SubjectHeaderBadge({ language, ownerName, onOpen }: { language: Language; ownerName: string; onOpen: () => void }) {
+  const ctx = useFocus();
+  if (!ctx) return <span aria-hidden="true" />;
+  const t = focusCopy[language];
+  const icon = ctx.group ? "👥" : ctx.member ? "👨‍👩‍👧" : "👤";
+  const who = ctx.group ? ctx.label(language) : ctx.member ? `${ctx.label(language)}（${t.family}）` : `${t.self}${ownerName ? `（${ownerName}）` : ""}`;
+  return <button type="button" onClick={onOpen} title={t.cardTitle} className="mx-auto flex min-h-10 min-w-0 max-w-full items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary"><span aria-hidden="true">{icon}</span><span className="truncate">{t.viewing(who)}</span></button>;
 }
 
 /** Small strip showing the current subject with a way back to self. */
