@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { isUpgradePlan, planForCount, planOrder, canUse, consultationDailyLimit, dailyUsageLimit } from './plans';
 describe('consultation limits', () => {
-  it.each([['free', 1], ['standard', 5], ['vip', 15], ['b2b', 30], ['b2b-premium', Infinity]] as const)('%s allows %s consultations per day', (plan, cap) => {
+  it.each([['free', 1], ['standard', 3], ['vip', 10], ['b2b', 30], ['b2b-premium', Infinity]] as const)('%s allows %s consultations per day', (plan, cap) => {
     expect(consultationDailyLimit[plan]).toBe(cap);
   });
   it('does not change compatibility limits', () => {
