@@ -31,7 +31,8 @@ import { goalText } from "@/lib/focus";
 type Pair = { ja: string; en: string };
 const P = (ja: string, en: string): Pair => ({ ja, en });
 
-const titles: Record<TodayFeature, Pair> = {
+export const todayTitles: Record<TodayFeature, Pair> = {
+
   decision: P("今日の具体的決断（攻める／守る）", "Today's concrete decision"),
   starPath: P("本日の星巡りと志の導き", "Today's star path & guiding aspiration"),
   dailyLucky: P("本日の3ラッキー", "Today's three lucky picks"),
@@ -45,6 +46,8 @@ const titles: Record<TodayFeature, Pair> = {
   biorhythm365: P("個人・ファミリーのバイオリズム", "Personal & family biorhythm"),
   familyRoadmap: P("ファミリーの365日ロードマップとバイオリズム", "Family 365-day roadmap & biorhythm"),
 };
+const titles = todayTitles;
+export const todayNotifyEmoji: Partial<Record<TodayFeature, string>> = { decision: "💡", starPath: "✨", dailyLucky: "🎨", direction: "🧭", helio: "🌍", shopping: "🛍️", health: "🌿", monthlyLucky: "🌸", directionExtended: "🧭", relations: "🤝", biorhythm365: "📈", familyRoadmap: "👨‍👩‍👧" };
 const icons: Record<TodayFeature, typeof Compass> = { decision: Swords, starPath: Stars, dailyLucky: Sparkles, direction: Compass, directionExtended: Compass, shopping: ShoppingBag, health: HeartPulse, relations: MessageCircleHeart, monthlyLucky: Flower2, helio: CalendarHeart, biorhythm365: LineChart, familyRoadmap: BriefcaseBusiness };
 
 const words: Record<Element, Pair[]> = {
@@ -193,7 +196,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       {plan !== "b2b" && plan !== "b2b-premium" && <Button size="sm" variant="champagne" className="mt-2 w-full" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る・期間を広げる" : "View plans"}</Button>}
     </div>
   );
-  const notifyEmoji: Partial<Record<TodayFeature, string>> = { decision: "💡", starPath: "✨", dailyLucky: "🎨", direction: "🧭", helio: "🌍", shopping: "🛍️", health: "🌿", monthlyLucky: "🌸", directionExtended: "🧭", relations: "🤝", biorhythm365: "📈", familyRoadmap: "👨‍👩‍👧" };
+  const notifyEmoji = todayNotifyEmoji;
   const extBody = <div className="space-y-1 text-sm">
         <p>{ja ? "生まれ持った吉方位タイプ" : "Birth direction type"}：{gua ? `${gua.group === "east" ? (ja ? "東四命" : "East group") : (ja ? "西四命" : "West group")} · ${L(dirNames[gua.shengQi])}` : (ja ? "性別（男性／女性）の登録で表示されます" : "Shown when gender is set to male or female")}</p>
         <p>{ja ? `${stars.year}年の大開運方位` : `${stars.year} favorable direction`}：<strong className="text-primary">{yearDir ? L(dirNames[yearDir]) : "—"}</strong></p>
@@ -447,7 +450,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
                 </div>
               </div>
             )}
-            <FeatureNotifySwitch id={id} title={`${notifyEmoji[id] ?? "🧭"} ${L(titles[id])}`} body={content[id].notify} language={language} disabled={!open} color={id === "dailyLucky" ? luckyColor?.code : undefined} />
+            <FeatureNotifySwitch id={id} title={`${notifyEmoji[id] ?? "🧭"} ${L(titles[id])}`} body={content[id].notify} language={language} disabled={!open} color={id === "dailyLucky" ? luckyColor?.code : undefined} variant="link" />
           </section>
           {i === lastOpen && share("share-open")}
         </Fragment>);
