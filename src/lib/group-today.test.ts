@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { bandOf, memberToday, roleAssignment, subjectDailyMessage } from "./group-today";
 import { replaceSubject } from "@/components/FocusPanels";
-const m = (id: string, birthDate: string) => ({ id, name: id, birthDate, role: "", skills: [] });
+const m = (id: string, birthDate: string) => ({ id, name: id, birthDate, gender: "undisclosed", bloodType: "", role: "", skills: [] });
 describe("group today", () => {
   it("bands at 70 and 45", () => { expect(bandOf(70)).toBe("high"); expect(bandOf(45)).toBe("steady"); expect(bandOf(44)).toBe("care"); });
   it("gives every member a reading and assigns every role", () => {
