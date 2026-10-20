@@ -56,7 +56,7 @@ import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
 import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
-import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, SubjectBanner } from "./FocusPanels";
+import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, GroupMembersToday, SubjectBanner, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
 import { focusCopy, goalText, groupDisplayName, memberDisplayName } from "@/lib/focus";
 import { savedPartner, savedGroupMembers } from "@/lib/saved-compatibility";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
@@ -620,13 +620,13 @@ function FocusedTraits({ language, render }: { language: Language; render: (p: U
   if (!ctx) return null;
   const t = focusCopy[language];
   const goal = goalText(ctx.focus, language);
-  if (ctx.group) return <><SubjectBanner language={language} /><GroupFocusCard language={language} /></>;
-  return <><SubjectBanner language={language} />{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</>;
+  if (ctx.group) return <SubjectVoice language={language}><SubjectBanner language={language} /><GroupFocusCard language={language} /><GroupMembersToday language={language} /></SubjectVoice>;
+  return <SubjectVoice language={language}><SubjectBanner language={language} />{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</SubjectVoice>;
 }
 function FocusedToday({ language, render }: { language: Language; render: (p: UserProfile) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx) return null;
-  return <><SubjectBanner language={language} />{ctx.group && <GroupFocusCard language={language} />}{render(ctx.readingProfile)}</>;
+  return <SubjectVoice language={language}><SubjectBanner language={language} /><SubjectDailyNote language={language} />{ctx.group && <><GroupFocusCard language={language} /><GroupMembersToday language={language} /></>}{render(ctx.readingProfile)}</SubjectVoice>;
 }
 
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
@@ -640,6 +640,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     const open = (target: string | null) => {
       if (target === "compass") { setTab("today"); window.scrollTo({ top: 0 }); }
       else if (target === "art") { setTab("art"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      else if (target === "notify") { setTab("settings"); window.setTimeout(() => document.getElementById("notification-center")?.scrollIntoView({ behavior: "smooth", block: "start" }), 150); }
+      else if (target === "bgm") { window.scrollTo({ top: 0 }); }
     };
     const q = new URLSearchParams(window.location.search).get("open");
     if (q) { open(q); const url = new URL(window.location.href); url.searchParams.delete("open"); window.history.replaceState(window.history.state, "", url); }
@@ -853,7 +855,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                   {(["compatibility", "consultation"] as const).map(mode => <Button key={mode} role="tab" aria-selected={consultMode === mode} aria-controls={`ai-${mode}`} variant={consultMode === mode ? "champagne" : "outline"} className="h-auto min-h-12 whitespace-normal px-2 py-2 text-xs sm:text-sm" onClick={() => setConsultMode(mode)}>{mode === "compatibility" ? <HeartHandshake className="size-4 shrink-0" /> : <WandSparkles className="size-4 shrink-0" />}{consultationUxCopy[language][mode]}</Button>)}
                 </div>
                 <div id="ai-compatibility" role="tabpanel" hidden={consultMode !== "compatibility"} className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} signedIn={signedIn} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
-                <div id="ai-consultation" role="tabpanel" hidden={consultMode !== "consultation"}><ConsultationPanel
+                <div id="ai-consultation" role="tabpanel" hidden={consultMode !== "consultation"}><SubjectVoice language={language}><ConsultationPanel
                   previewMode={devOverrideEnabled}
                   profile={profile}
                   focusTargetId={focusMemberId}
@@ -863,7 +865,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                   actualPlan={serverPlan}
                   signedIn={signedIn}
                   onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                /></div>
+                /></SubjectVoice></div>
               </>
             ) : tab === "business" ? (
               <><FamilyGroupButtons language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><BusinessFeaturePreview language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>

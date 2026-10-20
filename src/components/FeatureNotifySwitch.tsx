@@ -33,6 +33,8 @@ function colorIcon(color?: string) {
 
 type Entry = { title: string; body: string; color?: string | undefined };
 const registry = new Map<string, Entry>();
+/** Generic bodies registered by the Settings notification center; live screen content wins when present. */
+const fallbacks = new Map<string, Entry>();
 let timer: ReturnType<typeof setInterval> | null = null;
 /** One shared scheduler: all reminders set for the same minute are merged into a single bulleted notification. */
 function startScheduler() {
@@ -41,7 +43,8 @@ function startScheduler() {
     if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
     const now = new Date(); const hm = now.toTimeString().slice(0, 5); const day = now.toDateString();
     const settings = readAll();
-    const due = [...registry.entries()].filter(([fid]) => settings[fid]?.on && settings[fid]?.time === hm);
+    const ids = new Set([...registry.keys(), ...fallbacks.keys()]);
+    const due = [...ids].map(fid => [fid, registry.get(fid) ?? fallbacks.get(fid)!] as const).filter(([fid]) => settings[fid]?.on && settings[fid]?.time === hm);
     const sentKey = `${KEY}-sent-${hm}`;
     if (!due.length || localStorage.getItem(sentKey) === day) return;
     localStorage.setItem(sentKey, day);
@@ -49,26 +52,32 @@ function startScheduler() {
     const head = ja ? "【アゴルメンの羅針盤】本日の開運サマリー" : "Agolmen's Compass · Today's summary";
     const body = due.map(([, e]) => `・${e.title}：${e.body}`).join("\n");
     const color = due.find(([, e]) => e.color)?.[1].color;
-    try { const n = new Notification(head, { body, icon: colorIcon(color), badge: colorIcon(color), tag: `onore-summary-${hm}` }); n.onclick = () => { window.focus(); window.dispatchEvent(new CustomEvent("onore-open", { detail: "compass" })); n.close(); }; } catch { /* unsupported */ }
+    try { const n = new Notification(head, { body, icon: colorIcon(color), badge: colorIcon(color), tag: `onore-summary-${hm}` }); n.onclick = () => { window.focus(); window.dispatchEvent(new CustomEvent("onore-open", { detail: due.length === 1 && due[0]![0] === "bgm" ? "bgm" : "compass" })); n.close(); }; } catch { /* unsupported */ }
   };
   tick(); timer = setInterval(tick, 30_000);
 }
 
 /** Per-feature daily reminder. Delivers only while the app is open; no background push provider is connected. */
-export default function FeatureNotifySwitch({ id, title, body, language, disabled, color }: { id: string; title: string; body: string; language: Language; disabled?: boolean; color?: string | undefined }) {
+export default function FeatureNotifySwitch({ id, title, body, language, disabled, color, variant = "full", lockedNote }: { id: string; title: string; body: string; language: Language; disabled?: boolean; color?: string | undefined; variant?: "full" | "link" | "center"; lockedNote?: string }) {
   const t = language === "ja" ? copy.ja : copy.en;
   const [s, setS] = useState<Setting>({ on: false, time: "07:00" });
   const [msg, setMsg] = useState("");
   const [help, setHelp] = useState(false);
   useEffect(() => { const v = readAll()[id]; if (v) setS({ on: !!v.on, time: times.includes(v.time) ? v.time : "07:00" }); }, [id]);
-  const save = (next: Setting) => { setS(next); try { localStorage.setItem(KEY, JSON.stringify({ ...readAll(), [id]: next })); } catch { /* storage disabled */ } };
+  const save = (next: Setting) => { setS(next); try { localStorage.setItem(KEY, JSON.stringify({ ...readAll(), [id]: next })); window.dispatchEvent(new Event("onore-notify-change")); } catch { /* storage disabled */ } };
 
   useEffect(() => {
-    if (disabled) { registry.delete(id); return; }
-    registry.set(id, { title, body, color });
+    const map = variant === "center" ? fallbacks : registry;
+    if (disabled) { map.delete(id); return; }
+    map.set(id, { title, body, color });
     startScheduler();
-    return () => { registry.delete(id); };
-  }, [id, title, body, disabled, color]);
+    return () => { map.delete(id); };
+  }, [id, title, body, disabled, color, variant]);
+  useEffect(() => {
+    const sync = () => { const v = readAll()[id]; setS(v ? { on: !!v.on, time: times.includes(v.time) ? v.time : "07:00" } : { on: false, time: "07:00" }); };
+    window.addEventListener("onore-notify-change", sync);
+    return () => window.removeEventListener("onore-notify-change", sync);
+  }, [id]);
 
   const toggle = async (on: boolean) => {
     setMsg("");
@@ -92,12 +101,20 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
     else setMsg(language === "ja" ? "ブラウザが再確認を止めています。上の手順で「許可」に切り替えてから、もう一度押してくださいね。" : "Your browser paused the prompt. Switch to Allow using the steps above, then tap again.");
   };
 
+  if (variant === "link") {
+    const on = s.on && !disabled;
+    return <div className="feature-notify mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/50 bg-background/90 px-3 py-2 text-xs">
+      <span className="flex items-center gap-2 text-foreground"><BellRing className={`size-4 ${on ? "text-primary" : "text-muted-foreground"}`} />{t.label}<span className={`rounded-md border px-1.5 py-0.5 font-bold ${on ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/50 text-muted-foreground"}`}>{on ? `ON ${s.time}` : "OFF"}</span></span>
+      <Button size="sm" variant="outline" className="h-8 border-primary/50 text-xs" onClick={() => window.dispatchEvent(new CustomEvent("onore-open", { detail: "notify" }))}>{language === "ja" ? "通知設定センターで変更" : "Change in Notification Center"}</Button>
+    </div>;
+  }
+
   return (
     <div className={`feature-notify mt-3 rounded-xl border-2 p-3 text-foreground transition-all ${s.on && !disabled ? "border-primary bg-background/95 shadow-champagne ring-2 ring-primary/40" : "border-primary/70 bg-background/95 shadow-md"}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <label className="flex items-center gap-2 text-sm text-foreground">
           <span className={`grid size-9 place-items-center rounded-full border-2 ${s.on && !disabled ? "notify-on border-primary bg-primary text-primary-foreground shadow-champagne" : "border-muted-foreground/60 bg-muted text-muted-foreground"}`}><BellRing className="size-5" /></span>
-          <span className="font-semibold">{t.label}</span>
+          <span className="font-semibold">{variant === "center" ? title : t.label}</span>
           <Switch className="h-7 w-12 border-2 border-primary data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground/40" checked={s.on && !disabled} disabled={disabled} onCheckedChange={(v) => void toggle(v)} aria-label={`${title} · ${t.label}`} />
           <span className={`min-w-10 rounded-md border-2 px-1.5 py-0.5 text-center text-xs font-bold ${s.on && !disabled ? "notify-on border-primary bg-primary text-primary-foreground" : "notify-off border-destructive/70 bg-background text-destructive"}`}>{s.on && !disabled ? "ON" : "OFF"}</span>
         </label>
@@ -107,7 +124,7 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
           </select>
         </label>
       </div>
-      <p className="mt-1 text-[11px] leading-4 text-muted-foreground">{disabled ? t.locked : t.note}</p>
+      <p className="mt-1 text-[11px] leading-4 text-muted-foreground">{disabled ? (lockedNote ?? t.locked) : t.note}</p>
       {msg && <p role="status" className="mt-1 text-xs text-primary">{msg}</p>}
       <Dialog open={help} onOpenChange={setHelp}>
         <DialogContent className="w-[calc(100%-1.5rem)] rounded-lg border-primary/40 sm:max-w-md">
