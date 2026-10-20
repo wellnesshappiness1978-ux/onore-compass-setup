@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { groupTodayCopy, memberToday, roleAssignment, subjectDailyMessage } from "@/lib/group-today";
+import { goalText } from "@/lib/focus";
 import { useServerFn } from "@tanstack/react-start";
 import { Pencil, Sparkles, Target, Trash2, Users, UserRound } from "lucide-react";
 import { toast } from "sonner";
@@ -185,4 +187,78 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
       </DialogContent>
     </Dialog>
   </>;
+}
+
+/** Japanese subject wording: "あなた" → "〇〇さん" / "〇〇グループ" inside rendered readings (incl. AI text) while a non-self subject is fixed. */
+export function subjectWord(ctx: NonNullable<ReturnType<typeof useFocus>>, language: Language): string | null {
+  if (language !== "ja") return null;
+  if (ctx.member) return `${memberDisplayName(ctx.member)}さん`;
+  if (ctx.group) { const n = groupDisplayName(ctx.group.group, ctx.group.index, language); return n.includes("グループ") ? n : `${n}グループ`; }
+  return null;
+}
+export const replaceSubject = (text: string, word: string) => text.replace(/あなた(さん|様)?/g, word);
+
+export function SubjectVoice({ language, children }: { language: Language; children: ReactNode }) {
+  const ctx = useFocus();
+  const ref = useRef<HTMLDivElement>(null);
+  const word = ctx ? subjectWord(ctx, language) : null;
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !word) return;
+    const fix = (node: Node) => {
+      const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) if (n.nodeValue?.includes("あなた")) n.nodeValue = replaceSubject(n.nodeValue, word);
+      if (node instanceof Element) node.querySelectorAll("input[placeholder*='あなた'],textarea[placeholder*='あなた']").forEach(el => el.setAttribute("placeholder", replaceSubject(el.getAttribute("placeholder") ?? "", word)));
+    };
+    fix(root);
+    const obs = new MutationObserver(list => { for (const m of list) { if (m.type === "characterData") { if (m.target.nodeValue?.includes("あなた")) m.target.nodeValue = replaceSubject(m.target.nodeValue, word); } else m.addedNodes.forEach(fix); } });
+    obs.observe(root, { subtree: true, childList: true, characterData: true });
+    return () => obs.disconnect();
+  }, [word]);
+  return <div ref={ref} className="min-w-0">{children}</div>;
+}
+
+/** Daily message tailored to the fixed subject (self / person / group) and goal. */
+export function SubjectDailyNote({ language }: { language: Language }) {
+  const ctx = useFocus();
+  if (!ctx) return null;
+  const day = new Date().toLocaleDateString("en-CA");
+  const who = ctx.group ? groupDisplayName(ctx.group.group, ctx.group.index, language) : ctx.member ? memberDisplayName(ctx.member) : focusCopy[language].self;
+  const birth = ctx.group ? null : ctx.readingProfile.birthDate || null;
+  const key = ctx.group?.group.id ?? ctx.member?.id ?? "self";
+  const lines = subjectDailyMessage(key, birth, day, goalText(ctx.focus, language), language);
+  return <section className="mb-5 rounded-lg border border-primary/40 bg-primary/5 p-4 text-left">
+    <h3 className="font-serif text-lg text-primary">✦ {groupTodayCopy[language].dailyTitle(language === "ja" && (ctx.group || ctx.member) ? (subjectWord(ctx, language) ?? who) : who)}</h3>
+    {lines.map(l => <p key={l} className="mt-2 text-sm leading-7">{l}</p>)}
+  </section>;
+}
+
+/** Group extras: every member's reading for today, interactions, role assignment and synergy. */
+export function GroupMembersToday({ language }: { language: Language }) {
+  const ctx = useFocus();
+  const g = ctx?.group;
+  if (!g || !g.members.length) return null;
+  const c = groupTodayCopy[language];
+  const day = new Date().toLocaleDateString("en-CA");
+  const list = g.members.map(m => memberToday(m, day)).sort((a, b) => b.total - a.total);
+  const roles = roleAssignment(list, day);
+  const nameOf = (id: string | null) => { const m = g.members.find(x => x.id === id); return m ? memberDisplayName(m) : "—"; };
+  const roleNames = [...new Set(list.map(x => c.role[x.role]))].join("・");
+  const care = list.filter(x => x.band === "care").length;
+  return <section className="mb-6 space-y-4 rounded-lg border border-primary/30 bg-card/60 p-4 text-left sm:p-5">
+    <div><h3 className="font-serif text-lg text-primary">{c.synergyTitle}</h3>
+      <p className="mt-2 text-sm leading-7"><strong className="text-primary">{c.strengths}：</strong>{c.strengthLine(roleNames)}</p>
+      <p className="mt-1 text-sm leading-7"><strong className="text-primary">{c.issues}：</strong>{care ? c.issueLine(care) : c.noIssue}</p></div>
+    <div><h3 className="font-serif text-lg text-primary">{c.interactionTitle}</h3>
+      <p className="mt-2 text-sm font-bold">{c.keyPerson(memberDisplayName(list[0]!.member))}</p>
+      <h4 className="mt-3 text-sm text-primary">{c.assignTitle}</h4>
+      <ul className="mt-1 grid gap-1 text-sm sm:grid-cols-3">{(["physical", "emotional", "intellectual"] as const).map(a => <li key={a} className="rounded-md border border-primary/20 p-2"><span className="block text-xs text-muted-foreground">{c.role[a]}</span><strong>{nameOf(roles[a])}</strong></li>)}</ul></div>
+    <div><h3 className="font-serif text-lg text-primary">{c.membersTitle}</h3>
+      <ul className="mt-2 grid gap-2 sm:grid-cols-2">{list.map(x => <li key={x.member.id} className="rounded-md border border-primary/20 p-3 text-sm leading-6">
+        <div className="flex justify-between gap-2"><strong className="truncate">{memberDisplayName(x.member)}</strong><span className="text-primary">{x.total}/100</span></div>
+        <p>{c.band[x.band]}</p>
+        <p className="text-xs"><span className="text-primary">{c.roleLabel}：</span>{c.role[x.role]}</p>
+        <p className="text-xs"><span className="text-primary">{c.cautionLabel}：</span>{c.caution[x.caution]}</p>
+      </li>)}</ul></div>
+  </section>;
 }

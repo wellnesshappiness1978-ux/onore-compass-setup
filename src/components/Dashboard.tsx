@@ -620,13 +620,13 @@ function FocusedTraits({ language, render }: { language: Language; render: (p: U
   if (!ctx) return null;
   const t = focusCopy[language];
   const goal = goalText(ctx.focus, language);
-  if (ctx.group) return <><SubjectBanner language={language} /><GroupFocusCard language={language} /></>;
-  return <><SubjectBanner language={language} />{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</>;
+  if (ctx.group) return <SubjectVoice language={language}><SubjectBanner language={language} /><GroupFocusCard language={language} /><GroupMembersToday language={language} />{render(ctx.owner, t.traitsSelf, goal, true)}</SubjectVoice>;
+  return <SubjectVoice language={language}><SubjectBanner language={language} />{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</SubjectVoice>;
 }
 function FocusedToday({ language, render }: { language: Language; render: (p: UserProfile) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx) return null;
-  return <><SubjectBanner language={language} />{ctx.group && <GroupFocusCard language={language} />}{render(ctx.readingProfile)}</>;
+  return <SubjectVoice language={language}><SubjectBanner language={language} /><SubjectDailyNote language={language} />{ctx.group && <><GroupFocusCard language={language} /><GroupMembersToday language={language} /></>}{render(ctx.readingProfile)}</SubjectVoice>;
 }
 
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
