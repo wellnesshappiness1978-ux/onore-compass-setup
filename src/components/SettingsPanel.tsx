@@ -1,6 +1,7 @@
 import { planDetails } from "@/lib/plan-details";
 import { planOrder as tierOrder } from "@/lib/plans";
 import DailyReminderPanel from "./DailyReminderPanel";
+import NotificationCenter from "./NotificationCenter";
 import { ThemeSample } from "./ThemeSample";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -383,6 +384,7 @@ export default function SettingsPanel({
             </label>
           ))}
         </div>
+        <div className="my-4"><NotificationCenter language={language} plan={plan} profile={profile} onUpgrade={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })} /></div>
         <DailyReminderPanel language={language} plan={plan} profile={profile} />
         {notice && (
           <p role="status" className="mt-2 text-xs text-muted-foreground">

@@ -640,6 +640,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     const open = (target: string | null) => {
       if (target === "compass") { setTab("today"); window.scrollTo({ top: 0 }); }
       else if (target === "art") { setTab("art"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      else if (target === "notify") { setTab("settings"); window.setTimeout(() => document.getElementById("notification-center")?.scrollIntoView({ behavior: "smooth", block: "start" }), 150); }
+      else if (target === "bgm") { window.scrollTo({ top: 0 }); }
     };
     const q = new URLSearchParams(window.location.search).get("open");
     if (q) { open(q); const url = new URL(window.location.href); url.searchParams.delete("open"); window.history.replaceState(window.history.state, "", url); }
