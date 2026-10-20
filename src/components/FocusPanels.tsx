@@ -137,6 +137,7 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
   const limit = groupLimit[plan];
   const capacity = memberLimit[plan];
   const capacityText = familyCapacityCopy[language];
+  const [active, setActive] = useState<"family" | "group">("family");
   const reset = () => { setEditing(null); setName(""); setNick(""); setIds([SELF_MEMBER_ID]); };
   const writeLocal = (groups: TeamGroup[]) => { localStorage.setItem(GROUPS_KEY, JSON.stringify(groups)); ctx.reload(); };
   const save = async () => {
@@ -157,9 +158,8 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
   };
   const remove = async (g: TeamGroup) => { if (ctx.serverBacked) { await del({ data: { id: g.id } }); ctx.reload(); } else writeLocal(ctx.groups.filter(x => x.id !== g.id)); };
   return <>
-    <div className="mb-5 grid grid-cols-2 gap-2">
-      <Button variant="outline" className="h-12 border-primary/40" onClick={() => document.getElementById("family-roster-form")?.scrollIntoView({ behavior: "smooth", block: "center" })}><UserRound className="size-4" />{t.familyEdit}</Button>
-      <Button variant="outline" className="h-12 border-primary/40" onClick={() => { reset(); setOpen(true); }}><Users className="size-4" />{t.groupEdit}</Button>
+    <div role="tablist" className="mb-5 grid grid-cols-2 gap-2">
+      {([["family", UserRound, t.familyEdit, () => document.getElementById("family-roster-form")?.scrollIntoView({ behavior: "smooth", block: "center" })], ["group", Users, t.groupEdit, () => { reset(); setOpen(true); }]] as const).map(([key, Icon, label, act]) => { const on = active === key; return <Button key={key} role="tab" aria-selected={on} variant="outline" className={`h-12 border-2 transition-all md:h-14 md:text-base ${on ? "border-primary bg-primary/20 font-bold text-primary shadow-champagne after:absolute after:inset-x-3 after:bottom-1 after:h-1 after:rounded-full after:bg-primary relative" : "border-primary/30 text-muted-foreground hover:text-foreground"}`} onClick={() => { setActive(key); act(); }}><Icon className={on ? "size-5 text-primary" : "size-4"} />{label}</Button>; })}
     </div>
     {ctx.groups.length > 0 && <ul className="mb-5 grid gap-2 sm:grid-cols-2">{ctx.groups.map((g, i) => { const hex = mixHex(ctx.members.filter(m => g.memberIds.includes(m.id)).map(m => mainColor(m)?.code ?? "")); return <li key={g.id} className="rounded-md border-l-4 p-3" style={hex ? { borderLeftColor: hex, backgroundImage: `linear-gradient(90deg, ${hex}66, transparent 75%)` } : undefined}><p className="truncate font-serif text-lg font-bold text-outline">{groupDisplayName(g, i, language)}</p><p className="text-xs text-muted-foreground">{t.members} {g.memberIds.length}</p></li>; })}</ul>}
     <Dialog open={open} onOpenChange={setOpen}>
