@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { groupTodayCopy, memberToday, roleAssignment, subjectDailyMessage } from "@/lib/group-today";
-import { goalText } from "@/lib/focus";
 import { useServerFn } from "@tanstack/react-start";
 import { Pencil, Sparkles, Target, Trash2, Users, UserRound } from "lucide-react";
 import { toast } from "sonner";
@@ -9,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useFocus } from "./FocusProvider";
 import { addTeamGroup, deleteTeamGroup, updateTeamGroup } from "@/lib/team-groups.functions";
-import { canAddGroup, focusCopy, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, mixHex, type TargetKind, type TeamGroup } from "@/lib/focus";
+import { canAddGroup, focusCopy, goalText, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, mixHex, type TargetKind, type TeamGroup } from "@/lib/focus";
 import { groupLimit, memberLimit } from "@/lib/plans";
 import { familyCapacityCopy, fitsMemberCapacity, registeredMemberCount } from '@/lib/family-capacity';
 import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
