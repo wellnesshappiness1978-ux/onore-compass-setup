@@ -132,12 +132,12 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
   const [editing, setEditing] = useState<TeamGroup | null>(null);
   const [name, setName] = useState(""); const [nick, setNick] = useState(""); const [ids, setIds] = useState<string[]>([SELF_MEMBER_ID]);
   const [busy, setBusy] = useState(false);
+  const [active, setActive] = useState<"family" | "group">("family");
   const add = useServerFn(addTeamGroup); const upd = useServerFn(updateTeamGroup); const del = useServerFn(deleteTeamGroup);
   if (!ctx) return null;
   const limit = groupLimit[plan];
   const capacity = memberLimit[plan];
   const capacityText = familyCapacityCopy[language];
-  const [active, setActive] = useState<"family" | "group">("family");
   const reset = () => { setEditing(null); setName(""); setNick(""); setIds([SELF_MEMBER_ID]); };
   const writeLocal = (groups: TeamGroup[]) => { localStorage.setItem(GROUPS_KEY, JSON.stringify(groups)); ctx.reload(); };
   const save = async () => {
