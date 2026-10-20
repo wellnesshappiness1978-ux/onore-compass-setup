@@ -46,3 +46,7 @@
 - Settings: focus card renamed "目的・目標と診断対象設定" (7 languages) and collapsible.
 - Compatibility: member picker is now a dropdown; picked members skip re-entry; manual form shows family/given-name space hint.
 - Consultation: label renamed "相談する対象"; dropdown now offers owner / family / groups.
+
+## Subject wording / group depth / notification center (2026-10-21) — done
+- あなた→〇〇さん/〇〇グループ (Japanese), group member-by-member today readings, roles and synergy, daily subject message, clearer Family/Group tabs, Settings Notification Center with VIP+ BGM reminder.
+- Open: non-Japanese wording swap and full 5-locale translation of new group-today copy (currently English fallback).
