@@ -39,3 +39,4 @@
 - AI tabs keep sessions; compatibility compares people separately. Consultation shares request validation and builds group context only from structured members. Why: no invented births or goal overflow.
 - Today uses shared TodayCard; its twelve-category benefit catalogue is not an access gate, and recipes/depth stay local. Why: consistent cards, accurate counts, unchanged permissions.
 - BGM uses one shared audio context and offline-testable graph with normalized voices and smooth gain. Why: avoid driver churn, clipping and clicks.
+- Background reminders: devices register via Firebase (signed-in only) into owner-only push_devices; a per-minute managed schedule hits /api/public/jobs/send-push, which matches each device's local time and dedupes via last_sent. Why: delivery when the app is closed without double local notifications.
