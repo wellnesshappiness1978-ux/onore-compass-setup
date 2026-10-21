@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Painted mandala restoration (2026-10-21)
-- [ ] Confirm the original agolmen_birth_color_mandala_masterpiece-v3.png source (not present in the listed assets/uploads)
-- [ ] Replace procedural vector overlays with direct painted-image display and matched high-quality private export
+- [x] User selected the existing project painted source instead of the unavailable v3 filename
+- [x] Replace procedural vector overlays with direct painted-image display and matched high-quality private export
 - [ ] Verify brighter artwork, fullscreen and image saving
 
 ## Requested UI / mandala polish (2026-10-21) — done
