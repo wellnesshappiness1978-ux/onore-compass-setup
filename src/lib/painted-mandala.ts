@@ -7,7 +7,6 @@
 export type MandalaFinish = { colors: string[]; labels: string[] };
 
 const GOLD = "#E8C86A";
-const GOLD_DEEP = "#8A6A2F";
 const BAND_RATIO = 0.12;
 
 function shade(hexColor: string, amount: number) {
@@ -51,113 +50,110 @@ function drawHalo(context: CanvasRenderingContext2D, cx: number, cy: number, rad
   context.restore();
 }
 
-/** Oil-paint grain: tiny semi-transparent dabs clipped to the gem body. */
-function paintGrain(context: CanvasRenderingContext2D, cx: number, cy: number, radius: number, color: string) {
-  context.save();
-  polygon(context, cx, cy, radius, 8);
-  context.clip();
-  const dabs = 90;
-  for (let index = 0; index < dabs; index += 1) {
-    const angle = grain(index * 3 + 1) * Math.PI * 2;
-    const distance = Math.sqrt(grain(index * 3 + 2)) * radius;
-    const x = cx + Math.cos(angle) * distance;
-    const y = cy + Math.sin(angle) * distance;
-    const dab = radius * (0.015 + grain(index * 3 + 3) * 0.03);
-    const lighten = grain(index * 7 + 5) > 0.5;
-    context.globalAlpha = 0.05 + grain(index * 11 + 7) * 0.08;
-    context.fillStyle = lighten ? shade(color, 0.55) : shade(color, -0.4);
-    context.beginPath();
-    context.arc(x, y, dab, 0, Math.PI * 2);
-    context.fill();
-  }
-  context.restore();
+/** Smooth, deterministic pigment variation: no random changes on resize/export. */
+function pigmentNoise(x: number, y: number, seed: number) {
+  const ix = Math.floor(x), iy = Math.floor(y);
+  const fx = x - ix, fy = y - iy;
+  const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+  const sample = (dx: number, dy: number) => grain((ix + dx) * 41.31 + (iy + dy) * 73.17 + seed);
+  return (sample(0, 0) * (1 - sx) + sample(1, 0) * sx) * (1 - sy)
+    + (sample(0, 1) * (1 - sx) + sample(1, 1) * sx) * sy;
 }
 
-/** Faceted octagonal center gem in the overall (main) birth color, painted
- * with softened brush-like tones so it sits inside the oil painting. */
+function smoothEdge(low: number, high: number, value: number) {
+  const t = Math.max(0, Math.min(1, (value - low) / (high - low)));
+  return t * t * (3 - 2 * t);
+}
+
+const gemPaintings = new Map<string, HTMLCanvasElement>();
+
+/** A local pigment raster, not stroked geometry. Underpainting is opaque;
+ * fine directional ridges, glazes and broken gold leaf share the same pixels.
+ * Cache only this small personal finish, never the original painting. */
+function paintGemSurface(color: string) {
+  const cached = gemPaintings.get(color);
+  if (cached) return cached;
+  const surface = document.createElement("canvas");
+  surface.width = 640;
+  surface.height = 640;
+  const context = surface.getContext("2d");
+  if (!context) return surface;
+  const rgb = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(color);
+  const channels = rgb ? rgb.slice(1).map(value => Number.parseInt(value, 16)) : [160, 110, 180];
+  const pixels = context.createImageData(640, 640);
+  const radius = 250;
+  const sector = Math.PI / 4;
+  for (let py = 0; py < 640; py += 1) {
+    for (let px = 0; px < 640; px += 1) {
+      const x = (px - 319.5) / radius, y = (py - 319.5) / radius;
+      const distance = Math.hypot(x, y);
+      const angle = Math.atan2(y, x);
+      const local = ((angle + Math.PI / 2 + sector * 8) % sector) - sector / 2;
+      const boundary = Math.cos(sector / 2) / Math.cos(local);
+      const broad = pigmentNoise(x * 7, y * 7, 3) - 0.5;
+      const brush = pigmentNoise(x * 68 + y * 21, y * 13, 19) - 0.5;
+      const tooth = pigmentNoise(x * 185, y * 185, 31) - 0.5;
+      const edge = boundary + broad * 0.005 + brush * 0.003;
+      const body = 1 - smoothEdge(edge - 0.003, edge + 0.005, distance);
+      const offset = (py * 640 + px) * 4;
+      if (body > 0) {
+        // Broad facet light folds into the table through pigment, not outlines.
+        const facetPosition = (angle + Math.PI / 2 + sector * 8) / sector;
+        const facetIndex = Math.floor(facetPosition);
+        const transition = smoothEdge(0.82, 1, facetPosition - facetIndex);
+        const facetLight = (index: number) => Math.sin(index * 2.37 + 0.7) * 0.19
+          + Math.cos(index * sector + 2.3) * 0.15;
+        const cutLight = facetLight(facetIndex) * (1 - transition) + facetLight(facetIndex + 1) * transition;
+        const crown = smoothEdge(0.47, 0.69, distance / boundary + broad * 0.035);
+        const coreLight = 0.08 - x * 0.14 - y * 0.18 - distance * 0.1;
+        const deepReflection = Math.exp(-((x - 0.28) ** 2 / 0.045 + (y - 0.27) ** 2 / 0.14));
+        const glaze = coreLight * (1 - crown) + cutLight * crown
+          + broad * 0.12 + brush * 0.08 + tooth * 0.028 - deepReflection * 0.18;
+        // A fine, broken brush-shaped reflection, not a circular CG flash.
+        const reflection = Math.exp(-((x + 0.27 + y * 0.16) ** 2 / 0.009 + (y + 0.28) ** 2 / 0.07));
+        const secondary = Math.exp(-((x - 0.39 + y * 0.38) ** 2 / 0.003 + (y - 0.23) ** 2 / 0.05));
+        const sheen = Math.max(0, reflection * (0.60 + brush * 0.27) + secondary * 0.26);
+        for (let channel = 0; channel < 3; channel += 1) {
+          const base = channels[channel] ?? 160;
+          const pigment = glaze >= 0 ? base + (255 - base) * glaze : base * (1 + glaze);
+          pixels.data[offset + channel] = Math.max(0, Math.min(255, pigment + (255 - pigment) * sheen));
+        }
+        pixels.data[offset + 3] = Math.round(body * 255);
+      } else {
+        // Irregular leaf in the existing octagonal setting; no continuous stroke.
+        const rimDistance = distance / boundary;
+        const leaf = smoothEdge(1.008, 1.025, rimDistance)
+          * (1 - smoothEdge(1.082 + broad * 0.018, 1.108 + broad * 0.018, rimDistance));
+        const broken = smoothEdge(0.19, 0.44, pigmentNoise(x * 39, y * 39, 71));
+        const relief = Math.max(0, Math.min(1, 0.48 - y * 0.21 + brush * 0.65 + tooth * 0.38));
+        pixels.data[offset] = 127 + relief * 122;
+        pixels.data[offset + 1] = 88 + relief * 137;
+        pixels.data[offset + 2] = 34 + relief * 108;
+        pixels.data[offset + 3] = Math.round(leaf * broken * 238);
+      }
+    }
+  }
+  context.putImageData(pixels, 0, 0);
+  if (gemPaintings.size >= 8) {
+    const oldest = gemPaintings.keys().next().value;
+    if (oldest) gemPaintings.delete(oldest);
+  }
+  gemPaintings.set(color, surface);
+  return surface;
+}
+
+/** Keep the existing scale and personal color; light comes from the pigment
+ * and textured gold leaf, with no facet strokes or uniform metallic border. */
 function drawCenterGem(context: CanvasRenderingContext2D, cx: number, cy: number, radius: number, color: string) {
   drawHalo(context, cx, cy, radius * 3.2, color);
-
-  // Soft contact shadow so the gem feels set into the paint, not floating.
+  const surface = paintGemSurface(color);
+  const extent = radius * (640 / 250);
   context.save();
-  context.globalAlpha = 0.35;
-  const shadow = context.createRadialGradient(cx, cy, radius * 0.5, cx, cy, radius * 1.25);
-  shadow.addColorStop(0, "rgba(0,0,0,0)");
-  shadow.addColorStop(0.8, "rgba(10,8,20,0.55)");
-  shadow.addColorStop(1, "rgba(0,0,0,0)");
-  context.fillStyle = shadow;
-  context.beginPath();
-  context.arc(cx, cy, radius * 1.25, 0, Math.PI * 2);
-  context.fill();
-  context.restore();
-
-  // Gold setting ring, echoing the painting's filigree.
-  context.save();
-  context.globalAlpha = 0.85;
-  context.lineWidth = radius * 0.07;
-  context.strokeStyle = GOLD_DEEP;
-  polygon(context, cx, cy, radius * 1.12, 8);
-  context.stroke();
-  context.lineWidth = radius * 0.032;
-  context.strokeStyle = GOLD;
-  polygon(context, cx, cy, radius * 1.06, 8);
-  context.stroke();
-  context.restore();
-
-  // Outer facets: eight crown facets with gentle painterly tone shifts and
-  // slightly organic (jittered) inner points instead of CG-sharp geometry.
-  for (let index = 0; index < 8; index += 1) {
-    const a0 = -Math.PI / 2 + (index / 8) * Math.PI * 2;
-    const a1 = -Math.PI / 2 + ((index + 1) / 8) * Math.PI * 2;
-    const mid = (a0 + a1) / 2;
-    const inner = radius * (0.52 + grain(index * 13 + 2) * 0.08);
-    context.beginPath();
-    context.moveTo(cx + Math.cos(a0) * radius, cy + Math.sin(a0) * radius);
-    context.lineTo(cx + Math.cos(a1) * radius, cy + Math.sin(a1) * radius);
-    context.lineTo(cx + Math.cos(mid) * inner, cy + Math.sin(mid) * inner);
-    context.closePath();
-    context.fillStyle = index % 2 === 0 ? shade(color, 0.2) : shade(color, -0.16);
-    context.fill();
-  }
-
-  // Inner table with a luminous, softly blended core.
-  const table = context.createRadialGradient(cx - radius * 0.18, cy - radius * 0.22, radius * 0.04, cx, cy, radius * 0.62);
-  table.addColorStop(0, shade(color, 0.8));
-  table.addColorStop(0.45, shade(color, 0.3));
-  table.addColorStop(1, shade(color, -0.28));
-  polygon(context, cx, cy, radius * 0.58, 8);
-  context.fillStyle = table;
-  context.fill();
-
-  paintGrain(context, cx, cy, radius, color);
-
-  // Facet separation lines in soft, translucent gold — kept faint so the
-  // cuts read as brushwork rather than vector strokes.
-  context.save();
-  context.lineWidth = Math.max(1, radius * 0.02);
-  context.strokeStyle = "rgba(232, 200, 106, 0.4)";
-  for (let index = 0; index < 8; index += 1) {
-    const angle = -Math.PI / 2 + (index / 8) * Math.PI * 2;
-    context.beginPath();
-    context.moveTo(cx + Math.cos(angle) * radius * 0.58, cy + Math.sin(angle) * radius * 0.58);
-    context.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius);
-    context.stroke();
-  }
-  polygon(context, cx, cy, radius, 8);
-  context.stroke();
-  context.restore();
-
-  // White specular flash, blurred into the paint.
-  context.save();
-  context.globalCompositeOperation = "screen";
-  const flash = context.createRadialGradient(cx - radius * 0.22, cy - radius * 0.26, 0, cx - radius * 0.22, cy - radius * 0.26, radius * 0.34);
-  flash.addColorStop(0, "rgba(255,255,255,0.8)");
-  flash.addColorStop(0.5, "rgba(255,255,255,0.25)");
-  flash.addColorStop(1, "rgba(255,255,255,0)");
-  context.fillStyle = flash;
-  context.beginPath();
-  context.arc(cx - radius * 0.22, cy - radius * 0.26, radius * 0.34, 0, Math.PI * 2);
-  context.fill();
+  context.globalAlpha = 1;
+  context.globalCompositeOperation = "source-over";
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(surface, cx - extent / 2, cy - extent / 2, extent, extent);
   context.restore();
 }
 
