@@ -1,5 +1,10 @@
 # Roadmap
 
+## Group consultation goal overflow (2026-10-21)
+- [ ] Send only the user goal (maximum 240 characters), keeping member data in the structured group field
+- [ ] Preserve server goal validation and structured group context; add large-group regression tests
+- [ ] Verify a real large-group consultation submission and response, or report the exact blocker
+
 ## Owner-excluded registration / BGM follow-up (2026-10-19) — done
 - [x] Show the signed-in owner without creating a family row or consuming a slot
 - [x] Exclude owner from group create/edit caps, retain default selection, apply authenticated database enforcement; actual paid writes unverified because this account has no membership
