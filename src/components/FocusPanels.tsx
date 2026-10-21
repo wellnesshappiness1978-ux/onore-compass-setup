@@ -206,17 +206,40 @@ export function SubjectVoice({ language, children }: { language: Language; child
   useEffect(() => {
     const root = ref.current;
     if (!root || !word) return;
+    // Remember every original value so switching back to self restores JSX text exactly.
+    const texts = new Map<Node, string>();
+    const placeholders = new Map<Element, string>();
+    // Fixed UI copy (buttons, labels, form controls, opted-out regions) is never rewritten.
+    const skip = (n: Node) => !!n.parentElement?.closest("button,label,select,option,[role='button'],[role='tab'],[data-subject-fixed]");
+    const rewrite = (n: Node) => {
+      const v = n.nodeValue;
+      if (!v?.includes("あなた") || skip(n)) return;
+      if (!texts.has(n)) texts.set(n, v);
+      const next = replaceSubject(v, word);
+      if (next !== v) n.nodeValue = next;
+    };
     const fix = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) { rewrite(node); return; }
       const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
-      for (let n = walker.nextNode(); n; n = walker.nextNode()) if (n.nodeValue?.includes("あなた")) n.nodeValue = replaceSubject(n.nodeValue, word);
-      if (node instanceof Element) node.querySelectorAll("input[placeholder*='あなた'],textarea[placeholder*='あなた']").forEach(el => el.setAttribute("placeholder", replaceSubject(el.getAttribute("placeholder") ?? "", word)));
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) rewrite(n);
+      if (node instanceof Element) node.querySelectorAll("input[placeholder*='あなた'],textarea[placeholder*='あなた']").forEach(el => {
+        if (el.closest("[data-subject-fixed]")) return;
+        const v = el.getAttribute("placeholder") ?? "";
+        if (!placeholders.has(el)) placeholders.set(el, v);
+        el.setAttribute("placeholder", replaceSubject(v, word));
+      });
     };
     fix(root);
-    const obs = new MutationObserver(list => { for (const m of list) { if (m.type === "characterData") { if (m.target.nodeValue?.includes("あなた")) m.target.nodeValue = replaceSubject(m.target.nodeValue, word); } else m.addedNodes.forEach(fix); } });
+    const obs = new MutationObserver(list => { for (const m of list) { if (m.type === "characterData") { texts.delete(m.target); rewrite(m.target); } else m.addedNodes.forEach(fix); } });
     obs.observe(root, { subtree: true, childList: true, characterData: true });
-    return () => obs.disconnect();
+    return () => {
+      obs.disconnect();
+      texts.forEach((v, n) => { if (n.isConnected) n.nodeValue = v; });
+      placeholders.forEach((v, el) => { if (el.isConnected) el.setAttribute("placeholder", v); });
+    };
   }, [word]);
-  return <div ref={ref} className="min-w-0">{children}</div>;
+  // Keyed by subject so React re-renders pristine JSX text whenever the subject changes.
+  return <div ref={ref} key={word ?? "self"} className="min-w-0">{children}</div>;
 }
 
 /** Daily message tailored to the fixed subject (self / person / group) and goal. */
