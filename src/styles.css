@@ -1443,5 +1443,6 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 
 /* Preserve the full painted master; enhancement never redraws its details. */
 .mandala-masterpiece {
-  filter: brightness(var(--mandala-paint-brightness)) saturate(var(--mandala-paint-saturation)) drop-shadow(0 0 15px var(--mandala-paint-aura));
+  /* The original painting is brightened before the personal jewel is drawn. */
+  filter: none;
 }
