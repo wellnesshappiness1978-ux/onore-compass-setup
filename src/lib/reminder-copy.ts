@@ -4,7 +4,7 @@ type ReminderCopy = { pause: string; pauseNote: string; paused: string; openOnly
 export const reminderCopy: Record<Language, ReminderCopy> = {
   "ja": {
     "pause": "毎日通知を一時停止",
-    "pauseNote": "以前のON/OFFと時刻は記憶され、解除すると元に戻ります。",
+    "pauseNote": "現状のON/OFFと時刻は記憶され、解除すると元に戻ります。",
     "paused": "一時停止中",
     "openOnly": "通知はアプリを開いている間のみ届きます。",
     "bgm": "星音のBGM 毎日リフレッシュ",
