@@ -208,15 +208,16 @@ export function SubjectVoice({ language, children }: { language: Language; child
     if (!root || !word) return;
     // Remember every original value so switching back to self restores JSX text exactly.
     const texts = new Map<Node, string>();
+    const written = new WeakMap<Node, string>();
     const placeholders = new Map<Element, string>();
-    // Fixed UI copy (buttons, labels, form controls, opted-out regions) is never rewritten.
-    const skip = (n: Node) => !!n.parentElement?.closest("button,label,select,option,[role='button'],[role='tab'],[data-subject-fixed]");
+    // Fixed UI copy (buttons, labels, form controls, inputs, opted-out regions) is never rewritten.
+    const skip = (n: Node) => !!n.parentElement?.closest("button,label,select,option,input,textarea,a,[role='button'],[role='tab'],[role='menuitem'],[contenteditable='true'],[data-subject-fixed]");
     const rewrite = (n: Node) => {
       const v = n.nodeValue;
       if (!v?.includes("あなた") || skip(n)) return;
       if (!texts.has(n)) texts.set(n, v);
       const next = replaceSubject(v, word);
-      if (next !== v) n.nodeValue = next;
+      if (next !== v) { written.set(n, next); n.nodeValue = next; }
     };
     const fix = (node: Node) => {
       if (node.nodeType === Node.TEXT_NODE) { rewrite(node); return; }
@@ -230,7 +231,8 @@ export function SubjectVoice({ language, children }: { language: Language; child
       });
     };
     fix(root);
-    const obs = new MutationObserver(list => { for (const m of list) { if (m.type === "characterData") { texts.delete(m.target); rewrite(m.target); } else m.addedNodes.forEach(fix); } });
+    // Ignore our own writes so the remembered original is never overwritten by replaced text.
+    const obs = new MutationObserver(list => { for (const m of list) { if (m.type === "characterData") { if (written.get(m.target) === m.target.nodeValue) continue; texts.delete(m.target); rewrite(m.target); } else m.addedNodes.forEach(fix); } });
     obs.observe(root, { subtree: true, childList: true, characterData: true });
     return () => {
       obs.disconnect();
