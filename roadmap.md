@@ -1,5 +1,13 @@
 # Roadmap
 
+## Today notification and navigation consolidation (2026-10-21) — done
+- [x] Standard+ nine-frequency BGM and seven-language plan guidance; VIP+ BGM reminder
+- [x] Today-only switches/time controls; removed legacy morning and Settings individual controls/center
+- [x] One header language control between Settings/BGM; five bottom tabs at 320/390/768/1280px, no horizontal overflow
+- [x] Seven-language contextual VIP evening reset and lower-plan lock
+- [x] Persistent reversible master pause retains enabled state and 22:15 saved time in signed-in UI; 210 tests pass, build OK
+- [x] Standard nine enabled frequencies and playback across tabs beyond 20 seconds; Free one enabled sample frequency. Browser notification delivery permission was denied by the test environment, so pause/resume was verified with a local Notification mock; real OS delivery remains unverified and reminders remain open-app-only.
+
 ## Group consultation goal overflow (2026-10-21) — done
 - [x] Send only the user goal (maximum 240 characters), keeping member data in the structured group field
 - [x] Preserve server goal validation and structured group context; 10/100/101-member and 240/241-character regressions pass; 203 total tests pass, build OK

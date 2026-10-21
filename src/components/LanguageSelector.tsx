@@ -5,19 +5,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { languages, type Language } from "@/lib/translations";
 
-type Props = { language: Language; onChange: (language: Language) => void };
+type Props = { language: Language; onChange: (language: Language) => void; inline?: boolean };
 
-export default function LanguageSelector({ language, onChange }: Props) {
+export default function LanguageSelector({ language, onChange, inline = false }: Props) {
   const active = languages.find((item) => item.code === language) ?? languages[0];
 
   return (
-    <div className="language-controls fixed right-4 z-50 flex items-center sm:right-6">
+    <div className={inline ? 'flex shrink-0 items-center' : 'language-controls fixed right-4 z-50 flex items-center sm:right-6'}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" aria-label={`Language / 言語: ${active.label}`} className="h-10 gap-2 rounded-lg border-primary/30 bg-card/70 px-3 text-foreground shadow-lg backdrop-blur-md hover:border-primary/60 hover:bg-card focus-visible:ring-primary">
-            <Globe2 className="size-4 text-primary" aria-hidden="true" />
-            <span className="text-xs">{active.flag} {active.short}</span>
-            <ChevronDown className="size-3 text-muted-foreground" aria-hidden="true" />
+          <Button variant="outline" aria-label={`Language / 言語: ${active.label}`} title={active.label} className="h-10 gap-1 rounded-lg border-primary/30 bg-card/70 px-2 text-foreground backdrop-blur-md hover:border-primary/60 hover:bg-card focus-visible:ring-primary">
+            <Globe2 className="hidden size-4 text-primary sm:block" aria-hidden="true" />
+            <span className="text-xs">{active.short}</span>
+            <ChevronDown className="hidden size-3 text-muted-foreground sm:block" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" sideOffset={8} className="w-56 max-h-[min(26rem,calc(100dvh-5rem))] overflow-y-auto rounded-lg border border-primary/30 bg-popover p-1.5 text-popover-foreground shadow-2xl backdrop-blur-xl">

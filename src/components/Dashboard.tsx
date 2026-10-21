@@ -54,6 +54,7 @@ import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
+import { DailyReminderCatalogue } from "./TodayReminders";
 import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
 import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, GroupMembersToday, SubjectBanner, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
@@ -640,7 +641,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     const open = (target: string | null) => {
       if (target === "compass") { setTab("today"); window.scrollTo({ top: 0 }); }
       else if (target === "art") { setTab("art"); window.scrollTo({ top: 0, behavior: "smooth" }); }
-      else if (target === "notify") { setTab("settings"); window.setTimeout(() => document.getElementById("notification-center")?.scrollIntoView({ behavior: "smooth", block: "start" }), 150); }
+      else if (target === "notify") { setTab("today"); window.scrollTo({ top: 0 }); }
       else if (target === "bgm") { window.scrollTo({ top: 0 }); }
     };
     const q = new URLSearchParams(window.location.search).get("open");
@@ -753,22 +754,23 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
   return (
     <FocusProvider owner={profile} serverBacked={signedIn && !devOverrideEnabled}>
+    <DailyReminderCatalogue language={language} plan={previewPlan} />
     <FocusGoalBridge onChange={(id, g) => { setFocusMemberId(id); setFocusGoal(g); }} language={language} />
     <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <div className="mobile-fixed-header fixed inset-x-0 z-[60] grid grid-cols-[auto_minmax(0,1fr)_auto] items-center border-b border-primary/25 bg-background/95 px-2 backdrop-blur-xl">
-        <Button size="icon" variant="ghost" onClick={() => goToTab("home")} aria-label={t.home} title={t.home} aria-current={tab === "home" ? "page" : undefined} className="size-14 shrink-0 text-primary [&_svg]:size-7">
+        <Button size="icon" variant="ghost" onClick={() => goToTab("home")} aria-label={t.home} title={t.home} aria-current={tab === "home" ? "page" : undefined} className="size-10 shrink-0 text-primary [&_svg]:size-6">
           <Home className="size-7" strokeWidth={1.8} />
         </Button>
         <SubjectHeaderBadge language={language} ownerName={profile.nameKanji || profile.nameRomaji} onOpen={() => { goToTab("settings"); window.setTimeout(() => { const el = document.getElementById("focus-settings") as HTMLDetailsElement | null; if (el) { el.open = true; el.scrollIntoView({ behavior: "smooth", block: "start" }); } }, 150); }} />
         <div className="flex min-w-0 items-center gap-1">
-        <HeaderBgm language={language} plan={previewPlan} onUpgrade={() => { goToTab("settings"); window.setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100); }} />
-        <Button size="icon" variant="ghost" onClick={() => goToTab("settings")} aria-label={t.settings} title={t.settings} aria-current={tab === "settings" ? "page" : undefined} className="size-14 shrink-0 text-primary [&_svg]:size-7">
+        <Button size="icon" variant="ghost" onClick={() => goToTab("settings")} aria-label={t.settings} title={t.settings} aria-current={tab === "settings" ? "page" : undefined} className="size-10 shrink-0 text-primary [&_svg]:size-6">
           <Settings2 className="size-7" strokeWidth={1.8} />
         </Button>
+        <LanguageSelector inline language={language} onChange={onLanguageChange} />
+        <HeaderBgm language={language} plan={previewPlan} onUpgrade={() => { goToTab("settings"); window.setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100); }} />
         </div>
       </div>
-      {tab === "home" && <LanguageSelector language={language} onChange={onLanguageChange} />}
       <AppearanceMotif background />
       <header className="design-header relative z-10 border-b border-primary/10 bg-background/40 backdrop-blur-md">
         <div className="mx-auto max-w-5xl px-4 pb-4 pt-4 sm:px-8 sm:pb-5">
@@ -797,7 +799,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setModal("notifications")}
+                onClick={() => goToTab("today")}
                 aria-label={t.notifications}
                 title={t.notifications}
                 className="size-9 text-foreground hover:bg-primary/10 hover:text-primary"
@@ -886,7 +888,6 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 appearance={effectiveAppearance}
                 onAppearanceSave={saveAppearance}
                 signedIn={signedIn}
-                onLanguageChange={onLanguageChange}
                 onEdit={() => setModal("profile")}
               /></>
             ) : null}
@@ -897,15 +898,15 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         className="design-navigation fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"
         aria-label={language === "ja" ? "メインナビゲーション" : "Main navigation"}
       >
-        <div className="grid grid-cols-5 md:grid-cols-7">
-          {navigation.map((item) => (
+        <div className="grid grid-cols-5">
+          {navigation.filter(item => item.id !== "home" && item.id !== "settings").map((item) => (
             <Button
               key={item.id}
               variant="ghost"
               onClick={() => goToTab(item.id)}
               aria-label={item.mobileLabel}
               aria-current={tab === item.id ? "page" : undefined}
-              className={`${item.id === "home" || item.id === "settings" ? "hidden md:flex" : "flex"} h-14 min-w-0 flex-col gap-1 rounded-lg px-0.5 text-[9px] md:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
+              className={`flex h-14 min-w-0 flex-col gap-1 rounded-lg px-0.5 text-[9px] md:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
             >
               <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} />
               <span className="nav-label max-w-full whitespace-normal text-center leading-tight"><span className="md:hidden">{item.mobileLabel}</span><span className="hidden md:inline">{item.label}</span></span>

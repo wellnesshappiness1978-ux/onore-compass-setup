@@ -1,7 +1,6 @@
 import { planDetails } from "@/lib/plan-details";
 import { planOrder as tierOrder } from "@/lib/plans";
-import DailyReminderPanel from "./DailyReminderPanel";
-import NotificationCenter from "./NotificationCenter";
+import ReminderMasterSwitch from "./ReminderMasterSwitch";
 import { ThemeSample } from "./ThemeSample";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -11,7 +10,6 @@ import {
   HeartHandshake,
   Check,
   Crown,
-  Globe2,
   Gem,
   LockKeyhole,
   PenLine,
@@ -21,9 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { languages, type Language } from "@/lib/translations";
+import { type Language } from "@/lib/translations";
 import { settingsTranslations, type SettingsTranslation, type PricingTier } from "@/lib/settings-translations";
 import DebugPlanSwitcher from "@/components/DebugPlanSwitcher";
 import { teamCopy } from "@/lib/team-copy";
@@ -40,7 +36,6 @@ import { appearanceUiCopy } from '@/lib/appearance-ui-copy';
 type Props = {
   profile: UserProfile;
   language: Language;
-  onLanguageChange: (language: Language) => void;
   onEdit: () => void;
   plan: Plan;
   actualPlan: Plan;
@@ -60,7 +55,6 @@ const card = "border-b border-primary/20 py-6";
 export default function SettingsPanel({
   profile,
   language,
-  onLanguageChange,
   onEdit,
   plan,
   actualPlan,
@@ -80,8 +74,6 @@ export default function SettingsPanel({
   const profileUi = profileUiCopy[language];
   const [yearly, setYearly] = useState(false);
   const [upgradePlan, setUpgradePlan] = useState<string | null>(null);
-  const [notifyTiming, setNotifyTiming] = useState(true);
-  const [notifyBio, setNotifyBio] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [lockedMode, setLockedMode] = useState<DesignMode | null>(null);
 
@@ -186,19 +178,6 @@ export default function SettingsPanel({
               {planLabel}
             </span>
           </div>
-        </div>
-        <div className="mt-5 border-t border-primary/15 pt-4">
-          <label className="mb-2 flex items-center gap-2 text-sm" htmlFor="settings-language">
-            <Globe2 className="size-4 text-primary" /> {t.language}
-          </label>
-          <Select value={language} onValueChange={(value) => onLanguageChange(value as Language)}>
-            <SelectTrigger id="settings-language" aria-label={t.language} className="h-12 border-primary/30 bg-background/40 text-foreground focus:ring-primary">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="border-primary/30 bg-popover text-popover-foreground">
-              {languages.map((item) => <SelectItem key={item.code} value={item.code}>{item.flag} {item.label}</SelectItem>)}
-            </SelectContent>
-          </Select>
         </div>
         {devOverrideEnabled && <div className="mt-4 border-t border-primary/10 pt-3">
           <p className="mb-2 text-xs text-muted-foreground">{t.planTest}</p>
@@ -363,29 +342,7 @@ export default function SettingsPanel({
           <PenLine className="size-4 text-primary" /> {t.editBirth}
         </Button>
 
-        <div className="mt-5 space-y-3">
-          <p className="flex items-center gap-2 text-sm">
-            <Bell className="size-4 text-primary" /> {t.notifications}
-          </p>
-          <label className="flex items-center justify-between gap-3 rounded-md border border-primary/20 px-3 py-2.5 text-sm">
-            <span>{profileUi.settings.morningPush}</span>
-            <Switch checked={false} disabled aria-label={profileUi.settings.morningPushUnavailable} />
-          </label>
-          {[
-            [t.notifyTiming, notifyTiming, setNotifyTiming] as const,
-            [t.notifyBio, notifyBio, setNotifyBio] as const,
-          ].map(([label, value, set]) => (
-            <label
-              key={label}
-              className="flex items-center justify-between rounded-lg border border-primary/10 px-3 py-2.5 text-sm"
-            >
-              {label}
-              <Switch checked={value} onCheckedChange={set} aria-label={label} />
-            </label>
-          ))}
-        </div>
-        <div className="my-4"><NotificationCenter language={language} plan={plan} profile={profile} onUpgrade={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })} /></div>
-        <DailyReminderPanel language={language} plan={plan} profile={profile} />
+        <ReminderMasterSwitch language={language} />
         {notice && (
           <p role="status" className="mt-2 text-xs text-muted-foreground">
             {notice}: {t.soon}

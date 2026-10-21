@@ -27,7 +27,7 @@ export default function SolfeggioPlayer({ language, compact = false, controlsOnl
   const extra = pianoExtraCopy[language];
   const toggle = () => {
     if (playing) stopPiano();
-    else void playPiano(hz, sampleOnly ? 20 : undefined, onSampleEnd);
+    else void playPiano(sampleOnly ? 528 : hz, sampleOnly ? 20 : undefined, onSampleEnd);
   };
   return <section aria-label={text.region} className={`audio-controller ${compact ? "audio-controller--compact" : ""}`}>
     {!controlsOnly && <Button variant="ghost" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-label={text.settings} className="h-auto w-full justify-start gap-3 whitespace-normal p-0 text-left">

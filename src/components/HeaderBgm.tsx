@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import SolfeggioPlayer from "./SolfeggioPlayer";
 import { getPianoState, playPiano, stopPiano, subscribePiano } from "@/lib/piano-store";
 import { pianoExtraCopy } from "@/lib/piano-copy";
-import { planOrder } from "@/lib/plans";
+import { canPlayFullBgm } from '@/lib/daily-reminders';
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 
@@ -24,7 +24,7 @@ export default function HeaderBgm({ language, plan, onUpgrade }: { language: Lan
   const [open, setOpen] = useState(false);
   const [upsell, setUpsell] = useState(false);
   const { playing, busy, hz } = useSyncExternalStore(subscribePiano, getPianoState, getPianoState);
-  const sampleOnly = planOrder.indexOf(plan) < planOrder.indexOf("vip");
+  const sampleOnly = !canPlayFullBgm(plan);
   const text = labels[language];
   const extra = pianoExtraCopy[language];
   const sampleEnd = () => setUpsell(true);
