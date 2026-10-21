@@ -19,3 +19,5 @@
 
 - Cosmic typography owns resolution-scaled black glyph strokes and shadows without plates; full-light lunar rendering is presentation-only and never modifies phase data. Why: legibility and artistic illumination must remain distinct from birth astronomy.
 - Main planetary radii use one shared log1p transform normalized to the existing Jupiter extent, with a separate Sun scale; cosmic-radius-reference owns localized radius categories and presentation rounding while the nine-body strip uses canonical unrounded physical radii. Why: show giant/rocky contrast without hiding small bodies or misrepresenting the exact linear comparison.
+
+- Keep Japanese compatibility prose in a pure signal-driven builder with typed relationship/theme context and concern-topic matching; leave unknown comparisons unset. Why: testable boundaries without inventing birth context.

@@ -185,6 +185,39 @@ export type Database = {
         }
         Relationships: []
       }
+      push_devices: {
+        Row: {
+          language: string
+          last_sent: Json
+          paused: boolean
+          reminders: Json
+          timezone: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          language?: string
+          last_sent?: Json
+          paused?: boolean
+          reminders?: Json
+          timezone?: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          language?: string
+          last_sent?: Json
+          paused?: boolean
+          reminders?: Json
+          timezone?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       support_requests: {
         Row: {
           category: string

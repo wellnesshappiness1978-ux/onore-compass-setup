@@ -1,6 +1,6 @@
 import type { Language } from './translations';
 
-type ReminderCopy = { pause: string; pauseNote: string; paused: string; openOnly: string; bgm: string; bgmBody: string; alert: string; alertLow: string; alertOk: string; night: string; nightLocked: string; nightTeaser: string; plans: string; label: string; time: string; allow: string; tab: string; unsupported: string; help: string; helpBody: string; retry: string; close: string; fullBenefit: string; vipBenefit: string; sampleNote: string; upgradeBody: string; standardCta: string; today: string };
+type ReminderCopy = { pause: string; pauseNote: string; paused: string; openOnly: string; bgm: string; bgmBody: string; alert: string; alertLow: string; alertOk: string; night: string; nightLocked: string; nightTeaser: string; plans: string; label: string; time: string; allow: string; tab: string; unsupported: string; help: string; helpBody: string; retry: string; close: string; fullBenefit: string; vipBenefit: string; sampleNote: string; upgradeBody: string; standardCta: string; today: string; closedOk: string; enableClosed: string; signin: string; pushOn: string };
 export const reminderCopy: Record<Language, ReminderCopy> = {
   "ja": {
     "pause": "毎日通知を一時停止",
@@ -30,7 +30,11 @@ export const reminderCopy: Record<Language, ReminderCopy> = {
     "sampleNote": "無料は528Hzを20秒試聴できます。全9周波数の継続再生はスタンダード以上でお楽しみいただけます。",
     "upgradeBody": "全9周波数の星音のBGMとタブ移動中の継続再生はスタンダード以上の特典です。",
     "standardCta": "スタンダードプランを見る",
-    "today": "今日の占い"
+    "today": "今日の占い",
+    "closedOk": "ON時の通知はアプリを閉じていても届きます。",
+    "enableClosed": "アプリを閉じていても受け取る",
+    "signin": "アプリを閉じていても受け取るには、ログインしてください。",
+    "pushOn": "この端末はバックグラウンド通知に登録済みです。"
   },
   "en": {
     "pause": "Pause all daily reminders",
@@ -60,7 +64,11 @@ export const reminderCopy: Record<Language, ReminderCopy> = {
     "sampleNote": "Free offers a 20-second 528 Hz sample. Standard+ includes continuous playback in all nine frequencies.",
     "upgradeBody": "All nine Celestial BGM frequencies and playback across tabs are Standard+ benefits.",
     "standardCta": "View Standard plan",
-    "today": "Today's reading"
+    "today": "Today's reading",
+    "closedOk": "When ON, reminders arrive even when the app is closed.",
+    "enableClosed": "Receive even when the app is closed",
+    "signin": "Please sign in to receive reminders while the app is closed.",
+    "pushOn": "This device is registered for background reminders."
   },
   "zh-CN": {
     "pause": "暂停全部每日提醒",
@@ -90,7 +98,11 @@ export const reminderCopy: Record<Language, ReminderCopy> = {
     "sampleNote": "免费可试听528Hz 20秒。标准及以上可持续播放全部9种频率。",
     "upgradeBody": "全9种星音BGM频率与跨页面持续播放为标准及以上特权。",
     "standardCta": "查看标准方案",
-    "today": "今日解读"
+    "today": "今日解读",
+    "closedOk": "开启后，即使关闭应用也会收到提醒。",
+    "enableClosed": "关闭应用时也接收",
+    "signin": "请登录后才能在关闭应用时接收提醒。",
+    "pushOn": "此设备已注册后台提醒。"
   },
   "zh-TW": {
     "pause": "暫停全部每日提醒",
@@ -120,7 +132,11 @@ export const reminderCopy: Record<Language, ReminderCopy> = {
     "sampleNote": "免費可試聽528Hz 20秒。標準以上可持續播放全部9種頻率。",
     "upgradeBody": "全9種星音BGM頻率與跨頁面持續播放為標準以上特典。",
     "standardCta": "查看標準方案",
-    "today": "今日解讀"
+    "today": "今日解讀",
+    "closedOk": "開啟後，即使關閉應用程式也會收到提醒。",
+    "enableClosed": "關閉應用程式時也接收",
+    "signin": "請登入後才能在關閉應用程式時接收提醒。",
+    "pushOn": "此裝置已註冊背景提醒。"
   },
   "ko": {
     "pause": "모든 매일 알림 일시 중지",
@@ -150,7 +166,11 @@ export const reminderCopy: Record<Language, ReminderCopy> = {
     "sampleNote": "무료는 528Hz를 20초 미리 들을 수 있습니다. 스탠다드 이상은 9개 주파수 연속 재생을 제공합니다.",
     "upgradeBody": "별빛 BGM 9개 주파수와 탭 간 연속 재생은 스탠다드 이상 혜택입니다.",
     "standardCta": "스탠다드 플랜 보기",
-    "today": "오늘의 해석"
+    "today": "오늘의 해석",
+    "closedOk": "ON으로 설정하면 앱을 닫아도 알림이 도착합니다.",
+    "enableClosed": "앱을 닫아도 받기",
+    "signin": "앱을 닫은 상태에서 받으려면 로그인해 주세요.",
+    "pushOn": "이 기기는 백그라운드 알림에 등록되었습니다."
   },
   "es": {
     "pause": "Pausar todos los avisos diarios",
@@ -180,7 +200,11 @@ export const reminderCopy: Record<Language, ReminderCopy> = {
     "sampleNote": "Gratis ofrece 20 segundos de muestra a 528 Hz. Estándar+ incluye las nueve frecuencias sin límite.",
     "upgradeBody": "Las nueve frecuencias de BGM celeste y la reproducción entre pestañas son ventajas de Estándar+.",
     "standardCta": "Ver plan Estándar",
-    "today": "Lectura de hoy"
+    "today": "Lectura de hoy",
+    "closedOk": "Con la opción activada, los avisos llegan aunque la app esté cerrada.",
+    "enableClosed": "Recibir aunque la app esté cerrada",
+    "signin": "Inicia sesión para recibir avisos con la app cerrada.",
+    "pushOn": "Este dispositivo está registrado para avisos en segundo plano."
   },
   "fr": {
     "pause": "Suspendre tous les rappels quotidiens",
@@ -210,6 +234,10 @@ export const reminderCopy: Record<Language, ReminderCopy> = {
     "sampleNote": "Gratuit propose 20 secondes à 528 Hz. Standard+ permet l’écoute continue des neuf fréquences.",
     "upgradeBody": "Les neuf fréquences BGM célestes et la lecture entre onglets sont incluses dès Standard.",
     "standardCta": "Voir Standard",
-    "today": "Lecture du jour"
+    "today": "Lecture du jour",
+    "closedOk": "Une fois activés, les rappels arrivent même quand l’application est fermée.",
+    "enableClosed": "Recevoir même application fermée",
+    "signin": "Connectez-vous pour recevoir les rappels application fermée.",
+    "pushOn": "Cet appareil est inscrit aux rappels en arrière-plan."
   }
 };

@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import type { Language } from "@/lib/translations";
 import { effectiveReminder, migrateEveningReminder, PAUSE_KEY, REMINDER_KEY, readReminderSettings, remindersPaused } from '@/lib/daily-reminders';
 import { reminderCopy } from '@/lib/reminder-copy';
+import { enablePush, pushToken, schedulePushSync, setPushEntries, type PushResult } from '@/lib/push-client';
 
 type Setting = { on: boolean; time: string };
 const KEY = REMINDER_KEY;
@@ -35,6 +36,7 @@ export function registerReminderFallbacks(entries: Record<string, Entry>): () =>
   migrateEveningReminder();
   fallbacks.clear();
   for (const [id, entry] of Object.entries(entries)) fallbacks.set(id, entry);
+  setPushEntries(Object.fromEntries(Object.entries(entries).map(([id, e]) => [id, { title: e.title, body: e.body }])));
   startScheduler();
   return () => { fallbacks.clear(); if (timer) clearInterval(timer); timer = null; };
 }
@@ -43,6 +45,7 @@ let timer: ReturnType<typeof setInterval> | null = null;
 function startScheduler() {
   if (timer || typeof window === "undefined") return;
   const tick = () => {
+    if (pushToken() && document.visibilityState !== 'visible') return;
     if (remindersPaused() || typeof Notification === "undefined" || Notification.permission !== "granted") return;
     const now = new Date(); const hm = now.toTimeString().slice(0, 5); const day = now.toDateString();
     const settings = readAll();
@@ -56,12 +59,14 @@ function startScheduler() {
     const color = due.find(([, e]) => e.color)?.[1].color;
     try { const n = new Notification(head, { body, icon: colorIcon(color), badge: colorIcon(color), tag: `onore-summary-${hm}` }); localStorage.setItem(sentKey, day); n.onclick = () => { window.focus(); window.dispatchEvent(new CustomEvent("onore-open", { detail: "compass" })); n.close(); }; } catch { /* unsupported; retry next tick */ }
   };
+  window.addEventListener('onore-notify-change', schedulePushSync);
   tick(); timer = setInterval(tick, 30_000);
 }
 
 /** Per-feature daily reminder. Delivers only while the app is open; no background push provider is connected. */
 export default function FeatureNotifySwitch({ id, title, body, language, disabled, color, variant = "full", lockedNote }: { id: string; title: string; body: string; language: Language; disabled?: boolean; color?: string | undefined; variant?: "full" | "link" | "center"; lockedNote?: string }) {
-  const t = { ...reminderCopy[language], note: reminderCopy[language].openOnly, locked: reminderCopy[language].nightTeaser };
+  const [pushed, setPushed] = useState(false);
+  const t = { ...reminderCopy[language], note: pushed ? reminderCopy[language].closedOk : reminderCopy[language].openOnly, locked: reminderCopy[language].nightTeaser };
   const [paused, setPaused] = useState(false);
   const [s, setS] = useState<Setting>({ on: false, time: "07:00" });
   const [msg, setMsg] = useState("");
@@ -76,6 +81,8 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
     startScheduler();
     return () => { map.delete(id); };
   }, [id, title, body, disabled, color, variant]);
+  useEffect(() => { const f = () => setPushed(Boolean(pushToken())); f(); window.addEventListener('onore-push-change', f); return () => window.removeEventListener('onore-push-change', f); }, []);
+  const pushMsg = (r: PushResult) => r === 'registered' ? '' : r === 'signin' ? t.signin : r === 'open-in-new-tab' ? t.tab : r === 'unsupported' ? t.unsupported : r === 'denied' ? t.helpBody : '';
   useEffect(() => {
     const sync = () => { const v = readAll()[id]; setS(v ?? { on: false, time: id === 'eveningReset' ? '21:00' : '07:00' }); setPaused(remindersPaused()); };
     const storage = (e: StorageEvent) => { if (!e.key || e.key === KEY || e.key === PAUSE_KEY) sync(); };
@@ -96,6 +103,7 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
       }
     }
     save({ ...s, on });
+    if (on && !pushToken()) { try { const r = await enablePush(); const m = pushMsg(r); if (m) setMsg(m); } catch (e) { console.warn(e); } }
   };
 
   /** Retries the permission prompt; browsers cannot open OS settings directly, so a denied state keeps the step guide visible. */
@@ -122,6 +130,7 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
       </div>
       <p className="mt-1 text-[11px] leading-5 text-muted-foreground">{paused ? t.pauseNote : disabled ? (lockedNote ?? t.locked) : t.note}</p>
       {msg && <p role="status" className="mt-1 text-xs text-primary">{msg}</p>}
+      {!pushed && !disabled && !paused && <button type="button" className="mt-1 text-xs font-semibold text-primary underline underline-offset-2" onClick={() => void enablePush().then(r => setMsg(pushMsg(r))).catch(() => setMsg(t.unsupported))}>{t.enableClosed}</button>}
       <Dialog open={help} onOpenChange={setHelp}>
         <DialogContent className="w-[calc(100%-1.5rem)] rounded-lg border-primary/40 sm:max-w-md">
           <DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif"><BellRing className="size-5 text-primary" />{t.help}</DialogTitle>
