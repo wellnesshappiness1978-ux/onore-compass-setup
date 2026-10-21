@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useFocus } from "./FocusProvider";
 import { addTeamGroup, deleteTeamGroup, updateTeamGroup } from "@/lib/team-groups.functions";
-import { canAddGroup, focusCopy, goalText, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, mixHex, type TargetKind, type TeamGroup } from "@/lib/focus";
+import { canAddGroup, focusCopy, selfReadingLabel, goalText, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, mixHex, type TargetKind, type TeamGroup } from "@/lib/focus";
 import { groupLimit, memberLimit } from "@/lib/plans";
 import { familyCapacityCopy, fitsMemberCapacity, registeredMemberCount } from '@/lib/family-capacity';
 import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
@@ -58,8 +58,9 @@ export function SubjectHeaderBadge({ language, ownerName, onOpen }: { language: 
   if (!ctx) return <span aria-hidden="true" />;
   const t = focusCopy[language];
   const icon = ctx.group ? "👥" : ctx.member ? "👨‍👩‍👧" : "👤";
-  const who = ctx.group ? ctx.label(language) : ctx.member ? `${ctx.label(language)}（${t.family}）` : `${t.self}${ownerName ? `（${ownerName}）` : ""}`;
-  return <button type="button" onClick={onOpen} title={t.cardTitle} aria-label={t.viewing(who)} className="mx-auto flex min-h-10 min-w-0 max-w-full items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary"><span aria-hidden="true">{icon}</span><span className="truncate"><span className="hidden sm:inline">{t.viewing("")}</span>{ctx.group || ctx.member ? who : (ownerName ? `${t.self}・${ownerName.split(/[\s　]/)[0]}` : t.self)}</span></button>;
+  const self = selfReadingLabel[language];
+  const who = ctx.group ? (subjectWord(ctx, language) ?? ctx.label(language)) : ctx.member ? `${subjectWord(ctx, language) ?? ctx.label(language)}（${t.family}）` : `${self}${ownerName ? `（${ownerName}）` : ""}`;
+  return <Button variant="ghost" type="button" onClick={onOpen} title={t.cardTitle} aria-label={t.viewing(who)} className="mx-auto flex min-h-10 min-w-0 max-w-full items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary"><span aria-hidden="true">{icon}</span><span className="truncate"><span className="hidden sm:inline">{t.viewing("")}</span>{ctx.group || ctx.member ? who : (ownerName ? `${self}・${ownerName.split(/[\s　]/)[0]}` : self)}</span></Button>;
 }
 
 /** Small strip showing the current subject with a way back to self. */
@@ -222,7 +223,7 @@ export function SubjectDailyNote({ language }: { language: Language }) {
   const ctx = useFocus();
   if (!ctx) return null;
   const day = new Date().toLocaleDateString("en-CA");
-  const who = ctx.group ? groupDisplayName(ctx.group.group, ctx.group.index, language) : ctx.member ? memberDisplayName(ctx.member) : focusCopy[language].self;
+  const who = ctx.group ? groupDisplayName(ctx.group.group, ctx.group.index, language) : ctx.member ? memberDisplayName(ctx.member) : selfReadingLabel[language];
   const birth = ctx.group ? null : ctx.readingProfile.birthDate || null;
   const key = ctx.group?.group.id ?? ctx.member?.id ?? "self";
   const lines = subjectDailyMessage(key, birth, day, goalText(ctx.focus, language), language);

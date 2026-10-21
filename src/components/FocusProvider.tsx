@@ -5,11 +5,11 @@ import { getFocus, listTeamGroups, saveFocus } from "@/lib/team-groups.functions
 import { readPreviewMembers } from "@/lib/consultation-targets";
 import type { TeamMember } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
-import { defaultFocus, FOCUS_KEY, focusCopy, groupDisplayName, memberDisplayName, memberToProfile, readLocalFocus, readLocalGroups, type Focus, type TeamGroup } from "@/lib/focus";
+import { defaultFocus, FOCUS_KEY, selfReadingLabel, groupDisplayName, memberDisplayName, memberToProfile, readLocalFocus, readLocalGroups, type Focus, type TeamGroup } from "@/lib/focus";
 import type { UserProfile } from "./Onboarding";
 import { SELF_MEMBER_ID } from "@/lib/group-insight";
 
-export const ownerAsMember = (o: UserProfile): TeamMember => ({ id: SELF_MEMBER_ID, name: o.nameKanji || o.nameRomaji || "本人", nameKana: o.nameKana, birthDate: o.birthDate, birthTime: o.birthTime, birthTimeUnknown: o.birthTimeUnknown, birthPlace: o.birthPlace, birthCity: o.birthCity, siblingOrder: o.siblingOrder, gender: o.gender, bloodType: o.bloodType, role: "", skills: [] });
+export const ownerAsMember = (o: UserProfile): TeamMember => ({ id: SELF_MEMBER_ID, name: o.nameKanji || o.nameRomaji || selfReadingLabel.ja, nameKana: o.nameKana, birthDate: o.birthDate, birthTime: o.birthTime, birthTimeUnknown: o.birthTimeUnknown, birthPlace: o.birthPlace, birthCity: o.birthCity, siblingOrder: o.siblingOrder, gender: o.gender, bloodType: o.bloodType, role: "", skills: [] });
 
 type Ctx = {
   owner: UserProfile;
@@ -64,7 +64,7 @@ export function FocusProvider({ owner, serverBacked, children }: { owner: UserPr
     const group = g ? { group: g, index: gi, members: [...(g.memberIds.includes(SELF_MEMBER_ID) && owner.birthDate ? [ownerAsMember(owner)] : []), ...members.filter(m => g.memberIds.includes(m.id))] } : null;
     return {
       owner, focus, setFocus, members, groups, reload, serverBacked, member, group,
-      label: (language) => member ? memberDisplayName(member) : group ? groupDisplayName(group.group, group.index, language) : focusCopy[language].self,
+      label: (language) => member ? memberDisplayName(member) : group ? groupDisplayName(group.group, group.index, language) : selfReadingLabel[language],
       readingProfile: member ? memberToProfile(member) : owner,
     };
   }, [focus, setFocus, members, groups, reload, serverBacked, owner]);

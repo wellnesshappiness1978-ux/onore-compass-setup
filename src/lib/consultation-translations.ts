@@ -37,7 +37,7 @@ export type ConsultationTranslation = {
 
 export const consultationTranslations: Record<Language, ConsultationTranslation> = {
   ja: {
-    ownerLabel: "本人（登録オーナー）",
+    ownerLabel: "あなた",
     targetLabel: "相談する対象",
     title: "アゴルメン相談室",
     subtitle: "決断の輪郭を、静かに照らす",
