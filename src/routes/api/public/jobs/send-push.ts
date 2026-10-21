@@ -9,7 +9,7 @@ function localParts(tz: string, now: Date) {
   try {
     const f = new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
     const p = Object.fromEntries(f.formatToParts(now).map((x) => [x.type, x.value]));
-    return { hm: `${p.hour}:${p.minute}`, day: `${p.year}-${p.month}-${p.day}` };
+    return { hm: `${p["hour"]}:${p["minute"]}`, day: `${p["year"]}-${p["month"]}-${p["day"]}` };
   } catch { return null; }
 }
 
@@ -19,8 +19,8 @@ export const Route = createFileRoute("/api/public/jobs/send-push")({
       POST: async ({ request }) => {
         const authFailure = await authenticateCronRequest(request);
         if (authFailure) return authFailure;
-        const lovableKey = process.env.LOVABLE_API_KEY;
-        const fcmKey = process.env.FIREBASE_MESSAGING_API_KEY;
+        const lovableKey = process.env["LOVABLE_API_KEY"];
+        const fcmKey = process.env["FIREBASE_MESSAGING_API_KEY"];
         if (!lovableKey || !fcmKey) return new Response("Push not configured", { status: 500 });
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: devices, error } = await supabaseAdmin.from("push_devices").select("token,timezone,language,reminders,paused,last_sent").eq("paused", false);
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/api/public/jobs/send-push")({
             headers: { Authorization: `Bearer ${lovableKey}`, "X-Connection-Api-Key": fcmKey, "Content-Type": "application/json" },
             body: JSON.stringify({ message: {
               token: d.token,
-              notification: { title: HEAD[d.language] ?? HEAD.en, body: due.map((r) => `・${r.title}：${r.body}`).join("\n").slice(0, 1000) },
+              notification: { title: HEAD[d.language] ?? HEAD["en"], body: due.map((r) => `・${r.title}：${r.body}`).join("\n").slice(0, 1000) },
               webpush: { notification: { icon: "/pwa-icon-192.png", tag: `onore-summary-${lp.hm}` }, fcm_options: { link: "/" } },
             } }),
           });

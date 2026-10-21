@@ -9,7 +9,7 @@ export const FIREBASE_VAPID_KEY = "BG1xxIP4e0_8oTNIeikeosm5OptNlrvdjoVtaZ989xEnS
 export const FIREBASE_PROJECT_ID = "agolmen-compass-app";
 
 export const getPushConfig = createServerFn({ method: "GET" }).handler(async () => {
-  const apiKey = process.env.GOOGLE_API_KEY ?? "";
+  const apiKey = process.env["GOOGLE_API_KEY"] ?? "";
   return { apiKey, appId: FIREBASE_WEB_APP_ID, vapidKey: FIREBASE_VAPID_KEY, projectId: FIREBASE_PROJECT_ID, ready: Boolean(apiKey) };
 });
 
