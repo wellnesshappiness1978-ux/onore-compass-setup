@@ -113,8 +113,8 @@ function paintGemSurface(color: string) {
       } else {
         // Irregular leaf in the existing octagonal setting; no continuous stroke.
         const rimDistance = distance / boundary;
-         const leaf = smoothEdge(1.008, 1.014, rimDistance)
-           * (1 - smoothEdge(1.092 + broad * 0.005, 1.098 + broad * 0.005, rimDistance));
+         const leaf = smoothEdge(1.01 + brush * 0.01, 1.02 + brush * 0.01, rimDistance)
+           * (1 - smoothEdge(1.09 + broad * 0.03, 1.1 + broad * 0.03, rimDistance));
          const broken = smoothEdge(0.10, 0.26, pigmentNoise(x * 39, y * 39, 71));
         const relief = Math.max(0, Math.min(1, 0.48 - y * 0.21 + brush * 0.65 + tooth * 0.38));
         pixels.data[offset] = 127 + relief * 122;
