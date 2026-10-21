@@ -37,6 +37,6 @@
 - Personal readings share one versioned query plus a fast catchphrase/essence call shown first: six essence angles, method dialogs, nonempty server-available approach cards and one closing axis summary. Name grids stay in the name dialog. Why: prevent duplicate AI calls, fabricated charts and repeated prose.
 
 
-- AI tabs preserve sessions while showing one panel; saved compatibility normalizes individual profiles and compares group members separately. Why: avoid invented group birth data.
+- AI tabs keep sessions; compatibility compares people separately. Consultation shares request validation and builds group context only from structured members. Why: no invented births or goal overflow.
 - Today benefit progress is a separate cumulative twelve-category catalogue, never an access gate; recipes and expanded prose use browser-safe typed localized modules without extra AI calls. Why: keep marketing counts accurate without changing permissions or calculated values.
 - BGM uses one shared audio context and offline-testable graph with normalized voices and smooth gain. Why: avoid driver churn, clipping and clicks.
