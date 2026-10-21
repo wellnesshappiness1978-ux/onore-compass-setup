@@ -3,10 +3,13 @@ import { BellOff } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { PAUSE_KEY, REMINDER_EVENT, remindersPaused, setRemindersPaused } from '@/lib/daily-reminders';
 import { reminderCopy } from '@/lib/reminder-copy';
+import { pushToken } from '@/lib/push-client';
 import type { Language } from '@/lib/translations';
 
 export default function ReminderMasterSwitch({ language }: { language: Language }) {
   const [paused, setPaused] = useState(false);
+  const [pushed, setPushed] = useState(false);
+  useEffect(() => { const f = () => setPushed(Boolean(pushToken())); f(); window.addEventListener('onore-push-change', f); return () => window.removeEventListener('onore-push-change', f); }, []);
   const t = reminderCopy[language];
   useEffect(() => {
     const sync = () => setPaused(remindersPaused());
@@ -20,6 +23,6 @@ export default function ReminderMasterSwitch({ language }: { language: Language 
       <Switch checked={paused} aria-label={t.pause} onCheckedChange={value => { try { setRemindersPaused(value); } catch { /* retain current state if storage unavailable */ } }} />
     </label>
     <p className="mt-2 text-xs leading-6 text-muted-foreground">{t.pauseNote}</p>
-    <p className="mt-1 text-xs text-muted-foreground">{t.openOnly}</p>
+    <p className="mt-1 text-xs text-muted-foreground">{pushed ? `${t.closedOk} ${t.pushOn}` : t.openOnly}</p>
   </section>;
 }
