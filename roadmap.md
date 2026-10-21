@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Crisp high-definition center jewel (2026-10-21)
-- [ ] Remove canvas blur/drop-shadow, increase live DPI resolution, refine facet contrast and precise gold-leaf edges without changing the original painting, gem size or seven-color row
-- [ ] Verify live/fullscreen details and actual downloaded 2048×2048 certificate PNG; run related tests
+- [x] Remove canvas blur/drop-shadow, increase live DPI resolution, refine facet contrast and precise gold-leaf edges without changing the original painting, gem size or seven-color row
+- [x] Standard guest preview: live 1536px canvas / 768 CSS px at DPR 2; fullscreen 2048px canvas, both filter none. Actual downloaded certificate PNG 2048×2048; visually inspected gem crops, seven-color placement and certificate. No new clipping, collisions or page errors; 16 related tests pass; build OK. Full-resolution fullscreen screenshot exceeded image viewer limit; reviewed a resized copy plus original-resolution gem crop.
 
 ## Painterly center gem (2026-10-21)
 - [x] Replace crisp center-gem facets and uniform gold outlines with layered pigment, subtle brush relief and textured gold leaf; preserve size, personal color, original painting and seven-color placement
