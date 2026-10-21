@@ -101,18 +101,18 @@ function paintGemSurface(color: string) {
         const facetPosition = (angle + Math.PI / 2 + sector * 8) / sector;
         const facetIndex = Math.floor(facetPosition);
         const transition = smoothEdge(0.82, 1, facetPosition - facetIndex);
-        const facetLight = (index: number) => Math.sin(index * 2.37 + 0.7) * 0.19
-          + Math.cos(index * sector + 2.3) * 0.15;
+        const facetLight = (index: number) => Math.sin(index * 2.37 + 0.7) * 0.32
+          + Math.cos(index * sector + 2.3) * 0.22;
         const cutLight = facetLight(facetIndex) * (1 - transition) + facetLight(facetIndex + 1) * transition;
-        const crown = smoothEdge(0.47, 0.69, distance / boundary + broad * 0.035);
-        const coreLight = 0.08 - x * 0.14 - y * 0.18 - distance * 0.1;
+        const crown = smoothEdge(0.40, 0.58, distance / boundary + broad * 0.028);
+        const coreLight = -0.04 - x * 0.19 - y * 0.23 - distance * 0.1;
         const deepReflection = Math.exp(-((x - 0.28) ** 2 / 0.045 + (y - 0.27) ** 2 / 0.14));
         const glaze = coreLight * (1 - crown) + cutLight * crown
-          + broad * 0.12 + brush * 0.08 + tooth * 0.028 - deepReflection * 0.18;
+          + broad * 0.09 + brush * 0.12 + tooth * 0.055 - deepReflection * 0.23;
         // A fine, broken brush-shaped reflection, not a circular CG flash.
         const reflection = Math.exp(-((x + 0.27 + y * 0.16) ** 2 / 0.009 + (y + 0.28) ** 2 / 0.07));
         const secondary = Math.exp(-((x - 0.39 + y * 0.38) ** 2 / 0.003 + (y - 0.23) ** 2 / 0.05));
-        const sheen = Math.max(0, reflection * (0.60 + brush * 0.27) + secondary * 0.26);
+        const sheen = Math.max(0, reflection * (0.51 + brush * 0.42) + secondary * 0.23);
         for (let channel = 0; channel < 3; channel += 1) {
           const base = channels[channel] ?? 160;
           const pigment = glaze >= 0 ? base + (255 - base) * glaze : base * (1 + glaze);
