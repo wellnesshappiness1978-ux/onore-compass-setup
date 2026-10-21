@@ -38,5 +38,5 @@
 
 
 - AI tabs keep sessions; compatibility compares people separately. Consultation shares request validation and builds group context only from structured members. Why: no invented births or goal overflow.
-- Today benefit progress is a separate cumulative twelve-category catalogue, never an access gate; recipes and expanded prose use browser-safe typed localized modules without extra AI calls. Why: keep marketing counts accurate without changing permissions or calculated values.
+- Today uses shared TodayCard; its twelve-category benefit catalogue is not an access gate, and recipes/depth stay local. Why: consistent cards, accurate counts, unchanged permissions.
 - BGM uses one shared audio context and offline-testable graph with normalized voices and smooth gain. Why: avoid driver churn, clipping and clicks.
