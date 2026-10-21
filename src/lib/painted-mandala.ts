@@ -81,14 +81,15 @@ function paintGemSurface(color: string) {
       const broad = pigmentNoise(x * 7, y * 7, 3) - 0.5;
       const brush = pigmentNoise(x * 68 + y * 21, y * 13, 19) - 0.5;
       const tooth = pigmentNoise(x * 185, y * 185, 31) - 0.5;
-       const edge = boundary + broad * 0.0015 + brush * 0.001;
-       const body = 1 - smoothEdge(edge - 0.001, edge + 0.002, distance);
+       // Hand-cut outline: a gentle, deterministic wobble instead of a CAD line.
+       const edge = boundary + broad * 0.012 + brush * 0.004;
+       const body = 1 - smoothEdge(edge - 0.004, edge + 0.006, distance);
       const offset = (py * 640 + px) * 4;
       if (body > 0) {
-        // Broad facet light folds into the table through pigment, not outlines.
-        const facetPosition = (angle + Math.PI / 2 + sector * 8) / sector;
+        // Hand-polished facets: boundaries drift slightly like a natural stone.
+        const facetPosition = (angle + Math.PI / 2 + sector * 8) / sector + broad * 0.06 + brush * 0.02;
         const facetIndex = Math.floor(facetPosition);
-         const transition = smoothEdge(0.985, 1, facetPosition - facetIndex);
+         const transition = smoothEdge(0.93, 1, facetPosition - facetIndex);
          const facetLight = (index: number) => Math.sin(index * 2.37 + 0.7) * 0.43
            + Math.cos(index * sector + 2.3) * 0.29;
         const cutLight = facetLight(facetIndex) * (1 - transition) + facetLight(facetIndex + 1) * transition;
@@ -232,7 +233,7 @@ export function drawMandalaComposition(context: CanvasRenderingContext2D, image:
   context.drawImage(image, 0, band, size, size);
   context.restore();
   const main = finish.colors[0];
-  if (main) drawCenterGem(context, size / 2, band + size / 2, size * 0.08, main);
+  if (main) drawCenterGem(context, size / 2, band + size / 2, size * 0.04, main);
   if (band > 0) drawColorCrown(context, size, band, finish);
 }
 
