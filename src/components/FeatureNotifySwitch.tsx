@@ -9,12 +9,6 @@ import { reminderCopy } from '@/lib/reminder-copy';
 
 type Setting = { on: boolean; time: string };
 const KEY = REMINDER_KEY;
-const times = Array.from({ length: 38 }, (_, i) => { const m = 5 * 60 + i * 30; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${m % 60 ? "30" : "00"}`; });
-
-const copy = {
-  ja: { label: "この診断を毎日通知", time: "通知時刻", note: "アプリまたはブラウザが開いている間に通知が届きます。同じ時刻の通知は1通にまとめてお届けします。", locked: "プランを開放すると通知を設定できます。", allow: "通知を許可すると、指定の時刻にお届けします。端末の設定から許可してくださいね。", tab: "通知を許可するには、アプリを別タブで開いてください。", unsupported: "この端末では通知の代わりに画面でご確認ください。" },
-  en: { label: "Notify me daily", time: "Time", note: "Notifications arrive while the app or browser is open. Reminders at the same time are combined into one.", locked: "Unlock this plan to set a notification.", allow: "Allow notifications in your device settings to receive them at your chosen time.", tab: "Open the app in its own tab to allow notifications.", unsupported: "This device shows the guide on screen instead of notifications." },
-};
 
 function readAll(): Record<string, Setting> {
   return readReminderSettings();
@@ -35,7 +29,7 @@ function colorIcon(color?: string) {
 
 type Entry = { title: string; body: string; color?: string | undefined };
 const registry = new Map<string, Entry>();
-/** Generic bodies registered by the Settings notification center; live screen content wins when present. */
+/** Allowed catalogue survives tab navigation; live Today content wins when present. */
 const fallbacks = new Map<string, Entry>();
 export function registerReminderFallbacks(entries: Record<string, Entry>): () => void {
   migrateEveningReminder();
@@ -57,7 +51,8 @@ function startScheduler() {
     if (!due.length || localStorage.getItem(sentKey) === day) return;
     localStorage.setItem(sentKey, day);
     const ja = (document.documentElement.lang || "ja").startsWith("ja");
-    const head = ja ? "【アゴルメンの羅針盤】本日の開運サマリー" : "Agolmen's Compass · Today's summary";
+    const locale = document.documentElement.lang as Language;
+    const head = ja ? "【アゴルメンの羅針盤】本日の開運サマリー" : `Agolmen's Compass · ${reminderCopy[locale]?.today ?? reminderCopy.en.today}`;
     const body = due.map(([, e]) => `・${e.title}：${e.body}`).join("\n");
     const color = due.find(([, e]) => e.color)?.[1].color;
     try { const n = new Notification(head, { body, icon: colorIcon(color), badge: colorIcon(color), tag: `onore-summary-${hm}` }); n.onclick = () => { window.focus(); window.dispatchEvent(new CustomEvent("onore-open", { detail: "compass" })); n.close(); }; } catch { /* unsupported */ }
@@ -110,13 +105,13 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
     if (window.top !== window.self) { window.open(window.location.href, "_blank", "noopener"); return; }
     const p = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
     if (p === "granted") { save({ ...s, on: true }); setHelp(false); setMsg(""); }
-    else setMsg(language === "ja" ? "ブラウザが再確認を止めています。上の手順で「許可」に切り替えてから、もう一度押してくださいね。" : "Your browser paused the prompt. Switch to Allow using the steps above, then tap again.");
+    else setMsg(t.helpBody);
   };
 
   return (
     <div className={`feature-notify mt-3 rounded-lg border p-3 text-foreground transition-all ${effectiveReminder(s, paused, !disabled) ? "border-primary bg-background/95" : "border-primary/40 bg-background/95"}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <label className="flex items-center gap-2 text-sm text-foreground">
+        <label className="flex min-w-0 flex-wrap items-center gap-2 text-sm text-foreground">
           <span className={`grid size-9 shrink-0 place-items-center rounded-full border ${effectiveReminder(s, paused, !disabled) ? "notify-on border-primary bg-primary text-primary-foreground" : "border-muted-foreground/60 bg-muted text-muted-foreground"}`}><BellRing className="size-5" /></span>
           <span className="font-semibold">{variant === "center" ? title : t.label}</span>
           <Switch className="h-7 w-12 shrink-0 border border-primary data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground/40" checked={effectiveReminder(s, paused, !disabled)} disabled={disabled || paused} onCheckedChange={(v) => void toggle(v)} aria-label={`${title} · ${t.label}`} />
@@ -130,13 +125,12 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
       {msg && <p role="status" className="mt-1 text-xs text-primary">{msg}</p>}
       <Dialog open={help} onOpenChange={setHelp}>
         <DialogContent className="w-[calc(100%-1.5rem)] rounded-lg border-primary/40 sm:max-w-md">
-          <DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif"><BellRing className="size-5 text-primary" />{language === "ja" ? "通知を有効にするには" : "Turn on notifications"}</DialogTitle>
-            <DialogDescription>{language === "ja" ? "通知を有効にするには、端末またはブラウザの設定で通知を許可してください。" : "To turn on notifications, allow them in your device or browser settings."}</DialogDescription></DialogHeader>
-          <ol className="list-decimal space-y-1.5 pl-5 text-sm leading-6">{(language === "ja" ? ["パソコン：アドレスバー左の鍵（またはサイト情報）マーク →「通知」を「許可」にします。", "iPhone：ホーム画面に追加したアプリを開き、設定 → 通知 → このアプリ → 「通知を許可」をオンにします。", "Android：設定 → アプリ → ブラウザ（Chromeなど）→ 通知 → このサイトを許可します。", "許可したら画面を読み込み直し、もう一度スイッチをオンにしてください。"] : ["Desktop: click the lock/site-info icon in the address bar → set Notifications to Allow.", "iPhone: open the app from your Home Screen, then Settings → Notifications → this app → Allow.", "Android: Settings → Apps → your browser → Notifications → allow this site.", "Reload the page and turn the switch on again."]).map((x) => <li key={x}>{x}</li>)}</ol>
-          <Button variant="outline" className="border-2 border-primary/60" onClick={() => void retry()}>{language === "ja" ? "ワンタップで通知設定を開く" : "Open notification settings"}</Button>
+          <DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif"><BellRing className="size-5 text-primary" />{t.help}</DialogTitle>
+            <DialogDescription>{t.helpBody}</DialogDescription></DialogHeader>
+          <Button variant="outline" className="border-2 border-primary/60" onClick={() => void retry()}>{t.retry}</Button>
           {msg && <p role="status" className="text-xs text-primary">{msg}</p>}
           <p className="text-xs text-muted-foreground">{t.note}</p>
-          <Button variant="champagne" onClick={() => setHelp(false)}>{language === "ja" ? "わかりました" : "Got it"}</Button>
+          <Button variant="champagne" onClick={() => setHelp(false)}>{t.close}</Button>
         </DialogContent>
       </Dialog>
     </div>

@@ -32,7 +32,7 @@ export function setRemindersPaused(paused: boolean): void {
 export function migrateEveningReminder(): void {
   try {
     const settings = readReminderSettings();
-    if (settings.eveningReset) return;
+    if (settings['eveningReset']) return;
     const old = JSON.parse(localStorage.getItem('onore-reminders') ?? '{}');
     if (typeof old.night !== 'boolean') return;
     const time = typeof old.nightTime === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(old.nightTime) ? old.nightTime : '21:00';
