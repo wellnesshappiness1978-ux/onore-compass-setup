@@ -764,11 +764,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         </Button>
         <SubjectHeaderBadge language={language} ownerName={profile.nameKanji || profile.nameRomaji} onOpen={() => { goToTab("settings"); window.setTimeout(() => { const el = document.getElementById("focus-settings") as HTMLDetailsElement | null; if (el) { el.open = true; el.scrollIntoView({ behavior: "smooth", block: "start" }); } }, 150); }} />
         <div className="flex min-w-0 items-center gap-1">
+        <HeaderBgm language={language} plan={previewPlan} onUpgrade={() => { goToTab("settings"); window.setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100); }} />
+        <LanguageSelector inline language={language} onChange={onLanguageChange} />
         <Button size="icon" variant="ghost" onClick={() => goToTab("settings")} aria-label={t.settings} title={t.settings} aria-current={tab === "settings" ? "page" : undefined} className="size-10 shrink-0 text-primary [&_svg]:size-6">
           <Settings2 className="size-7" strokeWidth={1.8} />
         </Button>
-        <LanguageSelector inline language={language} onChange={onLanguageChange} />
-        <HeaderBgm language={language} plan={previewPlan} onUpgrade={() => { goToTab("settings"); window.setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100); }} />
         </div>
       </div>
       <AppearanceMotif background />
