@@ -82,4 +82,4 @@
 ## Mandala refinement (2026-10-21)
 - [x] Center gem shrunk to 50% (canvas radius 0.16→0.08) with oil-paint grain, soft halo/contact shadow and faint facet lines (no CG look)
 - [x] Seven birth-color stones moved out of the artwork to an HTML row above the frame (live + fullscreen); PNG export bakes the same row into a dark band above the painting (2048×2294)
-- [ ] Playwright verify: art screen, fullscreen, saved PNG balance
+- [x] Playwright verify: art screen, fullscreen, saved PNG balance (7-stone row above frame, small painterly gem, no page errors, build OK)
