@@ -1,9 +1,9 @@
 # Roadmap
 
-## Group consultation goal overflow (2026-10-21)
-- [ ] Send only the user goal (maximum 240 characters), keeping member data in the structured group field
-- [ ] Preserve server goal validation and structured group context; add large-group regression tests
-- [ ] Verify a real large-group consultation submission and response, or report the exact blocker
+## Group consultation goal overflow (2026-10-21) — done
+- [x] Send only the user goal (maximum 240 characters), keeping member data in the structured group field
+- [x] Preserve server goal validation and structured group context; 10/100/101-member and 240/241-character regressions pass; 203 total tests pass, build OK
+- [x] Signed-in live submission with 10 local preview members: goal 11 characters, HTTP 200, four-section AI answer read back in UI; real daily quota applied unchanged (paid roster persistence not part of this fix)
 
 ## Owner-excluded registration / BGM follow-up (2026-10-19) — done
 - [x] Show the signed-in owner without creating a family row or consuming a slot
