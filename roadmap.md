@@ -1,5 +1,12 @@
 # Roadmap
 
+## Today notification and navigation consolidation (2026-10-21)
+- [ ] Standard+ nine-frequency BGM and seven-language plan guidance; VIP+ BGM reminder
+- [ ] Today-only notification switches/time controls; remove morning and Settings individual controls/center
+- [ ] One header language control between Settings/BGM; five bottom tabs on all devices
+- [ ] Seven-language contextual VIP evening reset and lower-plan lock
+- [ ] Persistent reversible master pause in Settings; regression and live responsive checks
+
 ## Group consultation goal overflow (2026-10-21) — done
 - [x] Send only the user goal (maximum 240 characters), keeping member data in the structured group field
 - [x] Preserve server goal validation and structured group context; 10/100/101-member and 240/241-character regressions pass; 203 total tests pass, build OK
