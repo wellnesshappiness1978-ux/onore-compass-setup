@@ -77,4 +77,9 @@
 - Open: non-Japanese wording swap and full 5-locale translation of new group-today copy (currently English fallback).
 
 ## Mandala center gem + seven-color crown (2026-10-21) — done
-- MandalaCanvas renders the bundled painting on canvas and composes the overall-color faceted center gem plus the top seven birth-color stone row (localized labels); the same composition is used for the 2048px PNG export. Verified live, fullscreen and saved PNG on Standard preview plan; no page errors.
+- MandalaCanvas renders the bundled painting on canvas and composes the overall-color faceted center gem; the same composition is used for the PNG export. Verified live, fullscreen and saved PNG on Standard preview plan; no page errors.
+
+## Mandala refinement (2026-10-21)
+- [x] Center gem shrunk to 50% (canvas radius 0.16→0.08) with oil-paint grain, soft halo/contact shadow and faint facet lines (no CG look)
+- [x] Seven birth-color stones moved out of the artwork to an HTML row above the frame (live + fullscreen); PNG export bakes the same row into a dark band above the painting (2048×2294)
+- [ ] Playwright verify: art screen, fullscreen, saved PNG balance
