@@ -24,6 +24,7 @@ import {
 import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
+import { consultationGoal } from "@/lib/consultation-request";
 import type { Plan } from "@/lib/design-modes";
 import { nextPlan, planOrder } from "@/lib/plans";
 import { useDailyUsage, msUntilMidnight } from "@/hooks/use-daily-usage";
@@ -142,10 +143,7 @@ export default function ConsultationPanel({
     [target, profile],
   );
   const targetLabel = target?.name ?? (selGroup ? groupDisplayName(selGroup, selGroupIndex, language) : consultationTranslations[language].ownerLabel);
-  const groupContext = selGroup
-    ? `${language === "ja" ? "グループ相談" : "Group consultation"}: ${targetLabel}（${language === "ja" ? "メンバー" : "members"}: ${selGroupMembers.map((m) => `${m.name} ${m.birthDate}`).join(", ") || "—"}）`
-    : "";
-  const effectiveGoal = [goal, groupContext].filter(Boolean).join(" / ");
+  const effectiveGoal = consultationGoal(goal);
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -204,7 +202,7 @@ export default function ConsultationPanel({
           profile: targetProfile,
           ownerProfile: target ? profile : undefined,
           targetLabel,
-          goal: effectiveGoal || undefined,
+          goal: effectiveGoal,
           language,
           day: new Date().toLocaleDateString("en-CA"),
           group: selGroup ? { name: targetLabel.slice(0, 60), members: selGroupMembers.filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.birthDate)).slice(0, 100).map((m) => ({ name: (m.nickname || m.name || "—").slice(0, 40), birthDate: m.birthDate, birthTime: m.birthTimeUnknown === false ? (m.birthTime ?? "").slice(0, 5) : "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: (m.birthPlace ?? "").slice(0, 80), bloodType: m.bloodType ?? "", gender: m.gender ?? "undisclosed", siblingOrder: (m.siblingOrder ?? "").slice(0, 40), relationship: (m.relationship ?? "").slice(0, 60) })) } : undefined,
