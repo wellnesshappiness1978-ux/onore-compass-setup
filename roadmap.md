@@ -1,5 +1,9 @@
 # Roadmap
 
+## Painterly center gem (2026-10-21)
+- [ ] Replace crisp center-gem facets and uniform gold outlines with layered pigment, subtle brush relief and textured gold leaf; preserve size, personal color, original painting and seven-color placement
+- [ ] Verify live artwork, fullscreen and 2048-square certificate PNG, then inspect and refine the center detail
+
 ## Painted mandala restoration (2026-10-21)
 - [x] User selected the existing project painted source instead of the unavailable v3 filename
 - [x] Replace procedural vector overlays with direct painted-image display and matched high-quality private export
