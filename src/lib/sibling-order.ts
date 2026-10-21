@@ -28,8 +28,8 @@ export function parseSiblingComposition(v: string): SiblingComposition | null {
   for (const p of v.split("・")) {
     if ((SIBLING_COUNTS as readonly string[]).includes(p)) c.count = p;
     else if ((SIBLING_ORDERS as readonly string[]).includes(p)) c.order = p;
-    else if (p.startsWith("上に")) c.up = p.slice(3).split("と").filter((s) => (SIBLING_SIDES as readonly string[]).includes(s));
-    else if (p.startsWith("下に")) c.down = p.slice(3).split("と").filter((s) => (SIBLING_SIDES as readonly string[]).includes(s));
+    else if (p.startsWith("上に")) c.up = p.slice(2).split("と").filter((s) => (SIBLING_SIDES as readonly string[]).includes(s));
+    else if (p.startsWith("下に")) c.down = p.slice(2).split("と").filter((s) => (SIBLING_SIDES as readonly string[]).includes(s));
     else return null;
   }
   return c.count || c.order ? c : null;
