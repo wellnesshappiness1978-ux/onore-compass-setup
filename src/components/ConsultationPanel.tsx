@@ -205,7 +205,7 @@ export default function ConsultationPanel({
           goal: effectiveGoal,
           language,
           day: new Date().toLocaleDateString("en-CA"),
-          group: selGroup ? { name: targetLabel.slice(0, 60), members: selGroupMembers.filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.birthDate)).slice(0, 100).map((m) => ({ name: (m.nickname || m.name || "—").slice(0, 40), birthDate: m.birthDate, birthTime: m.birthTimeUnknown === false ? (m.birthTime ?? "").slice(0, 5) : "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: (m.birthPlace ?? "").slice(0, 80), bloodType: m.bloodType ?? "", gender: m.gender ?? "undisclosed", siblingOrder: (m.siblingOrder ?? "").slice(0, 40), relationship: (m.relationship ?? "").slice(0, 60) })) } : undefined,
+          group: selGroup ? { name: targetLabel.slice(0, 60), members: selGroupMembers.filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.birthDate)).slice(0, 100).map((m) => ({ name: (m.nickname || m.name || "—").slice(0, 40), birthDate: m.birthDate, birthTime: m.birthTimeUnknown === false ? (m.birthTime ?? "").slice(0, 5) : "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: (m.birthPlace ?? "").slice(0, 80), bloodType: m.bloodType ?? "", gender: m.gender ?? "undisclosed", siblingOrder: (m.siblingOrder ?? "").slice(0, 80), relationship: (m.relationship ?? "").slice(0, 60), relationshipType: (m.relationshipType ?? "").slice(0, 30) })) } : undefined,
         }),
       }),
     [targetProfile, profile, targetLabel, language, target, effectiveGoal, selGroup, selGroupMembers],

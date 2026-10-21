@@ -46,7 +46,7 @@ import { listTeamMembers } from "@/lib/team-members.functions";
 import { readPreviewMembers } from "@/lib/consultation-targets";
 import { personal } from "@/lib/day-compass";
 import type { TeamMember } from "@/lib/team-analysis";
-import { compatibilityContextCopy, readingThemes, relationshipKinds, type ReadingTheme } from "@/lib/compatibility-context";
+import { compatibilityContextCopy, kindFromRelationshipType, readingThemes, relationshipKinds, type ReadingTheme } from "@/lib/compatibility-context";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
@@ -213,7 +213,7 @@ function TorisetsuPanel({
     setAnalyzing(true);
     try {
       const readings = inputs.flatMap(item => {
-        const reading = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, item.input, language, { relationship: saved ? "close" : relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern });
+        const reading = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, item.input, language, { relationship: saved ? kindFromRelationshipType(pickedMember?.relationshipType ?? "") : relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern });
         return reading ? [{ name: item.name, reading }] : [];
       });
       if (!readings.length) return;
@@ -870,7 +870,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 /></SubjectVoice></div>
               </>
             ) : tab === "business" ? (
-              <><FamilyGroupButtons language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><BusinessFeaturePreview language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>
+              <><FamilyGroupButtons language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><BusinessFeaturePreview language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>
             ) : tab === "art" ? (
               <><ArtOwnerOnlyNotice language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /><NineStarsPanel language={language} profile={profile} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /></>
             ) : tab === "settings" ? (

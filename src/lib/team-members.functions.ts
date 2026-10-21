@@ -11,11 +11,11 @@ const memberBase = z.object({
   birthTimeUnknown: z.boolean(),
   birthPlace: z.string().trim().max(80),
   birthCity: z.string().trim().max(80),
-  siblingOrder: z.string().trim().max(40),
+  siblingOrder: z.string().trim().max(80),
   gender: z.enum(["female", "male", "other", "undisclosed"]),
   bloodType: z.enum(["", "A", "B", "O", "AB"]),
   relationship: z.string().trim().max(60),
-  relationshipType: z.enum(["", "partner", "family", "friend", "business", "employee", "other"]),
+  relationshipType: z.enum(["", "partner", "lover", "fiance", "family", "sibling", "relative", "friend", "business", "boss", "subordinate", "employee", "other"]),
   role: z.string().trim().max(60),
   skills: z.array(z.string().trim().min(1).max(30)).max(12),
 });

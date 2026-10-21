@@ -5,6 +5,13 @@ export const relationshipKinds: RelationshipKind[] = ["business", "hierarchy", "
 export type ReadingTheme = "connection" | "communication" | "future" | "work" | "distance";
 export const readingThemes: ReadingTheme[] = ["connection", "communication", "future", "work", "distance"];
 export type CompatibilityContext = { relationship?: RelationshipKind; theme?: ReadingTheme; concern?: string };
+/** Maps a registered member's relationship type to the closest compatibility reading kind. */
+export function kindFromRelationshipType(t: string): RelationshipKind {
+  if (t === "partner" || t === "lover" || t === "fiance") return "romance";
+  if (t === "boss" || t === "subordinate") return "hierarchy";
+  if (t === "business" || t === "employee") return "business";
+  return "close";
+}
 export function resolveReadingTheme(context: CompatibilityContext): ReadingTheme {
   const concern = context.concern?.trim() ?? "";
   if (/連絡|返信|返事|距離|会え|contact|reply|distance|联系|聯繫|연락|distancia/i.test(concern)) return "distance";

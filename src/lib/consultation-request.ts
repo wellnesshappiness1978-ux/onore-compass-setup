@@ -15,7 +15,7 @@ const personSchema = z.object({
   birthTimeUnknown: z.boolean(),
   birthPlace: z.string().max(80),
   bloodType: z.string().max(4),
-  siblingOrder: z.string().max(20),
+  siblingOrder: z.string().max(80),
   gender: z.enum(["male", "female", "other", "undisclosed"]).optional(),
 });
 

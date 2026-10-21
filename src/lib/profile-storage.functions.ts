@@ -13,7 +13,7 @@ const profileSchema = z.object({
   birthTimeUnknown: z.boolean(),
   birthPlace: z.string().min(1).max(80),
   bloodType: z.enum(["", "A", "B", "O", "AB"]),
-  siblingOrder: z.string().trim().max(20),
+  siblingOrder: z.string().trim().max(80),
 }).refine((p) => p.birthTimeUnknown || Boolean(p.birthTime), { message: "Birth time is required unless unknown" });
 
 export type StoredProfileInput = z.infer<typeof profileSchema>;

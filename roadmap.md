@@ -91,3 +91,11 @@
 - [x] Center gem shrunk to 50% (canvas radius 0.16→0.08) with oil-paint grain, soft halo/contact shadow and faint facet lines (no CG look)
 - [x] Seven birth-color stones moved out of the artwork to an HTML row above the frame (live + fullscreen); PNG export bakes the same row into a dark band above the painting (2048×2294)
 - [x] Playwright verify: art screen, fullscreen, saved PNG balance (7-stone row above frame, small painterly gem, no page errors, build OK)
+
+## Sibling composition, relationship types, family caps and upgrade funnel (2026-10-21) — done
+- [x] Sibling composition picker (count / birth order / older-younger brothers-sisters) stored as one Japanese `count・order・上に…・下に…` string; legacy values and free text remain valid; owner profile, onboarding and family roster share it; zod limits raised to 80
+- [x] siblingCategory/siblingDisplay parse compositions; AI consultation prompt uses composition as sibling-structure reference; 7-language render-time localization
+- [x] Relationship type options extended (lover/fiance/sibling/relative/boss/subordinate) in 7 languages; "other" free-text placeholder shows examples; relationshipType flows into group consultation context, team AI payloads and quick-compatibility kind mapping
+- [x] Family roster locks the add button at the plan cap (3/10/30/100 kept per user decision) with 「登録上限に達しました」 notice and upgrade modal; editing existing members stays possible
+- [x] Family feature list cards show lock icons below Family plan; dialogs offer 「ファミリープランへアップグレード」 when locked and open the real feature when unlocked; TeamStudio locked card uses the same upgrade copy; Plan Perks already reflects accurate limits
+- [x] 40 related tests pass (new sibling-order/relationship-kind tests), tsgo clean, build OK; Playwright verified roster UI, cap lock and upgrade dialog on Standard guest preview; dev server restarted once for a stale module cache
