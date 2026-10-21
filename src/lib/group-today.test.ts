@@ -14,4 +14,6 @@ describe("group today", () => {
     expect(new Set(days).size).toBeGreaterThan(1);
   });
   it("replaces あなた with the subject name", () => { expect(replaceSubject("あなたの特性", "花子さん")).toBe("花子さんの特性"); });
+  it("keeps quoted speech where あなた means someone else", () => { expect(replaceSubject("「あなたの意見を聞かせて」とあなたが先に", "花子さん")).toBe("「あなたの意見を聞かせて」と花子さんが先に"); });
+  it("keeps the flower meaning phrase", () => { expect(replaceSubject("憧れ・あなただけを見つめる", "花子さん")).toBe("憧れ・あなただけを見つめる"); });
 });

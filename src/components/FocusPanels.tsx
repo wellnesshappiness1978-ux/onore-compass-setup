@@ -197,7 +197,16 @@ export function subjectWord(ctx: NonNullable<ReturnType<typeof useFocus>>, langu
   if (ctx.group) { const n = groupDisplayName(ctx.group.group, ctx.group.index, language); return n.includes("グループ") ? n : `${n}グループ`; }
   return null;
 }
-export const replaceSubject = (text: string, word: string) => text.replace(/あなた(さん|様)?/g, word);
+/** Quoted speech (「…」/『…』) and set phrases where あなた means someone else are kept verbatim. */
+const SUBJECT_KEEP = /「[^」]*」|『[^』]*』|あなただけを見つめる/g;
+export const replaceSubject = (text: string, word: string) => {
+  let out = "", last = 0;
+  for (const m of text.matchAll(SUBJECT_KEEP)) {
+    out += text.slice(last, m.index).replace(/あなた(さん|様)?/g, word) + m[0];
+    last = m.index + m[0].length;
+  }
+  return out + text.slice(last).replace(/あなた(さん|様)?/g, word);
+};
 
 export function SubjectVoice({ language, children }: { language: Language; children: ReactNode }) {
   const ctx = useFocus();
