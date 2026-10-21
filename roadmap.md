@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Painted mandala restoration (2026-10-21)
-- [ ] Confirm the original agolmen_birth_color_mandala_masterpiece-v3.png source (not present in the listed assets/uploads)
-- [ ] Replace procedural vector overlays with direct painted-image display and matched high-quality private export
-- [ ] Verify brighter artwork, fullscreen and image saving
+- [x] User selected the existing project painted source instead of the unavailable v3 filename
+- [x] Replace procedural vector overlays with direct painted-image display and matched high-quality private export
+- [x] Verified the original 1024px painting with brightness 1.2 / saturation 1.25 / specified gold aura; no SVG/Canvas in live artwork, fullscreen and 2048px PNG saving succeed, no page errors; 8 related tests pass and build OK
 
 ## Requested UI / mandala polish (2026-10-21) — done
 - [x] Owner reading labels use あなた; Settings retains 本人; explicit self AI addressing instruction, family/group addressing retained

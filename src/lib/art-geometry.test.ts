@@ -59,26 +59,3 @@ describe("birth-color mandala geometry", () => {
     expect(vividHexColor("not-a-color")).toBe("not-a-color");
   });
 });
-import { simpleMandalaRings } from "./art-geometry";
-describe("simple mandala", () => {
-  it("uses only the seven given colors, core first", () => {
-    const c = ["#111111", "#222222", "#333333", "#444444", "#555555", "#666666", "#777777"];
-    const m = simpleMandalaRings(c, 500);
-    expect(m.core).toBe("#111111");
-    expect(m.rings.map(r => r.color)).toEqual(c.slice(1));
-    expect(m.rings[0]!.innerColor).toBe("#111111");
-    expect(m.rings.at(-1)!.outer).toBeCloseTo(500);
-  });
-});
-
-import { dotPaintLayout } from "./art-geometry";
-describe("dot paint mandala", () => {
-  const c = ["#111111", "#222222", "#333333", "#444444", "#555555", "#666666", "#777777"];
-  it("uses only the seven colors, stays inside the disc, and is deterministic", () => {
-    const d = dotPaintLayout(c, 480);
-    expect(d.length).toBeGreaterThan(2000);
-    expect(d.length).toBeLessThan(6000);
-    d.forEach(p => { expect(c).toContain(p.color); expect(Math.hypot(p.x, p.y) + p.r).toBeLessThanOrEqual(480); });
-    expect(dotPaintLayout(c, 480)).toEqual(d);
-  });
-});
