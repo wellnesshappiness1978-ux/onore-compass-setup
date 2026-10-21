@@ -27,6 +27,7 @@ import { buildTodayDepth, type DeepSection } from "@/lib/today-depth";
 import { useFocus } from "./FocusProvider";
 import { goalText } from "@/lib/focus";
 import TodayReminders from './TodayReminders';
+import { TodayCard } from './TodayCard';
 
 // Deterministic reference values from birth date and today's calendar; not verified readings or predictions.
 type Pair = { ja: string; en: string };
@@ -432,7 +433,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         const Icon = icons[id];
         const lucky = id === "dailyLucky" && open && luckyStyle;
         return (<Fragment key={id}>
-          <section id={`today-${id}`} style={lucky ? luckyStyle : undefined} className={`today-feature design-daily-panel card-lux min-w-0 w-full max-w-full rounded-lg p-3 md:p-5 ${lucky ? "lucky-themed" : ""}`} aria-label={L(titles[id])}>
+          <TodayCard id={`today-${id}`} style={lucky ? luckyStyle : undefined} className={lucky ? "lucky-themed" : ""} title={L(titles[id])}>
             <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
               <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className={`min-w-0 break-words ${lucky ? "lucky-shine-title" : ""}`}>{L(titles[id])}</span></h3>
               {!open && <span className="shrink-0 rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">{names[min]}+</span>}
@@ -452,11 +453,12 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
               </div>
             )}
             <FeatureNotifySwitch id={id} title={`${notifyEmoji[id] ?? "🧭"} ${L(titles[id])}`} body={content[id].notify} language={language} disabled={!open} color={id === "dailyLucky" ? luckyColor?.code : undefined} />
-          </section>
+          </TodayCard>
+          {id === "monthlyLucky" && <TodayReminders kind="bgm" language={language} plan={plan} onUpgrade={onUpgrade} />}
+          {id === "helio" && <TodayReminders kind="evening" language={language} plan={plan} onUpgrade={onUpgrade} />}
           {i === lastOpen && share("share-open")}
         </Fragment>);
       })}
-      <TodayReminders language={language} plan={plan} onUpgrade={onUpgrade} />
       {share("share-bottom")}
       <Dialog open={recipe !== null} onOpenChange={v => { if (!v) setRecipeIndex(null); }}><DialogContent className="max-h-[85dvh] w-[calc(100%-1.5rem)] max-w-lg overflow-y-auto border-primary/35 bg-card text-foreground"><DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif text-primary"><ChefHat className="size-5 shrink-0" />{recipe?.name}</DialogTitle><DialogDescription>{benefit.recipeNote}</DialogDescription></DialogHeader>{recipe && <div className="space-y-5 text-left"><section><h3 className="mb-2 font-serif text-primary">{benefit.ingredients}</h3><ul className="space-y-1 text-sm">{recipe.ingredients.map(item => <li key={item} className="border-b border-primary/10 py-1">{item}</li>)}</ul></section><section><h3 className="mb-2 font-serif text-primary">{benefit.steps}</h3><ol className="list-decimal space-y-3 pl-5 text-sm leading-7">{recipe.steps.map((step, i) => <li key={i}>{step}</li>)}</ol></section><section className="border-t border-primary/20 pt-3"><h3 className="font-serif text-primary">{benefit.luck}</h3><p className="mt-2 text-sm leading-7">{recipe.luck}</p></section></div>}<Button variant="outline" onClick={() => setRecipeIndex(null)}>{benefit.close}</Button></DialogContent></Dialog>
       <Dialog open={sample !== null} onOpenChange={(v) => !v && setSample(null)}>

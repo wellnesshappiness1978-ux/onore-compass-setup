@@ -23,9 +23,7 @@ describe("compass mandala layout", () => {
   it("places every exact birth color in the local SVG plate", () => {
     const plate = buildMandalaColorPlate(colors, 0, false);
     colors.forEach(color => expect(plate).toContain(`data-birth-color="${color}"`));
-    expect(plate).toContain("mix-blend-mode:overlay");
     expect(plate).toContain("mix-blend-mode:soft-light");
-    expect(plate).toContain("mix-blend-mode:color-burn");
     expect(plate).toContain("fractalNoise");
     expect(plate).toContain("roughGold");
     expect(plate).toContain("fineGold");

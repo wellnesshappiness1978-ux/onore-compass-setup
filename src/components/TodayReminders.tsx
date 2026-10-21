@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Crown, Moon, Music2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Moon, Music2 } from 'lucide-react';
 import { canUseToday, todayFeatures } from '@/lib/plans';
 import { canUseBgmNotify, canUseEveningReset } from '@/lib/daily-reminders';
 import { reminderCopy } from '@/lib/reminder-copy';
@@ -11,6 +10,7 @@ import type { Language } from '@/lib/translations';
 import type { Plan } from '@/lib/design-modes';
 import { useFocus } from './FocusProvider';
 import FeatureNotifySwitch, { registerReminderFallbacks } from './FeatureNotifySwitch';
+import { TodayCard, TodayLockedGuide } from './TodayCard';
 
 /** Keeps one allowed reminder catalogue active across tab navigation, not just while Today is mounted. */
 export function DailyReminderCatalogue({ language, plan }: { language: Language; plan: Plan }) {
@@ -31,7 +31,7 @@ export function DailyReminderCatalogue({ language, plan }: { language: Language;
   return null;
 }
 
-export default function TodayReminders({ language, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void }) {
+export default function TodayReminders({ language, plan, onUpgrade, kind }: { language: Language; plan: Plan; onUpgrade: () => void; kind: 'bgm' | 'evening' }) {
   const t = reminderCopy[language];
   const focus = useFocus();
   const today = new Date();
@@ -40,16 +40,13 @@ export default function TodayReminders({ language, plan, onUpgrade }: { language
   const total = members?.length ? members.reduce((sum, m) => sum + personal(m.birthDate, today).total, 0) / members.length : personal(focus?.readingProfile.birthDate ?? '', today).total;
   const next = members?.length ? members.reduce((sum, m) => sum + personal(m.birthDate, tomorrow).total, 0) / members.length : personal(focus?.readingProfile.birthDate ?? '', tomorrow).total;
   const sections = eveningReading(language, { name: focus?.label(language) ?? '', date: localIso(today), tomorrow: Math.round(next), day: Math.floor((Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()) - Date.UTC(today.getFullYear(),0,1)) / 86400000) + 1, goal: focus ? goalText(focus.focus,language) : '' });
-  const locked = (title: string) => <><p className="mt-3 flex items-center gap-2 text-sm font-semibold text-primary"><Crown className="size-4 shrink-0" />{title}</p><p className="mt-2 text-sm leading-6 text-muted-foreground">{t.nightTeaser}</p><Button variant="outline" size="sm" className="mt-3" onClick={onUpgrade}><Crown className="size-4" />{t.plans}</Button></>;
-  return <>
-    <section id="today-bgm" className="border-y border-primary/25 py-5">
-      <h3 className="flex items-center gap-2 font-serif text-lg text-primary"><Music2 className="size-5 shrink-0" />{t.bgm}</h3>
-      {canUseBgmNotify(plan) ? <FeatureNotifySwitch id="bgm" title={t.bgm} body={t.bgmBody} language={language} /> : <><p className="mt-2 text-sm leading-6">{t.vipBenefit}</p><Button variant="outline" size="sm" className="mt-3" onClick={onUpgrade}>{t.plans}</Button></>}
+  if (kind === 'bgm') return <TodayCard id="today-bgm" title={t.bgm}>
+      <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2"><h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><Music2 className="mt-1 size-4 shrink-0 text-primary" /><span className="min-w-0 break-words">{t.bgm}</span></h3>{!canUseBgmNotify(plan) && <span className="rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">VIP+</span>}</div>
+      {canUseBgmNotify(plan) ? <><p className="text-sm leading-7 text-foreground">{t.bgmBody}</p><FeatureNotifySwitch id="bgm" title={t.bgm} body={t.bgmBody} language={language} /></> : <TodayLockedGuide language={language} title={t.bgm} teaser={t.bgmBody} onUpgrade={onUpgrade} />}
       <FeatureNotifySwitch id="biorhythmAlert" title={t.alert} body={total < 45 ? t.alertLow : t.alertOk} language={language} variant="center" />
-    </section>
-    <section id="today-evening-reset" className="border-b border-primary/25 py-5">
-      <h3 className="flex items-center gap-2 font-serif text-xl text-primary"><Moon className="size-5 shrink-0" />{t.night}</h3>
-      {canUseEveningReset(plan) ? <><p className="mt-2 text-xs text-muted-foreground">{localIso(today)} · {focus?.label(language)}</p><div className="mt-5 space-y-5">{sections.map((s,i) => <article key={i} className="border-l border-primary/40 pl-3"><h4 className="font-serif text-base text-primary">{s.title}</h4><p className="mt-2 text-sm leading-7 text-foreground">{s.body}</p></article>)}</div><p className="mt-4 text-xs leading-5 text-muted-foreground">{eveningCopy[language].disclaimer}</p><FeatureNotifySwitch id="eveningReset" title={t.night} body={t.nightTeaser} language={language} /></> : locked(t.nightLocked)}
-    </section>
-  </>;
+    </TodayCard>;
+  return <TodayCard id="today-evening-reset" title={t.night}>
+      <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2"><h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><Moon className="mt-1 size-4 shrink-0 text-primary" /><span className="min-w-0 break-words">{t.night}</span></h3>{!canUseEveningReset(plan) && <span className="rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">VIP+</span>}</div>
+      {canUseEveningReset(plan) ? <><p className="mt-2 text-xs text-muted-foreground">{localIso(today)} · {focus?.label(language)}</p><div className="mt-5 space-y-5">{sections.map((s,i) => <article key={i} className="border-l border-primary/40 pl-3"><h4 className="font-serif text-base text-primary">{s.title}</h4><p className="mt-2 text-sm leading-7 text-foreground">{s.body}</p></article>)}</div><p className="mt-4 text-xs leading-5 text-muted-foreground">{eveningCopy[language].disclaimer}</p><FeatureNotifySwitch id="eveningReset" title={t.night} body={t.nightTeaser} language={language} /></> : <TodayLockedGuide language={language} title={t.night} teaser={t.nightTeaser} onUpgrade={onUpgrade} />}
+    </TodayCard>;
 }

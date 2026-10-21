@@ -8,6 +8,8 @@ export type TargetKind = "self" | "family" | "group";
 export type Focus = { goal: string; goalPreset: string; targetKind: TargetKind; targetId: string | null };
 export type TeamGroup = { id: string; name: string; nickname: string; memberIds: string[] };
 export const defaultFocus: Focus = { goal: "", goalPreset: "", targetKind: "self", targetId: null };
+/** Reading labels are independent of the Settings subject-selector labels. */
+export const selfReadingLabel: Record<Language, string> = { ja: "あなた", en: "You", "zh-CN": "你", "zh-TW": "你", ko: "당신", es: "Tú", fr: "Vous" };
 export const goalPresets = ["work", "love", "family", "health", "money", "growth"] as const;
 
 export const FOCUS_KEY = "onore-focus";
