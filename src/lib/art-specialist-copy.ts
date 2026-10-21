@@ -16,7 +16,19 @@ const ja: Copy = {
   valuesTitle: time => `出生天体と九星の計算値 · ${time}`, noon: "正午の参考時刻", registered: "登録時刻", honmei: "本命星", getsumei: "月命星", keisha: "傾斜宮", calculation: "立春と月の節入りを天文計算し、月命星を中宮に置く後天定位盤から算出します。", boundary: "この出生日時は節入り境界付近です。", planetDisclaimer: approximate => `宇宙創生図の惑星角度は出生瞬間の太陽中心位置を天文計算しています。${approximate ? "出生時間がないため正午（日本時間）の参考配置です。" : ""}中央配置図は共通の視認縮尺、9天体比較図は実半径の線形比率、軌道間隔は代表軌道長半径の対数縮尺です。星雲と光は創作表現で、色は測定された波長ではありません。`, personalGrid: "登録された出生日時から算出した九星盤です。造形と色彩は計算値を入力にした創作表現です。", zodiacNames: ["牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", "天秤座", "蠍座", "射手座", "山羊座", "水瓶座", "魚座"], animalNames: ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"],
 };
 
-const localized = (language: Language, values: Partial<Copy>): Copy => ({ ...en, ...values, valuesTitle: values.valuesTitle ?? en.valuesTitle, planetDisclaimer: values.planetDisclaimer ?? en.planetDisclaimer });
+const paintedCopy: Record<Language, Pick<Copy, "mandalaDescription" | "mandalaAbout" | "mandalaAlt" | "imageError">> = {
+  ja: { mandalaDescription: "七彩と黄金が織りなす、深い銀河の曼陀羅。", mandalaAbout: "重厚な油彩、繊細な金箔細工、神聖幾何学と黄金の螺旋が、銀河の奥行きに溶け合う原画作品です。", mandalaAlt: "七彩の油彩と緻密な金細工、銀河を描いた曼陀羅原画", imageError: "原画を読み込めませんでした。もう一度お試しください。" },
+  en: { mandalaDescription: "A galactic mandala woven from seven vivid hues and gold.", mandalaAbout: "An original painting uniting rich oil textures, delicate gold-leaf craft, sacred geometry and golden spirals within a deep galactic sky.", mandalaAlt: "Original oil-painted mandala with seven vivid hues, intricate goldwork and galaxies", imageError: "The original painting could not be loaded. Please try again." },
+  "zh-CN": { mandalaDescription: "七彩与黄金交织的银河曼陀罗。", mandalaAbout: "厚重油彩、细腻金箔、神圣几何与黄金螺旋融入深邃银河的原画作品。", mandalaAlt: "七彩油画、精细金工与银河曼陀罗原画", imageError: "无法加载原画，请重试。" },
+  "zh-TW": { mandalaDescription: "七彩與黃金交織的銀河曼陀羅。", mandalaAbout: "厚重油彩、細膩金箔、神聖幾何與黃金螺旋融入深邃銀河的原畫作品。", mandalaAlt: "七彩油畫、精細金工與銀河曼陀羅原畫", imageError: "無法載入原畫，請重試。" },
+  ko: { mandalaDescription: "일곱 빛깔과 황금이 어우러진 은하 만다라.", mandalaAbout: "깊은 유화 질감, 섬세한 금박, 신성한 기하학과 황금 나선이 은하의 깊이와 어우러진 원화입니다.", mandalaAlt: "일곱 빛깔의 유화와 정교한 금세공, 은하가 담긴 만다라 원화", imageError: "원화를 불러오지 못했습니다. 다시 시도해 주세요." },
+  es: { mandalaDescription: "Un mandala galáctico tejido con siete tonos vivos y oro.", mandalaAbout: "Una pintura original de óleo profundo, delicado pan de oro, geometría sagrada y espirales doradas en un cielo galáctico.", mandalaAlt: "Mandala original al óleo con siete tonos, orfebrería y galaxias", imageError: "No se pudo cargar la pintura original. Inténtalo de nuevo." },
+  fr: { mandalaDescription: "Un mandala galactique tissé de sept teintes vives et d’or.", mandalaAbout: "Une peinture originale mêlant huile profonde, feuille d’or délicate, géométrie sacrée et spirales dorées dans un ciel galactique.", mandalaAlt: "Mandala original à l’huile avec sept teintes, orfèvrerie et galaxies", imageError: "Impossible de charger la peinture originale. Réessayez." },
+};
+Object.assign(ja, paintedCopy.ja);
+Object.assign(en, paintedCopy.en);
+
+const localized = (language: Language, values: Partial<Copy>): Copy => ({ ...en, ...values, ...paintedCopy[language], valuesTitle: values.valuesTitle ?? en.valuesTitle, planetDisclaimer: values.planetDisclaimer ?? en.planetDisclaimer });
 export const artSpecialistCopy: Record<Language, Copy> = {
   ja, en,
   "zh-CN": localized("zh-CN", { heading: "艺术", tabs: "作品", mandala: "诞生色曼陀罗艺术", cosmic: "出生宇宙创生图", cosmicLong: "出生宇宙创生图 · 宇宙炼金", about: "关于作品", palette: "作品使用的七种颜色", paletteSlots: ["综合", "辅助", "财运", "事业运", "爱情运", "健康运", "内在"], intentionLabel: "选择想提升的运势", intentions: { overall: "综合开运", wealth: "财运", work: "事业运", love: "爱情运", health: "健康运" }, fullscreen: "全屏欣赏", closeFullscreen: "退出全屏", loading: "正在描绘光…", imageLoading: "正在根据您的波长创造神圣曼陀罗艺术…", imageError: "无法生成作品，请重新生成。", regenerate: "重新调和能量（重新生成）", downloadWallpaper: "保存高清壁纸（下载）", valuesTitle: time => `出生十天体与九星计算值 · ${time}`, noon: "正午参考", registered: "登记时间", honmei: "本命星", getsumei: "月命星", keisha: "倾斜宫", zodiacNames: ["白羊座", "金牛座", "双子座", "巨蟹座", "狮子座", "处女座", "天秤座", "天蝎座", "射手座", "摩羯座", "水瓶座", "双鱼座"], animalNames: ["鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"] }),
