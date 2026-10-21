@@ -6,7 +6,7 @@ import { consultationUxCopy } from '@/lib/consultation-ux-copy';
 import { focusCopy } from '@/lib/focus';
 import type { Language } from '@/lib/translations';
 
-export function TodayCard({ id, title, children, className = '', style }: { id: string; title: string; children: ReactNode; className?: string; style?: CSSProperties }) {
+export function TodayCard({ id, title, children, className = '', style }: { id: string; title: string; children: ReactNode; className?: string; style?: CSSProperties | undefined }) {
   return <section id={id} aria-label={title} style={style} className={`today-feature design-daily-panel card-lux min-w-0 w-full max-w-full rounded-lg p-3 md:p-5 ${className}`}>{children}</section>;
 }
 
