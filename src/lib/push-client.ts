@@ -20,12 +20,11 @@ export async function enablePush(): Promise<PushResult> {
   if (window.top !== window.self) return "open-in-new-tab";
   const cfg = await getPushConfig();
   const senderId = cfg.appId.split(":")[1] ?? "";
-  if (!cfg.ready || !senderId) return "not-configured";
+  if (!cfg.ready || !senderId || !cfg.projectId) return "not-configured";
   const permission = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
   if (permission !== "granted") return "denied";
-  const firebaseConfig = { apiKey: cfg.apiKey, appId: cfg.appId, messagingSenderId: senderId, projectId: "agolmen-compass" };
+  const firebaseConfig = { apiKey: cfg.apiKey, appId: cfg.appId, messagingSenderId: senderId, projectId: cfg.projectId };
   const { initializeApp, getApps } = await import("firebase/app");
-  // projectId must match the real Firebase project; it is derived from the sender via Installations if wrong, so prefer the SW query too.
   const app = getApps()[0] ?? initializeApp(firebaseConfig);
   const reg = await navigator.serviceWorker.register(`/firebase-messaging-sw.js?${new URLSearchParams(firebaseConfig).toString()}`);
   const token = await getToken(getMessaging(app), { vapidKey: cfg.vapidKey, serviceWorkerRegistration: reg });

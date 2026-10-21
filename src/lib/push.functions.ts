@@ -6,9 +6,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const FIREBASE_WEB_APP_ID = "1:148958895045:web:9e4aad38ac1947802289ac";
 export const FIREBASE_VAPID_KEY = "BG1xxIP4e0_8oTNIeikeosm5OptNlrvdjoVtaZ989xEnSHirY8YmjgbDCWX1j8VzJ9HqhnsUQ2a9a7acjCBsbw8";
 
+export const FIREBASE_PROJECT_ID = "agolmen-compass-app";
+
 export const getPushConfig = createServerFn({ method: "GET" }).handler(async () => {
   const apiKey = process.env.GOOGLE_API_KEY ?? "";
-  return { apiKey, appId: FIREBASE_WEB_APP_ID, vapidKey: FIREBASE_VAPID_KEY, projectId: "", ready: Boolean(apiKey) };
+  return { apiKey, appId: FIREBASE_WEB_APP_ID, vapidKey: FIREBASE_VAPID_KEY, projectId: FIREBASE_PROJECT_ID, ready: Boolean(apiKey) };
 });
 
 const reminder = z.object({ on: z.boolean(), time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/), title: z.string().max(200), body: z.string().max(600) });
