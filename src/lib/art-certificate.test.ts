@@ -3,6 +3,7 @@ import {artDimensions,privateDisclosure,recordLines,newArtSerial,birthJulianDay,
 import {artCertificateCopy} from './art-certificate-copy';
 const record={title:'Art',serial:'AG-ABCDEF',name:'Private name',birthDate:'1990-04-15',birthTime:'08:30',birthTimeUnknown:false,birthPlace:'東京都',birthCity:'新宿区'};
 describe('private artwork records',()=>{
+ it('keeps the requested certificate PNG at 2048 by 2048 pixels',()=>{expect(artDimensions.square).toEqual([2048,2048]);});
  it('starts without disclosure every time',()=>{expect(recordLines(record,privateDisclosure(),'ja')).toEqual([]);const a=privateDisclosure();a.name=true;expect(privateDisclosure().name).toBe(false);});
  it('reveals each field only by consent',()=>{expect(recordLines(record,{name:true,time:false,coordinates:false},'en')).toEqual(['Private name']);expect(recordLines(record,{name:false,time:true,coordinates:false},'en')).toEqual(['1990-04-15 · 08:30 JST']);});
  it('qualifies approximate points and never invents missing ones',()=>{expect(recordLines(record,{name:false,time:false,coordinates:true},'ja')[0]).toContain('市区町村の代表座標');expect(recordLines({...record,birthPlace:'',birthCity:''},{name:false,time:false,coordinates:true},'en')).toEqual(['Birth coordinates unavailable']);});
