@@ -120,6 +120,13 @@
       "when": 1792422007845,
       "tag": "0016_exclude_owner_from_group_member_capacity",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792595037300,
+      "tag": "0017_migration",
+      "breakpoints": true
     }
   ]
 }
