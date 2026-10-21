@@ -1,11 +1,11 @@
 # Roadmap
 
-## Requested UI / mandala polish (2026-10-21)
-- [ ] Owner readings use あなた; retain named family/group readings
-- [ ] Shared Today card design; BGM after monthlyLucky, evening after helio
-- [ ] Header order BGM → language → settings
-- [ ] Brighter seven-color mandala glow, identical live/export
-- [ ] Regression tests and real preview checks
+## Requested UI / mandala polish (2026-10-21) — done
+- [x] Owner reading labels use あなた; Settings retains 本人; explicit self AI addressing instruction, family/group addressing retained
+- [x] Shared TodayCard design; BGM immediately after monthlyLucky, evening immediately after helio; locked samples and guidance retained
+- [x] Header order BGM → language → settings, confirmed at 320/390/1280px without overflow
+- [x] Brighter exact seven-color pigment and neon aura, shared live/export; 2048-square private export preview rendered
+- [x] 26 targeted regression tests pass, build OK; signed-in Today/Art/Consult labels checked without page errors. Fresh AI answer remains unverified: send attempt produced no response; no actual daily limits bypassed.
 
 ## Today notification and navigation consolidation (2026-10-21) — done
 - [x] Standard+ nine-frequency BGM and seven-language plan guidance; VIP+ BGM reminder
