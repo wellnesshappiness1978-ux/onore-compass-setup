@@ -19,8 +19,7 @@
 - Keep support authenticated with owner-only RLS and legal content in shareable leaf pages. Why: protect personal information and avoid invented legal identity.
 - Keep reminders open-app only until a separate push provider is connected; do not add LINE integration. Why: browser timers stop when the app closes and LINE has been removed.
 - Settings owns account, plan, appearance and reminder pause; header owns language, Today owns reminders, Plan Perks owns calendar/team references. Why: no duplicates.
-- Birth-color mandala uses bundled neutral oil paint and local SVG/Canvas layers driven by seven exact colors, never external imagery. Why: private, offline, deterministic art without usage fees.
-- Mandala geometry exposes individually closed motif segments shared by color fills, masks, shadows, and top-layer gold outlines. Why: keep every birth color inside the jewelry pattern while live and exported art remain identical.
+- Mandala displays the bundled painted master directly without procedural/vector overlays; export only rasterizes that same image with its computed presentation filter. Why: preserve original artistic detail and private live/export consistency.
 - Related-person records share one backward-compatible extended shape across storage, preview, consultation and team tools. Why: retain birth context.
 - Keep user-facing localization in typed seven-language dictionaries and translate stable domain IDs only at render time. Why: calculations and stored data must remain language-independent while every locale stays complete.
 - Keep profile, settings-profile, and related-person copy in the typed profile UI dictionary; persisted prefecture IDs remain Japanese while labels localize at render time. Why: language switching must never alter saved data or leak fallback copy.

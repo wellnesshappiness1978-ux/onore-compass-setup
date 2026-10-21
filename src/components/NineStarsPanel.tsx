@@ -1,6 +1,6 @@
-import { lazy, Suspense, useCallback, useMemo, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Copy, Crown, Download, Expand, LockKeyhole, RefreshCw, Share2, X } from "lucide-react";
+import { Copy, Crown, Download, Expand, LockKeyhole, Share2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import { natalSky } from "@/lib/natal-sky";
@@ -22,8 +22,6 @@ import ArtExportDialog from "./ArtExportDialog";
 import { newArtSerial } from "@/lib/art-certificate";
 import type { Plan } from "@/lib/design-modes";
 
-import { computeCoreLayers } from "@/lib/ai/core-layers";
-import { mandalaTraitsFromCore } from "@/lib/mandala-traits";
 import { cosmicGenesis, earthViewAtBirth } from "@/lib/cosmic-astronomy";
 const MandalaScene = lazy(() => import("./MandalaCanvas"));
 type Props = { language: Language; onVip: () => void; profile: UserProfile; plan: Plan; previewMode?: boolean };
@@ -53,7 +51,6 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
   const a = artSpecialistCopy[language];
   const { birthDate, bloodType } = profile;
   const palette = birthColorSpectrum(profile);
-  const mandalaTraits = useMemo(() => { try { return mandalaTraitsFromCore(computeCoreLayers({ nameKanji: profile.nameKanji ?? "", nameRomaji: profile.nameRomaji ?? "", birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, bloodType, birthPlace: profile.birthPlace, birthCity: profile.birthCity })); } catch { return mandalaTraitsFromCore(null); } }, [profile.nameKanji, profile.nameRomaji, birthDate, profile.birthTime, profile.birthTimeUnknown, bloodType, profile.birthPlace, profile.birthCity]);
   const sky = natalSky(birthDate, profile.birthTime, profile.birthTimeUnknown);
   const genesis = cosmicGenesis(birthDate, profile.birthTime, profile.birthTimeUnknown);
   const earthView = genesis ? earthViewAtBirth(genesis, profile.birthPlace, profile.birthCity) : null;
@@ -61,29 +58,24 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
   const symbols = getArtSymbols(birthDate);
   const [art, setArt] = useState<"mandala" | "cosmic">("mandala");
   const [mounted, setMounted] = useState(false);
-  const [reduced, setReduced] = useState(false);
   const [colors, setColors] = useState({ main: "#D4AF37", sub: "#F3E5AB" });
   const paletteEntries = palette ? paletteColors(palette) : [];
   const artColors = paletteEntries.length ? paletteEntries.map(color => color.code) : [colors.main, colors.sub];
   const [status, setStatus] = useState("");
   const [fullscreen, setFullscreen] = useState(false);
-  const [variation, setVariation] = useState(0);
   const [exportOpen, setExportOpen] = useState(false);
   const [serial, setSerial] = useState("");
-  useEffect(() => { setSerial(newArtSerial()); }, [art, variation]);
+  useEffect(() => { setSerial(newArtSerial()); }, [art]);
   const [captureReady, setCaptureReady] = useState(false);
   const capture = useRef<Capture | null>(null);
   const setCapture = useCallback((fn: Capture | null) => { capture.current = fn; setCaptureReady(Boolean(fn)); }, []);
   const ignoreCapture = useCallback(() => undefined, []);
-  const displayedColors = paletteEntries.map(color => ({ name: color.name ?? "参考色", code: color.code }));
   const mandalaOpen = canUse(plan, "mandalaArt");
   const cosmicOpen = canUse(plan, "cosmicGenesisArt");
   const open = art === "mandala" ? mandalaOpen : cosmicOpen;
   const gateCopy = accessCopy[language];
   useEffect(() => {
     setMounted(true);
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
     const css = getComputedStyle(document.documentElement);
     setColors({ main: css.getPropertyValue("--primary").trim() || "#D4AF37", sub: css.getPropertyValue("--gold-glow").trim() || "#F3E5AB" });
   }, []);
@@ -109,19 +101,19 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
     <p className="mt-3 text-sm leading-7 text-muted-foreground">{palette && open ? art === "mandala" ? a.mandalaDescription : a.cosmicDescription : t.fallback}</p>
     {previewMode && open && <p className="mx-auto mt-3 inline-block border border-primary/40 px-3 py-1 text-sm text-primary">{t.testNotice}</p>}
     <aside className="mt-6 border-y border-primary/35 py-5 text-left" aria-label={a.about}><p className="font-serif text-lg leading-8 text-primary">{art === "mandala" ? a.mandalaAbout : a.cosmicAbout}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{art === "cosmic" && (sky?.approximate ? a.approximate : a.exactTime)} {a.artDisclaimer}</p></aside>
-    {palette && open && <div className="mx-auto mt-5 grid max-w-[720px] grid-cols-4 gap-2 sm:grid-cols-7" aria-label={a.palette}>{paletteColors(palette).map((color, index) => <div key={`${color.slot}-${index}`} className="min-w-0"><span className="mx-auto block size-8 rounded-full border border-primary/30" style={{ backgroundColor: color.code }} /><span className="mt-1 block truncate text-[11px] text-muted-foreground">{a.paletteSlots[index]}</span></div>)}</div>}
+    {palette && open && art === "cosmic" && <div className="mx-auto mt-5 grid max-w-[720px] grid-cols-4 gap-2 sm:grid-cols-7" aria-label={a.palette}>{paletteColors(palette).map((color, index) => <div key={`${color.slot}-${index}`} className="min-w-0"><span className="mx-auto block size-8 rounded-full border border-primary/30" style={{ backgroundColor: color.code }} /><span className="mt-1 block truncate text-[11px] text-muted-foreground">{a.paletteSlots[index]}</span></div>)}</div>}
     <div className="relative mx-auto mt-7 aspect-square w-full max-w-[920px] overflow-hidden border-y border-primary/35 bg-background shadow-gold" aria-label={art === "cosmic" ? a.cosmic : a.mandalaAlt}>
       {mounted && open && genesis && earthView && art === "cosmic" ? <CosmicGenesisCanvas genesis={genesis} earthView={earthView} colors={artColors} language={language} birthPlace={[profile.birthPlace, profile.birthCity].filter(Boolean).join(" ")} onCapture={setCapture} /> : mounted && open && sky ? <Suspense fallback={<AgolmenLoading compact label={a.loading} />}>
-        <MandalaScene colors={displayedColors} language={language} variation={variation} reduced={reduced} traits={mandalaTraits} onCapture={setCapture} />
-      </Suspense> : <NineStarsArtwork main={colors.main} sub={colors.sub} bloodType={bloodType} birthDate={birthDate} language={language} />}
+        <MandalaScene language={language} onCapture={setCapture} />
+      </Suspense> : art === "mandala" ? <Suspense fallback={<AgolmenLoading compact label={a.loading} />}><MandalaScene language={language} onCapture={ignoreCapture} /></Suspense> : <NineStarsArtwork main={colors.main} sub={colors.sub} bloodType={bloodType} birthDate={birthDate} language={language} />}
       {!open && <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/65 p-4 backdrop-blur-[2px]">
         <div className="flex size-12 items-center justify-center rounded-full border border-primary/50 bg-background/80 text-primary"><LockKeyhole className="size-5" /></div>
         <p className="mt-4 font-serif text-lg text-primary">{art === "mandala" ? gateCopy.mandalaLock : gateCopy.cosmicLock}</p>
         <Button variant="champagne" onClick={onVip} className="mt-5 h-auto max-w-[300px] whitespace-normal px-4 py-3 text-center text-sm leading-6"><Crown className="size-4 shrink-0" />{art === "mandala" ? gateCopy.mandalaCta : gateCopy.cosmicCta}</Button>
       </div>}
     </div>
-    {open && <div className="mt-3 flex flex-wrap justify-center gap-2">{art === "mandala" && <Button variant="outline" size="sm" onClick={() => setVariation(value => value + 1)}><RefreshCw className="size-4" />{a.regenerate}</Button>}<Button variant="outline" size="sm" onClick={() => setFullscreen(true)}><Expand className="size-4" />{a.fullscreen}</Button></div>}
-    {fullscreen && createPortal(<div className="fixed inset-0 z-[200] flex items-center justify-center bg-background p-2 sm:p-8" role="dialog" aria-modal="true" aria-label={art === "cosmic" ? a.cosmic : a.mandalaAlt}><Button variant="outline" size="icon" onClick={() => setFullscreen(false)} aria-label={a.closeFullscreen} title={a.closeFullscreen} className="absolute right-4 top-4 z-10"><X /></Button><div className="aspect-square max-h-full w-full max-w-[min(100vw,100vh)]">{art === "cosmic" && genesis && earthView ? <CosmicGenesisCanvas genesis={genesis} earthView={earthView} colors={artColors} language={language} birthPlace={[profile.birthPlace, profile.birthCity].filter(Boolean).join(" ")} onCapture={ignoreCapture} /> : <Suspense fallback={<AgolmenLoading label={a.loading} />}><MandalaScene colors={displayedColors} language={language} variation={variation} reduced={reduced} traits={mandalaTraits} onCapture={ignoreCapture} /></Suspense>}</div></div>, document.body)}
+    {open && <div className="mt-3 flex flex-wrap justify-center gap-2"><Button variant="outline" size="sm" onClick={() => setFullscreen(true)}><Expand className="size-4" />{a.fullscreen}</Button></div>}
+    {fullscreen && createPortal(<div className="fixed inset-0 z-[200] flex items-center justify-center bg-background p-2 sm:p-8" role="dialog" aria-modal="true" aria-label={art === "cosmic" ? a.cosmic : a.mandalaAlt}><Button variant="outline" size="icon" onClick={() => setFullscreen(false)} aria-label={a.closeFullscreen} title={a.closeFullscreen} className="absolute right-4 top-4 z-10"><X /></Button><div className="aspect-square max-h-full w-full max-w-[min(100vw,100vh)]">{art === "cosmic" && genesis && earthView ? <CosmicGenesisCanvas genesis={genesis} earthView={earthView} colors={artColors} language={language} birthPlace={[profile.birthPlace, profile.birthCity].filter(Boolean).join(" ")} onCapture={ignoreCapture} /> : <Suspense fallback={<AgolmenLoading label={a.loading} />}><MandalaScene language={language} onCapture={ignoreCapture} /></Suspense>}</div></div>, document.body)}
     {open && sky && nine && <SacredDisclosure className="mt-5 text-left" title={a.valuesTitle(sky.approximate ? a.noon : a.registered)} closeLabel={a.closeFullscreen}><dl className="mt-3 grid grid-cols-3 gap-3"><div><dt className="text-xs text-muted-foreground">{a.honmei}</dt><dd className="text-primary">{nineStarName(language, nine.honmei)}</dd></div><div><dt className="text-xs text-muted-foreground">{a.getsumei}</dt><dd className="text-primary">{nineStarName(language, nine.getsumei)}</dd></div><div><dt className="text-xs text-muted-foreground">{a.keisha}</dt><dd className="text-primary">{nineStarName(language, nine.keisha)}</dd></div></dl><p className="mt-3 text-sm leading-6 text-muted-foreground">{a.calculation}{nine.nearBoundary ? ` ${a.boundary}` : ""}</p><dl className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">{(art === "cosmic" && genesis ? genesis.planets : sky.bodies).map((body, index) => <div key={body.name}><dt className="text-sm text-muted-foreground">{art === "cosmic" ? cosmicPlanetNames[language][index] : Object.values(helioCopy[language].planets)[index] ?? body.name}</dt><dd className="text-primary">{body.longitude.toFixed(2)}°</dd></div>)}</dl></SacredDisclosure>}
     <p className="mx-auto mt-7 max-w-2xl text-sm leading-7 text-muted-foreground">{a.planetDisclaimer(Boolean(sky?.approximate))} {t.gridDisclaimer}</p>
     <div className="mx-auto mt-7 max-w-[640px] border-y border-primary/25 py-5 text-left"><div className="flex items-baseline justify-between gap-4"><h4 className="font-serif text-xl text-primary">{t.gridTitle}</h4><span className="text-xs text-muted-foreground">{nine ? `${nine.solarYear} · ${nine.solarMonth}` : t.gridQualifier}</span></div>
