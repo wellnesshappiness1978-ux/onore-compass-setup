@@ -1,5 +1,12 @@
 # Roadmap
 
+## Requested UI / mandala polish (2026-10-21)
+- [ ] Owner readings use あなた; retain named family/group readings
+- [ ] Shared Today card design; BGM after monthlyLucky, evening after helio
+- [ ] Header order BGM → language → settings
+- [ ] Brighter seven-color mandala glow, identical live/export
+- [ ] Regression tests and real preview checks
+
 ## Today notification and navigation consolidation (2026-10-21) — done
 - [x] Standard+ nine-frequency BGM and seven-language plan guidance; VIP+ BGM reminder
 - [x] Today-only switches/time controls; removed legacy morning and Settings individual controls/center
