@@ -18,7 +18,7 @@
 - Preserve legacy storage, event, and ICS identifiers and use the cropped brand logo. Why: avoid lost data and watermarks.
 - Keep support authenticated with owner-only RLS and legal content in shareable leaf pages. Why: protect personal information and avoid invented legal identity.
 - Keep reminders open-app only until a separate push provider is connected; do not add LINE integration. Why: browser timers stop when the app closes and LINE has been removed.
-- Settings holds account, plan, notifications, theme and language; calendar/team references stay in Plan Perks. Why: keep operations scannable.
+- Settings owns account, plan, appearance and reminder pause; header owns language, Today owns reminders, Plan Perks owns calendar/team references. Why: no duplicates.
 - Birth-color mandala uses bundled neutral oil paint and local SVG/Canvas layers driven by seven exact colors, never external imagery. Why: private, offline, deterministic art without usage fees.
 - Mandala geometry exposes individually closed motif segments shared by color fills, masks, shadows, and top-layer gold outlines. Why: keep every birth color inside the jewelry pattern while live and exported art remain identical.
 - Related-person records share one backward-compatible extended shape across storage, preview, consultation and team tools. Why: retain birth context.
