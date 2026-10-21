@@ -1,5 +1,6 @@
 import type { Language } from "./translations";
 import { reminderCopy } from "./reminder-copy";
+import { consultationDailyLimit, dailyUsageLimit, groupLimit, helioRangeDays, memberLimit } from "./plans";
 
 /** Home "next step" section: four paid-plan privilege cards. Preview copy only — billing is not connected. */
 export type HomePlanId = "standard" | "vip" | "b2b" | "b2b-premium";
@@ -116,4 +117,46 @@ const basehomePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
   },
 };
 
-export const homePlanCardsCopy: typeof basehomePlanCardsCopy = Object.fromEntries((Object.keys(basehomePlanCardsCopy) as Language[]).map(language => [language, { ...basehomePlanCardsCopy[language], cards: basehomePlanCardsCopy[language].cards.map(card => ({ ...card, features: [reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : []), ...card.features] })) }])) as typeof basehomePlanCardsCopy;
+const times = (n: number) => (Number.isFinite(n) ? `1日${n}回` : "無制限");
+/** Japanese feature lists are derived from the live caps in plans.ts so the guide never drifts from enforcement. */
+const jaFeatures: Record<HomePlanId, string[]> = {
+  standard: [
+    "無料プランの全機能（基本個別診断・当日の地球暦とコンパス・本日のメッセージ・今日の決断・目的/目標設定・今日の占い基本機能・基本バースカラー・AI相談 1日1回）",
+    "「バースカラー曼陀羅アート」完全解放",
+    "「9つの周波数BGM」全周波数の継続再生（タブ移動中も継続）",
+    "吉方位・開運エネルギー（生まれの方位タイプと今年の方位）解放",
+    "7色バースカラー完全解放（総合・サブ・金運・仕事運・恋愛運・健康運・内面）",
+    `相性診断＆相手の攻略トリセツ（${times(dailyUsageLimit.standard)}）`,
+    "全15占術統合詳細レポート＆トリセツ完全解放",
+    "「今日の占い」買い物・健康など詳細アドバイス＆テーマカラー",
+    `地球暦カレンダー 前後${helioRangeDays.standard}日の閲覧`,
+    `「アゴルメンの羅針盤」AI相談（${times(consultationDailyLimit.standard)}）`,
+    `関係者プロフィール登録（最大${memberLimit.standard}名）・グループ ${groupLimit.standard}件`,
+  ],
+  vip: [
+    "スタンダードプランの全機能",
+    "「出生宇宙創生図」完全解放",
+    "「9つの周波数BGM」毎日通知＆時刻設定、夜のエネルギーリセット",
+    "「バースカラー曼陀羅アート」「出生宇宙創生図」の2048×2048壁紙保存・作品証明書発行・SNS共有",
+    "「今日の占い」今月の3ラッキー・人間関係・365日バイオリズム",
+    "「決断・吉日」リズムのiOS/Googleカレンダー取り込み（ICS）",
+    `「アゴルメンの羅針盤」AI相談 深掘りコンサル（${times(consultationDailyLimit.vip)}）・相性診断（${times(dailyUsageLimit.vip)}）`,
+    "VIP限定豪華アプリアートテーマ解放",
+    `関係者プロフィール登録（最大${memberLimit.vip}名）・グループ ${groupLimit.vip}件`,
+  ],
+  b2b: [
+    "VIPプランの全機能",
+    "チーム・コンパス全7機能（同時診断、AI人員選抜、タレント名簿、アラートカレンダー、組織バランス、1on1トリセツ、採用面接AI）",
+    "365日ファミリーロードマップ・地球暦カレンダー無制限閲覧",
+    `「アゴルメンの羅針盤」AI相談（${times(consultationDailyLimit.b2b)}）・相性診断（${times(dailyUsageLimit.b2b)}）`,
+    `ファミリー登録（最大${memberLimit.b2b}名）・グループ ${groupLimit.b2b}件`,
+  ],
+  "b2b-premium": [
+    "ファミリープランの全機能",
+    `「アゴルメンの羅針盤」AI相談（${times(consultationDailyLimit["b2b-premium"])}）・相性診断（${times(dailyUsageLimit["b2b-premium"])}）`,
+    `ファミリー登録（最大${memberLimit["b2b-premium"]}名）・グループ ${groupLimit["b2b-premium"]}件`,
+    "100名規模の組織コンサルにフル対応",
+    "優先AI処理（Priority AI）",
+  ],
+};
+export const homePlanCardsCopy: typeof basehomePlanCardsCopy = Object.fromEntries((Object.keys(basehomePlanCardsCopy) as Language[]).map(language => [language, { ...basehomePlanCardsCopy[language], cards: basehomePlanCardsCopy[language].cards.map(card => ({ ...card, features: language === "ja" ? jaFeatures[card.id] : [reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : []), ...card.features] })) }])) as typeof basehomePlanCardsCopy;

@@ -30,9 +30,9 @@ export function FocusSettingsCard({ language }: { language: Language }) {
   const set = (patch: Partial<typeof f>) => setDraft({ ...f, ...patch });
   const kinds: TargetKind[] = ["self", "family", "group"];
   return (
-    <details id="focus-settings" className="group scroll-mt-28 rounded-lg border border-primary/30 bg-card/60" aria-label={t.cardTitle}>
-      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 [&::-webkit-details-marker]:hidden">
-        <span className="flex items-center gap-2 font-serif text-lg text-primary"><Target className="size-5" />{t.cardTitle}</span>
+    <details id="focus-settings" className="group mx-auto w-full max-w-2xl scroll-mt-28 rounded-lg border border-primary/30 bg-card/60" aria-label={t.cardTitle}>
+      <summary className="grid min-h-12 cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-3 sm:px-4 [&::-webkit-details-marker]:hidden">
+        <span className="flex min-w-0 items-start gap-2 font-serif text-[0.95rem] leading-snug text-primary sm:items-center sm:text-lg"><Target className="mt-0.5 size-5 shrink-0 sm:mt-0" /><span className="min-w-0 [overflow-wrap:anywhere]">{t.cardTitle}</span></span>
         <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
       </summary>
       <div className="border-t border-primary/15 p-4 sm:p-5">
@@ -60,7 +60,8 @@ export function SubjectHeaderBadge({ language, ownerName, onOpen }: { language: 
   const icon = ctx.group ? "👥" : ctx.member ? "👨‍👩‍👧" : "👤";
   const self = selfReadingLabel[language];
   const who = ctx.group ? (subjectWord(ctx, language) ?? ctx.label(language)) : ctx.member ? `${subjectWord(ctx, language) ?? ctx.label(language)}（${t.family}）` : `${self}${ownerName ? `（${ownerName}）` : ""}`;
-  return <Button variant="ghost" type="button" onClick={onOpen} title={t.cardTitle} aria-label={t.viewing(who)} className="mx-auto flex min-h-10 min-w-0 max-w-full items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary"><span aria-hidden="true">{icon}</span><span className="truncate"><span className="hidden sm:inline">{t.viewing("")}</span>{ctx.group || ctx.member ? who : (ownerName ? `${self}・${ownerName.split(/[\s　]/)[0]}` : self)}</span></Button>;
+  const fullName = ownerName.trim().replace(/[\s　]+/g, " ");
+  return <Button variant="ghost" type="button" onClick={onOpen} title={t.cardTitle} aria-label={t.viewing(who)} className="mx-auto flex min-h-10 min-w-0 max-w-full items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary"><span aria-hidden="true">{icon}</span><span className="truncate">{t.viewing("")}{ctx.group || ctx.member ? who : (fullName ? `${self}・${fullName}` : self)}</span></Button>;
 }
 
 /** Small strip showing the current subject with a way back to self. */
