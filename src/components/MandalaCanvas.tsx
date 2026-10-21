@@ -40,11 +40,11 @@ export default function MandalaCanvas({ language, onCapture, colors = [], labels
   useEffect(() => {
     const target = canvas.current;
     if (!target || !image) return;
-    const size = Math.min(1024, Math.max(320, Math.round((target.clientWidth || 640) * (window.devicePixelRatio || 1))));
+    const size = Math.min(2048, Math.max(320, Math.round((target.clientWidth || 640) * (window.devicePixelRatio || 1))));
     if (target.width !== size) { target.width = size; target.height = size; }
     paint();
     const observer = new ResizeObserver(() => {
-      const next = Math.min(1024, Math.max(320, Math.round((target.clientWidth || 640) * (window.devicePixelRatio || 1))));
+      const next = Math.min(2048, Math.max(320, Math.round((target.clientWidth || 640) * (window.devicePixelRatio || 1))));
       if (target.width !== next) { target.width = next; target.height = next; }
       paint();
     });

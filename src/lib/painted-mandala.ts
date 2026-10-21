@@ -17,18 +17,6 @@ function shade(hexColor: string, amount: number) {
   return `#${mixed.map(value => value.toString(16).padStart(2, "0")).join("")}`.toUpperCase();
 }
 
-function polygon(context: CanvasRenderingContext2D, cx: number, cy: number, radius: number, sides: number, phase = -Math.PI / 2) {
-  context.beginPath();
-  for (let index = 0; index < sides; index += 1) {
-    const angle = phase + (index / sides) * Math.PI * 2;
-    const x = cx + Math.cos(angle) * radius;
-    const y = cy + Math.sin(angle) * radius;
-    if (index === 0) context.moveTo(x, y);
-    else context.lineTo(x, y);
-  }
-  context.closePath();
-}
-
 /** Deterministic pseudo-random in [0,1) so grain is stable per index. */
 function grain(seed: number) {
   const value = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
@@ -43,7 +31,7 @@ function drawHalo(context: CanvasRenderingContext2D, cx: number, cy: number, rad
   glow.addColorStop(0.65, shade(color, -0.15));
   glow.addColorStop(1, "rgba(0,0,0,0)");
   context.save();
-  context.globalAlpha = 0.6;
+  context.globalAlpha = 0.16;
   context.globalCompositeOperation = "screen";
   context.fillStyle = glow;
   context.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
@@ -93,26 +81,28 @@ function paintGemSurface(color: string) {
       const broad = pigmentNoise(x * 7, y * 7, 3) - 0.5;
       const brush = pigmentNoise(x * 68 + y * 21, y * 13, 19) - 0.5;
       const tooth = pigmentNoise(x * 185, y * 185, 31) - 0.5;
-      const edge = boundary + broad * 0.005 + brush * 0.003;
-      const body = 1 - smoothEdge(edge - 0.003, edge + 0.005, distance);
+       const edge = boundary + broad * 0.0015 + brush * 0.001;
+       const body = 1 - smoothEdge(edge - 0.001, edge + 0.002, distance);
       const offset = (py * 640 + px) * 4;
       if (body > 0) {
         // Broad facet light folds into the table through pigment, not outlines.
         const facetPosition = (angle + Math.PI / 2 + sector * 8) / sector;
         const facetIndex = Math.floor(facetPosition);
-        const transition = smoothEdge(0.82, 1, facetPosition - facetIndex);
-        const facetLight = (index: number) => Math.sin(index * 2.37 + 0.7) * 0.32
-          + Math.cos(index * sector + 2.3) * 0.22;
+         const transition = smoothEdge(0.985, 1, facetPosition - facetIndex);
+         const facetLight = (index: number) => Math.sin(index * 2.37 + 0.7) * 0.43
+           + Math.cos(index * sector + 2.3) * 0.29;
         const cutLight = facetLight(facetIndex) * (1 - transition) + facetLight(facetIndex + 1) * transition;
-        const crown = smoothEdge(0.40, 0.58, distance / boundary + broad * 0.028);
-        const coreLight = -0.04 - x * 0.19 - y * 0.23 - distance * 0.1;
+         const crown = smoothEdge(0.475, 0.487, distance / boundary);
+         const coreLight = -0.06 - x * 0.23 - y * 0.29 - distance * 0.12;
         const deepReflection = Math.exp(-((x - 0.28) ** 2 / 0.045 + (y - 0.27) ** 2 / 0.14));
         const glaze = coreLight * (1 - crown) + cutLight * crown
-          + broad * 0.09 + brush * 0.12 + tooth * 0.055 - deepReflection * 0.23;
+           + broad * 0.05 + brush * 0.065 + tooth * 0.04 - deepReflection * 0.34;
         // A fine, broken brush-shaped reflection, not a circular CG flash.
-        const reflection = Math.exp(-((x + 0.27 + y * 0.16) ** 2 / 0.009 + (y + 0.28) ** 2 / 0.07));
-        const secondary = Math.exp(-((x - 0.39 + y * 0.38) ** 2 / 0.003 + (y - 0.23) ** 2 / 0.05));
-        const sheen = Math.max(0, reflection * (0.51 + brush * 0.42) + secondary * 0.23);
+         const reflection = Math.exp(-((x + 0.27 + y * 0.16) ** 2 / 0.0007 + (y + 0.28) ** 2 / 0.028));
+         const secondary = Math.exp(-((x - 0.39 + y * 0.38) ** 2 / 0.00045 + (y - 0.23) ** 2 / 0.025));
+         const edgeFlash = Math.exp(-((distance / boundary - 0.482) ** 2) / 0.000045)
+           * Math.max(0, -x * 0.8 - y * 0.65);
+         const sheen = Math.min(1, Math.max(0, reflection * (0.97 + brush * 0.09) + secondary * 0.72 + edgeFlash * 0.6));
         for (let channel = 0; channel < 3; channel += 1) {
           const base = channels[channel] ?? 160;
           const pigment = glaze >= 0 ? base + (255 - base) * glaze : base * (1 + glaze);
@@ -122,9 +112,9 @@ function paintGemSurface(color: string) {
       } else {
         // Irregular leaf in the existing octagonal setting; no continuous stroke.
         const rimDistance = distance / boundary;
-        const leaf = smoothEdge(1.008, 1.025, rimDistance)
-          * (1 - smoothEdge(1.082 + broad * 0.018, 1.108 + broad * 0.018, rimDistance));
-        const broken = smoothEdge(0.19, 0.44, pigmentNoise(x * 39, y * 39, 71));
+         const leaf = smoothEdge(1.008, 1.014, rimDistance)
+           * (1 - smoothEdge(1.092 + broad * 0.005, 1.098 + broad * 0.005, rimDistance));
+         const broken = smoothEdge(0.10, 0.26, pigmentNoise(x * 39, y * 39, 71));
         const relief = Math.max(0, Math.min(1, 0.48 - y * 0.21 + brush * 0.65 + tooth * 0.38));
         pixels.data[offset] = 127 + relief * 122;
         pixels.data[offset + 1] = 88 + relief * 137;
@@ -145,7 +135,7 @@ function paintGemSurface(color: string) {
 /** Keep the existing scale and personal color; light comes from the pigment
  * and textured gold leaf, with no facet strokes or uniform metallic border. */
 function drawCenterGem(context: CanvasRenderingContext2D, cx: number, cy: number, radius: number, color: string) {
-  drawHalo(context, cx, cy, radius * 3.2, color);
+   drawHalo(context, cx, cy, radius * 1.65, color);
   const surface = paintGemSurface(color);
   const extent = radius * (640 / 250);
   context.save();
