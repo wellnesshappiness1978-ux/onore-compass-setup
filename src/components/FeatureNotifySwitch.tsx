@@ -36,7 +36,7 @@ export function registerReminderFallbacks(entries: Record<string, Entry>): () =>
   fallbacks.clear();
   for (const [id, entry] of Object.entries(entries)) fallbacks.set(id, entry);
   startScheduler();
-  return () => { fallbacks.clear(); registry.clear(); if (timer) clearInterval(timer); timer = null; };
+  return () => { fallbacks.clear(); if (timer) clearInterval(timer); timer = null; };
 }
 let timer: ReturnType<typeof setInterval> | null = null;
 /** One shared scheduler: all reminders set for the same minute are merged into a single bulleted notification. */
@@ -49,13 +49,12 @@ function startScheduler() {
     const due = [...fallbacks.entries()].map(([fid, fallback]) => [fid, registry.get(fid) ?? fallback] as const).filter(([fid]) => effectiveReminder(settings[fid], false) && settings[fid]?.time === hm);
     const sentKey = `${KEY}-sent-${hm}`;
     if (!due.length || localStorage.getItem(sentKey) === day) return;
-    localStorage.setItem(sentKey, day);
     const ja = (document.documentElement.lang || "ja").startsWith("ja");
     const locale = document.documentElement.lang as Language;
     const head = ja ? "【アゴルメンの羅針盤】本日の開運サマリー" : `Agolmen's Compass · ${reminderCopy[locale]?.today ?? reminderCopy.en.today}`;
     const body = due.map(([, e]) => `・${e.title}：${e.body}`).join("\n");
     const color = due.find(([, e]) => e.color)?.[1].color;
-    try { const n = new Notification(head, { body, icon: colorIcon(color), badge: colorIcon(color), tag: `onore-summary-${hm}` }); n.onclick = () => { window.focus(); window.dispatchEvent(new CustomEvent("onore-open", { detail: "compass" })); n.close(); }; } catch { /* unsupported */ }
+    try { const n = new Notification(head, { body, icon: colorIcon(color), badge: colorIcon(color), tag: `onore-summary-${hm}` }); localStorage.setItem(sentKey, day); n.onclick = () => { window.focus(); window.dispatchEvent(new CustomEvent("onore-open", { detail: "compass" })); n.close(); }; } catch { /* unsupported; retry next tick */ }
   };
   tick(); timer = setInterval(tick, 30_000);
 }
