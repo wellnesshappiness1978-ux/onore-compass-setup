@@ -7,7 +7,7 @@ export type TeamCopy = {
   tabs: [string, string, string, string, string, string, string, string];
   add: string; name: string; birthDate: string; jobRole: string; skills: string; skillsHint: string; save: string; remove: string; empty: string; guestNote: string;
   limitTitle: string; limitBody: (plan: string, max: number) => string; absoluteLimit: string; upgradePending: string; saveError: string; switchPlan: string; later: string;
-  locked: (plan: string) => string; seePlans: string;
+  locked: (plan: string) => string; seePlans: string; upgradeFamily: string;
   select: string; selectedOf: (n: number, max: number) => string; balance: string; synergy: string; conflict: string; axisX: [string, string]; axisY: [string, string]; pickTwo: string;
   goal: string; goalPh: string; headcount: string; auto: string; runDraft: string; reevaluate: string; features: string; evaluation: string; cautions: string; recommended: (n: number) => string; swapHint: string;
   filterAll: string; search: string; thinking: string; words: string; bio: string;
@@ -25,7 +25,7 @@ const ja: TeamCopy = {
   tabs: ["ファミリー名簿", "チーム同時診断", "AI人員選抜", "タレント名簿", "アラートカレンダー", "組織バランス", "1on1トリセツ", "採用面接AI分析"],
   add: "ファミリーを追加", name: "名前", birthDate: "生年月日", jobRole: "得意職種・役職", skills: "スキル", skillsHint: "カンマ区切り", save: "追加する", remove: "削除", empty: "まだファミリーが登録されていません。", guestNote: "未ログインのため、この端末内だけに保存されます。",
   limitTitle: "登録上限に達しました", limitBody: (p, m) => `この人数を登録するには${p}プラン（上限${m}人）への切り替えが必要です。`, absoluteLimit: "ファミリープレミアムの登録上限は100人です。", upgradePending: "プランの申込受付前です。表示テストを切り替えても登録上限は変わりません。", saveError: "保存できませんでした。会員資格と登録上限を確認してください。", switchPlan: "プランを見る", later: "あとで",
-  locked: (p) => `この機能は${p}プラン以上で解放されます。`, seePlans: "プランを見る",
+  locked: (p) => `この機能は${p}プラン以上で解放されます。`, seePlans: "プランを見る", upgradeFamily: "ファミリープランへアップグレード",
   select: "診断するメンバーを選択", selectedOf: (n, m) => `${n} / ${m}人選択中`, balance: "総合相性・バランス", synergy: "シナジー", conflict: "注意すべき衝突ポイント", axisX: ["論理", "共感"], axisY: ["計画", "行動"], pickTwo: "2人以上選ぶと診断できます。",
   goal: "企画・イベントの目的", goalPh: "例：新商品のローンチイベントを成功させたい", headcount: "希望人数", auto: "AIにおまかせ", runDraft: "AIで選抜する", reevaluate: "この組み合わせで再評価", features: "組み合わせの特徴", evaluation: "評価", cautions: "注意点", recommended: (n) => `推奨人数：${n}人`, swapHint: "チェックで手動差し替えできます",
   filterAll: "すべてのタイプ", search: "名前・スキルで検索", thinking: "思考パターン", words: "響く言葉", bio: "今日のバイオリズム",
@@ -46,7 +46,7 @@ const en: TeamCopy = {
   tabs: ["Family", "Team diagnosis", "AI draft", "Talent catalog", "Alert calendar", "Org balance", "1on1 guide", "Hiring AI"],
   add: "Add family", name: "Name", birthDate: "Birth date", jobRole: "Specialty / role", skills: "Skills", skillsHint: "comma separated", save: "Add", remove: "Remove", empty: "No family registered yet.", guestNote: "Not signed in — saved on this device only.",
   limitTitle: "Family limit reached", limitBody: (p, m) => `To register this many people, switch to the ${p} plan (up to ${m}).`, absoluteLimit: "Family Premium allows up to 100 registered family members.", upgradePending: "Enrollment is not open yet. Changing the display preview does not raise your limit.", saveError: "Could not save. Check your membership and member limit.", switchPlan: "View plans", later: "Not now",
-  locked: (p) => `Unlocked from the ${p} plan.`, seePlans: "View plans",
+  locked: (p) => `Unlocked from the ${p} plan.`, seePlans: "View plans", upgradeFamily: "Upgrade to the Family plan",
   select: "Select members to diagnose", selectedOf: (n, m) => `${n} / ${m} selected`, balance: "Overall compatibility & balance", synergy: "Synergies", conflict: "Potential friction points", axisX: ["Logic", "Empathy"], axisY: ["Plan", "Action"], pickTwo: "Select two or more people.",
   goal: "Project / event goal", goalPh: "e.g. Make our product launch event a success", headcount: "Headcount", auto: "Let AI decide", runDraft: "Draft with AI", reevaluate: "Re-evaluate this lineup", features: "Team character", evaluation: "Evaluation", cautions: "Watch points", recommended: (n) => `Recommended size: ${n}`, swapHint: "Tick boxes to swap members manually",
   filterAll: "All types", search: "Search name or skill", thinking: "Thinking pattern", words: "Words that resonate", bio: "Today's biorhythm",
@@ -67,7 +67,7 @@ const zhCN = mk(en, {
   planNames: { free: "免费会员", standard: "标准会员", vip: "VIP会员", b2b: "家庭会员", "b2b-premium": "家庭尊享会员" }, limit: (u, m) => `已登记 ${u} / ${m}人`,
   tabs: ["家人名册", "团队同时诊断", "AI人员选拔", "人才名册", "提醒日历", "组织平衡", "1on1指南", "招聘面试AI分析"],
   add: "添加家人", name: "姓名", birthDate: "出生日期", jobRole: "擅长职种・职位", skills: "技能", skillsHint: "用逗号分隔", save: "添加", remove: "删除", empty: "尚未登记家人。", guestNote: "未登录，仅保存在本设备。",
-  limitTitle: "已达登记上限", limitBody: (p, m) => `登记这么多人需要切换到${p}方案（上限${m}人）。`, switchPlan: "切换方案", later: "以后再说", locked: (p) => `此功能从${p}方案起开放。`, seePlans: "查看方案",
+  limitTitle: "已达登记上限", limitBody: (p, m) => `登记这么多人需要切换到${p}方案（上限${m}人）。`, switchPlan: "切换方案", later: "以后再说", locked: (p) => `此功能从${p}方案起开放。`, seePlans: "查看方案", upgradeFamily: "升级到家庭方案",
   select: "选择诊断成员", selectedOf: (n, m) => `已选 ${n} / ${m}人`, balance: "综合相性・平衡", synergy: "协同", conflict: "需注意的冲突点", axisX: ["逻辑", "共情"], axisY: ["计划", "行动"], pickTwo: "请选择2人以上。",
   goal: "企划・活动目的", goalPh: "例：让新品发布会取得成功", headcount: "希望人数", auto: "交给AI", runDraft: "AI选拔", reevaluate: "按此组合重新评估", features: "组合特点", evaluation: "评价", cautions: "注意事项", recommended: (n) => `推荐人数：${n}人`, swapHint: "勾选可手动替换",
   filterAll: "全部类型", search: "按姓名・技能搜索", thinking: "思维模式", words: "打动人心的话", bio: "今日生物节律",
@@ -84,7 +84,7 @@ const zhTW = mk(zhCN, {
   planNames: { free: "免費會員", standard: "標準會員", vip: "VIP會員", b2b: "家庭會員", "b2b-premium": "家庭尊享會員" }, limit: (u, m) => `已登錄 ${u} / ${m}人`,
   tabs: ["家人名冊", "團隊同時診斷", "AI人員選拔", "人才名冊", "提醒日曆", "組織平衡", "1on1指南", "招聘面試AI分析"],
   add: "新增家人", name: "姓名", birthDate: "出生日期", jobRole: "擅長職種・職位", skills: "技能", skillsHint: "以逗號分隔", save: "新增", remove: "刪除", empty: "尚未登錄家人。", guestNote: "未登入，僅儲存在本裝置。",
-  limitTitle: "已達登錄上限", limitBody: (p, m) => `登錄這麼多人需要切換到${p}方案（上限${m}人）。`, switchPlan: "切換方案", later: "稍後", locked: (p) => `此功能自${p}方案起開放。`, seePlans: "查看方案",
+  limitTitle: "已達登錄上限", limitBody: (p, m) => `登錄這麼多人需要切換到${p}方案（上限${m}人）。`, switchPlan: "切換方案", later: "稍後", locked: (p) => `此功能自${p}方案起開放。`, seePlans: "查看方案", upgradeFamily: "升級到家庭方案",
   select: "選擇診斷成員", selectedOf: (n, m) => `已選 ${n} / ${m}人`, balance: "綜合相性・平衡", synergy: "協同", conflict: "需注意的衝突點", axisX: ["邏輯", "共感"], axisY: ["計畫", "行動"], pickTwo: "請選擇2人以上。",
   goal: "企劃・活動目的", goalPh: "例：讓新品發表會成功", headcount: "希望人數", auto: "交給AI", runDraft: "AI選拔", reevaluate: "以此組合重新評估", features: "組合特色", evaluation: "評價", cautions: "注意事項", recommended: (n) => `建議人數：${n}人`, swapHint: "勾選可手動替換",
   filterAll: "全部類型", search: "以姓名・技能搜尋", thinking: "思考模式", words: "打動人心的話", bio: "今日生物節律",
@@ -101,7 +101,7 @@ const ko = mk(en, {
   planNames: { free: "무료 회원", standard: "스탠다드 회원", vip: "VIP 회원", b2b: "패밀리 회원", "b2b-premium": "패밀리 프리미엄 회원" }, limit: (u, m) => `등록 ${u} / ${m}명`,
   tabs: ["패밀리 명단", "팀 동시 진단", "AI 인원 선발", "탤런트 명부", "알림 캘린더", "조직 밸런스", "1on1 가이드", "채용 면접 AI 분석"],
   add: "패밀리 추가", name: "이름", birthDate: "생년월일", jobRole: "전문 직종・직책", skills: "스킬", skillsHint: "쉼표로 구분", save: "추가", remove: "삭제", empty: "아직 등록된 패밀리가 없습니다.", guestNote: "로그인하지 않아 이 기기에만 저장됩니다.",
-  limitTitle: "등록 한도에 도달했습니다", limitBody: (p, m) => `이 인원을 등록하려면 ${p} 플랜(최대 ${m}명)으로 전환해야 합니다.`, switchPlan: "플랜 전환", later: "나중에", locked: (p) => `${p} 플랜부터 이용할 수 있습니다.`, seePlans: "플랜 보기",
+  limitTitle: "등록 한도에 도달했습니다", limitBody: (p, m) => `이 인원을 등록하려면 ${p} 플랜(최대 ${m}명)으로 전환해야 합니다.`, switchPlan: "플랜 전환", later: "나중에", locked: (p) => `${p} 플랜부터 이용할 수 있습니다.`, seePlans: "플랜 보기", upgradeFamily: "패밀리 플랜으로 업그레이드",
   select: "진단할 멤버 선택", selectedOf: (n, m) => `${n} / ${m}명 선택`, balance: "종합 궁합・밸런스", synergy: "시너지", conflict: "주의할 충돌 포인트", axisX: ["논리", "공감"], axisY: ["계획", "행동"], pickTwo: "2명 이상 선택하세요.",
   goal: "기획・이벤트 목적", goalPh: "예: 신제품 론칭 이벤트 성공", headcount: "희망 인원", auto: "AI에게 맡기기", runDraft: "AI로 선발", reevaluate: "이 조합으로 재평가", features: "조합 특징", evaluation: "평가", cautions: "주의점", recommended: (n) => `추천 인원: ${n}명`, swapHint: "체크로 수동 교체 가능",
   filterAll: "모든 유형", search: "이름・스킬 검색", thinking: "사고 패턴", words: "마음에 닿는 말", bio: "오늘의 바이오리듬",
@@ -118,7 +118,7 @@ const es = mk(en, {
   planNames: { free: "Membresía Gratis", standard: "Membresía Estándar", vip: "Membresía VIP", b2b: "Membresía Familia", "b2b-premium": "Familia Premium" }, limit: (u, m) => `${u} / ${m} registrados`,
   tabs: ["Familia", "Diagnóstico de equipo", "Selección IA", "Catálogo de talento", "Calendario de alertas", "Balance organizativo", "Guía 1on1", "Análisis IA de selección"],
   add: "Añadir familiar", name: "Nombre", birthDate: "Fecha de nacimiento", jobRole: "Especialidad / cargo", skills: "Habilidades", skillsHint: "separadas por comas", save: "Añadir", remove: "Quitar", empty: "Aún no hay familiares.", guestNote: "Sin sesión: se guarda solo en este dispositivo.",
-  limitTitle: "Límite alcanzado", limitBody: (p, m) => `Para registrar a tantas personas, cambia al plan ${p} (hasta ${m}).`, switchPlan: "Cambiar plan", later: "Ahora no", locked: (p) => `Disponible desde el plan ${p}.`, seePlans: "Ver planes",
+  limitTitle: "Límite alcanzado", limitBody: (p, m) => `Para registrar a tantas personas, cambia al plan ${p} (hasta ${m}).`, switchPlan: "Cambiar plan", later: "Ahora no", locked: (p) => `Disponible desde el plan ${p}.`, seePlans: "Ver planes", upgradeFamily: "Mejorar al plan Familia",
   select: "Selecciona miembros", selectedOf: (n, m) => `${n} / ${m} seleccionados`, balance: "Compatibilidad y balance", synergy: "Sinergias", conflict: "Posibles fricciones", axisX: ["Lógica", "Empatía"], axisY: ["Plan", "Acción"], pickTwo: "Selecciona dos o más personas.",
   goal: "Objetivo del proyecto", goalPh: "p. ej. Lograr un lanzamiento exitoso", headcount: "Número de personas", auto: "Que decida la IA", runDraft: "Seleccionar con IA", reevaluate: "Reevaluar esta combinación", features: "Carácter del equipo", evaluation: "Evaluación", cautions: "Puntos de atención", recommended: (n) => `Tamaño recomendado: ${n}`, swapHint: "Marca casillas para cambiar miembros",
   filterAll: "Todos los tipos", search: "Buscar nombre o habilidad", thinking: "Patrón de pensamiento", words: "Palabras que resuenan", bio: "Biorritmo de hoy",
@@ -135,7 +135,7 @@ const fr = mk(en, {
   planNames: { free: "Membre Gratuit", standard: "Membre Standard", vip: "Membre VIP", b2b: "Membre Famille", "b2b-premium": "Famille Premium" }, limit: (u, m) => `${u} / ${m} inscrits`,
   tabs: ["Famille", "Diagnostic d’équipe", "Sélection IA", "Catalogue talents", "Calendrier d’alertes", "Équilibre", "Guide 1on1", "Analyse IA recrutement"],
   add: "Ajouter un proche", name: "Nom", birthDate: "Date de naissance", jobRole: "Spécialité / poste", skills: "Compétences", skillsHint: "séparées par des virgules", save: "Ajouter", remove: "Retirer", empty: "Aucun proche pour l’instant.", guestNote: "Non connecté : enregistré sur cet appareil uniquement.",
-  limitTitle: "Limite atteinte", limitBody: (p, m) => `Pour inscrire autant de personnes, passez à l’offre ${p} (jusqu’à ${m}).`, switchPlan: "Changer d’offre", later: "Plus tard", locked: (p) => `Disponible à partir de l’offre ${p}.`, seePlans: "Voir les offres",
+  limitTitle: "Limite atteinte", limitBody: (p, m) => `Pour inscrire autant de personnes, passez à l’offre ${p} (jusqu’à ${m}).`, switchPlan: "Changer d’offre", later: "Plus tard", locked: (p) => `Disponible à partir de l’offre ${p}.`, seePlans: "Voir les offres", upgradeFamily: "Passer au forfait Famille",
   select: "Choisir les membres", selectedOf: (n, m) => `${n} / ${m} sélectionnés`, balance: "Compatibilité et équilibre", synergy: "Synergies", conflict: "Points de friction", axisX: ["Logique", "Empathie"], axisY: ["Plan", "Action"], pickTwo: "Choisissez au moins deux personnes.",
   goal: "Objectif du projet", goalPh: "ex. Réussir le lancement produit", headcount: "Effectif", auto: "Laisser l’IA choisir", runDraft: "Sélection IA", reevaluate: "Réévaluer cette équipe", features: "Caractère de l’équipe", evaluation: "Évaluation", cautions: "Points de vigilance", recommended: (n) => `Taille recommandée : ${n}`, swapHint: "Cochez pour remplacer manuellement",
   filterAll: "Tous les types", search: "Nom ou compétence", thinking: "Mode de pensée", words: "Mots qui touchent", bio: "Biorythme du jour",

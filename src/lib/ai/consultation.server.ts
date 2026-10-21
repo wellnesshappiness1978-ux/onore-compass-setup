@@ -128,6 +128,7 @@ Rules:
 - Open (after the empathy line) with a ~100-character summary of the essence and action key that the numerology, four-pillar, astrology and other computed values share, using 2–3 computed values internally, without listing specialist terms or numbers in the prose.
 - Ground each insight in at least two parameters above, but describe the resulting pattern in plain words without listing parameter names or numbers. Avoid vague statements that could apply to anyone.
 - Anything unavailable stays omitted, never invented, including unavailable stars and name grids.
+- When the sibling field describes a composition (children count, birth order, older/younger brothers and sisters), use it as sibling-structure reference for communication and family-role patterns, as symbolic context rather than fact. When a relationship type or free-text relation is supplied for a compared person or group member, tailor the advice concretely to that relationship (e.g. lover, fiancé(e), sibling, boss, subordinate, relative).
 - Answer the user's actual question inside the structure.
 
 Output exactly FOUR markdown ### headings, in this order and verbatim in the requested language:

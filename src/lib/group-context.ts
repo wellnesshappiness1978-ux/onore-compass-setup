@@ -12,8 +12,9 @@ export const groupMemberSchema = z.object({
   birthPlace: z.string().max(80).optional().default(""),
   bloodType: z.string().max(4).optional().default(""),
   gender: z.string().max(20).optional().default("undisclosed"),
-  siblingOrder: z.string().max(40).optional().default(""),
+  siblingOrder: z.string().max(80).optional().default(""),
   relationship: z.string().max(60).optional().default(""),
+  relationshipType: z.string().max(30).optional().default(""),
 });
 export type GroupMemberInput = z.infer<typeof groupMemberSchema>;
 
@@ -40,7 +41,7 @@ export function buildGroupContext(name: string, input: GroupMemberInput[], day: 
   const top = rh[0]!, low = rh[rh.length - 1]!;
   return [
     `GROUP CONSULTATION — group "${name}", ${members.length} members. Advise the group as a whole and refer to members by name.`,
-    `Members: ${members.map((m, i) => `${m.name} (born ${m.birthDate}${m.bloodType ? `, blood ${m.bloodType}` : ""}${m.siblingOrder ? `, sibling ${m.siblingOrder}` : ""}${m.relationship ? `, relation ${m.relationship}` : ""}, birth color ${colors[i] ? `${colors[i]!.name} ${colors[i]!.code}` : "n/a"})`).join("; ")}.`,
+    `Members: ${members.map((m, i) => `${m.name} (born ${m.birthDate}${m.bloodType ? `, blood ${m.bloodType}` : ""}${m.siblingOrder ? `, sibling ${m.siblingOrder}` : ""}${m.relationshipType ? `, relationship type ${m.relationshipType}` : ""}${m.relationship ? `, relation ${m.relationship}` : ""}, birth color ${colors[i] ? `${colors[i]!.name} ${colors[i]!.code}` : "n/a"})`).join("; ")}.`,
     meaning ? `Group color: ${meaning.name} ${hex}. Essence: ${meaning.essence} Energy: ${meaning.energy} Role: ${meaning.role} Advice: ${meaning.advice}` : "Group color: not available.",
     `Today's (${day}) group average rhythm: ${avg}/100. Per member (body/emotion/mind/total): ${rh.map(x => `${x.m.name} ${pct(x.r.physical)}/${pct(x.r.emotional)}/${pct(x.r.intellectual)}/${x.r.total}`).join("; ")}.`,
     `Most momentum today: ${top.m.name} (${top.r.total}).${rh.length > 1 && low.r.total < 45 ? ` Needs care today: ${low.m.name} (${low.r.total}).` : ""}`,
