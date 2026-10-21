@@ -1,6 +1,7 @@
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
 import { groupLimit } from "@/lib/plans";
+import { reminderCopy } from "./reminder-copy";
 
 type Detail = { label: string; showAll: string; hideLower: string; items: Record<Plan, string[]> };
 
@@ -91,7 +92,7 @@ const groupLine: Record<Language, (n: number) => string> = {
 export const planDetails: Record<Language, Detail> = Object.fromEntries(
   (Object.keys(baseDetails) as Language[]).map(lang => {
     const d = baseDetails[lang];
-    const items = Object.fromEntries((Object.keys(d.items) as Plan[]).map(plan => [plan, [...d.items[plan], groupLine[lang](groupLimit[plan])]])) as Record<Plan, string[]>;
+    const items = Object.fromEntries((Object.keys(d.items) as Plan[]).map(plan => [plan, [...d.items[plan], ...(plan !== "free" ? [reminderCopy[lang].fullBenefit] : []), ...(plan !== "free" && plan !== "standard" ? [reminderCopy[lang].vipBenefit] : []), groupLine[lang](groupLimit[plan])]])) as Record<Plan, string[]>;
     return [lang, { ...d, items }];
   }),
 ) as Record<Language, Detail>;

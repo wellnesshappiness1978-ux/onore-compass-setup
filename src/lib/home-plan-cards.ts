@@ -1,4 +1,5 @@
 import type { Language } from "./translations";
+import { reminderCopy } from "./reminder-copy";
 
 /** Home "next step" section: four paid-plan privilege cards. Preview copy only — billing is not connected. */
 export type HomePlanId = "standard" | "vip" | "b2b" | "b2b-premium";
@@ -21,7 +22,7 @@ export type HomePlanCardsCopy = {
   cards: HomePlanCard[];
 };
 
-export const homePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
+const basehomePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
   ja: {
     sectionTitle: "あなたの可能性を、もう一歩先へ",
     sectionSub: "上位プランへアップグレードすることで、下位プランのすべての特権サービスを完全に引き継ぎ、さらに高度で特別な限定機能・更なる分析サービスが解放されます。",
@@ -114,3 +115,5 @@ export const homePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
     ],
   },
 };
+
+export const homePlanCardsCopy: typeof basehomePlanCardsCopy = Object.fromEntries((Object.keys(basehomePlanCardsCopy) as Language[]).map(language => [language, { ...basehomePlanCardsCopy[language], cards: basehomePlanCardsCopy[language].cards.map(card => ({ ...card, features: [reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : []), ...card.features] })) }])) as typeof basehomePlanCardsCopy;
