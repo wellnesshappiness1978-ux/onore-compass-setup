@@ -75,3 +75,6 @@
 ## Subject wording / group depth / notification center (2026-10-21) — done
 - あなた→〇〇さん/〇〇グループ (Japanese), group member-by-member today readings, roles and synergy, daily subject message, clearer Family/Group tabs, Settings Notification Center with VIP+ BGM reminder.
 - Open: non-Japanese wording swap and full 5-locale translation of new group-today copy (currently English fallback).
+
+## Mandala center gem + seven-color crown (2026-10-21) — done
+- MandalaCanvas renders the bundled painting on canvas and composes the overall-color faceted center gem plus the top seven birth-color stone row (localized labels); the same composition is used for the 2048px PNG export. Verified live, fullscreen and saved PNG on Standard preview plan; no page errors.
