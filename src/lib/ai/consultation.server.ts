@@ -1,7 +1,7 @@
-import { buildGroupContext, groupMemberSchema } from "@/lib/group-context";
+import { buildGroupContext } from "@/lib/group-context";
+import { consultationRequestSchema } from "@/lib/consultation-request";
 import { createOpenAI } from "@ai-sdk/openai";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
-import { z } from "zod";
 
 import { consultationContext } from "./consultation-context";
 import { consultationHeadings } from "../consultation-card";
@@ -18,30 +18,6 @@ import {
   withLovableAiGatewayRunIdHeader,
 } from "./run-id.server.ts";
 
-const personSchema = z.object({
-  nameKanji: z.string().max(60).optional().default(""),
-  nameKana: z.string().max(60).optional().default(""),
-  nameRomaji: z.string().max(60).optional().default(""),
-  birthCity: z.string().max(80).optional().default(""),
-  birthDate: z.string().date(),
-  birthTime: z.string().max(20),
-  birthTimeUnknown: z.boolean(),
-  birthPlace: z.string().max(80),
-  bloodType: z.string().max(4),
-  siblingOrder: z.string().max(20),
-  gender: z.enum(["male", "female", "other", "undisclosed"]).optional(),
-});
-const requestSchema = z.object({
-  messages: z.array(z.unknown()).min(1),
-  profile: personSchema,
-  ownerProfile: personSchema.optional(),
-  targetLabel: z.string().trim().max(60).optional(),
-  goal: z.string().trim().max(240).optional(),
-  language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]),
-  day: z.string().date().optional(),
-  group: z.object({ name: z.string().trim().max(60), members: z.array(groupMemberSchema).max(101) }).optional(),
-});
-
 export async function handleConsultation(request: Request) {
   const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) {
@@ -54,7 +30,7 @@ export async function handleConsultation(request: Request) {
   } catch {
     return Response.json({ message: "Invalid consultation request." }, { status: 400 });
   }
-  const parsed = requestSchema.safeParse(body);
+  const parsed = consultationRequestSchema.safeParse(body);
   if (!parsed.success) {
     return Response.json(
       { message: "Please check the consultation message and try again." },
@@ -62,9 +38,9 @@ export async function handleConsultation(request: Request) {
     );
   }
 
-  const { messages, profile, ownerProfile, targetLabel, language, goal } = parsed.data;
+  const { messages, profile, ownerProfile, targetLabel, language, goal, group } = parsed.data;
   const day = parsed.data.day ?? new Date().toISOString().slice(0, 10);
-  const groupContext = parsed.data.group ? buildGroupContext(parsed.data.group.name, parsed.data.group.members, day) : "";
+  const groupContext = group ? buildGroupContext(group.name, group.members, day) : "";
   const utcDay = new Date().toISOString().slice(0, 10);
   if (
     Math.abs(new Date(`${day}T00:00:00Z`).getTime() - new Date(`${utcDay}T00:00:00Z`).getTime()) >
