@@ -1,5 +1,10 @@
 # Roadmap
 
+## Painted mandala restoration (2026-10-21)
+- [ ] Confirm the original agolmen_birth_color_mandala_masterpiece-v3.png source (not present in the listed assets/uploads)
+- [ ] Replace procedural vector overlays with direct painted-image display and matched high-quality private export
+- [ ] Verify brighter artwork, fullscreen and image saving
+
 ## Requested UI / mandala polish (2026-10-21) — done
 - [x] Owner reading labels use あなた; Settings retains 本人; explicit self AI addressing instruction, family/group addressing retained
 - [x] Shared TodayCard design; BGM immediately after monthlyLucky, evening immediately after helio; locked samples and guidance retained
