@@ -56,6 +56,10 @@ const contentMin: Record<ContentFeature, Plan> = {
 };
 export const canUse = (plan: Plan, feature: ContentFeature) => rank(plan) >= rank(contentMin[feature]);
 export const minPlanFor = (feature: ContentFeature) => contentMin[feature];
+/** Presentation gates; preview tiers never change server membership or write limits. */
+export const birthColorLimit = (plan: Plan) => plan === "free" ? 1 : 7;
+export const luckyFoodLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 5, b2b: 5, "b2b-premium": 5 };
+export const canReadThreeWaves = (plan: Plan) => rank(plan) >= rank("b2b");
 
 /** Ordered "Today" screen features (cheapest plan first; personal before family) and the minimum plan for each. */
 export type TodayFeature = "decision" | "starPath" | "dailyLucky" | "direction" | "helio" | "shopping" | "health" | "monthlyLucky" | "directionExtended" | "relations" | "biorhythm365" | "familyRoadmap";
