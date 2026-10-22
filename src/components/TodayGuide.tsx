@@ -173,6 +173,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const dayIdx = Math.floor((Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - Date.UTC(today.getFullYear(), 0, 1)) / 864e5);
   const luckyColor = spectrum ? [spectrum.main, spectrum.sub, spectrum.money, spectrum.work, spectrum.love, spectrum.health][dayIdx % 6]! : null;
   const word = words[el][dayIdx % 3]!;
+  const luckyHex = fortune.data?.luckyColor.hex ?? luckyColor?.code;
   const month = months[today.getMonth()]!;
 
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -417,7 +418,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   };
   const share = (key: string) => <div key={key} className="flex justify-center"><ShareCardButton language={language} autoOpen={false} label={ja ? "今日の占いを1タップでシェア" : "Share today's guide"} className="h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto" data={shareData} /></div>;
 
-  const luckyHex = fortune.data?.luckyColor.hex ?? luckyColor?.code;
   const neon = luckyHex ? neonOf(luckyHex) : null;
   const luckyStyle = neon ? ({
     background: `radial-gradient(120% 90% at 0% 0%, hsl(${neon.h} 100% 72% / .95), transparent 60%), linear-gradient(135deg, hsl(${neon.h} 100% 55%) 0%, hsl(${(neon.h + 25) % 360} 100% 50%) 55%, hsl(${(neon.h + 330) % 360} 100% 45%) 100%)`,

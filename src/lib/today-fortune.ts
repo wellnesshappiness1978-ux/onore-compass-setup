@@ -65,7 +65,7 @@ export function normalizeFortune(f: TodayFortune): TodayFortune {
 
 const HISTORY_KEY = "onore-today-ai-history";
 type HistoryEntry = { key: string; day: string; color: string; word: string; foods: string[] };
-export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string }) => `onore-today-ai:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}`;
+export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string | undefined }) => `onore-today-ai:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}`;
 
 /** Recent picks to avoid: same subject's colors/words, every subject's foods, last 7 days excluding today. */
 export function avoidFromHistory(history: HistoryEntry[], key: string, day: string) {
