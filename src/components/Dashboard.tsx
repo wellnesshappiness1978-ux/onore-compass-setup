@@ -617,7 +617,7 @@ function FocusedArt({ language, owner, plan, render }: { language: Language; own
 function FocusedToday({ language, render, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void; render: (p: UserProfile) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx) return null;
-  return <SubjectVoice language={language}><SubjectBanner language={language} /><SubjectDailyNote language={language} />{ctx.group && <><GroupFocusCard language={language} plan={plan} onUpgrade={onUpgrade} /><GroupMembersToday language={language} /></>}{render(ctx.readingProfile)}</SubjectVoice>;
+  return <SubjectVoice language={language}><SubjectBanner language={language} /><SubjectDailyNote language={language} />{ctx.group && <GroupMembersToday language={language} />}{render(ctx.readingProfile)}</SubjectVoice>;
 }
 
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
