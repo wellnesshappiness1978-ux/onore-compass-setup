@@ -19,7 +19,7 @@ export const generateTodayFortune = createServerFn({ method: "POST" })
     const isGroup = subject.kind === "group";
     const perMember = members.map(m => `## ${isGroup || subject.kind === "member" ? m.nameKanji || "member" : "SUBJECT"}${m.relationshipType ? ` (relationship ${m.relationshipType}${m.relationship ? `: ${m.relationship}` : ""})` : ""}\n${JSON.stringify(consultationContext({ ...m, gender: m.gender ?? "undisclosed" }, day))}`).join("\n");
     const groupCtx = isGroup ? buildGroupContext(subject.label, members.map(m => groupMemberSchema.parse({ ...m, name: m.nameKanji || "member" })), day) : "";
-    const people = members.length * (isGroup ? 1 : 1);
+    const people = members.length;
     const runIdFetch = createLovableAiGatewayRunIdFetch();
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
@@ -56,7 +56,6 @@ Fields:
 - luckyWord: a short soul-resonant word or phrase for the goal and today's state, plus a ~80 char message.
 - foods: EXACTLY 5 distinct supermarket-friendly dishes for ${people} ${people === 1 ? "person" : "people"} matching today's element balance, rhythm and goal; mix staple, main, side, soup, sweet/drink. For each: name; why (~80 chars why it lifts THIS subject's fortune today, symbolic, no medical claims); servings ("${people}人分" style localized); ingredients with exact quantities scaled to ${people} people (g, pieces, ml); seasonings with exact measures (大さじ/小さじ/ml/g localized); 4–6 beginner-friendly steps each with a fortune-raising cooking tip.
 Symbolic reference only; no medical, financial or guaranteed outcome claims.`,
-      abortSignal: undefined,
       providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", store: false, include: ["reasoning.encrypted_content"] } },
     });
     try {
