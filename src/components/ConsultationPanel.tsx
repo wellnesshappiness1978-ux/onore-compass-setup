@@ -37,7 +37,7 @@ import { listTeamMembers } from "@/lib/team-members.functions";
 import { readPreviewMembers } from "@/lib/consultation-targets";
 import { ownerAsMember, useFocus } from "./FocusProvider";
 import { SELF_MEMBER_ID } from "@/lib/group-insight";
-import { groupDisplayName } from "@/lib/focus";
+import { groupDisplayName, memberDisplayName } from "@/lib/focus";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { useServerFn } from "@tanstack/react-start";
 import type { TeamMember } from "@/lib/team-analysis";
@@ -113,8 +113,10 @@ export default function ConsultationPanel({
     } else if (!members.some((m) => m.id === targetId)) setTargetId("owner");
   }, [members, groups, targetId]);
   useEffect(() => {
-    if (focusTargetId && members.some((m) => m.id === focusTargetId)) setTargetId(focusTargetId);
-  }, [focusTargetId, members]);
+    if (focusCtx?.group) setTargetId(`group:${focusCtx.group.group.id}`);
+    else if (focusTargetId && members.some((m) => m.id === focusTargetId)) setTargetId(focusTargetId);
+    else if (focusCtx?.focus.targetKind === "self") setTargetId("owner");
+  }, [focusTargetId, members, focusCtx?.group?.group.id, focusCtx?.focus.targetKind]);
   const target = members.find((m) => m.id === targetId);
   const selGroupIndex = targetId.startsWith("group:") ? groups.findIndex((g) => g.id === targetId.slice(6)) : -1;
   const selGroup = selGroupIndex >= 0 ? groups[selGroupIndex] ?? null : null;
@@ -142,7 +144,7 @@ export default function ConsultationPanel({
         : profile,
     [target, profile],
   );
-  const targetLabel = target?.name ?? (selGroup ? groupDisplayName(selGroup, selGroupIndex, language) : consultationTranslations[language].ownerLabel);
+  const targetLabel = target ? memberDisplayName(target) : (selGroup ? groupDisplayName(selGroup, selGroupIndex, language) : consultationTranslations[language].ownerLabel);
   const effectiveGoal = consultationGoal(goal);
   const t = consultationTranslations[language];
   const planNames = teamCopy[language].planNames;
@@ -205,7 +207,7 @@ export default function ConsultationPanel({
           goal: effectiveGoal,
           language,
           day: new Date().toLocaleDateString("en-CA"),
-          group: selGroup ? { name: targetLabel.slice(0, 60), members: selGroupMembers.filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.birthDate)).slice(0, 100).map((m) => ({ name: (m.nickname || m.name || "—").slice(0, 40), birthDate: m.birthDate, birthTime: m.birthTimeUnknown === false ? (m.birthTime ?? "").slice(0, 5) : "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: (m.birthPlace ?? "").slice(0, 80), bloodType: m.bloodType ?? "", gender: m.gender ?? "undisclosed", siblingOrder: (m.siblingOrder ?? "").slice(0, 80), relationship: (m.relationship ?? "").slice(0, 60), relationshipType: (m.relationshipType ?? "").slice(0, 30) })) } : undefined,
+          group: selGroup ? { name: targetLabel.slice(0, 60), members: selGroupMembers.filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.birthDate)).slice(0, 101).map((m) => ({ name: memberDisplayName(m).slice(0, 40), birthDate: m.birthDate, birthTime: m.birthTimeUnknown === false ? (m.birthTime ?? "").slice(0, 5) : "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: (m.birthPlace ?? "").slice(0, 80), birthCity: (m.birthCity ?? "").slice(0, 80), bloodType: m.bloodType ?? "", gender: m.gender ?? "undisclosed", siblingOrder: (m.siblingOrder ?? "").slice(0, 80), relationship: (m.relationship ?? "").slice(0, 60), relationshipType: (m.relationshipType ?? "").slice(0, 30) })) } : undefined,
         }),
       }),
     [targetProfile, profile, targetLabel, language, target, effectiveGoal, selGroup, selGroupMembers],
@@ -329,7 +331,7 @@ export default function ConsultationPanel({
             <optgroup label={language === "ja" ? "登録ファミリー" : "Registered family"}>
               {members.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.name} · {m.role || m.birthDate}
+                  {memberDisplayName(m)} · {m.role || m.birthDate}
                 </option>
               ))}
             </optgroup>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { groupLimit } from "./plans";
-import { autoGroupLetter, canAddGroup, groupDisplayName, memberDisplayName, mixHex } from "./focus";
+import { autoGroupLetter, canAddGroup, groupDisplayName, memberDisplayName, mixHex, traitsNavigationLabel } from "./focus";
 
 describe("group limits per plan", () => {
   it("free 0, standard 1, vip 3, family 10, premium 30", () => {
@@ -15,6 +15,12 @@ describe("group limits per plan", () => {
 });
 
 describe("display names", () => {
+  it("uses you for self, nickname then name for family, and registered group names", () => {
+    expect(traitsNavigationLabel("ja")).toBe("あなたの特性");
+    expect(traitsNavigationLabel("ja", { name: "山田花子", nickname: "はなちゃん" })).toBe("はなちゃんさんの特性");
+    expect(traitsNavigationLabel("ja", { name: "山田花子", nickname: "" })).toBe("山田花子さんの特性");
+    expect(traitsNavigationLabel("ja", null, { group: { id: "g", name: "星の家族", nickname: "", memberIds: [] }, index: 0 })).toBe("星の家族の特性");
+  });
   it("nickname wins, family falls back to full name", () => {
     expect(memberDisplayName({ name: "山田花子", nickname: "はなちゃん" })).toBe("はなちゃん");
     expect(memberDisplayName({ name: "山田花子", nickname: "" })).toBe("山田花子");

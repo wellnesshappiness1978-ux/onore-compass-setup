@@ -2,15 +2,16 @@ import { useState } from "react";
 import { SacredDisclosure } from "./ui/sacred-disclosure";
 import { Check, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import BirthplaceFields from "./BirthplaceFields";
 import SiblingSelect from "./SiblingSelect";
 import { siblingLabels } from "@/lib/sibling-order";
-import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
-import { prefecturesRomanized, type Language } from "@/lib/translations";
+import { inputClass, type UserProfile } from "./Onboarding";
+import { type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { getFiveElements } from "@/lib/ai/five-elements";
 import { finalizePersonalName, formatPersonalName } from "@/lib/name-format";
-import { localizePrefecture, profileUiCopy } from "@/lib/profile-ui-copy";
+import { profileUiCopy } from "@/lib/profile-ui-copy";
 
 const ROMAJI = /^[A-Za-z][A-Za-z\s'-]*$/;
 
@@ -72,15 +73,9 @@ export default function ProfileEditor({
           <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
             <input type="checkbox" checked={draft.birthTimeUnknown} onChange={(e) => { set("birthTimeUnknown", e.target.checked); if (e.target.checked) set("birthTime", ""); }} className="accent-[var(--primary)]" />
             {t.timeUnknown}</label></div>
-        <div><label className={label} htmlFor="pe-pref">{t.prefecture}</label>
-          <select id="pe-pref" className={inputClass} value={draft.birthPlace} onChange={(e) => set("birthPlace", e.target.value)}>
-            <option value="">—</option>
-            {PREFECTURES.map((p, i) => <option key={p} value={p}>{localizePrefecture(language, i, p, prefecturesRomanized[i] ?? p)}</option>)}
-          </select></div>
+        <BirthplaceFields language={language} birthPlace={draft.birthPlace} birthCity={draft.birthCity} onChange={(birthPlace, birthCity) => { setSaved(false); setDraft(p => ({ ...p, birthPlace, birthCity })); }} className={inputClass} />
         <div><label className={label} htmlFor="pe-sibling">{siblingLabels[language].title}</label>
           <SiblingSelect id="pe-sibling" language={language} value={draft.siblingOrder} onChange={(v) => set("siblingOrder", v)} className={inputClass} /></div>
-        <div><label className={label} htmlFor="pe-city">{t.city}</label>
-          <input id="pe-city" className={inputClass} maxLength={80} placeholder={ui.placeholders.city} value={draft.birthCity} onChange={(e) => set("birthCity", e.target.value)} /></div>
       </div>
       {error && <p role="alert" className="mt-3 text-xs text-destructive">{error === "required" ? ui.requiredFieldsError : error === "kana" ? ui.kanaError : error === "romaji" ? t.romajiError : storage.saveError}</p>}
       {saved && <p role="status" className="mt-3 flex items-center gap-1 text-xs text-primary"><Check className="size-3.5" />{t.saved}</p>}

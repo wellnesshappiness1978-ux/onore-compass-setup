@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import BirthplaceFields from "../BirthplaceFields";
 import SiblingSelect from "../SiblingSelect";
 import { siblingLabels } from "@/lib/sibling-order";
 import { useServerFn } from "@tanstack/react-start";
@@ -32,7 +33,7 @@ const card = "rounded-2xl border border-primary/15 bg-background/40 p-4";
 const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "simulator", "draft", "catalog", "calendar", "balance", "oneOnOne", "recruit"];
 
 const summary = (m: TeamMember, t: TeamCopy) => ({
-  id: m.id, name: m.name, role: m.role, skills: m.skills,
+  id: m.id, name: memberDisplayName(m), role: m.role, skills: m.skills,
   relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", birthDate: m.birthDate,
   birthTime: m.birthTimeUnknown === false ? m.birthTime ?? "" : "", birthPlace: [m.birthPlace, m.birthCity].filter(Boolean).join(" "), siblingOrder: m.siblingOrder ?? "",
   gender: m.gender, bloodType: m.bloodType, teamRole: t.roles[roleOf(m)],
@@ -62,7 +63,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     else { try { setMembers(JSON.parse(localStorage.getItem(LOCAL) ?? "[]")); } catch { setMembers([]); } }
     return () => { active = false; };
   }, [localMode, list]);
-  const persistLocal = (next: TeamMember[]) => { setMembers(next); try { localStorage.setItem(LOCAL, JSON.stringify(next)); } catch { /* ignore */ } };
+  const persistLocal = (next: TeamMember[]) => { setMembers(next); try { localStorage.setItem(LOCAL, JSON.stringify(next)); window.dispatchEvent(new Event("onore-focus-reload")); } catch { /* ignore */ } };
 
   const addMember = async (m: Omit<TeamMember, "id">) => {
     if (members.length + 1 > max) { setLimitDialog(planForCount(members.length + 1) ?? "max"); return false; }
@@ -181,6 +182,12 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  useEffect(() => {
+    const open = () => { setFormOpen(v => !v); };
+    window.addEventListener("onore-family-edit", open);
+    return () => window.removeEventListener("onore-family-edit", open);
+  }, []);
   const atCap = !editingId && members.length >= max;
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,17 +205,16 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
     <div className="space-y-4">
       {owner && <ul aria-label={familyCapacityCopy[language].owner} className="grid gap-2 sm:grid-cols-2"><li className="flex items-center gap-3 rounded-md border border-primary/40 bg-primary/10 p-3"><div className="min-w-0 flex-1"><p className="truncate text-base font-bold text-primary">{memberDisplayName(owner)}</p><p className="text-xs text-primary">{familyCapacityCopy[language].owner}</p><p className="mt-1 text-xs text-muted-foreground">{familyCapacityCopy[language].excluded}</p></div></li></ul>}
       {!signedIn && <p className="text-[11px] text-muted-foreground">{previewOnly ? x.preview : t.guestNote}</p>}
-      <form id="family-roster-form" onSubmit={submit} className={`${card} grid gap-2 sm:grid-cols-2`}>
+      {formOpen && <form id="family-roster-form" onSubmit={submit} className={`${card} grid items-start gap-2 sm:grid-cols-2`}>
         <Input required aria-label={t.name} placeholder={`${t.name} *`} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <Input aria-label={focusCopy[language].nickname} placeholder={focusCopy[language].nickname} value={form.nickname} maxLength={40} onChange={(e) => setForm({ ...form, nickname: e.target.value })} />
         <Input aria-label={x.kana} placeholder={x.kana} value={form.nameKana} maxLength={60} onChange={(e) => setForm({ ...form, nameKana: e.target.value })} />
         <Input required aria-label={`${t.birthDate} *`} type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
         <Input aria-label={x.time} type="time" disabled={form.birthTimeUnknown} value={form.birthTime} onChange={(e) => setForm({ ...form, birthTime: e.target.value })} />
         <label className="flex min-h-11 items-center gap-2 text-xs"><input type="checkbox" checked={form.birthTimeUnknown} onChange={(e) => setForm({ ...form, birthTimeUnknown: e.target.checked, birthTime: e.target.checked ? "" : form.birthTime })} />{x.timeUnknown}</label>
-        <Input aria-label={x.place} placeholder={x.place} value={form.birthPlace} maxLength={80} onChange={(e) => setForm({ ...form, birthPlace: e.target.value })} />
-        <Input aria-label={x.city} placeholder={x.city} value={form.birthCity} maxLength={80} onChange={(e) => setForm({ ...form, birthCity: e.target.value })} />
+        <BirthplaceFields language={language} birthPlace={form.birthPlace} birthCity={form.birthCity} onChange={(birthPlace, birthCity) => setForm(p => ({ ...p, birthPlace, birthCity }))} />
         <SiblingSelect key={editingId ?? "new"} language={language} value={form.siblingOrder} maxLength={80} onChange={(v) => setForm({ ...form, siblingOrder: v })} />
-        <select aria-label={x.gender} value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as typeof form.gender })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm">{["undisclosed", "female", "male", "other"].map((value, i) => <option key={value} value={value}>{x.genders[i]}</option>)}</select>
+        <select aria-label={x.gender} value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as typeof form.gender })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm">{["undisclosed", "female", "male", "other"].map((value, i) => <option key={value} value={value}>{i === 0 ? x.gender : x.genders[i]}</option>)}</select>
         <select aria-label={x.blood} value={form.bloodType} onChange={(e) => setForm({ ...form, bloodType: e.target.value as typeof form.bloodType })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="">{x.blood}</option>{["A", "B", "O", "AB"].map(value => <option key={value} value={value}>{value}</option>)}</select>
         <select aria-label={x.relationType} value={form.relationshipType} onChange={(e) => setForm({ ...form, relationshipType: e.target.value })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm">{RELATIONSHIP_TYPE_VALUES.map((value, i) => <option key={value} value={value}>{i === 0 ? siblingLabels[language].relationTitle : x.types[i]}</option>)}</select>
         {(form.relationshipType === "other" || form.relationship) ? <Input aria-label={siblingLabels[language].relationOtherHint} placeholder={form.relationshipType === "other" ? siblingLabels[language].relationOtherHint : x.relationship} value={form.relationship} maxLength={60} onChange={(e) => setForm({ ...form, relationship: e.target.value })} /> : <span className="hidden sm:block" />}
@@ -217,7 +223,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
         <div className="flex gap-2 sm:col-span-2"><Button type="submit" disabled={busy || atCap} className="flex-1"><UserPlus className="size-4" />{editingId ? x.saved : t.add} ({members.length}/{max})</Button>{editingId && <Button type="button" variant="outline" onClick={() => { setEditingId(null); setForm(emptyMemberForm); }}>{x.cancel}</Button>}</div>
         {atCap && <div role="note" className="rounded-md border border-primary/40 bg-primary/10 p-3 text-xs sm:col-span-2"><p className="font-bold text-primary">{t.limitTitle}</p><Button size="sm" variant="outline" className="mt-2" onClick={onLimit}><Crown className="size-3.5" />{t.upgradeFamily}</Button></div>}
         {error && <p role="alert" className="text-xs text-destructive sm:col-span-2">{t.saveError}</p>}
-      </form>
+      </form>}
       {members.length === 0 ? <p className="text-sm text-muted-foreground">{t.empty}</p> : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {members.map((m) => (
@@ -227,7 +233,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
                 {m.nickname && <p className="truncate text-[11px] text-muted-foreground">{m.name}</p>}
                 <p className="truncate text-[11px] text-muted-foreground">{m.birthDate} · {m.relationship || m.role || "—"}</p>
               </div>
-              <Button size="icon" variant="ghost" aria-label={`${x.edit} ${m.name}`} onClick={() => { setEditingId(m.id); setForm({ name: m.name, nickname: m.nickname ?? "", nameKana: m.nameKana ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", birthCity: m.birthCity ?? "", siblingOrder: m.siblingOrder ?? "", gender: m.gender || "undisclosed", bloodType: m.bloodType || "", relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", role: m.role, skills: m.skills.join(", ") }); }}><Pencil className="size-4" /></Button>
+              <Button size="icon" variant="ghost" aria-label={`${x.edit} ${m.name}`} onClick={() => { setFormOpen(true); setEditingId(m.id); setForm({ name: m.name, nickname: m.nickname ?? "", nameKana: m.nameKana ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", birthCity: m.birthCity ?? "", siblingOrder: m.siblingOrder ?? "", gender: m.gender || "undisclosed", bloodType: m.bloodType || "", relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", role: m.role, skills: m.skills.join(", ") }); }}><Pencil className="size-4" /></Button>
               <Button size="icon" variant="ghost" aria-label={`${t.remove} ${m.name}`} onClick={() => onRemove(m.id)}><Trash2 className="size-4" /></Button>
             </li>
           ))}

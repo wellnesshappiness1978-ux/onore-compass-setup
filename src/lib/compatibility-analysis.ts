@@ -12,9 +12,9 @@ const date = z.string().date().refine(v => v >= "1900-01-01" && v <= new Date().
 export const partnerSchema = z.object({
   name: z.string().trim().max(40), nameKana: z.string().trim().max(60), birthDate: date,
   birthTime: z.union([z.literal(""), z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/)]),
-  birthPlace: z.string().max(20), birthCity: z.string().trim().max(80),
+  birthPlace: z.string().max(80), birthCity: z.string().trim().max(80),
   bloodType: z.enum(["", "A", "B", "O", "AB"]),
-  siblingOrder: z.string().trim().max(20),
+  siblingOrder: z.string().trim().max(80),
   gender: z.enum(["female", "male", "other", "undisclosed"]),
 });
 export type PartnerInput = z.infer<typeof partnerSchema>;

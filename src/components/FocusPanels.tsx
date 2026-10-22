@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { birthAddressCopy } from "@/lib/birth-address";
 import { groupTodayCopy, memberToday, roleAssignment, subjectDailyMessage } from "@/lib/group-today";
 import { useServerFn } from "@tanstack/react-start";
 import { Pencil, Sparkles, Target, Trash2, Users, UserRound } from "lucide-react";
@@ -30,9 +31,9 @@ export function FocusSettingsCard({ language }: { language: Language }) {
   const set = (patch: Partial<typeof f>) => setDraft({ ...f, ...patch });
   const kinds: TargetKind[] = ["self", "family", "group"];
   return (
-    <details id="focus-settings" className="group mx-auto w-full max-w-2xl scroll-mt-28 rounded-lg border border-primary/30 bg-card/60" aria-label={t.cardTitle}>
+    <details id="focus-settings" className="group mx-auto w-full max-w-2xl scroll-mt-28 rounded-lg border border-destructive bg-card/60" aria-label={t.cardTitle}>
       <summary className="grid min-h-12 cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-3 sm:px-4 [&::-webkit-details-marker]:hidden">
-        <span className="flex min-w-0 items-start gap-2 font-serif text-[0.95rem] leading-snug text-primary sm:items-center sm:text-lg"><Target className="mt-0.5 size-5 shrink-0 sm:mt-0" /><span className="min-w-0 [overflow-wrap:anywhere]">{t.cardTitle}</span></span>
+        <span className="flex min-w-0 items-start gap-2 font-serif text-[0.95rem] leading-snug text-primary sm:items-center sm:text-lg"><Target className="mt-0.5 size-5 shrink-0 sm:mt-0" /><span className="min-w-0 [overflow-wrap:anywhere]"><span className="mb-1 block w-fit rounded-sm bg-destructive px-2 py-0.5 font-sans text-[11px] font-bold text-destructive-foreground">{birthAddressCopy[language].important}</span>{t.cardTitle}</span></span>
         <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
       </summary>
       <div className="border-t border-primary/15 p-4 sm:p-5">
@@ -135,7 +136,7 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
   const [editing, setEditing] = useState<TeamGroup | null>(null);
   const [name, setName] = useState(""); const [nick, setNick] = useState(""); const [ids, setIds] = useState<string[]>([SELF_MEMBER_ID]);
   const [busy, setBusy] = useState(false);
-  const [active, setActive] = useState<"family" | "group">("family");
+  const [active, setActive] = useState<"family" | "group" | null>(null);
   const add = useServerFn(addTeamGroup); const upd = useServerFn(updateTeamGroup); const del = useServerFn(deleteTeamGroup);
   if (!ctx) return null;
   const limit = groupLimit[plan];
@@ -162,7 +163,7 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
   const remove = async (g: TeamGroup) => { if (ctx.serverBacked) { await del({ data: { id: g.id } }); ctx.reload(); } else writeLocal(ctx.groups.filter(x => x.id !== g.id)); };
   return <>
     <div role="tablist" className="mb-5 grid grid-cols-2 gap-2">
-      {([["family", UserRound, t.familyEdit, () => document.getElementById("family-roster-form")?.scrollIntoView({ behavior: "smooth", block: "center" })], ["group", Users, t.groupEdit, () => { reset(); setOpen(true); }]] as const).map(([key, Icon, label, act]) => { const on = active === key; return <Button key={key} role="tab" aria-selected={on} variant="outline" className={`h-12 border-2 transition-all md:h-14 md:text-base ${on ? "border-primary bg-primary/20 font-bold text-primary shadow-champagne after:absolute after:inset-x-3 after:bottom-1 after:h-1 after:rounded-full after:bg-primary relative" : "border-primary/30 text-muted-foreground hover:text-foreground"}`} onClick={() => { setActive(key); act(); }}><Icon className={on ? "size-5 text-primary" : "size-4"} />{label}</Button>; })}
+      {([["family", UserRound, t.familyEdit, () => { window.dispatchEvent(new Event("onore-family-edit")); window.setTimeout(() => document.getElementById("family-roster-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); }], ["group", Users, t.groupEdit, () => { reset(); setOpen(true); }]] as const).map(([key, Icon, label, act]) => { const on = active === key; return <Button key={key} role="tab" aria-selected={on} variant="outline" className={`h-12 border-2 transition-all md:h-14 md:text-base ${on ? "border-primary bg-primary/20 font-bold text-primary shadow-champagne after:absolute after:inset-x-3 after:bottom-1 after:h-1 after:rounded-full after:bg-primary relative" : "border-primary/30 text-muted-foreground hover:text-foreground"}`} onClick={() => { setActive(key); act(); }}><Icon className={on ? "size-5 text-primary" : "size-4"} />{label}</Button>; })}
     </div>
     {ctx.groups.length > 0 && <ul className="mb-5 grid gap-2 sm:grid-cols-2">{ctx.groups.map((g, i) => { const hex = mixHex(ctx.members.filter(m => g.memberIds.includes(m.id)).map(m => mainColor(m)?.code ?? "")); return <li key={g.id} className="rounded-md border-l-4 p-3" style={hex ? { borderLeftColor: hex, backgroundImage: `linear-gradient(90deg, ${hex}66, transparent 75%)` } : undefined}><p className="truncate font-serif text-lg font-bold text-outline">{groupDisplayName(g, i, language)}</p><p className="text-xs text-muted-foreground">{t.members} {g.memberIds.length}</p></li>; })}</ul>}
     <Dialog open={open} onOpenChange={setOpen}>

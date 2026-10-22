@@ -1,3 +1,6 @@
+import BirthplaceFields from "./BirthplaceFields";
+import SiblingSelect from "./SiblingSelect";
+import { traitsNavigationLabel } from "@/lib/focus";
 import { ArtsGuide } from "./ArtsGuide";
 import ProfileEditor from "./ProfileEditor";
 import SelfCoreCard from "./SelfCoreCard";
@@ -158,7 +161,7 @@ function TorisetsuPanel({
   const [partnerPlace, setPartnerPlace] = useState("");
   const [partnerCity, setPartnerCity] = useState("");
   const [partnerBlood, setPartnerBlood] = useState<"" | "A" | "B" | "O" | "AB">("");
-  const [partnerSibling, setPartnerSibling] = useState<"" | "first" | "middle" | "last" | "only">("");
+  const [partnerSibling, setPartnerSibling] = useState<string>("");
   const [result, setResult] = useState<ReturnType<typeof analyzeCompatibility>>(null);
   const [relation, setRelation] = useState<number | null>(null);
   const [analyzed, setAnalyzed] = useState(false);
@@ -184,13 +187,13 @@ function TorisetsuPanel({
   }, [signedIn, listMembers]);
   const pickMember = (m: TeamMember) => {
     setPickedId(m.id);
-    setPartnerName(m.name); setPartnerKana(m.nameKana ?? "");
+    setPartnerName(memberDisplayName(m)); setPartnerKana(m.nameKana ?? "");
     setPartnerGender((m.gender as UserProfile["gender"]) || "undisclosed");
     setPartnerDate(m.birthDate);
     setPartnerTime(savedPartner(m).birthTime); setPartnerTimeUnknown(!savedPartner(m).birthTime);
     setPartnerPlace(m.birthPlace ?? ""); setPartnerCity(m.birthCity ?? "");
     setPartnerBlood((m.bloodType as "" | "A" | "B" | "O" | "AB") || "");
-    setPartnerSibling((m.siblingOrder as "" | "first" | "middle" | "last" | "only") || "");
+    setPartnerSibling(m.siblingOrder || "");
     setAnalyzed(false);
   };
   const contextCopy = compatibilityContextCopy[language];
@@ -440,34 +443,11 @@ function TorisetsuPanel({
                     {base.timeUnknown}
                   </label>
                 </div>
-                <div>
-                  <label
-                    htmlFor="partner-birth-place"
-                    className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary"
-                  >
-                    <MapPin className="size-4 stroke-[1.4]" aria-hidden="true" />
-                    {t.partnerPlace}{" "}
-                    <span className="text-xs font-normal text-primary/70">{t.optional}</span>
-                  </label>
-                  <select
-                    id="partner-birth-place"
-                    value={partnerPlace}
-                    onChange={(event) => setPartnerPlace(event.target.value)}
-                    className={`${inputClass} appearance-none pr-10`}
-                  >
-                    <option value="">{base.selectPlace}</option>
-                    {PREFECTURES.map((pref, index) => (
-                      <option key={pref} value={pref}>
-                        {["en", "es", "fr"].includes(language) ? prefecturesRomanized[index] : pref}
-                      </option>
-                    ))}
-                  </select>
-                </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="text-sm text-primary">{profileTranslations[language].city}<span className="text-muted-foreground"> ({t.optional})</span><input aria-label={profileTranslations[language].city} className={`${inputClass} mt-2`} maxLength={80} value={partnerCity} onChange={e => setPartnerCity(e.target.value)} /></label>
+                <BirthplaceFields language={language} birthPlace={partnerPlace} birthCity={partnerCity} onChange={(place, city) => { setPartnerPlace(place); setPartnerCity(city); }} className={inputClass} />
                 <label className="text-sm text-primary">{base.bloodType}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.bloodType} className={`${inputClass} mt-2`} value={partnerBlood} onChange={e => setPartnerBlood(e.target.value as typeof partnerBlood)}><option value="">—</option>{["A","B","O","AB"].map(x => <option key={x} value={x}>{x}</option>)}</select></label>
-                <label className="text-sm text-primary">{base.siblingOrder}<span className="text-muted-foreground"> ({t.optional})</span><select aria-label={base.siblingOrder} className={`${inputClass} mt-2`} value={partnerSibling} onChange={e => setPartnerSibling(e.target.value as typeof partnerSibling)}><option value="">—</option>{["first","middle","last","only"].map((x,i) => <option key={x} value={x}>{base.siblings[i]}</option>)}</select></label>
+                <div><label className="mb-2 block text-sm text-primary">{base.siblingOrder}</label><SiblingSelect language={language} value={partnerSibling} onChange={setPartnerSibling} className={inputClass} /></div>
               </div>
               </>)}
               {entryMode === "manual" && <><div>
@@ -610,10 +590,11 @@ function TorisetsuPanel({
   );
 }
 
-function FocusGoalBridge({ onChange, language }: { onChange: (memberId: string | null, goal: string) => void; language: Language }) {
+function FocusGoalBridge({ onChange, language }: { onChange: (memberId: string | null, goal: string, label: string) => void; language: Language }) {
   const ctx = useFocus();
   const id = ctx?.member?.id ?? null; const g = ctx ? goalText(ctx.focus, language) : "";
-  useEffect(() => { onChange(id, g); }, [id, g]); // eslint-disable-line react-hooks/exhaustive-deps
+  const label = traitsNavigationLabel(language, ctx?.member, ctx?.group);
+  useEffect(() => { onChange(id, g, label); }, [id, g, label]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
 function FocusedTraits({ language, render }: { language: Language; render: (p: UserProfile, title: string, goal: string, isSelf: boolean) => ReactNode }) {
@@ -636,6 +617,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const [tab, setTab] = useState<Tab>("home");
   const [focusMemberId, setFocusMemberId] = useState<string | null>(null);
   const [focusGoal, setFocusGoal] = useState("");
+  const [traitsLabel, setTraitsLabel] = useState(traitsNavigationLabel(language));
   const [consultMode, setConsultMode] = useState<"compatibility" | "consultation">("consultation");
   useEffect(() => {
     const open = (target: string | null) => {
@@ -724,7 +706,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   
     const navigation: { id: Tab; label: string; mobileLabel: string; icon: typeof Home }[] = [
     { id: "home", label: t.home, mobileLabel: t.home, icon: Home },
-    { id: "traits", label: language === "ja" ? "あなたの特性" : t.traits, mobileLabel: language === "ja" ? "あなたの特性" : t.traits, icon: Compass },
+    { id: "traits", label: traitsLabel, mobileLabel: traitsLabel, icon: Compass },
     { id: "today", label: language === "ja" ? "今日の占い" : t.today, mobileLabel: language === "ja" ? "今日の占い" : t.today, icon: Clock3 },
     { id: "consult", label: language === "ja" ? "AI相談" : t.consult, mobileLabel: language === "ja" ? "AI相談" : t.consult, icon: WandSparkles },
     { id: "art", label: t.art, mobileLabel: t.art, icon: Palette },
@@ -755,7 +737,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   return (
     <FocusProvider owner={profile} serverBacked={signedIn && !devOverrideEnabled}>
     <DailyReminderCatalogue language={language} plan={previewPlan} />
-    <FocusGoalBridge onChange={(id, g) => { setFocusMemberId(id); setFocusGoal(g); }} language={language} />
+    <FocusGoalBridge onChange={(id, g, label) => { setFocusMemberId(id); setFocusGoal(g); setTraitsLabel(label); }} language={language} />
     <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
       <div className="mobile-fixed-header fixed inset-x-0 z-[60] grid grid-cols-[auto_minmax(0,1fr)_auto] items-center border-b border-primary/25 bg-background/95 px-2 backdrop-blur-xl">
@@ -909,7 +891,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               className={`flex h-14 min-w-0 flex-col gap-1 rounded-lg px-0.5 text-[9px] md:text-[11px] ${tab === item.id ? "bg-primary/12 text-primary hover:bg-primary/15 hover:text-primary" : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"}`}
             >
               <item.icon className="size-5 shrink-0" strokeWidth={tab === item.id ? 2 : 1.5} />
-              <span className="nav-label max-w-full whitespace-normal text-center leading-tight"><span className="md:hidden">{item.mobileLabel}</span><span className="hidden md:inline">{item.label}</span></span>
+              <span title={item.label} className="nav-label line-clamp-2 max-w-full whitespace-normal break-all text-center leading-tight"><span className="md:hidden">{item.mobileLabel}</span><span className="hidden md:inline">{item.label}</span></span>
             </Button>
           ))}
         </div>

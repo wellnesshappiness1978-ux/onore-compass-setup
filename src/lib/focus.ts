@@ -28,6 +28,15 @@ export const memberDisplayName = (m: Pick<TeamMember, "name" | "nickname">) => m
 export const groupDisplayName = (g: TeamGroup, index: number, language: Language) =>
   g.nickname.trim() || g.name.trim() || `${focusCopy[language].groupWord}${autoGroupLetter(index)}`;
 
+/** Saved subject identity drives navigation without changing profile names or calculations. */
+export function traitsNavigationLabel(language: Language, member?: Pick<TeamMember, "name" | "nickname"> | null, group?: { group: TeamGroup; index: number } | null) {
+  const name = member ? memberDisplayName(member) : group ? groupDisplayName(group.group, group.index, language) : null;
+  const self: Record<Language, string> = { ja: "あなたの特性", en: "Your traits", "zh-CN": "你的特质", "zh-TW": "你的特質", ko: "당신의 특성", es: "Tus rasgos", fr: "Vos traits" };
+  if (!name) return self[language];
+  const labels: Record<Language, string> = { ja: `${name}${member ? "さん" : ""}の特性`, en: `${name}'s traits`, "zh-CN": `${name}的特质`, "zh-TW": `${name}的特質`, ko: `${name}의 특성`, es: `Rasgos de ${name}`, fr: `Traits de ${name}` };
+  return labels[language];
+}
+
 export function memberToProfile(m: TeamMember): UserProfile {
   const gender = (["female", "male", "other", "undisclosed"] as const).find(g => g === m.gender) ?? "undisclosed";
   return {

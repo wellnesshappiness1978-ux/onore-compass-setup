@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import LanguageSelector from "./LanguageSelector";
+import BirthplaceFields from "./BirthplaceFields";
+import { addressRegion, japaneseRegions } from "@/lib/birth-address";
 import SiblingSelect from "./SiblingSelect";
 import { ArrowRight, CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
+import { translations, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
 import { finalizePersonalName, formatPersonalName } from "@/lib/name-format";
-import { localizePrefecture, profileUiCopy } from "@/lib/profile-ui-copy";
+import { profileUiCopy } from "@/lib/profile-ui-copy";
 
 export type UserProfile = {
   nameKanji: string;
@@ -24,15 +26,7 @@ export type UserProfile = {
   siblingOrder: string;
 };
 
-export const PREFECTURES = [
-  "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
-  "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
-  "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
-  "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
-  "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
-  "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
-  "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県",
-];
+export const PREFECTURES = japaneseRegions;
 
 const BLOOD_TYPES = ["A", "B", "O", "AB"] as const;
 
@@ -78,7 +72,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
 
   const stepValid = [
     profile.nameKanji.trim() !== "" && /^[\u3041-\u309F\u30FC\s]+$/.test(profile.nameKana.trim()) && /^[A-Za-z][A-Za-z\s'-]*$/.test(profile.nameRomaji.trim()) && genderChosen && profile.birthDate !== "",
-    profile.birthPlace !== "",
+    addressRegion(profile.birthPlace).trim() !== "",
     profile.bloodType !== "" && profile.siblingOrder !== "",
   ][step];
 
@@ -233,27 +227,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
           {/* Step 2: Birth place */}
           {step === 1 && (
             <div>
-              <label htmlFor="birth-place" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
-                <MapPin className="size-4 stroke-[1.4]" aria-hidden="true" />
-                 {t.birthPlace} <span className="text-xs font-normal text-primary/70">{t.required}</span>
-              </label>
-              <select
-                id="birth-place"
-                value={profile.birthPlace}
-                onChange={(e) => set("birthPlace", e.target.value)}
-                className={`${inputClass} appearance-none pr-10`}
-              >
-                <option value="" disabled>
-                   {t.selectPlace}
-                </option>
-                 {PREFECTURES.map((pref, index) => (
-                  <option key={pref} value={pref}>
-                     {localizePrefecture(language, index, pref, prefecturesRomanized[index] ?? pref)}
-                  </option>
-                ))}
-              </select>
-              <label htmlFor="birth-city" className="mb-2 mt-5 block font-serif text-sm font-semibold text-primary">{pt.city} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
-              <input id="birth-city" maxLength={80} placeholder={ui.placeholders.city} value={profile.birthCity} onChange={(e) => set("birthCity", e.target.value)} className={inputClass} />
+              <BirthplaceFields language={language} birthPlace={profile.birthPlace} birthCity={profile.birthCity} onChange={(birthPlace, birthCity) => setProfile(p => ({ ...p, birthPlace, birthCity }))} className={inputClass} />
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                  {t.placeHint}
               </p>
