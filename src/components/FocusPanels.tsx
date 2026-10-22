@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { useFocus } from "./FocusProvider";
 import { addTeamGroup, deleteTeamGroup, updateTeamGroup } from "@/lib/team-groups.functions";
 import { canAddGroup, focusCopy, selfReadingLabel, goalText, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, mixHex, type TargetKind, type TeamGroup } from "@/lib/focus";
-import { groupLimit, memberLimit } from "@/lib/plans";
+import { canUse, groupLimit, memberLimit } from "@/lib/plans";
 import { familyCapacityCopy, fitsMemberCapacity, registeredMemberCount } from '@/lib/family-capacity';
 import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
 import { biorhythm, pairScore, type TeamMember } from "@/lib/team-analysis";
@@ -120,9 +120,9 @@ export function GroupFocusCard({ language }: { language: Language }) {
   </section>;
 }
 
-export function ArtOwnerOnlyNotice({ language, onUpgrade }: { language: Language; onUpgrade: () => void }) {
+export function ArtOwnerOnlyNotice({ language, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void }) {
   const ctx = useFocus();
-  if (!ctx || ctx.focus.targetKind === "self" || (!ctx.member && !ctx.group)) return null;
+  if (!ctx || canUse(plan, "subjectArt") || ctx.focus.targetKind === "self" || (!ctx.member && !ctx.group)) return null;
   const t = focusCopy[language];
   return <div role="note" className="mb-5 rounded-md border border-primary/40 bg-primary/10 p-4"><p className="font-serif text-primary">{t.artOwnerOnly}</p><p className="mt-1 text-sm leading-6 text-foreground">{t.artOwnerOnlyBody}</p><Button size="sm" variant="outline" className="mt-3" onClick={onUpgrade}>{t.seePlans}</Button></div>;
 }
