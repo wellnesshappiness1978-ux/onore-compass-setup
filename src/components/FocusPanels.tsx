@@ -76,8 +76,8 @@ export function SubjectBanner({ language }: { language: Language }) {
   if (!ctx || ctx.focus.targetKind === "self" || (!ctx.member && !ctx.group)) return null;
   const t = focusCopy[language];
   return <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-sm">
-    <span className="flex items-center gap-2 text-primary">{ctx.group ? <Users className="size-4" /> : <UserRound className="size-4" />}{t.viewing(ctx.label(language))}</span>
-    <Button size="sm" variant="ghost" onClick={() => ctx.setFocus({ ...ctx.focus, targetKind: "self", targetId: null })}>{t.backToSelf}</Button>
+    <span className="flex min-w-0 flex-1 items-center justify-center gap-2 text-center text-primary">{ctx.group ? <Users className="size-4" /> : <UserRound className="size-4" />}{t.viewing(ctx.label(language))}</span>
+    <Button size="sm" variant="outline" className="border-2 border-primary/70" onClick={() => ctx.setFocus({ ...ctx.focus, targetKind: "self", targetId: null })}>{t.backToSelf}</Button>
   </div>;
 }
 

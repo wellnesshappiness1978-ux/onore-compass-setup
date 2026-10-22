@@ -118,7 +118,7 @@ const ja: SettingsTranslation = {
       features: [
         "ファミリーの登録 0人（本人専用）",
         "5大要素の個別診断をフル体験",
-        "基本カラー2色",
+        "無料プランはバースカラー1色開放",
         "曼陀羅プレビュー（モザイク表示）",
         "地球暦バイオリズムはぼかし・モザイク表示",
         "広告あり",
@@ -263,7 +263,7 @@ const en: SettingsTranslation = {
       features: [
         "0 registered family members (personal only)",
         "Full five-element personal reading",
-        "2 basic colors",
+        "Free: 1 birth color unlocked",
         "Mandala preview (mosaic)",
         "Biorhythm: blurred preview",
         "With ads",
@@ -414,7 +414,7 @@ const zhCN: SettingsTranslation = {
       features: [
         "本人专用（可登记0位家人）",
         "完整体验五大要素个人诊断",
-        "基础颜色2色",
+        "免费方案解锁1种诞生色",
         "曼陀罗预览（马赛克显示）",
         "地球暦生物节律（模糊显示）",
         "含广告",
@@ -555,7 +555,7 @@ const zhTW: SettingsTranslation = {
       features: [
         "本人專用（可登錄0位家人）",
         "完整體驗五大要素個別診斷",
-        "基礎顏色2色",
+        "免費方案解鎖1種誕生色",
         "曼陀羅預覽（馬賽克顯示）",
         "地球暦生物節律（模糊顯示）",
         "含廣告",
@@ -700,7 +700,7 @@ const ko: SettingsTranslation = {
       features: [
         "본인 전용 (패밀리 등록 0명)",
         "5대 요소 개인 진단 전체 체험",
-        "기본 컬러 2색",
+        "무료 플랜 탄생 컬러 1색 해제",
         "만다라 미리보기(모자이크)",
         "지구력 바이오리듬 흐림 표시",
         "광고 포함",
@@ -850,7 +850,7 @@ const es: SettingsTranslation = {
       features: [
         "Solo para ti (0 familiares adicionales)",
         "Lectura personal completa de cinco elementos",
-        "2 colores básicos",
+        "Gratis: 1 color natal desbloqueado",
         "Vista previa del mandala (mosaico)",
         "Biorritmo: vista difuminada",
         "Con anuncios",
@@ -1001,7 +1001,7 @@ const fr: SettingsTranslation = {
       features: [
         "Usage personnel (0 proche supplémentaire)",
         "Analyse personnelle complète des cinq éléments",
-        "2 couleurs de base",
+        "Gratuit : 1 couleur natale débloquée",
         "Aperçu du mandala (mosaïque)",
         "Biorythme : aperçu flouté",
         "Avec publicités",

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { readingProfileSchema } from "./profile-reading-context";
+import { fortuneFingerprint } from "./today-subject";
 
 /** Shared (client + server) contract for the AI "Today's fortune" reading. */
 export const todayMemberSchema = readingProfileSchema.extend({
@@ -21,7 +22,12 @@ export const todayFortuneRequestSchema = z.object({
 export type TodayFortuneRequest = z.input<typeof todayFortuneRequestSchema>;
 
 const amount = z.object({ item: z.string(), amount: z.string() });
+const guidance = z.object({ action: z.string(), reason: z.string(), benefit: z.string() });
 export const todayFortuneSchema = z.object({
+  decision: z.object({ advance: z.string(), protect: z.string(), reason: z.string() }),
+  shopping: guidance,
+  maintenance: guidance,
+  monthly: z.object({ flower: guidance, action: guidance, item: guidance, outlook: z.string() }),
   headline: z.string(),
   insight: z.string(),
   dynamics: z.string(),
@@ -65,7 +71,7 @@ export function normalizeFortune(f: TodayFortune): TodayFortune {
 
 const HISTORY_KEY = "onore-today-ai-history";
 type HistoryEntry = { key: string; day: string; color: string; word: string; foods: string[] };
-export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string | undefined }) => `onore-today-ai:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}`;
+export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string | undefined; members?: TodayFortuneRequest['members'] }) => `onore-today-ai:v2:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}:${daySeed(r.members ? fortuneFingerprint({ members: r.members, subject: { ...r.subject, kind: 'self', label: '' } }) : '', '')}`;
 
 /** Recent picks to avoid: same subject's colors/words, every subject's foods, last 7 days excluding today. */
 export function avoidFromHistory(history: HistoryEntry[], key: string, day: string) {

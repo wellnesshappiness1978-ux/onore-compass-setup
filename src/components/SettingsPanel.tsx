@@ -32,6 +32,7 @@ import { AppearanceFitting } from "./AppearanceFitting";
 import { NautilusIcon } from './NautilusIcon';
 import type { AppearanceSelection } from '@/lib/appearance-customization';
 import { appearanceUiCopy } from '@/lib/appearance-ui-copy';
+import { planReadingLines } from '@/lib/today-access-copy';
 
 type Props = {
   profile: UserProfile;
@@ -302,7 +303,7 @@ export default function SettingsPanel({
                   {tier.priceNote && tier.id !== "b2b" && <span className="text-[10px] text-primary">{tier.priceNote}</span>}
                 </p>
                 <ul className="mt-3 flex-1 space-y-2">
-                  {item.features.map((f) => (
+                  {[...item.features, ...planReadingLines(item.id, language)].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-xs leading-5">
                       <span className="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-primary/15 text-primary"><Check className="size-2.5" strokeWidth={3} /></span>
                       <span className="min-w-0 break-words text-foreground/90">{f}</span>

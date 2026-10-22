@@ -1,5 +1,12 @@
 # Roadmap
 
+## Uploaded eleven-item daily guidance update (2026-10-22)
+- [x] Free one birth color and 1/3/5 recipe gates with consistent plan copy
+- [x] Center subject label and outlined self reset
+- [x] Subject-based daily decision, shopping, maintenance/monthly guidance and contextual samples
+- [x] Move VIP BGM settings and expanded member/goal relationship reminder below important settings
+- [x] Family+ three-wave detail gate; 60 targeted tests pass and latest build OK. Signed-in local roster target saved/read back, fresh member AI decision and five recipes rendered; Free/Standard/Family recipe gates confirmed. BGM volume 0.31 and relationship selection restored after reload; 320/390/1280px centered header without overflow/page errors. Real OS push delivery and a fresh multi-member AI result not verified in this task.
+
 ## Unified profile inputs and target names (2026-10-22)
 - [x] Counted siblings through ten children across all forms, preserving legacy values
 - [x] Country-specific linked editable birthplace fields and gender placeholders; Geolonia Japan and attributed GeoNames overseas gazetteer (reference coverage, not exhaustive official registry), saved country independent of display language
