@@ -1,11 +1,11 @@
 # Roadmap
 
 ## Unified profile inputs and target names (2026-10-22)
-- [ ] Counted siblings through ten children across all forms, preserving legacy values
-- [ ] Country-specific linked editable birthplace fields and gender placeholders
-- [ ] Red important-settings frame, collapsed family input and automatic first owner
-- [ ] Dynamic target navigation/names and complete AI birth/sibling context
-- [ ] Regression tests, browser flow and build verification
+- [x] Counted siblings through ten children across all forms, preserving legacy values
+- [x] Country-specific linked editable birthplace fields and gender placeholders; Geolonia Japan and attributed GeoNames overseas gazetteer (reference coverage, not exhaustive official registry), saved country independent of display language
+- [x] Red important-settings frame, collapsed family input and automatic first owner without persisted duplicate
+- [x] Dynamic target navigation/names and complete AI birth/sibling context; full/fast schemas share 80-character composition, group includes municipality and relationship type
+- [x] Regression tests and build OK; guest add/save/readback, self/family/group navigation, France→Île-de-France→Paris plus manual override, 390px no overflow, authenticated owner/form and generated quick essence with nickname checked. Full lengthy AI reading still loading at 110 seconds; no completion claim for that result, paid database member writes not attempted.
 
 ## Crisp high-definition center jewel (2026-10-21)
 - [x] Remove canvas blur/drop-shadow, increase live DPI resolution, refine facet contrast and precise gold-leaf edges without changing the original painting, gem size or seven-color row
