@@ -24,7 +24,18 @@ import type { Plan } from "@/lib/design-modes";
 
 import { cosmicGenesis, earthViewAtBirth } from "@/lib/cosmic-astronomy";
 const MandalaScene = lazy(() => import("./MandalaCanvas"));
-type Props = { language: Language; onVip: () => void; profile: UserProfile; plan: Plan; previewMode?: boolean };
+import type { groupBirthPalette } from "@/lib/group-palette";
+export type ArtSubject = { key: string; label: string; kind: "member" | "group"; palette?: ReturnType<typeof groupBirthPalette> };
+type Props = { language: Language; onVip: () => void; profile: UserProfile; plan: Plan; previewMode?: boolean; subject?: ArtSubject };
+const ownerCopy: Record<Language, { self: string; member: (n: string) => string; group: (n: string) => string; groupNote: string }> = {
+  ja: { self: "あなたのアート作品", member: n => `${n}さんのアート作品`, group: n => `${n}のアート作品（全員の7色）`, groupNote: "グループの曼荼羅はメンバー全員の7つのカラーで描かれます。出生宇宙創生図は個人ごとの作品のため、ファミリーを個別に選ぶと表示されます。" },
+  en: { self: "Your artwork", member: n => `${n}'s artwork`, group: n => `${n} artwork (everyone's 7 colors)`, groupNote: "The group mandala is painted with all members' seven colors. Cosmic Genesis is personal; select an individual family member to view it." },
+  "zh-CN": { self: "你的艺术作品", member: n => `${n}的艺术作品`, group: n => `${n}的艺术作品（全员7色）`, groupNote: "群组曼荼罗以全体成员的7种颜色绘制。出生宇宙创生图为个人作品，请单独选择家人查看。" },
+  "zh-TW": { self: "你的藝術作品", member: n => `${n}的藝術作品`, group: n => `${n}的藝術作品（全員7色）`, groupNote: "群組曼荼羅以全體成員的7種顏色繪製。出生宇宙創生圖為個人作品，請個別選擇家人查看。" },
+  ko: { self: "당신의 아트 작품", member: n => `${n}님의 아트 작품`, group: n => `${n}의 아트 작품(전원의 7색)`, groupNote: "그룹 만다라는 멤버 전원의 7가지 컬러로 그려집니다. 출생 우주 창생도는 개인 작품이므로 패밀리를 개별 선택하면 표시됩니다." },
+  es: { self: "Tu obra", member: n => `Obra de ${n}`, group: n => `Obra de ${n} (los 7 colores de todos)`, groupNote: "El mandala del grupo se pinta con los siete colores de todos. Génesis Cósmica es personal: elige a un familiar para verla." },
+  fr: { self: "Votre œuvre", member: n => `Œuvre de ${n}`, group: n => `Œuvre de ${n} (les 7 couleurs de tous)`, groupNote: "Le mandala du groupe est peint avec les sept couleurs de tous les membres. Genèse cosmique est personnelle : choisissez un proche pour la voir." },
+};
 
 const accessCopy: Record<Language, { mandalaLock: string; cosmicLock: string; mandalaCta: string; cosmicCta: string }> = {
   ja: { mandalaLock: "スタンダード会員以上でご利用いただけます", cosmicLock: "VIP会員以上でご利用いただけます", mandalaCta: "スタンダードプランを見る", cosmicCta: "VIPプランを見る" },
@@ -46,11 +57,14 @@ const cosmicPlanetNames: Record<Language, string[]> = {
   fr: ["Mercure", "Vénus", "Terre", "Mars", "Jupiter", "Saturne", "Uranus", "Neptune"],
 };
 
-export default function NineStarsPanel({ language, onVip, profile, plan, previewMode = false }: Props) {
+export default function NineStarsPanel({ language, onVip, profile, plan, previewMode = false, subject }: Props) {
   const t = nineStarsTranslations[language];
   const a = artSpecialistCopy[language];
   const { birthDate, bloodType } = profile;
-  const palette = birthColorSpectrum(profile);
+  const palette = subject?.palette !== undefined ? subject.palette : birthColorSpectrum(profile);
+  const isGroup = subject?.kind === "group";
+  const oc = ownerCopy[language];
+  const ownerLabel = subject ? subject.kind === "group" ? oc.group(subject.label) : oc.member(subject.label) : canUse(plan, "subjectArt") ? oc.self : null;
   const sky = natalSky(birthDate, profile.birthTime, profile.birthTimeUnknown);
   const genesis = cosmicGenesis(birthDate, profile.birthTime, profile.birthTimeUnknown);
   const earthView = genesis ? earthViewAtBirth(genesis, profile.birthPlace, profile.birthCity) : null;
@@ -96,7 +110,9 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
     <p className="text-xs text-primary/75">{t.subtitle}</p>
     <p className="mt-5 font-serif text-base text-primary/90">{t.tagline}</p>
     <h3 id="nine-stars-heading" className="mt-2 font-serif text-2xl text-gradient-gold sm:text-3xl">{a.heading}</h3>
-    <div className="mt-6 flex justify-center gap-2" role="tablist" aria-label={a.tabs}><Button variant={art === "mandala" ? "default" : "outline"} role="tab" aria-selected={art === "mandala"} onClick={() => setArt("mandala")} className="h-auto min-h-12 whitespace-normal text-xs sm:text-sm">{a.mandala}</Button><Button variant={art === "cosmic" ? "default" : "outline"} role="tab" aria-selected={art === "cosmic"} onClick={() => setArt("cosmic")} className="h-auto min-h-12 whitespace-normal text-xs sm:text-sm">{a.cosmic}</Button></div>
+    <div className="mt-6 flex justify-center gap-2" role="tablist" aria-label={a.tabs}><Button variant={art === "mandala" ? "default" : "outline"} role="tab" aria-selected={art === "mandala"} onClick={() => setArt("mandala")} className="h-auto min-h-12 whitespace-normal text-xs sm:text-sm">{a.mandala}</Button>{!isGroup && <Button variant={art === "cosmic" ? "default" : "outline"} role="tab" aria-selected={art === "cosmic"} onClick={() => setArt("cosmic")} className="h-auto min-h-12 whitespace-normal text-xs sm:text-sm">{a.cosmic}</Button>}</div>
+    {ownerLabel && <p className="mx-auto mt-4 inline-block rounded-full border border-primary/60 bg-primary/10 px-4 py-1.5 font-serif text-base font-bold text-primary" data-testid="art-owner-label">{ownerLabel}</p>}
+    {isGroup && <p className="mt-2 text-xs leading-6 text-muted-foreground">{oc.groupNote}</p>}
     <p className="mt-3 font-serif text-xl text-primary">{art === "mandala" ? a.mandala : a.cosmicLong}</p>
     <p className="mt-3 text-sm leading-7 text-muted-foreground">{palette && open ? art === "mandala" ? a.mandalaDescription : a.cosmicDescription : t.fallback}</p>
     {previewMode && open && <p className="mx-auto mt-3 inline-block border border-primary/40 px-3 py-1 text-sm text-primary">{t.testNotice}</p>}
