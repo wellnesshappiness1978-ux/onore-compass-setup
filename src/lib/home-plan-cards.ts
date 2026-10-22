@@ -44,7 +44,7 @@ const basehomePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
     close: "Close",
     nextStepNote: "Plan details are a reference preview and are not linked to real sign-up or billing.",
     cards: [
-      { id: "standard", badge: "Recommended", name: "Standard", catch: "The essential plan to deepen bonds with yourself and others", features: ["Quick compatibility: 3/day", "Up to 3 registered family members", "AI consultation: 3 questions a day", "Unlimited compatibility checks & detailed manual", "All 6 personal-color genres", "365 days of personal guidance"], cta: "See the Standard plan" },
+      { id: "standard", badge: "Recommended", name: "Standard", catch: "The essential plan to deepen bonds with yourself and others", features: ["Quick compatibility: 3/day", "Up to 3 registered family members", "AI consultation: 3 questions a day", "Unlimited compatibility checks & detailed manual", "All 7 birth-color genres (7 colors)", "365 days of personal guidance"], cta: "See the Standard plan" },
       { id: "vip", badge: "Most popular", name: "VIP", catch: "The highest personal experience for awakening your potential", features: ["Quick compatibility: 10/day", "Up to 10 registered family members", "AI consultation: 10 questions a day", "Full HD resonance mandala art, wallpaper saving & SNS sharing", "8-direction lucky-direction navigator", "Big-day calendar sync", "Completely ad-free"], cta: "See the VIP plan" },
       { id: "b2b", badge: "For loved ones", name: "Family", catch: "Bring out the strengths of family, friends and colleagues", features: ["Quick compatibility: 30/day", "Up to 30 registered family members", "AI consultation: 30 questions a day", "All 7 team & organization consulting tools (simultaneous diagnosis, AI selection, talent catalog, alert calendar, team balance, 1-on-1 manual and more)", "365-day business roadmap"], cta: "See the Family plan" },
       { id: "b2b-premium", badge: "Flagship", name: "Family Premium", catch: "A compass for up to 100 important connections", features: ["Quick compatibility: unlimited", "Up to 100 registered family members", "Unlimited AI consultation", "Full consulting for organizations up to 100 people", "Priority AI processing"], cta: "See Family Premium" },
@@ -57,7 +57,7 @@ const basehomePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
     close: "关闭",
     nextStepNote: "方案显示为参考预览，尚未与真实注册或支付联动。",
     cards: [
-      { id: "standard", badge: "推荐", name: "标准会员", catch: "加深自己与重要之人关系的基础方案", features: ["快速契合诊断 每天3次", "最多登记3位家人", "AI咨询 每天3次", "契合诊断与详细指南 无限制", "全部6大类别个人色彩", "365天个人建议"], cta: "查看标准方案" },
+      { id: "standard", badge: "推荐", name: "标准会员", catch: "加深自己与重要之人关系的基础方案", features: ["快速契合诊断 每天3次", "最多登记3位家人", "AI咨询 每天3次", "契合诊断与详细指南 无限制", "全部7大类别（7色）诞生色", "365天个人建议"], cta: "查看标准方案" },
       { id: "vip", badge: "人气No.1", name: "VIP会员", catch: "唤醒潜在能力的个人最高级灵性体验", features: ["快速契合诊断 每天10次", "最多登记10位家人", "AI咨询 每天10次", "高清「波动共鸣 曼陀罗艺术」全解锁·壁纸保存·SNS分享", "8方位吉方位导航", "重要日历同步", "完全无广告"], cta: "查看VIP方案" },
       { id: "b2b", badge: "珍视关系", name: "家庭会员", catch: "发挥家人、朋友与同事的个性，深化彼此连结", features: ["快速契合诊断 每天30次", "最多登记30位家人", "AI咨询 每天30次", "团队·组织咨询全部7项功能（同时诊断、AI人才选拔、人才名册、提醒日历、组织平衡、1对1指南等）", "365天企业路线图"], cta: "查看家庭方案" },
       { id: "b2b-premium", badge: "旗舰方案", name: "家庭尊享会员", catch: "可守护100位重要之人的关系罗盘", features: ["快速契合诊断 无限制", "最多登记100人", "AI咨询 无限制", "100人大型组织咨询完整支持", "优先AI处理（Priority AI）"], cta: "查看家庭尊享方案" },
@@ -70,7 +70,7 @@ const basehomePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
     close: "關閉",
     nextStepNote: "方案顯示為參考預覽，尚未與實際註冊或付款連動。",
     cards: [
-      { id: "standard", badge: "推薦", name: "標準會員", catch: "加深自己與重要之人關係的基礎方案", features: ["快速契合診斷 每天3次", "最多登錄3位家人", "AI諮詢 每天3次", "契合度診斷與詳細指南 無限制", "全部6大類別個人色彩", "365天個人建議"], cta: "查看標準方案" },
+      { id: "standard", badge: "推薦", name: "標準會員", catch: "加深自己與重要之人關係的基礎方案", features: ["快速契合診斷 每天3次", "最多登錄3位家人", "AI諮詢 每天3次", "契合度診斷與詳細指南 無限制", "全部7大類別（7色）誕生色", "365天個人建議"], cta: "查看標準方案" },
       { id: "vip", badge: "人氣No.1", name: "VIP會員", catch: "喚醒潛能的個人最高階靈性體驗", features: ["快速契合診斷 每天10次", "最多登錄10位家人", "AI諮詢 每天10次", "高畫質「波動共鳴 曼陀羅藝術」全解鎖·桌布保存·SNS分享", "8方位吉方位導航", "重要日同步", "完全無廣告"], cta: "查看VIP方案" },
       { id: "b2b", badge: "珍視關係", name: "家庭會員", catch: "發揮家人、朋友與同事的個性，深化彼此連結", features: ["快速契合診斷 每天30次", "最多登錄30位家人", "AI諮詢 每天30次", "團隊·組織顧問全部7項功能（同時診斷、AI人才選拔、人才名冊、提醒行事曆、組織平衡、1對1指南等）", "365天家庭路線圖"], cta: "查看家庭方案" },
       { id: "b2b-premium", badge: "旗艦方案", name: "家庭尊享會員", catch: "可守護100位重要之人的關係羅盤", features: ["快速契合診斷 無限制", "最多登錄100人", "AI諮詢 無限制", "100人大型組織顧問完整支援", "優先AI處理（Priority AI）"], cta: "查看家庭尊享方案" },
@@ -83,7 +83,7 @@ const basehomePlanCardsCopy: Record<Language, HomePlanCardsCopy> = {
     close: "닫기",
     nextStepNote: "플랜 표시는 참고 미리보기이며 실제 가입·결제와 연동되지 않습니다.",
     cards: [
-      { id: "standard", badge: "추천", name: "스탠다드 회원", catch: "나와 소중한 사람의 관계를 깊게 하는 기본 플랜", features: ["빠른 궁합 진단 하루 3회", "패밀리 최대 3명 등록", "AI 상담 하루 3회", "궁합 진단 & 상세 가이드 무제한", "전체 6장르 퍼스널 컬러", "365일 개인 맞춤 조언"], cta: "스탠다드 플랜 보기" },
+      { id: "standard", badge: "추천", name: "스탠다드 회원", catch: "나와 소중한 사람의 관계를 깊게 하는 기본 플랜", features: ["빠른 궁합 진단 하루 3회", "패밀리 최대 3명 등록", "AI 상담 하루 3회", "궁합 진단 & 상세 가이드 무제한", "전체 7장르(7색) 탄생 컬러", "365일 개인 맞춤 조언"], cta: "스탠다드 플랜 보기" },
       { id: "vip", badge: "인기 No.1", name: "VIP 회원", catch: "잠재 능력을 깨우는 개인 최고의 스피리추얼 경험", features: ["빠른 궁합 진단 하루 10회", "패밀리 최대 10명 등록", "AI 상담 하루 10회", "고화질 「공명 만다라 아트」 완전 해제·배경화면 저장·SNS 공유", "8방위 길방위 내비게이션", "중요한 날 캘린더 연동", "완전 광고 없음"], cta: "VIP 플랜 보기" },
       { id: "b2b", badge: "소중한 관계", name: "패밀리 회원", catch: "가족·친구·동료의 개성을 살려 관계를 깊게", features: ["빠른 궁합 진단 하루 30회", "최대 30명 등록", "AI 상담 하루 30회", "팀·조직 컨설팅 전체 7가지 기능 (동시 진단·AI 인선·인물 명부·알림 캘린더·조직 밸런스·1on1 가이드 등)", "365일 기업 로드맵"], cta: "패밀리 플랜 보기" },
       { id: "b2b-premium", badge: "최상위 플랜", name: "패밀리 프리미엄 회원", catch: "최대 100명의 소중한 관계를 위한 나침반", features: ["빠른 궁합 진단 무제한", "최대 100명 등록", "AI 상담 무제한", "100명 규모 조직 컨설팅 완전 지원", "우선 AI 처리 (Priority AI)"], cta: "패밀리 프리미엄 보기" },
