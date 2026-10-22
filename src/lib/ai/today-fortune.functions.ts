@@ -47,6 +47,10 @@ ${groupCtx}
 AVOID repeating (recently used, choose clearly different): colors [${avoid.colors.join(", ")}]; words [${avoid.words.join(" | ")}]; dishes [${avoid.foods.join(", ")}].
 
 Fields:
+- decision: advance (a reversible specific step), protect (a different verification/rest step), reason (explain this subject's individual rhythms, or all members' differing rhythms; never the owner's birthday in place of a group). Each ~150 Japanese chars and tied to the saved goal. No lucky-hour prediction.
+- shopping: action (one specific affordable item, spending cap and how to use it), reason (why this subject's profile/rhythm/goal fits it today, ~180 Japanese chars), benefit (practical improvement such as fewer forgotten tasks or easier shared meals, ~150 chars). Rotate by date AND subject; do not recommend spending for its own sake.
+- maintenance: action (gentle specific daily practice with duration), reason (today's symbolic per-person rhythm, not organ diagnosis), benefit (practical comfort/rest/communication benefit). Each ~150 Japanese chars. Respect actual health, no treatment or physiological guarantees.
+- monthly: flower, action, item (each action/reason/benefit ~100–150 Japanese chars), outlook (~350 Japanese chars). Cover the whole calendar month: early/middle/late phases using this subject's calculated daily rhythms, goals and members; choose a realistic flower/item, provide weekly steps and review criteria, not generic calendar-month prose. Symbolism is not a predicted event.
 - headline: one striking line (~30 Japanese chars) naming today's theme for this subject.
 - insight: ~250 Japanese chars. Why today feels the way it does from today's rhythm × birth layers${isGroup ? " × member interplay" : ""}, the essential truth behind the current hesitation, and the turning point.
 - dynamics: ~150 Japanese chars. ${isGroup ? (members.length === 2 ? "How these two can understand and support each other today, by name." : "Who leads, who supports, who needs care today, by name, using pair scores and rhythms.") : "How today's rhythm meets this person's innate pattern in relationships and the goal."}

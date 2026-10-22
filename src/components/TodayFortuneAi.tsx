@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ChefHat, Loader2, RefreshCw, Sparkles } from "lucide-react";
+import { ChefHat, Loader2, RefreshCw, Sparkles, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { generateTodayFortune } from "@/lib/ai/today-fortune.functions";
 import { avoidFromHistory, cacheKey, pushHistory, readHistory, todayFortuneSchema, type TodayFortune, type TodayFortuneRequest } from "@/lib/today-fortune";
 import type { Language } from "@/lib/translations";
+import type { Plan } from '@/lib/design-modes';
+import { luckyFoodLimit } from '@/lib/plans';
+import { todayAccessCopy } from '@/lib/today-access-copy';
 
 type Base = Omit<TodayFortuneRequest, "avoid">;
 export type FortuneState = { data: TodayFortune | null; loading: boolean; error: string | null; retry: () => void };
@@ -24,7 +27,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
       if (cached.success && nonce === 0) { setState({ data: cached.data, loading: false, error: null }); return; }
     } catch { /* ignore */ }
     let active = true;
-    setState(s => ({ data: s.data, loading: true, error: null }));
+    setState({ data: null, loading: true, error: null });
     run({ data: { ...req, avoid: avoidFromHistory(readHistory(), req.subject.key, req.day) } })
       .then(data => {
         if (!active) return;
@@ -39,9 +42,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
   return { ...state, retry: () => setNonce(n => n + 1) };
 }
 
-const t = (language: Language) => language === "ja"
-  ? { loading: "今日だけのリーディングを作成しています…", retry: "もう一度試す", actions: "今日の選択肢", caution: "気をつけたいこと", ingredients: "材料", seasonings: "調味料", steps: "作り方", tip: "開運ポイント", why: "なぜ今日この一品か", color: "ラッキーカラー", word: "ラッキーワード", foods: "運気アップフード 選りすぐり5品" }
-  : { loading: "Creating today's reading…", retry: "Try again", actions: "Today's options", caution: "Watch for", ingredients: "Ingredients", seasonings: "Seasonings", steps: "Steps", tip: "Lucky tip", why: "Why this dish today", color: "Lucky color", word: "Lucky word", foods: "5 hand-picked lucky foods" };
+const t = (language: Language) => todayAccessCopy[language];
 
 function Status({ state, language }: { state: FortuneState; language: Language }) {
   const c = t(language);
@@ -62,16 +63,17 @@ export function TodayInsight({ state, language }: { state: FortuneState; languag
   </div>;
 }
 
-export function TodayLuckyTrio({ state, language, fallback }: { state: FortuneState; language: Language; fallback: React.ReactNode }) {
+export function TodayLuckyTrio({ state, language, fallback, plan, onUpgrade }: { state: FortuneState; language: Language; fallback: React.ReactNode; plan: Plan; onUpgrade: () => void }) {
   const c = t(language), f = state.data;
   if (!f) return <div className="space-y-3"><Status state={state} language={language} />{fallback}</div>;
   return <div className="space-y-4 text-sm leading-6">
     <div className="flex items-start gap-2"><span className="mt-1 size-5 shrink-0 rounded-full border border-primary/40" style={{ background: f.luckyColor.hex }} /><div><strong className="text-primary">{c.color}</strong>：{f.luckyColor.name}（{f.luckyColor.hex}）<p className="text-xs opacity-90">{f.luckyColor.reason}</p></div></div>
     <div><strong className="text-primary">{c.word}</strong>：「{f.luckyWord.word}」<p className="text-xs opacity-90">{f.luckyWord.message}</p></div>
     <div>
-      <p className="flex items-center gap-1.5 font-serif text-primary"><ChefHat className="size-4" />{c.foods}</p>
+      <p className="flex items-center gap-1.5 font-serif text-primary"><ChefHat className="size-4" />{c.allFoods}</p>
+      <p className="mt-2 text-xs leading-6">{c.rules}</p>
       <Accordion type="multiple" className="mt-2 rounded-md border border-primary/25 bg-background/90 px-3 text-foreground">
-        {f.foods.map((food, i) => <AccordionItem key={food.name + i} value={String(i)}>
+        {f.foods.map((food, i) => i >= luckyFoodLimit[plan] ? <div key={i} className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/20 py-3"><span className="flex items-center gap-2"><LockKeyhole className="size-4 text-primary" />{i + 1}. {c.food} · {i < 3 ? 'Standard+' : 'VIP+'}</span><Button size="sm" variant="outline" onClick={onUpgrade}>{c.plans}</Button></div> : <AccordionItem key={food.name + i} value={String(i)}>
           <AccordionTrigger className="text-left">{i + 1}. {food.name}<span className="ml-2 text-xs font-normal text-muted-foreground">{food.servings}</span></AccordionTrigger>
           <AccordionContent className="space-y-3 text-sm leading-7">
             <p><strong className="text-primary">{c.why}</strong>：{food.why}</p>
