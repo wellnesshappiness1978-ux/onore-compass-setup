@@ -32,6 +32,7 @@ import { TodayCard } from './TodayCard';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 import { todaySample } from '@/lib/today-samples';
 import { subjectSignals, subjectDirections } from '@/lib/today-subject';
+import { groupBirthPalette } from '@/lib/group-palette';
 
 // Deterministic reference values from birth date and today's calendar; not verified readings or predictions.
 type Pair = { ja: string; en: string };
@@ -116,7 +117,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const benefit = todayBenefitCopy[language];
   const focus = useFocus();
   const [recipeIndex, setRecipeIndex] = useState<number | null>(null);
-  const today = useMemo(() => new Date(), []);
+  const [today, setToday] = useState(() => new Date());
+  useEffect(() => { const id = setInterval(() => setToday(old => localIso(old) === localIso(new Date()) ? old : new Date()), 30_000); return () => clearInterval(id); }, []);
   const iso = localIso(today);
   // AI reading is built for the actual subject: group members, a family member, or the owner — never reused across subjects.
   const fortuneReq = useMemo(() => {
@@ -169,7 +171,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const subjectMembers = fortuneReq?.members ?? [];
   const rhythm = subjectSignals(subjectMembers, today);
   const access = todayAccessCopy[language];
-  const spectrum = birthColorSpectrum(profile);
+  const spectrum = focus?.group ? groupBirthPalette(focus.group.members) : birthColorSpectrum(profile);
   const energy = useMemo(() => subjectDirections(subjectMembers, today), [JSON.stringify(subjectMembers), iso]);
   const best = energy[0]!;
   const rank = (p: Plan) => planOrder.indexOf(p);
@@ -368,6 +370,15 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   content.shopping = { notify: fortune.data?.shopping.action ?? access.loading, body: fortune.data ? guide(fortune.data.shopping) : <TodayInsight state={fortune} language={language} /> };
   content.health = { notify: fortune.data?.maintenance.action ?? access.loading, body: fortune.data ? guide(fortune.data.maintenance) : <TodayInsight state={fortune} language={language} /> };
   content.monthlyLucky = { notify: fortune.data?.monthly.action.action ?? access.loading, body: fortune.data ? <div className="space-y-5">{guide(fortune.data.monthly.flower)}{guide(fortune.data.monthly.action)}{guide(fortune.data.monthly.item)}<p className="text-sm leading-7">{fortune.data.monthly.outlook}</p></div> : <TodayInsight state={fortune} language={language} /> };
+  if (focus?.group) {
+    const group = focus.group;
+    const each = (render: (p: UserProfile) => ReactNode) => <div className="space-y-3">{group.members.map(m => <details key={m.id} className="border-t border-primary/25 pt-3"><summary className="cursor-pointer font-serif text-primary">{m.nickname || m.name}</summary><div className="mt-3">{render(memberToProfile(m))}</div></details>)}</div>;
+    content.starPath = { notify: fortune.data?.headline ?? access.loading, body: <TodayInsight state={fortune} language={language} /> };
+    content.directionExtended = { notify: access.action, body: each(p => <FengShuiGuide profile={p} date={today} language={language} />) };
+    content.direction = { ...content.direction, body: <><p className="text-sm">{focus.label(language)} · {L(dirNames[best.dir])}（{best.score}）</p>{each(p => <><p className="text-sm">{subjectDirections([p], today).map(e => `${L(dirNames[e.dir])} ${e.score}`).join(' / ')}</p>{canUseToday(plan, 'directionExtended') && <FengShuiGuide profile={p} date={today} language={language} />}</>)}</> };
+    content.helio = { ...content.helio, body: <>{rangeBanner}{each(p => <><DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={p} language={language} plan={plan} onUpgrade={onUpgrade} /><HelioCalendar hideDirections date={today} profile={p} plan={plan} language={language} onUpgrade={onUpgrade} /></>)}</> };
+    content.familyRoadmap = { ...content.familyRoadmap, body: each(p => <DayCompass rangeDays={helioRangeDays[plan]} profile={p} language={language} plan={plan} onUpgrade={onUpgrade} />) };
+  }
   // One-line personal teasers for locked cards, computed from the user's own reference values.
   const hour = 9 + ([...birth].reduce((a, ch) => a + (Number(ch) || 0), 0) + dayIdx) % 9;
   const peak = monthAvg.indexOf(Math.max(...monthAvg));
@@ -378,7 +389,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     helio: ja ? `今日は地球暦で一年の${dayIdx + 1}日目。あなたの円盤に今日の位置が灯ります。` : `Day ${dayIdx + 1} on your Earth Calendar dial.`,
     relations: access.choose,
     biorhythm365: birth ? (ja ? `${peak + 1}月は参考モデルの月平均が高めです。` : `${monthLabels[peak]} has a higher modeled monthly mean.`) : undefined,
-    monthlyLucky: ja ? `今月のあなたの花は「${L(month.flower)}」。` : `Your flower this month: ${L(month.flower)}.`,
+    monthlyLucky: access.action + ' · ' + access.reason,
     directionExtended: gua ? (ja ? `あなたは${gua.group === "east" ? "東四命" : "西四命"}タイプ。` : `You are ${gua.group === "east" ? "East" : "West"} group.`) : (ja ? `${stars.year}年のあなたの大開運方位が分かります。` : `See your ${stars.year} favorable direction.`),
     familyRoadmap: map ? (ja ? `今年の攻め月は${map.attack.slice(0, 2).map((m) => `${m + 1}月`).join("・")}。` : `Advance months: ${map.attack.slice(0, 2).map((m) => monthLabels[m]).join(", ")}.`) : undefined,
   };
@@ -408,7 +419,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const shareData = {
     kicker: ja ? "今日の占い" : "Today's guide", title: iso, score: Math.round(rhythm.total), names: focus?.group ? [focus.label(language)] : profile.nameKanji ? [profile.nameKanji] : [], kind: "daily" as const,
     lines: [
-      rhythm.total >= 55 ? (ja ? "決断：準備した一歩を小さく試す日" : "Decision: test one prepared step") : (ja ? "決断：確認と余白を整える日" : "Decision: verify and leave space"),
+      fortune.data?.decision.advance ?? (rhythm.total >= 55 ? (ja ? "決断：準備した一歩を小さく試す日" : "Decision: test one prepared step") : (ja ? "決断：確認と余白を整える日" : "Decision: verify and leave space")),
       fortune.data ? `${ja ? "3ラッキー" : "3 lucky"}: ${fortune.data.luckyColor.name} / ${fortune.data.luckyWord.word} / ${fortune.data.foods[0]?.name ?? ""}` : `${ja ? "3ラッキー" : "3 lucky"}: ${luckyColor ? localizeBirthColorName(luckyColor.name, language) : "—"} / ${L(word)} / ${L(foods[el][0]!)}`,
       `${ja ? "吉方位" : "Direction"}: ${L(dirNames[best.dir])}（${best.score}）`,
       ...(rank(plan) >= rank("standard") ? [
@@ -417,7 +428,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         `${ja ? "地球暦" : "Earth Calendar"}: ${ja ? `一年の${dayIdx + 1}日目` : `day ${dayIdx + 1}`}`,
       ] : []),
       ...(rank(plan) >= rank("vip") ? [
-        `${ja ? "今月の3ラッキー" : "Monthly lucky"}: ${L(month.flower)} / ${L(month.action)} / ${L(month.item)}`,
+        `${ja ? "今月の3ラッキー" : "Monthly lucky"}: ${fortune.data ? [fortune.data.monthly.flower.action, fortune.data.monthly.action.action, fortune.data.monthly.item.action].join(' / ') : access.loading}`,
         ...(yearDir ? [`${ja ? `${stars.year}年の大開運方位` : `${stars.year} direction`}: ${L(dirNames[yearDir])}`] : []),
         `${ja ? "対人" : "Relations"}: ${advice ? L(advice[0]) : (ja ? "感謝をひとつ具体的に伝える" : "Share one specific thanks")}`,
         `${ja ? "バイオリズム" : "Biorhythm"}: ${Math.round(rhythm.total)}`,

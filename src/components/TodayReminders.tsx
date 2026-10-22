@@ -13,6 +13,7 @@ import FeatureNotifySwitch, { registerReminderFallbacks } from './FeatureNotifyS
 import { TodayCard, TodayLockedGuide } from './TodayCard';
 import SolfeggioPlayer from './SolfeggioPlayer';
 import { todayAccessCopy } from '@/lib/today-access-copy';
+import { todaySample } from '@/lib/today-samples';
 
 /** Keeps one allowed reminder catalogue active across tab navigation, not just while Today is mounted. */
 export function DailyReminderCatalogue({ language, plan }: { language: Language; plan: Plan }) {
@@ -49,6 +50,6 @@ export default function TodayReminders({ language, plan, onUpgrade, kind }: { la
     </TodayCard>;
   return <TodayCard id="today-evening-reset" title={t.night}>
       <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2"><h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><Moon className="mt-1 size-4 shrink-0 text-primary" /><span className="min-w-0 break-words">{t.night}</span></h3>{!canUseEveningReset(plan) && <span className="rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">VIP+</span>}</div>
-      {canUseEveningReset(plan) ? <><p className="mt-2 text-xs text-muted-foreground">{localIso(today)} · {focus?.label(language)}</p><div className="mt-5 space-y-5">{sections.map((s,i) => <article key={i} className="border-l border-primary/40 pl-3"><h4 className="font-serif text-base text-primary">{s.title}</h4><p className="mt-2 text-sm leading-7 text-foreground">{s.body}</p></article>)}</div><p className="mt-4 text-xs leading-5 text-muted-foreground">{eveningCopy[language].disclaimer}</p><FeatureNotifySwitch id="eveningReset" title={t.night} body={t.nightTeaser} language={language} /></> : <TodayLockedGuide language={language} title={t.night} teaser={t.nightTeaser} sampleText={`${todayAccessCopy[language].sample} ${t.nightTeaser}`} onUpgrade={onUpgrade} />}
+      {canUseEveningReset(plan) ? <><p className="mt-2 text-xs text-muted-foreground">{localIso(today)} · {focus?.label(language)}</p><div className="mt-5 space-y-5">{sections.map((s,i) => <article key={i} className="border-l border-primary/40 pl-3"><h4 className="font-serif text-base text-primary">{s.title}</h4><p className="mt-2 text-sm leading-7 text-foreground">{s.body}</p></article>)}</div><p className="mt-4 text-xs leading-5 text-muted-foreground">{eveningCopy[language].disclaimer}</p><FeatureNotifySwitch id="eveningReset" title={t.night} body={t.nightTeaser} language={language} /></> : <TodayLockedGuide language={language} title={t.night} teaser={t.nightTeaser} sampleText={`${todayAccessCopy[language].sample} ${todaySample('evening', language)}`} onUpgrade={onUpgrade} />}
     </TodayCard>;
 }

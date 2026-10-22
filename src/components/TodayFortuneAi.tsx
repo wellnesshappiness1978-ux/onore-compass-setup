@@ -11,12 +11,13 @@ import { luckyFoodLimit } from '@/lib/plans';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 
 type Base = Omit<TodayFortuneRequest, "avoid">;
+const pendingFortunes = new Map<string, Promise<TodayFortune>>();
 export type FortuneState = { data: TodayFortune | null; loading: boolean; error: string | null; retry: () => void };
 
 /** One AI reading per subject/day/language/goal, cached on the device; recent picks are sent as avoid lists. */
 export function useTodayFortune(req: Base | null): FortuneState {
   const run = useServerFn(generateTodayFortune);
-  const [state, setState] = useState<{ data: TodayFortune | null; loading: boolean; error: string | null }>({ data: null, loading: false, error: null });
+  const [state, setState] = useState<{ data: TodayFortune | null; loading: boolean; error: string | null; sig?: string }>({ data: null, loading: false, error: null });
   const [nonce, setNonce] = useState(0);
   const sig = req ? JSON.stringify(req) : "";
   useEffect(() => {
@@ -24,22 +25,30 @@ export function useTodayFortune(req: Base | null): FortuneState {
     const key = cacheKey(req);
     try {
       const cached = todayFortuneSchema.safeParse(JSON.parse(localStorage.getItem(key) ?? "null"));
-      if (cached.success && nonce === 0) { setState({ data: cached.data, loading: false, error: null }); return; }
+      if (cached.success && nonce === 0) { setState({ data: cached.data, loading: false, error: null, sig }); return; }
     } catch { /* ignore */ }
     let active = true;
-    setState({ data: null, loading: true, error: null });
-    run({ data: { ...req, avoid: avoidFromHistory(readHistory(), req.subject.key, req.day) } })
-      .then(data => {
-        if (!active) return;
+    setState({ data: null, loading: true, error: null, sig });
+    let request = pendingFortunes.get(key);
+    if (!request) {
+      request = run({ data: { ...req, avoid: avoidFromHistory(readHistory(), req.subject.key, req.day) } }).then(data => {
         try { localStorage.setItem(key, JSON.stringify(data)); } catch { /* full */ }
         pushHistory(req.subject.key, req.day, data);
-        setState({ data, loading: false, error: null });
+        return data;
+      });
+      pendingFortunes.set(key, request);
+      void request.then(() => pendingFortunes.delete(key), () => pendingFortunes.delete(key));
+    }
+    request
+      .then(data => {
+        if (!active) return;
+        setState({ data, loading: false, error: null, sig });
       })
-      .catch((e: unknown) => { if (active) setState({ data: null, loading: false, error: e instanceof Error ? e.message : String(e) }); });
+      .catch((e: unknown) => { if (active) setState({ data: null, loading: false, error: e instanceof Error ? e.message : String(e), sig }); });
     return () => { active = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig, nonce]);
-  return { ...state, retry: () => setNonce(n => n + 1) };
+  return { ...(state.sig === sig ? state : { data: null, loading: Boolean(req), error: null }), retry: () => setNonce(n => n + 1) };
 }
 
 const t = (language: Language) => todayAccessCopy[language];
