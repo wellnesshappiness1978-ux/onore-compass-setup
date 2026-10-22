@@ -1,6 +1,7 @@
 import type { Language } from "./translations";
 import { reminderCopy } from "./reminder-copy";
 import { consultationDailyLimit, dailyUsageLimit, groupLimit, helioRangeDays, memberLimit } from "./plans";
+import { planReadingLines } from './today-access-copy';
 
 /** Home "next step" section: four paid-plan privilege cards. Preview copy only — billing is not connected. */
 export type HomePlanId = "standard" | "vip" | "b2b" | "b2b-premium";
@@ -159,4 +160,4 @@ const jaFeatures: Record<HomePlanId, string[]> = {
     "優先AI処理（Priority AI）",
   ],
 };
-export const homePlanCardsCopy: typeof basehomePlanCardsCopy = Object.fromEntries((Object.keys(basehomePlanCardsCopy) as Language[]).map(language => [language, { ...basehomePlanCardsCopy[language], cards: basehomePlanCardsCopy[language].cards.map(card => ({ ...card, features: language === "ja" ? jaFeatures[card.id] : [reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : []), ...card.features] })) }])) as typeof basehomePlanCardsCopy;
+export const homePlanCardsCopy: typeof basehomePlanCardsCopy = Object.fromEntries((Object.keys(basehomePlanCardsCopy) as Language[]).map(language => [language, { ...basehomePlanCardsCopy[language], cards: basehomePlanCardsCopy[language].cards.map(card => ({ ...card, features: [...planReadingLines(card.id, language), ...(language === "ja" ? jaFeatures[card.id] : [reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : []), ...card.features])] })) }])) as typeof basehomePlanCardsCopy;
