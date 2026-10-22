@@ -6,6 +6,7 @@ import { partnerSchema } from './compatibility-analysis';
 describe('linked birth addresses', () => {
   it('offers all 47 prefectures and only the selected prefecture municipalities', () => {
     expect(japaneseRegions).toHaveLength(47);
+    expect(japaneseRegions[13]).toBe('神奈川県');
     expect(japaneseCities('神奈川県')).toContain('横浜市保土ケ谷区');
     expect(japaneseCities('東京都')).not.toContain('横浜市保土ケ谷区');
   });
