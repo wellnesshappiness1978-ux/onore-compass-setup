@@ -15,6 +15,13 @@ const profile = {
   gender: "undisclosed" as const,
 };
 describe("consultation context boundaries", () => {
+  it("keeps detailed birth region, municipality and sibling counts", () => {
+    const data = consultationContext({ ...profile, birthPlace: "神奈川県", birthCity: "横浜市", siblingOrder: "10人・中間子・上に兄2人・下に妹3人" }, "2026-10-22");
+    expect(data.profileContext.birthPlace).toBe("神奈川県");
+    expect(data.profileContext.birthCity).toBe("横浜市");
+    expect(data.profileContext.siblingComposition?.up).toEqual(["兄", "兄"]);
+    expect(data.profileContext.siblingComposition?.down).toEqual(["妹", "妹", "妹"]);
+  });
   it("injects ten celestial bodies and the selected day without inventing unavailable charts", () => {
     const data = consultationContext(profile, "2026-10-16");
     expect(data.sky?.bodies).toHaveLength(10);

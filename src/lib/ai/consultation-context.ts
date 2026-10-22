@@ -6,6 +6,7 @@ import { biorhythm } from "../team-analysis";
 import { nineStarProfile } from "../calendar-traditions";
 import { helioPhase } from "./helio-phase";
 import { approachStatuses } from "../trait-reading";
+import { parseSiblingComposition } from "../sibling-order";
 
 type Input = CoreInput & {
   birthPlace: string;
@@ -37,6 +38,13 @@ export function consultationContext(profile: Input, day: string) {
     region: Boolean(profile.birthPlace || profile.birthCity),
   });
   return {
+    profileContext: {
+      birthPlace: profile.birthPlace,
+      birthCity: profile.birthCity,
+      siblingOrder: profile.siblingOrder,
+      siblingComposition: parseSiblingComposition(profile.siblingOrder),
+      interpretation: "Use the exact entered location and sibling counts/order for contextual examples and questions, not as proven personality evidence. Never infer missing siblings, local culture, timezone or precise coordinates from a language or address alone.",
+    },
     core: coreLayersPrompt(core),
     status,
     sky,

@@ -23,6 +23,7 @@ import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 import BirthColorGuide from "./BirthColorGuide";
 import { SacredDisclosure } from "./ui/sacred-disclosure";
 import { essenceKeys, traitReadingCopy } from "@/lib/trait-reading";
+import { useFocus } from './FocusProvider';
 
 const layerCopy: Record<Language, { title: string; choose: string; names: string[]; summaries: string[]; surface: string; inner: string; moreTime: string; birthplace: string; regional: string; prefectural: string; source: string }> = {
   ja: { title: "6大占術レイヤー", choose: "占術レイヤーを選択", names: ["本格姓名判断", "精密数秘術", "西洋占星術", "四柱推命", "動物占い・独自4層参考", "本格風水学"], summaries: ["名前の五運と社会面を確認します。", "生年月日とローマ字名の数を確認します。", "出生時の天体配置を確認します。", "生年月日時の暦と要素の配分を確認します。", "生年月日の60日周期を確認します。", "生年と性別区分から方位タイプを確認します。"], surface: "表の顔", inner: "本音・潜在", moreTime: "※出生時間を設定するとさらに精密度が向上します", birthplace: "出生地", regional: "市区町村", prefectural: "都道府県", source: "代表座標をアセンダントに使用。位置データ" },
@@ -116,6 +117,8 @@ function CoreLayersPanel({ layers: c, profile, language, reading, loading, nameD
 const planIcons: Record<HomePlanId, typeof Sprout> = { standard: Sprout, vip: Gem, b2b: Building2, "b2b-premium": Crown };
 
 export default function SelfCoreCard({ title, goal = "", profile, language, onDiagnosis, onProfileChange, currentPlan, onSelectPlan, experienceOnly = false }: { title?: string; goal?: string; onProfileChange?: (p: UserProfile) => Promise<void>; profile: UserProfile; language: Language; onDiagnosis: () => void; currentPlan?: Plan; onSelectPlan?: (plan: HomePlanId) => void; experienceOnly?: boolean }) {
+  const focus = useFocus();
+  const subject = { label: focus?.label(language) ?? 'you', isSelf: !focus?.member && !focus?.group };
   const { override, enabled } = usePlan();
   const activePlan = enabled && override ? override : currentPlan ?? "free";
   const palette = birthColorSpectrum(profile);
@@ -133,8 +136,8 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-six-v16", profile, language, goal],
-    queryFn: () => generate({ data: { profile, language, goal } }),
+    queryKey: ["home-reading-six-v17", profile, language, goal, subject],
+    queryFn: () => generate({ data: { profile, language, goal, subject } }),
     staleTime: Infinity,
     retry: false,
   });
@@ -142,8 +145,8 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
   const quickGen = useServerFn(generateQuickEssence);
   // Priority 1: a small, fast call for catchphrase + essence so the top appears first.
   const quick = useQuery({
-    queryKey: ["home-quick-essence-v1", profile, language, goal],
-    queryFn: () => quickGen({ data: { profile, language, goal } }),
+    queryKey: ["home-quick-essence-v2", profile, language, goal, subject],
+    queryFn: () => quickGen({ data: { profile, language, goal, subject } }),
     staleTime: Infinity,
     retry: false,
   });

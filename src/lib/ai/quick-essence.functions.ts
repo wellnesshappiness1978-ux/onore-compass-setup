@@ -6,17 +6,13 @@ import { getFiveElements } from "./five-elements";
 import { computeCoreLayers, coreLayersPrompt } from "./core-layers";
 import { supportiveWritingVoice } from "./writing-voice";
 import { traitReadingPrompt } from "@/lib/trait-reading";
+import { readingProfileSchema, readingSubjectSchema, profileReadingContext, profileContextInstructions } from "@/lib/profile-reading-context";
 
 const inputSchema = z.object({
-  profile: z.object({
-    nameKanji: z.string().max(40), nameKana: z.string().max(60), nameRomaji: z.string().max(60),
-    birthDate: z.string().date(), birthTime: z.string().max(20), birthTimeUnknown: z.boolean(),
-    birthPlace: z.string().max(80), birthCity: z.string().max(80),
-    gender: z.enum(["male", "female", "other", "undisclosed"]).optional(),
-    bloodType: z.string().max(4), siblingOrder: z.string().max(20),
-  }),
+  profile: readingProfileSchema,
   language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]),
   goal: z.string().max(240).optional(),
+  subject: readingSubjectSchema.optional(),
 });
 const quickSchema = z.object({
   catchphrase: z.string(),
@@ -40,6 +36,8 @@ export const generateQuickEssence = createServerFn({ method: "POST" })
       output: Output.object({ schema: quickSchema }),
       prompt: `Write in ${language}. Return only catchphrase and essence.
 ${supportiveWritingVoice}
+${profileContextInstructions}
+PROFILE CONTEXT: ${profileReadingContext(profile, data.subject)}
 Inputs (never recalculate or invent): sun sign ${elements.zodiac ?? "unknown"}; animal core ${elements.animal ?? "unavailable"}; name grid ${elements.name ? `person ${elements.name.person}, outer ${elements.name.outer}, total ${elements.name.total}` : "unavailable"}.
 ${core}
 Keep specialist labels out of the prose.

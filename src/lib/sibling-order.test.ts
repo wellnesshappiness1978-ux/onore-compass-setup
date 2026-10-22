@@ -1,8 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { buildSiblingComposition, parseSiblingComposition, siblingCategory, siblingDisplay } from "./sibling-order";
+import { SIBLING_COUNTS, buildSiblingComposition, changeSiblingCount, parseSiblingComposition, siblingCategory, siblingDisplay } from "./sibling-order";
 import { kindFromRelationshipType } from "./compatibility-context";
 
 describe("sibling composition", () => {
+  it("supports ten children and repeated taps with exact reversible counts", () => {
+    expect(SIBLING_COUNTS).toContain("10人");
+    let c = { count: "10人", order: "中間子", up: [] as string[], down: [] as string[] };
+    c = changeSiblingCount(changeSiblingCount(c, "兄", 1), "兄", 1);
+    c = changeSiblingCount(c, "妹", 1);
+    expect(buildSiblingComposition(c)).toBe("10人・中間子・上に兄2人・下に妹");
+    expect(parseSiblingComposition(buildSiblingComposition(c))).toEqual(c);
+    expect(changeSiblingCount(c, "兄", -1).up).toEqual(["兄"]);
+  });
+  it("does not exceed nine other siblings or the selected total", () => {
+    let c = { count: "10人", order: "長子", up: [] as string[], down: [] as string[] };
+    for (let i = 0; i < 12; i++) c = changeSiblingCount(c, "弟", 1);
+    expect(c.down).toHaveLength(9);
+    expect(changeSiblingCount({ ...c, count: "2人", down: ["弟"] }, "妹", 1).down).toEqual(["弟"]);
+  });
   it("builds and parses a full composition round-trip", () => {
     const s = buildSiblingComposition({ count: "3人", order: "長子", up: ["姉"], down: ["弟", "妹"] });
     expect(s).toBe("3人・長子・上に姉・下に弟と妹");

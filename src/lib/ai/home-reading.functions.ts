@@ -10,17 +10,14 @@ import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 import { distinctTraitChapters, supportiveWritingVoice } from "./writing-voice";
 import { approachKeys, approachStatuses, traitReadingPrompt } from "@/lib/trait-reading";
 import { nineStarProfile } from "@/lib/calendar-traditions";
+import { readingProfileSchema, readingSubjectSchema, profileReadingContext, profileContextInstructions } from "@/lib/profile-reading-context";
 
-const profileSchema = z.object({
-  nameKanji: z.string().max(40), nameKana: z.string().max(60), nameRomaji: z.string().max(60),
-  birthDate: z.string().date(), birthTime: z.string().max(20), birthTimeUnknown: z.boolean(),
-  birthPlace: z.string().max(80), birthCity: z.string().max(80), gender: z.enum(["male", "female", "other", "undisclosed"]).optional(),
-  bloodType: z.string().max(4), siblingOrder: z.string().max(20),
-});
+const profileSchema = readingProfileSchema;
 const inputSchema = z.object({
   profile: profileSchema,
   language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]),
   goal: z.string().max(240).optional(),
+  subject: readingSubjectSchema.optional(),
 });
 const readingSchema = z.object({
   catchphrase: z.string(),
@@ -87,6 +84,8 @@ export const generateHomeReading = createServerFn({ method: "POST" })
 ${goalLine ? goalLine + " In axisSummary, add one paragraph of concrete ideas, advice and cautions for reaching this goal." : ""}
 
 SHARED VOICE:
+${profileContextInstructions}
+PROFILE CONTEXT: ${profileReadingContext(profile, data.subject)}
 ${supportiveWritingVoice}
 ${distinctTraitChapters}
 

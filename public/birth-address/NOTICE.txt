@@ -1,0 +1,16 @@
+Birth address reference data
+
+International countries, first-level administrative areas and populated places:
+GeoNames, https://www.geonames.org/ , CC BY 4.0
+https://creativecommons.org/licenses/by/4.0/
+Source: https://download.geonames.org/export/dump/
+Files: countryInfo.txt, admin1CodesASCII.txt, cities500.zip
+Retrieved 2026-10-22. Adapted to country JSON files; coordinates omitted,
+place names deduplicated and grouped by first-level administrative area.
+This reference gazetteer is not exhaustive or an official address registry.
+Manual overrides are supported. Data is supplied without accuracy warranties.
+
+Japanese municipalities use the existing Geolonia Japanese Addresses
+representative-point dataset (CC BY 4.0):
+https://github.com/geolonia/japanese-addresses
+Japanese region IDs and existing saved profile text are preserved.

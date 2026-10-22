@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import LanguageSelector from "./LanguageSelector";
+import BirthplaceFields from "./BirthplaceFields";
+import { addressRegion } from "@/lib/birth-address";
 import SiblingSelect from "./SiblingSelect";
 import { ArrowRight, CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { prefecturesRomanized, translations, type Language } from "@/lib/translations";
+import { translations, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
 import { finalizePersonalName, formatPersonalName } from "@/lib/name-format";
-import { localizePrefecture, profileUiCopy } from "@/lib/profile-ui-copy";
+import { profileUiCopy } from "@/lib/profile-ui-copy";
 
 export type UserProfile = {
   nameKanji: string;
@@ -78,7 +80,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
 
   const stepValid = [
     profile.nameKanji.trim() !== "" && /^[\u3041-\u309F\u30FC\s]+$/.test(profile.nameKana.trim()) && /^[A-Za-z][A-Za-z\s'-]*$/.test(profile.nameRomaji.trim()) && genderChosen && profile.birthDate !== "",
-    profile.birthPlace !== "",
+    addressRegion(profile.birthPlace).trim() !== "",
     profile.bloodType !== "" && profile.siblingOrder !== "",
   ][step];
 
@@ -233,27 +235,7 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
           {/* Step 2: Birth place */}
           {step === 1 && (
             <div>
-              <label htmlFor="birth-place" className="mb-2 flex items-center gap-2 font-serif text-sm font-semibold text-primary">
-                <MapPin className="size-4 stroke-[1.4]" aria-hidden="true" />
-                 {t.birthPlace} <span className="text-xs font-normal text-primary/70">{t.required}</span>
-              </label>
-              <select
-                id="birth-place"
-                value={profile.birthPlace}
-                onChange={(e) => set("birthPlace", e.target.value)}
-                className={`${inputClass} appearance-none pr-10`}
-              >
-                <option value="" disabled>
-                   {t.selectPlace}
-                </option>
-                 {PREFECTURES.map((pref, index) => (
-                  <option key={pref} value={pref}>
-                     {localizePrefecture(language, index, pref, prefecturesRomanized[index] ?? pref)}
-                  </option>
-                ))}
-              </select>
-              <label htmlFor="birth-city" className="mb-2 mt-5 block font-serif text-sm font-semibold text-primary">{pt.city} <span className="text-xs font-normal text-primary/70">{pt.optional}</span></label>
-              <input id="birth-city" maxLength={80} placeholder={ui.placeholders.city} value={profile.birthCity} onChange={(e) => set("birthCity", e.target.value)} className={inputClass} />
+              <BirthplaceFields language={language} birthPlace={profile.birthPlace} birthCity={profile.birthCity} onChange={(birthPlace, birthCity) => setProfile(p => ({ ...p, birthPlace, birthCity }))} className={inputClass} />
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                  {t.placeHint}
               </p>

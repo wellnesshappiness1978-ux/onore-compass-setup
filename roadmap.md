@@ -1,5 +1,12 @@
 # Roadmap
 
+## Unified profile inputs and target names (2026-10-22)
+- [ ] Counted siblings through ten children across all forms, preserving legacy values
+- [ ] Country-specific linked editable birthplace fields and gender placeholders
+- [ ] Red important-settings frame, collapsed family input and automatic first owner
+- [ ] Dynamic target navigation/names and complete AI birth/sibling context
+- [ ] Regression tests, browser flow and build verification
+
 ## Crisp high-definition center jewel (2026-10-21)
 - [x] Remove canvas blur/drop-shadow, increase live DPI resolution, refine facet contrast and precise gold-leaf edges without changing the original painting, gem size or seven-color row
 - [x] Standard guest preview: live 1536px canvas / 768 CSS px at DPR 2; fullscreen 2048px canvas, both filter none. Actual downloaded certificate PNG 2048×2048; visually inspected gem crops, seven-color placement and certificate. No new clipping, collisions or page errors; 16 related tests pass; build OK. Full-resolution fullscreen screenshot exceeded image viewer limit; reviewed a resized copy plus original-resolution gem crop.
