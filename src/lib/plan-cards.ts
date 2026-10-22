@@ -24,7 +24,7 @@ const JA_FEATURES = {
     "ファミリーを最大3人登録",
     "アゴルメン相談室 1日3回まで",
     "相性診断＆統合詳細トリセツ 無制限",
-    "全6ジャンルバースカラー解放",
+    "全7ジャンル（全7色）バースカラー解放",
     "毎日の個人アドバイス",
   ],
   vip: [
@@ -74,7 +74,7 @@ const baseplanCardsCopy: Record<Language, PlanCardsCopy> = {
         "Register up to 3 family members",
         "AI consultation: 3 questions a day",
         "Unlimited compatibility checks & detailed manual",
-        "All 6 birth-color genres",
+        "All 7 birth-color genres (7 colors)",
         "Daily personal guidance",
       ] },
       { id: "vip", badge: "Most popular", tagline: "Every radiance, nothing held back", features: [
@@ -112,7 +112,7 @@ const baseplanCardsCopy: Record<Language, PlanCardsCopy> = {
         "最多登记3位家人",
         "AI咨询 每天3次",
         "相性诊断与详细指南 无限制",
-        "全部6大类别诞生色",
+        "全部7大类别（7色）诞生色",
         "每日个人建议",
       ] },
       { id: "vip", badge: "人气No.1", tagline: "释放全部光彩，毫无保留", features: [
@@ -150,7 +150,7 @@ const baseplanCardsCopy: Record<Language, PlanCardsCopy> = {
         "最多登錄3位家人",
         "AI諮詢 每天3次",
         "契合度診斷與詳細指南 無限制",
-        "全部6大類別誕生色",
+        "全部7大類別（7色）誕生色",
         "每日個人建議",
       ] },
       { id: "vip", badge: "人氣No.1", tagline: "釋放全部光彩，毫無保留", features: [
@@ -188,7 +188,7 @@ const baseplanCardsCopy: Record<Language, PlanCardsCopy> = {
         "패밀리 최대 3명 등록",
         "AI 상담 하루 3회",
         "궁합 진단 & 상세 가이드 무제한",
-        "전체 6장르 탄생 컬러",
+        "전체 7장르(7색) 탄생 컬러",
         "매일의 개인 조언",
       ] },
       { id: "vip", badge: "인기 No.1", tagline: "모든 빛남을 온전히", features: [
@@ -226,7 +226,7 @@ const baseplanCardsCopy: Record<Language, PlanCardsCopy> = {
         "Registra hasta 3 familiares",
         "Consulta de IA: 3 veces al día",
         "Compatibilidad y manual detallado sin límites",
-        "Los 6 géneros de colores de nacimiento",
+        "Los 7 géneros de colores de nacimiento (7 colores)",
         "Consejo personal diario",
       ] },
       { id: "vip", badge: "N.º1 en popularidad", tagline: "Todo tu brillo, sin reservas", features: [
@@ -264,7 +264,7 @@ const baseplanCardsCopy: Record<Language, PlanCardsCopy> = {
         "Inscrivez jusqu’à 3 proches",
         "Consultation IA : 3 fois par jour",
         "Affinités et manuel détaillé illimités",
-        "Les 6 genres de couleurs de naissance",
+        "Les 7 genres de couleurs de naissance (7 couleurs)",
         "Conseil personnel quotidien",
       ] },
       { id: "vip", badge: "Nº1 de la popularité", tagline: "Tout votre éclat, sans retenue", features: [

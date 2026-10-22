@@ -42,7 +42,7 @@ import BusinessFeaturePreview from "@/components/BusinessFeaturePreview";
 import LanguageSelector from "@/components/LanguageSelector";
 import { type DesignMode, type Plan } from "@/lib/design-modes";
 import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
-import { planOrder, quickCompatibilityLimit } from "@/lib/plans";
+import { canUse, planOrder, quickCompatibilityLimit } from "@/lib/plans";
 import { useDailyUsage } from "@/hooks/use-daily-usage";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
@@ -60,8 +60,10 @@ import HeaderBgm from "./HeaderBgm";
 import { DailyReminderCatalogue } from "./TodayReminders";
 import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
+import { groupBirthPalette } from "@/lib/group-palette";
+import type { ArtSubject } from "./NineStarsPanel";
 import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, GroupMembersToday, SubjectBanner, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
-import { focusCopy, goalText, groupDisplayName, memberDisplayName } from "@/lib/focus";
+import { focusCopy, goalText, groupDisplayName, memberDisplayName, memberToProfile } from "@/lib/focus";
 import { savedPartner, savedGroupMembers } from "@/lib/saved-compatibility";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { teamCopy } from "@/lib/team-copy";
@@ -597,18 +599,25 @@ function FocusGoalBridge({ onChange, language }: { onChange: (memberId: string |
   useEffect(() => { onChange(id, g, label); }, [id, g, label]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
-function FocusedTraits({ language, render }: { language: Language; render: (p: UserProfile, title: string, goal: string, isSelf: boolean) => ReactNode }) {
+function FocusedTraits({ language, render, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void; render: (p: UserProfile, title: string, goal: string, isSelf: boolean) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx) return null;
   const t = focusCopy[language];
   const goal = goalText(ctx.focus, language);
-  if (ctx.group) return <SubjectVoice language={language}><SubjectBanner language={language} /><GroupFocusCard language={language} /><GroupMembersToday language={language} /></SubjectVoice>;
+  if (ctx.group) return <SubjectVoice language={language}><SubjectBanner language={language} /><GroupFocusCard language={language} plan={plan} onUpgrade={onUpgrade} /><GroupMembersToday language={language} /></SubjectVoice>;
   return <SubjectVoice language={language}><SubjectBanner language={language} />{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</SubjectVoice>;
 }
-function FocusedToday({ language, render }: { language: Language; render: (p: UserProfile) => ReactNode }) {
+function FocusedArt({ language, owner, plan, render }: { language: Language; owner: UserProfile; plan: Plan; render: (p: UserProfile, subject?: ArtSubject) => ReactNode }) {
+  const ctx = useFocus();
+  if (!ctx || !canUse(plan, "subjectArt") || ctx.focus.targetKind === "self") return <>{render(owner)}</>;
+  if (ctx.member) return <>{render(memberToProfile(ctx.member), { key: `m-${ctx.member.id}`, label: ctx.label(language), kind: "member" })}</>;
+  if (ctx.group) { const gp = groupBirthPalette(ctx.group.members); return <>{render(owner, { key: `g-${ctx.group.group.id}`, label: ctx.label(language), kind: "group", palette: gp })}</>; }
+  return <>{render(owner)}</>;
+}
+function FocusedToday({ language, render, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void; render: (p: UserProfile) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx) return null;
-  return <SubjectVoice language={language}><SubjectBanner language={language} /><SubjectDailyNote language={language} />{ctx.group && <><GroupFocusCard language={language} /><GroupMembersToday language={language} /></>}{render(ctx.readingProfile)}</SubjectVoice>;
+  return <SubjectVoice language={language}><SubjectBanner language={language} /><SubjectDailyNote language={language} />{ctx.group && <><GroupFocusCard language={language} plan={plan} onUpgrade={onUpgrade} /><GroupMembersToday language={language} /></>}{render(ctx.readingProfile)}</SubjectVoice>;
 }
 
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
@@ -813,7 +822,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               </h2>
             </div>
             {tab === "traits" ? (
-              <FocusedTraits language={language} render={(p, title, goal, isSelf) => <SelfCoreCard experienceOnly profile={p} title={title} goal={goal} language={language} {...(isSelf ? { onProfileChange } : {})} onDiagnosis={() => undefined} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} />} />
+              <FocusedTraits language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} render={(p, title, goal, isSelf) => <SelfCoreCard experienceOnly profile={p} title={title} goal={goal} language={language} {...(isSelf ? { onProfileChange } : {})} onDiagnosis={() => undefined} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} />} />
             ) : tab === "today" ? (
               <>
                 <section className="design-compass-section min-w-0 w-full max-w-full text-center" aria-label={t.today}>
@@ -830,7 +839,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                       day: "numeric",
                     }).format(new Date())}
                   </p>
-                  <FocusedToday language={language} render={(p) => <TodayGuide profile={p} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />} />
+                  <FocusedToday language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} render={(p) => <TodayGuide profile={p} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />} />
                 </section>
               </>
             ) : tab === "consult" ? (
@@ -854,7 +863,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             ) : tab === "business" ? (
               <><FamilyGroupButtons language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><BusinessFeaturePreview language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>
             ) : tab === "art" ? (
-              <><ArtOwnerOnlyNotice language={language} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /><NineStarsPanel language={language} profile={profile} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /></>
+              <><ArtOwnerOnlyNotice language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /><FocusedArt language={language} owner={profile} plan={previewPlan} render={(p, subject) => <NineStarsPanel key={subject?.key ?? "self"} subject={subject} language={language} profile={p} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} />} /></>
             ) : tab === "settings" ? (
               <><FocusSettingsCard language={language} /><div className="h-6" /><SettingsPanel
                 profile={profile}

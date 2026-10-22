@@ -10,9 +10,14 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { useFocus } from "./FocusProvider";
 import { addTeamGroup, deleteTeamGroup, updateTeamGroup } from "@/lib/team-groups.functions";
 import { canAddGroup, focusCopy, selfReadingLabel, goalText, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, mixHex, type TargetKind, type TeamGroup } from "@/lib/focus";
-import { groupLimit, memberLimit } from "@/lib/plans";
+import { canUse, groupLimit, memberLimit } from "@/lib/plans";
 import { familyCapacityCopy, fitsMemberCapacity, registeredMemberCount } from '@/lib/family-capacity';
-import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
+import { birthColorNameForHex, birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
+import { groupBirthPalette, groupPaletteRoles } from "@/lib/group-palette";
+import { birthColorCopy } from "@/lib/birth-color-copy";
+import { colorExperienceCopy } from "@/lib/color-experience-copy";
+import { colorReference, colorReferenceCopy } from "@/lib/color-reference";
+import { LockKeyhole } from "lucide-react";
 import { biorhythm, pairScore, type TeamMember } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
@@ -77,7 +82,7 @@ export function SubjectBanner({ language }: { language: Language }) {
 }
 
 /** Group reading: group color, members' colors, harmony and today's average rhythm. */
-export function GroupFocusCard({ language }: { language: Language }) {
+export function GroupFocusCard({ language, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void }) {
   const ctx = useFocus();
   const t = focusCopy[language];
   const g = ctx?.group;
@@ -101,7 +106,8 @@ export function GroupFocusCard({ language }: { language: Language }) {
     <h2 className="font-serif text-xl text-gradient-gold sm:text-2xl">{t.traitsGroup(name)}</h2>
     {goal && <p className="mt-1 text-xs text-muted-foreground">{t.goalNote(goal)}</p>}
     {!g.members.length ? <p className="mt-3 text-sm text-muted-foreground">{t.groupEmpty}</p> : <>
-      {stats.groupHex && <div className="mt-4 rounded-md p-4" style={{ background: `linear-gradient(135deg, ${stats.groupHex}, ${stats.groupHex}66)` }}><p className="text-xs font-bold text-outline text-foreground">{t.groupColor}</p><p className="mt-1 font-serif text-2xl font-bold text-outline text-foreground">{name} · {stats.groupHex.toUpperCase()}</p></div>}
+      {stats.groupHex && <div className="mt-4 rounded-md p-4" style={{ background: `linear-gradient(135deg, ${stats.groupHex}, ${stats.groupHex}66)` }}><p className="text-xs font-bold text-outline text-foreground">{t.groupColor}</p><p className="mt-1 font-serif text-2xl font-bold text-outline text-foreground">{name} · {localizeBirthColorName(birthColorNameForHex(stats.groupHex), language)}</p><p className="mt-1 font-mono text-sm font-bold text-outline text-foreground">{stats.groupHex.toUpperCase()}</p></div>}
+      <GroupSevenColors language={language} plan={plan} onUpgrade={onUpgrade} members={g.members} />
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupHarmony}</p><p className="font-serif text-2xl text-primary">{stats.harmony ?? "—"}{stats.harmony !== null && <span className="text-sm">/100</span>}</p></div>
         <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupRhythm}</p><p className="font-serif text-2xl text-primary">{stats.rhythm ?? "—"}<span className="text-sm">/100</span></p></div>
@@ -120,9 +126,9 @@ export function GroupFocusCard({ language }: { language: Language }) {
   </section>;
 }
 
-export function ArtOwnerOnlyNotice({ language, onUpgrade }: { language: Language; onUpgrade: () => void }) {
+export function ArtOwnerOnlyNotice({ language, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void }) {
   const ctx = useFocus();
-  if (!ctx || ctx.focus.targetKind === "self" || (!ctx.member && !ctx.group)) return null;
+  if (!ctx || canUse(plan, "subjectArt") || ctx.focus.targetKind === "self" || (!ctx.member && !ctx.group)) return null;
   const t = focusCopy[language];
   return <div role="note" className="mb-5 rounded-md border border-primary/40 bg-primary/10 p-4"><p className="font-serif text-primary">{t.artOwnerOnly}</p><p className="mt-1 text-sm leading-6 text-foreground">{t.artOwnerOnlyBody}</p><Button size="sm" variant="outline" className="mt-3" onClick={onUpgrade}>{t.seePlans}</Button></div>;
 }
@@ -297,4 +303,29 @@ export function GroupMembersToday({ language }: { language: Language }) {
         <p className="text-xs"><span className="text-primary">{c.cautionLabel}：</span>{c.caution[x.caution]}</p>
       </li>)}</ul></div>
   </section>;
+}
+
+const groupColorsCopy: Record<Language, { title: string; intro: string; lockTitle: string; lockBody: string; cta: string; psych: string; cue: string }> = {
+  ja: { title: "グループの全7カラー", intro: "メンバー全員の各ジャンルのカラーを重ね合わせた、グループの7色です。", lockTitle: "グループの全7色はVIPプラン以上で解放", lockBody: "VIPプラン以上で、グループ全員の7つのカラーの名称と、ご本人の診断と同じ詳しさの解説をご覧いただけます。", cta: "VIPプランを見る", psych: "色の印象", cue: "活かし方のヒント" },
+  en: { title: "The group's seven colors", intro: "Seven group colors blended from every member's color in each genre.", lockTitle: "All seven group colors unlock with VIP", lockBody: "With VIP or above, see the names of all seven group colors and explanations as detailed as your own reading.", cta: "View VIP plan", psych: "Impression", cue: "How to use it" },
+  "zh-CN": { title: "群组全部7色", intro: "将全体成员各类别颜色叠加而成的群组7色。", lockTitle: "群组全部7色在VIP方案及以上解锁", lockBody: "VIP方案及以上可查看群组全部7色的名称，以及与本人诊断同等详细的解说。", cta: "查看VIP方案", psych: "颜色印象", cue: "运用提示" },
+  "zh-TW": { title: "群組全部7色", intro: "將全體成員各類別顏色疊加而成的群組7色。", lockTitle: "群組全部7色在VIP方案以上解鎖", lockBody: "VIP方案以上可查看群組全部7色的名稱，以及與本人診斷同等詳細的解說。", cta: "查看VIP方案", psych: "顏色印象", cue: "運用提示" },
+  ko: { title: "그룹의 전체 7컬러", intro: "멤버 전원의 장르별 컬러를 겹쳐 만든 그룹의 7색입니다.", lockTitle: "그룹 전체 7색은 VIP 플랜 이상에서 해제", lockBody: "VIP 플랜 이상에서 그룹 7색의 이름과 본인 진단과 같은 수준의 자세한 해설을 볼 수 있습니다.", cta: "VIP 플랜 보기", psych: "색의 인상", cue: "활용 힌트" },
+  es: { title: "Los siete colores del grupo", intro: "Siete colores del grupo mezclando el color de cada miembro en cada género.", lockTitle: "Los siete colores del grupo se desbloquean con VIP", lockBody: "Con VIP o superior verás los nombres de los siete colores del grupo y explicaciones tan detalladas como tu propia lectura.", cta: "Ver plan VIP", psych: "Impresión", cue: "Cómo aprovecharlo" },
+  fr: { title: "Les sept couleurs du groupe", intro: "Sept couleurs de groupe issues du mélange des couleurs de chaque membre par genre.", lockTitle: "Les sept couleurs du groupe se débloquent avec VIP", lockBody: "Avec VIP ou plus, découvrez les noms des sept couleurs du groupe et des explications aussi détaillées que votre lecture.", cta: "Voir l'offre VIP", psych: "Impression", cue: "Comment l'utiliser" },
+};
+
+/** VIP+: the group's seven named colors with full explanations; lower plans see an upgrade prompt. */
+function GroupSevenColors({ language, plan, onUpgrade, members }: { language: Language; plan: Plan; onUpgrade: () => void; members: TeamMember[] }) {
+  const palette = useMemo(() => groupBirthPalette(members), [members]);
+  if (!palette) return null;
+  const c = groupColorsCopy[language], roles = birthColorCopy[language].roles, exp = colorExperienceCopy[language], ref = colorReferenceCopy[language];
+  if (!canUse(plan, "groupColorsFull")) return <div role="note" className="mt-4 rounded-md border border-dashed border-primary/50 p-4 text-center" data-testid="group-colors-locked"><LockKeyhole className="mx-auto size-5 text-primary" aria-hidden="true" /><p className="mt-2 font-serif text-primary">{c.lockTitle}</p><p className="mt-1 text-sm leading-6">{c.lockBody}</p><Button size="sm" variant="champagne" className="mt-3" onClick={onUpgrade}>{c.cta}</Button></div>;
+  return <section className="mt-4" data-testid="group-seven-colors"><h3 className="text-sm font-bold text-primary">{c.title}</h3><p className="mt-1 text-xs text-muted-foreground">{c.intro}</p>
+    <ul className="mt-3 grid gap-3 sm:grid-cols-2">{groupPaletteRoles.map(r => { const col = palette[r]; const e = colorReference(col.code); return <li key={r} className="min-w-0 rounded-md border border-primary/25 p-3 [overflow-wrap:anywhere]">
+      <div className="flex items-center gap-3"><span className="size-9 shrink-0 rounded-full border border-primary/40" style={{ backgroundColor: col.code }} aria-hidden="true" /><div className="min-w-0"><p className="text-xs text-muted-foreground">{roles[r].label}</p><p className="font-serif font-bold text-primary">{localizeBirthColorName(col.name, language)} <span className="font-mono text-xs">{col.code}</span></p></div></div>
+      <p className="mt-2 text-xs leading-6">{roles[r].detail}</p>
+      <p className="mt-2 text-xs font-bold text-primary">{c.psych}</p><p className="text-xs leading-6">{exp.psych[e.index]}</p>
+      <p className="mt-2 text-xs font-bold text-primary">{c.cue}</p><p className="text-xs leading-6">{ref.cues[e.index]}</p>
+    </li>; })}</ul></section>;
 }

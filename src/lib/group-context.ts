@@ -2,6 +2,8 @@ import { z } from "zod";
 import { birthColorSpectrum } from "./birth-color-spectrum";
 import { biorhythm, pairScore, type TeamMember } from "./team-analysis";
 import { groupColorMeaning } from "./group-insight";
+import { groupSizeDirective } from "./goal-guidance";
+import { groupBirthPalette } from "./group-palette";
 
 /** Minimal member data sent with a group consultation; numbers are recomputed server-side. */
 export const groupMemberSchema = z.object({
@@ -41,12 +43,13 @@ export function buildGroupContext(name: string, input: GroupMemberInput[], day: 
   scored.sort((x, y) => y.s - x.s).forEach(p => pairs.push(`${p.a} × ${p.b}: ${p.s}/100`));
   const top = rh[0]!, low = rh[rh.length - 1]!;
   return [
-    `GROUP CONSULTATION — group "${name}", ${members.length} members. Advise the group as a whole and refer to members by name.`,
+    `GROUP CONSULTATION — group "${name}", ${members.length} members. ${groupSizeDirective(members.length)}`,
     `Members: ${members.map((m, i) => `${m.name} (born ${m.birthDate}${m.birthPlace ? `, birth region ${m.birthPlace}` : ""}${m.birthCity ? `, birth municipality ${m.birthCity}` : ""}${m.bloodType ? `, blood ${m.bloodType}` : ""}${m.siblingOrder ? `, sibling ${m.siblingOrder}` : ""}${m.relationshipType ? `, relationship type ${m.relationshipType}` : ""}${m.relationship ? `, relation ${m.relationship}` : ""}, birth color ${colors[i] ? `${colors[i]!.name} ${colors[i]!.code}` : "n/a"})`).join("; ")}.`,
     meaning ? `Group color: ${meaning.name} ${hex}. Essence: ${meaning.essence} Energy: ${meaning.energy} Role: ${meaning.role} Advice: ${meaning.advice}` : "Group color: not available.",
+    (() => { const gp = groupBirthPalette(members); return gp ? `Group seven colors (role: name code): ${(["main", "sub", "money", "work", "love", "health", "mind"] as const).map(r => `${r}: ${gp[r].name} ${gp[r].code}`).join("; ")}.` : ""; })(),
     `Today's (${day}) group average rhythm: ${avg}/100. Per member (body/emotion/mind/total): ${rh.map(x => `${x.m.name} ${pct(x.r.physical)}/${pct(x.r.emotional)}/${pct(x.r.intellectual)}/${x.r.total}`).join("; ")}.`,
     `Most momentum today: ${top.m.name} (${top.r.total}).${rh.length > 1 && low.r.total < 45 ? ` Needs care today: ${low.m.name} (${low.r.total}).` : ""}`,
     pairs.length ? `Compatibility map (highest first): ${pairs.join("; ")}.` : "Only one member, so no pair compatibility.",
-    `Use these reference values as evidence: suggest concrete role assignments, who should pair up for which task, how to support low-rhythm members, and how to use the group color's strengths. Values are symbolic reference calculations, not verified facts.`,
+    members.length === 2 ? `Use these reference values as evidence for how these two can understand, support and talk to each other, timing for important conversations, and how to use their shared colors. Values are symbolic reference calculations, not verified facts.` : `Use these reference values as evidence: suggest concrete role assignments, who should pair up for which task, how to support low-rhythm members, and how to use the group color's strengths. Values are symbolic reference calculations, not verified facts.`,
   ].join("\n");
 }
