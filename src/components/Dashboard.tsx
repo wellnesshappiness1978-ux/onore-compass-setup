@@ -57,7 +57,8 @@ import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
-import { DailyReminderCatalogue } from "./TodayReminders";
+import TodayReminders, { DailyReminderCatalogue } from "./TodayReminders";
+import DailyRelationshipGuide from './DailyRelationshipGuide';
 import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
 import { groupBirthPalette } from "@/lib/group-palette";
@@ -749,12 +750,12 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     <FocusGoalBridge onChange={(id, g, label) => { setFocusMemberId(id); setFocusGoal(g); setTraitsLabel(label); }} language={language} />
     <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
       <div className="celestial-stars" aria-hidden="true" />
-      <div className="mobile-fixed-header fixed inset-x-0 z-[60] grid grid-cols-[auto_minmax(0,1fr)_auto] items-center border-b border-primary/25 bg-background/95 px-2 backdrop-blur-xl">
+      <div className="mobile-fixed-header fixed inset-x-0 z-[60] grid grid-cols-[1fr_auto_1fr] items-center border-b border-primary/25 bg-background/95 px-2 backdrop-blur-xl">
         <Button size="icon" variant="ghost" onClick={() => goToTab("home")} aria-label={t.home} title={t.home} aria-current={tab === "home" ? "page" : undefined} className="size-10 shrink-0 text-primary [&_svg]:size-6">
           <Home className="size-7" strokeWidth={1.8} />
         </Button>
         <SubjectHeaderBadge language={language} ownerName={profile.nameKanji || profile.nameRomaji} onOpen={() => { goToTab("settings"); window.setTimeout(() => { const el = document.getElementById("focus-settings") as HTMLDetailsElement | null; if (el) { el.open = true; el.scrollIntoView({ behavior: "smooth", block: "start" }); } }, 150); }} />
-        <div className="flex min-w-0 items-center gap-1">
+        <div className="flex min-w-0 items-center justify-self-end gap-1">
         <HeaderBgm language={language} plan={previewPlan} onUpgrade={() => { goToTab("settings"); window.setTimeout(() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100); }} />
         <LanguageSelector inline language={language} onChange={onLanguageChange} />
         <Button size="icon" variant="ghost" onClick={() => goToTab("settings")} aria-label={t.settings} title={t.settings} aria-current={tab === "settings" ? "page" : undefined} className="size-10 shrink-0 text-primary [&_svg]:size-6">
@@ -865,7 +866,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             ) : tab === "art" ? (
               <><ArtOwnerOnlyNotice language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /><FocusedArt language={language} owner={profile} plan={previewPlan} render={(p, subject) => <NineStarsPanel key={subject?.key ?? "self"} subject={subject} language={language} profile={p} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} />} /></>
             ) : tab === "settings" ? (
-              <><FocusSettingsCard language={language} /><div className="h-6" /><SettingsPanel
+              <><FocusSettingsCard language={language} /><div className="mt-4 space-y-4"><TodayReminders kind="bgm" language={language} plan={previewPlan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} /><DailyRelationshipGuide language={language} plan={previewPlan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} /></div><div className="h-6" /><SettingsPanel
                 profile={profile}
                 language={language}
                 plan={previewPlan}
