@@ -48,3 +48,14 @@ export function birthColorSpectrum(p: Birth) {
   const color = (index: number) => palette[(index + 1440) % 1440] ?? { slot: 1, name: "参考色", code: hex(0, 0.57, 0.51) };
   return { main: color(base), sub: color(base + 215), money: color(base + 360), work: color(base + 1013), love: color(base + 600), health: color(base + 840), mind: color(base + 487), provisional: !hasTime, placeDefault: !p.birthPlace };
 }
+/** Palette family name for any hex (same 45° hue bands as the 1440-slot palette). */
+export function birthColorNameForHex(code: string): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(code);
+  if (!m) return "—";
+  const [r, g, b] = [0, 2, 4].map(i => parseInt(m[1]!.slice(i, i + 2), 16) / 255) as [number, number, number];
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  let h = 0;
+  if (d) h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  const hue = (h * 60 + 360) % 360;
+  return names[Math.floor(hue / 45) % names.length]!;
+}
