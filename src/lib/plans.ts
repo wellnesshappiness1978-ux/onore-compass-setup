@@ -41,7 +41,7 @@ export const consultationDailyLimit: Record<Plan, number> = { free: 1, standard:
 export { quickCompatibilityLimit };
 export const nextPlan = (plan: Plan): Plan | null => planOrder[rank(plan) + 1] ?? null;
 /** Minimum plan for birth-color and earth-calendar sections. */
-export type ContentFeature = "birthColorsFull" | "helioPersonal" | "helioDirections" | "helioBusiness" | "mandalaArt" | "cosmicGenesisArt";
+export type ContentFeature = "birthColorsFull" | "helioPersonal" | "helioDirections" | "helioBusiness" | "mandalaArt" | "cosmicGenesisArt" | "groupColorsFull" | "subjectArt";
 const contentMin: Record<ContentFeature, Plan> = {
   birthColorsFull: "standard",
   helioPersonal: "standard",
@@ -49,6 +49,10 @@ const contentMin: Record<ContentFeature, Plan> = {
   helioBusiness: "b2b",
   mandalaArt: "standard",
   cosmicGenesisArt: "vip",
+  /** Group seven colors with names and details. */
+  groupColorsFull: "vip",
+  /** Family/group mandala and per-person Cosmic Genesis art. */
+  subjectArt: "b2b",
 };
 export const canUse = (plan: Plan, feature: ContentFeature) => rank(plan) >= rank(contentMin[feature]);
 export const minPlanFor = (feature: ContentFeature) => contentMin[feature];
