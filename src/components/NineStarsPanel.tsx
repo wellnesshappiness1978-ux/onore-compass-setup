@@ -26,7 +26,7 @@ import { cosmicGenesis, earthViewAtBirth } from "@/lib/cosmic-astronomy";
 const MandalaScene = lazy(() => import("./MandalaCanvas"));
 import type { groupBirthPalette } from "@/lib/group-palette";
 export type ArtSubject = { key: string; label: string; kind: "member" | "group"; palette?: ReturnType<typeof groupBirthPalette> };
-type Props = { language: Language; onVip: () => void; profile: UserProfile; plan: Plan; previewMode?: boolean; subject?: ArtSubject };
+type Props = { language: Language; onVip: () => void; profile: UserProfile; plan: Plan; previewMode?: boolean; subject?: ArtSubject | undefined };
 const ownerCopy: Record<Language, { self: string; member: (n: string) => string; group: (n: string) => string; groupNote: string }> = {
   ja: { self: "あなたのアート作品", member: n => `${n}さんのアート作品`, group: n => `${n}のアート作品（全員の7色）`, groupNote: "グループの曼荼羅はメンバー全員の7つのカラーで描かれます。出生宇宙創生図は個人ごとの作品のため、ファミリーを個別に選ぶと表示されます。" },
   en: { self: "Your artwork", member: n => `${n}'s artwork`, group: n => `${n} artwork (everyone's 7 colors)`, groupNote: "The group mandala is painted with all members' seven colors. Cosmic Genesis is personal; select an individual family member to view it." },
