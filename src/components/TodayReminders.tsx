@@ -14,6 +14,8 @@ import { TodayCard, TodayLockedGuide } from './TodayCard';
 import SolfeggioPlayer from './SolfeggioPlayer';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 import { todaySample } from '@/lib/today-samples';
+import { getPianoState, setPianoHz, setPianoVolume, subscribePiano } from '@/lib/piano-store';
+import { BGM_PREF_KEY, validBgmPreference } from '@/lib/reminder-preferences';
 
 /** Keeps one allowed reminder catalogue active across tab navigation, not just while Today is mounted. */
 export function DailyReminderCatalogue({ language, plan }: { language: Language; plan: Plan }) {
@@ -37,6 +39,11 @@ export function DailyReminderCatalogue({ language, plan }: { language: Language;
 export default function TodayReminders({ language, plan, onUpgrade, kind }: { language: Language; plan: Plan; onUpgrade: () => void; kind: 'bgm' | 'evening' }) {
   const t = reminderCopy[language];
   const focus = useFocus();
+  useEffect(() => {
+    if (kind !== 'bgm' || !canUseBgmNotify(plan)) return;
+    try { const saved = validBgmPreference(JSON.parse(localStorage.getItem(BGM_PREF_KEY) ?? 'null')); if (saved && !getPianoState().playing) { setPianoHz(saved.hz); setPianoVolume(saved.volume); } } catch { /* retain defaults */ }
+    return subscribePiano(() => { const { hz, volume } = getPianoState(); try { localStorage.setItem(BGM_PREF_KEY, JSON.stringify({ hz, volume })); } catch { /* storage disabled */ } });
+  }, [kind, plan]);
   const today = new Date();
   const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
   const members = focus?.group?.members;
