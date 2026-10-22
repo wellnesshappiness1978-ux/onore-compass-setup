@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import type { UserProfile } from "./Onboarding";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
-import { canUseToday, familyRoadmapMin, helioRangeDays, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
+import { canUseToday, canReadThreeWaves, luckyFoodLimit, familyRoadmapMin, helioRangeDays, planOrder, todayFeatures, type TodayFeature } from "@/lib/plans";
 import { dateAt, daysInYear, directionEnergy, localIso, personal, roadmap, type Direction, type Phase } from "@/lib/day-compass";
 import { almanacDay } from "@/lib/helio-almanac";
 import { dayElement, relation, type Element, type TeamMember } from "@/lib/team-analysis";
@@ -29,6 +29,9 @@ import { goalText, memberToProfile } from "@/lib/focus";
 import { TodayInsight, TodayLuckyTrio, useTodayFortune } from "./TodayFortuneAi";
 import TodayReminders from './TodayReminders';
 import { TodayCard } from './TodayCard';
+import { todayAccessCopy } from '@/lib/today-access-copy';
+import { todaySample } from '@/lib/today-samples';
+import { subjectSignals, subjectDirections } from '@/lib/today-subject';
 
 // Deterministic reference values from birth date and today's calendar; not verified readings or predictions.
 type Pair = { ja: string; en: string };
@@ -163,9 +166,11 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       : { term: alm.term, zassetsu: alm.zassetsu, adjust: adjustEn, prepare: prepareEn, mindset: mindsetEn, headings: ["🌱 Seasonal energy adjustment", "🧭 Preparation & action for this season", "✨ Today's aspiration & mindset"] as const };
   }, [today, ja]);
   const birth = profile.birthDate;
-  const rhythm = personal(birth, today);
+  const subjectMembers = fortuneReq?.members ?? [];
+  const rhythm = subjectSignals(subjectMembers, today);
+  const access = todayAccessCopy[language];
   const spectrum = birthColorSpectrum(profile);
-  const energy = useMemo(() => [...directionEnergy(birth, today)].sort((a, b) => b.score - a.score), [birth, iso]);
+  const energy = useMemo(() => subjectDirections(subjectMembers, today), [JSON.stringify(subjectMembers), iso]);
   const best = energy[0]!;
   const rank = (p: Plan) => planOrder.indexOf(p);
 
@@ -192,7 +197,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const advice = target ? talk[relation(me, target)] : null;
 
   const year = today.getFullYear();
-  const yearCurve = useMemo(() => birth ? Array.from({ length: daysInYear(year) }, (_, d) => Math.round(personal(birth, dateAt(year, d)).total)) : [], [birth, year]);
+  const yearCurve = useMemo(() => birth ? Array.from({ length: daysInYear(year) }, (_, d) => Math.round(subjectSignals(subjectMembers, dateAt(year, d)).total)) : [], [JSON.stringify(subjectMembers), year]);
   const monthAvg = useMemo(() => Array.from({ length: 12 }, (_, m) => { const days = yearCurve.filter((_, d) => dateAt(year, d).getMonth() === m); return days.length ? Math.round(days.reduce((a, b) => a + b, 0) / days.length) : 0; }), [yearCurve, year]);
   const map = useMemo(() => (birth ? roadmap(birth, year) : null), [birth, year]);
   const gua = mingGua(birth, profile.gender)?.branches[0];
@@ -251,12 +256,12 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     },
     dailyLucky: {
       notify: fortune.data ? `${fortune.data.luckyColor.name} / ${fortune.data.luckyWord.word} / ${fortune.data.foods[0]?.name ?? ""}` : `${luckyColor ? localizeBirthColorName(luckyColor.name, language) : ""} / ${L(word)}`,
-      body: <TodayLuckyTrio state={fortune} language={language} fallback={<ul className="space-y-2 text-sm leading-6">
+      body: <TodayLuckyTrio state={fortune} language={language} plan={plan} onUpgrade={onUpgrade} fallback={<ul className="space-y-2 text-sm leading-6">
         <li className="flex items-start gap-2"><span className="mt-1 size-4 shrink-0 rounded-full border border-primary/40" style={{ background: luckyColor?.code }} /><span><strong className="text-primary">{ja ? "ラッキーカラー" : "Lucky color"}</strong>：{luckyColor ? `${localizeBirthColorName(luckyColor.name, language)}（${luckyColor.code}）` : (ja ? "生年月日の登録で表示されます" : "Add your birth date")}</span></li>
         <li><strong className="text-primary">{ja ? "ラッキーワード" : "Lucky word"}</strong>：{L(word)}</li>
         <li><strong className="text-primary">{ja ? "運気アップフード 選りすぐり5品" : "5 lucky foods"}</strong>
-          <p className="mt-1 flex items-center gap-1.5 text-xs"><ChefHat className="size-4 shrink-0" />{benefit.recipeHint}</p>
-          <ol className="mt-2 grid gap-2 sm:grid-cols-2">{dailyRecipes.map((f, i) => <li key={f.id}><Button variant="outline" onClick={() => setRecipeIndex(i)} className="grid h-auto min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] gap-2 whitespace-normal border-primary/35 bg-background/90 px-3 py-2 text-left text-foreground"><span className="min-w-0">{i + 1}. {f.names[language]}</span><ChevronRight className="size-4 shrink-0" /></Button></li>)}</ol>
+          <p className="mt-2 text-xs leading-6">{access.rules}</p><p className="mt-1 flex items-center gap-1.5 text-xs"><ChefHat className="size-4 shrink-0" />{benefit.recipeHint}</p>
+          <ol className="mt-2 grid gap-2 sm:grid-cols-2">{dailyRecipes.map((f, i) => <li key={f.id}>{i >= luckyFoodLimit[plan] ? <Button variant="outline" className="h-auto min-h-12 w-full whitespace-normal" onClick={onUpgrade}><LockKeyhole className="size-4" />{i + 1}. {access.food} · {i < 3 ? "Standard+" : "VIP+"}</Button> : <><Button variant="outline" onClick={() => { if (i < luckyFoodLimit[plan]) setRecipeIndex(i); }} className="grid h-auto min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] gap-2 whitespace-normal border-primary/35 bg-background/90 px-3 py-2 text-left text-foreground"><span className="min-w-0">{i + 1}. {f.names[language]}</span><ChevronRight className="size-4 shrink-0" /></Button></>}</li>)}</ol>
           <span className="text-[11px] opacity-90">{ja ? "スーパーの食材で手軽に作れる、今日の気分を明るくする参考メニューです。" : "Easy reference dishes from everyday ingredients."}</span></li>
       </ul>} />,
     },
@@ -358,6 +363,11 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     },
   };
 
+  const guide = (v: { action: string; reason: string; benefit: string }) => <div className="space-y-3 text-sm leading-7"><p className="font-medium text-primary">{v.action}</p><p><strong>{access.reason}：</strong>{v.reason}</p><p><strong>{access.benefit}：</strong>{v.benefit}</p></div>;
+  content.decision = { notify: fortune.data?.decision.advance ?? content.decision.notify, body: fortune.data ? <div className="space-y-3 text-sm leading-7"><h4 className="text-primary">{access.advance}</h4><p>{fortune.data.decision.advance}</p><h4 className="text-primary">{access.protect}</h4><p>{fortune.data.decision.protect}</p><p><strong>{access.reason}：</strong>{fortune.data.decision.reason}</p></div> : <TodayInsight state={fortune} language={language} /> };
+  content.shopping = { notify: fortune.data?.shopping.action ?? access.loading, body: fortune.data ? guide(fortune.data.shopping) : <TodayInsight state={fortune} language={language} /> };
+  content.health = { notify: fortune.data?.maintenance.action ?? access.loading, body: fortune.data ? guide(fortune.data.maintenance) : <TodayInsight state={fortune} language={language} /> };
+  content.monthlyLucky = { notify: fortune.data?.monthly.action.action ?? access.loading, body: fortune.data ? <div className="space-y-5">{guide(fortune.data.monthly.flower)}{guide(fortune.data.monthly.action)}{guide(fortune.data.monthly.item)}<p className="text-sm leading-7">{fortune.data.monthly.outlook}</p></div> : <TodayInsight state={fortune} language={language} /> };
   // One-line personal teasers for locked cards, computed from the user's own reference values.
   const hour = 9 + ([...birth].reduce((a, ch) => a + (Number(ch) || 0), 0) + dayIdx) % 9;
   const peak = monthAvg.indexOf(Math.max(...monthAvg));
@@ -366,8 +376,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     shopping: ja ? "今日の運気を上げるお買い物、ひとつだけ選ぶなら？" : "One purchase to lift today's luck?",
     health: ja ? "今日のからだが喜ぶ、小さな習慣があります。" : "A small habit your body will enjoy today.",
     helio: ja ? `今日は地球暦で一年の${dayIdx + 1}日目。あなたの円盤に今日の位置が灯ります。` : `Day ${dayIdx + 1} on your Earth Calendar dial.`,
-    relations: ja ? `今日のあなたの大勝負の時間帯は${hour}時！` : `Your key moment today is around ${hour}:00!`,
-    biorhythm365: birth ? (ja ? `${peak + 1}月は人生の転機バイオリズム。` : `${monthLabels[peak]} is your turning-point rhythm.`) : undefined,
+    relations: access.choose,
+    biorhythm365: birth ? (ja ? `${peak + 1}月は参考モデルの月平均が高めです。` : `${monthLabels[peak]} has a higher modeled monthly mean.`) : undefined,
     monthlyLucky: ja ? `今月のあなたの花は「${L(month.flower)}」。` : `Your flower this month: ${L(month.flower)}.`,
     directionExtended: gua ? (ja ? `あなたは${gua.group === "east" ? "東四命" : "西四命"}タイプ。` : `You are ${gua.group === "east" ? "East" : "West"} group.`) : (ja ? `${stars.year}年のあなたの大開運方位が分かります。` : `See your ${stars.year} favorable direction.`),
     familyRoadmap: map ? (ja ? `今年の攻め月は${map.attack.slice(0, 2).map((m) => `${m + 1}月`).join("・")}。` : `Advance months: ${map.attack.slice(0, 2).map((m) => monthLabels[m]).join(", ")}.`) : undefined,
@@ -375,7 +385,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
 
   content.biorhythm365 = { ...content.biorhythm365, body: <>
     <p className="mb-2 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>
-    <h4 className="mb-1 font-serif text-sm text-primary">{ja ? "個人のバイオリズム" : "Personal biorhythm"}</h4>
+    <p className="mb-2 text-xs text-primary">{access.rhythm}</p><h4 className="mb-1 font-serif text-sm text-primary">{focus?.label(language)} · {titles.biorhythm365[ja ? "ja" : "en"]}</h4>
     {content.biorhythm365.body}
     <h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "ファミリーのロードマップとバイオリズム" : "Family roadmap & biorhythm"}</h4>
     {planOrder.indexOf(plan) >= planOrder.indexOf(familyRoadmapMin) ? content.familyRoadmap.body : (
@@ -391,19 +401,19 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const lastOpen = todayFeatures.map((f) => canUseToday(plan, f.id)).lastIndexOf(true);
   const higherBenefits = higherTodayBenefits(plan);
   const renderDepth = (section: DeepSection) => {
-    const reading = buildTodayDepth(section, plan, language, {date: iso, day: dayIdx + 1, total: Math.round(rhythm.total), physical: Math.round(rhythm.physical * 100), emotional: Math.round(rhythm.emotional * 100), intellectual: Math.round(rhythm.intellectual * 100), goal: focus ? goalText(focus.focus, language) : "", members: members.length});
+    const reading = buildTodayDepth(section, plan, language, {date: iso, day: dayIdx + 1, total: Math.round(rhythm.total), physical: Math.round(rhythm.physical * 100), emotional: Math.round(rhythm.emotional * 100), intellectual: Math.round(rhythm.intellectual * 100), goal: focus ? goalText(focus.focus, language) : "", members: focus?.group?.members.length ?? (focus?.member ? 1 : members.length)});
     return reading ? <div data-reading-depth={section} className="mt-5 space-y-3 border-t border-primary/20 pt-4"><h4 className="font-serif text-sm text-primary">{reading.title}</h4>{reading.paragraphs.map((paragraph, index) => <p key={index} className="text-sm leading-7 text-foreground">{paragraph}</p>)}</div> : null;
   };
 
   const shareData = {
-    kicker: ja ? "今日の占い" : "Today's guide", title: iso, score: Math.round(rhythm.total), names: profile.nameKanji ? [profile.nameKanji] : [], kind: "daily" as const,
+    kicker: ja ? "今日の占い" : "Today's guide", title: iso, score: Math.round(rhythm.total), names: focus?.group ? [focus.label(language)] : profile.nameKanji ? [profile.nameKanji] : [], kind: "daily" as const,
     lines: [
       rhythm.total >= 55 ? (ja ? "決断：準備した一歩を小さく試す日" : "Decision: test one prepared step") : (ja ? "決断：確認と余白を整える日" : "Decision: verify and leave space"),
       fortune.data ? `${ja ? "3ラッキー" : "3 lucky"}: ${fortune.data.luckyColor.name} / ${fortune.data.luckyWord.word} / ${fortune.data.foods[0]?.name ?? ""}` : `${ja ? "3ラッキー" : "3 lucky"}: ${luckyColor ? localizeBirthColorName(luckyColor.name, language) : "—"} / ${L(word)} / ${L(foods[el][0]!)}`,
       `${ja ? "吉方位" : "Direction"}: ${L(dirNames[best.dir])}（${best.score}）`,
       ...(rank(plan) >= rank("standard") ? [
-        `${ja ? "買い物" : "Shopping"}: ${firstSentence(L(shop[el]))}`,
-        `${ja ? "健康" : "Health"}: ${firstSentence(L(health[el]))}`,
+        `${ja ? "買い物" : "Shopping"}: ${firstSentence(fortune.data?.shopping.action ?? access.loading)}`,
+        `${ja ? "健康" : "Health"}: ${firstSentence(fortune.data?.maintenance.action ?? access.loading)}`,
         `${ja ? "地球暦" : "Earth Calendar"}: ${ja ? `一年の${dayIdx + 1}日目` : `day ${dayIdx + 1}`}`,
       ] : []),
       ...(rank(plan) >= rank("vip") ? [
@@ -448,7 +458,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <TodayInsight state={fortune} language={language} />
         <FeatureNotifySwitch id="insight" title={`🔮 ${ja ? "今日の深層リーディング" : "Today's deep reading"}`} body={fortune.data?.headline ?? (ja ? "今日だけのメッセージが届いています" : "Your message for today is ready")} language={language} />
       </TodayCard>
-      {todayFeatures.map(({ id, min }, i) => {
+      {todayFeatures.filter(f => f.id !== "relations").map(({ id, min }, i) => {
         const open = canUseToday(plan, id);
         const Icon = icons[id];
         const lucky = id === "dailyLucky" && open && luckyStyle;
@@ -458,7 +468,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
               <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className={`min-w-0 break-words ${lucky ? "lucky-shine-title" : ""}`}>{L(titles[id])}</span></h3>
               {!open && <span className="shrink-0 rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">{names[min]}+</span>}
             </div>
-            {open ? <>{content[id].body}{id === "decision" || id === "starPath" || id === "helio" ? renderDepth(id) : id === "biorhythm365" ? <>{renderDepth("biorhythm")}{renderDepth("family")}</> : null}</> : (
+            {open ? <>{content[id].body}{id === "starPath" || id === "helio" ? renderDepth(id) : id === "biorhythm365" ? <>{canReadThreeWaves(plan) ? renderDepth("biorhythm") : <div className="mt-3 border-t border-primary/25 pt-3"><p className="text-sm text-primary">{access.waves}</p><Button variant="outline" onClick={onUpgrade}><LockKeyhole className="size-4" />{access.plans}</Button></div>}{renderDepth("family")}</> : null}</> : (
               <div className="relative overflow-hidden rounded-md border border-primary/20 p-3">
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-champagne-gradient opacity-10 blur-sm" />
                 <div className="relative flex flex-col items-center gap-2 text-center">
@@ -474,7 +484,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
             )}
             <FeatureNotifySwitch id={id} title={`${notifyEmoji[id] ?? "🧭"} ${L(titles[id])}`} body={content[id].notify} language={language} disabled={!open} color={id === "dailyLucky" ? luckyHex : undefined} />
           </TodayCard>
-          {id === "monthlyLucky" && <TodayReminders kind="bgm" language={language} plan={plan} onUpgrade={onUpgrade} />}
           {id === "helio" && <TodayReminders kind="evening" language={language} plan={plan} onUpgrade={onUpgrade} />}
           {i === lastOpen && share("share-open")}
         </Fragment>);
@@ -485,9 +494,9 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 sm:max-w-lg">
           <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{consultationUxCopy[language].sample}</DialogDescription><DialogTitle className="font-serif text-xl">{sample ? L(titles[sample]) : ""}</DialogTitle></DialogHeader>
           <div className="text-left text-foreground">
-            <p data-sample-intro className="text-sm leading-7">{consultationUxCopy[language].intro}</p>
+            <p data-sample-intro className="text-sm leading-7">{access.sample}</p>
             <div className="relative mt-4 h-36 overflow-hidden rounded-md border border-primary/15">
-              <p className="p-3 text-sm leading-7" aria-hidden="true">{consultationUxCopy[language].body}</p>
+              <p className="p-3 text-sm leading-7" aria-hidden="true">{sample ? todaySample(sample, language) : ""}</p>
               <div className="pointer-events-none absolute inset-0 bg-background/60 backdrop-blur-md" aria-hidden="true" />
               <div className="absolute inset-0 flex items-center justify-center gap-2 px-3 text-xs text-primary"><LockKeyhole className="size-4 shrink-0" />{consultationUxCopy[language].continuation}</div>
             </div>
