@@ -7,7 +7,7 @@ import { todayAccessCopy } from '@/lib/today-access-copy';
 import { canUseToday } from '@/lib/plans';
 import { goalText, memberDisplayName, memberToProfile } from '@/lib/focus';
 import { selfReadingLabel } from '@/lib/focus';
-import { analyzeCompatibility } from '@/lib/compatibility-analysis';
+import { analyzeCompatibility, partnerSchema } from '@/lib/compatibility-analysis';
 import { kindFromRelationshipType } from '@/lib/compatibility-context';
 import { groupTodayCopy, memberToday } from '@/lib/group-today';
 import { localIso } from '@/lib/day-compass';
@@ -23,7 +23,8 @@ export default function DailyRelationshipGuide({ language, plan, onUpgrade }: { 
   const goal = ctx ? goalText(ctx.focus, language) : '';
   const subjects = ctx?.group ? ctx.group.members.filter(m => m.id !== target?.id).map(m => ({ profile: memberToProfile(m), name: memberDisplayName(m) })) : ctx ? [{ profile: ctx.readingProfile, name: ctx.label(language) }] : [];
   const partner = target ? memberToProfile(target) : null;
-  const readings = partner && target ? subjects.map(({ profile: p, name }) => ({ name, reading: analyzeCompatibility({ ...p, name: p.nameKanji }, { name: partner.nameKanji, nameKana: partner.nameKana, birthDate: partner.birthDate, birthTime: partner.birthTimeUnknown ? '' : partner.birthTime, birthPlace: partner.birthPlace, birthCity: partner.birthCity, gender: partner.gender, bloodType: partner.bloodType, siblingOrder: partner.siblingOrder }, language, { relationship: kindFromRelationshipType(target.relationshipType ?? ''), concern: goal }) })) : [];
+  const input = partner ? partnerSchema.safeParse({ name: partner.nameKanji, nameKana: partner.nameKana, birthDate: partner.birthDate, birthTime: partner.birthTimeUnknown ? '' : partner.birthTime, birthPlace: partner.birthPlace, birthCity: partner.birthCity, gender: partner.gender, bloodType: partner.bloodType, siblingOrder: partner.siblingOrder }) : null;
+  const readings = target && input?.success ? subjects.map(({ profile: p, name }) => ({ name, reading: analyzeCompatibility({ ...p, name: p.nameKanji }, input.data, language, { relationship: kindFromRelationshipType(target.relationshipType ?? ''), concern: goal }) })) : [];
   const rhythm = target ? memberToday(target, day) : null;
   const g = groupTodayCopy[language];
   const body = target && rhythm ? `${memberDisplayName(target)} · ${g.band[rhythm.band]} · ${g.caution[rhythm.caution]} · ${goal}` : c.none;

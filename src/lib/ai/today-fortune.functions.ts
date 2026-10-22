@@ -7,6 +7,7 @@ import { dailyAngle, normalizeFortune, todayFortuneRequestSchema, todayFortuneSc
 import { consultationContext } from "./consultation-context";
 import { supportiveWritingVoice } from "./writing-voice";
 import { createLovableAiGatewayRunIdFetch } from "./run-id.server";
+import { personal } from '../day-compass';
 
 export const generateTodayFortune = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => todayFortuneRequestSchema.parse(input))
@@ -20,6 +21,9 @@ export const generateTodayFortune = createServerFn({ method: "POST" })
     const perMember = members.map(m => `## ${isGroup || subject.kind === "member" ? m.nameKanji || "member" : "SUBJECT"}${m.relationshipType ? ` (relationship ${m.relationshipType}${m.relationship ? `: ${m.relationship}` : ""})` : ""}\n${JSON.stringify(consultationContext({ ...m, gender: m.gender ?? "undisclosed" }, day))}`).join("\n");
     const groupCtx = isGroup ? buildGroupContext(subject.label, members.map(m => groupMemberSchema.parse({ ...m, name: m.nameKanji || "member" })), day) : "";
     const people = members.length;
+    const monthStart = new Date(`${day.slice(0, 7)}-01T12:00:00Z`);
+    const monthDays = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() + 1, 0)).getUTCDate();
+    const monthContext = members.map(m => ({ name: m.nameKanji || 'SUBJECT', rhythms: Array.from({ length: monthDays }, (_, i) => { const date = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth(), i + 1, 12)); const r = personal(m.birthDate, date); return { day: i + 1, total: r.total, physical: r.physical, emotional: r.emotional, intellectual: r.intellectual }; }) }));
     const runIdFetch = createLovableAiGatewayRunIdFetch();
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
@@ -43,6 +47,8 @@ Voice: a trusted partner who helps overcome hesitation and notice what is essent
 PRE-CALCULATED DATA (exact, do not recalculate; today's biorhythm and directions are inside each context; unavailable items stay omitted):
 ${perMember}
 ${groupCtx}
+CALCULATED MONTHLY PER-MEMBER RHYTHMS (reference model, never medical measurements):
+${JSON.stringify(monthContext)}
 
 AVOID repeating (recently used, choose clearly different): colors [${avoid.colors.join(", ")}]; words [${avoid.words.join(" | ")}]; dishes [${avoid.foods.join(", ")}].
 

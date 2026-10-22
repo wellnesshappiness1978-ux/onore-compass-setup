@@ -17,6 +17,7 @@ it('a group uses both members rather than an owner birthday', () => {
   expect(subjectDirections(members, date)).toHaveLength(8);
 });
 it('changing a member profile invalidates the cached daily reading', () => {
-  const req = { subject: { key: 'g-1' }, language: 'ja', day: '2026-10-22', members: [{ birthDate: '1990-01-01' }] };
-  expect(cacheKey(req)).not.toBe(cacheKey({ ...req, members: [{ birthDate: '1991-01-01' }] }));
+  const member = { nameKanji: '', nameKana: '', nameRomaji: '', birthDate: '1990-01-01', birthTime: '', birthTimeUnknown: true, birthPlace: '', birthCity: '', bloodType: '', siblingOrder: '' };
+  const req = { subject: { key: 'g-1' }, language: 'ja', day: '2026-10-22', members: [member] };
+  expect(cacheKey(req)).not.toBe(cacheKey({ ...req, members: [{ ...member, birthDate: '1991-01-01' }] }));
 });
