@@ -31,4 +31,5 @@
 - AI tabs keep sessions; compatibility compares people separately. Consultation shares request validation and builds group context only from structured members. Why: no invented births or goal overflow.
 - Today uses shared TodayCard, shared presentation gates in plans.ts, per-subject daily AI fields and full-profile cache fingerprints; group signals aggregate each member, never a substituted owner. The twelve-category catalogue is not an access gate. Why: consistent subject-specific cards without altering server membership.
 - BGM uses one shared audio context and offline-testable graph with normalized voices and smooth gain. Why: avoid driver churn, clipping and clicks.
+- Settings BGM and relationship selections persist through reminder-preferences with validated audio values; all controls reuse piano-store. Why: retain choices across navigation without spawning another player.
 - Reminders: no LINE. Background push stores signed-in devices in owner-only push_devices; a per-minute schedule hits /api/public/jobs/send-push, matching local time, deduped by last_sent. Why: closed-app delivery without duplicates.
