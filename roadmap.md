@@ -1,5 +1,12 @@
 # Roadmap
 
+## Uploaded eleven-item daily guidance update (2026-10-22)
+- [ ] Free one birth color and 1/3/5 recipe gates with consistent plan copy
+- [ ] Center subject label and outlined self reset
+- [ ] Subject-based daily decision, shopping, maintenance/monthly guidance and contextual samples
+- [ ] Move VIP BGM settings and expanded member/goal relationship reminder below important settings
+- [ ] Family+ three-wave detail gate; regression tests and live verification
+
 ## Unified profile inputs and target names (2026-10-22)
 - [x] Counted siblings through ten children across all forms, preserving legacy values
 - [x] Country-specific linked editable birthplace fields and gender placeholders; Geolonia Japan and attributed GeoNames overseas gazetteer (reference coverage, not exhaustive official registry), saved country independent of display language
