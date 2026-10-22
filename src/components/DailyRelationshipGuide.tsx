@@ -29,7 +29,7 @@ export default function DailyRelationshipGuide({ language, plan, onUpgrade }: { 
   const input = partner ? partnerSchema.safeParse({ name: partner.nameKanji, nameKana: partner.nameKana, birthDate: partner.birthDate, birthTime: partner.birthTimeUnknown ? '' : partner.birthTime, birthPlace: partner.birthPlace, birthCity: partner.birthCity, gender: partner.gender, bloodType: partner.bloodType, siblingOrder: partner.siblingOrder }) : null;
   const readings = target && input?.success ? subjects.map(({ profile: p, name }) => ({ name, reading: analyzeCompatibility({ ...p, name: p.nameKanji }, input.data, language, { relationship: kindFromRelationshipType(target.relationshipType ?? ''), concern: goal }) })) : [];
   const rhythm = target ? memberToday(target, day) : null;
-  const subjectRhythms = subjects.map(s => ({ name: s.name, rhythm: memberToday({ id: s.name, name: s.name, birthDate: s.profile.birthDate, role: '', skills: [] }, day) }));
+  const subjectRhythms = subjects.map(s => ({ name: s.name, rhythm: memberToday({ id: s.name, name: s.name, birthDate: s.profile.birthDate, gender: s.profile.gender ?? 'undisclosed', bloodType: s.profile.bloodType, role: '', skills: [] }, day) }));
   const g = groupTodayCopy[language];
   const body = target && rhythm ? `${memberDisplayName(target)} · ${g.band[rhythm.band]} · ${g.caution[rhythm.caution]} · ${goal}` : c.none;
   return <TodayCard id="settings-relations" title={c.relations}>
