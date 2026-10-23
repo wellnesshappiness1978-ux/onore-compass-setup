@@ -4,7 +4,11 @@
  * shows the crown as HTML above the frame; exports bake it into a dark
  * band above the painting so the saved PNG keeps the same balance. */
 
-export type MandalaFinish = { colors: string[]; labels: string[] };
+import { CONSTELLATIONS, SIGN_GLYPHS, cornerSlots, paletteSeed } from "./mandala-constellations";
+
+/** signs: up to four Sun-sign indices for faint corner star charts.
+ * members: group members' main colors; when two or more, the group composition is used. */
+export type MandalaFinish = { colors: string[]; labels: string[]; signs?: number[]; members?: string[] };
 
 const GOLD = "#E8C86A";
 const BAND_RATIO = 0.12;
@@ -212,6 +216,110 @@ function drawColorCrown(context: CanvasRenderingContext2D, size: number, band: n
   }
 }
 
+function rgba(hexColor: string, alpha: number) {
+  const m = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hexColor);
+  const [r, g, b] = m ? m.slice(1).map(v => Number.parseInt(v, 16)) : [232, 200, 106];
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+/** Seven personal light pools glazed over the painting. Their angles, reach and
+ * intensity come from the person's own colors, so no two people share the same glow. */
+function drawPersonalAura(context: CanvasRenderingContext2D, size: number, top: number, colors: string[]) {
+  if (!colors.length) return;
+  const seed = paletteSeed(colors);
+  const cx = size / 2, cy = top + size / 2;
+  const offset = (seed % 3600) / 3600 * Math.PI * 2;
+  context.save();
+  context.globalCompositeOperation = "screen";
+  colors.slice(0, 7).forEach((color, i) => {
+    const jitter = grain(seed % 997 + i * 13);
+    const angle = offset + (i / Math.min(7, colors.length)) * Math.PI * 2 + (jitter - 0.5) * 0.4;
+    const dist = size * (0.2 + 0.14 * grain(seed % 487 + i * 7));
+    const x = cx + Math.cos(angle) * dist, y = cy + Math.sin(angle) * dist;
+    const r = size * (0.12 + 0.08 * jitter);
+    const g = context.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, rgba(shade(color, 0.25), 0.2 + 0.1 * jitter));
+    g.addColorStop(0.55, rgba(color, 0.07));
+    g.addColorStop(1, rgba(color, 0));
+    context.fillStyle = g;
+    context.fillRect(x - r, y - r, r * 2, r * 2);
+  });
+  context.restore();
+}
+
+/** Faint star charts in the four corners: chart ring, constellation lines and glyph. */
+function drawCornerConstellations(context: CanvasRenderingContext2D, size: number, top: number, signs: number[], colors: string[]) {
+  const slots = cornerSlots(signs.length);
+  const box = size * 0.2, pad = size * 0.025;
+  context.save();
+  slots.forEach(([sx, sy], i) => {
+    const sign = signs[i];
+    const shape = sign === undefined ? undefined : CONSTELLATIONS[sign];
+    if (!shape || sign === undefined) return;
+    const x0 = sx ? size - pad - box : pad, y0 = top + (sy ? size - pad - box : pad);
+    const cx = x0 + box / 2, cy = y0 + box / 2;
+    const tint = colors[i % Math.max(1, colors.length)] ?? GOLD;
+    context.globalCompositeOperation = "screen";
+    // star chart: ring, graduations and a soft glyph
+    context.globalAlpha = 0.46;
+    context.strokeStyle = GOLD;
+    context.lineWidth = Math.max(1, size * 0.0009);
+    context.beginPath(); context.arc(cx, cy, box * 0.5, 0, Math.PI * 2); context.stroke();
+    context.globalAlpha = 0.18;
+    context.beginPath(); context.arc(cx, cy, box * 0.36, 0, Math.PI * 2); context.stroke();
+    for (let t = 0; t < 24; t += 1) {
+      const a = t / 24 * Math.PI * 2, inner = box * (t % 2 ? 0.47 : 0.44);
+      context.beginPath(); context.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner); context.lineTo(cx + Math.cos(a) * box * 0.5, cy + Math.sin(a) * box * 0.5); context.stroke();
+    }
+    context.globalAlpha = 0.22;
+    context.fillStyle = shade(tint, 0.35);
+    context.font = `${Math.round(box * 0.55)}px "Noto Serif JP", serif`;
+    context.textAlign = "center"; context.textBaseline = "middle";
+    context.fillText(SIGN_GLYPHS[sign] ?? "", cx, cy);
+    // constellation lines
+    const inset = box * 0.14, span = box - inset * 2;
+    const pt = (s: [number, number, number]) => [x0 + inset + s[0] * span, y0 + inset + s[1] * span] as const;
+    context.globalAlpha = 0.42;
+    context.strokeStyle = shade(tint, 0.55);
+    context.lineWidth = Math.max(1, size * 0.0011);
+    shape.lines.forEach(([a, b]) => { const p = shape.stars[a], q = shape.stars[b]; if (!p || !q) return; const [ax, ay] = pt(p), [bx, by] = pt(q); context.beginPath(); context.moveTo(ax, ay); context.lineTo(bx, by); context.stroke(); });
+    shape.stars.forEach(star => {
+      const [px, py] = pt(star);
+      const r = size * 0.0028 * star[2];
+      const glow = context.createRadialGradient(px, py, 0, px, py, r * 4);
+      glow.addColorStop(0, "rgba(255,250,235,0.9)");
+      glow.addColorStop(0.3, rgba(shade(tint, 0.5), 0.45));
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      context.globalAlpha = 0.75;
+      context.fillStyle = glow;
+      context.fillRect(px - r * 4, py - r * 4, r * 8, r * 8);
+    });
+  });
+  context.restore();
+}
+
+/** Group composition: the same painting, interlaced with a rotated copy so the
+ * motif becomes an N-fold group design, plus one satellite gem per member. */
+function drawGroupComposition(context: CanvasRenderingContext2D, image: HTMLImageElement, size: number, top: number, members: string[], filter: string) {
+  const n = Math.min(12, members.length);
+  const cx = size / 2, cy = top + size / 2;
+  context.save();
+  context.beginPath(); context.arc(cx, cy, size * 0.4, 0, Math.PI * 2); context.clip();
+  context.translate(cx, cy);
+  context.rotate(Math.PI / n);
+  context.globalAlpha = 0.42;
+  context.globalCompositeOperation = "lighten";
+  context.imageSmoothingEnabled = true; context.imageSmoothingQuality = "high";
+  if (filter) context.filter = filter;
+  context.drawImage(image, -size / 2, -size / 2, size, size);
+  context.restore();
+  const ring = size * 0.17;
+  members.slice(0, n).forEach((color, i) => {
+    const a = -Math.PI / 2 + (i / n) * Math.PI * 2;
+    drawCenterGem(context, cx + Math.cos(a) * ring, cy + Math.sin(a) * ring, size * 0.016, color);
+  });
+}
+
 /** Compose the painting + personal finish into the given square context.
  * `band` reserves a dark strip of that height above the artwork for the
  * seven-color crown (exports only; the live view renders the crown as HTML). */
@@ -232,6 +340,10 @@ export function drawMandalaComposition(context: CanvasRenderingContext2D, image:
   if (filter) context.filter = filter;
   context.drawImage(image, 0, band, size, size);
   context.restore();
+  const members = finish.members ?? [];
+  if (members.length >= 2) drawGroupComposition(context, image, size, band, members, filter);
+  drawPersonalAura(context, size, band, finish.colors);
+  if (finish.signs?.length) drawCornerConstellations(context, size, band, finish.signs, finish.colors);
   const main = finish.colors[0];
   if (main) drawCenterGem(context, size / 2, band + size / 2, size * 0.04, main);
   if (band > 0) drawColorCrown(context, size, band, finish);

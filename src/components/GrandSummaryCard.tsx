@@ -39,7 +39,7 @@ const genres: Record<Language, Record<Genre, string>> = {
 export default function GrandSummaryCard({ profile, language, plan, embedded = false, part = "all" }: { profile: UserProfile; language: Language; plan: Plan; embedded?: boolean; part?: "all" | "approaches" | "summary" | "share" }) {
   const generate = useServerFn(generateHomeReading);
   const { data, isPending } = useQuery({
-    queryKey: ["home-reading-six-v16", profile, language],
+    queryKey: ["home-reading-six-v17", profile, language],
     queryFn: () => generate({ data: { profile, language } }),
     staleTime: Infinity,
     retry: false,

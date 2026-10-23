@@ -63,7 +63,7 @@ import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
 import { groupBirthPalette } from "@/lib/group-palette";
 import type { ArtSubject } from "./NineStarsPanel";
-import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, GroupMembersToday, SubjectBanner, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
+import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, GroupMembersToday, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
 import { focusCopy, goalText, groupDisplayName, memberDisplayName, memberToProfile } from "@/lib/focus";
 import { savedPartner, savedGroupMembers } from "@/lib/saved-compatibility";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
@@ -605,20 +605,20 @@ function FocusedTraits({ language, render, plan, onUpgrade }: { language: Langua
   if (!ctx) return null;
   const t = focusCopy[language];
   const goal = goalText(ctx.focus, language);
-  if (ctx.group) return <SubjectVoice language={language}><SubjectBanner language={language} /><GroupFocusCard language={language} plan={plan} onUpgrade={onUpgrade} /><GroupMembersToday language={language} /></SubjectVoice>;
-  return <SubjectVoice language={language}><SubjectBanner language={language} />{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</SubjectVoice>;
+  if (ctx.group) return <SubjectVoice language={language}><GroupFocusCard language={language} plan={plan} onUpgrade={onUpgrade} /><GroupMembersToday language={language} /></SubjectVoice>;
+  return <SubjectVoice language={language}>{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</SubjectVoice>;
 }
 function FocusedArt({ language, owner, plan, render }: { language: Language; owner: UserProfile; plan: Plan; render: (p: UserProfile, subject?: ArtSubject) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx || !canUse(plan, "subjectArt") || ctx.focus.targetKind === "self") return <>{render(owner)}</>;
   if (ctx.member) return <>{render(memberToProfile(ctx.member), { key: `m-${ctx.member.id}`, label: ctx.label(language), kind: "member" })}</>;
-  if (ctx.group) { const gp = groupBirthPalette(ctx.group.members); return <>{render(owner, { key: `g-${ctx.group.group.id}`, label: ctx.label(language), kind: "group", palette: gp })}</>; }
+  if (ctx.group) { const gp = groupBirthPalette(ctx.group.members); return <>{render(owner, { key: `g-${ctx.group.group.id}`, label: ctx.label(language), kind: "group", palette: gp, births: ctx.group.members })}</>; }
   return <>{render(owner)}</>;
 }
 function FocusedToday({ language, render, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void; render: (p: UserProfile) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx) return null;
-  return <SubjectVoice language={language}><SubjectBanner language={language} /><SubjectDailyNote language={language} />{ctx.group && <GroupMembersToday language={language} />}{render(ctx.readingProfile)}</SubjectVoice>;
+  return <SubjectVoice language={language}><SubjectDailyNote language={language} />{ctx.group && <GroupMembersToday language={language} />}{render(ctx.readingProfile)}</SubjectVoice>;
 }
 
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
