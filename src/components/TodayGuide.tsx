@@ -298,19 +298,9 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
           ) : (
             <div className="rounded-md border border-primary/25 p-3">
               <h4 className="mb-1 font-serif text-sm text-primary">{ja ? "風水：生まれ持った吉方位タイプと今年の方位" : "Feng shui: birth direction type & this year's direction"}</h4>
-              <div className="relative mt-2 overflow-hidden rounded-md">
-                <div aria-hidden="true" className="pointer-events-none select-none space-y-1.5 text-xs blur-[3px]">
-                  <p>{ja ? "東四命・西四命タイプと今年の大開運方位、九星の配置を詳しく表示します。" : "East/West group, this year's favorable direction and flying-star layout."}</p>
-                  <div className="grid grid-cols-2 gap-2"><div className="h-10 rounded-md border border-primary/20" /><div className="h-10 rounded-md border border-primary/20" /></div>
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-[2px]">
-                  <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-                    <LockKeyhole className="size-4 text-primary" />
-                    <span>{names.standard}+</span>
-                    <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "See plans"}</Button>
-                  </div>
-                </div>
-              </div>
+              <p className="mt-2 text-xs leading-6 text-muted-foreground">{access.sample}</p>
+              <p className="mt-2 whitespace-pre-line text-sm leading-7 text-foreground">{todaySample("directionExtended", language)}</p>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-4 text-primary" /><span>{names.standard}+</span><Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{access.plans}</Button></div>
             </div>
           )}
         </div>

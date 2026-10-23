@@ -9,7 +9,17 @@ const samples: Record<Language, [string, string, string, string, string, string]
   es: ['Ejemplo de compra: una pizarra de menús compartida ayuda a evitar olvidos y duplicados. Revisa espacio y presupuesto.', 'Ejemplo de cuidado: tres minutos lejos de la pantalla y movimientos suaves de hombros. Atiende al cansancio real y detente si duele.', 'Ejemplo mensual: paseo entre flores, charla familiar semanal y cuaderno compartido. Escucha al inicio, ajusta a mitad y revisa al final.', 'Ejemplo de ritmo: una onda física baja y emocional alta puede inspirar una charla corta. Es un modelo orientativo, no una medición médica.', 'Ejemplo nocturno: escribe una preocupación y prepara un objeto para mañana; deja las tareas pendientes en papel.', 'Ejemplo interpersonal: pregunta si es buen momento, expresa un deseo cada uno, confirma lo escuchado y acuerda una revisión.'],
   fr: ['Exemple d’achat : un tableau de menus partagé aide à éviter oublis et doublons. Vérifiez place et budget.', 'Exemple d’entretien : trois minutes sans écran et des mouvements doux des épaules. Écoutez la fatigue réelle, arrêtez en cas de douleur.', 'Exemple mensuel : balade fleurie, échange familial hebdomadaire et carnet partagé. Écoutez au début, ajustez au milieu, faites le bilan à la fin.', 'Exemple de rythme : une onde physique basse et émotionnelle haute peut inspirer un bref échange. Modèle indicatif, pas une mesure médicale.', 'Exemple du soir : notez une préoccupation, préparez un objet pour demain et confiez les tâches inachevées au papier.', 'Exemple relationnel : demandez si le moment convient, exprimez un souhait chacun, reformulez et fixez un prochain point.'],
 };
+const directionSample: Record<Language,string> = {
+  ja: '方位の固定例：東を「始める」の象徴として、東側の机を整えて連絡文を一通下書きします。実際の移動は天候・交通・距離を優先し、吉方位による結果は保証しません。',
+  en: 'Fixed direction example: use east as a symbol of beginnings, tidy the east side of your desk and draft one message. Prioritize weather, traffic and distance for travel; no outcome is guaranteed.',
+  'zh-CN': '固定方位示例：把东方作为开始的象征，整理桌子东侧并起草一条消息。出行以天气、交通和距离为先，不保证吉方效果。',
+  'zh-TW': '固定方位範例：把東方作為開始的象徵，整理桌子東側並起草一條訊息。出行以天氣、交通和距離為先，不保證吉方效果。',
+  ko: '고정 방위 예시: 동쪽을 시작의 상징으로 삼아 책상 동쪽을 정리하고 메시지를 작성하세요. 이동은 날씨·교통·거리를 우선하며 결과를 보장하지 않습니다.',
+  es: 'Ejemplo fijo de dirección: el este simboliza comienzos; ordena ese lado del escritorio y redacta un mensaje. Al viajar prioriza clima, tráfico y distancia, sin resultados garantizados.',
+  fr: 'Exemple fixe de direction : l’est symbolise les débuts ; rangez ce côté du bureau et rédigez un message. En déplacement, privilégiez météo, circulation et distance, sans garantie de résultat.',
+};
 export function todaySample(feature: TodayFeature | 'evening', language: Language) {
+  if (feature === 'directionExtended') return directionSample[language];
   const index = feature === 'shopping' ? 0 : feature === 'health' ? 1 : feature === 'monthlyLucky' ? 2 : feature === 'biorhythm365' || feature === 'familyRoadmap' ? 3 : feature === 'evening' ? 4 : 5;
   return samples[language][index] ?? '';
 }
