@@ -16,7 +16,10 @@ export const traitReadingCopy: Record<Language, Copy> = {
 };
 
 export function approachStatuses(has: { core: boolean; earth: boolean; nineStars: boolean; color: boolean; blood: boolean; siblings: boolean; region: boolean }): Record<ApproachKey, ApproachStatus> {
-  return { western: has.core ? "reference" : "unavailable", indian: "unavailable", ziwei: "unavailable", earth: has.earth ? "reference" : "unavailable", pillars: has.core ? "reference" : "unavailable", sanmei: "unavailable", nineStars: has.nineStars ? "reference" : "unavailable", lunarMansion: "unavailable", animal: has.core ? "reference" : "unavailable", numerology: has.core ? "reference" : "unavailable", maya: "unavailable", color: has.color ? "reference" : "unavailable", blood: has.blood ? "context" : "unavailable", siblings: has.siblings ? "context" : "unavailable", region: has.region ? "context" : "unavailable" };
+  // Every divination method is computed from the birth data; only context inputs
+  // (blood type, sibling order, birthplace) depend on optional profile fields.
+  const computed: ApproachStatus = has.core ? "reference" : "unavailable";
+  return { western: computed, indian: computed, ziwei: computed, eastern: computed, earth: has.earth ? "reference" : "unavailable", pillars: computed, sanmei: computed, nineStars: has.nineStars ? "reference" : "unavailable", lunarMansion: computed, animal: computed, numerology: computed, maya: computed, color: has.color ? "reference" : "unavailable", blood: has.blood ? "context" : "unavailable", siblings: has.siblings ? "context" : "unavailable", region: has.region ? "context" : "unavailable" };
 }
 
 export const traitReadingPrompt = `FINAL PRIORITY RULES for the new essence and multi-approach fields (override any earlier overlapping instructions):
