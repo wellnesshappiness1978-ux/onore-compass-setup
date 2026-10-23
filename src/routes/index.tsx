@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { readMyProfile, saveMyProfile } from "@/lib/profile-storage.functions";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
+import { clearReadingCaches } from "@/lib/reading-cache";
 import { type Language } from "@/lib/translations";
 
 const pageTitles: Record<Language, string> = { ja: "アゴルメンの羅針盤 | 自分を知る・今日を整える", en: "Agolmen's Compass | Know yourself, shape today", "zh-CN": "阿戈尔曼罗盘｜认识自己，调整今天", "zh-TW": "阿戈爾曼羅盤｜認識自己，調整今天", ko: "아골멘의 나침반 | 나를 알고 오늘을 정돈하다", es: "La brújula de Agolmen | Conócete y orienta tu día", fr: "La boussole d’Agolmen | Se connaître et orienter sa journée" };
@@ -96,7 +97,7 @@ function Index() {
     void load();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
-        if (event === "SIGNED_OUT") { ++loadSequence.current; setProfile(null); setEditing(false); setUserId(null); setLoading(false); setError(null); }
+        if (event === "SIGNED_OUT") { clearReadingCaches(); ++loadSequence.current; setProfile(null); setEditing(false); setUserId(null); setLoading(false); setError(null); }
         else window.setTimeout(() => { if (active) void load(); }, 0);
       }
     });
@@ -123,6 +124,7 @@ function Index() {
     setUserId(null);
     setEditing(false);
     writeLocal(null);
+    clearReadingCaches();
     await supabase.auth.signOut();
   };
 

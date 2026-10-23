@@ -11,6 +11,11 @@ describe("today fortune", () => {
     expect(f.foods).toHaveLength(5);
     expect(f.luckyColor.hex).toBe("#AABBCC");
   });
+  it('fixes recipes at two servings without altering their quantities', () => {
+    const result = normalizeFortune({ ...base, foods: [{ ...food('豆腐'), servings: '30人分' }] });
+    expect(result.foods[0]?.servings).toBe('2人前');
+    expect(result.foods[0]?.ingredients).toEqual([{ item: '豆腐', amount: '300g' }]);
+  });
   it("differs per subject and per day", () => {
     expect(daySeed("self", "2026-10-22")).not.toBe(daySeed("self", "2026-10-23"));
     expect(daySeed("g-1", "2026-10-22")).not.toBe(daySeed("self", "2026-10-22"));

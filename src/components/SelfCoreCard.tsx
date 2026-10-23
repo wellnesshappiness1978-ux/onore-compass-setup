@@ -1,5 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+import { usePersonalReading } from "@/hooks/use-personal-reading";
 import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, Heart, Orbit, Sparkles, Sprout } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import GrandSummaryCard from "./GrandSummaryCard";
@@ -8,7 +7,6 @@ import { usePlan } from "./PlanProvider";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
-import { generateQuickEssence } from "@/lib/ai/quick-essence.functions";
 import { fiveElementsCopy } from "@/lib/five-elements-copy";
 import { homeReadingCopy, readingCompleteMessage } from "@/lib/home-reading-copy";
 import { computeCoreLayers, type CoreLayers } from "@/lib/ai/core-layers";
@@ -128,29 +126,17 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
   const upgradeCards = p.cards.filter(card => isUpgradePlan(activePlan, card.id));
   const [dialogPlan, setDialogPlan] = useState<HomePlanId | null>(null);
   const f = fiveElementsCopy[language];
-  const generate = useServerFn(generateHomeReading);
   const n = nameCopy[language];
   const chars = splittableName(profile.nameKanji);
   const localLayers = useMemo(() => computeCoreLayers(profile), [profile]);
   const gua = mingGua(profile.birthDate, profile.gender);
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
-  const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ["home-reading-six-v17", profile, language, goal, subject],
-    queryFn: () => generate({ data: { profile, language, goal, subject } }),
-    staleTime: Infinity,
-    retry: false,
-  });
-  const holding = useCompletionHold(isPending);
-  const quickGen = useServerFn(generateQuickEssence);
-  // Priority 1: a small, fast call for catchphrase + essence so the top appears first.
-  const quick = useQuery({
-    queryKey: ["home-quick-essence-v2", profile, language, goal, subject],
-    queryFn: () => quickGen({ data: { profile, language, goal, subject } }),
-    staleTime: Infinity,
-    retry: false,
-  });
-  const top = quick.data ?? (data ? { catchphrase: data.catchphrase, essence: data.essence } : undefined);
+  // The short essence gets priority; the complete result starts after its first visible text.
+  const quick = usePersonalReading({ profile, language, goal, subject }, 'quick');
+  const { data, partial, isPending, isError, refetch } = usePersonalReading({ profile, language, goal, subject });
+  const holding = useCompletionHold(isPending, 0);
+  const top = quick.data ?? (quick.partial.catchphrase ? quick.partial : data ?? (partial.catchphrase ? partial : undefined));
   const topLoading = !top && (quick.isPending || isPending);
   const e = data?.elements;
   const values = e ? [e.name ? `${e.name.sky} · ${e.name.person} · ${e.name.earth} · ${e.name.outer} · ${e.name.total}` : null, e.zodiac, e.eto, e.blood, e.animal] : [];
@@ -202,7 +188,7 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
           {topLoading ? <AgolmenLoading compact label={t.loading} /> : top ? <div className="mt-4 divide-y divide-primary/20">
             {essenceKeys.map((key, i) => <article key={key} className="min-w-0 py-5 [overflow-wrap:anywhere]">
               <h4 className="flex items-start gap-3 font-serif text-lg leading-8 text-primary"><span className="shrink-0 font-mono text-xs leading-8">0{i + 1}</span><span>{traits.headings[i]}</span></h4>
-              <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{top.essence[key]}</p>
+              <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{top.essence?.[key]}</p>
             </article>)}
           </div> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
           {!top && isError && quick.isError && <Button variant="outline" className="mt-3" onClick={() => { void quick.refetch(); void refetch(); }}>{t.retry}</Button>}

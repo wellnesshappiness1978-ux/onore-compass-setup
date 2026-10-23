@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { readingProfileSchema } from "./profile-reading-context";
 import { fortuneFingerprint } from "./today-subject";
+import { servingsLabel } from './reading-presentation';
 
 /** Shared (client + server) contract for the AI "Today's fortune" reading. */
 export const todayMemberSchema = readingProfileSchema.extend({
@@ -59,19 +60,19 @@ const angles = [
 export const dailyAngle = (key: string, day: string) => angles[daySeed(key, day) % angles.length]!;
 
 /** Normalise model output: exactly the first five complete foods, valid hex color. */
-export function normalizeFortune(f: TodayFortune): TodayFortune {
+export function normalizeFortune(f: TodayFortune, language: keyof typeof servingsLabel = 'ja'): TodayFortune {
   const hex = /^#[0-9a-f]{6}$/i.test(f.luckyColor.hex.trim()) ? f.luckyColor.hex.trim().toUpperCase() : "#D4AF37";
   return {
     ...f,
     actions: f.actions.filter(Boolean).slice(0, 4),
     luckyColor: { ...f.luckyColor, hex },
-    foods: f.foods.filter(x => x.name && x.ingredients.length && x.steps.length).slice(0, 5),
+    foods: f.foods.filter(x => x.name && x.ingredients.length && x.steps.length).slice(0, 5).map(food => ({ ...food, servings: servingsLabel[language] })),
   };
 }
 
 const HISTORY_KEY = "onore-today-ai-history";
 type HistoryEntry = { key: string; day: string; color: string; word: string; foods: string[] };
-export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string | undefined; members?: TodayFortuneRequest['members'] }) => `onore-today-ai:v2:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}:${daySeed(r.members ? fortuneFingerprint({ members: r.members, subject: { ...r.subject, kind: 'self', label: '' } }) : '', '')}`;
+export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string | undefined; members?: TodayFortuneRequest['members'] }) => `onore-today-ai:v3:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}:${daySeed(r.members ? fortuneFingerprint({ members: r.members, subject: { ...r.subject, kind: 'self', label: '' } }) : '', '')}`;
 
 /** Recent picks to avoid: same subject's colors/words, every subject's foods, last 7 days excluding today. */
 export function avoidFromHistory(history: HistoryEntry[], key: string, day: string) {

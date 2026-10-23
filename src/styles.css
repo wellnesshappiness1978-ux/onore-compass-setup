@@ -1458,3 +1458,9 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
   /* The original painting is brightened before the personal jewel is drawn. */
   filter: none;
 }
+
+/* Lucky accents stay on swatches; opaque semantic surfaces preserve readable recipes. */
+.lucky-readable { color: var(--foreground); }
+.lucky-readable :where(p, li, span) { overflow-wrap: anywhere; min-width: 0; }
+.lucky-readable .text-primary { color: var(--primary); }
+.lucky-readable .text-foreground { color: var(--foreground); }
