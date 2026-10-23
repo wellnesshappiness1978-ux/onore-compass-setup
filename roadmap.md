@@ -1,5 +1,11 @@
 # Roadmap
 
+## Uploaded layout, color and sample refinement (2026-10-23)
+- [ ] Centered left-aligned intro, strict two-row fixed header on all sizes, native pinch-safe gestures, high-contrast theme-aware headings
+- [ ] Centered ingredients, expanded cooking variety/detail/reasons and renamed Japanese tips; prominent shared lucky-color dialog
+- [ ] Fully visible fixed fictional samples with unchanged paid gates and no sample-generation calls
+- [ ] Regression tests, 320/390/1280px browser checks, latest build signal; physical-phone pinch remains externally verifiable
+
 ## Shared explanations and progressive readings (2026-10-23)
 - [x] Unify Home/Traits via shared method explanations and accordion cards; retain subject-named personal details and sign/branch expanders
 - [x] Persist owner/day/full-input readings and deduplicate full requests across surfaces; genuine partial fields visible, independent fast essence retained. Signed-in real first visible output ~26s versus full completion ~221s; reload generated no additional requests

@@ -1,0 +1,10 @@
+import type { Language } from './translations';
+export const dailyColorCopy: Record<Language, { meaning: string; wear: string; idea: string; note: string }> = {
+  ja: { meaning: 'この色が伝える象徴', wear: 'おすすめの身につけ方', idea: 'スカーフ・靴下・バッグの小物に、この色をひとつ。仕事ではペンや手帳、休日はアクセサリーで取り入れると、装いを大きく変えずに楽しめます。迷ったら手持ちの白・グレー・紺と合わせてみませんか。', note: '波動は色から受け取るイメージの象徴表現です。運気や身体への効果を保証するものではありません。' },
+  en: { meaning: 'What this color symbolizes', wear: 'Ways to wear it', idea: 'Try a scarf, socks or a bag accessory. At work use a pen or notebook; on days off try jewelry. Pair it with white, gray or navy already in your wardrobe.', note: 'Resonance describes symbolic color imagery, not a guaranteed effect on fortune or health.' },
+  'zh-CN': { meaning: '色彩的象征', wear: '推荐搭配', idea: '在围巾、袜子或包饰中加入这一颜色。工作时用笔或笔记本，休息日用饰品。可搭配现有的白色、灰色或藏蓝色衣物。', note: '波动是色彩图像的象征表达，不保证运气或健康效果。' },
+  'zh-TW': { meaning: '色彩的象徵', wear: '推薦搭配', idea: '在圍巾、襪子或包飾中加入這一顏色。工作時用筆或筆記本，休息日用飾品。可搭配現有的白色、灰色或藏藍色衣物。', note: '波動是色彩圖像的象徵表達，不保證運氣或健康效果。' },
+  ko: { meaning: '색의 상징', wear: '추천 스타일', idea: '스카프, 양말, 가방 장식에 이 색을 더해 보세요. 직장에서는 펜이나 노트, 휴일에는 액세서리로 즐기세요. 기존 흰색, 회색, 남색 옷과 잘 어울립니다.', note: '파동은 색의 이미지를 나타내는 상징이며 운이나 건강 효과를 보장하지 않습니다.' },
+  es: { meaning: 'El simbolismo de este color', wear: 'Cómo llevarlo', idea: 'Prueba una bufanda, calcetines o un accesorio de bolso. En el trabajo, un bolígrafo o cuaderno; en días libres, joyas. Combínalo con blanco, gris o azul marino.', note: 'La resonancia es una imagen simbólica del color, no un efecto garantizado sobre suerte o salud.' },
+  fr: { meaning: 'La symbolique de cette couleur', wear: 'Comment la porter', idea: 'Essayez une écharpe, des chaussettes ou un accessoire de sac. Au travail, un stylo ou carnet ; en repos, un bijou. Associez-la au blanc, gris ou bleu marine.', note: 'La résonance est une image symbolique, sans effet garanti sur la chance ou la santé.' },
+};

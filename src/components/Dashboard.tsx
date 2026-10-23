@@ -730,12 +730,12 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const swipeStart = useRef<{ x: number; y: number; t: number } | null>(null);
   const onSwipeStart = (e: ReactTouchEvent) => {
     const target = e.target as HTMLElement;
-    if (window.innerWidth >= 768 || target.closest("input,textarea,select,canvas,[data-no-swipe],.overflow-x-auto,[role=dialog]")) { swipeStart.current = null; return; }
+    if (e.touches.length !== 1 || (window.visualViewport?.scale ?? 1) > 1 || window.innerWidth >= 768 || target.closest("input,textarea,select,canvas,[data-no-swipe],.overflow-x-auto,[role=dialog]")) { swipeStart.current = null; return; }
     const p = e.touches[0]; if (p) swipeStart.current = { x: p.clientX, y: p.clientY, t: Date.now() };
   };
   const onSwipeEnd = (e: ReactTouchEvent) => {
     const s = swipeStart.current; swipeStart.current = null; const p = e.changedTouches[0];
-    if (!s || !p) return;
+    if (!s || !p || e.touches.length || (window.visualViewport?.scale ?? 1) > 1) return;
     const dx = p.clientX - s.x, dy = p.clientY - s.y;
     if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8 || Date.now() - s.t > 700) return;
     const i = swipeOrder.indexOf(tab); const next = swipeOrder[i + (dx < 0 ? 1 : -1)];
@@ -810,7 +810,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         </div>
       </header>
 
-      <main onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
+      <main onTouchStart={onSwipeStart} onTouchMove={e => { if (e.touches.length > 1) swipeStart.current = null; }} onTouchEnd={onSwipeEnd} onTouchCancel={() => { swipeStart.current = null; }} className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {tab === "home" ? (
           <ArtsGuide language={language} />
         ) : (

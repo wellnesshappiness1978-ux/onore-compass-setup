@@ -9,6 +9,7 @@ import { luckyFoodLimit } from '@/lib/plans';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 import { servingsLabel } from '@/lib/reading-presentation';
 import { consumeReadingStream, readingCacheEpoch } from '@/lib/reading-cache';
+import DailyLuckyColor from './DailyLuckyColor';
 
 type Base = Omit<TodayFortuneRequest, "avoid">;
 const pendingFortunes = new Map<string, Promise<TodayFortune>>();
@@ -86,7 +87,7 @@ export function TodayLuckyTrio({ state, language, fallback, plan, onUpgrade }: {
   const c = t(language), f = state.data;
   if (!f) return <div className="space-y-3"><Status state={state} language={language} />{fallback}</div>;
   return <div className="lucky-readable min-w-0 space-y-4 text-base leading-7 [overflow-wrap:anywhere]">
-    <div className="flex min-w-0 items-start gap-3 rounded-md border border-primary/25 bg-card p-4 shadow-champagne"><span className="mt-1 size-6 shrink-0 rounded-full border border-primary/40" style={{ background: f.luckyColor.hex }} /><div className="min-w-0"><strong className="text-primary">{c.color}</strong>：{f.luckyColor.name}<p className="mt-2 text-sm text-foreground">{f.luckyColor.reason}</p></div></div>
+    <DailyLuckyColor language={language} hex={f.luckyColor.hex} name={f.luckyColor.name} reason={f.luckyColor.reason} />
     <div className="rounded-md border border-primary/25 bg-card p-4 shadow-champagne"><strong className="text-primary">{c.word}</strong>：「{f.luckyWord.word}」<p className="mt-2 text-sm text-foreground">{f.luckyWord.message}</p></div>
     <div>
       <p className="flex items-center gap-1.5 font-serif text-primary"><ChefHat className="size-4" />{c.allFoods}</p>
@@ -96,8 +97,8 @@ export function TodayLuckyTrio({ state, language, fallback, plan, onUpgrade }: {
           <AccordionTrigger className="min-w-0 gap-2 text-left"><span className="min-w-0 flex-1 break-words">{i + 1}. {food.name}<span className="mt-1 block text-sm font-normal text-muted-foreground">{servingsLabel[language]}</span></span></AccordionTrigger>
           <AccordionContent className="min-w-0 space-y-3 text-[15px] leading-7 [overflow-wrap:anywhere]">
             <p><strong className="text-primary">{c.why}</strong>：{food.why}</p>
-            <section><h5 className="font-serif text-primary">{c.ingredients}（{servingsLabel[language]}）</h5><ul>{food.ingredients.map((x, j) => <li key={j} className="grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-3 border-b border-primary/10 py-1"><span>{x.item}</span><span className="text-right">{x.amount}</span></li>)}</ul></section>
-            <section><h5 className="font-serif text-primary">{c.seasonings}</h5><ul>{food.seasonings.map((x, j) => <li key={j} className="grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-3 border-b border-primary/10 py-1"><span>{x.item}</span><span className="text-right">{x.amount}</span></li>)}</ul></section>
+            <section className="recipe-ingredients"><h5 className="text-center font-serif text-primary">{c.ingredients}（{servingsLabel[language]}）</h5><ul>{food.ingredients.map((x, j) => <li key={j} className="grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-3 border-b border-primary/10 py-2"><span>{x.item}</span><span className="text-right">{x.amount}</span></li>)}</ul></section>
+            <section className="recipe-ingredients"><h5 className="text-center font-serif text-primary">{c.seasonings}</h5><ul>{food.seasonings.map((x, j) => <li key={j} className="grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-3 border-b border-primary/10 py-2"><span>{x.item}</span><span className="text-right">{x.amount}</span></li>)}</ul></section>
             <section><h5 className="font-serif text-primary">{c.steps}</h5><ol className="list-decimal space-y-2 pl-5">{food.steps.map((s, j) => <li key={j}>{s.text}{s.tip && <p className="text-xs text-primary">✦ {c.tip}：{s.tip}</p>}</li>)}</ol></section>
           </AccordionContent>
         </AccordionItem>)}
