@@ -94,7 +94,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     color: "생년월일과 태양의 위치에서 이끌어내는 1440가지 탄생 색상은 색채 심리의 관점을 담은 현대적인 상징 체계입니다. 색이 지닌 심리적 이미지를 통해 의식을 향할 곳과 기분을 가다듬는 힌트를 얻을 수 있습니다. 과학적 측정이 아니라, 매일의 옷차림과 공간 만들기에 '나다운 색'을 더하는 감각적인 참고로 즐기는 것입니다.",
     blood: "다이쇼 시대 이후 일본에서 퍼진, 혈액형에 따른 기질 분류라는 문화적 화제입니다. 과학적 근거는 확립되어 있지 않지만, A형·B형·O형·AB형 각각의 '전형적인 이미지'는 세대를 넘어 사랑받아 왔습니다. 자신을 규정하는 것이 아니라, 대화의 계기나 자기 관찰의 유쾌한 관점으로 즐기는 엔터테인먼트입니다.",
     siblings: "가족 안에서 자란 순서나 구성이 행동의 버릇에 영향을 줄지도 모른다는, 심리학에서 온 관점입니다. 장남·장녀, 중간, 막내, 외동 각각에 오랫동안 이야기되어 온 역할의 이야기가 있습니다. 정해진 성격을 보여주는 것이 아니라, '이런 장면에 기억이 있나요?'라고 자신의 경험을 돌아보는 공감의 질문으로 사용합니다.",
-    region: "태어난 땅의 풍토·기후·문화가 감각의 토대에 살며시 영향을 주고 있을지도 모른다는 관점입니다. 바닷가·산간·도시 등 환경이 기르는 가치관의 차이는 오래전부터 이야기되어 왔습니다. 출생지가 성격을 결정하는 것은 아니며, 자신의 감각의 원점을 떠올리기 위한 중립적인 내省のきっかけとして扱います。",
+    region: "태어난 땅의 풍토·기후·문화가 감각의 토대에 살며시 영향을 주고 있을지도 모른다는 관점입니다. 바닷가·산간·도시 등 환경이 기르는 가치관의 차이는 오래전부터 이야기되어 왔습니다. 출생지가 성격을 결정하는 것은 아니며, 자신의 감각의 원점을 떠올리기 위한 중립적인 성찰의 계기로 다룹니다.",
   },
   es: {
     western: "Nacida de la observación del cielo en la antigua Babilonia y sistematizada en la Grecia helenística, es una de las artes de lectura más antiguas del mundo. Interpreta en qué signos estaban el Sol, la Luna y los planetas al nacer, reflejando patrones emocionales, hábitos de pensamiento y la forma de relacionarse. Hoy sirve como un espejo del corazón: ver con claridad las propias tendencias y armonizar las relaciones y la comunicación.",
