@@ -134,6 +134,7 @@ export type Database = {
           name_kana: string
           name_kanji: string
           name_romaji: string
+          parents: Json | null
           profile_version: string
           sibling_order: string
           target_id: string | null
@@ -155,6 +156,7 @@ export type Database = {
           name_kana?: string
           name_kanji?: string
           name_romaji?: string
+          parents?: Json | null
           profile_version?: string
           sibling_order?: string
           target_id?: string | null
@@ -176,6 +178,7 @@ export type Database = {
           name_kana?: string
           name_kanji?: string
           name_romaji?: string
+          parents?: Json | null
           profile_version?: string
           sibling_order?: string
           target_id?: string | null

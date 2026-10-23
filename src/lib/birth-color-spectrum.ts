@@ -1,6 +1,7 @@
 // A reproducible 1440-slot visual palette, not a measured wavelength or a validated birth-color method.
 import * as A from "astronomy-engine";
-type Birth = { birthDate: string; birthTime: string; birthTimeUnknown: boolean; birthPlace: string };
+type ParentBirth = { birthDate: string; birthPlace?: string; birthCity?: string };
+type Birth = { birthDate: string; birthTime: string; birthTimeUnknown: boolean; birthPlace: string; father?: ParentBirth | null; mother?: ParentBirth | null };
 const names = ["サンライズコーラル", "シャンパンローズ", "アンバーゴールド", "翡翠グリーン", "ターコイズ", "瑠璃ブルー", "アメジスト", "モーヴピンク"];
 const translatedNames = {
   en: ["Sunrise Coral", "Champagne Rose", "Amber Gold", "Jade Green", "Turquoise", "Lapis Blue", "Amethyst", "Mauve Pink"],
