@@ -63,7 +63,7 @@ import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
 import { groupBirthPalette } from "@/lib/group-palette";
 import type { ArtSubject } from "./NineStarsPanel";
-import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, GroupMembersToday, SubjectBanner, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
+import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, GroupMembersToday, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
 import { focusCopy, goalText, groupDisplayName, memberDisplayName, memberToProfile } from "@/lib/focus";
 import { savedPartner, savedGroupMembers } from "@/lib/saved-compatibility";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { birthAddressCopy } from "@/lib/birth-address";
 import { groupTodayCopy, memberToday, roleAssignment, subjectDailyMessage } from "@/lib/group-today";
 import { useServerFn } from "@tanstack/react-start";
-import { Pencil, Sparkles, Target, Trash2, Users, UserRound } from "lucide-react";
+import { Pencil, RotateCcw, Sparkles, Target, Trash2, Users, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +60,16 @@ export function FocusSettingsCard({ language }: { language: Language }) {
   );
 }
 
+const resetLabel: Record<Language, { short: string; subject: string; goal: string }> = {
+  ja: { short: "戻す", subject: "診断対象をあなた（本人）に戻す", goal: "目的をフリーに戻す" },
+  en: { short: "Reset", subject: "Reset subject to you", goal: "Reset goal to free" },
+  "zh-CN": { short: "恢复", subject: "将诊断对象恢复为你本人", goal: "将目标恢复为自由" },
+  "zh-TW": { short: "恢復", subject: "將診斷對象恢復為你本人", goal: "將目標恢復為自由" },
+  ko: { short: "되돌리기", subject: "진단 대상을 본인으로 되돌리기", goal: "목적을 자유로 되돌리기" },
+  es: { short: "Restablecer", subject: "Volver a ti como sujeto", goal: "Volver al objetivo libre" },
+  fr: { short: "Rétablir", subject: "Revenir à vous comme sujet", goal: "Revenir à l’objectif libre" },
+};
+
 /** Fixed header badge: who the readings are about; tap opens the focus settings. */
 export function SubjectHeaderBadge({ language, ownerName, onOpen }: { language: Language; ownerName: string; onOpen: () => void }) {
   const ctx = useFocus();
@@ -69,7 +79,14 @@ export function SubjectHeaderBadge({ language, ownerName, onOpen }: { language: 
   const who = ctx.group ? (subjectWord(ctx, language) ?? ctx.label(language)) : ctx.member ? `${subjectWord(ctx, language) ?? ctx.label(language)}（${t.family}）` : `${self}${ownerName ? `（${ownerName}）` : ""}`;
   const goal = goalText(ctx.focus, language) || reminderUiCopy[language].free;
   const subject = ctx.group || ctx.member ? who : self;
-  return <Button variant="ghost" type="button" onClick={onOpen} title={`${t.viewing(subject)} ｜ ${reminderUiCopy[language].goal}：${goal}`} aria-label={`${t.viewing(subject)} ｜ ${reminderUiCopy[language].goal}：${goal}`} className="subject-goal-badge mx-auto grid min-h-10 min-w-0 max-w-full grid-cols-2 items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-2 text-xs font-bold text-primary"><span className="min-w-0 truncate text-center">{t.viewing(subject)}</span><span className="min-w-0 truncate border-l border-primary/30 pl-2 text-center">{reminderUiCopy[language].goal}：{goal}</span></Button>;
+  const isSelf = ctx.focus.targetKind === "self";
+  const isFree = !goalText(ctx.focus, language);
+  const reset = resetLabel[language];
+  const resetBtn = (label: string, onClick: () => void) => <button type="button" onClick={onClick} aria-label={label} title={label} className="inline-flex min-h-8 shrink-0 items-center gap-0.5 rounded border border-primary/50 px-1.5 text-[10px] font-bold text-primary hover:bg-primary/15"><RotateCcw className="size-3" aria-hidden="true" />{reset.short}</button>;
+  return <div className="subject-goal-badge mx-auto grid min-h-10 min-w-0 max-w-full grid-cols-2 items-center gap-1 rounded-md border border-primary/40 bg-primary/10 px-1 text-xs font-bold text-primary">
+    <span className="flex min-w-0 items-center gap-1"><button type="button" onClick={onOpen} title={t.viewing(subject)} className="min-h-8 min-w-0 flex-1 truncate text-center">{t.viewing(subject)}</button>{!isSelf && resetBtn(reset.subject, () => void ctx.setFocus({ ...ctx.focus, targetKind: "self", targetId: null }))}</span>
+    <span className="flex min-w-0 items-center gap-1 border-l border-primary/30 pl-1"><button type="button" onClick={onOpen} title={`${reminderUiCopy[language].goal}：${goal}`} className="min-h-8 min-w-0 flex-1 truncate text-center">{reminderUiCopy[language].goal}：{goal}</button>{!isFree && resetBtn(reset.goal, () => void ctx.setFocus({ ...ctx.focus, goalPreset: "", goal: "" }))}</span>
+  </div>;
 }
 
 /** Small strip showing the current subject with a way back to self. */
