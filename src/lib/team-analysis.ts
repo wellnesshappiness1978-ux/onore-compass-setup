@@ -12,6 +12,9 @@ export type TeamMember = {
   birthPlace?: string;
   birthCity?: string;
   siblingOrder?: string;
+  /** Optional parents' birth data; refines the illustrative birth-color palette. */
+  father?: { birthDate: string; birthPlace?: string; birthCity?: string } | null;
+  mother?: { birthDate: string; birthPlace?: string; birthCity?: string } | null;
   gender: string;
   bloodType: string;
   relationship?: string;
