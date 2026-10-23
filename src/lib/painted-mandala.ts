@@ -259,28 +259,20 @@ function drawCornerConstellations(context: CanvasRenderingContext2D, size: numbe
     const x0 = sx ? size - pad - box : pad, y0 = top + (sy ? size - pad - box : pad);
     const cx = x0 + box / 2, cy = y0 + box / 2;
     const tint = colors[i % Math.max(1, colors.length)] ?? GOLD;
-    // Quiet dark disc behind the chart so lines and stars separate from the busy background.
-    const backdrop = context.createRadialGradient(cx, cy, 0, cx, cy, box * 0.62);
-    backdrop.addColorStop(0, "rgba(6,9,22,0.6)");
-    backdrop.addColorStop(0.75, "rgba(6,9,22,0.42)");
-    backdrop.addColorStop(1, "rgba(6,9,22,0)");
-    context.globalCompositeOperation = "source-over";
-    context.globalAlpha = 1;
-    context.fillStyle = backdrop;
-    context.fillRect(cx - box * 0.62, cy - box * 0.62, box * 1.24, box * 1.24);
+    // Background-only layer: drawn right after the painting, beneath every personal finish, kept very faint.
     context.globalCompositeOperation = "screen";
     // star chart: ring, graduations and a soft glyph
-    context.globalAlpha = 0.66;
+    context.globalAlpha = 0.22;
     context.strokeStyle = GOLD;
     context.lineWidth = Math.max(1, size * 0.0012);
     context.beginPath(); context.arc(cx, cy, box * 0.5, 0, Math.PI * 2); context.stroke();
-    context.globalAlpha = 0.32;
+    context.globalAlpha = 0.12;
     context.beginPath(); context.arc(cx, cy, box * 0.36, 0, Math.PI * 2); context.stroke();
     for (let t = 0; t < 24; t += 1) {
       const a = t / 24 * Math.PI * 2, inner = box * (t % 2 ? 0.47 : 0.44);
       context.beginPath(); context.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner); context.lineTo(cx + Math.cos(a) * box * 0.5, cy + Math.sin(a) * box * 0.5); context.stroke();
     }
-    context.globalAlpha = 0.42;
+    context.globalAlpha = 0.14;
     context.fillStyle = shade(tint, 0.55);
     context.font = `${Math.round(box * 0.55)}px "Noto Serif JP", serif`;
     context.textAlign = "center"; context.textBaseline = "middle";
@@ -288,7 +280,7 @@ function drawCornerConstellations(context: CanvasRenderingContext2D, size: numbe
     // constellation lines
     const inset = box * 0.14, span = box - inset * 2;
     const pt = (s: [number, number, number]) => [x0 + inset + s[0] * span, y0 + inset + s[1] * span] as const;
-    context.globalAlpha = 0.6;
+    context.globalAlpha = 0.24;
     context.strokeStyle = shade(tint, 0.7);
     context.lineWidth = Math.max(1, size * 0.0014);
     shape.lines.forEach(([a, b]) => { const p = shape.stars[a], q = shape.stars[b]; if (!p || !q) return; const [ax, ay] = pt(p), [bx, by] = pt(q); context.beginPath(); context.moveTo(ax, ay); context.lineTo(bx, by); context.stroke(); });
@@ -299,7 +291,7 @@ function drawCornerConstellations(context: CanvasRenderingContext2D, size: numbe
       glow.addColorStop(0, "rgba(255,252,240,1)");
       glow.addColorStop(0.3, rgba(shade(tint, 0.6), 0.6));
       glow.addColorStop(1, "rgba(0,0,0,0)");
-      context.globalAlpha = 0.95;
+      context.globalAlpha = 0.4;
       context.fillStyle = glow;
       context.fillRect(px - r * 4, py - r * 4, r * 8, r * 8);
     });
@@ -349,10 +341,10 @@ export function drawMandalaComposition(context: CanvasRenderingContext2D, image:
   if (filter) context.filter = filter;
   context.drawImage(image, 0, band, size, size);
   context.restore();
+  if (finish.signs?.length) drawCornerConstellations(context, size, band, finish.signs, finish.colors);
   const members = finish.members ?? [];
   if (members.length >= 2) drawGroupComposition(context, image, size, band, members, filter);
   drawPersonalAura(context, size, band, finish.colors);
-  if (finish.signs?.length) drawCornerConstellations(context, size, band, finish.signs, finish.colors);
   const main = finish.colors[0];
   if (main) drawCenterGem(context, size / 2, band + size / 2, size * 0.04, main);
   if (band > 0) drawColorCrown(context, size, band, finish);
