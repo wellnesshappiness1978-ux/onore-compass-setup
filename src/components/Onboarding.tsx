@@ -24,6 +24,9 @@ export type UserProfile = {
   birthPlace: string;
   bloodType: string;
   siblingOrder: string;
+  /** Optional parents' birth data; refines the illustrative birth-color palette. */
+  father?: ParentBirth | null;
+  mother?: ParentBirth | null;
 };
 
 export const PREFECTURES = japaneseRegions;
