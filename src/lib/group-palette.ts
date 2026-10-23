@@ -45,6 +45,13 @@ export function elevatedGroupColor(codes: string[]): string {
   return fromHsl(Math.round(hue * 10) / 10, sat, light);
 }
 
+/** The group's single main ("total compatibility") color. Every surface — traits card,
+ * group list chips, art, Today and AI context — must read the group color through this
+ * helper so all displays stay identical to the latest calculation. */
+export function groupMainColor(members: GroupBirth[]): string | null {
+  return groupBirthPalette(members)?.main.code ?? null;
+}
+
 /** Seven group colors computed from every member's role colors to raise the group's shared fortune (illustrative). */
 export function groupBirthPalette(members: GroupBirth[]) {
   const palettes = members.map(m => birthColorSpectrum({ birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", father: m.father ?? null, mother: m.mother ?? null })).filter(p => p !== null);

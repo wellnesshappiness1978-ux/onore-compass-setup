@@ -117,6 +117,108 @@ export const groupInsightCopy: Record<Language, { essence: string; energy: strin
   fr: { essence: "Essence", energy: "Vibration et énergie", role: "Rôle dans le groupe", advice: "Conseil du jour", map: "Carte des affinités (paires)", rhythmTable: "Rythme du jour par membre", physical: "Corps", emotional: "Émotion", intellectual: "Esprit", today: "Fortune du groupe aujourd'hui", peak: n => `${n} a le plus d'élan aujourd'hui : confiez-lui la tête.`, care: n => `Le rythme de ${n} est bas aujourd'hui ; proposez un rôle léger.`, best: (a, b) => `La paire la plus accordée est ${a} × ${b}. Commencez par eux.`, note: "Les lectures de groupe sont des valeurs de référence calculées à partir des dates de naissance.", self: "Moi" },
 };
 
+/** Deep-dive sections for the group traits card: five themed readings personalized
+ * with the group's color meaning and member count. Shown inside collapsible panels. */
+export type GroupDepthCopy = {
+  synergyTitle: string;
+  synergy: (m: Meaning, count: number) => string;
+  strengthsTitle: string;
+  strengths: (m: Meaning, count: number) => string;
+  frictionTitle: string;
+  friction: (m: Meaning, count: number) => string;
+  coopTitle: string;
+  coop: (m: Meaning, count: number) => string;
+  fortuneTitle: string;
+  fortune: (m: Meaning, count: number) => string;
+};
+
+export const groupDepthCopy: Record<Language, GroupDepthCopy> = {
+  ja: {
+    synergyTitle: "グループ独自のシナジー",
+    synergy: (m, n) => `${n}人の個性が重なり合うと、${m.name}のエネルギーが生まれます。${m.essence}一人では届かない場所へ、互いの得意を掛け合わせることで進めるのがこのグループの特徴です。${m.energy}日常的には、誰かの小さな閃きが別の誰かの行動力に火をつけ、思いがけない成果につながる場面が増えるでしょう。`,
+    strengthsTitle: "共有される強み",
+    strengths: (m, n) => `このグループ全員に共通する土台は、${m.name}が象徴する力です。${m.role}${n}人それぞれの得意分野は違っても、根っこの価値観が近いため、大切な場面で方向性が自然と揃いやすい傾向にあります。会議や家族の相談ごとでは、この共通の土台に立ち返ると結論がぶれにくくなります。`,
+    frictionTitle: "すれ違いやすいポイント",
+    friction: (m) => `同じ色の波動を共有するぶん、弱みも似たタイミングで表れます。${m.advice}特に全員が疲れている時期は、普段なら笑って流せる言葉が刺さりやすくなります。違和感を覚えたら「誰が悪いか」ではなく「今グループ全体がどんな状態か」に視点を移すと、対立を未然に和らげられます。`,
+    coopTitle: "円滑な協力のコツ",
+    coop: (m, n) => `役割分担は「全員で同じことをする」より「それぞれの得意を一か所に集める」形が合っています。${m.role}話し合いの冒頭で今日の目的を一文で共有し、終わりに一言ずつ感想を回すだけで、${n}人の一体感がぐっと高まります。無理に全員の意見を一致させようとせず、決める人と支える人を日替わりで回すのも効果的です。`,
+    fortuneTitle: "全体運気の活かし方",
+    fortune: (m) => `グループの運気は、メンバー各自の波が重なってできる大きなうねりです。${m.energy}全体の波が高い日は新しい挑戦や決断を、低い日は振り返りと休息を意識的に振り分けると、無理のない循環が生まれます。${m.advice}この色を意識した小物や場の演出を共有スペースに取り入れるのも、気持ちを揃えるきっかけとしておすすめです。`,
+  },
+  en: {
+    synergyTitle: "The group's unique synergy",
+    synergy: (m, n) => `When ${n} personalities overlap, the energy of ${m.name} emerges. ${m.essence} This group moves forward by multiplying each other's strengths, reaching places no one could alone. ${m.energy} In daily life, one person's small spark tends to ignite another's drive, leading to unexpected results.`,
+    strengthsTitle: "Shared strengths",
+    strengths: (m, n) => `The common foundation of this group is the power symbolized by ${m.name}. ${m.role} Though each of the ${n} members excels differently, your core values sit close together, so direction naturally aligns in important moments. In meetings or family discussions, returning to this shared ground keeps conclusions steady.`,
+    frictionTitle: "Where friction tends to appear",
+    friction: (m) => `Sharing the same wave means weaknesses surface at similar times too. ${m.advice} Especially when everyone is tired, words that would normally slide off can sting. When something feels off, shift the view from "who is wrong" to "what state is the group in right now" — it softens conflict before it grows.`,
+    coopTitle: "Tips for smooth cooperation",
+    coop: (m, n) => `Rather than everyone doing the same thing, gather each person's strength in one place. ${m.role} Share the day's purpose in one sentence at the start of a discussion and close with one reflection each — the unity of ${n} people rises noticeably. Rotating who decides and who supports, day by day, also works well.`,
+    fortuneTitle: "Making the most of the group's fortune",
+    fortune: (m) => `Group fortune is a large swell formed by each member's waves overlapping. ${m.energy} On high days, choose new challenges and decisions; on low days, choose review and rest — this creates a sustainable cycle. ${m.advice} Bringing this color into shared spaces through small items or accents is a lovely way to align everyone's mood.`,
+  },
+  "zh-CN": {
+    synergyTitle: "群组独特的协同效应",
+    synergy: (m, n) => `${n}个人的个性交叠，便产生了${m.name}的能量。${m.essence}这个群组的特点是：把彼此的长处相乘，去到一个人无法到达的地方。${m.energy}日常生活中，一个人的小小灵感容易点燃另一个人的行动力，带来意想不到的成果。`,
+    strengthsTitle: "共同拥有的优势",
+    strengths: (m, n) => `这个群组共有的根基，是${m.name}所象征的力量。${m.role}${n}位成员各有所长，但核心价值观相近，因此在重要时刻方向容易自然一致。开会或家庭商量时，回到这个共同的根基，结论就不易摇摆。`,
+    frictionTitle: "容易产生分歧的地方",
+    friction: (m) => `共享同样的波动，弱点也容易在相似的时刻浮现。${m.advice}尤其在大家都疲惫的时期，平时一笑置之的话也容易刺痛彼此。感到不对劲时，把视角从"谁的错"转向"现在整个群组处于什么状态"，就能在对立扩大前化解。`,
+    coopTitle: "顺利协作的诀窍",
+    coop: (m, n) => `分工上，"所有人做同样的事"不如"把各自的强项汇聚到一处"。${m.role}讨论开头用一句话共享今日目标，结尾每人说一句感想，${n}个人的一体感就会明显提升。不必强求意见完全一致，轮流担任"决定的人"和"支持的人"也很有效。`,
+    fortuneTitle: "整体运势的运用方法",
+    fortune: (m) => `群组运势是每位成员的波重叠而成的大浪潮。${m.energy}整体波高的日子安排新挑战和决定，波低的日子安排回顾与休息，就能形成不勉强的循环。${m.advice}在共享空间里加入这种颜色的小物件或布置，也是统一大家心情的好办法。`,
+  },
+  "zh-TW": {
+    synergyTitle: "群組獨特的協同效應",
+    synergy: (m, n) => `${n}個人的個性交疊，便產生了${m.name}的能量。${m.essence}這個群組的特點是：把彼此的長處相乘，去到一個人無法到達的地方。${m.energy}日常生活中，一個人的小小靈感容易點燃另一個人的行動力，帶來意想不到的成果。`,
+    strengthsTitle: "共同擁有的優勢",
+    strengths: (m, n) => `這個群組共有的根基，是${m.name}所象徵的力量。${m.role}${n}位成員各有所長，但核心價值觀相近，因此在重要時刻方向容易自然一致。開會或家庭商量時，回到這個共同的根基，結論就不易搖擺。`,
+    frictionTitle: "容易產生分歧的地方",
+    friction: (m) => `共享同樣的波動，弱點也容易在相似的時刻浮現。${m.advice}尤其在大家都疲憊的時期，平時一笑置之的話也容易刺痛彼此。感到不對勁時，把視角從「誰的錯」轉向「現在整個群組處於什麼狀態」，就能在對立擴大前化解。`,
+    coopTitle: "順利協作的訣竅",
+    coop: (m, n) => `分工上，「所有人做同樣的事」不如「把各自的強項匯聚到一處」。${m.role}討論開頭用一句話共享今日目標，結尾每人說一句感想，${n}個人的一體感就會明顯提升。不必強求意見完全一致，輪流擔任「決定的人」和「支持的人」也很有效。`,
+    fortuneTitle: "整體運勢的運用方法",
+    fortune: (m) => `群組運勢是每位成員的波重疊而成的大浪潮。${m.energy}整體波高的日子安排新挑戰和決定，波低的日子安排回顧與休息，就能形成不勉強的循環。${m.advice}在共享空間裡加入這種顏色的小物件或佈置，也是統一大家心情的好辦法。`,
+  },
+  ko: {
+    synergyTitle: "그룹만의 시너지",
+    synergy: (m, n) => `${n}명의 개성이 겹쳐지면 ${m.name}의 에너지가 태어납니다. ${m.essence} 서로의 강점을 곱해 혼자서는 닿을 수 없는 곳까지 나아가는 것이 이 그룹의 특징입니다. ${m.energy} 일상에서는 누군가의 작은 영감이 다른 사람의 행동력에 불을 붙여 뜻밖의 성과로 이어지는 장면이 늘어날 것입니다.`,
+    strengthsTitle: "함께 나누는 강점",
+    strengths: (m, n) => `이 그룹 전원이 공유하는 토대는 ${m.name}이 상징하는 힘입니다. ${m.role} ${n}명 각자의 장점은 달라도 뿌리의 가치관이 가까워서, 중요한 순간에 방향이 자연스럽게 맞춰지기 쉽습니다. 회의나 가족 상의에서는 이 공통의 토대로 돌아가면 결론이 흔들리지 않습니다.`,
+    frictionTitle: "어긋나기 쉬운 포인트",
+    friction: (m) => `같은 색의 파동을 공유하는 만큼 약점도 비슷한 타이밍에 드러납니다. ${m.advice} 특히 모두가 지쳐 있는 시기에는 평소라면 웃어넘길 말도 찌르기 쉬워집니다. 위화감이 들면 "누가 잘못했나"가 아니라 "지금 그룹 전체가 어떤 상태인가"로 시점을 옮기면 대립을 미리 누그러뜨릴 수 있습니다.`,
+    coopTitle: "원활한 협력의 요령",
+    coop: (m, n) => `역할 분담은 "모두가 같은 일을 하는 것"보다 "각자의 강점을 한곳에 모으는" 형태가 어울립니다. ${m.role} 이야기를 시작할 때 오늘의 목적을 한 문장으로 공유하고, 끝에 한마디씩 소감을 돌리기만 해도 ${n}명의 일체감이 크게 높아집니다. 의견을 억지로 일치시키려 하지 말고, 결정하는 사람과 지원하는 사람을 매일 바꾸는 것도 효과적입니다.`,
+    fortuneTitle: "전체 운기를 살리는 방법",
+    fortune: (m) => `그룹의 운기는 멤버 각자의 파도가 겹쳐 만들어지는 큰 물결입니다. ${m.energy} 전체의 파도가 높은 날에는 새로운 도전과 결단을, 낮은 날에는 돌아보기와 휴식을 의식적으로 나누면 무리 없는 순환이 생깁니다. ${m.advice} 이 색을 의식한 소품이나 연출을 공유 공간에 들이는 것도 마음을 맞추는 계기로 추천합니다.`,
+  },
+  es: {
+    synergyTitle: "La sinergia única del grupo",
+    synergy: (m, n) => `Cuando ${n} personalidades se superponen, surge la energía de ${m.name}. ${m.essence} Este grupo avanza multiplicando las fortalezas de cada uno, llegando donde nadie llegaría solo. ${m.energy} En el día a día, la pequeña chispa de uno enciende el impulso de otro y da resultados inesperados.`,
+    strengthsTitle: "Fortalezas compartidas",
+    strengths: (m, n) => `La base común de este grupo es el poder que simboliza ${m.name}. ${m.role} Aunque cada uno de los ${n} miembros destaca en algo distinto, sus valores de fondo están cerca, así que la dirección se alinea sola en los momentos importantes. En reuniones o charlas familiares, volver a esta base compartida mantiene firmes las conclusiones.`,
+    frictionTitle: "Dónde suele aparecer la fricción",
+    friction: (m) => `Al compartir la misma onda, las debilidades también afloran en momentos parecidos. ${m.advice} Sobre todo cuando todos están cansados, palabras que normalmente no importan pueden doler. Cuando algo no encaje, cambia el enfoque de "quién tiene la culpa" a "en qué estado está el grupo ahora": así se suaviza el conflicto antes de que crezca.`,
+    coopTitle: "Claves para cooperar con fluidez",
+    coop: (m, n) => `En vez de que todos hagan lo mismo, reunid las fortalezas de cada uno en un solo punto. ${m.role} Compartir el objetivo del día en una frase al empezar y cerrar con una reflexión por persona eleva mucho la unidad de ${n} personas. No hace falta que todos coincidan: turnar quién decide y quién apoya también funciona muy bien.`,
+    fortuneTitle: "Cómo aprovechar la fortuna del grupo",
+    fortune: (m) => `La fortuna del grupo es una gran ola formada por las olas de cada miembro. ${m.energy} En días altos, elegid retos y decisiones nuevas; en días bajos, repaso y descanso: así nace un ciclo sin esfuerzo. ${m.advice} Incorporar este color en espacios compartidos con pequeños detalles también ayuda a alinear el ánimo de todos.`,
+  },
+  fr: {
+    synergyTitle: "La synergie unique du groupe",
+    synergy: (m, n) => `Quand ${n} personnalités se superposent, l'énergie de ${m.name} naît. ${m.essence} Ce groupe avance en multipliant les forces de chacun, atteignant ce que personne n'atteindrait seul. ${m.energy} Au quotidien, la petite étincelle de l'un allume l'élan de l'autre et mène à des résultats inattendus.`,
+    strengthsTitle: "Forces partagées",
+    strengths: (m, n) => `Le socle commun de ce groupe est le pouvoir symbolisé par ${m.name}. ${m.role} Même si chacun des ${n} membres excelle différemment, vos valeurs profondes sont proches : la direction s'aligne naturellement dans les moments clés. En réunion ou en discussion familiale, revenir à ce socle commun stabilise les conclusions.`,
+    frictionTitle: "Où la friction apparaît",
+    friction: (m) => `Partager la même onde, c'est aussi voir les faiblesses surgir aux mêmes moments. ${m.advice} Surtout quand tout le monde est fatigué, des mots anodins peuvent blesser. Quand quelque chose cloche, passez de « qui a tort » à « dans quel état est le groupe » : le conflit s'apaise avant de grandir.`,
+    coopTitle: "Les clés d'une coopération fluide",
+    coop: (m, n) => `Plutôt que de faire tous la même chose, rassemblez les forces de chacun en un seul point. ${m.role} Partager l'objectif du jour en une phrase au début, puis une impression chacun à la fin, renforce nettement l'unité des ${n} personnes. Inutile de forcer l'unanimité : alterner qui décide et qui soutient fonctionne très bien.`,
+    fortuneTitle: "Tirer parti de la fortune du groupe",
+    fortune: (m) => `La fortune du groupe est une grande houle formée par les vagues de chaque membre. ${m.energy} Les jours hauts, choisissez nouveautés et décisions ; les jours bas, bilan et repos : un cycle sans effort s'installe. ${m.advice} Intégrer cette couleur dans les espaces partagés, par de petits objets ou accents, aide aussi à harmoniser les humeurs.`,
+  },
+};
+
 export function groupDayLine(avg: number, language: Language): string {
   const tiers: Record<Language, [string, string, string]> = {
     ja: ["全体の波が高まる日。共同作業や決めごとを前に進めるチャンスです。", "落ち着いた安定日。役割分担を見直し、着実に積み上げましょう。", "全体が充電モードの日。無理に進めず、労い合う時間を優先しましょう。"],

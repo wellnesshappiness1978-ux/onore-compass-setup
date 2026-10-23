@@ -259,38 +259,47 @@ function drawCornerConstellations(context: CanvasRenderingContext2D, size: numbe
     const x0 = sx ? size - pad - box : pad, y0 = top + (sy ? size - pad - box : pad);
     const cx = x0 + box / 2, cy = y0 + box / 2;
     const tint = colors[i % Math.max(1, colors.length)] ?? GOLD;
+    // Quiet dark disc behind the chart so lines and stars separate from the busy background.
+    const backdrop = context.createRadialGradient(cx, cy, 0, cx, cy, box * 0.62);
+    backdrop.addColorStop(0, "rgba(6,9,22,0.6)");
+    backdrop.addColorStop(0.75, "rgba(6,9,22,0.42)");
+    backdrop.addColorStop(1, "rgba(6,9,22,0)");
+    context.globalCompositeOperation = "source-over";
+    context.globalAlpha = 1;
+    context.fillStyle = backdrop;
+    context.fillRect(cx - box * 0.62, cy - box * 0.62, box * 1.24, box * 1.24);
     context.globalCompositeOperation = "screen";
     // star chart: ring, graduations and a soft glyph
-    context.globalAlpha = 0.46;
+    context.globalAlpha = 0.66;
     context.strokeStyle = GOLD;
-    context.lineWidth = Math.max(1, size * 0.0009);
+    context.lineWidth = Math.max(1, size * 0.0012);
     context.beginPath(); context.arc(cx, cy, box * 0.5, 0, Math.PI * 2); context.stroke();
-    context.globalAlpha = 0.18;
+    context.globalAlpha = 0.32;
     context.beginPath(); context.arc(cx, cy, box * 0.36, 0, Math.PI * 2); context.stroke();
     for (let t = 0; t < 24; t += 1) {
       const a = t / 24 * Math.PI * 2, inner = box * (t % 2 ? 0.47 : 0.44);
       context.beginPath(); context.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner); context.lineTo(cx + Math.cos(a) * box * 0.5, cy + Math.sin(a) * box * 0.5); context.stroke();
     }
-    context.globalAlpha = 0.22;
-    context.fillStyle = shade(tint, 0.35);
+    context.globalAlpha = 0.42;
+    context.fillStyle = shade(tint, 0.55);
     context.font = `${Math.round(box * 0.55)}px "Noto Serif JP", serif`;
     context.textAlign = "center"; context.textBaseline = "middle";
     context.fillText(SIGN_GLYPHS[sign] ?? "", cx, cy);
     // constellation lines
     const inset = box * 0.14, span = box - inset * 2;
     const pt = (s: [number, number, number]) => [x0 + inset + s[0] * span, y0 + inset + s[1] * span] as const;
-    context.globalAlpha = 0.42;
-    context.strokeStyle = shade(tint, 0.55);
-    context.lineWidth = Math.max(1, size * 0.0011);
+    context.globalAlpha = 0.6;
+    context.strokeStyle = shade(tint, 0.7);
+    context.lineWidth = Math.max(1, size * 0.0014);
     shape.lines.forEach(([a, b]) => { const p = shape.stars[a], q = shape.stars[b]; if (!p || !q) return; const [ax, ay] = pt(p), [bx, by] = pt(q); context.beginPath(); context.moveTo(ax, ay); context.lineTo(bx, by); context.stroke(); });
     shape.stars.forEach(star => {
       const [px, py] = pt(star);
-      const r = size * 0.0028 * star[2];
+      const r = size * 0.0032 * star[2];
       const glow = context.createRadialGradient(px, py, 0, px, py, r * 4);
-      glow.addColorStop(0, "rgba(255,250,235,0.9)");
-      glow.addColorStop(0.3, rgba(shade(tint, 0.5), 0.45));
+      glow.addColorStop(0, "rgba(255,252,240,1)");
+      glow.addColorStop(0.3, rgba(shade(tint, 0.6), 0.6));
       glow.addColorStop(1, "rgba(0,0,0,0)");
-      context.globalAlpha = 0.75;
+      context.globalAlpha = 0.95;
       context.fillStyle = glow;
       context.fillRect(px - r * 4, py - r * 4, r * 8, r * 8);
     });
