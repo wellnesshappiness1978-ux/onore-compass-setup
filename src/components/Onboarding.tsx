@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import LanguageSelector from "./LanguageSelector";
 import BirthplaceFields from "./BirthplaceFields";
+import ParentFields, { validParent, type ParentBirth } from "./ParentFields";
 import { addressRegion, japaneseRegions } from "@/lib/birth-address";
 import SiblingSelect from "./SiblingSelect";
 import { ArrowRight, CalendarDays, Clock3, Compass, Droplets, MapPin, Network, Sparkles } from "lucide-react";
@@ -234,6 +235,10 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
               <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                  {t.placeHint}
               </p>
+              <div className="mt-6 border-t border-primary/15 pt-5">
+                <ParentFields language={language} father={profile.father ?? null} mother={profile.mother ?? null}
+                  onChange={(father, mother) => setProfile(p => ({ ...p, father, mother }))} className={inputClass} />
+              </div>
             </div>
           )}
 
