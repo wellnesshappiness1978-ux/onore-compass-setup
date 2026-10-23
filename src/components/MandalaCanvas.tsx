@@ -6,19 +6,19 @@ import { capturePaintedMandala, drawMandalaComposition, type MandalaFinish } fro
 
 export type MandalaColor = { name: string; code: string };
 export type Capture = (options?: { hideBirthDetails?: boolean }) => Promise<{ blob: Blob; width: number; height: number }>;
-type Props = { language: Language; onCapture: (capture: Capture | null) => void; colors?: string[]; labels?: string[] };
+type Props = { language: Language; onCapture: (capture: Capture | null) => void; colors?: string[]; labels?: string[]; signs?: number[]; members?: string[] };
 
 const BASE_FILTER = "brightness(1.12) saturate(1.18)";
 
 /** The original painting is the artwork; the personal birth-color gem and
  * seven-color crown are composed on top, identically for view and export. */
-export default function MandalaCanvas({ language, onCapture, colors = [], labels = [] }: Props) {
+export default function MandalaCanvas({ language, onCapture, colors = [], labels = [], signs = [], members = [] }: Props) {
   const copy = artSpecialistCopy[language];
   const canvas = useRef<HTMLCanvasElement>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [failed, setFailed] = useState(false);
-  const finish = useRef<MandalaFinish>({ colors, labels });
-  finish.current = { colors, labels };
+  const finish = useRef<MandalaFinish>({ colors, labels, signs, members });
+  finish.current = { colors, labels, signs, members };
 
   useEffect(() => {
     const source = new Image();
@@ -50,7 +50,7 @@ export default function MandalaCanvas({ language, onCapture, colors = [], labels
     });
     observer.observe(target);
     return () => observer.disconnect();
-  }, [image, paint, colors, labels]);
+  }, [image, paint, colors, labels, signs.join(","), members.join(",")]);
 
   const capture = useCallback<Capture>(async () => {
     if (!image) throw new Error("Artwork unavailable");

@@ -612,7 +612,7 @@ function FocusedArt({ language, owner, plan, render }: { language: Language; own
   const ctx = useFocus();
   if (!ctx || !canUse(plan, "subjectArt") || ctx.focus.targetKind === "self") return <>{render(owner)}</>;
   if (ctx.member) return <>{render(memberToProfile(ctx.member), { key: `m-${ctx.member.id}`, label: ctx.label(language), kind: "member" })}</>;
-  if (ctx.group) { const gp = groupBirthPalette(ctx.group.members); return <>{render(owner, { key: `g-${ctx.group.group.id}`, label: ctx.label(language), kind: "group", palette: gp })}</>; }
+  if (ctx.group) { const gp = groupBirthPalette(ctx.group.members); return <>{render(owner, { key: `g-${ctx.group.group.id}`, label: ctx.label(language), kind: "group", palette: gp, births: ctx.group.members })}</>; }
   return <>{render(owner)}</>;
 }
 function FocusedToday({ language, render, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void; render: (p: UserProfile) => ReactNode }) {
