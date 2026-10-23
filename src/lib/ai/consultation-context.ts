@@ -14,8 +14,8 @@ type Input = CoreInput & {
   birthCity: string;
   siblingOrder: string;
   gender?: "male" | "female" | "other" | "undisclosed";
-  father?: { birthDate: string; birthPlace?: string; birthCity?: string } | null;
-  mother?: { birthDate: string; birthPlace?: string; birthCity?: string } | null;
+  father?: { birthDate: string; birthPlace?: string; birthCity?: string } | null | undefined;
+  mother?: { birthDate: string; birthPlace?: string; birthCity?: string } | null | undefined;
 };
 
 export function consultationContext(profile: Input, day: string) {
