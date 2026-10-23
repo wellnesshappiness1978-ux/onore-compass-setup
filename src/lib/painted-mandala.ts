@@ -261,7 +261,7 @@ function drawCornerConstellations(context: CanvasRenderingContext2D, size: numbe
     const tint = colors[i % Math.max(1, colors.length)] ?? GOLD;
     context.globalCompositeOperation = "screen";
     // star chart: ring, graduations and a soft glyph
-    context.globalAlpha = 0.32;
+    context.globalAlpha = 0.46;
     context.strokeStyle = GOLD;
     context.lineWidth = Math.max(1, size * 0.0009);
     context.beginPath(); context.arc(cx, cy, box * 0.5, 0, Math.PI * 2); context.stroke();
@@ -271,7 +271,7 @@ function drawCornerConstellations(context: CanvasRenderingContext2D, size: numbe
       const a = t / 24 * Math.PI * 2, inner = box * (t % 2 ? 0.47 : 0.44);
       context.beginPath(); context.moveTo(cx + Math.cos(a) * inner, cy + Math.sin(a) * inner); context.lineTo(cx + Math.cos(a) * box * 0.5, cy + Math.sin(a) * box * 0.5); context.stroke();
     }
-    context.globalAlpha = 0.14;
+    context.globalAlpha = 0.22;
     context.fillStyle = shade(tint, 0.35);
     context.font = `${Math.round(box * 0.55)}px "Noto Serif JP", serif`;
     context.textAlign = "center"; context.textBaseline = "middle";
