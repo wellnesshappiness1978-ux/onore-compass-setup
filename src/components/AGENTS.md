@@ -26,3 +26,5 @@
 - Cosmic Genesis shares live/2048 rendering, birth astronomy, golden astrolabe and ring-clipped nautilus relief; bodies foreground, scaled text without plates, birthplace Earth outside the ring with daylight-independent exposure, radius comparison keeps scale labels and Sun visibility note. Why: scientific context and readable art.
 
 - Group color names use birthColorNameForHex; the group's seven named colors with details are gated by `groupColorsFull`, lower plans see an upgrade note. Why: one gate source and no unnamed codes.
+- The group traits card reads its headline color via groupMainColor (same value as art/Today/AI) and presents deep-dive sections, the rhythm table and the pair map in collapsible details panels. Why: consistent color and a compact screen despite richer content.
+- Mandala corner star charts paint a quiet dark backdrop disc before the screen-composited ring, glyph, lines and stars, with raised alphas for legibility. Why: charts must stay visible over the busy background without touching the main artwork.

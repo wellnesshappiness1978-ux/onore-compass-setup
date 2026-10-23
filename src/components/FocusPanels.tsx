@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useFocus } from "./FocusProvider";
 import { addTeamGroup, deleteTeamGroup, updateTeamGroup } from "@/lib/team-groups.functions";
-import { canAddGroup, focusCopy, selfReadingLabel, goalText, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, mixHex, type TargetKind, type TeamGroup } from "@/lib/focus";
+import { canAddGroup, focusCopy, selfReadingLabel, goalText, goalPresets, GROUPS_KEY, groupDisplayName, memberDisplayName, memberToProfile, type TargetKind, type TeamGroup } from "@/lib/focus";
 import { canUse, groupLimit, memberLimit } from "@/lib/plans";
 import { familyCapacityCopy, fitsMemberCapacity, registeredMemberCount } from '@/lib/family-capacity';
 import { birthColorNameForHex, birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-spectrum";
-import { groupBirthPalette, groupPaletteRoles } from "@/lib/group-palette";
+import { groupBirthPalette, groupMainColor, groupPaletteRoles } from "@/lib/group-palette";
 import { birthColorCopy } from "@/lib/birth-color-copy";
 import { colorExperienceCopy } from "@/lib/color-experience-copy";
 import { colorReference, colorReferenceCopy } from "@/lib/color-reference";
@@ -21,7 +21,7 @@ import { LockKeyhole } from "lucide-react";
 import { biorhythm, pairScore, type TeamMember } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
-import { groupColorMeaning, groupDayLine, groupInsightCopy, SELF_MEMBER_ID } from "@/lib/group-insight";
+import { groupColorMeaning, groupDayLine, groupDepthCopy, groupInsightCopy, SELF_MEMBER_ID } from "@/lib/group-insight";
 
 import { reminderUiCopy } from '@/lib/reminder-ui-copy';
 
@@ -108,7 +108,8 @@ export function GroupFocusCard({ language, plan, onUpgrade }: { language: Langua
   const stats = useMemo(() => {
     if (!g) return null;
     const colors = g.members.map(m => ({ m, c: mainColor(m) }));
-    const groupHex = mixHex(colors.map(x => x.c?.code ?? ""));
+    // Single source of truth: the same elevated group color used by art, Today and AI context.
+    const groupHex = groupMainColor(g.members);
     const pairList: { a: TeamMember; b: TeamMember; score: number }[] = [];
     for (let i = 0; i < g.members.length; i++) for (let j = i + 1; j < g.members.length; j++) pairList.push({ a: g.members[i]!, b: g.members[j]!, score: pairScore(g.members[i]!, g.members[j]!) });
     pairList.sort((x, y) => y.score - x.score);
@@ -131,12 +132,17 @@ export function GroupFocusCard({ language, plan, onUpgrade }: { language: Langua
         <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupHarmony}</p><p className="font-serif text-2xl text-primary">{stats.harmony ?? "—"}{stats.harmony !== null && <span className="text-sm">/100</span>}</p></div>
         <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupRhythm}</p><p className="font-serif text-2xl text-primary">{stats.rhythm ?? "—"}<span className="text-sm">/100</span></p></div>
       </div>
-      {stats.groupHex && (() => { const gm = groupColorMeaning(stats.groupHex, language); const gi = groupInsightCopy[language]; return <div className="mt-3 rounded-md border border-primary/25 p-3 text-sm leading-6"><p className="font-serif text-lg font-bold text-primary">{gm.name}</p><dl className="mt-2 space-y-2"><div><dt className="text-xs font-bold text-primary">{gi.essence}</dt><dd>{gm.essence}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.energy}</dt><dd>{gm.energy}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.role}</dt><dd>{gm.role}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.advice}</dt><dd>{gm.advice}</dd></div></dl></div>; })()}
+      {stats.groupHex && (() => { const gm = groupColorMeaning(stats.groupHex, language); const gi = groupInsightCopy[language]; const gd = groupDepthCopy[language]; const n = g.members.length; const panel = "group rounded-md border border-primary/25"; const head = "flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden"; const body = "border-t border-primary/15 px-3 pb-3 pt-2 text-sm leading-7"; return <>
+        <div className="mt-3 rounded-md border border-primary/25 p-3 text-sm leading-6"><p className="font-serif text-lg font-bold text-primary">{gm.name}</p><dl className="mt-2 space-y-2"><div><dt className="text-xs font-bold text-primary">{gi.essence}</dt><dd>{gm.essence}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.energy}</dt><dd>{gm.energy}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.role}</dt><dd>{gm.role}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.advice}</dt><dd>{gm.advice}</dd></div></dl></div>
+        <div className="mt-3 space-y-2">
+          {([[gd.synergyTitle, gd.synergy(gm, n)], [gd.strengthsTitle, gd.strengths(gm, n)], [gd.frictionTitle, gd.friction(gm, n)], [gd.coopTitle, gd.coop(gm, n)], [gd.fortuneTitle, gd.fortune(gm, n)]] as const).map(([title, text]) => <details key={title} className={panel}><summary className={head}>{title}<span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span></summary><p className={body}>{text}</p></details>)}
+        </div>
+      </>; })()}
       {(() => { const gi = groupInsightCopy[language]; const pct = (v: number) => Math.round((v + 1) * 50); const top = stats.rhythms[0]; const low = stats.rhythms[stats.rhythms.length - 1]; const best = stats.pairList[0]; return <>
         <div className="mt-4 rounded-md border border-primary/25 p-3 text-sm leading-6"><h3 className="text-sm font-bold text-primary">{gi.today}</h3><p className="mt-1">{groupDayLine(stats.rhythm ?? 50, language)}</p>{top && <p className="mt-1">{gi.peak(memberDisplayName(top.m))}</p>}{low && low !== top && low.r.total < 45 && <p className="mt-1">{gi.care(memberDisplayName(low.m))}</p>}{best && <p className="mt-1">{gi.best(memberDisplayName(best.a), memberDisplayName(best.b))}</p>}</div>
-        <h3 className="mt-4 text-sm text-primary">{gi.rhythmTable}</h3>
-        <div className="mt-2 overflow-x-auto"><table className="w-full text-xs"><thead><tr className="text-muted-foreground"><th className="p-1 text-left"></th><th className="p-1">{gi.physical}</th><th className="p-1">{gi.emotional}</th><th className="p-1">{gi.intellectual}</th><th className="p-1">∑</th></tr></thead><tbody>{stats.rhythms.map(({ m, r }) => <tr key={m.id} className="border-t border-primary/15"><td className="max-w-28 truncate p-1 font-bold">{memberDisplayName(m)}</td><td className="p-1 text-center">{pct(r.physical)}</td><td className="p-1 text-center">{pct(r.emotional)}</td><td className="p-1 text-center">{pct(r.intellectual)}</td><td className="p-1 text-center text-primary">{r.total}</td></tr>)}</tbody></table></div>
-        {stats.pairList.length > 0 && <><h3 className="mt-4 text-sm text-primary">{gi.map}</h3><ul className="mt-2 space-y-1.5">{stats.pairList.map(p => <li key={p.a.id + p.b.id} className="text-xs"><div className="flex justify-between gap-2"><span className="truncate">{memberDisplayName(p.a)} × {memberDisplayName(p.b)}</span><span className="text-primary">{p.score}</span></div><div className="mt-0.5 h-1.5 rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${p.score}%` }} /></div></li>)}</ul></>}
+        <details className="group mt-4 rounded-md border border-primary/25"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden">{gi.rhythmTable}<span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span></summary>
+        <div className="overflow-x-auto border-t border-primary/15 p-2"><table className="w-full text-xs"><thead><tr className="text-muted-foreground"><th className="p-1 text-left"></th><th className="p-1">{gi.physical}</th><th className="p-1">{gi.emotional}</th><th className="p-1">{gi.intellectual}</th><th className="p-1">∑</th></tr></thead><tbody>{stats.rhythms.map(({ m, r }) => <tr key={m.id} className="border-t border-primary/15"><td className="max-w-28 truncate p-1 font-bold">{memberDisplayName(m)}</td><td className="p-1 text-center">{pct(r.physical)}</td><td className="p-1 text-center">{pct(r.emotional)}</td><td className="p-1 text-center">{pct(r.intellectual)}</td><td className="p-1 text-center text-primary">{r.total}</td></tr>)}</tbody></table></div></details>
+        {stats.pairList.length > 0 && <details className="group mt-3 rounded-md border border-primary/25"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden">{gi.map}<span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span></summary><ul className="space-y-1.5 border-t border-primary/15 p-3">{stats.pairList.map(p => <li key={p.a.id + p.b.id} className="text-xs"><div className="flex justify-between gap-2"><span className="truncate">{memberDisplayName(p.a)} × {memberDisplayName(p.b)}</span><span className="text-primary">{p.score}</span></div><div className="mt-0.5 h-1.5 rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${p.score}%` }} /></div></li>)}</ul></details>}
         <p className="mt-3 text-[11px] text-muted-foreground">{gi.note}</p>
       </>; })()}
       <h3 className="mt-4 text-sm text-primary">{t.groupMembers}</h3>
@@ -190,7 +196,7 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
     <div role="tablist" className="mb-5 grid grid-cols-2 gap-2">
       {([["family", UserRound, t.familyEdit, () => { window.dispatchEvent(new Event("onore-family-edit")); window.setTimeout(() => document.getElementById("family-roster-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); }], ["group", Users, t.groupEdit, () => { reset(); setOpen(true); }]] as const).map(([key, Icon, label, act]) => { const on = active === key; return <Button key={key} role="tab" aria-selected={on} variant="outline" className={`h-12 border-2 transition-all md:h-14 md:text-base ${on ? "border-primary bg-primary/20 font-bold text-primary shadow-champagne after:absolute after:inset-x-3 after:bottom-1 after:h-1 after:rounded-full after:bg-primary relative" : "border-primary/30 text-muted-foreground hover:text-foreground"}`} onClick={() => { setActive(key); act(); }}><Icon className={on ? "size-5 text-primary" : "size-4"} />{label}</Button>; })}
     </div>
-    {ctx.groups.length > 0 && <ul className="mb-5 grid gap-2 sm:grid-cols-2">{ctx.groups.map((g, i) => { const hex = mixHex(ctx.members.filter(m => g.memberIds.includes(m.id)).map(m => mainColor(m)?.code ?? "")); return <li key={g.id} className="rounded-md border-l-4 p-3" style={hex ? { borderLeftColor: hex, backgroundImage: `linear-gradient(90deg, ${hex}66, transparent 75%)` } : undefined}><p className="truncate font-serif text-lg font-bold text-outline">{groupDisplayName(g, i, language)}</p><p className="text-xs text-muted-foreground">{t.members} {g.memberIds.length}</p></li>; })}</ul>}
+    {ctx.groups.length > 0 && <ul className="mb-5 grid gap-2 sm:grid-cols-2">{ctx.groups.map((g, i) => { const hex = groupMainColor(ctx.members.filter(m => g.memberIds.includes(m.id))); return <li key={g.id} className="rounded-md border-l-4 p-3" style={hex ? { borderLeftColor: hex, backgroundImage: `linear-gradient(90deg, ${hex}66, transparent 75%)` } : undefined}><p className="truncate font-serif text-lg font-bold text-outline">{groupDisplayName(g, i, language)}</p><p className="text-xs text-muted-foreground">{t.members} {g.memberIds.length}</p></li>; })}</ul>}
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="z-[200] max-h-[88dvh] w-[calc(100%-1.5rem)] max-w-lg overflow-y-auto border-primary/40">
         <DialogTitle className="font-serif text-primary">{t.groupEdit}</DialogTitle>

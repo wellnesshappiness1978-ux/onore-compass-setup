@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { elevatedGroupColor, groupBirthPalette } from "./group-palette";
+import { elevatedGroupColor, groupBirthPalette, groupMainColor } from "./group-palette";
+import { groupDepthCopy } from "./group-insight";
+import type { Language } from "./translations";
 import { sunSignIndex, cornerSlots, paletteSeed } from "./mandala-constellations";
 
 describe("group fortune-raising colors", () => {
@@ -16,6 +18,26 @@ describe("group fortune-raising colors", () => {
     const m = [{ birthDate: "1990-04-12" }, { birthDate: "1985-11-03" }];
     expect(groupBirthPalette(m)).toEqual(groupBirthPalette(m));
     expect(groupBirthPalette(m)?.love.code).toMatch(/^#[0-9A-F]{6}$/);
+  });
+  it("groupMainColor is the single source matching the palette's main color", () => {
+    const m = [{ birthDate: "1990-04-12" }, { birthDate: "1985-11-03" }];
+    expect(groupMainColor(m)).toBe(groupBirthPalette(m)?.main.code);
+    expect(groupMainColor([])).toBeNull();
+  });
+});
+
+describe("group depth copy", () => {
+  const langs: Language[] = ["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"];
+  const meaning = { name: "X", essence: "E", energy: "G", role: "R", advice: "A" };
+  it("provides all five sections in every language", () => {
+    for (const l of langs) {
+      const d = groupDepthCopy[l];
+      expect(d.synergy(meaning, 3).length).toBeGreaterThan(40);
+      expect(d.strengths(meaning, 3).length).toBeGreaterThan(40);
+      expect(d.friction(meaning, 3).length).toBeGreaterThan(40);
+      expect(d.coop(meaning, 3).length).toBeGreaterThan(40);
+      expect(d.fortune(meaning, 3).length).toBeGreaterThan(40);
+    }
   });
 });
 
