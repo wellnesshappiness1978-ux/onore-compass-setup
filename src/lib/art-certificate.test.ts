@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {artDimensions,privateDisclosure,recordLines,newArtSerial,birthJulianDay,inscriptionSerial} from './art-certificate';
+import {artDimensions,privateDisclosure,recordLines,newArtSerial,birthJulianDay,inscriptionSerial,fitContain} from './art-certificate';
 import {artCertificateCopy} from './art-certificate-copy';
 const record={title:'Art',serial:'AG-ABCDEF',name:'Private name',birthDate:'1990-04-15',birthTime:'08:30',birthTimeUnknown:false,birthPlace:'東京都',birthCity:'新宿区'};
 describe('private artwork records',()=>{
