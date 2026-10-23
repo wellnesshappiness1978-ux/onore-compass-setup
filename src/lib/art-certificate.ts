@@ -30,6 +30,8 @@ export function recordLines(record:ArtRecord, disclosure:Disclosure, language:La
  if(disclosure.coordinates) { const point=resolveBirthplace(record.birthPlace,record.birthCity); lines.push(point?`${point.lat.toFixed(3)}° N · ${point.lon.toFixed(3)}° E · ${point.precision==='municipality'?t.municipality:t.prefecture}`:t.unknown); }
  return lines;
 }
+/** Aspect-preserving fit of a source into a box; the artwork is never stretched. */
+export function fitContain(iw:number,ih:number,boxW:number,boxH:number){const s=Math.min(boxW/iw,boxH/ih);return{w:iw*s,h:ih*s};}
 export async function composeArtRecord(blob:Blob,format:ArtFormat,record:ArtRecord,disclosure:Disclosure,language:Language):Promise<Blob> {
  if(format==='art') return blob;
  await document.fonts.ready;
@@ -37,13 +39,16 @@ export async function composeArtRecord(blob:Blob,format:ArtFormat,record:ArtReco
  const ctx=canvas.getContext('2d'); if(!ctx) throw new Error('Canvas unavailable');
  const css=getComputedStyle(document.documentElement),token=(n:string)=>css.getPropertyValue(n).trim();
  const gold=token('--cosmic-text-main'),paper=token('--cosmic-text-data'),ink=token('--share-midnight');
- ctx.fillStyle=ink;ctx.fillRect(0,0,w,h);ctx.strokeStyle=gold;ctx.lineWidth=w*.001;
+  ctx.fillStyle=ink;ctx.fillRect(0,0,w,h);ctx.strokeStyle=gold;ctx.lineWidth=w*.001;
  const margin=w*.04;ctx.strokeRect(margin,margin,w-2*margin,h-2*margin);
  ctx.globalAlpha=.35;ctx.strokeRect(margin+w*.007,margin+w*.007,w-2*(margin+w*.007),h-2*(margin+w*.007));ctx.globalAlpha=1;
  const landscape=format==='landscape',wallpaper=format==='wallpaper';
- const imageSize=landscape?h*.79:format==='square'?w*.60:w*.84, x=landscape?w*.06:(w-imageSize)/2, y=landscape?(h-imageSize)/2:wallpaper?h*.30:format==='story'?h*.17:h*.14;
+ const imageSize=landscape?h*.79:format==='square'?w*.56:w*.84, x=landscape?w*.06:(w-imageSize)/2, y=landscape?(h-imageSize)/2:wallpaper?h*.30:format==='story'?h*.17:h*.14;
  const url=URL.createObjectURL(blob);
- try { const image=new Image();image.src=url;await image.decode();ctx.drawImage(image,x,y,imageSize,imageSize); } finally { URL.revokeObjectURL(url); }
+ // The mandala export carries a seven-color band above the square painting;
+ // fit the whole source proportionally so it never distorts into a wide shape.
+ let imageBottom=y+imageSize;
+ try { const image=new Image();image.src=url;await image.decode();const fit=fitContain(image.naturalWidth,image.naturalHeight,imageSize,imageSize*1.15);const dx=x+(imageSize-fit.w)/2;ctx.drawImage(image,dx,y,fit.w,fit.h);imageBottom=y+fit.h; } finally { URL.revokeObjectURL(url); }
  const textX=landscape?w*.735:w*.5, textW=landscape?w*.38:w*.85;
  ctx.textAlign='center';ctx.textBaseline='middle';
  ctx.shadowColor=token('--cosmic-text-shadow');ctx.shadowBlur=4*w/1024;ctx.shadowOffsetY=w/1024;
@@ -51,7 +56,7 @@ export async function composeArtRecord(blob:Blob,format:ArtFormat,record:ArtReco
  const t=artCertificateCopy[language],titleY=landscape?h*.36:wallpaper?h*.272:h*.102;
  text(t.brand,landscape?h*.30:wallpaper?h*.25:h*.073,w*.017,gold,true);text(record.title,titleY,w*.026,paper,true);
  const logo=new Image();logo.src=logoAsset.url;await logo.decode();const logoSize=w*.035;ctx.drawImage(logo,textX-logoSize/2,(landscape?h*.20:wallpaper?h*.22:h*.022),logoSize,logoSize);
- const baseY=landscape?h*.47:y+imageSize+w*.046;
+ const baseY=landscape?h*.47:imageBottom+w*.046;
  text(t.record,baseY,w*.013,gold);text(inscriptionSerial(record,disclosure),baseY+w*.026,w*.0135,gold,true);
  const rows=recordLines(record,disclosure,language);rows.forEach((line,i)=>text(line,baseY+w*(.057+i*.025),w*.013));
  const jd = disclosure.time ? birthJulianDay(record) : null;

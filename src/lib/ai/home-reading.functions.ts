@@ -11,6 +11,7 @@ import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 import { distinctTraitChapters, supportiveWritingVoice } from "./writing-voice";
 import { approachKeys, approachStatuses, traitReadingPrompt } from "@/lib/trait-reading";
 import { computeExtendedArts, extendedArtsPrompt } from "@/lib/extended-arts";
+import { artPrinciplesPrompt } from "@/lib/art-overview-copy";
 import { nineStarProfile } from "@/lib/calendar-traditions";
 import { readingProfileSchema, readingSubjectSchema, profileReadingContext, profileContextInstructions } from "@/lib/profile-reading-context";
 
@@ -104,6 +105,7 @@ FIVE CORE LAYERS (computed by the app; cite exact values, never recalculate, nev
 ${core}
 EXTENDED ARTS (computed by the app from the birth data; cite exact values, never recalculate):
 ${extendedArtsPrompt(extended)}
+${artPrinciplesPrompt}
 CROSS-ANALYSIS (required): In synthesis and strength, contrast the 表の顔 list with the 本音・潜在 list and use the [クロス解析] verdicts (一致 / ギャップ) explicitly: 日干×太陽, 人格×ソウル数, 動物×月星座. Weave in 通変星, 十二運星, 五行の最多/欠如, ライフパス, and 月・水星・金星 where they sharpen the portrait. The animal surface/hope/hidden values are an original +1/+2/+3 day reference model, NOT official animal layers; do not infer personality from them. The ascendant uses birthplace representative coordinates only when available and birth time is known. Geocentric planets and Ba Zhai directions are not birthplace-dependent. Treat these as traditional divination lenses, not scientific facts.
 BANNED hedges: "〜な面もあります", "人それぞれ", "〜かもしれません", "場合によっては", and any sentence that would fit anyone.
 
