@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronDown, Lock, Sparkles } from "lucide-react";
+import { ChevronDown, Sparkles } from "lucide-react";
 import ShareCardButton from "./ShareCardButton";
 import type { UserProfile } from "./Onboarding";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
@@ -9,21 +9,21 @@ import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-sp
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 import { AgolmenLoading, useCompletionHold } from "./AgolmenSpiral";
-import { approachKeys, type ApproachKey, traitReadingCopy } from "@/lib/trait-reading";
+import { approachKeys, type ApproachKey, traitReadingCopy, visibleApproachKeys } from "@/lib/trait-reading";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 
-const titles: Record<Language, [string, string, string, string, string]> = {
-  ja: ["分類別診断（15占術）", "あなたの診断カードをシェア", "詳しい解説を読む", "この占術は現在のプロフィールでは算出していません。推測で補うことはせず、表示を控えています。", "多層総合診断"],
-  en: ["Readings by method (15 arts)", "Share your reading card", "Read the detailed reading", "This method is not calculated from the current profile. Rather than guessing, no reading is shown.", "Multi-layer grand reading"],
-  "zh-CN": ["分类别诊断（15种占术）", "分享你的诊断卡", "阅读详细解说", "此占术目前未根据资料计算，为避免臆测，不显示解读。", "多层综合诊断"],
-  "zh-TW": ["分類別診斷（15種占術）", "分享你的診斷卡", "閱讀詳細解說", "此占術目前未依資料計算，為避免臆測，不顯示解讀。", "多層綜合診斷"],
-  ko: ["분류별 분석 (15가지 점술)", "나의 진단 카드 공유", "자세한 해설 읽기", "이 점술은 현재 프로필로 계산하지 않습니다. 추측으로 채우지 않고 표시하지 않습니다.", "다층 종합 분석"],
-  es: ["Lecturas por método (15 artes)", "Compartir tu tarjeta", "Leer la explicación", "Este método no se calcula con el perfil actual. No se muestra una lectura inventada.", "Lectura integral multicapa"],
-  fr: ["Lectures par méthode (15 arts)", "Partager votre carte", "Lire l’explication", "Cette méthode n’est pas calculée avec le profil actuel. Aucune lecture inventée n’est affichée.", "Lecture globale multicouche"],
+const titles: Record<Language, [string, string, string]> = {
+  ja: ["分類別診断（16占術）", "あなたの診断カードをシェア", "詳しい解説を読む"],
+  en: ["Readings by method (16 arts)", "Share your reading card", "Read the detailed reading"],
+  "zh-CN": ["分类别诊断（16种占术）", "分享你的诊断卡", "阅读详细解说"],
+  "zh-TW": ["分類別診斷（16種占術）", "分享你的診斷卡", "閱讀詳細解說"],
+  ko: ["분류별 분석 (16가지 점술)", "나의 진단 카드 공유", "자세한 해설 읽기"],
+  es: ["Lecturas por método (16 artes)", "Compartir tu tarjeta", "Leer la explicación"],
+  fr: ["Lectures par méthode (16 arts)", "Partager votre carte", "Lire l’explication"],
 };
 
 type Genre = "western" | "eastern" | "calendar" | "number" | "color" | "context";
-const genreOf: Record<ApproachKey, Genre> = { western: "western", indian: "western", ziwei: "eastern", earth: "calendar", pillars: "eastern", sanmei: "eastern", nineStars: "eastern", lunarMansion: "calendar", animal: "eastern", numerology: "number", maya: "calendar", color: "color", blood: "context", siblings: "context", region: "context" };
+const genreOf: Record<ApproachKey, Genre> = { western: "western", indian: "western", ziwei: "eastern", eastern: "eastern", earth: "calendar", pillars: "eastern", sanmei: "eastern", nineStars: "eastern", lunarMansion: "calendar", animal: "eastern", numerology: "number", maya: "calendar", color: "color", blood: "context", siblings: "context", region: "context" };
 const genres: Record<Language, Record<Genre, string>> = {
   ja: { western: "天体・星の占術", eastern: "東洋命術", calendar: "暦・周期の占術", number: "数の占術", color: "色彩理論", context: "気質・環境の参考" },
   en: { western: "Celestial astrology", eastern: "East Asian destiny arts", calendar: "Calendar & cycles", number: "Number arts", color: "Color theory", context: "Temperament & context" },
