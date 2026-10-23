@@ -17,9 +17,10 @@ describe("birthColorSpectrum with parents", () => {
     const refined = birthColorSpectrum({ ...base, father, mother })!;
     expect(refined.parentInfluence).toBe("both");
     const roles = ["main", "sub", "money", "work", "love", "health", "mind"] as const;
-    // Every role shifts together from the blended base slot.
+    // Every role shifts together from the blended base slot (slots wrap at 1440).
     expect(refined.main.slot).not.toBe(plain.main.slot);
-    for (const role of roles) expect(refined[role].slot - plain[role].slot).toBe(refined.main.slot - plain.main.slot);
+    const shift = (refined.main.slot - plain.main.slot + 1440) % 1440;
+    for (const role of roles) expect((refined[role].slot - plain[role].slot + 1440) % 1440).toBe(shift);
   });
 
   it("blends a single parent and stays deterministic", () => {
