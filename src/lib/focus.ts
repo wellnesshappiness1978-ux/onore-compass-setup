@@ -44,6 +44,8 @@ export function memberToProfile(m: TeamMember): UserProfile {
     birthCity: m.birthCity ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "",
     birthTimeUnknown: m.birthTimeUnknown ?? !m.birthTime, birthPlace: m.birthPlace ?? "",
     bloodType: m.bloodType ?? "", siblingOrder: m.siblingOrder ?? "",
+    father: m.father ? { birthDate: m.father.birthDate, birthPlace: m.father.birthPlace ?? "", birthCity: m.father.birthCity ?? "" } : null,
+    mother: m.mother ? { birthDate: m.mother.birthDate, birthPlace: m.mother.birthPlace ?? "", birthCity: m.mother.birthCity ?? "" } : null,
   };
 }
 

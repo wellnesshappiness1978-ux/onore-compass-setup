@@ -3,6 +3,7 @@
 import * as A from "astronomy-engine";
 import { reduceNumerology } from "@/lib/birth-colors";
 import { resolveBirthplace } from "@/lib/birthplace";
+import { branchInfo, signInfo } from "@/lib/zodiac-signs";
 import { getFiveElements } from "./five-elements";
 
 export type CoreInput = { nameKanji: string; nameRomaji: string; birthDate: string; birthTime: string; birthTimeUnknown: boolean; bloodType: string; birthPlace?: string; birthCity?: string };
@@ -111,7 +112,11 @@ export function computeCoreLayers(p: CoreInput, now = new Date()) {
   const surface = [five.name ? `人格${five.name.person}画` : null, `太陽${western.sun}`, `月柱通変星${shichu.pillars[1]!.tsuhen}`].filter(Boolean) as string[];
   const inner = [numerology.soul ? `ソウル数${numerology.soul}` : null, `月${western.moon}`, `日柱十二運${shichu.pillars[2]!.stage}`].filter(Boolean) as string[];
 
-  return { western, shichu, numerology, name: five.name, animal, cross, surface, inner, hasTime, birthplace };
+  // Eastern zodiac (十二支): the year branch from the same 立春-based year as Four Pillars.
+  const branchIdx = yearIdx % 12;
+  const eastern = { yearBranch: BRANCHES[branchIdx]!, branchIndex: branchIdx, element: EL[BRANCH_EL[branchIdx]!]!, yinYang: yearIdx % 2 === 0 ? "陽" : "陰" };
+
+  return { western, shichu, eastern, numerology, name: five.name, animal, cross, surface, inner, hasTime, birthplace };
 }
 
 export type CoreLayers = NonNullable<ReturnType<typeof computeCoreLayers>>;
@@ -122,8 +127,9 @@ export function coreLayersPrompt(c: CoreLayers | null): string {
   return [
     `[姓名判断] ${n ? `天格${n.sky}(${n.luck.sky}) 人格${n.person}(${n.luck.person}) 地格${n.earth}(${n.luck.earth}) 外格${n.outer}(${n.luck.outer}) 総格${n.total}(${n.luck.total})` : "未算出（空白区切りの漢字氏名が必要）"}`,
     `[数秘術] ライフパス${c.numerology.lifePath} / ディスティニー${c.numerology.destiny ?? "未算出"} / ソウル${c.numerology.soul ?? "未算出"} / パーソナリティ${c.numerology.personality ?? "未算出"} / ${c.numerology.cyclePhase} / 次の転機 ${c.numerology.turningAge ? `${c.numerology.turningAge}歳（${c.numerology.turningYear}年・ピナクル切替）` : "—"}`,
-    `[西洋占星術] 太陽${c.western.sun} 月${c.western.moon}${c.western.moonUncertain ? "（出生時間不明のため月星座は確定できない）" : ""} ${c.western.planets.map(p => `${p.name}${p.sign}`).join(" ")} / ASC ${c.western.ascendant ? `${c.western.ascendant}（${c.birthplace?.label}の代表座標を使用）` : "出生時刻・日本国内の出生地が揃うと表示"}`,
+    `[西洋占星術] 太陽${c.western.sun}（${signInfo(c.western.sun, "ja")?.element}・${signInfo(c.western.sun, "ja")?.quality}・${signInfo(c.western.sun, "ja")?.traits}） 月${c.western.moon}（${signInfo(c.western.moon, "ja")?.element}・${signInfo(c.western.moon, "ja")?.quality}）${c.western.moonUncertain ? "（出生時間不明のため月星座は確定できない）" : ""} ${c.western.planets.map(p => `${p.name}${p.sign}`).join(" ")} / ASC ${c.western.ascendant ? `${c.western.ascendant}（${c.birthplace?.label}の代表座標を使用）` : "出生時刻・日本国内の出生地が揃うと表示"}。星座の象徴（エレメント・宮・シンボルの特性）は、伝統的なたとえとして時折表現に自然に織り込んでよい`,
     `[四柱推命] ${c.shichu.pillars.map(p => `${p.label}${p.kanshi}(通変星:${p.tsuhen}/十二運:${p.stage})`).join(" ")}${c.hasTime ? "" : " 時柱:未算出"} / 日干${c.shichu.dayMaster} / 五行 ${Object.entries(c.shichu.balance).map(([k, v]) => `${k}${v}`).join(" ")} 最多${c.shichu.dominant} 欠如${c.shichu.missing.join("・") || "なし"}${c.shichu.yearBoundary || c.shichu.monthBoundary ? " ※節入り境界付近" : ""}`,
+    `[東洋占星術・干支] 年生まれの十二支${c.eastern.yearBranch}（${branchInfo(c.eastern.branchIndex, "ja").animal}・${c.eastern.element}・${c.eastern.yinYang}）。特性「${branchInfo(c.eastern.branchIndex, "ja").traits}」。十二支の特性・相性・12年周期の巡りは伝統的な参考として、日々の食や行動の助言に時折自然に活かしてよい（断定や科学的根拠の主張はしない）`,
     `[動物占い] 本質 ${c.animal.core ?? "未算出"} / ${c.animal.group ?? "—"} / 表面・希望・隠れは独自参考モデル（本質の60日周期をそれぞれ+1日/+2日/+3日ずらした値、公式分類ではない）: ${c.animal.referenceAnimals ? `${c.animal.referenceAnimals.surface} / ${c.animal.referenceAnimals.hope} / ${c.animal.referenceAnimals.hidden}` : "入力不足"}。独自3層を公式の性格判定として扱わない`,
     `[クロス解析] ${c.cross.map(x => `${x.pair}: ${x.a} × ${x.b} → ${x.verdict}`).join(" | ")}`,
     `[表の顔] ${c.surface.join("・")} ／ [本音・潜在] ${c.inner.join("・")}`,

@@ -1,0 +1,2 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS parents jsonb;
+COMMENT ON COLUMN public.profiles.parents IS 'Optional father/mother birth date and birthplace used to refine the illustrative birth-color palette. Shape: {"father":{"birthDate":"YYYY-MM-DD","birthPlace":"...","birthCity":"..."},"mother":{...}}';

@@ -3,6 +3,7 @@ import { SacredDisclosure } from "./ui/sacred-disclosure";
 import { Check, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import BirthplaceFields from "./BirthplaceFields";
+import ParentFields, { validParent } from "./ParentFields";
 import SiblingSelect from "./SiblingSelect";
 import { siblingLabels } from "@/lib/sibling-order";
 import { inputClass, type UserProfile } from "./Onboarding";
@@ -43,7 +44,7 @@ export default function ProfileEditor({
     setError(null);
     setSaving(true);
     try {
-      await onSave({ ...draft, nameKanji: finalizePersonalName(draft.nameKanji).slice(0, 40), nameKana: finalizePersonalName(draft.nameKana).slice(0, 60), nameRomaji: finalizePersonalName(draft.nameRomaji, true).slice(0, 60), birthCity: draft.birthCity.trim().slice(0, 80) });
+      await onSave({ ...draft, nameKanji: finalizePersonalName(draft.nameKanji).slice(0, 40), nameKana: finalizePersonalName(draft.nameKana).slice(0, 60), nameRomaji: finalizePersonalName(draft.nameRomaji, true).slice(0, 60), birthCity: draft.birthCity.trim().slice(0, 80), father: validParent(draft.father), mother: validParent(draft.mother) });
       setSaved(true);
     } catch { setError("save"); }
     finally { setSaving(false); }
@@ -74,6 +75,7 @@ export default function ProfileEditor({
             <input type="checkbox" checked={draft.birthTimeUnknown} onChange={(e) => { set("birthTimeUnknown", e.target.checked); if (e.target.checked) set("birthTime", ""); }} className="accent-[var(--primary)]" />
             {t.timeUnknown}</label></div>
         <BirthplaceFields language={language} birthPlace={draft.birthPlace} birthCity={draft.birthCity} onChange={(birthPlace, birthCity) => { setSaved(false); setDraft(p => ({ ...p, birthPlace, birthCity })); }} className={inputClass} />
+        <ParentFields language={language} father={draft.father ?? null} mother={draft.mother ?? null} onChange={(father, mother) => { setSaved(false); setDraft(p => ({ ...p, father, mother })); }} className={inputClass} />
         <div><label className={label} htmlFor="pe-sibling">{siblingLabels[language].title}</label>
           <SiblingSelect id="pe-sibling" language={language} value={draft.siblingOrder} onChange={(v) => set("siblingOrder", v)} className={inputClass} /></div>
       </div>

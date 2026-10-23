@@ -113,3 +113,9 @@
 - [x] Family roster locks the add button at the plan cap (3/10/30/100 kept per user decision) with 「登録上限に達しました」 notice and upgrade modal; editing existing members stays possible
 - [x] Family feature list cards show lock icons below Family plan; dialogs offer 「ファミリープランへアップグレード」 when locked and open the real feature when unlocked; TeamStudio locked card uses the same upgrade copy; Plan Perks already reflects accurate limits
 - [x] 40 related tests pass (new sibling-order/relationship-kind tests), tsgo clean, build OK; Playwright verified roster UI, cap lock and upgrade dialog on Standard guest preview; dev server restarted once for a stale module cache
+
+## Zodiac explanations, eastern astrology layer, parent-refined birth colors (2026-10-23) — done
+- [x] 12-sign symbolism (element/quality/traits, 7 languages) in the Western astrology method dialog; new 東洋占星術（十二支・干支占い） method entry with 12-branch details in 7 languages
+- [x] core-layers computes the 立春-based year branch (eastern layer); sign/branch symbolism flows into AI prompts as illustrative metaphor
+- [x] Optional father/mother birth date + linked birthplace (shared ParentFields) on onboarding, profile editor and family roster; stored as `parents` jsonb on profiles/team_members; birthColorSpectrum blends parent slots (own dominant, each parent a quarter) with parentInfluence flag; group palettes and mandala art follow automatically
+- [x] 250 tests pass (new zodiac-signs and birth-color-spectrum tests), tsgo clean, build OK; Playwright verified both method dialogs and the roster parents form

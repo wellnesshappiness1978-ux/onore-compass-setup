@@ -9,6 +9,8 @@ const memberSchema = z.object({
   gender: z.enum(["female", "male", "other", "undisclosed"]), bloodType: z.enum(["", "A", "B", "O", "AB"]),
   relationship: z.string().max(60).catch(""), relationshipType: z.string().max(30).catch(""),
   role: z.string().max(60).catch(""), skills: z.array(z.string().max(30)).max(12).catch([]),
+  father: z.object({ birthDate: z.string().date(), birthPlace: z.string().max(80).catch(""), birthCity: z.string().max(80).catch("") }).nullable().catch(null),
+  mother: z.object({ birthDate: z.string().date(), birthPlace: z.string().max(80).catch(""), birthCity: z.string().max(80).catch("") }).nullable().catch(null),
 });
 export function readPreviewMembers(): TeamMember[] {
   if (typeof window === "undefined") return [];

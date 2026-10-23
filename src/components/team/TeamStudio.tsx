@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import BirthplaceFields from "../BirthplaceFields";
+import ParentFields, { validParent, type ParentBirth } from "../ParentFields";
 import SiblingSelect from "../SiblingSelect";
 import { siblingLabels } from "@/lib/sibling-order";
 import { useServerFn } from "@tanstack/react-start";
@@ -174,7 +175,7 @@ const rosterExtra: Record<Language, { kana: string; time: string; timeUnknown: s
   fr: { kana: "Lecture du nom", time: "Heure de naissance", timeUnknown: "Heure inconnue", place: "Région / pays de naissance", city: "Ville de naissance", sibling: "Rang dans la fratrie", gender: "Genre", blood: "Groupe sanguin", relationship: "Lien / fonction", relationType: "Type de relation", types: ["Non précisé", "Partenaire", "Amoureux/se", "Fiancé(e)", "Famille", "Frère/Sœur", "Parent(e)", "Ami·e", "Collègue", "Supérieur(e)", "Subordonné(e)", "Employé·e", "Autre"], genders: ["Non renseigné", "Femme", "Homme", "Autre"], edit: "Modifier", cancel: "Annuler", saved: "Mettre à jour", preview: "Les membres de prévisualisation restent sur cet appareil et ne modifient pas la limite réelle." },
 };
 const RELATIONSHIP_TYPE_VALUES = ["", "partner", "lover", "fiance", "family", "sibling", "relative", "friend", "business", "boss", "subordinate", "employee", "other"] as const;
-const emptyMemberForm = { name: "", nickname: "", nameKana: "", birthDate: "", birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", siblingOrder: "", gender: "undisclosed", bloodType: "", relationship: "", relationshipType: "", role: "", skills: "" };
+const emptyMemberForm = { name: "", nickname: "", nameKana: "", birthDate: "", birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", siblingOrder: "", gender: "undisclosed", bloodType: "", relationship: "", relationshipType: "", role: "", skills: "", father: null as ParentBirth | null, mother: null as ParentBirth | null };
 
 function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd, onEdit, onRemove, onLimit }: { t: TeamCopy; owner: TeamMember | null; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void; onLimit: () => void }) {
   const x = rosterExtra[language];
@@ -195,7 +196,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
     setBusy(true);
     setError(false);
     try {
-      const member = { name: form.name.trim(), nickname: form.nickname.trim(), nameKana: form.nameKana.trim(), birthDate: form.birthDate, birthTime: form.birthTimeUnknown ? "" : form.birthTime, birthTimeUnknown: form.birthTimeUnknown, birthPlace: form.birthPlace.trim(), birthCity: form.birthCity.trim(), siblingOrder: form.siblingOrder.trim(), gender: form.gender, bloodType: form.bloodType, relationship: form.relationship.trim(), relationshipType: form.relationshipType, role: form.role.trim(), skills: form.skills.split(/[,、，]/).map((s) => s.trim()).filter(Boolean).slice(0, 12) };
+      const member = { name: form.name.trim(), nickname: form.nickname.trim(), nameKana: form.nameKana.trim(), birthDate: form.birthDate, birthTime: form.birthTimeUnknown ? "" : form.birthTime, birthTimeUnknown: form.birthTimeUnknown, birthPlace: form.birthPlace.trim(), birthCity: form.birthCity.trim(), siblingOrder: form.siblingOrder.trim(), gender: form.gender, bloodType: form.bloodType, relationship: form.relationship.trim(), relationshipType: form.relationshipType, role: form.role.trim(), skills: form.skills.split(/[,、，]/).map((s) => s.trim()).filter(Boolean).slice(0, 12), father: validParent(form.father), mother: validParent(form.mother) };
       const ok = editingId ? await onEdit({ ...member, id: editingId }) : await onAdd(member);
       if (ok) { setForm(emptyMemberForm); setEditingId(null); window.dispatchEvent(new Event("onore-focus-reload")); }
     } catch { setError(true);
@@ -213,6 +214,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
         <Input aria-label={x.time} type="time" disabled={form.birthTimeUnknown} value={form.birthTime} onChange={(e) => setForm({ ...form, birthTime: e.target.value })} />
         <label className="flex min-h-11 items-center gap-2 text-xs"><input type="checkbox" checked={form.birthTimeUnknown} onChange={(e) => setForm({ ...form, birthTimeUnknown: e.target.checked, birthTime: e.target.checked ? "" : form.birthTime })} />{x.timeUnknown}</label>
         <BirthplaceFields language={language} birthPlace={form.birthPlace} birthCity={form.birthCity} onChange={(birthPlace, birthCity) => setForm(p => ({ ...p, birthPlace, birthCity }))} />
+        <ParentFields language={language} father={form.father} mother={form.mother} onChange={(father, mother) => setForm(p => ({ ...p, father, mother }))} />
         <SiblingSelect key={editingId ?? "new"} language={language} value={form.siblingOrder} maxLength={80} onChange={(v) => setForm({ ...form, siblingOrder: v })} />
         <select aria-label={x.gender} value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as typeof form.gender })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm">{["undisclosed", "female", "male", "other"].map((value, i) => <option key={value} value={value}>{i === 0 ? x.gender : x.genders[i]}</option>)}</select>
         <select aria-label={x.blood} value={form.bloodType} onChange={(e) => setForm({ ...form, bloodType: e.target.value as typeof form.bloodType })} className="min-h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="">{x.blood}</option>{["A", "B", "O", "AB"].map(value => <option key={value} value={value}>{value}</option>)}</select>
@@ -233,7 +235,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
                 {m.nickname && <p className="truncate text-[11px] text-muted-foreground">{m.name}</p>}
                 <p className="truncate text-[11px] text-muted-foreground">{m.birthDate} · {m.relationship || m.role || "—"}</p>
               </div>
-              <Button size="icon" variant="ghost" aria-label={`${x.edit} ${m.name}`} onClick={() => { setFormOpen(true); setEditingId(m.id); setForm({ name: m.name, nickname: m.nickname ?? "", nameKana: m.nameKana ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", birthCity: m.birthCity ?? "", siblingOrder: m.siblingOrder ?? "", gender: m.gender || "undisclosed", bloodType: m.bloodType || "", relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", role: m.role, skills: m.skills.join(", ") }); }}><Pencil className="size-4" /></Button>
+              <Button size="icon" variant="ghost" aria-label={`${x.edit} ${m.name}`} onClick={() => { setFormOpen(true); setEditingId(m.id); setForm({ name: m.name, nickname: m.nickname ?? "", nameKana: m.nameKana ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", birthCity: m.birthCity ?? "", siblingOrder: m.siblingOrder ?? "", gender: m.gender || "undisclosed", bloodType: m.bloodType || "", relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", role: m.role, skills: m.skills.join(", "), father: m.father ? { birthDate: m.father.birthDate, birthPlace: m.father.birthPlace ?? "", birthCity: m.father.birthCity ?? "" } : null, mother: m.mother ? { birthDate: m.mother.birthDate, birthPlace: m.mother.birthPlace ?? "", birthCity: m.mother.birthCity ?? "" } : null }); }}><Pencil className="size-4" /></Button>
               <Button size="icon" variant="ghost" aria-label={`${t.remove} ${m.name}`} onClick={() => onRemove(m.id)}><Trash2 className="size-4" /></Button>
             </li>
           ))}

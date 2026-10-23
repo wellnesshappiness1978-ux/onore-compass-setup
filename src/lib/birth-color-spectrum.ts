@@ -1,6 +1,7 @@
 // A reproducible 1440-slot visual palette, not a measured wavelength or a validated birth-color method.
 import * as A from "astronomy-engine";
-type Birth = { birthDate: string; birthTime: string; birthTimeUnknown: boolean; birthPlace: string };
+type ParentBirth = { birthDate: string; birthPlace?: string; birthCity?: string };
+type Birth = { birthDate: string; birthTime: string; birthTimeUnknown: boolean; birthPlace: string; father?: ParentBirth | null | undefined; mother?: ParentBirth | null | undefined };
 const names = ["サンライズコーラル", "シャンパンローズ", "アンバーゴールド", "翡翠グリーン", "ターコイズ", "瑠璃ブルー", "アメジスト", "モーヴピンク"];
 const translatedNames = {
   en: ["Sunrise Coral", "Champagne Rose", "Amber Gold", "Jade Green", "Turquoise", "Lapis Blue", "Amethyst", "Mauve Pink"],
@@ -44,9 +45,24 @@ export function birthColorSpectrum(p: Birth) {
   const instant = new Date(`${p.birthDate}T03:00:00Z`); // noon JST reference longitude
   const sunSlot = Math.floor(A.SunPosition(instant).elon * 4);
   const seed = [...`${p.birthDate}|${p.birthPlace || "東京都"}`].reduce((v, ch) => (v * 31 + ch.charCodeAt(0)) % 1440, 0);
-  const base = (seed + minute + sunSlot) % 1440;
+  const own = (seed + minute + sunSlot) % 1440;
+  // Optional parents' birth data refines the palette: the person's own slot stays
+  // dominant while each known parent contributes a quarter of the blend. This is an
+  // illustrative family-resonance input to the same 1440-slot palette, never a
+  // measured vibration or an inherited-traits claim.
+  const parentSlot = (parent: ParentBirth | null | undefined) => {
+    if (!parent || !/^\d{4}-\d{2}-\d{2}$/.test(parent.birthDate)) return null;
+    const date = new Date(`${parent.birthDate}T03:00:00Z`);
+    if (Number.isNaN(date.getTime())) return null;
+    const pSeed = [...`${parent.birthDate}|${parent.birthPlace || ""}|${parent.birthCity || ""}`].reduce((v, ch) => (v * 31 + ch.charCodeAt(0)) % 1440, 0);
+    return (pSeed + Math.floor(A.SunPosition(date).elon * 4)) % 1440;
+  };
+  const fatherSlot = parentSlot(p.father);
+  const motherSlot = parentSlot(p.mother);
+  const known = [fatherSlot, motherSlot].filter((s): s is number => s !== null);
+  const base = known.length === 0 ? own : Math.round((own * 2 + known.reduce((a, s) => a + s, 0)) / (2 + known.length)) % 1440;
   const color = (index: number) => palette[(index + 1440) % 1440] ?? { slot: 1, name: "参考色", code: hex(0, 0.57, 0.51) };
-  return { main: color(base), sub: color(base + 215), money: color(base + 360), work: color(base + 1013), love: color(base + 600), health: color(base + 840), mind: color(base + 487), provisional: !hasTime, placeDefault: !p.birthPlace };
+  return { main: color(base), sub: color(base + 215), money: color(base + 360), work: color(base + 1013), love: color(base + 600), health: color(base + 840), mind: color(base + 487), provisional: !hasTime, placeDefault: !p.birthPlace, parentInfluence: known.length === 2 ? "both" as const : fatherSlot !== null ? "father" as const : motherSlot !== null ? "mother" as const : null };
 }
 /** Palette family name for any hex (same 45° hue bands as the 1440-slot palette). */
 export function birthColorNameForHex(code: string): string {
