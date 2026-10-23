@@ -104,8 +104,8 @@ function CoreLayersPanel({ layers: c, profile, language, reading, loading, nameD
         </DialogContent>
       </Dialog>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-md border border-primary/30 p-3"><p className="text-xs text-primary">{lc.surface}</p><p className="mt-1 text-sm text-foreground">{language === "ja" ? c.surface.join(" / ") : lc.summaries[0]}</p></div>
-        <div className="rounded-md border border-primary/30 bg-primary/10 p-3"><p className="text-xs text-primary">{lc.inner}</p><p className="mt-1 text-sm text-foreground">{language === "ja" ? c.inner.join(" / ") : lc.summaries[1]}</p></div>
+        <div className="rounded-md border border-primary/30 bg-card/60 p-3"><p className="text-xs text-primary">{lc.surface}</p><p className="mt-1 text-sm text-foreground">{language === "ja" ? c.surface.join(" / ") : lc.summaries[0]}</p></div>
+        <div className="rounded-md border border-primary/30 bg-card/60 p-3"><p className="text-xs text-primary">{lc.inner}</p><p className="mt-1 text-sm text-foreground">{language === "ja" ? c.inner.join(" / ") : lc.summaries[1]}</p></div>
       </div>
       {language === "ja" && <ul className="mt-3 space-y-1 text-xs leading-6 text-muted-foreground">{c.cross.map(x => <li key={x.pair}>{x.pair}：{x.a} × {x.b} → <span className="text-primary">{x.verdict}</span></li>)}</ul>}
        {!c.hasTime && <p className="mt-3 inline-block border border-primary/30 px-3 py-2 text-sm text-primary">{lc.moreTime}</p>}
