@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import type { Language } from "@/lib/translations";
 import { artsGuideCopy } from "@/lib/arts-guide-copy";
+import { allBranches, allSigns } from "@/lib/zodiac-signs";
 
 const stars = [
   { top: "8%", left: "8%", size: 2, delay: "0s" },
