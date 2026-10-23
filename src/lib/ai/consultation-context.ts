@@ -8,6 +8,7 @@ import { helioPhase } from "./helio-phase";
 import { approachStatuses } from "../trait-reading";
 import { parseSiblingComposition } from "../sibling-order";
 import { computeExtendedArts, extendedArtsPrompt } from "../extended-arts";
+import { artPrinciplesPrompt } from "../art-overview-copy";
 
 type Input = CoreInput & {
   birthPlace: string;
@@ -50,6 +51,7 @@ export function consultationContext(profile: Input, day: string) {
     },
     core: coreLayersPrompt(core),
     extended: extendedArtsPrompt(computeExtendedArts(profile.birthDate, profile.birthTime, profile.birthTimeUnknown)),
+    principles: artPrinciplesPrompt,
     status,
     sky,
     colors,
