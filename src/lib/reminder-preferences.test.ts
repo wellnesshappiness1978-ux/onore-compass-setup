@@ -1,3 +1,5 @@
+import { goalThemes } from './goal-guidance';
+import { relationshipGoalAction } from './relationship-goal-advice';
 import { expect, it } from 'vitest';
 import { defaultRelationshipGoal, relationshipGoalText, validRelationshipGoal, validBgmPreference } from './reminder-preferences';
 it('retains chosen BGM track and volume', () => expect(validBgmPreference({ hz: 639, volume: 0.31 })).toEqual({ hz: 639, volume: 0.31 }));
@@ -12,4 +14,13 @@ it('keeps the relationship goal separate from a work default and combines its ow
 it('restores valid independent goals and rejects unknown presets', () => {
  expect(validRelationshipGoal(JSON.parse(JSON.stringify({ goalPreset: 'love', goal: '二人の時間' })))).toEqual({ goalPreset: 'love', goal: '二人の時間' });
  expect(validRelationshipGoal({ goalPreset: 'unknown', goal: 1 })).toEqual(defaultRelationshipGoal);
+});
+
+it('routes all six independent presets to their own advice theme, never work for a health goal', () => {
+ for (const preset of ['work','love','family','health','money','growth']) {
+  const goal = { goalPreset: preset, goal: '' };
+  expect(goalThemes(relationshipGoalText(goal, 'ja'))).toEqual([preset]);
+  expect(relationshipGoalAction(goal, 'ja')).not.toBe('');
+ }
+ expect(relationshipGoalAction({ goalPreset: 'health', goal: '' }, 'ja')).not.toBe(relationshipGoalAction({ goalPreset: 'work', goal: '' }, 'ja'));
 });

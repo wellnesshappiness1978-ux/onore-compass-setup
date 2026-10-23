@@ -13,6 +13,7 @@ import FeatureNotifySwitch, { registerReminderFallbacks } from './FeatureNotifyS
 import { TodayCard, TodayLockedGuide } from './TodayCard';
 import BgmReminderSettings from './BgmReminderSettings';
 import { SacredDisclosure } from './ui/sacred-disclosure';
+import { relationshipGoalAction } from '@/lib/relationship-goal-advice';
 import { useRelationshipPreferences } from '@/hooks/use-relationship-preferences';
 import { relationshipGoalText } from '@/lib/reminder-preferences';
 import { todayAccessCopy } from '@/lib/today-access-copy';
@@ -32,7 +33,7 @@ export function DailyReminderCatalogue({ language, plan }: { language: Language;
     const total = members?.length ? members.reduce((sum, member) => sum + personal(member.birthDate, date).total, 0) / members.length : personal(focus?.readingProfile.birthDate ?? '', date).total;
     const entries: Record<string, { title: string; body: string }> = Object.fromEntries(todayFeatures.filter(f => canUseToday(plan, f.id)).map(f => [f.id, { title: t.today, body: `${day} · ${focus?.label(language) ?? ''} · ${t.today}` }]));
     const target = focus?.members.find(m => m.id === relationPrefs.picked) ?? focus?.members[0];
-    if (canUseToday(plan, 'relations') && target) entries['relations'] = { title: todayAccessCopy[language].relations, body: `${memberDisplayName(target)} · ${relationshipGoalText(relationPrefs.goal, language)} · ${day}` };
+    if (canUseToday(plan, 'relations') && target) entries['relations'] = { title: todayAccessCopy[language].relations, body: `${memberDisplayName(target)} · ${relationshipGoalText(relationPrefs.goal, language)} · ${relationshipGoalAction(relationPrefs.goal, language)} · ${day}` };
     entries['biorhythmAlert'] = { title: t.alert, body: total < 45 ? t.alertLow : t.alertOk };
     if (canUseBgmNotify(plan)) entries['bgm'] = { title: t.bgm, body: t.bgmBody };
     if (canUseEveningReset(plan)) entries['eveningReset'] = { title: t.night, body: t.nightTeaser };

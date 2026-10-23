@@ -18,6 +18,7 @@ import { useRelationshipPreferences } from '@/hooks/use-relationship-preferences
 import { reminderUiCopy } from '@/lib/reminder-ui-copy';
 import { SacredDisclosure } from './ui/sacred-disclosure';
 import { Input } from './ui/input';
+import { relationshipGoalAction } from '@/lib/relationship-goal-advice';
 import { reminderCopy } from '@/lib/reminder-copy';
 
 export default function DailyRelationshipGuide({ language, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void }) {
@@ -36,13 +37,13 @@ export default function DailyRelationshipGuide({ language, plan, onUpgrade }: { 
   const rhythm = target ? memberToday(target, day) : null;
   const subjectRhythms = subjects.map(s => ({ name: s.name, rhythm: memberToday({ id: s.name, name: s.name, birthDate: s.profile.birthDate, gender: s.profile.gender ?? 'undisclosed', bloodType: s.profile.bloodType, role: '', skills: [] }, day) }));
   const g = groupTodayCopy[language];
-  const body = target && rhythm ? `${memberDisplayName(target)} · ${g.band[rhythm.band]} · ${g.caution[rhythm.caution]} · ${goal}` : c.none;
+  const body = target && rhythm ? `${memberDisplayName(target)} · ${g.band[rhythm.band]} · ${g.caution[rhythm.caution]} · ${goal} · ${relationshipGoalAction(ownGoal, language)}` : c.none;
   return <div id="settings-relations"><SacredDisclosure closeLabel={reminderCopy[language].close} title={<span className="flex items-start gap-2"><MessageCircleHeart className="mt-1 size-4 shrink-0 text-primary" /><span>{c.relations}</span></span>}>
     {canUseToday(plan, 'relations') ? <>
       <label className="mb-4 block text-sm text-primary">{ui.independent}<select aria-label={ui.independent} value={ownGoal.goalPreset} onChange={e => saveGoal({ ...ownGoal, goalPreset: e.target.value })} className="mt-2 min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"><option value="">{ui.free}</option>{goalPresets.map(p => <option key={p} value={p}>{f.presets[p]}</option>)}</select><Input className="mt-2" aria-label={`${ui.independent} · ${f.goalLabel}`} placeholder={f.goalPlaceholder} maxLength={200} value={ownGoal.goal} onChange={e => saveGoal({ ...ownGoal, goal: e.target.value })} /></label>
       {target ? <><label className="block text-sm text-primary">{c.choose}<select value={target.id} onChange={e => savePerson(e.target.value)} className="mt-2 min-h-11 w-full rounded-md border border-input bg-background px-3 text-foreground">{ctx?.members.map(m => <option value={m.id} key={m.id}>{memberDisplayName(m)}</option>)}</select></label>
         <p className="mt-3 text-xs text-muted-foreground">{day} · {subjects.map(s => s.name).join(' / ')} → {memberDisplayName(target)}</p>
-        {goal && <p className="mt-2 border-l-2 border-primary pl-3 text-sm">{goal}</p>}
+        {goal && <div className="mt-2 border-l-2 border-primary pl-3 text-sm"><p>{goal}</p><p className="mt-2 leading-7">{relationshipGoalAction(ownGoal, language)}</p></div>}
         {rhythm && <p className="mt-3 text-sm leading-7">{g.band[rhythm.band]} · {g.caution[rhythm.caution]}</p>}
         {subjectRhythms.map(s => <p key={s.name} className="mt-2 text-sm leading-7">{s.name}：{g.caution[s.rhythm.caution]} / {memberDisplayName(target)}：{rhythm ? g.caution[rhythm.caution] : ''}</p>)}
         <div className="mt-4 space-y-4">{readings.map(({ name, reading }, i) => reading ? <div key={name + i} className="border-t border-primary/20 pt-3"><h4 className="font-serif text-primary">{name || selfReadingLabel[language]} × {memberDisplayName(target)}</h4>{reading.sentences.map((s, j) => <p key={j} className="mt-2 text-sm leading-7">{s}</p>)}<p className="mt-2 text-xs text-muted-foreground">{reading.note}</p></div> : null)}</div>
