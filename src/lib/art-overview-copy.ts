@@ -139,3 +139,14 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
 export const artPrinciplesPrompt = `SIXTEEN LENS PRINCIPLES (use each lens for its strength; never list them):
 western: emotion/thinking/relating contrast from Sun, Moon, Mercury, Venus. indian: deep soul motives from sidereal Sun and Moon nakshatra. ziwei: life posture (Ming) and maturing domain (Shen). eastern: temperament and ~12-year rhythm from the year branch's animal, element, yin/yang. earth: seasonal planning phase only, never personality. pillars: energy allocation and endurance from five-element balance. sanmei: shifting roles across early/middle/late life via ten master stars. nineStars: environmental and routine affinities. lunarMansion: relational style from the birth mansion. animal: action tempo and decision rhythm (core only). numerology: growth themes and priorities. maya: symbolic energy cycle from the Tzolkin kin. color: symbolic attention cues, never health claims. blood/siblings/region: attributed symbolic context only, never personality evidence.
 MULTI-LAYER RESONANCE (required): do not enumerate method results. Let 2-4 lenses intersect into one observation the reader recognizes from daily life; where two lenses point the same way, say what that convergence means; where they tension, describe the creative friction. Every passage should feel impossible to write for a different birth date.`;
+
+/** Dynamic label for the per-art detail disclosure, naming the current subject. */
+export function detailLinkLabel(language: Language, subjectName: string | null, isGroup: boolean): string {
+  if (!subjectName) {
+    return { ja: "あなたの詳しい解説を読む", en: "Read your detailed reading", "zh-CN": "阅读你的详细解说", "zh-TW": "閱讀你的詳細解說", ko: "당신의 자세한 해설 읽기", es: "Leer tu explicación detallada", fr: "Lire votre explication détaillée" }[language];
+  }
+  if (isGroup) {
+    return { ja: `${subjectName}の詳しい解説を読む`, en: `Read the detailed reading for ${subjectName}`, "zh-CN": `阅读${subjectName}的详细解说`, "zh-TW": `閱讀${subjectName}的詳細解說`, ko: `${subjectName}의 자세한 해설 읽기`, es: `Leer la explicación detallada de ${subjectName}`, fr: `Lire l'explication détaillée de ${subjectName}` }[language];
+  }
+  return { ja: `${subjectName}さんの詳しい解説を読む`, en: `Read ${subjectName}'s detailed reading`, "zh-CN": `阅读${subjectName}的详细解说`, "zh-TW": `閱讀${subjectName}的詳細解說`, ko: `${subjectName} 님의 자세한 해설 읽기`, es: `Leer la explicación detallada de ${subjectName}`, fr: `Lire l'explication détaillée de ${subjectName}` }[language];
+}
