@@ -22,15 +22,15 @@ describe("consultation context boundaries", () => {
     expect(data.profileContext.siblingComposition?.up).toEqual(["兄", "兄"]);
     expect(data.profileContext.siblingComposition?.down).toEqual(["妹", "妹", "妹"]);
   });
-  it("injects ten celestial bodies and the selected day without inventing unavailable charts", () => {
+  it("injects ten celestial bodies, all sixteen computed arts and the selected day", () => {
     const data = consultationContext(profile, "2026-10-16");
     expect(data.sky?.bodies).toHaveLength(10);
     expect(data.sky?.approximate).toBe(true);
     expect(data.today.day).toBe("2026-10-16");
     expect(data.today.directions).toHaveLength(8);
-    expect(data.boundaries).toContain("NOT fifteen computed charts");
-    expect(data.boundaries).toContain("unavailable");
+    expect(data.boundaries).toContain("All sixteen perspective methods");
     expect(data.boundaries).toContain("illustrative");
+    for (const label of ["インド占星術", "紫微斗数", "算命学", "宿曜占星術", "マヤ暦"]) expect(data.extended).toContain(label);
   });
   it("changes daily signals with the requested day", () => {
     expect(consultationContext(profile, "2026-10-16").today.rhythm).not.toEqual(

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronDown, Lock, Sparkles } from "lucide-react";
+import { ChevronDown, Sparkles } from "lucide-react";
 import ShareCardButton from "./ShareCardButton";
 import type { UserProfile } from "./Onboarding";
 import { generateHomeReading } from "@/lib/ai/home-reading.functions";
@@ -9,21 +9,21 @@ import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-sp
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 import { AgolmenLoading, useCompletionHold } from "./AgolmenSpiral";
-import { approachKeys, type ApproachKey, traitReadingCopy } from "@/lib/trait-reading";
+import { approachKeys, type ApproachKey, traitReadingCopy, visibleApproachKeys } from "@/lib/trait-reading";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 
-const titles: Record<Language, [string, string, string, string, string]> = {
-  ja: ["分類別診断（15占術）", "あなたの診断カードをシェア", "詳しい解説を読む", "この占術は現在のプロフィールでは算出していません。推測で補うことはせず、表示を控えています。", "多層総合診断"],
-  en: ["Readings by method (15 arts)", "Share your reading card", "Read the detailed reading", "This method is not calculated from the current profile. Rather than guessing, no reading is shown.", "Multi-layer grand reading"],
-  "zh-CN": ["分类别诊断（15种占术）", "分享你的诊断卡", "阅读详细解说", "此占术目前未根据资料计算，为避免臆测，不显示解读。", "多层综合诊断"],
-  "zh-TW": ["分類別診斷（15種占術）", "分享你的診斷卡", "閱讀詳細解說", "此占術目前未依資料計算，為避免臆測，不顯示解讀。", "多層綜合診斷"],
-  ko: ["분류별 분석 (15가지 점술)", "나의 진단 카드 공유", "자세한 해설 읽기", "이 점술은 현재 프로필로 계산하지 않습니다. 추측으로 채우지 않고 표시하지 않습니다.", "다층 종합 분석"],
-  es: ["Lecturas por método (15 artes)", "Compartir tu tarjeta", "Leer la explicación", "Este método no se calcula con el perfil actual. No se muestra una lectura inventada.", "Lectura integral multicapa"],
-  fr: ["Lectures par méthode (15 arts)", "Partager votre carte", "Lire l’explication", "Cette méthode n’est pas calculée avec le profil actuel. Aucune lecture inventée n’est affichée.", "Lecture globale multicouche"],
+const titles: Record<Language, [string, string, string]> = {
+  ja: ["分類別診断（16占術）", "あなたの診断カードをシェア", "詳しい解説を読む"],
+  en: ["Readings by method (16 arts)", "Share your reading card", "Read the detailed reading"],
+  "zh-CN": ["分类别诊断（16种占术）", "分享你的诊断卡", "阅读详细解说"],
+  "zh-TW": ["分類別診斷（16種占術）", "分享你的診斷卡", "閱讀詳細解說"],
+  ko: ["분류별 분석 (16가지 점술)", "나의 진단 카드 공유", "자세한 해설 읽기"],
+  es: ["Lecturas por método (16 artes)", "Compartir tu tarjeta", "Leer la explicación"],
+  fr: ["Lectures par méthode (16 arts)", "Partager votre carte", "Lire l’explication"],
 };
 
 type Genre = "western" | "eastern" | "calendar" | "number" | "color" | "context";
-const genreOf: Record<ApproachKey, Genre> = { western: "western", indian: "western", ziwei: "eastern", earth: "calendar", pillars: "eastern", sanmei: "eastern", nineStars: "eastern", lunarMansion: "calendar", animal: "eastern", numerology: "number", maya: "calendar", color: "color", blood: "context", siblings: "context", region: "context" };
+const genreOf: Record<ApproachKey, Genre> = { western: "western", indian: "western", ziwei: "eastern", eastern: "eastern", earth: "calendar", pillars: "eastern", sanmei: "eastern", nineStars: "eastern", lunarMansion: "calendar", animal: "eastern", numerology: "number", maya: "calendar", color: "color", blood: "context", siblings: "context", region: "context" };
 const genres: Record<Language, Record<Genre, string>> = {
   ja: { western: "天体・星の占術", eastern: "東洋命術", calendar: "暦・周期の占術", number: "数の占術", color: "色彩理論", context: "気質・環境の参考" },
   en: { western: "Celestial astrology", eastern: "East Asian destiny arts", calendar: "Calendar & cycles", number: "Number arts", color: "Color theory", context: "Temperament & context" },
@@ -43,7 +43,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
     retry: false,
   });
   const copy = homeReadingCopy[language];
-  const [title, share, readMore, unavailable, summaryTitle] = titles[language];
+  const [title, share, readMore] = titles[language];
   const palette = birthColorSpectrum(profile);
   const traits = traitReadingCopy[language];
   const text = data?.axisSummary;
@@ -51,7 +51,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
   const showApproaches = part === "all" || part === "approaches";
   const showSummary = part === "all" || part === "summary";
   const showShare = part === "all" || part === "share";
-  const heading = part === "summary" ? summaryTitle : part === "share" ? share : title;
+  const heading = part === "summary" ? traits.final : part === "share" ? share : title;
   const colors = palette ? (plan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.work, palette.love, palette.health, palette.mind]) : [];
   const available = data ? approachKeys.filter(k => data.approachAvailability[k] !== "unavailable" && data.approaches[k]?.trim()) : [];
   const shareData = data && (data.keySummary || text) ? {
@@ -70,20 +70,19 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
         <h2 className="mt-3 font-serif text-2xl text-gradient-gold sm:text-3xl">{heading}</h2>
       </div>
       {showApproaches && <Accordion type="single" collapsible className="mt-6 divide-y divide-primary/20 rounded-lg border border-primary/30">
-        {approachKeys.map((key, i) => {
-          const status = data?.approachAvailability[key] ?? "unavailable";
+        {(data ? visibleApproachKeys(data.approachAvailability, data.approaches) : [...approachKeys]).map((key, i) => {
+          const status = data?.approachAvailability[key] ?? "reference";
           const body = data?.approaches[key]?.trim();
-          const ok = status !== "unavailable" && Boolean(body);
           return <AccordionItem key={key} value={key} className="border-b-0 px-4">
             <AccordionTrigger className="min-w-0 gap-3 py-4 text-left hover:no-underline">
-              <span className="flex min-w-0 items-center gap-3"><span className="shrink-0 font-mono text-xs text-primary/70">{String(i + 1).padStart(2, "0")}</span><span className="min-w-0 break-words font-serif text-base text-primary">{traits.methods[i]}</span></span>
+              <span className="flex min-w-0 items-center gap-3"><span className="shrink-0 font-mono text-xs text-primary/70">{String(i + 1).padStart(2, "0")}</span><span className="min-w-0 break-words font-serif text-base text-primary">{traits.methods[approachKeys.indexOf(key)]}</span></span>
             </AccordionTrigger>
             <AccordionContent className="pb-4">
-              <p className="text-xs text-muted-foreground">{genres[language][genreOf[key]]} · {loading ? copy.loading : ok ? (status === "context" ? traits.symbolic : traits.statuses.reference) : traits.statuses.unavailable}</p>
-              {loading ? <AgolmenLoading compact label={copy.loading} /> : ok ? <details className="group mt-3 rounded-md border border-primary/25 bg-primary/5">
+              <p className="text-xs text-muted-foreground">{genres[language][genreOf[key]]} · {loading ? copy.loading : status === "context" ? traits.symbolic : traits.statuses.reference}</p>
+              {loading ? <AgolmenLoading compact label={copy.loading} /> : <details className="group mt-3 rounded-md border border-primary/25 bg-primary/5">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm text-primary [&::-webkit-details-marker]:hidden">{readMore}<ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
                 <p className="whitespace-pre-line px-3 pb-3 text-[15px] leading-7 text-foreground [overflow-wrap:anywhere]">{body}</p>
-              </details> : <p className="mt-3 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><Lock className="mt-1 size-3.5 shrink-0" aria-hidden="true" />{unavailable}</p>}
+              </details>}
             </AccordionContent>
           </AccordionItem>;
         })}

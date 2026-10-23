@@ -10,6 +10,7 @@ import { helioPhase } from "./helio-phase";
 import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 import { distinctTraitChapters, supportiveWritingVoice } from "./writing-voice";
 import { approachKeys, approachStatuses, traitReadingPrompt } from "@/lib/trait-reading";
+import { computeExtendedArts, extendedArtsPrompt } from "@/lib/extended-arts";
 import { nineStarProfile } from "@/lib/calendar-traditions";
 import { readingProfileSchema, readingSubjectSchema, profileReadingContext, profileContextInstructions } from "@/lib/profile-reading-context";
 
@@ -23,7 +24,7 @@ const inputSchema = z.object({
 const readingSchema = z.object({
   catchphrase: z.string(),
   essence: z.object({ outward: z.string(), inner: z.string(), growth: z.string(), resilience: z.string(), relationships: z.string(), gift: z.string() }),
-  approaches: z.object({ western: z.string(), indian: z.string(), ziwei: z.string(), earth: z.string(), pillars: z.string(), sanmei: z.string(), nineStars: z.string(), lunarMansion: z.string(), animal: z.string(), numerology: z.string(), maya: z.string(), color: z.string(), blood: z.string(), siblings: z.string(), region: z.string() }),
+  approaches: z.object({ western: z.string(), indian: z.string(), ziwei: z.string(), eastern: z.string(), earth: z.string(), pillars: z.string(), sanmei: z.string(), nineStars: z.string(), lunarMansion: z.string(), animal: z.string(), numerology: z.string(), maya: z.string(), color: z.string(), blood: z.string(), siblings: z.string(), region: z.string() }),
   axisSummary: z.string(),
   synthesis: z.string().min(60).max(1100),
   name: z.string().min(30).max(750),
@@ -65,6 +66,7 @@ export const generateHomeReading = createServerFn({ method: "POST" })
     const helio = helioPhase(profile.birthDate);
     const gua = mingGua(profile.birthDate, profile.gender ?? "undisclosed");
     const nineStars = nineStarProfile(profile.birthDate, profile.birthTime, profile.birthTimeUnknown, profile.gender);
+    const extended = computeExtendedArts(profile.birthDate, profile.birthTime, profile.birthTimeUnknown);
     const approachAvailability = approachStatuses({ core: Boolean(layers), earth: Boolean(helio), nineStars: Boolean(nineStars), color: Boolean(color), blood: Boolean(elements.blood), siblings: Boolean(profile.siblingOrder), region: Boolean(profile.birthPlace || profile.birthCity) });
     let runId: string | undefined;
     const provider = createOpenAI({
@@ -100,10 +102,12 @@ Animal character: ${elements.animal ?? "unavailable"} (reference 60-day-number m
 
 FIVE CORE LAYERS (computed by the app; cite exact values, never recalculate, never fill 未算出 values):
 ${core}
+EXTENDED ARTS (computed by the app from the birth data; cite exact values, never recalculate):
+${extendedArtsPrompt(extended)}
 CROSS-ANALYSIS (required): In synthesis and strength, contrast the 表の顔 list with the 本音・潜在 list and use the [クロス解析] verdicts (一致 / ギャップ) explicitly: 日干×太陽, 人格×ソウル数, 動物×月星座. Weave in 通変星, 十二運星, 五行の最多/欠如, ライフパス, and 月・水星・金星 where they sharpen the portrait. The animal surface/hope/hidden values are an original +1/+2/+3 day reference model, NOT official animal layers; do not infer personality from them. The ascendant uses birthplace representative coordinates only when available and birth time is known. Geocentric planets and Ba Zhai directions are not birthplace-dependent. Treat these as traditional divination lenses, not scientific facts.
 BANNED hedges: "〜な面もあります", "人それぞれ", "〜かもしれません", "場合によっては", and any sentence that would fit anyone.
 
-STYLE (strict): Write in direct, warm everyday language at the reader's eye level. Use the exact computed values internally as evidence, but keep specialist labels and raw parameter lists OUT of the prose: the interface displays them separately. Translate them into recognizable patterns in daily decisions, work, study, family and relationships. Make the portrait uniquely traceable to this exact combination of inputs: identify a specific tension between two calculated layers, the condition that brings out the person's strength, and the recurring point where their decisions stall. ABSOLUTELY FORBIDDEN in every output language: unexplained divination jargon or translated equivalents of 通変星, 命格, 日干, 十二運, 天格, 地格, 五行, ハウス or アスペクト; abstract spiritual wording or ornate metaphors, preambles; brief familiar everyday analogies are encouraged when useful; generic praise that fits anyone. Start each field with a clear observation. Keep sentences short without sounding severe.
+STYLE (strict): Write in direct, warm everyday language at the reader's eye level. SENTENCE ENDINGS: never end any field with 「〜読みです」 and never repeat one closing pattern; rotate varied warm endings such as 「〜と読み解くことができます」「〜という本質を示しています」「〜のバイオリズムが表れています」「〜と解釈されます」「〜という傾向が強く表れます」「〜という流れが息づいています」, each at most twice across the whole reading (equally natural variety in other languages). Use the exact computed values internally as evidence, but keep specialist labels and raw parameter lists OUT of the prose: the interface displays them separately. Translate them into recognizable patterns in daily decisions, work, study, family and relationships. Make the portrait uniquely traceable to this exact combination of inputs: identify a specific tension between two calculated layers, the condition that brings out the person's strength, and the recurring point where their decisions stall. ABSOLUTELY FORBIDDEN in every output language: unexplained divination jargon or translated equivalents of 通変星, 命格, 日干, 十二運, 天格, 地格, 五行, ハウス or アスペクト; abstract spiritual wording or ornate metaphors, preambles; brief familiar everyday analogies are encouraged when useful; generic praise that fits anyone. Start each field with a clear observation. Keep sentences short without sounding severe.
 Guardrails: do not invent values; if a lens is unavailable, say in one short sentence which one was not computed and use the rest (never claim all five were combined when not). Do not state facts about their job, relationships, health, or future events; no guaranteed outcomes or verified multi-layer claims. Blood type is described only as a traditional lens (never as science) — phrase its part as "血液型の見立てでは〜". No disclaimers or methodology inside passages; the interface states limits separately.
 
 synthesis: about 150 Japanese characters (equivalent depth in other languages). Describe the reference pattern of their core style and central desire where the available axes intersect. Translate every source value into everyday behavior; never cite a method name, symbol, number, sign, element or fortune label. Portrait, not advice.
