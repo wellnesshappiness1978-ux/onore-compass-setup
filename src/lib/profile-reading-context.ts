@@ -1,12 +1,16 @@
 import { z } from 'zod';
 import { parseSiblingComposition } from './sibling-order';
 
+const parentBirthSchema = z.object({
+  birthDate: z.string().date(), birthPlace: z.string().max(80).optional().default(''), birthCity: z.string().max(80).optional().default(''),
+}).nullable().optional();
 export const readingProfileSchema = z.object({
   nameKanji: z.string().max(40), nameKana: z.string().max(60), nameRomaji: z.string().max(60),
   birthDate: z.string().date(), birthTime: z.string().max(20), birthTimeUnknown: z.boolean(),
   birthPlace: z.string().max(80), birthCity: z.string().max(80),
   gender: z.enum(['male', 'female', 'other', 'undisclosed']).optional(),
   bloodType: z.string().max(4), siblingOrder: z.string().max(80),
+  father: parentBirthSchema, mother: parentBirthSchema,
 });
 export const readingSubjectSchema = z.object({ label: z.string().trim().max(80), isSelf: z.boolean() });
 export function profileReadingContext(profile: z.infer<typeof readingProfileSchema>, subject?: z.infer<typeof readingSubjectSchema>) {
