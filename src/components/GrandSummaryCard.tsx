@@ -43,7 +43,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
     retry: false,
   });
   const copy = homeReadingCopy[language];
-  const [title, share, readMore, unavailable, summaryTitle] = titles[language];
+  const [title, share, readMore] = titles[language];
   const palette = birthColorSpectrum(profile);
   const traits = traitReadingCopy[language];
   const text = data?.axisSummary;
@@ -51,7 +51,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
   const showApproaches = part === "all" || part === "approaches";
   const showSummary = part === "all" || part === "summary";
   const showShare = part === "all" || part === "share";
-  const heading = part === "summary" ? summaryTitle : part === "share" ? share : title;
+  const heading = part === "summary" ? traits.final : part === "share" ? share : title;
   const colors = palette ? (plan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.work, palette.love, palette.health, palette.mind]) : [];
   const available = data ? approachKeys.filter(k => data.approachAvailability[k] !== "unavailable" && data.approaches[k]?.trim()) : [];
   const shareData = data && (data.keySummary || text) ? {
@@ -70,20 +70,19 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
         <h2 className="mt-3 font-serif text-2xl text-gradient-gold sm:text-3xl">{heading}</h2>
       </div>
       {showApproaches && <Accordion type="single" collapsible className="mt-6 divide-y divide-primary/20 rounded-lg border border-primary/30">
-        {approachKeys.map((key, i) => {
-          const status = data?.approachAvailability[key] ?? "unavailable";
+        {(data ? visibleApproachKeys(data.approachAvailability, data.approaches) : [...approachKeys]).map((key, i) => {
+          const status = data?.approachAvailability[key] ?? "reference";
           const body = data?.approaches[key]?.trim();
-          const ok = status !== "unavailable" && Boolean(body);
           return <AccordionItem key={key} value={key} className="border-b-0 px-4">
             <AccordionTrigger className="min-w-0 gap-3 py-4 text-left hover:no-underline">
-              <span className="flex min-w-0 items-center gap-3"><span className="shrink-0 font-mono text-xs text-primary/70">{String(i + 1).padStart(2, "0")}</span><span className="min-w-0 break-words font-serif text-base text-primary">{traits.methods[i]}</span></span>
+              <span className="flex min-w-0 items-center gap-3"><span className="shrink-0 font-mono text-xs text-primary/70">{String(i + 1).padStart(2, "0")}</span><span className="min-w-0 break-words font-serif text-base text-primary">{traits.methods[approachKeys.indexOf(key)]}</span></span>
             </AccordionTrigger>
             <AccordionContent className="pb-4">
-              <p className="text-xs text-muted-foreground">{genres[language][genreOf[key]]} · {loading ? copy.loading : ok ? (status === "context" ? traits.symbolic : traits.statuses.reference) : traits.statuses.unavailable}</p>
-              {loading ? <AgolmenLoading compact label={copy.loading} /> : ok ? <details className="group mt-3 rounded-md border border-primary/25 bg-primary/5">
+              <p className="text-xs text-muted-foreground">{genres[language][genreOf[key]]} · {loading ? copy.loading : status === "context" ? traits.symbolic : traits.statuses.reference}</p>
+              {loading ? <AgolmenLoading compact label={copy.loading} /> : <details className="group mt-3 rounded-md border border-primary/25 bg-primary/5">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm text-primary [&::-webkit-details-marker]:hidden">{readMore}<ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
                 <p className="whitespace-pre-line px-3 pb-3 text-[15px] leading-7 text-foreground [overflow-wrap:anywhere]">{body}</p>
-              </details> : <p className="mt-3 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><Lock className="mt-1 size-3.5 shrink-0" aria-hidden="true" />{unavailable}</p>}
+              </details>}
             </AccordionContent>
           </AccordionItem>;
         })}
