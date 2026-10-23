@@ -10,6 +10,8 @@ import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 import { AgolmenLoading, useCompletionHold } from "./AgolmenSpiral";
 import { approachKeys, type ApproachKey, traitReadingCopy, visibleApproachKeys } from "@/lib/trait-reading";
+import { artOverviewCopy, detailLinkLabel } from "@/lib/art-overview-copy";
+import { useFocus } from "./FocusProvider";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 
 const titles: Record<Language, [string, string, string]> = {
@@ -43,7 +45,10 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
     retry: false,
   });
   const copy = homeReadingCopy[language];
-  const [title, share, readMore] = titles[language];
+  const [title, share] = titles[language];
+  const focus = useFocus();
+  const overviews = artOverviewCopy[language];
+  const readMore = detailLinkLabel(language, focus?.member || focus?.group ? focus.label(language) : null, Boolean(focus?.group));
   const palette = birthColorSpectrum(profile);
   const traits = traitReadingCopy[language];
   const text = data?.axisSummary;
@@ -79,6 +84,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
             </AccordionTrigger>
             <AccordionContent className="pb-4">
               <p className="text-xs text-muted-foreground">{genres[language][genreOf[key]]} · {loading ? copy.loading : status === "context" ? traits.symbolic : traits.statuses.reference}</p>
+              <p className="mt-2 text-sm leading-7 text-foreground/90 [overflow-wrap:anywhere]">{overviews[key]}</p>
               {loading ? <AgolmenLoading compact label={copy.loading} /> : <details className="group mt-3 rounded-md border border-primary/25 bg-primary/5">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm text-primary [&::-webkit-details-marker]:hidden">{readMore}<ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
                 <p className="whitespace-pre-line px-3 pb-3 text-[15px] leading-7 text-foreground [overflow-wrap:anywhere]">{body}</p>
