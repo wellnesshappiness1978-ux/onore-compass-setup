@@ -3,6 +3,7 @@
 import * as A from "astronomy-engine";
 import { reduceNumerology } from "@/lib/birth-colors";
 import { resolveBirthplace } from "@/lib/birthplace";
+import { branchInfo, signInfo } from "@/lib/zodiac-signs";
 import { getFiveElements } from "./five-elements";
 
 export type CoreInput = { nameKanji: string; nameRomaji: string; birthDate: string; birthTime: string; birthTimeUnknown: boolean; bloodType: string; birthPlace?: string; birthCity?: string };
@@ -111,7 +112,11 @@ export function computeCoreLayers(p: CoreInput, now = new Date()) {
   const surface = [five.name ? `人格${five.name.person}画` : null, `太陽${western.sun}`, `月柱通変星${shichu.pillars[1]!.tsuhen}`].filter(Boolean) as string[];
   const inner = [numerology.soul ? `ソウル数${numerology.soul}` : null, `月${western.moon}`, `日柱十二運${shichu.pillars[2]!.stage}`].filter(Boolean) as string[];
 
-  return { western, shichu, numerology, name: five.name, animal, cross, surface, inner, hasTime, birthplace };
+  // Eastern zodiac (十二支): the year branch from the same 立春-based year as Four Pillars.
+  const branchIdx = yearIdx % 12;
+  const eastern = { yearBranch: BRANCHES[branchIdx]!, branchIndex: branchIdx, element: EL[BRANCH_EL[branchIdx]!]!, yinYang: yearIdx % 2 === 0 ? "陽" : "陰" };
+
+  return { western, shichu, eastern, numerology, name: five.name, animal, cross, surface, inner, hasTime, birthplace };
 }
 
 export type CoreLayers = NonNullable<ReturnType<typeof computeCoreLayers>>;
