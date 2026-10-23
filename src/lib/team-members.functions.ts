@@ -61,7 +61,7 @@ export const updateTeamMember = createServerFn({ method: "POST" })
       name: member.name, nickname: member.nickname, name_kana: member.nameKana, birth_date: member.birthDate,
       birth_time: member.birthTimeUnknown ? null : member.birthTime, birth_time_unknown: member.birthTimeUnknown,
       birth_place: member.birthPlace, birth_city: member.birthCity, sibling_order: member.siblingOrder, gender: member.gender, blood_type: member.bloodType,
-      relationship: member.relationship, relationship_type: member.relationshipType, role: member.role, skills: member.skills,
+      relationship: member.relationship, relationship_type: member.relationshipType, role: member.role, skills: member.skills, parents: parentsRow(member),
     }).eq("id", id).eq("user_id", context.userId).select(columns).single();
     if (error) throw error;
     return toMember(row);
