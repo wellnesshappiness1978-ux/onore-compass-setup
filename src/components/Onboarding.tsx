@@ -97,6 +97,8 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
         nameKana: finalizePersonalName(profile.nameKana),
         nameRomaji: finalizePersonalName(profile.nameRomaji, true),
         birthTimeUnknown: profile.birthTimeUnknown || profile.birthTime === "",
+        father: validParent(profile.father),
+        mother: validParent(profile.mother),
       });
     } catch {
       setSaveError(true);
