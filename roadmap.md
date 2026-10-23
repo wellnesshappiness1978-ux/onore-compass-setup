@@ -1,5 +1,12 @@
 # Roadmap
 
+## Regional context and reminder settings (2026-10-23)
+- [ ] Add symbolic birth-sky/environment explanations with scientific boundaries
+- [ ] Fixed subject and goal header, including unset Free label and small-screen checks
+- [ ] Collapsible BGM/relationship settings and VIP header reminder dialog
+- [ ] Independent persisted relationship goal drives advice and notification wording
+- [ ] Exact pause explanation, truthful registered-device message, tests and verification
+
 ## Uploaded eleven-item daily guidance update (2026-10-22)
 - [x] Free one birth color and 1/3/5 recipe gates with consistent plan copy
 - [x] Center subject label and outlined self reset
