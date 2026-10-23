@@ -3,7 +3,7 @@ import type { Language } from "./translations";
 
 // Stable IDs for the 15 analysis logics; display text is resolved per language at render time.
 export const artsLogicIds = [
-  "westernAstrology", "vedicAstrology", "ziWei", "helioCompass", "fourPillars", "sanmeigaku", "nineStarKi", "sukuyo",
+  "westernAstrology", "easternAstrology", "vedicAstrology", "ziWei", "helioCompass", "fourPillars", "sanmeigaku", "nineStarKi", "sukuyo",
   "animalLayers", "numerology", "mayaTzolkin", "birthColor", "nameAnalysis", "bloodType", "siblingOrder",
 ] as const;
 export type ArtsLogicId = (typeof artsLogicIds)[number];
@@ -11,6 +11,7 @@ type Logic = { title: string; background: string; scope: string };
 
 const ja: Record<ArtsLogicId, Logic> = {
   westernAstrology: { title: "西洋占星術（ホロスコープ・10天体解析）", background: "バビロニアの天体観測にさかのぼる、数千年の歴史を持つ占星の源流です。生を受けた瞬間に太陽・月・水星・金星・火星・木星・土星・天王星・海王星・冥王星の10天体が黄道十二宮のどこにあったかを、実際の天文計算で立体的に描き出します。伝統的には、その配置からアイデンティティ、思考パターン、感情の揺らぎ、人生の試練と拡大の周期を幾何学的に読み解いてきました。", scope: "自分らしさ、感情と知性、人生の節目を見つめ直す視点として用います。" },
+  easternAstrology: { title: "東洋占星術（十二支・干支占い）", background: "古代中国で生まれ、暦や方位とともに東アジア全域へ広まった、十二年周期の干支による占いです。子・丑・寅・卯・辰・巳・午・未・申・酉・戌・亥の十二支は、それぞれ動物の姿と木・火・土・金・水の気、そして陰陽を帯び、生まれ年の支はその人の原点となる気質の象徴とされてきました。支どうしの組み合わせによる相性（三合・六合など）や、十二年ごとに巡る運気の周期を読み解く、暮らしに根ざした時間の智慧です。", scope: "生まれ年の干支の特性、人との相性、巡る運気の周期を振り返る視点として用います。" },
   vedicAstrology: { title: "インド占星術（ジョーティシュ / ヴェーダ星学）", background: "古代インドの聖典『ヴェーダ』に由来し、「光の学問」を意味するジョーティシュ。実際の星々の位置に合わせたサイデリアル（恒星）方式で天体を計算し、魂のカルマ（宿命的な課題）や精神の成熟段階、人生の時期区分（ダシャー）を読み解く体系です。西洋占星術が心の内側を映すのに対し、「現実の出来事がどの時期に動きやすいか」という時間軸を重視する点に特色があります。", scope: "人生のテーマと時期の流れを、別の角度から確かめる参考にします。" },
   ziWei: { title: "紫微斗数（東洋の星占い・十二宮解析）", background: "中国の唐代から宋代にかけ、道教思想と天文学が融合して生まれた東洋占星術の代表格です。北極星を象徴する「紫微星」をはじめ数十の星を、生年月日時に応じて命宮・財帛宮・官禄宮・夫妻宮などの十二宮へ配置します。人間関係、お金との向き合い方、天職、人生の浮き沈みを、場面ごとに具体的に映し出す体系として受け継がれてきました。", scope: "役割、仕事、人間関係、優先順位の移り変わりを整理する視点です。" },
   helioCompass: { title: "地球暦（Helio Compass / 天体周期バイオリズム）", background: "太陽を中心（ヘリオセントリック）に、地球を含む太陽系惑星の実際の位置関係を描く現代のコズミック・クロックです。地球の公転・自転という確かな周期を一年の地図として可視化し、季節や暮らしのリズムと重ね合わせます。「今、自分が一年の巡りのどのフェーズにいて、どのタイミングで行動・決断するか」を、感覚的かつ視覚的に捉えるための道具です。", scope: "天体位置は実測計算、フェーズ区分は振り返りのための象徴的な目安です。" },
@@ -29,6 +30,7 @@ const ja: Record<ArtsLogicId, Logic> = {
 
 const en: Record<ArtsLogicId, Logic> = {
   westernAstrology: { title: "Western astrology (horoscope · ten bodies)", background: "A tradition reaching back thousands of years to Babylonian sky-watching. Using real astronomical calculation, it maps where the Sun, Moon, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, Neptune and Pluto stood in the zodiac at the moment you were born. Traditionally, this geometry is read for identity, thinking patterns, emotional tides, and the cycles of challenge and expansion across a life.", scope: "Used as a lens on identity, feeling and intellect, and life's turning points." },
+  easternAstrology: { title: "Eastern astrology (twelve branches · zodiac years)", background: "Born in ancient China and spread across East Asia alongside calendars and directions, this is a twelve-year cycle of zodiac branches. The twelve branches—Rat, Ox, Tiger, Rabbit, Dragon, Snake, Horse, Goat, Monkey, Rooster, Dog and Boar—each carry an animal form, one of the five qi (wood, fire, earth, metal, water), and a yin or yang nature. The branch of your birth year has long symbolized your foundational temperament, while pairings of branches (such as the trines and six harmonies) and the returning twelve-year cycle are read as the rhythm of fortune.", scope: "A lens on your birth-year branch traits, compatibility between people, and the cycling of fortune." },
   vedicAstrology: { title: "Vedic astrology (Jyotish)", background: "Rooted in India's ancient Vedas, Jyotish means \"the science of light.\" It calculates planets against the sidereal zodiac—aligned with the actual stars—to explore karmic themes, stages of inner growth, and life periods known as dashas. Where Western astrology focuses on the inner world, Jyotish emphasizes timing: when real-world events tend to move.", scope: "A second angle on life themes and the flow of timing." },
   ziWei: { title: "Zi Wei Dou Shu (Purple Star astrology)", background: "Born in China between the Tang and Song dynasties from a fusion of Taoist thought and astronomy, it is one of the great Eastern astrological systems. Dozens of stars, led by the Purple Star that symbolizes the pole star, are placed into twelve palaces—Self, Wealth, Career, Partnership and more—according to the birth date and hour, painting relationships, money, vocation and life's ups and downs in concrete detail.", scope: "Helps organize roles, work, relationships, and shifting priorities." },
   helioCompass: { title: "Earth Calendar (Helio Compass)", background: "A modern cosmic clock that draws the real positions of Earth and the other planets with the Sun at the center. It turns Earth's orbit and rotation—dependable natural cycles—into a yearly map, layered with seasons and daily rhythms, so you can sense visually where you are in the year's journey and when to act or decide.", scope: "Planet positions are calculated; the phases are symbolic markers for reflection." },
@@ -47,6 +49,7 @@ const en: Record<ArtsLogicId, Logic> = {
 
 const zhCN: Record<ArtsLogicId, Logic> = {
   westernAstrology: { title: "西方占星（星盘·十大天体）", background: "可追溯至巴比伦天象观测、拥有数千年历史的占星源流。以真实天文计算，立体描绘出生瞬间太阳、月亮、水星、金星、火星、木星、土星、天王星、海王星、冥王星位于黄道十二宫的位置。传统上，人们从这一几何配置解读自我认同、思维模式、情绪起伏，以及人生考验与扩展的周期。", scope: "用作审视自我、情感与思维、人生节点的视角。" },
+  easternAstrology: { title: "东方占星（十二支·生肖运势）", background: "起源于古代中国，并随历法与方位传遍东亚的十二年生肖周期占卜。子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥十二支各自带有动物形象、木火土金水之气与阴阳属性；出生年的支被视为一个人根源气质的象征。支与支的组合（三合、六合等）以及每十二年循环一周的运势周期，是扎根于生活的时间智慧。", scope: "用于回顾出生年生肖的特性、人与人之间的相合，以及循环的运势周期。" },
   vedicAstrology: { title: "印度占星（吠陀占星 Jyotish）", background: "源自古印度经典《吠陀》，意为“光的学问”。以对齐真实星空的恒星黄道计算天体，解读灵魂的业力课题、心灵成长阶段与人生大运周期（Dasha）。相较于西方占星关注内心，它更重视时间轴——现实事件在何时容易发生变化。", scope: "从另一角度确认人生主题与时间流向。" },
   ziWei: { title: "紫微斗数（十二宫解析）", background: "唐宋之际由道教思想与天文学融合而成的东方占星代表。以象征北极星的“紫微星”为首，将数十颗星曜依出生年月日时排入命宫、财帛宫、官禄宫、夫妻宫等十二宫，具体映照人际关系、金钱观、天职与人生起伏。", scope: "整理角色、工作、人际与优先事项变化的视角。" },
   helioCompass: { title: "地球历（Helio Compass）", background: "以太阳为中心，描绘地球及太阳系行星真实位置关系的现代宇宙时钟。把地球公转与自转这一可靠的自然周期化为一年的地图，并与季节、生活节律相叠，帮助你直观感受自己正处于一年旅程的哪个阶段、何时行动与决断。", scope: "行星位置为实际计算，阶段划分是供回顾的象征性参考。" },
