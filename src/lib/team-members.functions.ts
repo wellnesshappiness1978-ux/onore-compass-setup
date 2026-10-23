@@ -18,13 +18,17 @@ const memberBase = z.object({
   relationshipType: z.enum(["", "partner", "lover", "fiance", "family", "sibling", "relative", "friend", "business", "boss", "subordinate", "employee", "other"]),
   role: z.string().trim().max(60),
   skills: z.array(z.string().trim().min(1).max(30)).max(12),
+  father: z.object({ birthDate: z.string().date(), birthPlace: z.string().max(80), birthCity: z.string().max(80) }).nullable().optional(),
+  mother: z.object({ birthDate: z.string().date(), birthPlace: z.string().max(80), birthCity: z.string().max(80) }).nullable().optional(),
 });
 const knownTime = (value: z.infer<typeof memberBase>) => value.birthTimeUnknown || value.birthTime.length > 0;
 const memberInput = memberBase.refine(knownTime, { path: ["birthTime"], message: "Birth time is required unless marked unknown" });
 
-type Row = { id: string; name: string; nickname: string; name_kana: string; birth_date: string; birth_time: string | null; birth_time_unknown: boolean; birth_place: string; birth_city: string; sibling_order: string; gender: string; blood_type: string; relationship: string; relationship_type: string; role: string; skills: string[] };
-const columns = "id,name,nickname,name_kana,birth_date,birth_time,birth_time_unknown,birth_place,birth_city,sibling_order,gender,blood_type,relationship,relationship_type,role,skills";
-const toMember = (r: Row) => ({ id: r.id, name: r.name, nickname: r.nickname, nameKana: r.name_kana, birthDate: r.birth_date, birthTime: r.birth_time?.slice(0, 5) ?? "", birthTimeUnknown: r.birth_time_unknown, birthPlace: r.birth_place, birthCity: r.birth_city, siblingOrder: r.sibling_order, gender: r.gender, bloodType: r.blood_type, relationship: r.relationship, relationshipType: r.relationship_type, role: r.role, skills: r.skills });
+type ParentRow = { birthDate: string; birthPlace: string; birthCity: string } | null;
+type Row = { id: string; name: string; nickname: string; name_kana: string; birth_date: string; birth_time: string | null; birth_time_unknown: boolean; birth_place: string; birth_city: string; sibling_order: string; gender: string; blood_type: string; relationship: string; relationship_type: string; role: string; skills: string[]; parents: { father?: ParentRow; mother?: ParentRow } | null };
+const columns = "id,name,nickname,name_kana,birth_date,birth_time,birth_time_unknown,birth_place,birth_city,sibling_order,gender,blood_type,relationship,relationship_type,role,skills,parents";
+const toMember = (r: Row) => ({ id: r.id, name: r.name, nickname: r.nickname, nameKana: r.name_kana, birthDate: r.birth_date, birthTime: r.birth_time?.slice(0, 5) ?? "", birthTimeUnknown: r.birth_time_unknown, birthPlace: r.birth_place, birthCity: r.birth_city, siblingOrder: r.sibling_order, gender: r.gender, bloodType: r.blood_type, relationship: r.relationship, relationshipType: r.relationship_type, role: r.role, skills: r.skills, father: r.parents?.father ?? null, mother: r.parents?.mother ?? null });
+const parentsRow = (m: { father?: ParentRow; mother?: ParentRow }) => m.father || m.mother ? { father: m.father ?? null, mother: m.mother ?? null } : null;
 
 export const listTeamMembers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -42,7 +46,7 @@ export const addTeamMember = createServerFn({ method: "POST" })
       user_id: context.userId, name: data.name, nickname: data.nickname, name_kana: data.nameKana, birth_date: data.birthDate,
       birth_time: data.birthTimeUnknown ? null : data.birthTime, birth_time_unknown: data.birthTimeUnknown,
       birth_place: data.birthPlace, birth_city: data.birthCity, sibling_order: data.siblingOrder, gender: data.gender, blood_type: data.bloodType,
-      relationship: data.relationship, relationship_type: data.relationshipType, role: data.role, skills: data.skills,
+      relationship: data.relationship, relationship_type: data.relationshipType, role: data.role, skills: data.skills, parents: parentsRow(data),
     }).select(columns).single();
     if (error) throw error;
     return toMember(row);
