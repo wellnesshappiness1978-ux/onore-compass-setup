@@ -34,6 +34,7 @@ import { todaySample } from '@/lib/today-samples';
 import { subjectSignals, subjectDirections } from '@/lib/today-subject';
 import { readingDate, monthlyLabels, servingsLabel } from "@/lib/reading-presentation";
 import { groupBirthPalette } from '@/lib/group-palette';
+import DailyLuckyColor from './DailyLuckyColor';
 
 // Deterministic reference values from birth date and today's calendar; not verified readings or predictions.
 type Pair = { ja: string; en: string };
@@ -135,7 +136,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   }, [focus, profile, language, iso]);
   const fortune = useTodayFortune(fortuneReq);
   const el = dayElement(iso);
-  const dailyRecipes = recipesForElement(el);
+  const dailyRecipes = recipesForElement(el, iso);
   const selectedRecipe = recipeIndex === null ? null : dailyRecipes[recipeIndex];
   const recipe = selectedRecipe ? recipeDetails(selectedRecipe, language) : null;
   const starPoem = useMemo(() => {
@@ -260,7 +261,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     dailyLucky: {
       notify: fortune.data ? `${fortune.data.luckyColor.name} / ${fortune.data.luckyWord.word} / ${fortune.data.foods[0]?.name ?? ""}` : `${luckyColor ? localizeBirthColorName(luckyColor.name, language) : ""} / ${L(word)}`,
       body: <TodayLuckyTrio state={fortune} language={language} plan={plan} onUpgrade={onUpgrade} fallback={<ul className="space-y-2 text-sm leading-6">
-        <li className="flex items-start gap-2"><span className="mt-1 size-4 shrink-0 rounded-full border border-primary/40" style={{ background: luckyColor?.code }} /><span><strong className="text-primary">{ja ? "ラッキーカラー" : "Lucky color"}</strong>：{luckyColor ? `${localizeBirthColorName(luckyColor.name, language)}（${luckyColor.code}）` : (ja ? "生年月日の登録で表示されます" : "Add your birth date")}</span></li>
+        {luckyColor && <li><DailyLuckyColor language={language} hex={luckyColor.code} name={localizeBirthColorName(luckyColor.name, language)} /></li>}
         <li><strong className="text-primary">{ja ? "ラッキーワード" : "Lucky word"}</strong>：{L(word)}</li>
         <li><strong className="text-primary">{ja ? "運気アップフード 選りすぐり5品" : "5 lucky foods"}</strong>
           <p className="mt-2 text-xs leading-6">{access.rules}</p><p className="mt-1 flex items-center gap-1.5 text-xs"><ChefHat className="size-4 shrink-0" />{benefit.recipeHint}</p>
