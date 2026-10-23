@@ -292,6 +292,7 @@ export type Database = {
           name: string
           name_kana: string
           nickname: string
+          parents: Json | null
           relationship: string
           relationship_type: string
           role: string
@@ -312,6 +313,7 @@ export type Database = {
           name: string
           name_kana?: string
           nickname?: string
+          parents?: Json | null
           relationship?: string
           relationship_type?: string
           role?: string
@@ -332,6 +334,7 @@ export type Database = {
           name?: string
           name_kana?: string
           nickname?: string
+          parents?: Json | null
           relationship?: string
           relationship_type?: string
           role?: string
