@@ -3,6 +3,7 @@
 // character, and (3) the role it plays in modern daily life. Reference
 // education only — never scientific or deterministic claims.
 import type { Language } from "./translations";
+import { regionalContextCopy, regionalContextPrompt } from "./regional-context-copy";
 import type { ApproachKey } from "./trait-reading";
 
 export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
@@ -22,7 +23,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     color: "生年月日と太陽の位置から導く1440通りのバースカラーは、色彩心理の考え方を取り入れた現代的な象徴システムです。色が持つ心理的なイメージを通して、意識を向ける先や気分の整え方のヒントを得られます。科学的な測定ではなく、日々の装いや空間づくりに「自分らしさの色」を添えるための、感覚的な参考として楽しむものです。",
     blood: "大正時代以降に日本で広まった、血液型による気質分類の文化的な話題です。科学的な根拠は確立していませんが、A型・B型・O型・AB型それぞれの「あるある」的な archetype（典型像）は、世代を超えて親しまれてきました。自分を決めつけるものではなく、会話のきっかけや自己観察の遊び心ある視点として楽しむエンターテインメントです。",
     siblings: "家族の中で育った順番や構成が、振る舞いのクセに影響するかもしれないという、心理学由来の視点です。長子・中間子・末子・一人っ子それぞれに語られてきた役割の物語があります。決まった性格を示すものではなく、「こんな場面に覚えはありませんか？」と自分の経験を振り返る、共感のための問いかけとして用います。",
-    region: "生まれた土地の風土・気候・文化が、感覚の土台にそっと影響しているかもしれないという視点です。海沿い・山間・都市など、環境が育む価値観の違いは古くから語られてきました。出身地で性格が決まるわけではなく、自分の感覚の原点を思い出すための、中立な内省のきっかけとして扱います。",
+    region: regionalContextCopy["ja"],
   },
   en: {
     western: "Born from ancient Babylonian sky observation and systematized in Hellenistic Greece, this is one of the world's oldest reading arts. It maps which signs the Sun, Moon and planets occupied at your birth, reflecting emotional patterns, thinking habits and how you relate to others. Today it serves as a mirror for the heart — a way to see your tendencies clearly and tune your relationships and communication.",
@@ -40,7 +41,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     color: "The 1,440-slot birth color palette, derived from your birth date and the Sun's position, is a modern symbolic system informed by color psychology. Through the psychological imagery of colors it offers hints for where to direct attention and how to settle your mood. Not a scientific measurement — enjoy it as a sensory reference for adding your own color to daily dress and spaces.",
     blood: "A cultural topic of temperament categories by blood type that spread in Japan from the Taisho era. Though scientifically unestablished, the familiar archetypes of types A, B, O and AB have been loved across generations. It does not define you — enjoy it as entertainment: a conversation starter and a playful lens for self-observation.",
     siblings: "A psychology-derived perspective that the order and composition you grew up in may shape habits of behavior. Eldest, middle, youngest and only children each carry stories of roles long told about them. It shows no fixed personality; it is an empathetic question — does this scene sound familiar? — for looking back on your own experience.",
-    region: "A perspective that the landscape, climate and culture of your birthplace may quietly underlie your senses. Differences in values nurtured by seaside, mountain or city environments have long been told. Your hometown does not determine character; treat it as a neutral prompt for remembering where your sensibilities began.",
+    region: regionalContextCopy["en"],
   },
   "zh-CN": {
     western: "起源于古代巴比伦的天象观测，并在希腊化时代体系化，是世界最古老的占术之一。它解读出生瞬间太阳、月亮与行星所在的星座，映照情感的流动、思维的习惯与与人相处的方式。如今，它作为一面「心之镜」，帮助人们客观看待自己的倾向，调整人际关系与沟通方式。",
@@ -58,7 +59,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     color: "由生日与太阳位置导出的1440种出生色彩，是融入色彩心理学观点的现代象征体系。通过色彩的心理意象，获得注意力投向与情绪整理的提示。它并非科学测量，而是为日常穿搭与空间点缀「属于自己的颜色」的感性参考。",
     blood: "自日本大正时代起流传的血型气质分类文化话题。虽然科学根据尚未确立，但A型、B型、O型、AB型各自的「典型形象」被世代喜爱。它不决定你是谁——作为谈资与自我观察的趣味视角，请当作娱乐来享受。",
     siblings: "一种源自心理学的视角：成长的排行与家庭构成或许会影响行为习惯。长子、中间子、幺子、独生子女各自都有流传已久的角色故事。它不显示固定性格，而是共感的提问——「这样的场景你有印象吗？」——用来回顾自己的经历。",
-    region: "一种视角：出生地的风土、气候与文化或许悄悄铺垫了你的感觉基础。海边、山间、都市等环境孕育的价值观差异自古被人们讲述。故乡并不决定性格，请把它当作回想自己感觉原点的中立内省契机。",
+    region: regionalContextCopy["zh-CN"],
   },
   "zh-TW": {
     western: "起源於古代巴比倫的天象觀測，並在希臘化時代體系化，是世界最古老的占術之一。它解讀出生瞬間太陽、月亮與行星所在的星座，映照情感的流動、思維的習慣與與人相處的方式。如今，它作為一面「心之鏡」，幫助人們客觀看待自己的傾向，調整人際關係與溝通方式。",
@@ -76,7 +77,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     color: "由生日與太陽位置導出的1440種出生色彩，是融入色彩心理學觀點的現代象徵體系。透過色彩的心理意象，獲得注意力投向與情緒整理的提示。它並非科學測量，而是為日常穿搭與空間點綴「屬於自己的顏色」的感性參考。",
     blood: "自日本大正時代起流傳的血型氣質分類文化話題。雖然科學根據尚未確立，但A型、B型、O型、AB型各自的「典型形象」被世代喜愛。它不決定你是誰——作為談資與自我觀察的趣味視角，請當作娛樂來享受。",
     siblings: "一種源自心理學的視角：成長的排行與家庭構成或許會影響行為習慣。長子、中間子、么子、獨生子女各自都有流傳已久的角色故事。它不顯示固定性格，而是共感的提問——「這樣的場景你有印象嗎？」——用來回顧自己的經歷。",
-    region: "一種視角：出生地的風土、氣候與文化或許悄悄鋪墊了你的感覺基礎。海邊、山間、都市等環境孕育的價值觀差異自古被人們講述。故鄉並不決定性格，請把它當作回想自己感覺原點的中立內省契機。",
+    region: regionalContextCopy["zh-TW"],
   },
   ko: {
     western: "고대 바빌로니아의 천체 관측에서 시작되어 헬레니즘 그리스에서 체계화된, 세계에서 가장 오래된 점술 중 하나입니다. 태어난 순간 태양·달·행성이 어느 별자리에 있었는지를 읽어 감정의 흐름, 사고의 습관, 사람과 어울리는 방식을 비춰줍니다. 오늘날에는 자신의 경향을 객관적으로 보고 인간관계와 소통을 가다듬는 '마음의 거울'로 사랑받고 있습니다.",
@@ -94,7 +95,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     color: "생년월일과 태양의 위치에서 이끌어내는 1440가지 탄생 색상은 색채 심리의 관점을 담은 현대적인 상징 체계입니다. 색이 지닌 심리적 이미지를 통해 의식을 향할 곳과 기분을 가다듬는 힌트를 얻을 수 있습니다. 과학적 측정이 아니라, 매일의 옷차림과 공간 만들기에 '나다운 색'을 더하는 감각적인 참고로 즐기는 것입니다.",
     blood: "다이쇼 시대 이후 일본에서 퍼진, 혈액형에 따른 기질 분류라는 문화적 화제입니다. 과학적 근거는 확립되어 있지 않지만, A형·B형·O형·AB형 각각의 '전형적인 이미지'는 세대를 넘어 사랑받아 왔습니다. 자신을 규정하는 것이 아니라, 대화의 계기나 자기 관찰의 유쾌한 관점으로 즐기는 엔터테인먼트입니다.",
     siblings: "가족 안에서 자란 순서나 구성이 행동의 버릇에 영향을 줄지도 모른다는, 심리학에서 온 관점입니다. 장남·장녀, 중간, 막내, 외동 각각에 오랫동안 이야기되어 온 역할의 이야기가 있습니다. 정해진 성격을 보여주는 것이 아니라, '이런 장면에 기억이 있나요?'라고 자신의 경험을 돌아보는 공감의 질문으로 사용합니다.",
-    region: "태어난 땅의 풍토·기후·문화가 감각의 토대에 살며시 영향을 주고 있을지도 모른다는 관점입니다. 바닷가·산간·도시 등 환경이 기르는 가치관의 차이는 오래전부터 이야기되어 왔습니다. 출생지가 성격을 결정하는 것은 아니며, 자신의 감각의 원점을 떠올리기 위한 중립적인 성찰의 계기로 다룹니다.",
+    region: regionalContextCopy["ko"],
   },
   es: {
     western: "Nacida de la observación del cielo en la antigua Babilonia y sistematizada en la Grecia helenística, es una de las artes de lectura más antiguas del mundo. Interpreta en qué signos estaban el Sol, la Luna y los planetas al nacer, reflejando patrones emocionales, hábitos de pensamiento y la forma de relacionarse. Hoy sirve como un espejo del corazón: ver con claridad las propias tendencias y armonizar las relaciones y la comunicación.",
@@ -112,7 +113,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     color: "La paleta de 1.440 colores de nacimiento, derivada de tu fecha de nacimiento y la posición del Sol, es un sistema simbólico moderno inspirado en la psicología del color. A través de las imágenes psicológicas de los colores ofrece pistas sobre dónde dirigir la atención y cómo serenar el ánimo. No es una medición científica: disfrútala como referencia sensorial para añadir tu propio color a la ropa y los espacios.",
     blood: "Un tema cultural de categorías de temperamento por grupo sanguíneo que se difundió en Japón desde la era Taisho. Aunque sin base científica establecida, los arquetipos familiares de los tipos A, B, O y AB han sido queridos por generaciones. No te define: disfrútalo como entretenimiento, un inicio de conversación y una lente lúdica de autoobservación.",
     siblings: "Una perspectiva derivada de la psicología: el orden y la composición en que creciste pueden moldear hábitos de conducta. Los mayores, los del medio, los menores y los hijos únicos cargan historias de roles contadas desde hace mucho. No muestra una personalidad fija; es una pregunta empática —¿te suena esta escena?— para mirar hacia tu propia experiencia.",
-    region: "Una perspectiva según la cual el paisaje, el clima y la cultura de tu lugar de nacimiento pueden sustentar silenciosamente tus sentidos. Las diferencias de valores que nutren el mar, la montaña o la ciudad se cuentan desde antiguo. Tu tierra natal no determina el carácter; trátala como un estímulo neutral para recordar dónde comenzaron tus sensibilidades.",
+    region: regionalContextCopy["es"],
   },
   fr: {
     western: "Née de l'observation du ciel dans l'ancienne Babylone et systématisée dans la Grèce hellénistique, c'est l'un des plus anciens arts de lecture au monde. Elle lit dans quels signes se trouvaient le Soleil, la Lune et les planètes à votre naissance, reflétant les schémas émotionnels, les habitudes de pensée et la manière de se relier aux autres. Aujourd'hui, elle sert de miroir du cœur : voir clairement ses tendances et harmoniser relations et communication.",
@@ -130,14 +131,14 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     color: "La palette de 1 440 couleurs de naissance, dérivée de votre date de naissance et de la position du Soleil, est un système symbolique moderne inspiré de la psychologie de la couleur. À travers l'imagerie psychologique des couleurs, elle offre des pistes sur où diriger l'attention et comment apaiser l'humeur. Ce n'est pas une mesure scientifique : savourez-la comme une référence sensorielle pour ajouter votre couleur propre à vos tenues et vos espaces.",
     blood: "Un sujet culturel de catégories de tempérament par groupe sanguin, répandu au Japon depuis l'ère Taishô. Bien que scientifiquement non établi, les archétypes familiers des types A, B, O et AB sont aimés depuis des générations. Il ne vous définit pas : appréciez-le comme un divertissement, un amorceur de conversation et une lentille ludique d'auto-observation.",
     siblings: "Une perspective issue de la psychologie : l'ordre et la composition dans lesquels vous avez grandi peuvent façonner des habitudes de comportement. Aînés, cadets, benjamins et enfants uniques portent chacun des histoires de rôles racontées de longue date. Elle ne montre aucune personnalité figée ; c'est une question empathique — cette scène vous rappelle-t-elle quelque chose ? — pour revisiter votre propre expérience.",
-    region: "Une perspective selon laquelle le paysage, le climat et la culture de votre lieu de naissance peuvent silencieusement soutenir vos sens. Les différences de valeurs nourries par la mer, la montagne ou la ville se racontent depuis toujours. Votre terre natale ne détermine pas le caractère ; traitez-la comme une invitation neutre à vous rappeler où vos sensibilités ont commencé.",
+    region: regionalContextCopy["fr"],
   },
 };
 
 /** Short principle lines for AI prompts: each art's analytical strength, so
  * readings weave all sixteen lenses instead of listing them. */
 export const artPrinciplesPrompt = `SIXTEEN LENS PRINCIPLES (use each lens for its strength; never list them):
-western: emotion/thinking/relating contrast from Sun, Moon, Mercury, Venus. indian: deep soul motives from sidereal Sun and Moon nakshatra. ziwei: life posture (Ming) and maturing domain (Shen). eastern: temperament and ~12-year rhythm from the year branch's animal, element, yin/yang. earth: seasonal planning phase only, never personality. pillars: energy allocation and endurance from five-element balance. sanmei: shifting roles across early/middle/late life via ten master stars. nineStars: environmental and routine affinities. lunarMansion: relational style from the birth mansion. animal: action tempo and decision rhythm (core only). numerology: growth themes and priorities. maya: symbolic energy cycle from the Tzolkin kin. color: symbolic attention cues, never health claims. blood: attributed entertainment archetype only, never personality evidence. siblings: family-role scene as a question, never facts. region: neutral self-reflection prompt only.
+western: emotion/thinking/relating contrast from Sun, Moon, Mercury, Venus. indian: deep soul motives from sidereal Sun and Moon nakshatra. ziwei: life posture (Ming) and maturing domain (Shen). eastern: temperament and ~12-year rhythm from the year branch's animal, element, yin/yang. earth: seasonal planning phase only, never personality. pillars: energy allocation and endurance from five-element balance. sanmei: shifting roles across early/middle/late life via ten master stars. nineStars: environmental and routine affinities. lunarMansion: relational style from the birth mansion. animal: action tempo and decision rhythm (core only). numerology: growth themes and priorities. maya: symbolic energy cycle from the Tzolkin kin. color: symbolic attention cues, never health claims. blood: attributed entertainment archetype only, never personality evidence. siblings: family-role scene as a question, never facts. region: neutral self-reflection prompt only. ${regionalContextPrompt}
 MULTI-LAYER RESONANCE (required): do not enumerate method results. Let 2-4 lenses intersect into one observation the reader recognizes from daily life; where two lenses point the same way, say what that convergence means; where they tension, describe the creative friction. Every passage should feel impossible to write for a different birth date.`;
 
 /** Dynamic label for the per-art detail disclosure, naming the current subject. */

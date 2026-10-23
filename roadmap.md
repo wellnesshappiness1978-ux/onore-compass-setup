@@ -1,5 +1,12 @@
 # Roadmap
 
+## Regional context and reminder settings (2026-10-23)
+- [x] Shared seven-language symbolic birth-sky/environment explanation and AI instructions; regional overview visibly checked
+- [x] Fixed subject/goal header; unset フリー verified, 320/390/1280px no overflow or page errors
+- [x] Collapsible BGM/relationship settings and VIP header reminder dialog; shared 639Hz/0.31/09:45 settings read back; Free has no daily-setting entry
+- [x] Independent relationship preset/free text persists after reload, health-specific advice visibly rendered for a registered local family member; live bodies merge into push catalogue
+- [x] Exact pause explanation with registration-dependent footer; all 266 tests pass, latest build OK. Real OS background push delivery and newly generated regional AI prose were not verified.
+
 ## Uploaded eleven-item daily guidance update (2026-10-22)
 - [x] Free one birth color and 1/3/5 recipe gates with consistent plan copy
 - [x] Center subject label and outlined self reset
