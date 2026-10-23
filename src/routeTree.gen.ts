@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as ApiConsultationRouteImport } from './routes/api/consultation'
+import { Route as ApiReadingsRouteImport } from './routes/api/readings'
 import { Route as LegalDocumentRouteImport } from './routes/legal.$document'
 import { Route as ApiPublicJobsSendPushRouteImport } from './routes/api/public/jobs/send-push'
 
@@ -30,6 +31,11 @@ const ApiConsultationRoute = ApiConsultationRouteImport.update({
   path: '/api/consultation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiReadingsRoute = ApiReadingsRouteImport.update({
+  id: '/api/readings',
+  path: '/api/readings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LegalDocumentRoute = LegalDocumentRouteImport.update({
   id: '/legal/$document',
   path: '/legal/$document',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/support': typeof SupportRoute
   '/api/consultation': typeof ApiConsultationRoute
+  '/api/readings': typeof ApiReadingsRoute
   '/legal/$document': typeof LegalDocumentRoute
   '/api/public/jobs/send-push': typeof ApiPublicJobsSendPushRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/support': typeof SupportRoute
   '/api/consultation': typeof ApiConsultationRoute
+  '/api/readings': typeof ApiReadingsRoute
   '/legal/$document': typeof LegalDocumentRoute
   '/api/public/jobs/send-push': typeof ApiPublicJobsSendPushRoute
 }
@@ -60,6 +68,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/support': typeof SupportRoute
   '/api/consultation': typeof ApiConsultationRoute
+  '/api/readings': typeof ApiReadingsRoute
   '/legal/$document': typeof LegalDocumentRoute
   '/api/public/jobs/send-push': typeof ApiPublicJobsSendPushRoute
 }
@@ -69,6 +78,7 @@ export interface FileRouteTypes {
     | '/'
     | '/support'
     | '/api/consultation'
+    | '/api/readings'
     | '/legal/$document'
     | '/api/public/jobs/send-push'
   fileRoutesByTo: FileRoutesByTo
@@ -76,6 +86,7 @@ export interface FileRouteTypes {
     | '/'
     | '/support'
     | '/api/consultation'
+    | '/api/readings'
     | '/legal/$document'
     | '/api/public/jobs/send-push'
   id:
@@ -83,6 +94,7 @@ export interface FileRouteTypes {
     | '/'
     | '/support'
     | '/api/consultation'
+    | '/api/readings'
     | '/legal/$document'
     | '/api/public/jobs/send-push'
   fileRoutesById: FileRoutesById
@@ -91,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SupportRoute: typeof SupportRoute
   ApiConsultationRoute: typeof ApiConsultationRoute
+  ApiReadingsRoute: typeof ApiReadingsRoute
   LegalDocumentRoute: typeof LegalDocumentRoute
   ApiPublicJobsSendPushRoute: typeof ApiPublicJobsSendPushRoute
 }
@@ -118,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiConsultationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/readings': {
+      id: '/api/readings'
+      path: '/api/readings'
+      fullPath: '/api/readings'
+      preLoaderRoute: typeof ApiReadingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/legal/$document': {
       id: '/legal/$document'
       path: '/legal/$document'
@@ -139,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SupportRoute: SupportRoute,
   ApiConsultationRoute: ApiConsultationRoute,
+  ApiReadingsRoute: ApiReadingsRoute,
   LegalDocumentRoute: LegalDocumentRoute,
   ApiPublicJobsSendPushRoute: ApiPublicJobsSendPushRoute,
 }

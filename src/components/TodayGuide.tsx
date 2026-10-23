@@ -32,6 +32,7 @@ import { TodayCard } from './TodayCard';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 import { todaySample } from '@/lib/today-samples';
 import { subjectSignals, subjectDirections } from '@/lib/today-subject';
+import { readingDate, monthlyLabels, servingsLabel } from "@/lib/reading-presentation";
 import { groupBirthPalette } from '@/lib/group-palette';
 
 // Deterministic reference values from birth date and today's calendar; not verified readings or predictions.
@@ -122,7 +123,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const iso = localIso(today);
   // AI reading is built for the actual subject: group members, a family member, or the owner — never reused across subjects.
   const fortuneReq = useMemo(() => {
-    const toReq = (p: UserProfile, rel = "", relType = "") => ({ nameKanji: p.nameKanji ?? "", nameKana: p.nameKana ?? "", nameRomaji: p.nameRomaji ?? "", birthDate: p.birthDate, birthTime: p.birthTime ?? "", birthTimeUnknown: p.birthTimeUnknown ?? true, birthPlace: p.birthPlace ?? "", birthCity: p.birthCity ?? "", gender: p.gender ?? "undisclosed", bloodType: p.bloodType ?? "", siblingOrder: p.siblingOrder ?? "", relationship: rel, relationshipType: relType });
+    const toReq = (p: UserProfile, rel = "", relType = "") => ({ nameKanji: p.nameKanji ?? "", nameKana: p.nameKana ?? "", nameRomaji: p.nameRomaji ?? "", birthDate: p.birthDate, birthTime: p.birthTime ?? "", birthTimeUnknown: p.birthTimeUnknown ?? true, birthPlace: p.birthPlace ?? "", birthCity: p.birthCity ?? "", gender: p.gender ?? "undisclosed", bloodType: p.bloodType ?? "", siblingOrder: p.siblingOrder ?? "", father: p.father, mother: p.mother, relationship: rel, relationshipType: relType });
     const goal = focus ? goalText(focus.focus, language) : "";
     if (focus?.group) {
       const ms = focus.group.members.filter(m => m.birthDate).slice(0, 30).map(m => toReq(memberToProfile(m), m.relationship ?? "", m.relationshipType ?? ""));
@@ -369,7 +370,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   content.decision = { notify: fortune.data?.decision.advance ?? content.decision.notify, body: fortune.data ? <div className="space-y-3 text-sm leading-7"><h4 className="text-primary">{access.advance}</h4><p>{fortune.data.decision.advance}</p><h4 className="text-primary">{access.protect}</h4><p>{fortune.data.decision.protect}</p><p><strong>{access.reason}：</strong>{fortune.data.decision.reason}</p></div> : <TodayInsight state={fortune} language={language} /> };
   content.shopping = { notify: fortune.data?.shopping.action ?? access.loading, body: fortune.data ? guide(fortune.data.shopping) : <TodayInsight state={fortune} language={language} /> };
   content.health = { notify: fortune.data?.maintenance.action ?? access.loading, body: fortune.data ? guide(fortune.data.maintenance) : <TodayInsight state={fortune} language={language} /> };
-  content.monthlyLucky = { notify: fortune.data?.monthly.action.action ?? access.loading, body: fortune.data ? <div className="space-y-5">{guide(fortune.data.monthly.flower)}{guide(fortune.data.monthly.action)}{guide(fortune.data.monthly.item)}<p className="text-sm leading-7">{fortune.data.monthly.outlook}</p></div> : <TodayInsight state={fortune} language={language} /> };
+  content.monthlyLucky = { notify: fortune.data?.monthly.action.action ?? access.loading, body: fortune.data ? <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]"><p className="font-serif text-lg text-primary">{readingDate(iso, language, true)}</p><div className="grid min-w-0 gap-3">{[fortune.data.monthly.action, fortune.data.monthly.item, fortune.data.monthly.flower].map((item, i) => <article key={i} className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne"><h4 className="mb-3 font-serif text-base text-primary">{i + 1}. {monthlyLabels[language][i]}</h4>{guide(item)}</article>)}</div><p className="text-sm leading-7">{fortune.data.monthly.outlook}</p></div> : <TodayInsight state={fortune} language={language} /> };
   if (focus?.group) {
     const group = focus.group;
     const each = (render: (p: UserProfile) => ReactNode) => <div className="space-y-3">{group.members.map(m => <details key={m.id} className="border-t border-primary/25 pt-3"><summary className="cursor-pointer font-serif text-primary">{m.nickname || m.name}</summary><div className="mt-3">{render(memberToProfile(m))}</div></details>)}</div>;
@@ -439,15 +440,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   };
   const share = (key: string) => <div key={key} className="flex justify-center"><ShareCardButton language={language} autoOpen={false} label={ja ? "今日の占いを1タップでシェア" : "Share today's guide"} className="h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto" data={shareData} /></div>;
 
-  const neon = luckyHex ? neonOf(luckyHex) : null;
-  const luckyStyle = neon ? ({
-    background: `radial-gradient(120% 90% at 0% 0%, hsl(${neon.h} 100% 72% / .95), transparent 60%), linear-gradient(135deg, hsl(${neon.h} 100% 55%) 0%, hsl(${(neon.h + 25) % 360} 100% 50%) 55%, hsl(${(neon.h + 330) % 360} 100% 45%) 100%)`,
-    boxShadow: `0 0 24px hsl(${neon.h} 100% 55% / .55), inset 0 0 0 1px hsl(${neon.h} 100% 85% / .7)`,
-    "--lucky-fg": neon.light ? "#0B132B" : "#FFFFFF",
-    "--lucky-accent": neon.light ? "#0B132B" : "#FFF3B0",
-    "--lucky-muted": neon.light ? "rgba(11,19,43,.8)" : "rgba(255,255,255,.88)",
-    "--lucky-outline": neon.light ? "rgba(255,255,255,.95)" : "rgba(5,8,20,.95)",
-  } as CSSProperties) : undefined;
 
   return (
     <div className="today-guide mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 text-left md:gap-4">
@@ -466,17 +458,18 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       </section>
       <TodayCard id="today-insight" title={ja ? "今日だけの深層リーディング" : "Today's deep reading"}>
         <h3 className="mb-3 flex items-center gap-2 font-serif text-lg text-foreground"><Sparkles className="size-4 text-primary" />{ja ? "今日だけの深層リーディング" : "Today's deep reading"}</h3>
+        <p className="mb-4 text-base font-medium tabular-nums text-primary">{readingDate(iso, language)}</p>
         <TodayInsight state={fortune} language={language} />
         <FeatureNotifySwitch id="insight" title={`🔮 ${ja ? "今日の深層リーディング" : "Today's deep reading"}`} body={fortune.data?.headline ?? (ja ? "今日だけのメッセージが届いています" : "Your message for today is ready")} language={language} />
       </TodayCard>
       {todayFeatures.filter(f => f.id !== "relations").map(({ id, min }, i) => {
         const open = canUseToday(plan, id);
         const Icon = icons[id];
-        const lucky = id === "dailyLucky" && open && luckyStyle;
+        const lucky = id === "dailyLucky" && open;
         return (<Fragment key={id}>
-          <TodayCard id={`today-${id}`} style={lucky ? luckyStyle : undefined} className={lucky ? "lucky-themed" : ""} title={L(titles[id])}>
+          <TodayCard id={`today-${id}`} className={lucky ? "lucky-readable shadow-champagne" : ""} title={L(titles[id])}>
             <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
-              <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className={`min-w-0 break-words ${lucky ? "lucky-shine-title" : ""}`}>{L(titles[id])}</span></h3>
+              <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className={`min-w-0 break-words ${lucky ? "font-semibold" : ""}`}>{L(titles[id])}</span></h3>
               {!open && <span className="shrink-0 rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">{names[min]}+</span>}
             </div>
             {open ? <>{content[id].body}{id === "starPath" || id === "helio" ? renderDepth(id) : id === "biorhythm365" ? <>{canReadThreeWaves(plan) ? renderDepth("biorhythm") : <div className="mt-3 border-t border-primary/25 pt-3"><p className="text-sm text-primary">{access.waves}</p><Button variant="outline" onClick={onUpgrade}><LockKeyhole className="size-4" />{access.plans}</Button></div>}{renderDepth("family")}</> : null}</> : (
@@ -500,7 +493,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         </Fragment>);
       })}
       {share("share-bottom")}
-      <Dialog open={recipe !== null} onOpenChange={v => { if (!v) setRecipeIndex(null); }}><DialogContent className="max-h-[85dvh] w-[calc(100%-1.5rem)] max-w-lg overflow-y-auto border-primary/35 bg-card text-foreground"><DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif text-primary"><ChefHat className="size-5 shrink-0" />{recipe?.name}</DialogTitle><DialogDescription>{benefit.recipeNote}</DialogDescription></DialogHeader>{recipe && <div className="space-y-5 text-left"><section><h3 className="mb-2 font-serif text-primary">{benefit.ingredients}</h3><ul className="space-y-1 text-sm">{recipe.ingredients.map(item => <li key={item} className="border-b border-primary/10 py-1">{item}</li>)}</ul></section><section><h3 className="mb-2 font-serif text-primary">{benefit.steps}</h3><ol className="list-decimal space-y-3 pl-5 text-sm leading-7">{recipe.steps.map((step, i) => <li key={i}>{step}</li>)}</ol></section><section className="border-t border-primary/20 pt-3"><h3 className="font-serif text-primary">{benefit.luck}</h3><p className="mt-2 text-sm leading-7">{recipe.luck}</p></section></div>}<Button variant="outline" onClick={() => setRecipeIndex(null)}>{benefit.close}</Button></DialogContent></Dialog>
+      <Dialog open={recipe !== null} onOpenChange={v => { if (!v) setRecipeIndex(null); }}><DialogContent className="max-h-[85dvh] w-[calc(100%-1.5rem)] max-w-lg min-w-0 overflow-x-hidden overflow-y-auto border-primary/35 bg-card text-foreground [overflow-wrap:anywhere]"><DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif text-primary"><ChefHat className="size-5 shrink-0" />{recipe?.name}</DialogTitle><DialogDescription>{servingsLabel[language]} · {benefit.recipeNote}</DialogDescription></DialogHeader>{recipe && <div className="space-y-5 text-left"><section><h3 className="mb-2 font-serif text-primary">{benefit.ingredients}</h3><ul className="space-y-1 text-sm">{recipe.ingredients.map(item => <li key={item} className="border-b border-primary/10 py-1">{item}</li>)}</ul></section><section><h3 className="mb-2 font-serif text-primary">{benefit.steps}</h3><ol className="list-decimal space-y-3 pl-5 text-sm leading-7">{recipe.steps.map((step, i) => <li key={i}>{step}</li>)}</ol></section><section className="border-t border-primary/20 pt-3"><h3 className="font-serif text-primary">{benefit.luck}</h3><p className="mt-2 text-sm leading-7">{recipe.luck}</p></section></div>}<Button variant="outline" onClick={() => setRecipeIndex(null)}>{benefit.close}</Button></DialogContent></Dialog>
       <Dialog open={sample !== null} onOpenChange={(v) => !v && setSample(null)}>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 sm:max-w-lg">
           <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{consultationUxCopy[language].sample}</DialogDescription><DialogTitle className="font-serif text-xl">{sample ? L(titles[sample]) : ""}</DialogTitle></DialogHeader>

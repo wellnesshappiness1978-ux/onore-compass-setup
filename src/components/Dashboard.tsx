@@ -10,7 +10,7 @@ import { NautilusIcon } from './NautilusIcon';
 import { AppearanceMotif } from './AppearanceMotif';
 import { useEffect, useRef, useState, type ReactNode, type CSSProperties, type TouchEvent as ReactTouchEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { usePersonalReading } from "@/hooks/use-personal-reading";
 import {
   Bell,
   Building2,
@@ -53,7 +53,6 @@ import { compatibilityContextCopy, kindFromRelationshipType, readingThemes, rela
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
-import { generateHomeReading } from "@/lib/ai/home-reading.functions";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
@@ -153,8 +152,8 @@ function TorisetsuPanel({
   const base = translations[language];
   const q = quickCompatibilityCopy[language];
   const [mode, setMode] = useState<"manual" | "compatibility">(only ?? initialMode);
-  const generate = useServerFn(generateHomeReading);
-  const manualReading = useQuery({ queryKey: ["home-reading-six-v14", profile, language], queryFn: () => generate({ data: { profile, language } }), staleTime: Infinity, retry: false, enabled: mode === "manual" });
+  const readingFocus = useFocus();
+  const manualReading = usePersonalReading({ profile, language, goal: readingFocus ? goalText(readingFocus.focus, language) : '', subject: { label: readingFocus?.label(language) ?? 'you', isSelf: !readingFocus?.member && !readingFocus?.group } }, 'full', mode === 'manual');
   const [partnerName, setPartnerName] = useState("");
   const [partnerKana, setPartnerKana] = useState("");
   const [partnerGender, setPartnerGender] = useState<UserProfile["gender"]>("undisclosed");
@@ -281,11 +280,11 @@ function TorisetsuPanel({
               ✧
             </div>
             {manualReading.isPending && <AgolmenLoading compact label={homeReadingCopy[language].loading} />}
-            {!manualReading.isPending && <div className="relative space-y-0">
+            <div className="relative space-y-0">
               {[
-                { title: t.coreTitle, body: manualReading.data?.manualCore, symbol: "✦" },
-                { title: t.decisionTitle, body: manualReading.data?.manualDecision, symbol: "◇" },
-                { title: t.timingTitle, body: manualReading.data?.manualTiming, symbol: "☼" },
+                { title: t.coreTitle, body: manualReading.data?.manualCore ?? manualReading.partial.manualCore, symbol: "✦" },
+                { title: t.decisionTitle, body: manualReading.data?.manualDecision ?? manualReading.partial.manualDecision, symbol: "◇" },
+                { title: t.timingTitle, body: manualReading.data?.manualTiming ?? manualReading.partial.manualTiming, symbol: "☼" },
               ].map((part, index) => (
                 <div
                   key={part.title}
@@ -304,7 +303,7 @@ function TorisetsuPanel({
                   </div>
                 </div>
               ))}
-            </div>}
+            </div>
           </section>
           <p className="mt-5 text-center text-[11px] text-muted-foreground/80">{t.preview}</p>
         </div>

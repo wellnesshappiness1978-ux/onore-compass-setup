@@ -1,5 +1,11 @@
 # Roadmap
 
+## Shared explanations and progressive readings (2026-10-23)
+- [x] Unify Home/Traits via shared method explanations and accordion cards; retain subject-named personal details and sign/branch expanders
+- [x] Persist owner/day/full-input readings and deduplicate full requests across surfaces; genuine partial fields visible, independent fast essence retained. Signed-in real first visible output ~26s versus full completion ~221s; reload generated no additional requests
+- [x] Readable lucky surfaces, two-serving prompt/quantities, Arabic Japanese date, three named month-long items; actual five recipes rendered
+- [x] 279 tests passed and build OK; signed-in real Today completed, reload reused cache, 320/390/1280px no horizontal overflow/page errors. First-generation duration remains model-dependent; family/group fresh AI generation not separately retested
+
 ## Regional context and reminder settings (2026-10-23)
 - [x] Shared seven-language symbolic birth-sky/environment explanation and AI instructions; regional overview visibly checked
 - [x] Fixed subject/goal header; unset フリー verified, 320/390/1280px no overflow or page errors

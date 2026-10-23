@@ -1,9 +1,6 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import MethodExplanationList from "./MethodExplanationList";
 import type { Language } from "@/lib/translations";
 import { artsGuideCopy } from "@/lib/arts-guide-copy";
-import { allBranches, allSigns } from "@/lib/zodiac-signs";
 
 const stars = [
   { top: "8%", left: "8%", size: 2, delay: "0s" },
@@ -50,7 +47,6 @@ function IntroStars() {
 
 export function ArtsGuide({ language = "ja" }: { language?: Language }) {
   const words = artsGuideCopy[language];
-  const [selected, setSelected] = useState<(typeof words.methods)[number] | null>(null);
   return (
     <section className="mb-6 overflow-hidden rounded-3xl border border-primary/30 bg-card/60 backdrop-blur">
       <div className="relative px-4 py-4 text-center md:px-6 md:py-14">
@@ -89,13 +85,11 @@ export function ArtsGuide({ language = "ja" }: { language?: Language }) {
         </div>
         <div>
           <h4 className="font-serif text-lg text-primary">{words.methodsTitle}</h4>
-          <div className="mt-3 space-y-2">
-            {words.methods.map((method, i) => <Button key={method.title} type="button" variant="outline" onClick={() => setSelected(method)} className="h-auto min-h-16 w-full justify-start whitespace-normal rounded-md border-primary/25 bg-background/40 p-4 text-left font-serif text-foreground"><span className="mr-2 text-primary">{i + 1}.</span>{method.title}</Button>)}
-          </div>
+          <MethodExplanationList language={language} />
         </div>
         <p className="text-xs text-muted-foreground">{words.disclaimer}</p>
       </div>
-      <Dialog open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null); }}><DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto border-primary/30 bg-card text-foreground">{selected && <><DialogTitle className="font-serif text-xl text-primary">{selected.title}</DialogTitle><DialogDescription className="text-sm leading-7 text-muted-foreground">{words.dialogDescription}</DialogDescription><div className="space-y-4"><div className="border-l-2 border-primary/50 bg-primary/5 p-4"><p className="text-xs text-primary">{words.background}</p><p className="mt-2 text-sm leading-7">{selected.background}</p></div><div className="border-l-2 border-primary/25 p-4"><p className="text-xs text-primary">{words.scope}</p><p className="mt-2 text-sm leading-7">{selected.scope}</p></div>{"id" in selected && selected.id === "westernAstrology" && <ul className="grid gap-2 sm:grid-cols-2">{allSigns(language).map((s) => <li key={s.name} className="rounded-lg border border-primary/20 bg-background/40 p-3"><p className="text-sm font-semibold text-primary">{s.name} <span className="text-xs font-normal text-muted-foreground">{s.symbol} · {s.element} · {s.quality}</span></p><p className="mt-1 text-xs leading-5 text-foreground/90">{s.traits}</p></li>)}</ul>}{"id" in selected && selected.id === "easternAstrology" && <ul className="grid gap-2 sm:grid-cols-2">{allBranches(language).map((b) => <li key={b.name} className="rounded-lg border border-primary/20 bg-background/40 p-3"><p className="text-sm font-semibold text-primary">{b.name}（{b.animal}） <span className="text-xs font-normal text-muted-foreground">{b.element} · {b.yinYang}</span></p><p className="mt-1 text-xs leading-5 text-foreground/90">{b.traits}</p></li>)}</ul>}<p className="text-xs leading-6 text-muted-foreground">{words.disclaimer}</p></div></>}</DialogContent></Dialog>
+
     </section>
   );
 }
