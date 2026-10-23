@@ -1,5 +1,11 @@
 # Roadmap
 
+## Uploaded layout, color and sample refinement (2026-10-23)
+- [x] Centered left-aligned intro, strict two-row fixed header on all sizes, native pinch-safe gestures, high-contrast theme-aware headings; removed opacity-based intro animation that made later headings temporarily unreadable
+- [x] Centered ingredients, expanded date-rotated cooking catalogue/detail and AI recipe instructions, renamed Japanese tips; shared tappable lucky-color dialog with seven-language symbolic and fashion guidance
+- [x] Fully visible fixed fictional samples including Free direction preview, unchanged paid gates and no sample-triggered generation
+- [x] 281 full-suite tests passed; final changed areas 21 tests passed; latest build OK. 320/390/1280px no horizontal overflow/page errors, correct header row/order, color and two-serving recipe dialogs, sample blur count zero. One run showed arriving generated lucky foods; later run did not complete in 260s, so fresh full recipe reasoning and cache restoration are not claimed verified. Physical-device pinch remains unverified.
+
 ## Shared explanations and progressive readings (2026-10-23)
 - [x] Unify Home/Traits via shared method explanations and accordion cards; retain subject-named personal details and sign/branch expanders
 - [x] Persist owner/day/full-input readings and deduplicate full requests across surfaces; genuine partial fields visible, independent fast essence retained. Signed-in real first visible output ~26s versus full completion ~221s; reload generated no additional requests

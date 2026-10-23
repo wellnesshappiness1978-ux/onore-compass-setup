@@ -34,6 +34,7 @@ import { todaySample } from '@/lib/today-samples';
 import { subjectSignals, subjectDirections } from '@/lib/today-subject';
 import { readingDate, monthlyLabels, servingsLabel } from "@/lib/reading-presentation";
 import { groupBirthPalette } from '@/lib/group-palette';
+import DailyLuckyColor from './DailyLuckyColor';
 
 // Deterministic reference values from birth date and today's calendar; not verified readings or predictions.
 type Pair = { ja: string; en: string };
@@ -135,7 +136,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   }, [focus, profile, language, iso]);
   const fortune = useTodayFortune(fortuneReq);
   const el = dayElement(iso);
-  const dailyRecipes = recipesForElement(el);
+  const dailyRecipes = recipesForElement(el, iso);
   const selectedRecipe = recipeIndex === null ? null : dailyRecipes[recipeIndex];
   const recipe = selectedRecipe ? recipeDetails(selectedRecipe, language) : null;
   const starPoem = useMemo(() => {
@@ -260,7 +261,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     dailyLucky: {
       notify: fortune.data ? `${fortune.data.luckyColor.name} / ${fortune.data.luckyWord.word} / ${fortune.data.foods[0]?.name ?? ""}` : `${luckyColor ? localizeBirthColorName(luckyColor.name, language) : ""} / ${L(word)}`,
       body: <TodayLuckyTrio state={fortune} language={language} plan={plan} onUpgrade={onUpgrade} fallback={<ul className="space-y-2 text-sm leading-6">
-        <li className="flex items-start gap-2"><span className="mt-1 size-4 shrink-0 rounded-full border border-primary/40" style={{ background: luckyColor?.code }} /><span><strong className="text-primary">{ja ? "ラッキーカラー" : "Lucky color"}</strong>：{luckyColor ? `${localizeBirthColorName(luckyColor.name, language)}（${luckyColor.code}）` : (ja ? "生年月日の登録で表示されます" : "Add your birth date")}</span></li>
+        {luckyColor && <li><DailyLuckyColor language={language} hex={luckyColor.code} name={localizeBirthColorName(luckyColor.name, language)} /></li>}
         <li><strong className="text-primary">{ja ? "ラッキーワード" : "Lucky word"}</strong>：{L(word)}</li>
         <li><strong className="text-primary">{ja ? "運気アップフード 選りすぐり5品" : "5 lucky foods"}</strong>
           <p className="mt-2 text-xs leading-6">{access.rules}</p><p className="mt-1 flex items-center gap-1.5 text-xs"><ChefHat className="size-4 shrink-0" />{benefit.recipeHint}</p>
@@ -297,19 +298,9 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
           ) : (
             <div className="rounded-md border border-primary/25 p-3">
               <h4 className="mb-1 font-serif text-sm text-primary">{ja ? "風水：生まれ持った吉方位タイプと今年の方位" : "Feng shui: birth direction type & this year's direction"}</h4>
-              <div className="relative mt-2 overflow-hidden rounded-md">
-                <div aria-hidden="true" className="pointer-events-none select-none space-y-1.5 text-xs blur-[3px]">
-                  <p>{ja ? "東四命・西四命タイプと今年の大開運方位、九星の配置を詳しく表示します。" : "East/West group, this year's favorable direction and flying-star layout."}</p>
-                  <div className="grid grid-cols-2 gap-2"><div className="h-10 rounded-md border border-primary/20" /><div className="h-10 rounded-md border border-primary/20" /></div>
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-[2px]">
-                  <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-                    <LockKeyhole className="size-4 text-primary" />
-                    <span>{names.standard}+</span>
-                    <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{ja ? "プランを見る" : "See plans"}</Button>
-                  </div>
-                </div>
-              </div>
+              <p className="mt-2 text-xs leading-6 text-muted-foreground">{access.sample}</p>
+              <p className="mt-2 whitespace-pre-line text-sm leading-7 text-foreground">{todaySample("directionExtended", language)}</p>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-4 text-primary" /><span>{names.standard}+</span><Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{access.plans}</Button></div>
             </div>
           )}
         </div>
@@ -478,6 +469,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
                 <div className="relative flex flex-col items-center gap-2 text-center">
                   <LockKeyhole className="size-5 text-primary" />
                   {teaser[id] && <p className="text-sm font-medium text-foreground">✦ {teaser[id]}</p>}
+                  {plan === "free" && <><p className="text-xs leading-6 text-muted-foreground">{access.sample}</p><p className="w-full whitespace-pre-line text-left text-sm leading-7 text-foreground">{todaySample(id, language)}</p></>}
                   <p className="text-xs text-muted-foreground">{ja ? `${names[min]}以上でお楽しみいただけます` : `Enjoy with ${names[min]} or higher`}</p>
                   <div className="flex flex-wrap justify-center gap-2">
                     <Button size="sm" variant="outline" className="border-primary/40" onClick={() => setSample(id)}><Eye className="size-3.5" />{ja ? "サンプルを見る" : "See sample"}</Button>
@@ -493,16 +485,14 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         </Fragment>);
       })}
       {share("share-bottom")}
-      <Dialog open={recipe !== null} onOpenChange={v => { if (!v) setRecipeIndex(null); }}><DialogContent className="max-h-[85dvh] w-[calc(100%-1.5rem)] max-w-lg min-w-0 overflow-x-hidden overflow-y-auto border-primary/35 bg-card text-foreground [overflow-wrap:anywhere]"><DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif text-primary"><ChefHat className="size-5 shrink-0" />{recipe?.name}</DialogTitle><DialogDescription>{servingsLabel[language]} · {benefit.recipeNote}</DialogDescription></DialogHeader>{recipe && <div className="space-y-5 text-left"><section><h3 className="mb-2 font-serif text-primary">{benefit.ingredients}</h3><ul className="space-y-1 text-sm">{recipe.ingredients.map(item => <li key={item} className="border-b border-primary/10 py-1">{item}</li>)}</ul></section><section><h3 className="mb-2 font-serif text-primary">{benefit.steps}</h3><ol className="list-decimal space-y-3 pl-5 text-sm leading-7">{recipe.steps.map((step, i) => <li key={i}>{step}</li>)}</ol></section><section className="border-t border-primary/20 pt-3"><h3 className="font-serif text-primary">{benefit.luck}</h3><p className="mt-2 text-sm leading-7">{recipe.luck}</p></section></div>}<Button variant="outline" onClick={() => setRecipeIndex(null)}>{benefit.close}</Button></DialogContent></Dialog>
+      <Dialog open={recipe !== null} onOpenChange={v => { if (!v) setRecipeIndex(null); }}><DialogContent className="max-h-[85dvh] w-[calc(100%-1.5rem)] max-w-lg min-w-0 overflow-x-hidden overflow-y-auto border-primary/35 bg-card text-foreground [overflow-wrap:anywhere]"><DialogHeader className="text-left"><DialogTitle className="flex items-center gap-2 font-serif text-primary"><ChefHat className="size-5 shrink-0" />{recipe?.name}</DialogTitle><DialogDescription>{servingsLabel[language]} · {benefit.recipeNote}</DialogDescription></DialogHeader>{recipe && <div className="space-y-5 text-left"><section className="recipe-ingredients"><h3 className="mb-2 text-center font-serif text-primary">{benefit.ingredients}</h3><ul className="space-y-1 text-sm">{recipe.ingredients.map(item => <li key={item} className="border-b border-primary/10 py-1">{item}</li>)}</ul></section><section><h3 className="mb-2 font-serif text-primary">{benefit.steps}</h3><ol className="list-decimal space-y-3 pl-5 text-sm leading-7">{recipe.steps.map((step, i) => <li key={i}>{step}</li>)}</ol></section><section className="border-t border-primary/20 pt-3"><h3 className="font-serif text-primary">{benefit.luck}</h3><p className="mt-2 text-sm leading-7">{recipe.luck}</p></section></div>}<Button variant="outline" onClick={() => setRecipeIndex(null)}>{benefit.close}</Button></DialogContent></Dialog>
       <Dialog open={sample !== null} onOpenChange={(v) => !v && setSample(null)}>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 sm:max-w-lg">
           <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{consultationUxCopy[language].sample}</DialogDescription><DialogTitle className="font-serif text-xl">{sample ? L(titles[sample]) : ""}</DialogTitle></DialogHeader>
           <div className="text-left text-foreground">
             <p data-sample-intro className="text-sm leading-7">{access.sample}</p>
-            <div className="relative mt-4 h-36 overflow-hidden rounded-md border border-primary/15">
-              <p className="p-3 text-sm leading-7" aria-hidden="true">{sample ? todaySample(sample, language) : ""}</p>
-              <div className="pointer-events-none absolute inset-0 bg-background/60 backdrop-blur-md" aria-hidden="true" />
-              <div className="absolute inset-0 flex items-center justify-center gap-2 px-3 text-xs text-primary"><LockKeyhole className="size-4 shrink-0" />{consultationUxCopy[language].continuation}</div>
+            <div className="mt-4 rounded-md border border-primary/15 bg-card p-3">
+              <p className="whitespace-pre-line text-sm leading-7">{sample ? todaySample(sample, language) : ""}</p>
             </div>
           </div>
           <p className="text-sm text-primary">{ja ? `${names[sampleMin]}になると、これが毎日・詳細に占えます。` : `With ${names[sampleMin]}, this arrives daily in detail.`}</p>
