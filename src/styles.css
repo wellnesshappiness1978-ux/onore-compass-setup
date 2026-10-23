@@ -154,7 +154,7 @@
 .sacred-modal > :not(.sacred-modal-close) { grid-column: 1; }
 .sacred-modal > :first-child { grid-row: 1; }
 .sacred-accordion-content { animation-duration: 300ms; }
-.mandala-masterpiece, img { touch-action: manipulation; }
+html, body, .app-content, .design-canvas, .design-main, .mandala-masterpiece, img, canvas { touch-action: auto; }
 .sacred-disclosure-scroll { max-height: 65dvh; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; overflow-wrap: anywhere; }
 @media (prefers-reduced-motion: reduce) { .sacred-modal, .sacred-overlay, .sacred-accordion-content { animation: none !important; transition: none !important; } }
 .agolmen-story-dialog {
@@ -267,7 +267,7 @@
 }
 
 @utility text-gradient-gold {
-  background-image: linear-gradient(120deg, var(--gold-glow), var(--primary), var(--gold-deep));
+  background-image: linear-gradient(120deg, var(--gold-glow), var(--primary), var(--gold-glow));
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -1368,25 +1368,23 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 /* Bounded daily grids: scrollable tables must never widen their parent track. */
 .design-main, .tab-content, #day-compass, .daily-card-grid > *, .daily-life-guide section { min-width: 0; max-width: 100%; box-sizing: border-box; }
 #day-compass > section, #day-compass > div:not(.compass-wheel) { min-width: 0; max-width: 100%; }
-.mobile-fixed-header { top: var(--preview-bar-height); height: calc(56px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); }
-.mobile-fixed-header > .subject-goal-badge { width: min(620px, calc(100vw - 300px)); max-width: 100%; grid-column: 2; }
-.mobile-fixed-header > button:first-child { justify-self: start; }
+.mobile-fixed-header { top: var(--preview-bar-height); height: calc(100px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); grid-template-columns: minmax(40px,1fr) auto; grid-template-rows: 50px 44px; gap: 0 4px; padding-bottom: 6px; }
+.mobile-fixed-header > .subject-goal-badge { grid-row: 2; grid-column: 1 / -1; width: min(680px, 100%); max-width: 100%; justify-self: center; }
+.mobile-fixed-header > button:first-child { grid-row: 1; grid-column: 1; justify-self: start; }
+.mobile-fixed-header > div:last-child { grid-row: 1; grid-column: 2; justify-self: end; }
 .subject-goal-badge button { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
 @media (max-width: 899px) {
-  .mobile-fixed-header { height: calc(98px + env(safe-area-inset-top)); grid-template-columns: auto minmax(0,1fr) auto; grid-template-rows: 50px 40px; row-gap: 2px; padding-bottom: 6px; }
-  .mobile-fixed-header > button:first-child { grid-row: 1; grid-column: 1; }
-  .mobile-fixed-header > div:last-child { grid-row: 1; grid-column: 3; }
-  .mobile-fixed-header > .subject-goal-badge { grid-row: 2; grid-column: 1 / 4; justify-self: stretch; width: auto; max-width: none; min-height: 36px; font-size: 11px; }
+  .mobile-fixed-header > .subject-goal-badge { min-height: 38px; font-size: 11px; }
   body:has(.design-canvas) .account-controls, .design-canvas .language-controls { top: calc(var(--preview-bar-height) + 106px + env(safe-area-inset-top)) !important; }
   .design-canvas .design-header { padding-top: calc(146px + env(safe-area-inset-top)) !important; }
   .design-canvas:not([data-tab=home]) .design-header { height: calc(146px + env(safe-area-inset-top)) !important; }
   html { scroll-padding-top: calc(var(--preview-bar-height) + 112px + env(safe-area-inset-top)) !important; }
 }
-html { scroll-padding-top: calc(var(--preview-bar-height) + 72px + env(safe-area-inset-top)); }
-body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 64px + env(safe-area-inset-top)); left: 12px; right: auto; max-width: calc(100vw - 160px); }
-.design-canvas .language-controls { top: calc(var(--preview-bar-height) + 64px + env(safe-area-inset-top)); right: 12px; }
-.design-canvas .design-header { padding-top: calc(104px + env(safe-area-inset-top)); }
-.design-canvas:not([data-tab=home]) .design-header { height: calc(104px + env(safe-area-inset-top)); border: 0; }
+html { scroll-padding-top: calc(var(--preview-bar-height) + 112px + env(safe-area-inset-top)); }
+body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 106px + env(safe-area-inset-top)); left: 12px; right: auto; max-width: calc(100vw - 160px); }
+.design-canvas .language-controls { top: calc(var(--preview-bar-height) + 106px + env(safe-area-inset-top)); right: 12px; }
+.design-canvas .design-header { padding-top: calc(146px + env(safe-area-inset-top)); }
+.design-canvas:not([data-tab=home]) .design-header { height: calc(146px + env(safe-area-inset-top)); border: 0; }
 .design-canvas:not([data-tab=home]) .design-header > div { display: none; }
 
 @media (max-width: 767px) {
@@ -1466,3 +1464,10 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 .lucky-readable :where(p, li, span) { overflow-wrap: anywhere; min-width: 0; }
 .lucky-readable .text-primary { color: var(--primary); }
 .lucky-readable .text-foreground { color: var(--foreground); }
+
+/* Opaque, theme-aware heading ink avoids dark gradient tails and heavy outlines. */
+.design-canvas :is(h1,h2,h3,h4,h5,h6) { color: var(--foreground); text-shadow: none; -webkit-text-stroke: 0; letter-spacing: 0; }
+.design-canvas :is(.text-gradient-gold,.arts-shimmer) { background: none; color: var(--primary); -webkit-text-fill-color: var(--primary); text-shadow: none; }
+.lucky-color-chip { background: var(--daily-color); box-shadow: 0 0 22px color-mix(in srgb, var(--daily-color) 45%, transparent), inset 0 0 0 2px color-mix(in srgb, var(--foreground) 35%, transparent); }
+.lucky-color-surface { background: linear-gradient(120deg, color-mix(in srgb, var(--daily-color) 16%, var(--card)), var(--card) 75%); border-color: color-mix(in srgb, var(--daily-color) 55%, var(--border)); }
+.recipe-ingredients { width: 100%; max-width: 28rem; margin-inline: auto; }

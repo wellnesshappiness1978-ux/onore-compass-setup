@@ -478,6 +478,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
                 <div className="relative flex flex-col items-center gap-2 text-center">
                   <LockKeyhole className="size-5 text-primary" />
                   {teaser[id] && <p className="text-sm font-medium text-foreground">✦ {teaser[id]}</p>}
+                  {plan === "free" && <p className="w-full whitespace-pre-line text-left text-sm leading-7 text-foreground">{todaySample(id, language)}</p>}
                   <p className="text-xs text-muted-foreground">{ja ? `${names[min]}以上でお楽しみいただけます` : `Enjoy with ${names[min]} or higher`}</p>
                   <div className="flex flex-wrap justify-center gap-2">
                     <Button size="sm" variant="outline" className="border-primary/40" onClick={() => setSample(id)}><Eye className="size-3.5" />{ja ? "サンプルを見る" : "See sample"}</Button>
@@ -499,10 +500,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
           <DialogHeader className="text-left"><DialogDescription className="text-xs text-primary">{consultationUxCopy[language].sample}</DialogDescription><DialogTitle className="font-serif text-xl">{sample ? L(titles[sample]) : ""}</DialogTitle></DialogHeader>
           <div className="text-left text-foreground">
             <p data-sample-intro className="text-sm leading-7">{access.sample}</p>
-            <div className="relative mt-4 h-36 overflow-hidden rounded-md border border-primary/15">
-              <p className="p-3 text-sm leading-7" aria-hidden="true">{sample ? todaySample(sample, language) : ""}</p>
-              <div className="pointer-events-none absolute inset-0 bg-background/60 backdrop-blur-md" aria-hidden="true" />
-              <div className="absolute inset-0 flex items-center justify-center gap-2 px-3 text-xs text-primary"><LockKeyhole className="size-4 shrink-0" />{consultationUxCopy[language].continuation}</div>
+            <div className="mt-4 rounded-md border border-primary/15 bg-card p-3">
+              <p className="whitespace-pre-line text-sm leading-7">{sample ? todaySample(sample, language) : ""}</p>
             </div>
           </div>
           <p className="text-sm text-primary">{ja ? `${names[sampleMin]}になると、これが毎日・詳細に占えます。` : `With ${names[sampleMin]}, this arrives daily in detail.`}</p>

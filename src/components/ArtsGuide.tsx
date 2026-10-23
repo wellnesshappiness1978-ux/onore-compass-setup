@@ -58,10 +58,10 @@ export function ArtsGuide({ language = "ja" }: { language?: Language }) {
           <span className="text-primary/90" style={{ fontSize: 10 }}>✦</span>
           <span className="h-px w-14 bg-gradient-to-l from-transparent to-primary/60" />
         </div>
-        <h3 className="arts-rise relative mt-4 font-serif text-3xl" style={{ animationDelay: "0.15s", textShadow: "0 0 24px color-mix(in oklab, var(--gold-glow) 35%, transparent)" }}>
+        <h3 className="arts-rise relative mx-auto mt-4 max-w-2xl text-left font-serif text-2xl leading-relaxed sm:text-3xl" style={{ animationDelay: "0.15s" }}>
           <span className="arts-shimmer">{words.originTitle}</span>
         </h3>
-        <div className="relative mx-auto mt-4 max-w-2xl space-y-4 font-serif text-base leading-normal text-foreground/90 md:mt-8 md:space-y-6 md:text-2xl md:leading-[2.1]">
+        <div className="relative mx-auto mt-5 max-w-2xl space-y-5 text-left font-serif text-base leading-[1.9] text-foreground md:mt-8 md:space-y-6 md:text-xl md:leading-[2.1]">
           {language === "ja" ? <div className="arts-rise space-y-4 md:space-y-6" style={{ animationDelay: "0.3s" }}>{jaWelcome.map((para, i) => <p key={i} className="whitespace-pre-line">{para}</p>)}</div> : <p className="arts-rise" style={{ animationDelay: "0.3s" }}>{words.origin}</p>}
           <div className="flex items-center justify-center gap-3 pt-2" aria-hidden>
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-primary/50" />
