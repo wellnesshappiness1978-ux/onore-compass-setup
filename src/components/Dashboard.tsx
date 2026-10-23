@@ -605,8 +605,8 @@ function FocusedTraits({ language, render, plan, onUpgrade }: { language: Langua
   if (!ctx) return null;
   const t = focusCopy[language];
   const goal = goalText(ctx.focus, language);
-  if (ctx.group) return <SubjectVoice language={language}><SubjectBanner language={language} /><GroupFocusCard language={language} plan={plan} onUpgrade={onUpgrade} /><GroupMembersToday language={language} /></SubjectVoice>;
-  return <SubjectVoice language={language}><SubjectBanner language={language} />{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</SubjectVoice>;
+  if (ctx.group) return <SubjectVoice language={language}><GroupFocusCard language={language} plan={plan} onUpgrade={onUpgrade} /><GroupMembersToday language={language} /></SubjectVoice>;
+  return <SubjectVoice language={language}>{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</SubjectVoice>;
 }
 function FocusedArt({ language, owner, plan, render }: { language: Language; owner: UserProfile; plan: Plan; render: (p: UserProfile, subject?: ArtSubject) => ReactNode }) {
   const ctx = useFocus();
@@ -618,7 +618,7 @@ function FocusedArt({ language, owner, plan, render }: { language: Language; own
 function FocusedToday({ language, render, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void; render: (p: UserProfile) => ReactNode }) {
   const ctx = useFocus();
   if (!ctx) return null;
-  return <SubjectVoice language={language}><SubjectBanner language={language} /><SubjectDailyNote language={language} />{ctx.group && <GroupMembersToday language={language} />}{render(ctx.readingProfile)}</SubjectVoice>;
+  return <SubjectVoice language={language}><SubjectDailyNote language={language} />{ctx.group && <GroupMembersToday language={language} />}{render(ctx.readingProfile)}</SubjectVoice>;
 }
 
 export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
