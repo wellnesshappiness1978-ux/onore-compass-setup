@@ -30,13 +30,19 @@ function colorIcon(color?: string) {
 
 type Entry = { title: string; body: string; color?: string | undefined };
 const registry = new Map<string, Entry>();
+const liveEntries = new Map<symbol, { id: string; entry: Entry }>();
+function syncEntries() {
+  registry.clear();
+  for (const { id, entry } of liveEntries.values()) registry.set(id, entry);
+  setPushEntries(Object.fromEntries([...fallbacks, ...registry].map(([id, e]) => [id, { title: e.title, body: e.body }])));
+}
 /** Allowed catalogue survives tab navigation; live Today content wins when present. */
 const fallbacks = new Map<string, Entry>();
 export function registerReminderFallbacks(entries: Record<string, Entry>): () => void {
   migrateEveningReminder();
   fallbacks.clear();
   for (const [id, entry] of Object.entries(entries)) fallbacks.set(id, entry);
-  setPushEntries(Object.fromEntries(Object.entries(entries).map(([id, e]) => [id, { title: e.title, body: e.body }])));
+  syncEntries();
   startScheduler();
   return () => { fallbacks.clear(); if (timer) clearInterval(timer); timer = null; };
 }
@@ -75,11 +81,11 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
   const save = (next: Setting) => { setS(next); try { localStorage.setItem(KEY, JSON.stringify({ ...readAll(), [id]: next })); window.dispatchEvent(new Event("onore-notify-change")); } catch { /* storage disabled */ } };
 
   useEffect(() => {
-    const map = registry;
-    if (disabled) { map.delete(id); return; }
-    map.set(id, { title, body, color });
-    startScheduler();
-    return () => { map.delete(id); };
+    if (disabled) return;
+    const owner = Symbol(id);
+    liveEntries.set(owner, { id, entry: { title, body, color } });
+    syncEntries(); startScheduler();
+    return () => { liveEntries.delete(owner); syncEntries(); };
   }, [id, title, body, disabled, color, variant]);
   useEffect(() => { const f = () => setPushed(Boolean(pushToken())); f(); window.addEventListener('onore-push-change', f); return () => window.removeEventListener('onore-push-change', f); }, []);
   const pushMsg = (r: PushResult) => r === 'registered' ? '' : r === 'signin' ? t.signin : r === 'open-in-new-tab' ? t.tab : r === 'unsupported' ? t.unsupported : r === 'denied' ? t.helpBody : '';

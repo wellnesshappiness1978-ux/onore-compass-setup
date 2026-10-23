@@ -23,6 +23,8 @@ import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
 import { groupColorMeaning, groupDayLine, groupInsightCopy, SELF_MEMBER_ID } from "@/lib/group-insight";
 
+import { reminderUiCopy } from '@/lib/reminder-ui-copy';
+
 const mainColor = (m: TeamMember) => birthColorSpectrum(memberToProfile(m))?.main ?? null;
 
 /** Settings card: goal + main subject. */
@@ -63,11 +65,11 @@ export function SubjectHeaderBadge({ language, ownerName, onOpen }: { language: 
   const ctx = useFocus();
   if (!ctx) return <span aria-hidden="true" />;
   const t = focusCopy[language];
-  const icon = ctx.group ? "👥" : ctx.member ? "👨‍👩‍👧" : "👤";
   const self = selfReadingLabel[language];
   const who = ctx.group ? (subjectWord(ctx, language) ?? ctx.label(language)) : ctx.member ? `${subjectWord(ctx, language) ?? ctx.label(language)}（${t.family}）` : `${self}${ownerName ? `（${ownerName}）` : ""}`;
-  const fullName = ownerName.trim().replace(/[\s　]+/g, " ");
-  return <Button variant="ghost" type="button" onClick={onOpen} title={t.cardTitle} aria-label={t.viewing(who)} className="mx-auto flex min-h-10 min-w-0 max-w-full items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 text-xs font-bold text-primary"><span aria-hidden="true">{icon}</span><span className="truncate">{t.viewing("")}{ctx.group || ctx.member ? who : (fullName ? `${self}・${fullName}` : self)}</span></Button>;
+  const goal = goalText(ctx.focus, language) || reminderUiCopy[language].free;
+  const subject = ctx.group || ctx.member ? who : self;
+  return <Button variant="ghost" type="button" onClick={onOpen} title={`${t.viewing(subject)} ｜ ${reminderUiCopy[language].goal}：${goal}`} aria-label={`${t.viewing(subject)} ｜ ${reminderUiCopy[language].goal}：${goal}`} className="subject-goal-badge mx-auto grid min-h-10 min-w-0 max-w-full grid-cols-2 items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-2 text-xs font-bold text-primary"><span className="min-w-0 truncate text-center">{t.viewing(subject)}</span><span className="min-w-0 truncate border-l border-primary/30 pl-2 text-center">{reminderUiCopy[language].goal}：{goal}</span></Button>;
 }
 
 /** Small strip showing the current subject with a way back to self. */
