@@ -322,46 +322,75 @@ function drawGroupComposition(context: CanvasRenderingContext2D, image: HTMLImag
   });
 }
 
-/** Glaze existing painted detail, then add filled pigment motifs, never vector outlines. */
-function drawVariableFinish(context: CanvasRenderingContext2D, image: HTMLImageElement, size: number, top: number, design: MandalaDesign) {
+function hexAlpha(hex: string, alpha: number) {
+  const m = /^#([\da-f]{6})$/i.exec(hex); const v = m?.[1] ?? 'E8C86A';
+  return `rgba(${parseInt(v.slice(0, 2), 16)},${parseInt(v.slice(2, 4), 16)},${parseInt(v.slice(4, 6), 16)},${alpha})`;
+}
+
+/** Strictly radially symmetric luminous finish: soft aura, concentric light rings,
+ * a flower-of-life / vesica circle lattice with N crossings, motif-shaped gem halo
+ * and deterministic particles. No asymmetric wedges, so the painting's symmetry is kept. */
+function drawVariableFinish(context: CanvasRenderingContext2D, _image: HTMLImageElement, size: number, top: number, design: MandalaDesign) {
   const cx = size / 2, cy = top + size / 2;
+  const main = design.pigments[0] ?? GOLD, soul = design.pigments[1] ?? main;
   context.save();
-  context.globalCompositeOperation = 'color';
-  design.pigments.forEach((color, i) => {
-    context.save();
-    context.beginPath(); context.moveTo(cx, cy);
-    context.arc(cx, cy, size * .7, design.rotation + i / design.pigments.length * Math.PI * 2, design.rotation + (i + 1) / design.pigments.length * Math.PI * 2); context.closePath(); context.clip();
-    context.globalAlpha = i < 3 ? .68 : .38; context.fillStyle = color;
-    context.fillRect(0, top, size, size); context.restore();
-  });
-  context.restore();
-  const n = design.nodes, ring = size * .29;
-  for (let i = 0; i < n; i++) {
-    const angle = design.rotation + i / n * Math.PI * 2;
-    const r = size * Math.min(.057, .38 / n);
-    context.save(); context.translate(cx + Math.cos(angle) * ring, cy + Math.sin(angle) * ring); context.rotate(angle);
-    context.beginPath();
-    if (design.motif === 'petal') context.ellipse(0, 0, r * .62, r * 1.5, 0, 0, Math.PI * 2);
-    else {
-      const sides = design.motif === 'star' ? 10 : design.motif === 'crystal' ? 4 : 6;
-      for (let j = 0; j < sides; j++) {
-        const a = j / sides * Math.PI * 2;
-        const extent = design.motif === 'star' && j % 2 ? r * .42 : r;
-        const x = Math.cos(a) * extent, y = Math.sin(a) * extent;
-        if (j === 0) context.moveTo(x, y); else context.lineTo(x, y);
-      }
-      context.closePath();
-    }
-    context.clip();
-    // Oil texture is sampled from the original master inside the new silhouette.
-    const pigment = design.pigments[i % design.pigments.length] ?? GOLD;
-    context.drawImage(paintGemSurface(pigment), -r * 1.3, -r * 1.7, r * 2.6, r * 3.4);
-    context.globalCompositeOperation = 'multiply'; context.globalAlpha = .26;
-    context.drawImage(image, -.5 * size, -.5 * size, size, size);
-    context.globalCompositeOperation = 'screen'; context.globalAlpha = .12;
-    const light = context.createLinearGradient(-r, -r, r, r); light.addColorStop(0, GOLD); light.addColorStop(.4, 'rgba(232,200,106,0)'); light.addColorStop(1, 'rgba(232,200,106,.45)');
-    context.fillStyle = light; context.fillRect(-r * 2, -r * 2, r * 4, r * 4); context.restore();
+  // Background aura in the soul color, gentle and centered.
+  context.globalCompositeOperation = 'soft-light';
+  const aura = context.createRadialGradient(cx, cy, size * .05, cx, cy, size * .5);
+  aura.addColorStop(0, hexAlpha(soul, .55)); aura.addColorStop(.6, hexAlpha(main, .22)); aura.addColorStop(1, hexAlpha(soul, 0));
+  context.fillStyle = aura; context.fillRect(0, top, size, size);
+  context.globalCompositeOperation = 'screen';
+  // Concentric rings of light: 2–4 layers from life path.
+  const layers = 2 + design.lifePath % 3;
+  for (let k = 0; k < layers; k++) {
+    const r = size * (.12 + k * (.26 / layers));
+    const g = context.createRadialGradient(cx, cy, r * .97, cx, cy, r * 1.03);
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(.5, hexAlpha(k % 2 ? soul : GOLD, .22)); g.addColorStop(1, 'rgba(0,0,0,0)');
+    context.fillStyle = g; context.beginPath(); context.arc(cx, cy, r * 1.04, 0, Math.PI * 2); context.fill();
   }
+  // Flower-of-life lattice: N equal circles through the center (vesica crossings).
+  const n = Math.max(6, design.nodes), petal = size * .085;
+  context.lineWidth = Math.max(1, size * .0016);
+  context.strokeStyle = hexAlpha(GOLD, .26);
+  context.shadowColor = hexAlpha(main, .6); context.shadowBlur = size * .006;
+  for (let i = 0; i < n; i++) {
+    const a = design.rotation + i / n * Math.PI * 2;
+    context.beginPath(); context.arc(cx + Math.cos(a) * petal, cy + Math.sin(a) * petal, petal, 0, Math.PI * 2); context.stroke();
+  }
+  context.shadowBlur = 0;
+  // Motif-shaped halo behind the center gem (star / petal / crystal / hexagon).
+  const sides = design.motif === 'star' ? 16 : design.motif === 'crystal' ? 8 : design.motif === 'hexagon' ? 6 : 12;
+  const hr = size * .062;
+  const halo = context.createRadialGradient(cx, cy, 0, cx, cy, hr);
+  halo.addColorStop(0, hexAlpha(main, .55)); halo.addColorStop(1, hexAlpha(main, 0));
+  context.fillStyle = halo; context.beginPath();
+  for (let j = 0; j < sides; j++) {
+    const a = design.rotation + j / sides * Math.PI * 2;
+    const e = design.motif === 'star' && j % 2 ? hr * .5 : design.motif === 'petal' && j % 2 ? hr * .78 : hr;
+    const x = cx + Math.cos(a) * e, y = cy + Math.sin(a) * e;
+    if (j === 0) context.moveTo(x, y); else context.lineTo(x, y);
+  }
+  context.closePath(); context.fill();
+  // Symmetric node jewels on the outer lattice ring.
+  const ring = size * .29;
+  for (let i = 0; i < n; i++) {
+    const a = design.rotation + i / n * Math.PI * 2, x = cx + Math.cos(a) * ring, y = cy + Math.sin(a) * ring, r = size * Math.min(.012, .16 / n);
+    const glow = context.createRadialGradient(x, y, 0, x, y, r * 3);
+    glow.addColorStop(0, hexAlpha(i % 2 ? soul : main, .7)); glow.addColorStop(1, 'rgba(0,0,0,0)');
+    context.fillStyle = glow; context.beginPath(); context.arc(x, y, r * 3, 0, Math.PI * 2); context.fill();
+  }
+  // Deterministic fine particles, mirrored N-fold.
+  let seed = Math.round(design.rotation * 1000) + design.lifePath * 97;
+  const rand = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (let p = 0; p < 18; p++) {
+    const d = size * (.1 + rand() * .34), off = rand() * Math.PI * 2 / n, pr = size * (.0015 + rand() * .0025);
+    for (let i = 0; i < n; i++) {
+      const a = design.rotation + off + i / n * Math.PI * 2;
+      context.fillStyle = hexAlpha(p % 3 ? GOLD : soul, .5);
+      context.beginPath(); context.arc(cx + Math.cos(a) * d, cy + Math.sin(a) * d, pr, 0, Math.PI * 2); context.fill();
+    }
+  }
+  context.restore();
 }
 
 /** Compose the painting + personal finish into the given square context.

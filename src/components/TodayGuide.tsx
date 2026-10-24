@@ -450,8 +450,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <details className="mt-3 border-t border-primary/20 pt-3"><summary className="cursor-pointer text-sm text-primary">{benefit.catalogue}</summary><ol className="mt-2 grid gap-1 text-xs sm:grid-cols-2">{todayBenefitCategories.map((c, i) => <li key={c.id} className={rank(plan) >= rank(c.min) ? "text-foreground" : "text-muted-foreground"}>{i + 1}. {benefit[c.id as keyof typeof benefit]} · {names[c.min]}</li>)}</ol></details>
         {higherBenefits.length > 0 && <div className="mt-3 space-y-2 border-t border-primary/20 pt-3"><h4 className="text-xs text-primary">{benefit.higher}</h4>{higherBenefits.map(({tier, categories}) => <p key={tier} className="text-xs leading-6"><strong className="text-primary">{names[tier]}</strong>：{categories.map(c => benefit[c.id as keyof typeof benefit]).join(" / ")}</p>)}</div>}
       </section>
-      <TodayCard id="today-insight" title={ja ? "今日だけの深層リーディング" : "Today's deep reading"}>
-        <h3 className="mb-3 flex items-center gap-2 font-serif text-lg text-foreground"><Sparkles className="size-4 text-primary" />{ja ? "今日だけの深層リーディング" : "Today's deep reading"}</h3>
+      <TodayCard id="today-insight" defaultOpen title={ja ? "今日だけの深層リーディング" : "Today's deep reading"} summary={<h3 className="flex items-center gap-2 font-serif text-lg text-foreground"><Sparkles className="size-4 text-primary" />{ja ? "今日だけの深層リーディング" : "Today's deep reading"}</h3>}>
         <p className="mb-4 text-base font-medium tabular-nums text-primary">{readingDate(iso, language)}</p>
         <TodayInsight state={fortune} language={language} />
         <FeatureNotifySwitch id="insight" title={`🔮 ${ja ? "今日の深層リーディング" : "Today's deep reading"}`} body={fortune.data?.headline ?? (ja ? "今日だけのメッセージが届いています" : "Your message for today is ready")} language={language} />
@@ -461,11 +460,11 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         const Icon = icons[id];
         const lucky = id === "dailyLucky" && open;
         return (<Fragment key={id}>
-          <TodayCard id={`today-${id}`} className={lucky ? "lucky-readable shadow-champagne" : ""} title={L(titles[id])}>
-            <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+          <TodayCard id={`today-${id}`} className={lucky ? "lucky-readable shadow-champagne" : ""} title={L(titles[id])} summary={
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
               <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className={`min-w-0 break-words ${lucky ? "font-semibold" : ""}`}>{L(titles[id])}</span></h3>
               {!open && <span className="shrink-0 rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">{names[min]}+</span>}
-            </div>
+            </div>}>
             {open ? <>{content[id].body}{id === "starPath" || id === "helio" ? renderDepth(id) : id === "biorhythm365" ? <>{canReadThreeWaves(plan) ? renderDepth("biorhythm") : <div className="mt-3 border-t border-primary/25 pt-3"><p className="text-sm text-primary">{access.waves}</p><Button variant="outline" onClick={onUpgrade}><LockKeyhole className="size-4" />{access.plans}</Button></div>}{renderDepth("family")}</> : null}</> : (
               <div className="relative overflow-hidden rounded-md border border-primary/20 p-3">
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-champagne-gradient opacity-10 blur-sm" />
