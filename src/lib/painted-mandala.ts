@@ -354,11 +354,11 @@ function drawVariableFinish(context: CanvasRenderingContext2D, image: HTMLImageE
     }
     context.clip();
     // Oil texture is sampled from the original master inside the new silhouette.
+    const pigment = design.pigments[i % design.pigments.length] ?? GOLD;
+    context.drawImage(paintGemSurface(pigment), -r * 1.3, -r * 1.7, r * 2.6, r * 3.4);
+    context.globalCompositeOperation = 'multiply'; context.globalAlpha = .26;
     context.drawImage(image, -.5 * size, -.5 * size, size, size);
-    context.globalCompositeOperation = 'color'; context.globalAlpha = .9;
-    context.fillStyle = design.pigments[i % design.pigments.length] ?? GOLD;
-    context.fillRect(-r * 2, -r * 2, r * 4, r * 4);
-    context.globalCompositeOperation = 'screen'; context.globalAlpha = .28;
+    context.globalCompositeOperation = 'screen'; context.globalAlpha = .12;
     const light = context.createLinearGradient(-r, -r, r, r); light.addColorStop(0, GOLD); light.addColorStop(.4, 'rgba(232,200,106,0)'); light.addColorStop(1, 'rgba(232,200,106,.45)');
     context.fillStyle = light; context.fillRect(-r * 2, -r * 2, r * 4, r * 4); context.restore();
   }
