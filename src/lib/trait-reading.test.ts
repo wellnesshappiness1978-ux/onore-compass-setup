@@ -32,7 +32,12 @@ describe("distinct personal reading contract", () => {
     for (const copy of Object.values(traitReadingCopy)) { expect(copy.catchphrase).toBeTruthy(); expect(copy.symbolic).toBeTruthy(); }
   });
   it("keeps plain speech, non-repetition, source boundaries and actionable closure", () => {
-    for (const text of ["No headings or method names", "different central observation", "everyday analogies", "Missing context MUST be empty", "all sixteen fixed keys", "tomorrow's first step", "not evidence of upbringing"]) expect(traitReadingPrompt).toContain(text);
+    for (const text of ["No headings or method names", "different central observation", "everyday analogies", "Missing context MUST be empty", "all sixteen fixed keys", "not evidence of upbringing"]) expect(traitReadingPrompt).toContain(text);
+  });
+  it("derives the grand diagnosis directly from four elements and bans roundabout micro-instructions", () => {
+    for (const text of ["FUNDAMENTAL NATURE", "ABSOLUTE STRENGTHS", "PITFALLS", "GUIDELINES FOR A HAPPY LIFE", "STRICTLY FORBIDDEN"]) expect(traitReadingPrompt).toContain(text);
+    for (const banned of ["五分だけ", "三分", "メモに書いて"]) expect(traitReadingPrompt).toContain(banned);
+    expect(traitReadingPrompt).not.toContain("tomorrow's first step");
   });
   it("bans repeated 「〜読みです」 endings and requires varied warm closings", () => {
     expect(traitReadingPrompt).toContain("〜読みです");
