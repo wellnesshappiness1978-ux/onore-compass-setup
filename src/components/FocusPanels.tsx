@@ -114,10 +114,8 @@ export function GroupFocusCard({ language, plan, onUpgrade }: { language: Langua
     for (let i = 0; i < g.members.length; i++) for (let j = i + 1; j < g.members.length; j++) pairList.push({ a: g.members[i]!, b: g.members[j]!, score: pairScore(g.members[i]!, g.members[j]!) });
     pairList.sort((x, y) => y.score - x.score);
     const harmony = pairList.length ? Math.round(pairList.reduce((a, p) => a + p.score, 0) / pairList.length) : null;
-    const today = new Date().toLocaleDateString("en-CA");
-    const rhythms = g.members.map(m => ({ m, r: biorhythm(m.birthDate, today) })).sort((x, y) => y.r.total - x.r.total);
-    const rhythm = rhythms.length ? Math.round(rhythms.reduce((a, x) => a + x.r.total, 0) / rhythms.length) : null;
-    return { colors, groupHex, harmony, rhythm, pairList, rhythms };
+    // Date-dependent rhythm content lives in the Today tab (GroupMembersToday); Traits keeps timeless structure only.
+    return { colors, groupHex, harmony, pairList };
   }, [g]);
   if (!g || !stats) return null;
   const name = groupDisplayName(g.group, g.index, language);
@@ -128,9 +126,8 @@ export function GroupFocusCard({ language, plan, onUpgrade }: { language: Langua
     {!g.members.length ? <p className="mt-3 text-sm text-muted-foreground">{t.groupEmpty}</p> : <>
       {stats.groupHex && <div className="mt-4 rounded-md p-4" style={{ background: `linear-gradient(135deg, ${stats.groupHex}, ${stats.groupHex}66)` }}><p className="text-xs font-bold text-outline text-foreground">{t.groupColor}</p><p className="mt-1 font-serif text-2xl font-bold text-outline text-foreground">{name} · {localizeBirthColorName(birthColorNameForHex(stats.groupHex), language)}</p><p className="mt-1 font-mono text-sm font-bold text-outline text-foreground">{stats.groupHex.toUpperCase()}</p></div>}
       <GroupSevenColors language={language} plan={plan} onUpgrade={onUpgrade} members={g.members} />
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-4 grid gap-3">
         <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupHarmony}</p><p className="font-serif text-2xl text-primary">{stats.harmony ?? "—"}{stats.harmony !== null && <span className="text-sm">/100</span>}</p></div>
-        <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupRhythm}</p><p className="font-serif text-2xl text-primary">{stats.rhythm ?? "—"}<span className="text-sm">/100</span></p></div>
       </div>
       {stats.groupHex && (() => { const gm = groupColorMeaning(stats.groupHex, language); const gi = groupInsightCopy[language]; const gd = groupDepthCopy[language]; const n = g.members.length; const panel = "group rounded-md border border-primary/25"; const head = "flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden"; const body = "border-t border-primary/15 px-3 pb-3 pt-2 text-sm leading-7"; return <>
         <div className="mt-3 rounded-md border border-primary/25 p-3 text-sm leading-6"><p className="font-serif text-lg font-bold text-primary">{gm.name}</p><dl className="mt-2 space-y-2"><div><dt className="text-xs font-bold text-primary">{gi.essence}</dt><dd>{gm.essence}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.energy}</dt><dd>{gm.energy}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.role}</dt><dd>{gm.role}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.advice}</dt><dd>{gm.advice}</dd></div></dl></div>
