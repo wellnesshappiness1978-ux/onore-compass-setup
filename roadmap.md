@@ -167,3 +167,10 @@
 - [x] core-layers computes the 立春-based year branch (eastern layer); sign/branch symbolism flows into AI prompts as illustrative metaphor
 - [x] Optional father/mother birth date + linked birthplace (shared ParentFields) on onboarding, profile editor and family roster; stored as `parents` jsonb on profiles/team_members; birthColorSpectrum blends parent slots (own dominant, each parent a quarter) with parentInfluence flag; group palettes and mandala art follow automatically
 - [x] 250 tests pass (new zodiac-signs and birth-color-spectrum tests), tsgo clean, build OK; Playwright verified both method dialogs and the roster parents form
+
+## Origin centering, essence title, notice text and grand diagnosis rewrite (2026-10-24)
+- [x] "星々の引力と生命の原点" header and body restored to center alignment
+- [x] Essence title simplified to 「あなたの本質」 (removed （1〜10）)
+- [x] Settings notification guide (pause note + closed-app delivery + registration status) now always renders on mobile
+- [x] axisSummary prompt rewritten: four direct elements (nature, strengths, pitfalls, happiness guidelines); roundabout micro-instructions/analogies banned; cache bumped to full-four-elements-v5; 304 tests pass, build OK
+- [ ] "機能表示" removal inside the six-perspectives section — awaiting user clarification on which element

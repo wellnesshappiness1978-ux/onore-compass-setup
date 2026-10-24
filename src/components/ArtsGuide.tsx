@@ -58,17 +58,17 @@ export function ArtsGuide({ language = "ja" }: { language?: Language }) {
           <span className="text-primary/90" style={{ fontSize: 10 }}>✦</span>
           <span className="h-px w-14 bg-gradient-to-l from-transparent to-primary/60" />
         </div>
-        <h3 className="arts-rise relative mx-auto mt-4 max-w-2xl text-left font-serif text-2xl leading-relaxed sm:text-3xl" style={{ animationDelay: "0.15s" }}>
+        <h3 className="arts-rise relative mx-auto mt-4 max-w-2xl text-center font-serif text-2xl leading-relaxed sm:text-3xl" style={{ animationDelay: "0.15s" }}>
           <span className="arts-shimmer">{words.originTitle}</span>
         </h3>
-        <div className="relative mx-auto mt-5 max-w-2xl space-y-5 text-left font-serif text-base leading-[1.9] text-foreground md:mt-8 md:space-y-6 md:text-xl md:leading-[2.1]">
+        <div className="relative mx-auto mt-5 max-w-2xl space-y-5 text-center font-serif text-base leading-[1.9] text-foreground md:mt-8 md:space-y-6 md:text-xl md:leading-[2.1]">
           {language === "ja" ? <div className="arts-rise space-y-4 md:space-y-6" style={{ animationDelay: "0.3s" }}>{jaWelcome.map((para, i) => <p key={i} className="whitespace-pre-line">{para}</p>)}</div> : <p className="arts-rise" style={{ animationDelay: "0.3s" }}>{words.origin}</p>}
           <div className="flex items-center justify-center gap-3 pt-2" aria-hidden>
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-primary/50" />
             <span className="text-primary/80" style={{ fontSize: 9 }}>✧</span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-primary/50" />
           </div>
-          <div className="arts-rise border-t border-primary/25 pt-8 text-left" style={{ animationDelay: "0.75s" }}><h4 className="text-center font-serif text-3xl text-primary">{words.nameOrigin}</h4><p className="mt-6">{words.nameOrigin1}</p><p className="mt-5">{words.nameOrigin2}</p></div><p className="arts-rise text-lg text-primary sm:text-xl" style={{ animationDelay: "0.85s" }}>{words.summary}</p>
+          <div className="arts-rise border-t border-primary/25 pt-8 text-center" style={{ animationDelay: "0.75s" }}><h4 className="text-center font-serif text-3xl text-primary">{words.nameOrigin}</h4><p className="mt-6">{words.nameOrigin1}</p><p className="mt-5">{words.nameOrigin2}</p></div><p className="arts-rise text-lg text-primary sm:text-xl" style={{ animationDelay: "0.85s" }}>{words.summary}</p>
         </div>
       </div>
       <div className="space-y-4 border-t border-primary/20 px-4 py-4 md:space-y-6 md:px-5 md:py-6">
