@@ -13,6 +13,7 @@ import { computeExtendedArts, extendedArtsPrompt } from "@/lib/extended-arts";
 import { artPrinciplesPrompt } from "@/lib/art-overview-copy";
 import { nineStarProfile } from "@/lib/calendar-traditions";
 import { readingProfileSchema, readingSubjectSchema, profileReadingContext, profileContextInstructions } from "@/lib/profile-reading-context";
+import { deeperEssenceContext } from '../deeper-essence';
 
 const profileSchema = readingProfileSchema;
 const inputSchema = z.object({
@@ -24,6 +25,7 @@ const inputSchema = z.object({
 const readingSchema = z.object({
   catchphrase: z.string(),
   essence: z.object({ outward: z.string(), inner: z.string(), growth: z.string(), resilience: z.string(), relationships: z.string(), gift: z.string() }),
+  deeperEssence: z.object({ roots: z.string(), energy: z.string(), learning: z.string(), guidance: z.string() }),
   approaches: z.object({ western: z.string(), indian: z.string(), ziwei: z.string(), eastern: z.string(), earth: z.string(), pillars: z.string(), sanmei: z.string(), nineStars: z.string(), lunarMansion: z.string(), animal: z.string(), numerology: z.string(), maya: z.string(), color: z.string(), blood: z.string(), siblings: z.string(), region: z.string() }),
   axisSummary: z.string(),
   synthesis: z.string().min(60).max(1100),
@@ -104,6 +106,8 @@ FIVE CORE LAYERS (computed by the app; cite exact values, never recalculate, nev
 ${core}
 EXTENDED ARTS (computed by the app from the birth data; cite exact values, never recalculate):
 ${extendedArtsPrompt(extended)}
+DEEPER ESSENCE BIRTH REFERENCES:
+${JSON.stringify(deeperEssenceContext(profile, layers))}
 ${artPrinciplesPrompt}
 CROSS-ANALYSIS (required): In synthesis and strength, contrast the 表の顔 list with the 本音・潜在 list and use the [クロス解析] verdicts (一致 / ギャップ) explicitly: 日干×太陽, 人格×ソウル数, 動物×月星座. Weave in 通変星, 十二運星, 五行の最多/欠如, ライフパス, and 月・水星・金星 where they sharpen the portrait. The animal surface/hope/hidden values are an original +1/+2/+3 day reference model, NOT official animal layers; do not infer personality from them. The ascendant uses birthplace representative coordinates only when available and birth time is known. Geocentric planets and Ba Zhai directions are not birthplace-dependent. Treat these as traditional divination lenses, not scientific facts.
 BANNED hedges: "〜な面もあります", "人それぞれ", "〜かもしれません", "場合によっては", and any sentence that would fit anyone.
@@ -138,6 +142,7 @@ helioGuide: about 120 chars. State the phase explicitly and what to do in this p
 Do not mention any birth-color names, HEX codes, or color themes outside colorPractice; colorPractice is displayed behind a separate plan gate. Include a practical feng-shui environmental reflection in manualTiming when relevant: clearing a walkway before a task, adjusting glare at the desk, or choosing an entered Gua direction; never promise health, wealth or outcomes.
 FINAL NEW FIELD CONTRACT:
 ${traitReadingPrompt}
+deeperEssence: four additional rich passages roots/energy/learning/guidance, 220–360 Japanese characters each (equivalent depth in other languages), 2–3 short paragraphs. Preserve the original six essence fields unchanged. Follow the deeperEssence birth references and symbolic boundaries above. Each new field must connect at least TWO supplied personal references, include one recognizable daily scene and a distinct optional practical reflection. These four fields may name soul roots, chakras, tarot, runes and higher self as explicitly symbolic metaphors; this is the narrow exception to earlier jargon bans. Never assert a real past life, blocked body part, current mental state, external guardian contact or guaranteed future. Roots: familiar south-node pattern versus north-node invitation and available Sun/Moon/ASC/life-path/soul. Energy: discuss all seven attention windows, dominant four-element distribution and initiative/reception as birth-symbolism, not a live energy diagnosis. Learning: name the supplied major arcana and rune, interpret Maya seal/tone/wave without inventing a draw or mission. Guidance: a warm imagined higher-self message, one symbolic release question and one conditional future possibility; avoid fear, karmic debt and destiny claims. Do not repeat the six earlier passages or disclose gated birth-color codes/names.
 Availability (server-authoritative): ${JSON.stringify(approachAvailability)}.
 Nine Star reference: ${nineStars ? `honmei ${nineStars.honmei}, getsumei ${nineStars.getsumei}, keisha ${nineStars.keisha}; boundary ${nineStars.nearBoundary}; traditional reference, not measured personality or auspicious timing` : "unavailable"}.
 Supplied family context: ${profile.siblingOrder || "missing"}. Supplied birth location: ${profile.birthPlace} ${profile.birthCity}; do not infer upbringing.

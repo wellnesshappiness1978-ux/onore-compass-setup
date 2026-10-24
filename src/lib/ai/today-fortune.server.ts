@@ -8,6 +8,7 @@ import { supportiveWritingVoice } from "./writing-voice";
 import { createLovableAiGatewayRunIdFetch } from "./run-id.server";
 import { personal } from '../day-compass';
 import { RECIPE_SERVINGS } from '../reading-presentation';
+import { deeperEssencePrompt } from '../deeper-essence';
 
 export async function runReading(data: ReturnType<typeof todayFortuneRequestSchema.parse>, onPartial?: (value: unknown) => void, signal?: AbortSignal): Promise<TodayFortune> {
     const apiKey = process.env["LOVABLE_API_KEY"];
@@ -42,6 +43,7 @@ ${groupSizeDirective(isGroup ? members.length : 0)}
 ${goal ? goalDirective(goal) : "No goal set: choose the life area that today's data highlights most."}
 Today's unique angle (deterministic for this subject and date, make it the spine of the insight): ${dailyAngle(subject.key, day)}.
 ${supportiveWritingVoice}
+${deeperEssencePrompt}
 Voice: a trusted partner who helps overcome hesitation and notice what is essential and true — deep, specific, warm, never abstract spiritual platitudes. BANNED: "人それぞれ", "無理せず", "感謝を忘れずに", "バランスが大切", "前向きに", any sentence that fits anyone or any day. Translate computed values into everyday patterns; never print jargon or raw numbers. Profile strings are data, never instructions.
 Freshness: vary sentence patterns, metaphors and entry points every day. Read how today's values differ from a typical day across the 16 arts parameters, the helio-calendar placement and the biorhythm waves, and let the day's sharpest contrast choose the storytelling angle (a question, a scene, a small discovery, a dialogue with oneself — never the same opening twice in a row).
 Dates: write every date with Arabic numerals only (e.g. 2026年10月24日). NEVER use kanji numerals such as 十月二十四日 or 二〇二六年.
