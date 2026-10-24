@@ -2,7 +2,7 @@ import { Fragment, useEffect, useMemo, useState, type CSSProperties, type ReactN
 import { useServerFn } from "@tanstack/react-start";
 import { BriefcaseBusiness, CalendarHeart, CalendarRange, ChefHat, ChevronRight, Compass, Crown, Eye, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Stars, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { UserProfile } from "./Onboarding";
 import type { Language } from "@/lib/translations";
 import type { Plan } from "@/lib/design-modes";
