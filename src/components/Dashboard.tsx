@@ -604,7 +604,7 @@ function FocusedTraits({ language, render, plan, onUpgrade }: { language: Langua
   if (!ctx) return null;
   const t = focusCopy[language];
   const goal = goalText(ctx.focus, language);
-  if (ctx.group) return <SubjectVoice language={language}><GroupFocusCard language={language} plan={plan} onUpgrade={onUpgrade} /><GroupMembersToday language={language} /></SubjectVoice>;
+  if (ctx.group) return <SubjectVoice language={language}><GroupFocusCard language={language} plan={plan} onUpgrade={onUpgrade} /></SubjectVoice>;
   return <SubjectVoice language={language}>{render(ctx.readingProfile, ctx.member ? t.traitsPerson(ctx.label(language)) : t.traitsSelf, goal, !ctx.member)}</SubjectVoice>;
 }
 function FocusedArt({ language, owner, plan, render }: { language: Language; owner: UserProfile; plan: Plan; render: (p: UserProfile, subject?: ArtSubject) => ReactNode }) {

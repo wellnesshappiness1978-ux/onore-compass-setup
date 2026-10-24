@@ -307,6 +307,19 @@ export function GroupMembersToday({ language }: { language: Language }) {
   const roleNames = [...new Set(list.map(x => c.role[x.role]))].join("・");
   const care = list.filter(x => x.band === "care").length;
   return <section className="mb-6 space-y-4 rounded-lg border border-primary/30 bg-card/60 p-4 text-left sm:p-5">
+    {(() => { const gi = groupInsightCopy[language]; const ft = focusCopy[language]; const pct = (v: number) => Math.round((v + 1) * 50);
+      const rhythms = g.members.map(m => ({ m, r: biorhythm(m.birthDate, day) })).sort((x, y) => y.r.total - x.r.total);
+      const avg = rhythms.length ? Math.round(rhythms.reduce((a, x) => a + x.r.total, 0) / rhythms.length) : null;
+      const top = rhythms[0]; const low = rhythms[rhythms.length - 1];
+      const pairs: { a: TeamMember; b: TeamMember; score: number }[] = [];
+      for (let i = 0; i < g.members.length; i++) for (let j = i + 1; j < g.members.length; j++) pairs.push({ a: g.members[i]!, b: g.members[j]!, score: pairScore(g.members[i]!, g.members[j]!) });
+      pairs.sort((x, y) => y.score - x.score); const best = pairs[0];
+      return <>
+        <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{ft.groupRhythm}</p><p className="font-serif text-2xl text-primary">{avg ?? "—"}<span className="text-sm">/100</span></p></div>
+        <div className="rounded-md border border-primary/25 p-3 text-sm leading-6"><h3 className="text-sm font-bold text-primary">{gi.today}</h3><p className="mt-1">{groupDayLine(avg ?? 50, language)}</p>{top && <p className="mt-1">{gi.peak(memberDisplayName(top.m))}</p>}{low && low !== top && low.r.total < 45 && <p className="mt-1">{gi.care(memberDisplayName(low.m))}</p>}{best && <p className="mt-1">{gi.best(memberDisplayName(best.a), memberDisplayName(best.b))}</p>}</div>
+        <details className="group rounded-md border border-primary/25"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden">{gi.rhythmTable}<span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span></summary>
+        <div className="overflow-x-auto border-t border-primary/15 p-2"><table className="w-full text-xs"><thead><tr className="text-muted-foreground"><th className="p-1 text-left"></th><th className="p-1">{gi.physical}</th><th className="p-1">{gi.emotional}</th><th className="p-1">{gi.intellectual}</th><th className="p-1">∑</th></tr></thead><tbody>{rhythms.map(({ m, r }) => <tr key={m.id} className="border-t border-primary/15"><td className="max-w-28 truncate p-1 font-bold">{memberDisplayName(m)}</td><td className="p-1 text-center">{pct(r.physical)}</td><td className="p-1 text-center">{pct(r.emotional)}</td><td className="p-1 text-center">{pct(r.intellectual)}</td><td className="p-1 text-center text-primary">{r.total}</td></tr>)}</tbody></table></div></details>
+      </>; })()}
     <div><h3 className="font-serif text-lg text-primary">{c.synergyTitle}</h3>
       <p className="mt-2 text-sm leading-7"><strong className="text-primary">{c.strengths}：</strong>{c.strengthLine(roleNames)}</p>
       <p className="mt-1 text-sm leading-7"><strong className="text-primary">{c.issues}：</strong>{care ? c.issueLine(care) : c.noIssue}</p></div>
