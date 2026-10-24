@@ -97,7 +97,7 @@ function CoreLayersPanel({ layers: c, profile, language, reading, loading, nameD
               <section className="border-l-2 border-primary pl-4"><h4 className="text-sm text-primary">{copy.guide}</h4><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{passage[1]}</p></section>
             </div> : loading ? <AgolmenLoading compact label={copy.loading} /> : <p role="status" className="text-sm leading-7 text-muted-foreground">{copy.error}</p>}
             {selected === 0 && nameDetails}
-            <SacredDisclosure className="mt-6" title={copy.basis}><p className="mt-3 text-sm leading-7 text-foreground">{rows[selected]?.[1]}</p><p className="mt-2 text-xs leading-6 text-muted-foreground">{details[selected]}</p></SacredDisclosure>
+
             <p className="mt-6 border-t border-primary/20 pt-4 text-xs leading-6 text-muted-foreground">{copy.preview}</p>
           </div>
         </DialogContent>
@@ -149,15 +149,8 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
 <section aria-label={n.title} className="my-6 border-y border-primary/25 py-5">
             <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
             {localLayers?.name ? <>
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {(["sky", "person", "earth", "outer", "total"] as const).map((k, i) => { const l = localLayers.name?.luck[k]; return <div key={k} className="rounded-md border border-primary/25 bg-background/40 p-3 text-center">
-                  <p className="text-[11px] leading-4 text-muted-foreground">{n.grids[i]}</p>
-                  <p className="mt-1 font-serif text-2xl text-primary">{localLayers.name?.[k]}<span className="text-xs">画</span></p>
-                  <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] ${l === "吉" ? "bg-primary text-primary-foreground" : l === "半吉" ? "border border-primary/50 text-primary" : "border border-muted-foreground/40 text-muted-foreground"}`}>{l}</span>
-                </div>; })}
-              </div>
               {data?.nameFortune && <><h4 className="mt-5 font-serif text-sm text-primary">{n.fortune}</h4><p className="mt-2 whitespace-pre-line text-sm leading-8 text-foreground sm:text-base">{data?.nameFortune}</p></>}
-              <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{n.note}</p>
+
             </> : chars && onProfileChange ? <div className="mt-3">
               <p className="text-sm text-muted-foreground">{n.split}</p>
               <div className="mt-3 flex flex-wrap gap-2">{chars.slice(0, -1).map((_, i) => <Button key={i} size="sm" variant={cut === i + 1 ? "default" : "outline"} onClick={() => setCut(i + 1)}>{chars.slice(0, i + 1).join("")}　{chars.slice(i + 1).join("")}</Button>)}</div>
@@ -178,12 +171,6 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
           <p className="flex items-center gap-2 text-sm text-primary"><Sparkles className="size-4" aria-hidden="true" />{traits.catchphrase}</p>
           <p className="mt-4 border-l-2 border-primary pl-4 font-serif text-2xl leading-relaxed text-gradient-gold sm:pl-6 sm:text-3xl">{top.catchphrase}</p>
         </section>}
-        {!experienceOnly && localLayers && <section aria-label="診断の根拠サマリー" className="border-b border-primary/20 py-4"><dl className="flex flex-wrap gap-x-5 gap-y-3">{[
-          ["名前の中心数", localLayers.name ? `${localLayers.name.person}画` : "姓・名の区切りを設定"],
-          ["生年月日の基本数", String(localLayers.numerology.lifePath)],
-          ["生まれ日の性質", localLayers.shichu.dayMaster], ["外向き / 内面", `${localLayers.western.sun} / ${localLayers.western.moon}`],
-          ["生まれ持った方位タイプ", gua?.branches[0] ? String(gua.branches[0].number) : "性別を設定"],
-        ].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-1 text-sm font-semibold text-primary">{value}</dd></div>)}</dl></section>}
         <section aria-label="自分を知る・今日のダイジェスト" className="py-6">
           <h3 className="font-serif text-xl text-primary">{traits.essence}</h3>
           {topLoading ? <AgolmenLoading compact label={t.loading} /> : top ? <div className="mt-4 divide-y divide-primary/20">
@@ -197,13 +184,10 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
         </section>
         <SacredDisclosure defaultOpen className="my-5" title={t.views}>
         {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} language={language} reading={data} loading={isPending} nameDetails={nameDetails} />}
-        {!experienceOnly && <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜生まれ持った吉方位タイプ（本命卦）" : "Feng shui · Your birth direction type (Ming Gua)"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性" : "女性"}の計算式 · 方位タイプ ${b.number}` : `${b.branch === "male" ? "Male" : "Female"} calculation · Type ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `活動を広げる方角 ${fengDirectionNames[b.shengQi]} · 休息を整える方角 ${fengDirectionNames[b.tianYi]} · 関係を育てる方角 ${fengDirectionNames[b.yanNian]}` : `Expansion ${b.shengQi} · Restoration ${b.tianYi} · Relationships ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "プロフィールの性別区分と立春基準の生年から求める、伝統的な方位の参考値です。住まいごとの吉凶や効果を保証しません。" : "A traditional direction reference based on the profile's gender category and solar year, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "この方位タイプの算出には生年月日と性別の入力が必要です。マイページで設定できます。" : "Add birth date and gender in your profile to view this direction type."}</p>}</section>}
+        {!experienceOnly && <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜生まれ持った吉方位タイプ（本命卦）" : "Feng shui · Your birth direction type (Ming Gua)"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性" : "女性"}の計算式 · 方位タイプ ${b.number}` : `${b.branch === "male" ? "Male" : "Female"} calculation · Type ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `活動を広げる方角 ${fengDirectionNames[b.shengQi]} · 休息を整える方角 ${fengDirectionNames[b.tianYi]} · 関係を育てる方角 ${fengDirectionNames[b.yanNian]}` : `Expansion ${b.shengQi} · Restoration ${b.tianYi} · Relationships ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "プロフィールの性別区分と立春基準の生年から求める、伝統的な方位の見方です。住まいごとの吉凶や効果を保証しません。" : "A traditional direction reference based on the profile's gender category and solar year, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "この方位タイプの算出には生年月日と性別の入力が必要です。マイページで設定できます。" : "Add birth date and gender in your profile to view this direction type."}</p>}</section>}
          {isPending || holding ? <AgolmenLoading compact label={holding ? readingCompleteMessage[language] : t.loading} /> : isError || !data ? (
           <div className="flex min-h-40 flex-col items-start justify-center gap-3" role="alert"><p className="text-sm text-muted-foreground">{t.error}</p><Button variant="outline" onClick={() => void refetch()}>{t.retry}</Button></div>
         ) : <>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-4 border-b border-primary/20 py-6 sm:grid-cols-5 sm:gap-5">
-            {f.axes.map((label, i) => <div key={label} className="min-w-0 border-l border-primary/35 pl-3"><p className="text-xs text-primary">{label}</p><p className="mt-2 break-words font-serif text-sm leading-6 text-foreground">{values[i] ?? f.missing}</p></div>)}
-          </div>
           {!experienceOnly && data.keySummary && <section aria-label="本質の交差点" className="my-6 rounded-lg border border-primary/50 bg-gradient-to-b from-primary/15 to-transparent p-5 sm:p-6"><p className="text-xs text-primary">{language === "ja" ? "複数の参考レイヤーが交差する人物像" : "A portrait across the reference layers"}</p><p className="mt-3 font-serif text-lg leading-9 text-foreground sm:text-xl">{data.keySummary}</p></section>}
           {!experienceOnly && sections.map((text, i) => {
             const Icon = icons[i] ?? Sparkles;

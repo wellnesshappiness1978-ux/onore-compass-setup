@@ -10,7 +10,7 @@ import type { Language } from '@/lib/translations';
 import { essenceKeys, approachKeys } from '@/lib/trait-reading';
 
 type Reading = Awaited<ReturnType<typeof generateHomeReading>>;
-type Request = { profile: UserProfile; language: Language; goal?: string; subject?: { label: string; isSelf: boolean } };
+type Request = { profile: UserProfile; language: Language; goal?: string; subject?: { label: string; isSelf: boolean }; group?: { name: string; members: UserProfile[] } };
 type PartialReading = { catchphrase?: string; essence?: Partial<Reading['essence']>; deeperEssence?: Partial<Reading['deeperEssence']>; approaches?: Partial<Reading['approaches']>; axisSummary?: string; manualCore?: string; manualDecision?: string; manualTiming?: string };
 const stringMap = (keys: readonly string[]) => z.object(Object.fromEntries(keys.map(k => [k, z.string()])));
 const cacheSchema = z.object({ catchphrase: z.string(), essence: stringMap(essenceKeys), approaches: stringMap(approachKeys), axisSummary: z.string(), approachAvailability: z.record(z.string(), z.enum(['reference', 'context', 'unavailable'])) }).passthrough();

@@ -12,6 +12,7 @@ export const readingProfileSchema = z.object({
   bloodType: z.string().max(4), siblingOrder: z.string().max(80),
   father: parentBirthSchema, mother: parentBirthSchema,
 });
+export const readingGroupSchema = z.object({ name: z.string().max(80), members: z.array(readingProfileSchema).min(2).max(30) });
 export const readingSubjectSchema = z.object({ label: z.string().trim().max(80), isSelf: z.boolean() });
 export function profileReadingContext(profile: z.infer<typeof readingProfileSchema>, subject?: z.infer<typeof readingSubjectSchema>) {
   return JSON.stringify({ subject: subject ?? { label: 'you', isSelf: true }, birthPlace: profile.birthPlace, birthCity: profile.birthCity, siblingOrder: profile.siblingOrder, siblingComposition: parseSiblingComposition(profile.siblingOrder) });

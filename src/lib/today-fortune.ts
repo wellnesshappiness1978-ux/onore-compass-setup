@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { readingProfileSchema } from "./profile-reading-context";
 import { fortuneFingerprint } from "./today-subject";
+import { luckyRecipes } from './lucky-recipes';
 import { servingsLabel } from './reading-presentation';
 
 /** Shared (client + server) contract for the AI "Today's fortune" reading. */
@@ -37,7 +38,7 @@ export const todayFortuneSchema = z.object({
   luckyColor: z.object({ name: z.string(), hex: z.string(), reason: z.string() }),
   luckyWord: z.object({ word: z.string(), message: z.string() }),
   foods: z.array(z.object({
-    name: z.string(), why: z.string(), servings: z.string(),
+    recipeId: z.string().optional(), name: z.string(), why: z.string(), servings: z.string(),
     ingredients: z.array(amount), seasonings: z.array(amount),
     steps: z.array(z.object({ text: z.string(), tip: z.string() })),
   })),
@@ -66,13 +67,13 @@ export function normalizeFortune(f: TodayFortune, language: keyof typeof serving
     ...f,
     actions: f.actions.filter(Boolean).slice(0, 4),
     luckyColor: { ...f.luckyColor, hex },
-    foods: f.foods.filter(x => x.name && x.ingredients.length && x.steps.length).slice(0, 5).map(food => ({ ...food, servings: servingsLabel[language] })),
+    foods: f.foods.filter(x => x.name && x.ingredients.length && x.steps.length).slice(0, 5).map(food => ({ ...food, name: luckyRecipes.find(r => r.id === food.recipeId)?.names[language] ?? food.name, servings: servingsLabel[language] })),
   };
 }
 
 const HISTORY_KEY = "onore-today-ai-history";
 type HistoryEntry = { key: string; day: string; color: string; word: string; foods: string[] };
-export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string | undefined; members?: TodayFortuneRequest['members'] }) => `onore-today-ai:v3:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}:${daySeed(r.members ? fortuneFingerprint({ members: r.members, subject: { ...r.subject, kind: 'self', label: '' } }) : '', '')}`;
+export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string | undefined; members?: TodayFortuneRequest['members'] }) => `onore-today-ai:v4:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}:${daySeed(r.members ? fortuneFingerprint({ members: r.members, subject: { ...r.subject, kind: 'self', label: '' } }) : '', '')}`;
 
 /** Recent picks to avoid: same subject's colors/words, every subject's foods, last 7 days excluding today. */
 export function avoidFromHistory(history: HistoryEntry[], key: string, day: string) {

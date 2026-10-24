@@ -27,12 +27,12 @@ describe("distinct personal reading contract", () => {
     const statuses = approachStatuses({ core: true, earth: true, nineStars: true, color: true, blood: true, siblings: false, region: false });
     const passages = Object.fromEntries(approachKeys.map(key => [key, key === "earth" ? " " : "reading"])) as Record<typeof approachKeys[number], string>;
     expect(visibleApproachKeys(statuses, passages)).toEqual(["western", "indian", "ziwei", "eastern", "pillars", "sanmei", "nineStars", "lunarMansion", "animal", "numerology", "maya", "color", "blood"]);
-    expect(traitReadingPrompt).toContain("540–660");
+    expect(traitReadingPrompt).toContain("1080–1320");
     expect(traitReadingPrompt).toContain("catchphrase");
     for (const copy of Object.values(traitReadingCopy)) { expect(copy.catchphrase).toBeTruthy(); expect(copy.symbolic).toBeTruthy(); }
   });
   it("keeps plain speech, non-repetition, source boundaries and actionable closure", () => {
-    for (const text of ["No headings or method names", "different central observation", "everyday analogies", "Missing context MUST be empty", "all sixteen fixed keys", "optional small tomorrow step", "not evidence of upbringing"]) expect(traitReadingPrompt).toContain(text);
+    for (const text of ["No headings or method names", "different central observation", "everyday analogies", "Missing context MUST be empty", "all sixteen fixed keys", "tomorrow's first step", "not evidence of upbringing"]) expect(traitReadingPrompt).toContain(text);
   });
   it("bans repeated 「〜読みです」 endings and requires varied warm closings", () => {
     expect(traitReadingPrompt).toContain("〜読みです");

@@ -64,8 +64,8 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
         </details>;
       }} />}
 
-      {showSummary && (text ? <section className="mt-6 border-y border-primary/40 py-6 [overflow-wrap:anywhere]"><p aria-busy={isPending} className="whitespace-pre-line text-base leading-snug text-foreground sm:text-lg">{text}</p></section> : loading ? <AgolmenLoading compact label={holding ? readingCompleteMessage[language] : copy.loading} /> : data ? <section className="mt-6 border-y border-primary/40 py-6 [overflow-wrap:anywhere]">
-        <p className="whitespace-pre-line text-base leading-snug text-foreground sm:text-lg sm:leading-snug">{text}</p>
+      {showSummary && (text ? <section className="mt-6 border-y border-primary/40 py-6 [overflow-wrap:anywhere]"><p aria-busy={isPending} className="whitespace-pre-line text-base leading-8 text-foreground sm:text-lg">{text}</p></section> : loading ? <AgolmenLoading compact label={holding ? readingCompleteMessage[language] : copy.loading} /> : data ? <section className="mt-6 border-y border-primary/40 py-6 [overflow-wrap:anywhere]">
+        <p className="whitespace-pre-line text-base leading-8 text-foreground sm:text-lg sm:leading-9">{text}</p>
       </section> : <p role="status" className="mt-6 text-foreground">{copy.error}</p>)}
       {showSummary && <p className="mt-5 text-center text-[11px] text-muted-foreground">{copy.preview}</p>}
       {showShare && <ShareCardButton

@@ -8,6 +8,9 @@ import { supportiveWritingVoice } from "./writing-voice";
 import { createLovableAiGatewayRunIdFetch } from "./run-id.server";
 import { personal } from '../day-compass';
 import { RECIPE_SERVINGS } from '../reading-presentation';
+import { luckyRecipes, recipeDetails } from '../lucky-recipes';
+import { z } from 'zod';
+import { validateRecipeIdentities } from '../recipe-identity';
 import { deeperEssencePrompt } from '../deeper-essence';
 
 export async function runReading(data: ReturnType<typeof todayFortuneRequestSchema.parse>, onPartial?: (value: unknown) => void, signal?: AbortSignal): Promise<TodayFortune> {
@@ -36,7 +39,7 @@ export async function runReading(data: ReturnType<typeof todayFortuneRequestSche
       maxRetries: 0,
       ...(signal ? { abortSignal: signal } : {}),
       model: provider.responses("openai/gpt-6-astra"),
-      output: Output.object({ schema: todayFortuneSchema }),
+      output: Output.object({ schema: todayFortuneSchema.extend({ foods: z.array(todayFortuneSchema.shape.foods.element.extend({ recipeId: z.enum(luckyRecipes.map(r => r.id) as [string, ...string[]]) })).length(5) }) }),
       prompt: `Write TODAY'S FORTUNE for ${who}, dated ${day}, entirely in language code ${language}.
 This reading is created only for this subject and this date. ${isGroup ? "NEVER reuse an individual owner reading: weave every member's data, pair compatibility, sibling structures and today's per-member rhythms into one reading for the group." : ""}
 ${groupSizeDirective(isGroup ? members.length : 0)}
@@ -68,17 +71,20 @@ Fields:
 - caution: one specific pitfall for today and the phrase to say instead in 「」.
 - luckyColor: a color (localized poetic name + #RRGGBB hex) that complements today's lowest rhythm${isGroup ? " and boosts every member together (composite color)" : ""}; reason ~80 chars.
 - luckyWord: a short soul-resonant word or phrase for the goal and today's state, plus a ~80 char message.
-- foods: EXACTLY 5 distinct supermarket-friendly dishes for ${people} people ALWAYS, even for an individual or a larger group. Match the actual subject's element balance, rhythm and goal; mix staple, main, side, soup, sweet/drink. Expand the repertoire across Japanese, Mediterranean, Chinese and other home cooking; include quick/no-fuss and one more elaborate dish (stuffed, layered, braised or oven-roasted) with realistic time and difficulty stated in why. Avoid recurring tofu/miso-only menus. For each: name; why (~160 Japanese chars for THIS subject, distinguishing the calculated symbolic element/rhythm choice from a factual ingredient nutrition point such as protein/fiber, with no medical, mood or fortune guarantees); servings ("2人前" style localized); ingredients and seasonings with exact quantities for TWO servings (g, pieces, ml, 大さじ/小さじ localized). Provide 5–8 beginner-friendly steps from washing/preparation and precise cut size through heat level, cooking time, doneness check, plating and finishing. Steps may include a symbolic cooking tip (Japanese label 運気アップポイント); never substitute symbolism for real cooking guidance. Specify safe heating for meat, fish and eggs; allergies and substitutions must not invalidate quantities. Never scale quantities to group size.
+- foods: EXACTLY 5 DISTINCT recipeId values chosen ONLY from the catalogue below, matching this subject's element/rhythm/goal and avoiding recent names where feasible. Each photo is tied to that exact recipeId, so DO NOT invent a dish, change its name, add a main ingredient, substitute its protein or change its cooking method. Use the exact localized catalogue name and ingredients/quantities for TWO servings; seasonings already listed must not be duplicated. Provide personalized why (~160 Japanese chars) distinguishing symbolic selection from factual nutrition, no health or luck guarantee. Explain 5–8 beginner steps (washing, cut size, heat, timing, doneness, plating) faithfully expanding the supplied method, with safe meat/fish/egg heating, and optional symbolic tip. servings always localized TWO people, regardless of group size. Never select the same recipeId twice.
+RECIPE CATALOGUE (id, element, exact localized name/ingredients, method):
+${JSON.stringify(luckyRecipes.map(r => ({ recipeId: r.id, element: r.element, ...recipeDetails(r, language) })))}
 Symbolic reference only; no medical, financial or guaranteed outcome claims.`,
       providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", store: false, include: ["reasoning.encrypted_content"] } },
     });
     try {
       if (onPartial) for await (const partial of result.partialOutputStream) onPartial(partial);
-      return normalizeFortune(await result.output, language);
+      const output = await result.output;
+      return normalizeFortune({ ...output, foods: validateRecipeIdentities(output.foods, language) }, language);
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error) && error.text) {
         const parsed = todayFortuneSchema.safeParse(JSON.parse(error.text));
-        if (parsed.success) return normalizeFortune(parsed.data, language);
+        if (parsed.success) return normalizeFortune({ ...parsed.data, foods: validateRecipeIdentities(parsed.data.foods, language) }, language);
       }
       throw error;
     }
