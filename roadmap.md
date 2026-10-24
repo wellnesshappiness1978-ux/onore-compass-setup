@@ -1,15 +1,15 @@
 # Roadmap
 
 ## Capacity pre-check, pinch zoom, art teaser, relationships, tab split (2026-10-24)
-- [ ] Block family member form before input when the plan roster cap is full
-- [ ] Confirm pinch zoom works app-wide (viewport, touch-action, swipe guard ignores multi-touch)
-- [ ] Free-plan mandala art shown as elegant blurred/masked teaser, full art stays paid
-- [ ] Relationship dropdown gains mother/father/son/daughter plus free text for "other"
-- [ ] Move date-dependent group items (daily rhythm, interactions) from Traits to Today; Traits keeps timeless structure only
-- [ ] Strengthen Today generation prompt for daily variety (16 arts + biorhythm + helio calendar)
-- [ ] Replace all kanji-numeral dates with Arabic numerals
-- [ ] Add appetizing food images to recipe cards
-- [ ] Free Today samples hidden until tapped; tap reveals fixed one-day full sample
+- [x] Full roster now shows the capacity notice with upgrade link instead of the input form; submit stays disabled as a guard
+- [x] Pinch zoom confirmed open app-wide: viewport allows 5x, touch-action auto, tab swipe ignores multi-touch and zoomed state
+- [x] Free-plan art renders as a blurred, radially veiled teaser with lock and upgrade CTA; paid art unchanged (verified at 390px)
+- [x] Relationship dropdown adds mother/father/son/daughter in 7 languages plus existing free text for "other"; server enum extended
+- [x] Group daily rhythm, interactions and rhythm table moved from Traits to Today; Traits keeps color/harmony/pair-map structure only
+- [x] Today prompt now requires day-fresh angles from 16-arts/biorhythm/helio shifts and Arabic-numeral dates only
+- [x] Five generated spiritual food photos cycle through recipe cards and the recipe dialog
+- [x] Locked Today cards and feng shui teaser hide samples until 「サンプルを見る」 opens the fixed one-day dialog
+- [x] 281 tests pass, tsgo clean, build OK; 390px art/today verified without page errors. Family cap notice and recipe images not visually rechecked; fresh AI output unverified.
 
 ## Uploaded layout, color and sample refinement (2026-10-23)
 - [x] Centered left-aligned intro, strict two-row fixed header on all sizes, native pinch-safe gestures, high-contrast theme-aware headings; removed opacity-based intro animation that made later headings temporarily unreadable
