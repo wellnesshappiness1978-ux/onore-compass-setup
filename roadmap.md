@@ -1,5 +1,11 @@
 # Roadmap
 
+## Cosmic wording, individual essence, cached perspectives and text size (2026-10-24)
+- [ ] Replace cosmic color captions with a compact birth-sky compass interpretation
+- [ ] Keep essence visible with independent sections 1–10
+- [ ] Restore cached six-perspective readings without redundant requests/calculations
+- [ ] Persist three global text sizes in Settings; test and verify screen flows
+
 ## Integrated diagnosis, recipe identity, variable mandala and plain essence (2026-10-24)
 - [x] Conclusion-first personal/group axisSummary uses 1080–1320 characters and goal-led tomorrow/week/review roadmap; real owner generation returned 1175 characters for a relationship goal and all four deeper fields; actual Traits capstone displayed 1215 characters with an unset-goal plan
 - [x] Thirty catalogue photos resolve by stable recipe ID in cards/details; AI is constrained to five distinct supported IDs and canonical localized names; actual signed-in soup dialog loaded the exact napa-mushroom photo. Arbitrary invented AI recipes intentionally excluded to guarantee identity
