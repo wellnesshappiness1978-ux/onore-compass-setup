@@ -1,5 +1,16 @@
 # Roadmap
 
+## Capacity pre-check, pinch zoom, art teaser, relationships, tab split (2026-10-24)
+- [ ] Block family member form before input when the plan roster cap is full
+- [ ] Confirm pinch zoom works app-wide (viewport, touch-action, swipe guard ignores multi-touch)
+- [ ] Free-plan mandala art shown as elegant blurred/masked teaser, full art stays paid
+- [ ] Relationship dropdown gains mother/father/son/daughter plus free text for "other"
+- [ ] Move date-dependent group items (daily rhythm, interactions) from Traits to Today; Traits keeps timeless structure only
+- [ ] Strengthen Today generation prompt for daily variety (16 arts + biorhythm + helio calendar)
+- [ ] Replace all kanji-numeral dates with Arabic numerals
+- [ ] Add appetizing food images to recipe cards
+- [ ] Free Today samples hidden until tapped; tap reveals fixed one-day full sample
+
 ## Uploaded layout, color and sample refinement (2026-10-23)
 - [x] Centered left-aligned intro, strict two-row fixed header on all sizes, native pinch-safe gestures, high-contrast theme-aware headings; removed opacity-based intro animation that made later headings temporarily unreadable
 - [x] Centered ingredients, expanded date-rotated cooking catalogue/detail and AI recipe instructions, renamed Japanese tips; shared tappable lucky-color dialog with seven-language symbolic and fashion guidance
