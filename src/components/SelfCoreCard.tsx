@@ -23,6 +23,8 @@ import { SacredDisclosure } from "./ui/sacred-disclosure";
 import { essenceKeys, traitReadingCopy } from "@/lib/trait-reading";
 import { useFocus } from './FocusProvider';
 import DeeperEssenceSections from './DeeperEssenceSections';
+import { useQueryClient } from '@tanstack/react-query';
+import { localIso } from '@/lib/day-compass';
 
 const layerCopy: Record<Language, { title: string; choose: string; names: string[]; summaries: string[]; surface: string; inner: string; moreTime: string; birthplace: string; regional: string; prefectural: string; source: string }> = {
   ja: { title: "6大占術レイヤー", choose: "占術レイヤーを選択", names: ["本格姓名判断", "精密数秘術", "西洋占星術", "四柱推命", "動物占い・独自4層参考", "本格風水学"], summaries: ["名前の五運と社会面を確認します。", "生年月日とローマ字名の数を確認します。", "出生時の天体配置を確認します。", "生年月日時の暦と要素の配分を確認します。", "生年月日の60日周期を確認します。", "生年と性別区分から方位タイプを確認します。"], surface: "表の顔", inner: "本音・潜在", moreTime: "※出生時間を設定するとさらに精密度が向上します", birthplace: "出生地", regional: "市区町村", prefectural: "都道府県", source: "代表座標をアセンダントに使用。位置データ" },
@@ -129,7 +131,17 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
   const f = fiveElementsCopy[language];
   const n = nameCopy[language];
   const chars = splittableName(profile.nameKanji);
-  const localLayers = useMemo(() => computeCoreLayers(profile), [profile]);
+  const readingClient = useQueryClient();
+  const profileSignature = JSON.stringify(profile);
+  const day = localIso(new Date());
+  const localLayers = useMemo(() => {
+    const key = ['core-layers', day, profileSignature];
+    const cached = readingClient.getQueryData<CoreLayers | null>(key);
+    if (cached !== undefined) return cached;
+    const calculated = computeCoreLayers(profile);
+    readingClient.setQueryData(key, calculated);
+    return calculated;
+  }, [profileSignature, day, readingClient]);
   const gua = mingGua(profile.birthDate, profile.gender);
   const [cut, setCut] = useState(chars && chars.length >= 3 ? 2 : 1);
   const [saving, setSaving] = useState(false);
@@ -171,18 +183,16 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
           <p className="flex items-center gap-2 text-sm text-primary"><Sparkles className="size-4" aria-hidden="true" />{traits.catchphrase}</p>
           <p className="mt-4 border-l-2 border-primary pl-4 font-serif text-2xl leading-relaxed text-gradient-gold sm:pl-6 sm:text-3xl">{top.catchphrase}</p>
         </section>}
-        <SacredDisclosure className="my-5" title={<span className="font-serif text-xl text-primary">{traits.essence}{experienceOnly ? "（1〜10）" : ""}</span>}>
-        <section aria-label={traits.essence} className="py-2">
-          {topLoading ? <AgolmenLoading compact label={t.loading} /> : top ? <div className="mt-4 divide-y divide-primary/20">
-            {essenceKeys.map((key, i) => <article key={key} className="min-w-0 py-5 [overflow-wrap:anywhere]">
-              <h4 className="flex items-start gap-3 font-serif text-lg leading-8 text-primary"><span className="shrink-0 font-mono text-xs leading-8">0{i + 1}</span><span>{traits.headings[i]}</span></h4>
-              <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{top.essence?.[key]}</p>
-            </article>)}
-          </div> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
+        <section aria-label={traits.essence} className="my-5 py-2">
+          <h3 className="font-serif text-xl text-primary">{traits.essence}{experienceOnly ? "（1〜10）" : ""}</h3>
+          <div className="mt-4 divide-y divide-primary/20">
+            {essenceKeys.map((key, i) => <SacredDisclosure key={key} className="min-w-0 py-1 [overflow-wrap:anywhere]" title={<span className="flex items-start gap-3 font-serif text-lg leading-8 text-primary"><span className="shrink-0 font-mono text-xs leading-8">0{i + 1}</span><span>{traits.headings[i]}</span></span>}>
+              {top?.essence?.[key] ? <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{top.essence[key]}</p> : topLoading ? <AgolmenLoading compact label={t.loading} /> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
+            </SacredDisclosure>)}
+          </div>
           {!top && isError && quick.isError && <Button variant="outline" className="mt-3" onClick={() => { void quick.refetch(); void refetch(); }}>{t.retry}</Button>}
           {experienceOnly && <DeeperEssenceSections profile={profile} language={language} passages={data?.deeperEssence ?? partial.deeperEssence} />}
         </section>
-        </SacredDisclosure>
         <SacredDisclosure className="my-5" title={t.views}>
         {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} language={language} reading={data} loading={isPending} nameDetails={nameDetails} />}
         {!experienceOnly && <section className="border-b border-primary/20 py-6"><h3 className="font-serif text-xl text-primary">{language === "ja" ? "風水｜生まれ持った吉方位タイプ（本命卦）" : "Feng shui · Your birth direction type (Ming Gua)"}</h3>{gua ? <><div className="mt-3 flex flex-wrap gap-3">{gua.branches.map(b => <div key={b.branch} className="min-w-[210px] flex-1 border-l-2 border-primary/50 bg-primary/5 p-4"><p className="font-serif text-lg text-primary">{language === "ja" ? `${b.branch === "male" ? "男性" : "女性"}の計算式 · 方位タイプ ${b.number}` : `${b.branch === "male" ? "Male" : "Female"} calculation · Type ${b.number}`}</p><p className="mt-2 text-base leading-7 text-foreground">{language === "ja" ? `活動を広げる方角 ${fengDirectionNames[b.shengQi]} · 休息を整える方角 ${fengDirectionNames[b.tianYi]} · 関係を育てる方角 ${fengDirectionNames[b.yanNian]}` : `Expansion ${b.shengQi} · Restoration ${b.tianYi} · Relationships ${b.yanNian}`}</p></div>)}</div><p className="mt-3 text-sm leading-7 text-muted-foreground">{language === "ja" ? "プロフィールの性別区分と立春基準の生年から求める、伝統的な方位の見方です。住まいごとの吉凶や効果を保証しません。" : "A traditional direction reference based on the profile's gender category and solar year, not a property-specific assessment."}</p></> : <p className="mt-3 text-sm text-muted-foreground">{language === "ja" ? "この方位タイプの算出には生年月日と性別の入力が必要です。マイページで設定できます。" : "Add birth date and gender in your profile to view this direction type."}</p>}</section>}

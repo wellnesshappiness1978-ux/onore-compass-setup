@@ -27,6 +27,7 @@ const MandalaScene = lazy(() => import("./MandalaCanvas"));
 import type { groupBirthPalette, GroupBirth } from "@/lib/group-palette";
 import { mandalaDesign } from "@/lib/mandala-design";
 import { sunSignIndex } from "@/lib/mandala-constellations";
+import { cosmicCompass } from '@/lib/cosmic-compass';
 export type ArtSubject = { key: string; label: string; kind: "member" | "group"; palette?: ReturnType<typeof groupBirthPalette>; births?: GroupBirth[] };
 type Props = { language: Language; onVip: () => void; profile: UserProfile; plan: Plan; previewMode?: boolean; subject?: ArtSubject | undefined };
 const ownerCopy: Record<Language, { self: string; member: (n: string) => string; group: (n: string) => string; groupNote: string }> = {
@@ -120,10 +121,9 @@ export default function NineStarsPanel({ language, onVip, profile, plan, preview
     {ownerLabel && <p className="mx-auto mt-4 inline-block rounded-full border border-primary/60 bg-primary/10 px-4 py-1.5 font-serif text-base font-bold text-primary" data-testid="art-owner-label">{ownerLabel}</p>}
     {isGroup && <p className="mt-2 text-xs leading-6 text-muted-foreground">{oc.groupNote}</p>}
     <p className="mt-3 font-serif text-xl text-primary">{art === "mandala" ? a.mandala : a.cosmicLong}</p>
-    <p className="mt-3 text-sm leading-7 text-muted-foreground">{palette && open ? art === "mandala" ? a.mandalaDescription : a.cosmicDescription : t.fallback}</p>
+    <p className="mt-3 text-sm leading-7 text-muted-foreground">{art === 'cosmic' ? cosmicCompass(sky, language) : palette && open ? a.mandalaDescription : t.fallback}</p>
     {previewMode && open && <p className="mx-auto mt-3 inline-block border border-primary/40 px-3 py-1 text-sm text-primary">{t.testNotice}</p>}
-    <aside className="mt-6 border-y border-primary/35 py-5 text-left" aria-label={a.about}><p className="font-serif text-lg leading-8 text-primary">{art === "mandala" ? a.mandalaAbout : a.cosmicAbout}</p><p className="mt-2 text-sm leading-7 text-muted-foreground">{art === "cosmic" && (sky?.approximate ? a.approximate : a.exactTime)} {a.artDisclaimer}</p></aside>
-    {palette && open && art === "cosmic" && <div className="mx-auto mt-5 grid max-w-[720px] grid-cols-4 gap-2 sm:grid-cols-7" aria-label={a.palette}>{paletteColors(palette).map((color, index) => <div key={`${color.slot}-${index}`} className="min-w-0"><span className="mx-auto block size-8 rounded-full border border-primary/30" style={{ backgroundColor: color.code }} /><span className="mt-1 block truncate text-[11px] text-muted-foreground">{a.paletteSlots[index]}</span></div>)}</div>}
+    <aside className="mt-6 border-y border-primary/35 py-5 text-left" aria-label={a.about}>{art === 'mandala' && <p className="font-serif text-lg leading-8 text-primary">{a.mandalaAbout}</p>}<p className="mt-2 text-sm leading-7 text-muted-foreground">{art === "cosmic" && (sky?.approximate ? a.approximate : a.exactTime)} {a.artDisclaimer}</p></aside>
     {palette && open && art === "mandala" && <div className="mx-auto mt-6 grid max-w-[720px] grid-cols-4 gap-2 sm:grid-cols-7" aria-label={a.palette}>{paletteColors(palette).map((color, index) => <div key={`${color.slot}-${index}`} className="min-w-0"><span className="mx-auto block size-8 rounded-full border border-primary/30 shadow-gold" style={{ backgroundColor: color.code }} /><span className="mt-1 block truncate text-[11px] text-muted-foreground">{a.paletteSlots[index]}</span></div>)}</div>}
     <div className="relative mx-auto mt-7 aspect-square w-full max-w-[920px] overflow-hidden border-y border-primary/35 bg-background shadow-gold" aria-label={art === "cosmic" ? a.cosmic : a.mandalaAlt}>
       <div className={open ? "" : "pointer-events-none select-none blur-[12px] saturate-[.55] scale-105"} aria-hidden={!open}>

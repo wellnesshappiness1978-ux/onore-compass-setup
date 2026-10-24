@@ -33,6 +33,8 @@ import { NautilusIcon } from './NautilusIcon';
 import type { AppearanceSelection } from '@/lib/appearance-customization';
 import { appearanceUiCopy } from '@/lib/appearance-ui-copy';
 import { planReadingLines } from '@/lib/today-access-copy';
+import { useFontSize } from '@/hooks/use-font-size';
+import { fontSizeCopy, fontSizes } from '@/lib/font-size';
 
 type Props = {
   profile: UserProfile;
@@ -70,6 +72,8 @@ export default function SettingsPanel({
   signedIn = false,
 }: Props) {
   const t = settingsTranslations[language];
+  const font = useFontSize();
+  const fontCopy = fontSizeCopy[language];
   const dc = designCopy[language];
   const appearanceCopy = appearanceUiCopy[language];
   const profileUi = profileUiCopy[language];
@@ -343,6 +347,12 @@ export default function SettingsPanel({
           <PenLine className="size-4 text-primary" /> {t.editBirth}
         </Button>
 
+        <div className="mt-5 border-t border-primary/20 pt-4">
+          <h4 className="mb-3 font-serif text-base text-primary">{fontCopy.title}</h4>
+          <div role="radiogroup" aria-label={fontCopy.title} className="grid grid-cols-3 gap-2">
+            {fontSizes.map(size => <Button key={size} role="radio" aria-checked={font.size === size} variant={font.size === size ? 'default' : 'outline'} onClick={() => font.select(size)} className="h-auto min-h-12 min-w-0 whitespace-normal px-2 py-2 text-xs leading-relaxed">{fontCopy.labels[size]}</Button>)}
+          </div>
+        </div>
         <ReminderMasterSwitch language={language} />
         {notice && (
           <p role="status" className="mt-2 text-xs text-muted-foreground">

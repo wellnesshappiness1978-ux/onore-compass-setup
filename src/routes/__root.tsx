@@ -19,6 +19,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { storedLanguage } from "@/lib/support-copy";
 import type { Language } from "@/lib/translations";
+import { useFontSize } from '@/hooks/use-font-size';
 
 const pageStateCopy: Record<Language, { missing: string; missingBody: string; failed: string; failedBody: string; retry: string; home: string }> = {
   ja: { missing: "ページが見つかりません", missingBody: "ページが移動したか、リンクが正しくありません。", failed: "ページを表示できませんでした", failedBody: "再読み込みするか、ホームに戻ってお試しください。", retry: "再試行", home: "ホームに戻る" },
@@ -164,6 +165,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useFontSize();
 
   return (
     <QueryClientProvider client={queryClient}>

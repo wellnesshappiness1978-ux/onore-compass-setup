@@ -155,7 +155,9 @@
 .sacred-modal > :first-child { grid-row: 1; }
 .sacred-accordion-content { animation-duration: 300ms; }
 html, body, .app-content, .design-canvas, .design-main, .mandala-masterpiece, img, canvas { touch-action: auto; }
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; font-size: 16px; }
+html[data-font-size="small"] { font-size: 14px; }
+html[data-font-size="large"] { font-size: 18px; }
 body { overflow-x: clip; }
 body p, body li, body h1, body h2, body h3, body h4, body span, body label, body summary, body button, body td, body th { overflow-wrap: anywhere; word-break: normal; min-width: 0; }
 .sacred-disclosure-scroll { max-height: 65dvh; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; overflow-wrap: anywhere; }
@@ -241,7 +243,7 @@ body p, body li, body h1, body h2, body h3, body h4, body span, body label, body
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.8;
     letter-spacing: 0;
   }
