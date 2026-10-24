@@ -2,7 +2,7 @@
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { expect, it } from 'vitest';
-import { useRelationshipPreferences, type } from './use-relationship-preferences';
+import { useRelationshipPreferences } from './use-relationship-preferences';
 import type { RelationshipGoal } from '@/lib/reminder-preferences';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
