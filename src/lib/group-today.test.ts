@@ -17,3 +17,12 @@ describe("group today", () => {
   it("keeps quoted speech where あなた means someone else", () => { expect(replaceSubject("「あなたの意見を聞かせて」とあなたが先に", "花子さん")).toBe("「あなたの意見を聞かせて」と花子さんが先に"); });
   it("keeps the flower meaning phrase", () => { expect(replaceSubject("憧れ・あなただけを見つめる", "花子さん")).toBe("憧れ・あなただけを見つめる"); });
 });
+
+import { describe as d2, it as i2, expect as e2 } from "vitest";
+d2("daily message depth", () => {
+  i2("includes meaning, action and reflection beyond the short line", () => {
+    const lines = subjectDailyMessage("self", "1990-05-05", "2026-10-24", "", "ja");
+    e2(lines.length).toBeGreaterThanOrEqual(5);
+    e2(lines.join("").length).toBeGreaterThan(200);
+  });
+});
