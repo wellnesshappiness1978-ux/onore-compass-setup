@@ -5,10 +5,11 @@
  * band above the painting so the saved PNG keeps the same balance. */
 
 import { CONSTELLATIONS, SIGN_GLYPHS, cornerSlots, paletteSeed } from "./mandala-constellations";
+import type { MandalaDesign } from './mandala-design';
 
 /** signs: up to four Sun-sign indices for faint corner star charts.
  * members: group members' main colors; when two or more, the group composition is used. */
-export type MandalaFinish = { colors: string[]; labels: string[]; signs?: number[]; members?: string[] };
+export type MandalaFinish = { colors: string[]; labels: string[]; signs?: number[]; members?: string[]; design?: MandalaDesign | undefined };
 
 const GOLD = "#E8C86A";
 const BAND_RATIO = 0.12;
@@ -302,7 +303,7 @@ function drawCornerConstellations(context: CanvasRenderingContext2D, size: numbe
 /** Group composition: the same painting, interlaced with a rotated copy so the
  * motif becomes an N-fold group design, plus one satellite gem per member. */
 function drawGroupComposition(context: CanvasRenderingContext2D, image: HTMLImageElement, size: number, top: number, members: string[], filter: string) {
-  const n = Math.min(12, members.length);
+  const n = members.length;
   const cx = size / 2, cy = top + size / 2;
   context.save();
   context.beginPath(); context.arc(cx, cy, size * 0.4, 0, Math.PI * 2); context.clip();
@@ -314,11 +315,53 @@ function drawGroupComposition(context: CanvasRenderingContext2D, image: HTMLImag
   if (filter) context.filter = filter;
   context.drawImage(image, -size / 2, -size / 2, size, size);
   context.restore();
-  const ring = size * 0.17;
+  const ring = size * (n > 12 ? 0.32 : n > 5 ? 0.25 : 0.17);
   members.slice(0, n).forEach((color, i) => {
     const a = -Math.PI / 2 + (i / n) * Math.PI * 2;
-    drawCenterGem(context, cx + Math.cos(a) * ring, cy + Math.sin(a) * ring, size * 0.016, color);
+    drawCenterGem(context, cx + Math.cos(a) * ring, cy + Math.sin(a) * ring, size * Math.min(0.016, 0.24 / n), color);
   });
+}
+
+/** Glaze existing painted detail, then add filled pigment motifs, never vector outlines. */
+function drawVariableFinish(context: CanvasRenderingContext2D, image: HTMLImageElement, size: number, top: number, design: MandalaDesign) {
+  const cx = size / 2, cy = top + size / 2;
+  context.save();
+  context.globalCompositeOperation = 'color';
+  design.pigments.forEach((color, i) => {
+    context.save();
+    context.beginPath(); context.moveTo(cx, cy);
+    context.arc(cx, cy, size * .7, design.rotation + i / design.pigments.length * Math.PI * 2, design.rotation + (i + 1) / design.pigments.length * Math.PI * 2); context.closePath(); context.clip();
+    context.globalAlpha = i < 3 ? .68 : .38; context.fillStyle = color;
+    context.fillRect(0, top, size, size); context.restore();
+  });
+  context.restore();
+  const n = design.nodes, ring = size * .29;
+  for (let i = 0; i < n; i++) {
+    const angle = design.rotation + i / n * Math.PI * 2;
+    const r = size * Math.min(.057, .38 / n);
+    context.save(); context.translate(cx + Math.cos(angle) * ring, cy + Math.sin(angle) * ring); context.rotate(angle);
+    context.beginPath();
+    if (design.motif === 'petal') context.ellipse(0, 0, r * .62, r * 1.5, 0, 0, Math.PI * 2);
+    else {
+      const sides = design.motif === 'star' ? 10 : design.motif === 'crystal' ? 4 : 6;
+      for (let j = 0; j < sides; j++) {
+        const a = j / sides * Math.PI * 2;
+        const extent = design.motif === 'star' && j % 2 ? r * .42 : r;
+        const x = Math.cos(a) * extent, y = Math.sin(a) * extent;
+        if (j === 0) context.moveTo(x, y); else context.lineTo(x, y);
+      }
+      context.closePath();
+    }
+    context.clip();
+    // Oil texture is sampled from the original master inside the new silhouette.
+    context.drawImage(image, -.5 * size, -.5 * size, size, size);
+    context.globalCompositeOperation = 'color'; context.globalAlpha = .9;
+    context.fillStyle = design.pigments[i % design.pigments.length] ?? GOLD;
+    context.fillRect(-r * 2, -r * 2, r * 4, r * 4);
+    context.globalCompositeOperation = 'screen'; context.globalAlpha = .28;
+    const light = context.createLinearGradient(-r, -r, r, r); light.addColorStop(0, GOLD); light.addColorStop(.4, 'rgba(232,200,106,0)'); light.addColorStop(1, 'rgba(232,200,106,.45)');
+    context.fillStyle = light; context.fillRect(-r * 2, -r * 2, r * 4, r * 4); context.restore();
+  }
 }
 
 /** Compose the painting + personal finish into the given square context.
@@ -344,6 +387,7 @@ export function drawMandalaComposition(context: CanvasRenderingContext2D, image:
   if (finish.signs?.length) drawCornerConstellations(context, size, band, finish.signs, finish.colors);
   const members = finish.members ?? [];
   if (members.length >= 2) drawGroupComposition(context, image, size, band, members, filter);
+  if (finish.design) drawVariableFinish(context, image, size, band, finish.design);
   drawPersonalAura(context, size, band, finish.colors);
   const main = finish.colors[0];
   if (main) drawCenterGem(context, size / 2, band + size / 2, size * 0.04, main);
