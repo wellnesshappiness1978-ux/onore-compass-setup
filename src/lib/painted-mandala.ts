@@ -322,7 +322,7 @@ function drawGroupComposition(context: CanvasRenderingContext2D, image: HTMLImag
   });
 }
 
-function rgba(hex: string, alpha: number) {
+function hexAlpha(hex: string, alpha: number) {
   const m = /^#([\da-f]{6})$/i.exec(hex); const v = m?.[1] ?? 'E8C86A';
   return `rgba(${parseInt(v.slice(0, 2), 16)},${parseInt(v.slice(2, 4), 16)},${parseInt(v.slice(4, 6), 16)},${alpha})`;
 }
@@ -337,7 +337,7 @@ function drawVariableFinish(context: CanvasRenderingContext2D, _image: HTMLImage
   // Background aura in the soul color, gentle and centered.
   context.globalCompositeOperation = 'soft-light';
   const aura = context.createRadialGradient(cx, cy, size * .05, cx, cy, size * .5);
-  aura.addColorStop(0, rgba(soul, .55)); aura.addColorStop(.6, rgba(main, .22)); aura.addColorStop(1, rgba(soul, 0));
+  aura.addColorStop(0, hexAlpha(soul, .55)); aura.addColorStop(.6, hexAlpha(main, .22)); aura.addColorStop(1, hexAlpha(soul, 0));
   context.fillStyle = aura; context.fillRect(0, top, size, size);
   context.globalCompositeOperation = 'screen';
   // Concentric rings of light: 2–4 layers from life path.
@@ -345,14 +345,14 @@ function drawVariableFinish(context: CanvasRenderingContext2D, _image: HTMLImage
   for (let k = 0; k < layers; k++) {
     const r = size * (.12 + k * (.26 / layers));
     const g = context.createRadialGradient(cx, cy, r * .97, cx, cy, r * 1.03);
-    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(.5, rgba(k % 2 ? soul : GOLD, .22)); g.addColorStop(1, 'rgba(0,0,0,0)');
+    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(.5, hexAlpha(k % 2 ? soul : GOLD, .22)); g.addColorStop(1, 'rgba(0,0,0,0)');
     context.fillStyle = g; context.beginPath(); context.arc(cx, cy, r * 1.04, 0, Math.PI * 2); context.fill();
   }
   // Flower-of-life lattice: N equal circles through the center (vesica crossings).
   const n = Math.max(6, design.nodes), petal = size * .085;
   context.lineWidth = Math.max(1, size * .0016);
-  context.strokeStyle = rgba(GOLD, .26);
-  context.shadowColor = rgba(main, .6); context.shadowBlur = size * .006;
+  context.strokeStyle = hexAlpha(GOLD, .26);
+  context.shadowColor = hexAlpha(main, .6); context.shadowBlur = size * .006;
   for (let i = 0; i < n; i++) {
     const a = design.rotation + i / n * Math.PI * 2;
     context.beginPath(); context.arc(cx + Math.cos(a) * petal, cy + Math.sin(a) * petal, petal, 0, Math.PI * 2); context.stroke();
@@ -362,7 +362,7 @@ function drawVariableFinish(context: CanvasRenderingContext2D, _image: HTMLImage
   const sides = design.motif === 'star' ? 16 : design.motif === 'crystal' ? 8 : design.motif === 'hexagon' ? 6 : 12;
   const hr = size * .062;
   const halo = context.createRadialGradient(cx, cy, 0, cx, cy, hr);
-  halo.addColorStop(0, rgba(main, .55)); halo.addColorStop(1, rgba(main, 0));
+  halo.addColorStop(0, hexAlpha(main, .55)); halo.addColorStop(1, hexAlpha(main, 0));
   context.fillStyle = halo; context.beginPath();
   for (let j = 0; j < sides; j++) {
     const a = design.rotation + j / sides * Math.PI * 2;
@@ -376,7 +376,7 @@ function drawVariableFinish(context: CanvasRenderingContext2D, _image: HTMLImage
   for (let i = 0; i < n; i++) {
     const a = design.rotation + i / n * Math.PI * 2, x = cx + Math.cos(a) * ring, y = cy + Math.sin(a) * ring, r = size * Math.min(.012, .16 / n);
     const glow = context.createRadialGradient(x, y, 0, x, y, r * 3);
-    glow.addColorStop(0, rgba(i % 2 ? soul : main, .7)); glow.addColorStop(1, 'rgba(0,0,0,0)');
+    glow.addColorStop(0, hexAlpha(i % 2 ? soul : main, .7)); glow.addColorStop(1, 'rgba(0,0,0,0)');
     context.fillStyle = glow; context.beginPath(); context.arc(x, y, r * 3, 0, Math.PI * 2); context.fill();
   }
   // Deterministic fine particles, mirrored N-fold.
@@ -386,7 +386,7 @@ function drawVariableFinish(context: CanvasRenderingContext2D, _image: HTMLImage
     const d = size * (.1 + rand() * .34), off = rand() * Math.PI * 2 / n, pr = size * (.0015 + rand() * .0025);
     for (let i = 0; i < n; i++) {
       const a = design.rotation + off + i / n * Math.PI * 2;
-      context.fillStyle = rgba(p % 3 ? GOLD : soul, .5);
+      context.fillStyle = hexAlpha(p % 3 ? GOLD : soul, .5);
       context.beginPath(); context.arc(cx + Math.cos(a) * d, cy + Math.sin(a) * d, pr, 0, Math.PI * 2); context.fill();
     }
   }
