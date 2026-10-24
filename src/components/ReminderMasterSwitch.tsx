@@ -23,6 +23,7 @@ export default function ReminderMasterSwitch({ language }: { language: Language 
       <Switch checked={paused} aria-label={t.pause} onCheckedChange={value => { try { setRemindersPaused(value); } catch { /* retain current state if storage unavailable */ } }} />
     </label>
     <p className="mt-2 text-xs leading-6 text-muted-foreground">{t.pauseNote}</p>
-    <p className="mt-1 text-xs text-muted-foreground">{pushed ? `${language === 'ja' ? '※' : ''}${t.closedOk} ${t.pushOn}` : t.openOnly}</p>
+    <p className="mt-1 text-xs leading-6 text-muted-foreground">{language === 'ja' ? '※' : ''}{t.closedOk}</p>
+    <p className="mt-1 text-xs leading-6 text-muted-foreground">{pushed ? t.pushOn : t.openOnly}</p>
   </section>;
 }

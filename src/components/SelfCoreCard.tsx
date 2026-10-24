@@ -184,7 +184,7 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
           <p className="mt-4 border-l-2 border-primary pl-4 font-serif text-2xl leading-relaxed text-gradient-gold sm:pl-6 sm:text-3xl">{top.catchphrase}</p>
         </section>}
         <section aria-label={traits.essence} className="my-5 py-2">
-          <h3 className="font-serif text-xl text-primary">{traits.essence}{experienceOnly ? "（1〜10）" : ""}</h3>
+          <h3 className="font-serif text-xl text-primary">{traits.essence}</h3>
           <div className="mt-4 divide-y divide-primary/20">
             {essenceKeys.map((key, i) => <SacredDisclosure key={key} className="min-w-0 py-1 [overflow-wrap:anywhere]" title={<span className="flex items-start gap-3 font-serif text-lg leading-8 text-primary"><span className="shrink-0 font-mono text-xs leading-8">0{i + 1}</span><span>{traits.headings[i]}</span></span>}>
               {top?.essence?.[key] ? <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{top.essence[key]}</p> : topLoading ? <AgolmenLoading compact label={t.loading} /> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
