@@ -157,7 +157,7 @@ function GroupIntegratedReading({ language }: { language: Language }) {
   const members = ctx?.group?.members.map(m => m.id === SELF_MEMBER_ID ? ctx.owner : memberToProfile(m)) ?? [];
   const name = ctx?.label(language) ?? '';
   const request = { profile: members[0] ?? ctx?.owner, language, goal: ctx ? goalText(ctx.focus, language) : '', subject: { label: name, isSelf: false }, group: { name, members } };
-  const reading = usePersonalReading({ ...request, profile: request.profile ?? { nameKanji: '', nameKana: '', nameRomaji: '', birthDate: '', birthTime: '', birthTimeUnknown: true, birthPlace: '', birthCity: '', bloodType: '', siblingOrder: '' } }, 'full', members.length >= 2);
+  const reading = usePersonalReading({ ...request, profile: request.profile ?? { nameKanji: '', nameKana: '', nameRomaji: '', birthDate: '', birthTime: '', birthTimeUnknown: true, birthPlace: '', birthCity: '', bloodType: '', siblingOrder: '', gender: 'undisclosed' } }, 'full', members.length >= 2);
   if (members.length < 2) return null;
   const text = reading.data?.axisSummary ?? reading.partial.axisSummary;
   return <section className="mt-6 border-y border-primary/30 py-5" aria-label={traitReadingCopy[language].final}><h3 className="font-serif text-xl text-primary">{traitReadingCopy[language].final}</h3>{text ? <p aria-busy={reading.isPending} className="mt-4 whitespace-pre-line text-base leading-8 [overflow-wrap:anywhere]">{text}</p> : <p role="status" className="mt-3 text-sm text-muted-foreground">{reading.isError ? homeReadingCopy[language].error : homeReadingCopy[language].loading}</p>}</section>;
