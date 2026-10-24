@@ -24,6 +24,8 @@ import type { Plan } from "@/lib/design-modes";
 import { groupColorMeaning, groupDayLine, groupDepthCopy, groupInsightCopy, SELF_MEMBER_ID } from "@/lib/group-insight";
 
 import { reminderUiCopy } from '@/lib/reminder-ui-copy';
+import DeeperEssenceSections from './DeeperEssenceSections';
+import { SacredDisclosure } from './ui/sacred-disclosure';
 
 const mainColor = (m: TeamMember) => birthColorSpectrum(memberToProfile(m))?.main ?? null;
 
@@ -141,6 +143,7 @@ export function GroupFocusCard({ language, plan, onUpgrade }: { language: Langua
       </>; })()}
       <h3 className="mt-4 text-sm text-primary">{t.groupMembers}</h3>
       <ul className="mt-2 grid gap-2 sm:grid-cols-2">{stats.colors.map(({ m, c }) => <li key={m.id} className="flex items-center gap-3 rounded-md border border-primary/20 p-2"><span className="size-8 shrink-0 rounded-full border border-primary/40" style={{ background: c?.code }} /><span className="min-w-0"><span className="block truncate font-bold text-outline">{memberDisplayName(m)}</span><span className="block truncate text-xs text-muted-foreground">{c ? `${localizeBirthColorName(c.name, language)} ${c.code}` : "—"}</span></span></li>)}</ul>
+      <div className="mt-5 space-y-3">{g.members.map(m => <SacredDisclosure key={m.id} title={memberDisplayName(m)}><DeeperEssenceSections profile={m.id === SELF_MEMBER_ID && ctx ? ctx.owner : memberToProfile(m)} language={language} /></SacredDisclosure>)}</div>
     </>}
   </section>;
 }
