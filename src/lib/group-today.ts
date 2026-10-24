@@ -62,8 +62,8 @@ export function subjectDailyMessage(subjectKey: string, birthDate: string | null
   const lines = [c.daily[seed % c.daily.length]!];
   if (birthDate) lines.push(c.rhythmLine[bandOf(biorhythm(birthDate, day).total)]);
   const d = dailyMessageDepth[language];
-  lines.push(d.meaning[(seed >> 3) % d.meaning.length]!);
+  lines.push(d.meaning[(seed >>> 3) % d.meaning.length]!);
   if (goal) lines.push(c.goalLine(goal));
-  lines.push(d.action[(seed >> 6) % d.action.length]!, d.reflect[(seed >> 9) % d.reflect.length]!);
+  lines.push(d.action[(seed >>> 6) % d.action.length]!, d.reflect[(seed >>> 9) % d.reflect.length]!);
   return lines;
 }
