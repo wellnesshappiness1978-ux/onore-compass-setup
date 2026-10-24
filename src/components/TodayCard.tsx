@@ -16,7 +16,6 @@ export function TodayLockedGuide({ language, title, teaser, onUpgrade, sampleTex
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-champagne-gradient opacity-10 blur-sm" />
     <div className="relative flex flex-col items-center gap-2 text-center">
       <LockKeyhole className="size-5 text-primary" /><p className="text-sm font-medium text-foreground">✦ {teaser}</p>
-      {sampleText && <p className="w-full whitespace-pre-line text-left text-sm leading-7 text-foreground">{sampleText}</p>}
       <div className="flex flex-wrap justify-center gap-2">
         <Dialog><DialogTrigger asChild><Button size="sm" variant="outline" className="border-primary/40"><Eye className="size-3.5" />{t.sample}</Button></DialogTrigger>
           <DialogContent className="max-h-[90dvh] overflow-y-auto border-primary/35"><DialogHeader><DialogDescription>{t.sample}</DialogDescription><DialogTitle className="font-serif text-primary">{title}</DialogTitle></DialogHeader><p className="whitespace-pre-line text-sm leading-7">{sampleText ?? teaser}</p><Button variant="champagne" onClick={onUpgrade}><Crown className="size-4" />{focusCopy[language].seePlans}</Button></DialogContent>

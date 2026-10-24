@@ -1,5 +1,16 @@
 # Roadmap
 
+## Capacity pre-check, pinch zoom, art teaser, relationships, tab split (2026-10-24)
+- [x] Full roster now shows the capacity notice with upgrade link instead of the input form; submit stays disabled as a guard
+- [x] Pinch zoom confirmed open app-wide: viewport allows 5x, touch-action auto, tab swipe ignores multi-touch and zoomed state
+- [x] Free-plan art renders as a blurred, radially veiled teaser with lock and upgrade CTA; paid art unchanged (verified at 390px)
+- [x] Relationship dropdown adds mother/father/son/daughter in 7 languages plus existing free text for "other"; server enum extended
+- [x] Group daily rhythm, interactions and rhythm table moved from Traits to Today; Traits keeps color/harmony/pair-map structure only
+- [x] Today prompt now requires day-fresh angles from 16-arts/biorhythm/helio shifts and Arabic-numeral dates only
+- [x] Five generated spiritual food photos cycle through recipe cards and the recipe dialog
+- [x] Locked Today cards and feng shui teaser hide samples until 「サンプルを見る」 opens the fixed one-day dialog
+- [x] 281 tests pass, tsgo clean, build OK; 390px art/today verified without page errors. Family cap notice and recipe images not visually rechecked; fresh AI output unverified.
+
 ## Uploaded layout, color and sample refinement (2026-10-23)
 - [x] Centered left-aligned intro, strict two-row fixed header on all sizes, native pinch-safe gestures, high-contrast theme-aware headings; removed opacity-based intro animation that made later headings temporarily unreadable
 - [x] Centered ingredients, expanded date-rotated cooking catalogue/detail and AI recipe instructions, renamed Japanese tips; shared tappable lucky-color dialog with seven-language symbolic and fashion guidance

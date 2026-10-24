@@ -8,6 +8,7 @@ import type { Plan } from '@/lib/design-modes';
 import { luckyFoodLimit } from '@/lib/plans';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 import { servingsLabel } from '@/lib/reading-presentation';
+import { recipeImage } from '@/lib/recipe-images';
 import { consumeReadingStream, readingCacheEpoch } from '@/lib/reading-cache';
 import DailyLuckyColor from './DailyLuckyColor';
 
@@ -96,6 +97,7 @@ export function TodayLuckyTrio({ state, language, fallback, plan, onUpgrade }: {
         {f.foods.map((food, i) => i >= luckyFoodLimit[plan] ? <div key={i} className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/20 py-3"><span className="flex items-center gap-2"><LockKeyhole className="size-4 text-primary" />{i + 1}. {c.food} · {i < 3 ? 'Standard+' : 'VIP+'}</span><Button size="sm" variant="outline" onClick={onUpgrade}>{c.plans}</Button></div> : <AccordionItem key={food.name + i} value={String(i)}>
           <AccordionTrigger className="min-w-0 gap-2 text-left"><span className="min-w-0 flex-1 break-words">{i + 1}. {food.name}<span className="mt-1 block text-sm font-normal text-muted-foreground">{servingsLabel[language]}</span></span></AccordionTrigger>
           <AccordionContent className="min-w-0 space-y-3 text-[15px] leading-7 [overflow-wrap:anywhere]">
+            <img src={recipeImage(i)} alt={food.name} loading="lazy" width={1024} height={640} className="w-full rounded-md border border-primary/25 object-cover shadow-champagne" />
             <p><strong className="text-primary">{c.why}</strong>：{food.why}</p>
             <section className="recipe-ingredients"><h5 className="text-center font-serif text-primary">{c.ingredients}（{servingsLabel[language]}）</h5><ul>{food.ingredients.map((x, j) => <li key={j} className="grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-3 border-b border-primary/10 py-2"><span>{x.item}</span><span className="text-right">{x.amount}</span></li>)}</ul></section>
             <section className="recipe-ingredients"><h5 className="text-center font-serif text-primary">{c.seasonings}</h5><ul>{food.seasonings.map((x, j) => <li key={j} className="grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-3 border-b border-primary/10 py-2"><span>{x.item}</span><span className="text-right">{x.amount}</span></li>)}</ul></section>

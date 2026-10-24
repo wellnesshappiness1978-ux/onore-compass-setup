@@ -114,10 +114,8 @@ export function GroupFocusCard({ language, plan, onUpgrade }: { language: Langua
     for (let i = 0; i < g.members.length; i++) for (let j = i + 1; j < g.members.length; j++) pairList.push({ a: g.members[i]!, b: g.members[j]!, score: pairScore(g.members[i]!, g.members[j]!) });
     pairList.sort((x, y) => y.score - x.score);
     const harmony = pairList.length ? Math.round(pairList.reduce((a, p) => a + p.score, 0) / pairList.length) : null;
-    const today = new Date().toLocaleDateString("en-CA");
-    const rhythms = g.members.map(m => ({ m, r: biorhythm(m.birthDate, today) })).sort((x, y) => y.r.total - x.r.total);
-    const rhythm = rhythms.length ? Math.round(rhythms.reduce((a, x) => a + x.r.total, 0) / rhythms.length) : null;
-    return { colors, groupHex, harmony, rhythm, pairList, rhythms };
+    // Date-dependent rhythm content lives in the Today tab (GroupMembersToday); Traits keeps timeless structure only.
+    return { colors, groupHex, harmony, pairList };
   }, [g]);
   if (!g || !stats) return null;
   const name = groupDisplayName(g.group, g.index, language);
@@ -128,9 +126,8 @@ export function GroupFocusCard({ language, plan, onUpgrade }: { language: Langua
     {!g.members.length ? <p className="mt-3 text-sm text-muted-foreground">{t.groupEmpty}</p> : <>
       {stats.groupHex && <div className="mt-4 rounded-md p-4" style={{ background: `linear-gradient(135deg, ${stats.groupHex}, ${stats.groupHex}66)` }}><p className="text-xs font-bold text-outline text-foreground">{t.groupColor}</p><p className="mt-1 font-serif text-2xl font-bold text-outline text-foreground">{name} · {localizeBirthColorName(birthColorNameForHex(stats.groupHex), language)}</p><p className="mt-1 font-mono text-sm font-bold text-outline text-foreground">{stats.groupHex.toUpperCase()}</p></div>}
       <GroupSevenColors language={language} plan={plan} onUpgrade={onUpgrade} members={g.members} />
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-4 grid gap-3">
         <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupHarmony}</p><p className="font-serif text-2xl text-primary">{stats.harmony ?? "—"}{stats.harmony !== null && <span className="text-sm">/100</span>}</p></div>
-        <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{t.groupRhythm}</p><p className="font-serif text-2xl text-primary">{stats.rhythm ?? "—"}<span className="text-sm">/100</span></p></div>
       </div>
       {stats.groupHex && (() => { const gm = groupColorMeaning(stats.groupHex, language); const gi = groupInsightCopy[language]; const gd = groupDepthCopy[language]; const n = g.members.length; const panel = "group rounded-md border border-primary/25"; const head = "flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden"; const body = "border-t border-primary/15 px-3 pb-3 pt-2 text-sm leading-7"; return <>
         <div className="mt-3 rounded-md border border-primary/25 p-3 text-sm leading-6"><p className="font-serif text-lg font-bold text-primary">{gm.name}</p><dl className="mt-2 space-y-2"><div><dt className="text-xs font-bold text-primary">{gi.essence}</dt><dd>{gm.essence}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.energy}</dt><dd>{gm.energy}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.role}</dt><dd>{gm.role}</dd></div><div><dt className="text-xs font-bold text-primary">{gi.advice}</dt><dd>{gm.advice}</dd></div></dl></div>
@@ -138,11 +135,8 @@ export function GroupFocusCard({ language, plan, onUpgrade }: { language: Langua
           {([[gd.synergyTitle, gd.synergy(gm, n)], [gd.strengthsTitle, gd.strengths(gm, n)], [gd.frictionTitle, gd.friction(gm, n)], [gd.coopTitle, gd.coop(gm, n)], [gd.fortuneTitle, gd.fortune(gm, n)]] as const).map(([title, text]) => <details key={title} className={panel}><summary className={head}>{title}<span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span></summary><p className={body}>{text}</p></details>)}
         </div>
       </>; })()}
-      {(() => { const gi = groupInsightCopy[language]; const pct = (v: number) => Math.round((v + 1) * 50); const top = stats.rhythms[0]; const low = stats.rhythms[stats.rhythms.length - 1]; const best = stats.pairList[0]; return <>
-        <div className="mt-4 rounded-md border border-primary/25 p-3 text-sm leading-6"><h3 className="text-sm font-bold text-primary">{gi.today}</h3><p className="mt-1">{groupDayLine(stats.rhythm ?? 50, language)}</p>{top && <p className="mt-1">{gi.peak(memberDisplayName(top.m))}</p>}{low && low !== top && low.r.total < 45 && <p className="mt-1">{gi.care(memberDisplayName(low.m))}</p>}{best && <p className="mt-1">{gi.best(memberDisplayName(best.a), memberDisplayName(best.b))}</p>}</div>
-        <details className="group mt-4 rounded-md border border-primary/25"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden">{gi.rhythmTable}<span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span></summary>
-        <div className="overflow-x-auto border-t border-primary/15 p-2"><table className="w-full text-xs"><thead><tr className="text-muted-foreground"><th className="p-1 text-left"></th><th className="p-1">{gi.physical}</th><th className="p-1">{gi.emotional}</th><th className="p-1">{gi.intellectual}</th><th className="p-1">∑</th></tr></thead><tbody>{stats.rhythms.map(({ m, r }) => <tr key={m.id} className="border-t border-primary/15"><td className="max-w-28 truncate p-1 font-bold">{memberDisplayName(m)}</td><td className="p-1 text-center">{pct(r.physical)}</td><td className="p-1 text-center">{pct(r.emotional)}</td><td className="p-1 text-center">{pct(r.intellectual)}</td><td className="p-1 text-center text-primary">{r.total}</td></tr>)}</tbody></table></div></details>
-        {stats.pairList.length > 0 && <details className="group mt-3 rounded-md border border-primary/25"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden">{gi.map}<span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span></summary><ul className="space-y-1.5 border-t border-primary/15 p-3">{stats.pairList.map(p => <li key={p.a.id + p.b.id} className="text-xs"><div className="flex justify-between gap-2"><span className="truncate">{memberDisplayName(p.a)} × {memberDisplayName(p.b)}</span><span className="text-primary">{p.score}</span></div><div className="mt-0.5 h-1.5 rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${p.score}%` }} /></div></li>)}</ul></details>}
+      {(() => { const gi = groupInsightCopy[language]; return <>
+        {stats.pairList.length > 0 && <details className="group mt-4 rounded-md border border-primary/25"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden">{gi.map}<span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span></summary><ul className="space-y-1.5 border-t border-primary/15 p-3">{stats.pairList.map(p => <li key={p.a.id + p.b.id} className="text-xs"><div className="flex justify-between gap-2"><span className="truncate">{memberDisplayName(p.a)} × {memberDisplayName(p.b)}</span><span className="text-primary">{p.score}</span></div><div className="mt-0.5 h-1.5 rounded-full bg-muted"><div className="h-full rounded-full bg-primary" style={{ width: `${p.score}%` }} /></div></li>)}</ul></details>}
         <p className="mt-3 text-[11px] text-muted-foreground">{gi.note}</p>
       </>; })()}
       <h3 className="mt-4 text-sm text-primary">{t.groupMembers}</h3>
@@ -313,6 +307,19 @@ export function GroupMembersToday({ language }: { language: Language }) {
   const roleNames = [...new Set(list.map(x => c.role[x.role]))].join("・");
   const care = list.filter(x => x.band === "care").length;
   return <section className="mb-6 space-y-4 rounded-lg border border-primary/30 bg-card/60 p-4 text-left sm:p-5">
+    {(() => { const gi = groupInsightCopy[language]; const ft = focusCopy[language]; const pct = (v: number) => Math.round((v + 1) * 50);
+      const rhythms = g.members.map(m => ({ m, r: biorhythm(m.birthDate, day) })).sort((x, y) => y.r.total - x.r.total);
+      const avg = rhythms.length ? Math.round(rhythms.reduce((a, x) => a + x.r.total, 0) / rhythms.length) : null;
+      const top = rhythms[0]; const low = rhythms[rhythms.length - 1];
+      const pairs: { a: TeamMember; b: TeamMember; score: number }[] = [];
+      for (let i = 0; i < g.members.length; i++) for (let j = i + 1; j < g.members.length; j++) pairs.push({ a: g.members[i]!, b: g.members[j]!, score: pairScore(g.members[i]!, g.members[j]!) });
+      pairs.sort((x, y) => y.score - x.score); const best = pairs[0];
+      return <>
+        <div className="rounded-md border border-primary/25 p-3 text-center"><p className="text-xs text-muted-foreground">{ft.groupRhythm}</p><p className="font-serif text-2xl text-primary">{avg ?? "—"}<span className="text-sm">/100</span></p></div>
+        <div className="rounded-md border border-primary/25 p-3 text-sm leading-6"><h3 className="text-sm font-bold text-primary">{gi.today}</h3><p className="mt-1">{groupDayLine(avg ?? 50, language)}</p>{top && <p className="mt-1">{gi.peak(memberDisplayName(top.m))}</p>}{low && low !== top && low.r.total < 45 && <p className="mt-1">{gi.care(memberDisplayName(low.m))}</p>}{best && <p className="mt-1">{gi.best(memberDisplayName(best.a), memberDisplayName(best.b))}</p>}</div>
+        <details className="group rounded-md border border-primary/25"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 text-sm font-bold text-primary [&::-webkit-details-marker]:hidden">{gi.rhythmTable}<span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span></summary>
+        <div className="overflow-x-auto border-t border-primary/15 p-2"><table className="w-full text-xs"><thead><tr className="text-muted-foreground"><th className="p-1 text-left"></th><th className="p-1">{gi.physical}</th><th className="p-1">{gi.emotional}</th><th className="p-1">{gi.intellectual}</th><th className="p-1">∑</th></tr></thead><tbody>{rhythms.map(({ m, r }) => <tr key={m.id} className="border-t border-primary/15"><td className="max-w-28 truncate p-1 font-bold">{memberDisplayName(m)}</td><td className="p-1 text-center">{pct(r.physical)}</td><td className="p-1 text-center">{pct(r.emotional)}</td><td className="p-1 text-center">{pct(r.intellectual)}</td><td className="p-1 text-center text-primary">{r.total}</td></tr>)}</tbody></table></div></details>
+      </>; })()}
     <div><h3 className="font-serif text-lg text-primary">{c.synergyTitle}</h3>
       <p className="mt-2 text-sm leading-7"><strong className="text-primary">{c.strengths}：</strong>{c.strengthLine(roleNames)}</p>
       <p className="mt-1 text-sm leading-7"><strong className="text-primary">{c.issues}：</strong>{care ? c.issueLine(care) : c.noIssue}</p></div>

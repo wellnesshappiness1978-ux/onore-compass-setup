@@ -15,7 +15,7 @@ const memberBase = z.object({
   gender: z.enum(["female", "male", "other", "undisclosed"]),
   bloodType: z.enum(["", "A", "B", "O", "AB"]),
   relationship: z.string().trim().max(60),
-  relationshipType: z.enum(["", "partner", "lover", "fiance", "family", "sibling", "relative", "friend", "business", "boss", "subordinate", "employee", "other"]),
+  relationshipType: z.enum(["", "partner", "lover", "fiance", "family", "mother", "father", "son", "daughter", "sibling", "relative", "friend", "business", "boss", "subordinate", "employee", "other"]),
   role: z.string().trim().max(60),
   skills: z.array(z.string().trim().min(1).max(30)).max(12),
   father: z.object({ birthDate: z.string().date(), birthPlace: z.string().max(80), birthCity: z.string().max(80) }).nullable().optional(),
