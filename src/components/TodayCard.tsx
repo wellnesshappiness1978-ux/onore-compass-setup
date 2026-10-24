@@ -1,13 +1,22 @@
 import type { ReactNode, CSSProperties } from 'react';
-import { Crown, Eye, LockKeyhole } from 'lucide-react';
+import { ChevronDown, Crown, Eye, LockKeyhole } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from './ui/dialog';
 import { consultationUxCopy } from '@/lib/consultation-ux-copy';
 import { focusCopy } from '@/lib/focus';
 import type { Language } from '@/lib/translations';
 
-export function TodayCard({ id, title, children, className = '', style }: { id: string; title: string; children: ReactNode; className?: string; style?: CSSProperties | undefined }) {
-  return <section id={id} aria-label={title} style={style} className={`today-feature design-daily-panel card-lux min-w-0 w-full max-w-full rounded-lg p-3 md:p-5 ${className}`}>{children}</section>;
+/** Collapsible Today card: only the heading shows until the user taps it open. */
+export function TodayCard({ id, title, children, className = '', style, summary, defaultOpen = false }: { id: string; title: string; children: ReactNode; className?: string; style?: CSSProperties | undefined; summary?: ReactNode; defaultOpen?: boolean }) {
+  return <section id={id} aria-label={title} style={style} className={`today-feature design-daily-panel card-lux min-w-0 w-full max-w-full rounded-lg p-3 md:p-5 ${className}`}>
+    <details open={defaultOpen || undefined} className="group">
+      <summary className="flex cursor-pointer list-none items-start gap-2 [&::-webkit-details-marker]:hidden">
+        <div className="min-w-0 flex-1">{summary ?? <h3 className="font-serif text-lg text-foreground">{title}</h3>}</div>
+        <ChevronDown aria-hidden="true" className="mt-1.5 size-5 shrink-0 text-primary transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="mt-3">{children}</div>
+    </details>
+  </section>;
 }
 
 export function TodayLockedGuide({ language, title, teaser, onUpgrade, sampleText }: { language: Language; title: string; teaser: string; onUpgrade: () => void; sampleText?: string }) {
