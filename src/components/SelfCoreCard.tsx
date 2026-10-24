@@ -185,11 +185,11 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
         </section>}
         <section aria-label={traits.essence} className="my-5 py-2">
           <h3 className="font-serif text-xl text-primary">{traits.essence}{experienceOnly ? "（1〜10）" : ""}</h3>
-          {topLoading ? <AgolmenLoading compact label={t.loading} /> : top ? <div className="mt-4 divide-y divide-primary/20">
+          <div className="mt-4 divide-y divide-primary/20">
             {essenceKeys.map((key, i) => <SacredDisclosure key={key} className="min-w-0 py-1 [overflow-wrap:anywhere]" title={<span className="flex items-start gap-3 font-serif text-lg leading-8 text-primary"><span className="shrink-0 font-mono text-xs leading-8">0{i + 1}</span><span>{traits.headings[i]}</span></span>}>
-              <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{top.essence?.[key]}</p>
+              {top?.essence?.[key] ? <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{top.essence[key]}</p> : topLoading ? <AgolmenLoading compact label={t.loading} /> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
             </SacredDisclosure>)}
-          </div> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
+          </div>
           {!top && isError && quick.isError && <Button variant="outline" className="mt-3" onClick={() => { void quick.refetch(); void refetch(); }}>{t.retry}</Button>}
           {experienceOnly && <DeeperEssenceSections profile={profile} language={language} passages={data?.deeperEssence ?? partial.deeperEssence} />}
         </section>
