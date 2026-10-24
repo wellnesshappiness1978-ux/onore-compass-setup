@@ -1,5 +1,12 @@
 # Roadmap
 
+## Integrated diagnosis, recipe identity, variable mandala and plain essence (2026-10-24)
+- [ ] Conclusion-first integrated personal/group diagnosis with doubled goal-led action roadmap
+- [ ] Exact recipe identity/photo mapping in cards and details
+- [ ] Deterministic element/life-path/palette motifs and actual-count member nodes, same live/export
+- [ ] Plain sections 1–10 without parameter tables; deeper-title-linked prose in Traits/Today/consultation
+- [ ] Run affected tests, check automatic build and verify central UI flows
+
 ## Four deeper essence domains (2026-10-24)
 - [x] Shared birth-based symbolic calculations, seven-language sections 7–10, selected-person rendering and individual member details in groups; mean nodes, optional ASC/soul, original chakra/tarot/rune archetypes remain distinct
 - [x] Personal progressive reading, Today and consultation share deeper birth references and symbolic boundaries; first six sections, model, gates and limits preserved; parents retained through consultation validation and selected-member payloads
