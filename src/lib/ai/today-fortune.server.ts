@@ -10,6 +10,7 @@ import { personal } from '../day-compass';
 import { RECIPE_SERVINGS } from '../reading-presentation';
 import { luckyRecipes, recipeDetails } from '../lucky-recipes';
 import { z } from 'zod';
+import { validateRecipeIdentities } from '../recipe-identity';
 import { deeperEssencePrompt } from '../deeper-essence';
 
 export async function runReading(data: ReturnType<typeof todayFortuneRequestSchema.parse>, onPartial?: (value: unknown) => void, signal?: AbortSignal): Promise<TodayFortune> {
@@ -78,11 +79,12 @@ Symbolic reference only; no medical, financial or guaranteed outcome claims.`,
     });
     try {
       if (onPartial) for await (const partial of result.partialOutputStream) onPartial(partial);
-      return normalizeFortune(await result.output, language);
+      const output = await result.output;
+      return normalizeFortune({ ...output, foods: validateRecipeIdentities(output.foods, language) }, language);
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error) && error.text) {
         const parsed = todayFortuneSchema.safeParse(JSON.parse(error.text));
-        if (parsed.success) return normalizeFortune(parsed.data, language);
+        if (parsed.success) return normalizeFortune({ ...parsed.data, foods: validateRecipeIdentities(parsed.data.foods, language) }, language);
       }
       throw error;
     }
