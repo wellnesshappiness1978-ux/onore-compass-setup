@@ -12,7 +12,7 @@ export function readFontSize(): FontSize {
 }
 export function saveFontSize(value: FontSize) {
   try { localStorage.setItem(FONT_SIZE_KEY, value); } catch { /* device storage unavailable */ }
-  document.documentElement.dataset.fontSize = value;
+  document.documentElement.dataset['fontSize'] = value;
   window.dispatchEvent(new Event(FONT_SIZE_EVENT));
 }
 export const fontSizeCopy: Record<Language, { title: string; labels: Record<FontSize, string> }> = {

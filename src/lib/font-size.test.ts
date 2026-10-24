@@ -13,6 +13,6 @@ it('persists all three sizes and applies each immediately', () => {
   for (const size of fontSizes) {
     saveFontSize(size);
     expect(readFontSize()).toBe(size);
-    expect(document.documentElement.dataset.fontSize).toBe(size);
+    expect(document.documentElement.dataset['fontSize']).toBe(size);
   }
 });

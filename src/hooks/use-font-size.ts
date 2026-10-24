@@ -7,7 +7,7 @@ export function useFontSize() {
     const sync = () => {
       const next = readFontSize();
       setSize(next);
-      document.documentElement.dataset.fontSize = next;
+      document.documentElement.dataset['fontSize'] = next;
     };
     const storage = (event: StorageEvent) => { if (!event.key || event.key === FONT_SIZE_KEY) sync(); };
     sync();

@@ -37,8 +37,12 @@ export function usePersonalReading(request: Request, kind: 'full' | 'quick' = 'f
     return () => { active = false; };
   }, [sig, kind, client]);
   const query = useQuery<Reading>({
-    queryKey: [key], enabled: Boolean(key) && enabled, staleTime: Infinity, retry: false,
+    queryKey: [key], enabled: Boolean(key) && enabled, staleTime: Infinity, gcTime: Infinity, retry: false,
     queryFn: async () => {
+      // Also restore here after query eviction or a screen re-entry: no network for a completed reading.
+      const schema = kind === 'full' ? cacheSchema : z.object({ catchphrase: z.string(), essence: stringMap(essenceKeys) });
+      const cached = readReadingCache(key, schema);
+      if (cached) return cached as Reading;
       let flight = flights.get(key);
       if (!flight) {
         const listeners = new Set<(p: PartialReading) => void>();
