@@ -58,6 +58,18 @@ export function deeperEssenceSections(value: DeeperEssence, language: Language):
     es: [c.roots, `Tu primera ventana es ${window}. ${c.energy}`, `Tus símbolos de aprendizaje son ${card} y ${l.rune}. ${c.learning}`],
     fr: [c.roots, `Votre première fenêtre est ${window}. ${c.energy}`, `Vos symboles d’apprentissage sont ${card} et ${l.rune}. ${c.learning}`],
   };
+  if (language === 'ja') {
+    // Oracle tone: a solemn message and the soul's present state; no advice, analogies or explanations.
+    const jaGuard = ['静かな導き手が、あなたの言葉が生まれる手前の沈黙に寄り添っている。', '先を照らす探求者の灯が、まだ形になる前のあなたの一歩を見守っている。', '支える者の手が、あなたが背負いすぎた荷の重さをすでに知っている。', '橋を架ける者の光が、あなたと誰かのあいだに細い道を描き始めている。'];
+    const jaRelease = ['急ぐ心が、いま静かにほどけようとしている。', '誰かの期待とあなた自身の願いが、ようやく分かれ始めている。', 'ひとつのつまずきは、あなたという存在のすべてではないと魂は知っている。', '助けを求める声を閉ざしてきた扉が、少しずつ緩んでいる。'];
+    const jaFuture = ['静けさの先に、澄んだ決断の気配がある。', '差し出した小さな種が、ともに育つ未来へつながっている。', '役割の輪郭が整うほど、支え合う流れが満ちてくる。', '耳を澄ます時間が、あなたの軸を保ったまま視界を広げていく。'];
+    return {
+      roots: { body: `あなたの魂は、遠い記憶のなかで慣れ親しんだ力を携えて、この地上に降りてきた。\n\nいま、その根は深く静かに張られ、天命の光は「誰のためにその力が灯るのか」という一点へ集まりつつある。魂はすでに、その方角を知っている。`, rows: [] },
+      energy: { body: `七つの光の扉のうち、いまもっとも強く脈打っているのは「${window}」。\n\nあなたのエネルギーはそこに集まり、静かな熱を帯びている。ほかの扉もまた、それぞれの色で呼吸を続け、ひとつの調和へ向かって満ちていく途上にある。`, rows: [] },
+      learning: { body: `「${card}」と「${l.rune}」の印が、あなたの現世の道に刻まれている。\n\nいま目の前にある出来事は偶然ではなく、魂が選んだ学びの舞台。その試練の只中で、あなたの内側ではすでに新しい理解が芽吹いている。`, rows: [] },
+      guidance: { body: [`高き次元より、ひとつのお告げが届いている。`, jaGuard[g.archetype] ?? jaGuard[0], jaRelease[g.release] ?? jaRelease[0], jaFuture[g.possibility] ?? jaFuture[0]].join('\n\n'), rows: [] },
+    };
+  }
   const body = personalized[language];
   return { roots: { body: body[0], rows: [] }, energy: { body: body[1], rows: [] }, learning: { body: body[2], rows: [] }, guidance: { body: [c.guidance, c.guardians[g.archetype], c.releases[g.release], c.futures[g.possibility]].join('\n\n'), rows: [] } };
 }
