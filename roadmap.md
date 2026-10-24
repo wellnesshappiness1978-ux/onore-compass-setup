@@ -1,11 +1,11 @@
 # Roadmap
 
 ## Integrated diagnosis, recipe identity, variable mandala and plain essence (2026-10-24)
-- [ ] Conclusion-first integrated personal/group diagnosis with doubled goal-led action roadmap
-- [ ] Exact recipe identity/photo mapping in cards and details
-- [ ] Deterministic element/life-path/palette motifs and actual-count member nodes, same live/export
-- [ ] Plain sections 1–10 without parameter tables; deeper-title-linked prose in Traits/Today/consultation
-- [ ] Run affected tests, check automatic build and verify central UI flows
+- [x] Conclusion-first personal/group axisSummary uses 1080–1320 characters and goal-led tomorrow/week/review roadmap; real owner generation returned 1175 characters for a relationship goal and all four deeper fields; actual Traits capstone displayed 1215 characters with an unset-goal plan
+- [x] Thirty catalogue photos resolve by stable recipe ID in cards/details; AI is constrained to five distinct supported IDs and canonical localized names; actual signed-in soup dialog loaded the exact napa-mushroom photo. Arbitrary invented AI recipes intentionally excluded to guarantee identity
+- [x] Birth-fixed four-element/life-path motifs, main/soul/complement pigments and actual-count member nodes share live/export; refined live canvas visually inspected; 390px no horizontal overflow or page errors
+- [x] Sections 1–10 omit parameter disclosures/tables; deeper-title-linked plain prose and shared Today/consultation symbolism retained
+- [x] Full suite 298 tests passed; final affected suite 25 passed; latest automatic build OK. Fresh group AI capstone, consultation output and new export not separately exercised; no guarantees claimed for these verification gaps
 
 ## Four deeper essence domains (2026-10-24)
 - [x] Shared birth-based symbolic calculations, seven-language sections 7–10, selected-person rendering and individual member details in groups; mean nodes, optional ASC/soul, original chakra/tarot/rune archetypes remain distinct
