@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { computeDeeperEssence, deeperEssenceKeys } from './deeper-essence';
 import { consultationContext } from './ai/consultation-context';
+import { consultationRequestSchema } from './consultation-request';
+import { groupMemberSchema, buildGroupContext } from './group-context';
 
 const profile = { nameKanji: '', nameRomaji: 'AE', nameKana: '', birthDate: '2000-01-01', birthTime: '21:00', birthTimeUnknown: false, birthPlace: '東京都', birthCity: '新宿区', bloodType: '', siblingOrder: '' };
 describe('four deeper birth-reference domains', () => {
@@ -51,5 +53,16 @@ describe('four deeper birth-reference domains', () => {
   it('keeps Traits birth structure stable while the selected day changes daily signals', () => {
     expect(consultationContext(profile, '2026-10-24').deeperEssence.values).toEqual(consultationContext(profile, '2026-10-25').deeperEssence.values);
     expect(computeDeeperEssence({ ...profile, birthDate: '2026-02-30' })).toBeNull();
+  });
+  it('preserves parents and per-member deeper references through consultation validation', () => {
+    const father = { birthDate: '1960-05-05', birthPlace: '大阪府', birthCity: '大阪市' };
+    const member = groupMemberSchema.parse({ ...profile, name: '選択した家族', father });
+    const body = consultationRequestSchema.parse({ profile: { ...profile, father }, language: 'ja', messages: [{ role: 'user' }], group: { name: '家族', members: [member] } });
+    expect(body.profile.father).toEqual(father);
+    expect(body.group?.members[0]?.father).toEqual(father);
+    const context = buildGroupContext('家族', [member], '2026-10-24');
+    expect(context).toContain('"name":"選択した家族"');
+    expect(context).toContain('"soul":6');
+    expect(context).toContain('"parentInfluence":"father"');
   });
 });
