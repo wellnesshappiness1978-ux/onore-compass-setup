@@ -404,7 +404,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const [sample, setSample] = useState<TodayFeature | null>(null);
   const sampleMin = sample === "familyRoadmap" ? familyRoadmapMin : sample ? todayFeatures.find((f) => f.id === sample)!.min : "vip";
   const openCount = todayBenefitCount(plan);
-  const lastOpen = todayFeatures.filter(f => f.id !== 'relations').map((f) => canUseToday(plan, f.id)).lastIndexOf(true);
   const higherBenefits = higherTodayBenefits(plan);
   const renderDepth = (section: DeepSection) => {
     const reading = buildTodayDepth(section, plan, language, {date: iso, day: dayIdx + 1, total: Math.round(rhythm.total), physical: Math.round(rhythm.physical * 100), emotional: Math.round(rhythm.emotional * 100), intellectual: Math.round(rhythm.intellectual * 100), goal: focus ? goalText(focus.focus, language) : "", members: focus?.group?.members.length ?? (focus?.member ? 1 : members.length)});
