@@ -298,9 +298,11 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
           ) : (
             <div className="rounded-md border border-primary/25 p-3">
               <h4 className="mb-1 font-serif text-sm text-primary">{ja ? "風水：生まれ持った吉方位タイプと今年の方位" : "Feng shui: birth direction type & this year's direction"}</h4>
-              <p className="mt-2 text-xs leading-6 text-muted-foreground">{access.sample}</p>
-              <p className="mt-2 whitespace-pre-line text-sm leading-7 text-foreground">{todaySample("directionExtended", language)}</p>
-              <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-4 text-primary" /><span>{names.standard}+</span><Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{access.plans}</Button></div>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-4 text-primary" /><span>{names.standard}+</span>
+                <Dialog><DialogTrigger asChild><Button size="sm" variant="outline" className="border-primary/40"><Eye className="size-3.5" />{consultationUxCopy[language].sample}</Button></DialogTrigger>
+                  <DialogContent className="max-h-[90dvh] overflow-y-auto border-primary/35"><DialogHeader><DialogDescription className="text-xs text-primary">{consultationUxCopy[language].sample}</DialogDescription><DialogTitle className="font-serif text-primary">{ja ? "風水：生まれ持った吉方位タイプと今年の方位" : "Feng shui: birth direction type & this year's direction"}</DialogTitle></DialogHeader><p className="text-xs leading-6 text-muted-foreground">{access.sample}</p><p className="mt-2 whitespace-pre-line text-sm leading-7">{todaySample("directionExtended", language)}</p><Button variant="champagne" onClick={onUpgrade}><Crown className="size-4" />{access.plans}</Button></DialogContent>
+                </Dialog>
+                <Button size="sm" variant="champagne" onClick={onUpgrade}><Crown className="size-3.5" />{access.plans}</Button></div>
             </div>
           )}
         </div>
@@ -469,7 +471,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
                 <div className="relative flex flex-col items-center gap-2 text-center">
                   <LockKeyhole className="size-5 text-primary" />
                   {teaser[id] && <p className="text-sm font-medium text-foreground">✦ {teaser[id]}</p>}
-                  {plan === "free" && <><p className="text-xs leading-6 text-muted-foreground">{access.sample}</p><p className="w-full whitespace-pre-line text-left text-sm leading-7 text-foreground">{todaySample(id, language)}</p></>}
                   <p className="text-xs text-muted-foreground">{ja ? `${names[min]}以上でお楽しみいただけます` : `Enjoy with ${names[min]} or higher`}</p>
                   <div className="flex flex-wrap justify-center gap-2">
                     <Button size="sm" variant="outline" className="border-primary/40" onClick={() => setSample(id)}><Eye className="size-3.5" />{ja ? "サンプルを見る" : "See sample"}</Button>
