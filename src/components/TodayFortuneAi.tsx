@@ -8,6 +8,7 @@ import type { Plan } from '@/lib/design-modes';
 import { luckyFoodLimit } from '@/lib/plans';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 import { servingsLabel } from '@/lib/reading-presentation';
+import { recipeImage } from '@/lib/recipe-images';
 import { consumeReadingStream, readingCacheEpoch } from '@/lib/reading-cache';
 import DailyLuckyColor from './DailyLuckyColor';
 

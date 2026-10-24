@@ -33,6 +33,7 @@ import { todayAccessCopy } from '@/lib/today-access-copy';
 import { todaySample } from '@/lib/today-samples';
 import { subjectSignals, subjectDirections } from '@/lib/today-subject';
 import { readingDate, monthlyLabels, servingsLabel } from "@/lib/reading-presentation";
+import { recipeImage } from "@/lib/recipe-images";
 import { groupBirthPalette } from '@/lib/group-palette';
 import DailyLuckyColor from './DailyLuckyColor';
 
