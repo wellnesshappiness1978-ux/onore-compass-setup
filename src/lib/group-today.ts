@@ -1,3 +1,4 @@
+import { dailyMessageDepth } from "./daily-message-depth";
 import { biorhythm, type TeamMember } from "./team-analysis";
 import type { Language } from "./translations";
 
@@ -60,6 +61,9 @@ export function subjectDailyMessage(subjectKey: string, birthDate: string | null
   const seed = seedOf(`${day}|${subjectKey}`);
   const lines = [c.daily[seed % c.daily.length]!];
   if (birthDate) lines.push(c.rhythmLine[bandOf(biorhythm(birthDate, day).total)]);
+  const d = dailyMessageDepth[language];
+  lines.push(d.meaning[(seed >>> 3) % d.meaning.length]!);
   if (goal) lines.push(c.goalLine(goal));
+  lines.push(d.action[(seed >>> 6) % d.action.length]!, d.reflect[(seed >>> 9) % d.reflect.length]!);
   return lines;
 }

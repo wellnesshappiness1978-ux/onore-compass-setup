@@ -404,7 +404,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const [sample, setSample] = useState<TodayFeature | null>(null);
   const sampleMin = sample === "familyRoadmap" ? familyRoadmapMin : sample ? todayFeatures.find((f) => f.id === sample)!.min : "vip";
   const openCount = todayBenefitCount(plan);
-  const lastOpen = todayFeatures.filter(f => f.id !== 'relations').map((f) => canUseToday(plan, f.id)).lastIndexOf(true);
   const higherBenefits = higherTodayBenefits(plan);
   const renderDepth = (section: DeepSection) => {
     const reading = buildTodayDepth(section, plan, language, {date: iso, day: dayIdx + 1, total: Math.round(rhythm.total), physical: Math.round(rhythm.physical * 100), emotional: Math.round(rhythm.emotional * 100), intellectual: Math.round(rhythm.intellectual * 100), goal: focus ? goalText(focus.focus, language) : "", members: focus?.group?.members.length ?? (focus?.member ? 1 : members.length)});
@@ -450,7 +449,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <details className="mt-3 border-t border-primary/20 pt-3"><summary className="cursor-pointer text-sm text-primary">{benefit.catalogue}</summary><ol className="mt-2 grid gap-1 text-xs sm:grid-cols-2">{todayBenefitCategories.map((c, i) => <li key={c.id} className={rank(plan) >= rank(c.min) ? "text-foreground" : "text-muted-foreground"}>{i + 1}. {benefit[c.id as keyof typeof benefit]} · {names[c.min]}</li>)}</ol></details>
         {higherBenefits.length > 0 && <div className="mt-3 space-y-2 border-t border-primary/20 pt-3"><h4 className="text-xs text-primary">{benefit.higher}</h4>{higherBenefits.map(({tier, categories}) => <p key={tier} className="text-xs leading-6"><strong className="text-primary">{names[tier]}</strong>：{categories.map(c => benefit[c.id as keyof typeof benefit]).join(" / ")}</p>)}</div>}
       </section>
-      <TodayCard id="today-insight" defaultOpen title={ja ? "今日だけの深層リーディング" : "Today's deep reading"} summary={<h3 className="flex items-center gap-2 font-serif text-lg text-foreground"><Sparkles className="size-4 text-primary" />{ja ? "今日だけの深層リーディング" : "Today's deep reading"}</h3>}>
+      <TodayCard id="today-insight" title={ja ? "今日だけの深層リーディング" : "Today's deep reading"} summary={<h3 className="flex items-center gap-2 font-serif text-lg text-foreground"><Sparkles className="size-4 text-primary" />{ja ? "今日だけの深層リーディング" : "Today's deep reading"}</h3>}>
         <p className="mb-4 text-base font-medium tabular-nums text-primary">{readingDate(iso, language)}</p>
         <TodayInsight state={fortune} language={language} />
         <FeatureNotifySwitch id="insight" title={`🔮 ${ja ? "今日の深層リーディング" : "Today's deep reading"}`} body={fortune.data?.headline ?? (ja ? "今日だけのメッセージが届いています" : "Your message for today is ready")} language={language} />
@@ -482,7 +481,6 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
             <FeatureNotifySwitch id={id} title={`${notifyEmoji[id] ?? "🧭"} ${L(titles[id])}`} body={content[id].notify} language={language} disabled={!open} color={id === "dailyLucky" ? luckyHex : undefined} />
           </TodayCard>
           {id === "helio" && <TodayReminders kind="evening" language={language} plan={plan} onUpgrade={onUpgrade} />}
-          {i === lastOpen && share("share-open")}
         </Fragment>);
       })}
       {share("share-bottom")}
