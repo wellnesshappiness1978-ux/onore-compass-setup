@@ -1,10 +1,10 @@
 # Roadmap
 
 ## Cosmic wording, individual essence, cached perspectives and text size (2026-10-24)
-- [ ] Replace cosmic color captions with a compact birth-sky compass interpretation
-- [ ] Keep essence visible with independent sections 1–10
-- [ ] Restore cached six-perspective readings without redundant requests/calculations
-- [ ] Persist three global text sizes in Settings; test and verify screen flows
+- [x] Replace cosmic color captions with a compact whole-natal-sky compass interpretation; signed-in card has no seven-color row
+- [x] Keep essence visible with independent sections 1–10, including while generating; ten controls verified at 320px
+- [x] Restore cached six-perspective readings without redundant requests/calculations; actual signed-in generation completed, reload and opened perspective made zero reading requests
+- [x] Persist three global text sizes in Settings; 14/16/18px confirmed at 320px without horizontal overflow, large restored after reload; full suite 303 tests and final affected 18 tests passed, automatic build OK
 
 ## Integrated diagnosis, recipe identity, variable mandala and plain essence (2026-10-24)
 - [x] Conclusion-first personal/group axisSummary uses 1080–1320 characters and goal-led tomorrow/week/review roadmap; real owner generation returned 1175 characters for a relationship goal and all four deeper fields; actual Traits capstone displayed 1215 characters with an unset-goal plan
