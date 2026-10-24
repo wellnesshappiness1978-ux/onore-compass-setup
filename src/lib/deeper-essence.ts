@@ -5,7 +5,7 @@ import { natalSky } from './natal-sky';
 
 export const deeperEssenceKeys = ['roots', 'energy', 'learning', 'guidance'] as const;
 export type DeeperEssenceKey = typeof deeperEssenceKeys[number];
-export type DeeperProfile = CoreInput & { birthPlace: string; father?: { birthDate: string; birthPlace?: string; birthCity?: string } | null; mother?: { birthDate: string; birthPlace?: string; birthCity?: string } | null };
+export type DeeperProfile = CoreInput & { birthPlace: string; father?: { birthDate: string; birthPlace?: string; birthCity?: string } | null | undefined; mother?: { birthDate: string; birthPlace?: string; birthCity?: string } | null | undefined };
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 const signNames = ['牡羊座', '牡牛座', '双子座', '蟹座', '獅子座', '乙女座', '天秤座', '蠍座', '射手座', '山羊座', '水瓶座', '魚座'];
 const elementOrder = ['火', '地', '風', '水'];

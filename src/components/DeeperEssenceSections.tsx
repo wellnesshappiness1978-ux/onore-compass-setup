@@ -4,7 +4,7 @@ import { deeperEssenceCopy, deeperEssenceSections } from '@/lib/deeper-essence-c
 import type { Language } from '@/lib/translations';
 import { SacredDisclosure } from './ui/sacred-disclosure';
 
-export default function DeeperEssenceSections({ profile, language, passages }: { profile: DeeperProfile; language: Language; passages?: Partial<Record<DeeperEssenceKey, string>> }) {
+export default function DeeperEssenceSections({ profile, language, passages }: { profile: DeeperProfile; language: Language; passages?: Partial<Record<DeeperEssenceKey, string>> | undefined }) {
   const values = useMemo(() => computeDeeperEssence(profile), [profile]);
   if (!values) return null;
   const c = deeperEssenceCopy[language], sections = deeperEssenceSections(values, language);
