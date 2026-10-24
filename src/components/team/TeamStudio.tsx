@@ -206,7 +206,8 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
     <div className="space-y-4">
       {owner && <ul aria-label={familyCapacityCopy[language].owner} className="grid gap-2 sm:grid-cols-2"><li className="flex items-center gap-3 rounded-md border border-primary/40 bg-primary/10 p-3"><div className="min-w-0 flex-1"><p className="truncate text-base font-bold text-primary">{memberDisplayName(owner)}</p><p className="text-xs text-primary">{familyCapacityCopy[language].owner}</p><p className="mt-1 text-xs text-muted-foreground">{familyCapacityCopy[language].excluded}</p></div></li></ul>}
       {!signedIn && <p className="text-[11px] text-muted-foreground">{previewOnly ? x.preview : t.guestNote}</p>}
-      {formOpen && <form id="family-roster-form" onSubmit={submit} className={`${card} grid items-start gap-2 sm:grid-cols-2`}>
+      {formOpen && atCap && <div role="note" className={`${card} border-primary/40 bg-primary/10 p-4 text-center`}><p className="font-bold text-primary">{t.limitTitle}</p><p className="mt-1 text-xs text-muted-foreground">{familyCapacityCopy[language].capacity(members.length, max)}</p><Button size="sm" variant="outline" className="mt-3" onClick={onLimit}><Crown className="size-3.5" />{t.upgradeFamily}</Button></div>}
+      {formOpen && !atCap && <form id="family-roster-form" onSubmit={submit} className={`${card} grid items-start gap-2 sm:grid-cols-2`}>
         <Input required aria-label={t.name} placeholder={`${t.name} *`} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <Input aria-label={focusCopy[language].nickname} placeholder={focusCopy[language].nickname} value={form.nickname} maxLength={40} onChange={(e) => setForm({ ...form, nickname: e.target.value })} />
         <Input aria-label={x.kana} placeholder={x.kana} value={form.nameKana} maxLength={60} onChange={(e) => setForm({ ...form, nameKana: e.target.value })} />
