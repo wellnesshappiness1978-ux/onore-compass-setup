@@ -1,5 +1,10 @@
 # Roadmap
 
+## Four deeper essence domains (2026-10-24)
+- [ ] Shared birth-based symbolic calculations, seven-language sections 7–10 and selected-person/group rendering
+- [ ] Personal reading, Today and consultation integration; preserve first six sections and existing gates/models
+- [ ] Regression tests, live AI and UI checks, current build diagnostics
+
 ## Capacity pre-check, pinch zoom, art teaser, relationships, tab split (2026-10-24)
 - [x] Full roster now shows the capacity notice with upgrade link instead of the input form; submit stays disabled as a guard
 - [x] Pinch zoom confirmed open app-wide: viewport allows 5x, touch-action auto, tab swipe ignores multi-touch and zoomed state
