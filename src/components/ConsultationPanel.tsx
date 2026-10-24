@@ -139,6 +139,8 @@ export default function ConsultationPanel({
             birthCity: target.birthCity ?? "",
             bloodType: target.bloodType,
             siblingOrder: target.siblingOrder ?? "",
+            father: target.father ?? null,
+            mother: target.mother ?? null,
             gender: target.gender ?? "undisclosed",
           }
         : profile,
@@ -207,7 +209,7 @@ export default function ConsultationPanel({
           goal: effectiveGoal,
           language,
           day: new Date().toLocaleDateString("en-CA"),
-          group: selGroup ? { name: targetLabel.slice(0, 60), members: selGroupMembers.filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.birthDate)).slice(0, 101).map((m) => ({ name: memberDisplayName(m).slice(0, 40), birthDate: m.birthDate, birthTime: m.birthTimeUnknown === false ? (m.birthTime ?? "").slice(0, 5) : "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: (m.birthPlace ?? "").slice(0, 80), birthCity: (m.birthCity ?? "").slice(0, 80), bloodType: m.bloodType ?? "", gender: m.gender ?? "undisclosed", siblingOrder: (m.siblingOrder ?? "").slice(0, 80), relationship: (m.relationship ?? "").slice(0, 60), relationshipType: (m.relationshipType ?? "").slice(0, 30) })) } : undefined,
+          group: selGroup ? { name: targetLabel.slice(0, 60), members: selGroupMembers.filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.birthDate)).slice(0, 101).map((m) => ({ name: memberDisplayName(m).slice(0, 40), nameRomaji: m.id === SELF_MEMBER_ID ? profile.nameRomaji : '', father: m.father ?? null, mother: m.mother ?? null, birthDate: m.birthDate, birthTime: m.birthTimeUnknown === false ? (m.birthTime ?? "").slice(0, 5) : "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: (m.birthPlace ?? "").slice(0, 80), birthCity: (m.birthCity ?? "").slice(0, 80), bloodType: m.bloodType ?? "", gender: m.gender ?? "undisclosed", siblingOrder: (m.siblingOrder ?? "").slice(0, 80), relationship: (m.relationship ?? "").slice(0, 60), relationshipType: (m.relationshipType ?? "").slice(0, 30) })) } : undefined,
         }),
       }),
     [targetProfile, profile, targetLabel, language, target, effectiveGoal, selGroup, selGroupMembers],
