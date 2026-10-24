@@ -1,5 +1,10 @@
 # Roadmap
 
+## Four deeper essence domains (2026-10-24)
+- [x] Shared birth-based symbolic calculations, seven-language sections 7–10, selected-person rendering and individual member details in groups; mean nodes, optional ASC/soul, original chakra/tarot/rune archetypes remain distinct
+- [x] Personal progressive reading, Today and consultation share deeper birth references and symbolic boundaries; first six sections, model, gates and limits preserved; parents retained through consultation validation and selected-member payloads
+- [x] 288 full-suite tests passed before final added validation regression; actual full reading generated all four passages (256–288 chars), Today and consultation completed successfully. Actual Traits UI displayed arriving personalized sections and reload made zero new generation requests; 320/390px no horizontal overflow/page errors. Group/member fresh AI prose not separately verified. Latest automatic build OK.
+
 ## Capacity pre-check, pinch zoom, art teaser, relationships, tab split (2026-10-24)
 - [x] Full roster now shows the capacity notice with upgrade link instead of the input form; submit stays disabled as a guard
 - [x] Pinch zoom confirmed open app-wide: viewport allows 5x, touch-action auto, tab swipe ignores multi-touch and zoomed state

@@ -4,6 +4,8 @@ import { biorhythm, pairScore, type TeamMember } from "./team-analysis";
 import { groupColorMeaning } from "./group-insight";
 import { groupSizeDirective } from "./goal-guidance";
 import { groupBirthPalette } from "./group-palette";
+import { deeperEssenceContext } from './deeper-essence';
+import { readingProfileSchema } from './profile-reading-context';
 
 /** Minimal member data sent with a group consultation; numbers are recomputed server-side. */
 export const groupMemberSchema = z.object({
@@ -18,6 +20,9 @@ export const groupMemberSchema = z.object({
   siblingOrder: z.string().max(80).optional().default(""),
   relationship: z.string().max(60).optional().default(""),
   relationshipType: z.string().max(30).optional().default(""),
+  nameRomaji: z.string().max(60).optional().default(''),
+  father: readingProfileSchema.shape.father,
+  mother: readingProfileSchema.shape.mother,
 });
 export type GroupMemberInput = z.infer<typeof groupMemberSchema>;
 
@@ -44,6 +49,7 @@ export function buildGroupContext(name: string, input: GroupMemberInput[], day: 
   const top = rh[0]!, low = rh[rh.length - 1]!;
   return [
     `GROUP CONSULTATION — group "${name}", ${members.length} members. ${groupSizeDirective(members.length)}`,
+    `Each member's deeper birth references: ${JSON.stringify(input.map(m => ({ name: m.name, ...deeperEssenceContext({ ...m, nameKanji: m.name }) })))}`,
     `Members: ${members.map((m, i) => `${m.name} (born ${m.birthDate}${m.birthPlace ? `, birth region ${m.birthPlace}` : ""}${m.birthCity ? `, birth municipality ${m.birthCity}` : ""}${m.bloodType ? `, blood ${m.bloodType}` : ""}${m.siblingOrder ? `, sibling ${m.siblingOrder}` : ""}${m.relationshipType ? `, relationship type ${m.relationshipType}` : ""}${m.relationship ? `, relation ${m.relationship}` : ""}, birth color ${colors[i] ? `${colors[i]!.name} ${colors[i]!.code}` : "n/a"})`).join("; ")}.`,
     meaning ? `Group color: ${meaning.name} ${hex}. Essence: ${meaning.essence} Energy: ${meaning.energy} Role: ${meaning.role} Advice: ${meaning.advice}` : "Group color: not available.",
     (() => { const gp = groupBirthPalette(members); return gp ? `Group seven colors (role: name code): ${(["main", "sub", "money", "work", "love", "health", "mind"] as const).map(r => `${r}: ${gp[r].name} ${gp[r].code}`).join("; ")}.` : ""; })(),

@@ -9,7 +9,7 @@ import { defaultFocus, FOCUS_KEY, selfReadingLabel, groupDisplayName, memberDisp
 import type { UserProfile } from "./Onboarding";
 import { SELF_MEMBER_ID } from "@/lib/group-insight";
 
-export const ownerAsMember = (o: UserProfile): TeamMember => ({ id: SELF_MEMBER_ID, name: o.nameKanji || o.nameRomaji || selfReadingLabel.ja, nameKana: o.nameKana, birthDate: o.birthDate, birthTime: o.birthTime, birthTimeUnknown: o.birthTimeUnknown, birthPlace: o.birthPlace, birthCity: o.birthCity, siblingOrder: o.siblingOrder, gender: o.gender, bloodType: o.bloodType, role: "", skills: [] });
+export const ownerAsMember = (o: UserProfile): TeamMember => ({ id: SELF_MEMBER_ID, name: o.nameKanji || o.nameRomaji || selfReadingLabel.ja, nameKana: o.nameKana, birthDate: o.birthDate, birthTime: o.birthTime, birthTimeUnknown: o.birthTimeUnknown, birthPlace: o.birthPlace, birthCity: o.birthCity, siblingOrder: o.siblingOrder, father: o.father ?? null, mother: o.mother ?? null, gender: o.gender, bloodType: o.bloodType, role: "", skills: [] });
 
 type Ctx = {
   owner: UserProfile;

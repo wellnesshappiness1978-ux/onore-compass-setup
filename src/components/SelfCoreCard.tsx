@@ -22,6 +22,7 @@ import BirthColorGuide from "./BirthColorGuide";
 import { SacredDisclosure } from "./ui/sacred-disclosure";
 import { essenceKeys, traitReadingCopy } from "@/lib/trait-reading";
 import { useFocus } from './FocusProvider';
+import DeeperEssenceSections from './DeeperEssenceSections';
 
 const layerCopy: Record<Language, { title: string; choose: string; names: string[]; summaries: string[]; surface: string; inner: string; moreTime: string; birthplace: string; regional: string; prefectural: string; source: string }> = {
   ja: { title: "6大占術レイヤー", choose: "占術レイヤーを選択", names: ["本格姓名判断", "精密数秘術", "西洋占星術", "四柱推命", "動物占い・独自4層参考", "本格風水学"], summaries: ["名前の五運と社会面を確認します。", "生年月日とローマ字名の数を確認します。", "出生時の天体配置を確認します。", "生年月日時の暦と要素の配分を確認します。", "生年月日の60日周期を確認します。", "生年と性別区分から方位タイプを確認します。"], surface: "表の顔", inner: "本音・潜在", moreTime: "※出生時間を設定するとさらに精密度が向上します", birthplace: "出生地", regional: "市区町村", prefectural: "都道府県", source: "代表座標をアセンダントに使用。位置データ" },
@@ -192,6 +193,7 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
             </article>)}
           </div> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
           {!top && isError && quick.isError && <Button variant="outline" className="mt-3" onClick={() => { void quick.refetch(); void refetch(); }}>{t.retry}</Button>}
+          {experienceOnly && <DeeperEssenceSections profile={profile} language={language} passages={data?.deeperEssence ?? partial.deeperEssence} />}
         </section>
         <SacredDisclosure defaultOpen className="my-5" title={t.views}>
         {localLayers && <CoreLayersPanel layers={localLayers} profile={profile} language={language} reading={data} loading={isPending} nameDetails={nameDetails} />}

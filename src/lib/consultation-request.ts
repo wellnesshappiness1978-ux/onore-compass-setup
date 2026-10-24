@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { groupMemberSchema } from "./group-context";
+import { readingProfileSchema } from './profile-reading-context';
 
 /** Only the selected/entered goal belongs here; roster data belongs in group. */
 export const consultationGoal = (goal: string): string | undefined =>
@@ -17,6 +18,8 @@ const personSchema = z.object({
   bloodType: z.string().max(4),
   siblingOrder: z.string().max(80),
   gender: z.enum(["male", "female", "other", "undisclosed"]).optional(),
+  father: readingProfileSchema.shape.father,
+  mother: readingProfileSchema.shape.mother,
 });
 
 export const consultationRequestSchema = z.object({

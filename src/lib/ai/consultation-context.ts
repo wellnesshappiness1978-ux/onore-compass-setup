@@ -9,6 +9,7 @@ import { approachStatuses } from "../trait-reading";
 import { parseSiblingComposition } from "../sibling-order";
 import { computeExtendedArts, extendedArtsPrompt } from "../extended-arts";
 import { artPrinciplesPrompt } from "../art-overview-copy";
+import { deeperEssenceContext } from '../deeper-essence';
 
 type Input = CoreInput & {
   birthPlace: string;
@@ -52,6 +53,7 @@ export function consultationContext(profile: Input, day: string) {
     core: coreLayersPrompt(core),
     extended: extendedArtsPrompt(computeExtendedArts(profile.birthDate, profile.birthTime, profile.birthTimeUnknown)),
     principles: artPrinciplesPrompt,
+    deeperEssence: deeperEssenceContext(profile, core),
     status,
     sky,
     colors,
