@@ -1,12 +1,11 @@
 import type { Language } from './translations';
 import type { DeeperEssence, DeeperEssenceKey } from './deeper-essence';
-import { signInfo } from './zodiac-signs';
 
 type Copy = { headings: [string, string, string, string]; note: string; basis: string; roots: string; energy: string; learning: string; guidance: string; labels: string[]; chakras: string[]; elements: string[]; tarot: string[]; guardians: string[]; releases: string[]; futures: string[]; missing: string; provisional: string };
 export const deeperEssenceCopy: Record<Language, Copy> = {
   ja: {
     headings: ['魂のルーツと天命', 'チャクラとエネルギー状態', '現実世界での学び', '高次元からの導き'],
-    note: '魂・前世・守護存在は、自分を見つめるための物語の象徴です。チャクラやオーラは身体・精神状態の測定ではなく、未来は選択によって開く可能性として描きます。', basis: '出生データからの参考値',
+    note: '魂・前世・守護存在は、自分を見つめるための物語の象徴です。チャクラやオーラは身体・精神状態の測定ではなく、未来は選択によって開く可能性として描きます。', basis: '日々に活かすヒント',
     roots: '太陽を表に出る意志、月を安心のよりどころとして重ねると、頑張り方と休み方の違いが見えてきます。ドラゴンテイルは慣れた得意パターン、ドラゴンヘッドは新しく育てる方向を表す象徴。「以前から得意なことを、誰のためにどう使いたいか」と問い直すと、天命という大きな言葉を日々の選択へ戻せます。',
     energy: '7つのチャクラを、安心・創造・意志・つながり・表現・洞察・広い視点という7つの窓として眺めます。強調される窓は不足や病気ではなく、自己対話の入り口。火と風を動き出す力、地と水を受け止める力として比べると、会議で先に提案するか、相手の話を聞いてから言葉にするかという小さな選択に活かせます。オーラは出生色の象徴で、今の気分を言い当てるものではありません。',
     learning: '出生データから選んだ大アルカナとルーンは、人生を決める札ではなく、学び方を照らすたとえです。マヤ暦の紋章・音・ウェイブと重ね、仕事の依頼にどう答えるか、家族との意見の違いをどう扱うかを考えてみます。試練は約束された出来事ではなく、いつもの選び方を見直すテーマ。明日の小さな実験から、自分に合う越え方を探せます。',
@@ -47,12 +46,18 @@ export const deeperEssenceCopy: Record<Language, Copy> = {
 
 export function deeperEssenceSections(value: DeeperEssence, language: Language): Record<DeeperEssenceKey, { body: string; rows: [string, string][] }> {
   const c = deeperEssenceCopy[language];
-  const sign = (name: string | null | undefined) => name ? signInfo(name, language)?.name ?? name : c.missing;
-  const r = value.roots, e = value.energy, l = value.learning, g = value.guidance;
-  return {
-    roots: { body: c.roots, rows: [[c.labels[0] ?? '', `${sign(r.sun)} / ${sign(r.moon)} / ${sign(r.ascendant)}`], [c.labels[1] ?? '', `${sign(r.northSign)} ${r.northLongitude.toFixed(1)}° / ${sign(r.southSign)} ${r.southLongitude.toFixed(1)}°`], [c.labels[2] ?? '', `${r.lifePath} / ${r.soul ?? c.missing}`], ...(r.timeReference === 'JST noon' ? [[c.provisional, ''] as [string, string]] : [])] },
-    energy: { body: c.energy, rows: [[c.labels[3] ?? '', `${e.focusChakra} · ${c.chakras[e.focusChakra - 1]}`], ...e.chakraThemes.map(x => [`${x.chakra} · ${c.chakras[x.chakra - 1]}`, `${x.emphasis}/7`] as [string, string]), ...e.elements.map((x, i) => [c.elements[i] ?? '', `${x.count}/10`] as [string, string]), [c.labels[4] ?? '', `${e.yang} / ${e.yin}`]] },
-    learning: { body: c.learning, rows: [[c.labels[5] ?? '', `${l.tarot} · ${c.tarot[l.tarot]} / ${l.rune}`], [c.labels[6] ?? '', `${l.maya.kin} / ${l.maya.tone} / ${l.maya.waveStart}`]] },
-    guidance: { body: [c.guidance, c.guardians[g.archetype], c.releases[g.release], c.futures[g.possibility]].join('\n\n'), rows: [] },
+  const e = value.energy, l = value.learning, g = value.guidance;
+  const window = c.chakras[e.focusChakra - 1] ?? c.chakras[0];
+  const card = c.tarot[l.tarot] ?? c.tarot[0];
+  const personalized: Record<Language, [string, string, string]> = {
+    ja: [ `魂のルーツとは、自然に力が湧く「自分らしさ」のこと。天命は、その力を誰のために使うかという日々の選択です。${c.roots}`, `チャクラは、暮らしの中で自分をいたわる7つの入口です。あなたがまず目を向けたいのは「${window}」。安心・楽しみ・意志・いたわり・対話・見通し・意味を順に振り返り、明日の予定に自分のための5分を一つ置いてみてください。${c.energy}`, `現実の学びは、目の前の困りごとを小さな練習へ変えることです。「${card}」と「${l.rune}」を学びの物語として眺め、いつもの返事を一つ言い換えたり、依頼を小分けにしたりするところから始められます。${c.learning}` ],
+    en: [c.roots, `Your first window is ${window}. ${c.energy}`, `Your learning symbols are ${card} and ${l.rune}. ${c.learning}`],
+    'zh-CN': [c.roots, `先关注「${window}」。${c.energy}`, `学习的象征是「${card}」与「${l.rune}」。${c.learning}`],
+    'zh-TW': [c.roots, `先關注「${window}」。${c.energy}`, `學習的象徵是「${card}」與「${l.rune}」。${c.learning}`],
+    ko: [c.roots, `먼저 살펴볼 창은 ${window}입니다. ${c.energy}`, `배움의 상징은 ${card}와 ${l.rune}입니다. ${c.learning}`],
+    es: [c.roots, `Tu primera ventana es ${window}. ${c.energy}`, `Tus símbolos de aprendizaje son ${card} y ${l.rune}. ${c.learning}`],
+    fr: [c.roots, `Votre première fenêtre est ${window}. ${c.energy}`, `Vos symboles d’apprentissage sont ${card} et ${l.rune}. ${c.learning}`],
   };
+  const body = personalized[language];
+  return { roots: { body: body[0], rows: [] }, energy: { body: body[1], rows: [] }, learning: { body: body[2], rows: [] }, guidance: { body: [c.guidance, c.guardians[g.archetype], c.releases[g.release], c.futures[g.possibility]].join('\n\n'), rows: [] } };
 }

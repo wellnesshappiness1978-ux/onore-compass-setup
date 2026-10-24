@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { readingProfileSchema, readingSubjectSchema } from "../profile-reading-context";
+import { readingProfileSchema, readingSubjectSchema, readingGroupSchema } from "../profile-reading-context";
 import { z } from "zod";
-const inputSchema = z.object({ profile: readingProfileSchema, language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]), goal: z.string().max(240).optional(), subject: readingSubjectSchema.optional() });
+const inputSchema = z.object({ profile: readingProfileSchema, language: z.enum(["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"]), goal: z.string().max(240).optional(), subject: readingSubjectSchema.optional(), group: readingGroupSchema.optional() });
 export const generateHomeReading = createServerFn({ method: "POST" }).inputValidator((input: unknown) => inputSchema.parse(input)).handler(async ({ data }) => {
   const { runReading } = await import("./home-reading.server");
   return runReading(data);

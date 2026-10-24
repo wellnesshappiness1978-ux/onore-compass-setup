@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { usePersonalReading } from "@/hooks/use-personal-reading";
+import { traitReadingCopy } from "@/lib/trait-reading";
+import { homeReadingCopy } from "@/lib/home-reading-copy";
 import { birthAddressCopy } from "@/lib/birth-address";
 import { groupTodayCopy, memberToday, roleAssignment, subjectDailyMessage } from "@/lib/group-today";
 import { useServerFn } from "@tanstack/react-start";
@@ -143,9 +146,21 @@ export function GroupFocusCard({ language, plan, onUpgrade }: { language: Langua
       </>; })()}
       <h3 className="mt-4 text-sm text-primary">{t.groupMembers}</h3>
       <ul className="mt-2 grid gap-2 sm:grid-cols-2">{stats.colors.map(({ m, c }) => <li key={m.id} className="flex items-center gap-3 rounded-md border border-primary/20 p-2"><span className="size-8 shrink-0 rounded-full border border-primary/40" style={{ background: c?.code }} /><span className="min-w-0"><span className="block truncate font-bold text-outline">{memberDisplayName(m)}</span><span className="block truncate text-xs text-muted-foreground">{c ? `${localizeBirthColorName(c.name, language)} ${c.code}` : "—"}</span></span></li>)}</ul>
+      <GroupIntegratedReading language={language} />
       <div className="mt-5 space-y-3">{g.members.map(m => <SacredDisclosure key={m.id} title={memberDisplayName(m)}><DeeperEssenceSections profile={m.id === SELF_MEMBER_ID && ctx ? ctx.owner : memberToProfile(m)} language={language} /></SacredDisclosure>)}</div>
     </>}
   </section>;
+}
+
+function GroupIntegratedReading({ language }: { language: Language }) {
+  const ctx = useFocus();
+  const members = ctx?.group?.members.map(m => m.id === SELF_MEMBER_ID ? ctx.owner : memberToProfile(m)) ?? [];
+  const name = ctx?.label(language) ?? '';
+  const request = { profile: members[0] ?? ctx?.owner, language, goal: ctx ? goalText(ctx.focus, language) : '', subject: { label: name, isSelf: false }, group: { name, members } };
+  const reading = usePersonalReading({ ...request, profile: request.profile ?? { nameKanji: '', nameKana: '', nameRomaji: '', birthDate: '', birthTime: '', birthTimeUnknown: true, birthPlace: '', birthCity: '', bloodType: '', siblingOrder: '' } }, 'full', members.length >= 2);
+  if (members.length < 2) return null;
+  const text = reading.data?.axisSummary ?? reading.partial.axisSummary;
+  return <section className="mt-6 border-y border-primary/30 py-5" aria-label={traitReadingCopy[language].final}><h3 className="font-serif text-xl text-primary">{traitReadingCopy[language].final}</h3>{text ? <p aria-busy={reading.isPending} className="mt-4 whitespace-pre-line text-base leading-8 [overflow-wrap:anywhere]">{text}</p> : <p role="status" className="mt-3 text-sm text-muted-foreground">{reading.isError ? homeReadingCopy[language].error : homeReadingCopy[language].loading}</p>}</section>;
 }
 
 export function ArtOwnerOnlyNotice({ language, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void }) {
