@@ -1,3 +1,4 @@
+import ChunkedText from "@/components/ChunkedText";
 import { usePersonalReading } from "@/hooks/use-personal-reading";
 import { ArrowUpRight, Building2, Check, Compass, Crown, Dna, Fingerprint, Gem, Heart, Orbit, Sparkles, Sprout } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
@@ -106,7 +107,7 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
           <h3 className="font-serif text-xl text-primary">{traits.essence}</h3>
           <div className="mt-4 divide-y divide-primary/20">
             {essenceKeys.map((key, i) => <SacredDisclosure key={key} className="min-w-0 py-1 [overflow-wrap:anywhere]" title={<span className="flex items-start gap-3 font-serif text-lg leading-8 text-primary"><span className="shrink-0 font-mono text-xs leading-8">0{i + 1}</span><span>{traits.headings[i]}</span></span>}>
-              {top?.essence?.[key] ? <p className="mt-3 whitespace-pre-line text-base leading-8 text-foreground">{top.essence[key]}</p> : topLoading ? <AgolmenLoading compact label={t.loading} /> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
+              {top?.essence?.[key] ? <ChunkedText className="mt-3 text-base leading-8 text-foreground" text={top.essence[key]} /> : topLoading ? <AgolmenLoading compact label={t.loading} /> : <p role="status" className="mt-3 text-foreground">{t.error}</p>}
             </SacredDisclosure>)}
           </div>
           {!top && isError && quick.isError && <Button variant="outline" className="mt-3" onClick={() => { void quick.refetch(); void refetch(); }}>{t.retry}</Button>}

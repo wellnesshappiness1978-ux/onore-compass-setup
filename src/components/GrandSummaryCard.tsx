@@ -1,3 +1,4 @@
+import ChunkedText from "@/components/ChunkedText";
 import { usePersonalReading } from "@/hooks/use-personal-reading";
 import MethodExplanationList from "./MethodExplanationList";
 import { goalText } from "@/lib/focus";
@@ -60,12 +61,12 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
         if (data?.approachAvailability[key] === "unavailable") return null;
         return <details className="group mt-3 rounded-md border border-primary/25 bg-primary/5">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm text-primary [&::-webkit-details-marker]:hidden">{readMore}<ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
-          {body ? <p aria-busy={isPending} className="whitespace-pre-line px-3 pb-3 text-[15px] leading-7 text-foreground [overflow-wrap:anywhere]">{body}</p> : <AgolmenLoading compact label={copy.loading} />}
+          {body ? <div aria-busy={isPending}><ChunkedText className="px-3 pb-3 text-[15px] leading-7 text-foreground" text={body} /></div> : <AgolmenLoading compact label={copy.loading} />}
         </details>;
       }} />}
 
       {showSummary && (text ? <section className="mt-6 border-y border-primary/40 py-6 [overflow-wrap:anywhere]"><p aria-busy={isPending} className="whitespace-pre-line text-base leading-8 text-foreground sm:text-lg">{text}</p></section> : loading ? <AgolmenLoading compact label={holding ? readingCompleteMessage[language] : copy.loading} /> : data ? <section className="mt-6 border-y border-primary/40 py-6 [overflow-wrap:anywhere]">
-        <p className="whitespace-pre-line text-base leading-8 text-foreground sm:text-lg sm:leading-9">{text}</p>
+        <ChunkedText className="text-base leading-8 text-foreground sm:text-lg sm:leading-9" text={text} />
       </section> : <p role="status" className="mt-6 text-foreground">{copy.error}</p>)}
       {showSummary && <p className="mt-5 text-center text-[11px] text-muted-foreground">{copy.preview}</p>}
       {showShare && <ShareCardButton

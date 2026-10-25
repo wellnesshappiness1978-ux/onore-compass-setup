@@ -1,3 +1,4 @@
+import ChunkedText from "@/components/ChunkedText";
 import { useEffect, useState } from "react";
 import { ChefHat, Loader2, RefreshCw, Sparkles, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -76,8 +77,8 @@ export function TodayInsight({ state, language }: { state: FortuneState; languag
   if (!f?.headline) return <Status state={state} language={language} />;
   return <div className="space-y-3 text-sm leading-7">
     <p className="flex items-start gap-2 font-serif text-base text-primary"><Sparkles className="mt-1 size-4 shrink-0" />{f.headline}</p>
-    <p className="whitespace-pre-line">{f.insight}</p>
-    <p className="whitespace-pre-line border-l-2 border-primary/50 pl-3">{f.dynamics}</p>
+    <ChunkedText text={f.insight} />
+    <ChunkedText className="border-l-2 border-primary/50 pl-3" text={f.dynamics} />
     {f.actions?.length ? <div><h4 className="font-serif text-primary">{c.actions}</h4><ul className="mt-1 list-disc space-y-1 pl-5">{f.actions.map(a => <li key={a}>{a}</li>)}</ul></div> : null}
     {f.caution && <p className="rounded-md border border-primary/25 bg-card/50 p-3"><strong className="text-primary">{c.caution}</strong>：{f.caution}</p>}
     {(state.loading || state.error) && <Status state={state} language={language} />}
