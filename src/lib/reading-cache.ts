@@ -13,7 +13,7 @@ let cacheEpoch = 0;
 export const readingCacheEpoch = () => cacheEpoch;
 export function readingCacheKey(kind: string, day: string, request: unknown, owner = 'guest') {
   // Full structured inputs are retained in the key: no collisions between profiles, parents or goals.
-  return PREFIX + JSON.stringify([owner, kind === 'full' ? 'full-four-elements-v5' : kind, day, request]);
+  return PREFIX + JSON.stringify([owner, kind === 'full' ? 'full-wind-age-v6' : kind, day, request]);
 }
 export function readReadingCache<T>(key: string, schema: z.ZodType<T>): T | undefined {
   try {
