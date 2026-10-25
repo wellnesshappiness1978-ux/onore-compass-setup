@@ -10,6 +10,7 @@ import { luckyFoodLimit } from '@/lib/plans';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 import { servingsLabel } from '@/lib/reading-presentation';
 import { recipeImage } from '@/lib/recipe-images';
+import { COURSE_ORDER, courseLabels } from '@/lib/lucky-recipes';
 import { consumeReadingStream, readingCacheEpoch } from '@/lib/reading-cache';
 import DailyLuckyColor from './DailyLuckyColor';
 
@@ -100,8 +101,8 @@ export function TodayLuckyTrio({ state, language, fallback, plan, onUpgrade }: {
       <p className="flex items-center gap-1.5 font-serif text-primary"><ChefHat className="size-4" />{c.allFoods}</p>
       <p className="mt-2 text-xs leading-6">{c.rules}</p>
       <Accordion type="multiple" className="mt-2 min-w-0 rounded-md border border-primary/25 bg-card px-3 text-foreground">
-        {f.foods.map((food, i) => i >= luckyFoodLimit[plan] ? <div key={i} className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/20 py-3"><span className="flex items-center gap-2"><LockKeyhole className="size-4 text-primary" />{i + 1}. {c.food} · {i < 3 ? 'Standard+' : 'VIP+'}</span><Button size="sm" variant="outline" onClick={onUpgrade}>{c.plans}</Button></div> : <AccordionItem key={food.name + i} value={String(i)}>
-          <AccordionTrigger className="min-w-0 gap-2 text-left">{recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt="" loading="lazy" width={384} height={512} className="h-20 w-16 shrink-0 rounded object-cover" />}<span className="min-w-0 flex-1 break-words">{i + 1}. {food.name}<span className="mt-1 block text-sm font-normal text-muted-foreground">{servingsLabel[language]}</span></span></AccordionTrigger>
+        {f.foods.map((food, i) => i >= luckyFoodLimit[plan] ? <div key={i} className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/20 py-3"><span className="flex items-center gap-2"><LockKeyhole className="size-4 text-primary" />{courseLabels[language][COURSE_ORDER[i]!]} · {i < 3 ? 'Standard+' : 'VIP+'}</span><Button size="sm" variant="outline" onClick={onUpgrade}>{c.plans}</Button></div> : <AccordionItem key={food.name + i} value={String(i)}>
+          <AccordionTrigger className="min-w-0 gap-2 text-left">{recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt="" loading="lazy" width={384} height={512} className="h-20 w-16 shrink-0 rounded object-cover" />}<span className="min-w-0 flex-1 break-words"><span className="block text-xs text-primary">{courseLabels[language][COURSE_ORDER[i]!]}</span>{food.name}<span className="mt-1 block text-sm font-normal text-muted-foreground">{servingsLabel[language]}</span></span></AccordionTrigger>
           <AccordionContent className="min-w-0 space-y-3 text-[15px] leading-7 [overflow-wrap:anywhere]">
             {recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt={food.name} loading="lazy" width={1024} height={640} className="w-full rounded-md border border-primary/25 object-cover shadow-champagne" />}
             <p><strong className="text-primary">{c.why}</strong>：{food.why}</p>
