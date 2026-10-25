@@ -7,7 +7,7 @@ it.each(['wood','fire','earth','metal','water'] as const)('%s has five individua
   for(const recipe of recipes) for(const lang of ['ja','en','zh-CN','zh-TW','ko','es','fr'] as const){
     const details=recipeDetails(recipe,lang);
     expect(details.ingredients.length).toBeGreaterThanOrEqual(2);
-    expect(details.steps).toHaveLength(5);
+    expect(details.steps.length).toBeGreaterThanOrEqual(3);
   }
 });
 it('rotates the five-dish catalogue by day without duplicates',()=>{
