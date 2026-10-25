@@ -1479,7 +1479,6 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
   .design-main { padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right)); }
   .design-main .tab-content { padding-inline: 0.25rem; padding-bottom: 1.5rem; }
   .design-main .tab-content > * + * { margin-top: 1rem; }
-  .design-main canvas, .mandala-masterpiece { max-height: 75svh; width: auto; max-width: 100%; margin-inline: auto; }
 }
 /* Inner scrolling areas hand the gesture back to the page at their edges; horizontal carousels keep their sideways swipe. */
 [data-radix-scroll-area-viewport], .overflow-y-auto { overscroll-behavior-y: auto; touch-action: pan-y pinch-zoom; }
