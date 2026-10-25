@@ -1,3 +1,4 @@
+import ChunkedText from "@/components/ChunkedText";
 import { useMemo } from 'react';
 import { computeDeeperEssence, deeperEssenceKeys, type DeeperProfile, type DeeperEssenceKey } from '@/lib/deeper-essence';
 import { deeperEssenceCopy, deeperEssenceSections } from '@/lib/deeper-essence-copy';
