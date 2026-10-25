@@ -624,6 +624,9 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const t = dashboardTranslations[language];
   const base = translations[language];
   const [tab, setTab] = useState<Tab>("home");
+  // Visited tabs stay mounted (hidden) so returning shows loaded readings instantly without refetching.
+  const [visitedTabs, setVisitedTabs] = useState<Set<Tab>>(() => new Set<Tab>(["home"]));
+  useEffect(() => { setVisitedTabs(prev => prev.has(tab) ? prev : new Set(prev).add(tab)); }, [tab]);
   const [focusMemberId, setFocusMemberId] = useState<string | null>(null);
   const [focusGoal, setFocusGoal] = useState("");
   const [traitsLabel, setTraitsLabel] = useState(traitsNavigationLabel(language));
@@ -811,19 +814,18 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       </header>
 
       <main onTouchStart={onSwipeStart} onTouchMove={e => { if (e.touches.length > 1) swipeStart.current = null; }} onTouchEnd={onSwipeEnd} onTouchCancel={() => { swipeStart.current = null; }} className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
-        {tab === "home" ? (
-          <ArtsGuide language={language} />
-        ) : (
-          <section key={tab} className="tab-content animate-in fade-in slide-in-from-bottom-1 duration-300 mx-auto min-w-0 max-w-3xl pt-3 md:pt-10">
+        {visitedTabs.has("home") && <div hidden={tab !== "home"}><ArtsGuide language={language} /></div>}
+        {(["traits", "today", "consult", "business", "art", "settings"] as const).filter(id => visitedTabs.has(id)).map(id => (
+          <section key={id} hidden={tab !== id} className="tab-content animate-in fade-in slide-in-from-bottom-1 duration-300 mx-auto min-w-0 max-w-3xl pt-3 md:pt-10">
             <div className="tab-heading mb-4 text-center md:mb-8">
               <NautilusIcon className="mx-auto hidden size-12 text-primary md:block" />
               <h2 className="mt-1 font-serif text-2xl text-gradient-gold md:mt-3">
-                {navigation.find((n) => n.id === tab)?.label}
+                {navigation.find((n) => n.id === id)?.label}
               </h2>
             </div>
-            {tab === "traits" ? (
+            {id === "traits" ? (
               <FocusedTraits language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} render={(p, title, goal, isSelf) => <SelfCoreCard experienceOnly profile={p} title={title} goal={goal} language={language} {...(isSelf ? { onProfileChange } : {})} onDiagnosis={() => undefined} currentPlan={previewPlan} {...(devOverrideEnabled ? { onSelectPlan: selectTestPlan } : {})} />} />
-            ) : tab === "today" ? (
+            ) : id === "today" ? (
               <>
                 <section className="design-compass-section min-w-0 w-full max-w-full text-center" aria-label={t.today}>
                   <div className="flex items-center justify-center gap-3 text-primary/70">
@@ -842,7 +844,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                   <FocusedToday language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} render={(p) => <TodayGuide profile={p} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />} />
                 </section>
               </>
-            ) : tab === "consult" ? (
+            ) : id === "consult" ? (
               <>
                 <div role="tablist" aria-label={consultationUxCopy[language].switchLabel} className="mb-5 grid grid-cols-2 gap-2" data-no-swipe>
                   {(["compatibility", "consultation"] as const).map(mode => <Button key={mode} role="tab" aria-selected={consultMode === mode} aria-controls={`ai-${mode}`} variant={consultMode === mode ? "champagne" : "outline"} className="h-auto min-h-12 whitespace-normal px-2 py-2 text-xs sm:text-sm" onClick={() => setConsultMode(mode)}>{mode === "compatibility" ? <HeartHandshake className="size-4 shrink-0" /> : <WandSparkles className="size-4 shrink-0" />}{consultationUxCopy[language][mode]}</Button>)}
@@ -860,11 +862,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                   onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 /></SubjectVoice></div>
               </>
-            ) : tab === "business" ? (
+            ) : id === "business" ? (
               <><FamilyGroupButtons language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><BusinessFeaturePreview language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio plan={previewPlan} actualPlan={actualPlan} language={language} signedIn={signedIn && !devOverrideEnabled} ownerBirthDate={profile.birthDate} /></>
-            ) : tab === "art" ? (
+            ) : id === "art" ? (
               <><ArtOwnerOnlyNotice language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /><FocusedArt language={language} owner={profile} plan={previewPlan} render={(p, subject) => <NineStarsPanel key={subject?.key ?? "self"} subject={subject} language={language} profile={p} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} />} /></>
-            ) : tab === "settings" ? (
+            ) : id === "settings" ? (
               <><FocusSettingsCard language={language} /><div className="mt-4 space-y-4"><TodayReminders kind="bgm" language={language} plan={previewPlan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} /><DailyRelationshipGuide language={language} plan={previewPlan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} /></div><div className="h-6" /><SettingsPanel
                 profile={profile}
                 language={language}
@@ -883,7 +885,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
               /></>
             ) : null}
           </section>
-        )}      </main>
+        ))}
+      </main>
 
       <nav
         className="design-navigation fixed bottom-3 left-1/2 z-30 w-[min(94vw,560px)] -translate-x-1/2 rounded-2xl border border-primary/25 bg-card/85 p-1.5 shadow-2xl backdrop-blur-xl sm:bottom-5"
