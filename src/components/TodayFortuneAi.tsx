@@ -1,3 +1,4 @@
+import ChunkedText from "@/components/ChunkedText";
 import { useEffect, useState } from "react";
 import { ChefHat, Loader2, RefreshCw, Sparkles, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,12 +10,14 @@ import { luckyFoodLimit } from '@/lib/plans';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 import { servingsLabel } from '@/lib/reading-presentation';
 import { recipeImage } from '@/lib/recipe-images';
+import { COURSE_ORDER, courseLabels } from '@/lib/lucky-recipes';
 import { consumeReadingStream, readingCacheEpoch } from '@/lib/reading-cache';
 import DailyLuckyColor from './DailyLuckyColor';
 
 type Base = Omit<TodayFortuneRequest, "avoid">;
 const pendingFortunes = new Map<string, Promise<TodayFortune>>();
 export type FortuneState = { data: TodayFortune | null; partial?: Partial<TodayFortune>; loading: boolean; error: string | null; retry: () => void };
+const resolvedFortunes = new Map<string, { epoch: number; data: TodayFortune }>();
 const fortuneListeners = new Map<string, Set<(value: Partial<TodayFortune>) => void>>();
 
 /** One AI reading per subject/day/language/goal, cached on the device; recent picks are sent as avoid lists. */
@@ -28,7 +31,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
     const key = cacheKey(req);
     try {
       const cached = todayFortuneSchema.safeParse(JSON.parse(localStorage.getItem(key) ?? "null"));
-      if (cached.success && nonce === 0) { setState({ data: cached.data, loading: false, error: null, sig }); return; }
+      if (cached.success && nonce === 0) { resolvedFortunes.set(key, { epoch: readingCacheEpoch(), data: cached.data }); setState({ data: cached.data, loading: false, error: null, sig }); return; }
     } catch { /* ignore */ }
     let active = true;
     const listener = (value: Partial<TodayFortune>) => { if (active) setPartial({ sig, value }); };
@@ -42,6 +45,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
         .then(response => consumeReadingStream(response, value => { for (const notify of listeners) notify(value as Partial<TodayFortune>); }))
         .then(value => todayFortuneSchema.parse(value)).then(data => {
         if (epoch === readingCacheEpoch()) {
+          resolvedFortunes.set(key, { epoch, data });
           try { localStorage.setItem(key, JSON.stringify(data)); } catch { /* full */ }
           pushHistory(req.subject.key, req.day, data);
         }
@@ -59,7 +63,10 @@ export function useTodayFortune(req: Base | null): FortuneState {
     return () => { active = false; listeners.delete(listener); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig, nonce]);
-  return { ...(state.sig === sig ? state : { data: null, loading: Boolean(req), error: null }), partial: partial.sig === sig ? partial.value : {}, retry: () => setNonce(n => n + 1) };
+  // Already-resolved readings render instantly on remount (tab or subject switches) without a loading frame.
+  const memo = req && nonce === 0 ? resolvedFortunes.get(cacheKey(req)) : undefined;
+  const instant = memo && memo.epoch === readingCacheEpoch() ? memo.data : undefined;
+  return { ...(state.sig === sig ? state : instant ? { data: instant, loading: false, error: null } : { data: null, loading: Boolean(req), error: null }), partial: partial.sig === sig ? partial.value : {}, retry: () => setNonce(n => n + 1) };
 }
 
 const t = (language: Language) => todayAccessCopy[language];
@@ -76,8 +83,8 @@ export function TodayInsight({ state, language }: { state: FortuneState; languag
   if (!f?.headline) return <Status state={state} language={language} />;
   return <div className="space-y-3 text-sm leading-7">
     <p className="flex items-start gap-2 font-serif text-base text-primary"><Sparkles className="mt-1 size-4 shrink-0" />{f.headline}</p>
-    <p className="whitespace-pre-line">{f.insight}</p>
-    <p className="whitespace-pre-line border-l-2 border-primary/50 pl-3">{f.dynamics}</p>
+    <ChunkedText text={f.insight} />
+    <ChunkedText className="border-l-2 border-primary/50 pl-3" text={f.dynamics} />
     {f.actions?.length ? <div><h4 className="font-serif text-primary">{c.actions}</h4><ul className="mt-1 list-disc space-y-1 pl-5">{f.actions.map(a => <li key={a}>{a}</li>)}</ul></div> : null}
     {f.caution && <p className="rounded-md border border-primary/25 bg-card/50 p-3"><strong className="text-primary">{c.caution}</strong>：{f.caution}</p>}
     {(state.loading || state.error) && <Status state={state} language={language} />}
@@ -94,8 +101,8 @@ export function TodayLuckyTrio({ state, language, fallback, plan, onUpgrade }: {
       <p className="flex items-center gap-1.5 font-serif text-primary"><ChefHat className="size-4" />{c.allFoods}</p>
       <p className="mt-2 text-xs leading-6">{c.rules}</p>
       <Accordion type="multiple" className="mt-2 min-w-0 rounded-md border border-primary/25 bg-card px-3 text-foreground">
-        {f.foods.map((food, i) => i >= luckyFoodLimit[plan] ? <div key={i} className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/20 py-3"><span className="flex items-center gap-2"><LockKeyhole className="size-4 text-primary" />{i + 1}. {c.food} · {i < 3 ? 'Standard+' : 'VIP+'}</span><Button size="sm" variant="outline" onClick={onUpgrade}>{c.plans}</Button></div> : <AccordionItem key={food.name + i} value={String(i)}>
-          <AccordionTrigger className="min-w-0 gap-2 text-left">{recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt="" loading="lazy" width={384} height={512} className="h-20 w-16 shrink-0 rounded object-cover" />}<span className="min-w-0 flex-1 break-words">{i + 1}. {food.name}<span className="mt-1 block text-sm font-normal text-muted-foreground">{servingsLabel[language]}</span></span></AccordionTrigger>
+        {f.foods.map((food, i) => i >= luckyFoodLimit[plan] ? <div key={i} className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/20 py-3"><span className="flex items-center gap-2"><LockKeyhole className="size-4 text-primary" />{courseLabels[language][COURSE_ORDER[i]!]} · {i < 3 ? 'Standard+' : 'VIP+'}</span><Button size="sm" variant="outline" onClick={onUpgrade}>{c.plans}</Button></div> : <AccordionItem key={food.name + i} value={String(i)}>
+          <AccordionTrigger className="min-w-0 gap-2 text-left">{recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt="" loading="lazy" width={384} height={512} className="h-20 w-16 shrink-0 rounded object-cover" />}<span className="min-w-0 flex-1 break-words"><span className="block text-xs text-primary">{courseLabels[language][COURSE_ORDER[i]!]}</span>{food.name}<span className="mt-1 block text-sm font-normal text-muted-foreground">{servingsLabel[language]}</span></span></AccordionTrigger>
           <AccordionContent className="min-w-0 space-y-3 text-[15px] leading-7 [overflow-wrap:anywhere]">
             {recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt={food.name} loading="lazy" width={1024} height={640} className="w-full rounded-md border border-primary/25 object-cover shadow-champagne" />}
             <p><strong className="text-primary">{c.why}</strong>：{food.why}</p>

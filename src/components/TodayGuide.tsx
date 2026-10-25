@@ -22,7 +22,7 @@ import HelioCalendar from "./HelioCalendar";
 import FengShuiGuide from "./FengShuiGuide";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { higherTodayBenefits, todayBenefitCategories, todayBenefitCopy, todayBenefitCount } from "@/lib/today-benefits";
-import { recipesForElement, recipeDetails } from "@/lib/lucky-recipes";
+import { recipesForElement, recipeDetails, COURSE_ORDER, courseLabels } from "@/lib/lucky-recipes";
 import { buildTodayDepth, type DeepSection } from "@/lib/today-depth";
 import { useFocus } from "./FocusProvider";
 import { goalText, memberToProfile } from "@/lib/focus";
@@ -266,7 +266,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         <li><strong className="text-primary">{ja ? "ラッキーワード" : "Lucky word"}</strong>：{L(word)}</li>
         <li><strong className="text-primary">{ja ? "運気アップフード 選りすぐり5品" : "5 lucky foods"}</strong>
           <p className="mt-2 text-xs leading-6">{access.rules}</p><p className="mt-1 flex items-center gap-1.5 text-xs"><ChefHat className="size-4 shrink-0" />{benefit.recipeHint}</p>
-          <ol className="mt-2 grid gap-2 sm:grid-cols-2">{dailyRecipes.map((f, i) => <li key={f.id}>{i >= luckyFoodLimit[plan] ? <Button variant="outline" className="h-auto min-h-12 w-full whitespace-normal" onClick={onUpgrade}><LockKeyhole className="size-4" />{i + 1}. {access.food} · {i < 3 ? "Standard+" : "VIP+"}</Button> : <><Button variant="outline" onClick={() => { if (i < luckyFoodLimit[plan]) setRecipeIndex(i); }} className="grid h-auto min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] gap-2 whitespace-normal border-primary/35 bg-background/90 px-3 py-2 text-left text-foreground"><span className="flex min-w-0 items-center gap-3"><img src={recipeImage(f.id)} alt="" loading="lazy" width={384} height={512} className="h-20 w-16 shrink-0 rounded object-cover" /><span>{i + 1}. {f.names[language]}</span></span><ChevronRight className="size-4 shrink-0" /></Button></>}</li>)}</ol>
+          <ol className="mt-2 grid gap-2 sm:grid-cols-2">{dailyRecipes.map((f, i) => <li key={f.id}>{i >= luckyFoodLimit[plan] ? <Button variant="outline" className="h-auto min-h-12 w-full whitespace-normal" onClick={onUpgrade}><LockKeyhole className="size-4" />{courseLabels[language][COURSE_ORDER[i]!]} · {i < 3 ? "Standard+" : "VIP+"}</Button> : <><Button variant="outline" onClick={() => { if (i < luckyFoodLimit[plan]) setRecipeIndex(i); }} className="grid h-auto min-h-12 w-full grid-cols-[minmax(0,1fr)_auto] gap-2 whitespace-normal border-primary/35 bg-background/90 px-3 py-2 text-left text-foreground"><span className="flex min-w-0 items-center gap-3"><img src={recipeImage(f.id)} alt="" loading="lazy" width={384} height={512} className="h-20 w-16 shrink-0 rounded object-cover" /><span><span className="block text-xs text-primary">{courseLabels[language][COURSE_ORDER[i]!]}</span>{f.names[language]}</span></span><ChevronRight className="size-4 shrink-0" /></Button></>}</li>)}</ol>
           <span className="text-[11px] opacity-90">{ja ? "スーパーの食材で手軽に作れる、今日の気分を明るくする参考メニューです。" : "Easy reference dishes from everyday ingredients."}</span></li>
       </ul>} />,
     },

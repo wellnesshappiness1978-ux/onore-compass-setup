@@ -23,11 +23,22 @@ import dish21 from "@/assets/dish-salmon-foil.jpg";
 import dish22 from "@/assets/dish-hijiki-beans.jpg";
 import dish23 from "@/assets/dish-nameko-daikon.jpg";
 import dish24 from "@/assets/dish-clam-miso.jpg";
-import dish25 from "@/assets/dish-broccoli-tofu.jpg";
-import dish26 from "@/assets/dish-pepper-carrot.jpg";
-import dish27 from "@/assets/dish-pumpkin-sweetpotato.jpg";
-import dish28 from "@/assets/dish-napa-mushroom.jpg";
-import dish29 from "@/assets/dish-salmon-cabbage-foil.jpg";
+import dish25 from "@/assets/dish-matcha-latte.jpg";
+import dish26 from "@/assets/dish-mint-lemon-water.jpg";
+import dish27 from "@/assets/dish-hibiscus-tea.jpg";
+import dish28 from "@/assets/dish-hojicha-latte.jpg";
+import dish29 from "@/assets/dish-yuzu-ginger.jpg";
+import dish30 from "@/assets/dish-blueberry-smoothie.jpg";
+import dish31 from "@/assets/dish-matcha-warabimochi.jpg";
+import dish32 from "@/assets/dish-apple-compote.jpg";
+import dish33 from "@/assets/dish-kinako-shiratama.jpg";
+import dish34 from "@/assets/dish-peach-jelly.jpg";
+import dish35 from "@/assets/dish-sesame-pudding.jpg";
+import dish36 from "@/assets/dish-broccoli-tofu.jpg";
+import dish37 from "@/assets/dish-pepper-carrot.jpg";
+import dish38 from "@/assets/dish-pumpkin-sweetpotato.jpg";
+import dish39 from "@/assets/dish-napa-mushroom.jpg";
+import dish40 from "@/assets/dish-salmon-cabbage-foil.jpg";
 
 /** Each photograph depicts exactly this catalogue recipe, independent of position or language. */
 export const RECIPE_IMAGES: Record<string, string> = {
@@ -56,10 +67,21 @@ export const RECIPE_IMAGES: Record<string, string> = {
   "hijiki-beans": dish22,
   "nameko-daikon": dish23,
   "clam-miso": dish24,
-  "broccoli-tofu": dish25,
-  "pepper-carrot": dish26,
-  "pumpkin-sweetpotato": dish27,
-  "napa-mushroom": dish28,
-  "salmon-cabbage-foil": dish29,
+  "matcha-latte": dish25,
+  "mint-lemon-water": dish26,
+  "hibiscus-tea": dish27,
+  "hojicha-latte": dish28,
+  "yuzu-ginger": dish29,
+  "blueberry-smoothie": dish30,
+  "matcha-warabimochi": dish31,
+  "apple-compote": dish32,
+  "kinako-shiratama": dish33,
+  "peach-jelly": dish34,
+  "sesame-pudding": dish35,
+  "broccoli-tofu": dish36,
+  "pepper-carrot": dish37,
+  "pumpkin-sweetpotato": dish38,
+  "napa-mushroom": dish39,
+  "salmon-cabbage-foil": dish40,
 };
 export const recipeImage = (id: string | undefined) => id ? RECIPE_IMAGES[id] : undefined;
