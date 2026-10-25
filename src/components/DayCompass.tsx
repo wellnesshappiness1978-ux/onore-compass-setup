@@ -197,7 +197,7 @@ export default function DayCompass({ profile, language, plan, onUpgrade, dialOnl
     <div id="day-compass" className="box-border min-w-0 w-full max-w-full scroll-mt-4">
       <div
         ref={wheel}
-        className="compass-wheel relative mx-auto mt-3 aspect-square w-full max-w-[430px] touch-none select-none"
+        className="compass-wheel relative mx-auto mt-3 aspect-square w-full max-w-[min(430px,calc(100vw-5rem))] touch-none select-none"
         role="slider" tabIndex={0} aria-label={c.hint}
         aria-valuemin={1} aria-valuemax={total} aria-valuenow={idx + 1} aria-valuetext={fmt.format(date)}
         onKeyDown={(e) => {
