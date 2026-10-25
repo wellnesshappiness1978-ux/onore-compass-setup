@@ -15,7 +15,7 @@ describe("AI writing voice", () => {
   });
 
   it("requires respectful, accessible, perceptive and actionable guidance", () => {
-    for (const rule of ["desu/masu", "first-year middle-school", "age 12–13", "everyday analogy", "at least two available reference values", "today or tomorrow", "when and what", "Portrait-only fields"]) {
+    for (const rule of ["desu/masu", "first-year middle-school", "age 12–13", "DIRECT STATEMENTS ONLY", "Never use analogies", "at least two available reference values", "today or tomorrow", "when and what", "Portrait-only fields"]) {
       expect(supportiveWritingVoice).toContain(rule);
     }
   });
