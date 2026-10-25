@@ -1,5 +1,5 @@
 import type { Language } from "./translations";
-import type { Element } from "./today-fortune-elements";
+import type { Element } from "./team-analysis";
 
 /** Splits a cooking step into plain and key-point segments (heat, time, temperature, doneness, timing). */
 const KEY = /(強火|中強火|中火|中弱火|弱火|とろ火|余熱|\d+(?:\s*[〜~\-–]\s*\d+)?\s*(?:分|秒|時間|℃|°C|min(?:utes?)?|sec(?:onds?)?|hours?|minutos?|segundos?|heures?|분|초|分钟|分鐘|秒钟)|沸騰|煮立|火を止め|火から下ろ|中心まで|十分に加熱|しっかり加熱|色が変わ|透き通|コツ|ポイント|最後に|仕上げに|high heat|medium(?:-low|-high)? heat|low heat|until (?:cooked|tender|golden|fragrant)[^,.]*|bring to a boil|cooked through|大火|中火|小火|煮沸|센 불|중불|약불|끓|fuego (?:alto|medio|bajo)|feu (?:vif|moyen|doux))/gi;
