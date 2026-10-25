@@ -39,6 +39,46 @@ import dish37 from "@/assets/dish-pepper-carrot.jpg";
 import dish38 from "@/assets/dish-pumpkin-sweetpotato.jpg";
 import dish39 from "@/assets/dish-napa-mushroom.jpg";
 import dish40 from "@/assets/dish-salmon-cabbage-foil.jpg";
+import dish41 from "@/assets/dish-bamboo-rice.jpg";
+import dish42 from "@/assets/dish-cabbage-pork-miso.jpg";
+import dish43 from "@/assets/dish-eggplant-mapo.jpg";
+import dish44 from "@/assets/dish-cold-pork-shabu.jpg";
+import dish45 from "@/assets/dish-mushroom-rice.jpg";
+import dish46 from "@/assets/dish-saury-salt-grill.jpg";
+import dish47 from "@/assets/dish-yellowtail-teriyaki.jpg";
+import dish48 from "@/assets/dish-oden-stew.jpg";
+import dish49 from "@/assets/dish-nanohana-clear-soup.jpg";
+import dish50 from "@/assets/dish-new-onion-soup.jpg";
+import dish51 from "@/assets/dish-tomato-gazpacho.jpg";
+import dish52 from "@/assets/dish-okra-miso-soup.jpg";
+import dish53 from "@/assets/dish-sweetpotato-potage.jpg";
+import dish54 from "@/assets/dish-kenchin-soup.jpg";
+import dish55 from "@/assets/dish-ishikari-soup.jpg";
+import dish56 from "@/assets/dish-ginger-chicken-soup.jpg";
+import dish57 from "@/assets/dish-strawberry-milk.jpg";
+import dish58 from "@/assets/dish-komatsuna-smoothie.jpg";
+import dish59 from "@/assets/dish-watermelon-mint-juice.jpg";
+import dish60 from "@/assets/dish-homemade-ginger-ale.jpg";
+import dish61 from "@/assets/dish-pumpkin-spice-latte.jpg";
+import dish62 from "@/assets/dish-apple-cinnamon-tea.jpg";
+import dish63 from "@/assets/dish-ginger-amazake.jpg";
+import dish64 from "@/assets/dish-black-sesame-latte.jpg";
+import dish65 from "@/assets/dish-asparagus-sesame.jpg";
+import dish66 from "@/assets/dish-snappea-egg.jpg";
+import dish67 from "@/assets/dish-grilled-eggplant.jpg";
+import dish68 from "@/assets/dish-tomato-marinade.jpg";
+import dish69 from "@/assets/dish-kinpira-burdock.jpg";
+import dish70 from "@/assets/dish-mushroom-butter-saute.jpg";
+import dish71 from "@/assets/dish-daikon-yuzu-pickle.jpg";
+import dish72 from "@/assets/dish-simmered-taro.jpg";
+import dish73 from "@/assets/dish-strawberry-daifuku.jpg";
+import dish74 from "@/assets/dish-kiwi-honey-yogurt.jpg";
+import dish75 from "@/assets/dish-watermelon-jelly.jpg";
+import dish76 from "@/assets/dish-mango-pudding.jpg";
+import dish77 from "@/assets/dish-sweet-potato-cake.jpg";
+import dish78 from "@/assets/dish-pear-compote.jpg";
+import dish79 from "@/assets/dish-shiratama-zenzai.jpg";
+import dish80 from "@/assets/dish-yuzu-kanten.jpg";
 
 /** Each photograph depicts exactly this catalogue recipe, independent of position or language. */
 export const RECIPE_IMAGES: Record<string, string> = {
@@ -83,5 +123,45 @@ export const RECIPE_IMAGES: Record<string, string> = {
   "pumpkin-sweetpotato": dish38,
   "napa-mushroom": dish39,
   "salmon-cabbage-foil": dish40,
+  "bamboo-rice": dish41,
+  "cabbage-pork-miso": dish42,
+  "eggplant-mapo": dish43,
+  "cold-pork-shabu": dish44,
+  "mushroom-rice": dish45,
+  "saury-salt-grill": dish46,
+  "yellowtail-teriyaki": dish47,
+  "oden-stew": dish48,
+  "nanohana-clear-soup": dish49,
+  "new-onion-soup": dish50,
+  "tomato-gazpacho": dish51,
+  "okra-miso-soup": dish52,
+  "sweetpotato-potage": dish53,
+  "kenchin-soup": dish54,
+  "ishikari-soup": dish55,
+  "ginger-chicken-soup": dish56,
+  "strawberry-milk": dish57,
+  "komatsuna-smoothie": dish58,
+  "watermelon-mint-juice": dish59,
+  "homemade-ginger-ale": dish60,
+  "pumpkin-spice-latte": dish61,
+  "apple-cinnamon-tea": dish62,
+  "ginger-amazake": dish63,
+  "black-sesame-latte": dish64,
+  "asparagus-sesame": dish65,
+  "snappea-egg": dish66,
+  "grilled-eggplant": dish67,
+  "tomato-marinade": dish68,
+  "kinpira-burdock": dish69,
+  "mushroom-butter-saute": dish70,
+  "daikon-yuzu-pickle": dish71,
+  "simmered-taro": dish72,
+  "strawberry-daifuku": dish73,
+  "kiwi-honey-yogurt": dish74,
+  "watermelon-jelly": dish75,
+  "mango-pudding": dish76,
+  "sweet-potato-cake": dish77,
+  "pear-compote": dish78,
+  "shiratama-zenzai": dish79,
+  "yuzu-kanten": dish80,
 };
 export const recipeImage = (id: string | undefined) => id ? RECIPE_IMAGES[id] : undefined;
