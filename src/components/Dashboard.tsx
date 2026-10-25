@@ -814,8 +814,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       </header>
 
       <main onTouchStart={onSwipeStart} onTouchMove={e => { if (e.touches.length > 1) swipeStart.current = null; }} onTouchEnd={onSwipeEnd} onTouchCancel={() => { swipeStart.current = null; }} className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
-        {visitedTabs.has("home") && <div hidden={tab !== "home"}><ArtsGuide language={language} /></div>}
-        {(["traits", "today", "consult", "business", "art", "settings"] as const).filter(id => visitedTabs.has(id)).map(id => (
+        {(visitedTabs.has("home") || tab === "home") && <div hidden={tab !== "home"}><ArtsGuide language={language} /></div>}
+        {(["traits", "today", "consult", "business", "art", "settings"] as const).filter(id => visitedTabs.has(id) || tab === id).map(id => (
           <section key={id} hidden={tab !== id} className="tab-content animate-in fade-in slide-in-from-bottom-1 duration-300 mx-auto min-w-0 max-w-3xl pt-3 md:pt-10">
             <div className="tab-heading mb-4 text-center md:mb-8">
               <NautilusIcon className="mx-auto hidden size-12 text-primary md:block" />
