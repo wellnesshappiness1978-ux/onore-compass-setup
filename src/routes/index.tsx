@@ -61,6 +61,7 @@ function Index() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const loadSequence = useRef(0);
+  const loadedUser = useRef<string | null>(null);
   const queryClient = useQueryClient();
   const read = useServerFn(readMyProfile);
   const save = useServerFn(saveMyProfile);
@@ -88,6 +89,7 @@ function Index() {
         if (active && sequence === loadSequence.current) {
           const next = saved ?? readLocal();
           if (saved) writeLocal(saved);
+          loadedUser.current = data.user.id;
           setProfile(next); setError(null);
         }
       } catch {
@@ -95,9 +97,12 @@ function Index() {
       } finally { if (active && sequence === loadSequence.current) setLoading(false); }
     };
     void load();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
-        if (event === "SIGNED_OUT") { clearReadingCaches(); ++loadSequence.current; setProfile(null); setEditing(false); setUserId(null); setLoading(false); setError(null); }
+        if (event === "SIGNED_OUT") { loadedUser.current = null; clearReadingCaches(); ++loadSequence.current; setProfile(null); setEditing(false); setUserId(null); setLoading(false); setError(null); }
+        // SIGNED_IN is re-emitted when the browser tab regains focus; keep the mounted screens
+        // (and every loaded reading) unless the signed-in person actually changed.
+        else if (session?.user.id && session.user.id === loadedUser.current) return;
         else window.setTimeout(() => { if (active) void load(); }, 0);
       }
     });
