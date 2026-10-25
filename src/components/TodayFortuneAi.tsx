@@ -13,6 +13,9 @@ import { recipeImage } from '@/lib/recipe-images';
 import { COURSE_ORDER, courseLabels } from '@/lib/lucky-recipes';
 import { consumeReadingStream, readingCacheEpoch } from '@/lib/reading-cache';
 import DailyLuckyColor from './DailyLuckyColor';
+import RecipeStep, { cleanRecipeSteps } from './RecipeStep';
+import { recipeLabels } from '@/lib/recipe-presentation';
+import { todayBenefitCopy } from '@/lib/today-benefits';
 
 type Base = Omit<TodayFortuneRequest, "avoid">;
 const pendingFortunes = new Map<string, Promise<TodayFortune>>();
@@ -105,10 +108,12 @@ export function TodayLuckyTrio({ state, language, fallback, plan, onUpgrade }: {
           <AccordionTrigger className="min-w-0 gap-2 text-left">{recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt="" loading="lazy" width={384} height={512} className="h-20 w-16 shrink-0 rounded object-cover" />}<span className="min-w-0 flex-1 break-words"><span className="block text-xs text-primary">{courseLabels[language][COURSE_ORDER[i]!]}</span>{food.name}<span className="mt-1 block text-sm font-normal text-muted-foreground">{servingsLabel[language]}</span></span></AccordionTrigger>
           <AccordionContent className="min-w-0 space-y-3 text-[15px] leading-7 [overflow-wrap:anywhere]">
             {recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt={food.name} loading="lazy" width={1024} height={640} className="w-full rounded-md border border-primary/25 object-cover shadow-champagne" />}
-            <p><strong className="text-primary">{c.why}</strong>：{food.why}</p>
+            <section className="rounded-md border border-primary/30 bg-primary/5 p-3"><h5 className="font-serif text-sm text-primary">{recipeLabels[language].why}</h5><ChunkedText className="mt-1 text-sm" text={food.why} /></section>
             <section className="recipe-ingredients"><h5 className="text-center font-serif text-primary">{c.ingredients}（{servingsLabel[language]}）</h5><ul>{food.ingredients.map((x, j) => <li key={j} className="grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-3 border-b border-primary/10 py-2"><span>{x.item}</span><span className="text-right">{x.amount}</span></li>)}</ul></section>
             <section className="recipe-ingredients"><h5 className="text-center font-serif text-primary">{c.seasonings}</h5><ul>{food.seasonings.map((x, j) => <li key={j} className="grid min-w-0 grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-3 border-b border-primary/10 py-2"><span>{x.item}</span><span className="text-right">{x.amount}</span></li>)}</ul></section>
-            <section><h5 className="font-serif text-primary">{c.steps}</h5><ol className="list-decimal space-y-2 pl-5">{food.steps.map((s, j) => <li key={j}>{s.text}{s.tip && <p className="text-xs text-primary">✦ {c.tip}：{s.tip}</p>}</li>)}</ol></section>
+            <section><h5 className="font-serif text-primary">{c.steps}</h5><ol className="list-decimal space-y-2 pl-5">{cleanRecipeSteps(food.steps.map(s => s.text)).map((s, j) => <li key={j}><RecipeStep text={s} /></li>)}</ol></section>
+            {food.steps.some(s => s.tip.trim()) && <section className="rounded-md border border-primary/35 bg-card p-3 shadow-champagne"><h5 className="flex items-center gap-1.5 font-serif text-primary"><Sparkles className="size-4" />{recipeLabels[language].luck}</h5><ul className="mt-2 list-disc space-y-1 pl-5 text-sm">{food.steps.filter(s => s.tip.trim()).map((s, j) => <li key={j}>{s.tip}</li>)}</ul></section>}
+            <p className="border-t border-primary/15 pt-2 text-xs leading-5 text-muted-foreground">{servingsLabel[language]} · {todayBenefitCopy[language].recipeNote}</p>
           </AccordionContent>
         </AccordionItem>)}
       </Accordion>
