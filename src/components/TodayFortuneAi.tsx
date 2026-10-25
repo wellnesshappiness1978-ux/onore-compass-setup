@@ -16,6 +16,7 @@ import DailyLuckyColor from './DailyLuckyColor';
 type Base = Omit<TodayFortuneRequest, "avoid">;
 const pendingFortunes = new Map<string, Promise<TodayFortune>>();
 export type FortuneState = { data: TodayFortune | null; partial?: Partial<TodayFortune>; loading: boolean; error: string | null; retry: () => void };
+const resolvedFortunes = new Map<string, TodayFortune>();
 const fortuneListeners = new Map<string, Set<(value: Partial<TodayFortune>) => void>>();
 
 /** One AI reading per subject/day/language/goal, cached on the device; recent picks are sent as avoid lists. */
@@ -29,7 +30,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
     const key = cacheKey(req);
     try {
       const cached = todayFortuneSchema.safeParse(JSON.parse(localStorage.getItem(key) ?? "null"));
-      if (cached.success && nonce === 0) { setState({ data: cached.data, loading: false, error: null, sig }); return; }
+      if (cached.success && nonce === 0) { resolvedFortunes.set(key, cached.data); setState({ data: cached.data, loading: false, error: null, sig }); return; }
     } catch { /* ignore */ }
     let active = true;
     const listener = (value: Partial<TodayFortune>) => { if (active) setPartial({ sig, value }); };
@@ -43,6 +44,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
         .then(response => consumeReadingStream(response, value => { for (const notify of listeners) notify(value as Partial<TodayFortune>); }))
         .then(value => todayFortuneSchema.parse(value)).then(data => {
         if (epoch === readingCacheEpoch()) {
+          resolvedFortunes.set(key, data);
           try { localStorage.setItem(key, JSON.stringify(data)); } catch { /* full */ }
           pushHistory(req.subject.key, req.day, data);
         }
@@ -60,7 +62,9 @@ export function useTodayFortune(req: Base | null): FortuneState {
     return () => { active = false; listeners.delete(listener); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig, nonce]);
-  return { ...(state.sig === sig ? state : { data: null, loading: Boolean(req), error: null }), partial: partial.sig === sig ? partial.value : {}, retry: () => setNonce(n => n + 1) };
+  // Already-resolved readings render instantly on remount (tab or subject switches) without a loading frame.
+  const instant = req && nonce === 0 ? resolvedFortunes.get(cacheKey(req)) : undefined;
+  return { ...(state.sig === sig ? state : instant ? { data: instant, loading: false, error: null } : { data: null, loading: Boolean(req), error: null }), partial: partial.sig === sig ? partial.value : {}, retry: () => setNonce(n => n + 1) };
 }
 
 const t = (language: Language) => todayAccessCopy[language];
