@@ -43,3 +43,4 @@
 - Group integrated readings pass every structured profile through the shared full-reading contract, and only the group axisSummary interprets the joint goal. Why: never reuse the owner's individual capstone for a group.
 - Font-size preference is device-local, applied after hydration at the HTML rem root and synchronized across tabs; Settings owns its three-size selector. Why: global accessible sizing without altering appearance or artwork pixels.
 - Completed personal readings restore from bounded in-memory/device caches with explicit access-time eviction, while core calculations reuse profile/day query entries; sign-out clears both. Why: fast repeated views without cross-owner stale results.
+- Profile text fields that the UI composes (e.g. sibling_order) use DB length limits, not value-list CHECK constraints. Why: legacy enums silently rejected new structured values.
