@@ -1,4 +1,4 @@
-import type { Element } from './ai/five-elements';
+import type { Element } from './team-analysis';
 import type { Language } from './translations';
 
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
