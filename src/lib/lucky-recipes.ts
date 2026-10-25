@@ -41,7 +41,7 @@ Object.assign(ingredients, seasonalIngredients);
 for (const x of seasonalRecipes) { luckyRecipes.push({ id: x.id, element: x.element, season: x.season, rhythm: x.rhythm, names: x.names, ingredients: x.ingredients, method: x.method }); COURSE_RECIPES[x.course].push(x.id); }
 const ELEMENTS: Element[] = ['wood', 'fire', 'earth', 'metal', 'water'];
 const dayIndex = (day: string) => { const t = Date.parse(`${day}T00:00:00Z`); return Number.isFinite(t) ? Math.floor(t / 86400000) : 0; };
-/** Daily candidates for one course: in-season dishes (matching the biorhythm when known) on alternating days, the whole course catalogue otherwise. */
+/** Daily candidates for one course: in-season dishes (matching the biorhythm when known) on alternating days, evergreen plus in-season dishes otherwise. */
 export function courseCandidates(course: Course, element: Element, day = '', birthDate?: string) {
   const all = COURSE_RECIPES[course].map(id => luckyRecipes.find(r => r.id === id)!).filter(Boolean);
   if (!day) return all;
@@ -49,7 +49,8 @@ export function courseCandidates(course: Course, element: Element, day = '', bir
   const seasonal = all.filter(r => r.season === season);
   const tuned = rhythm ? seasonal.filter(r => r.rhythm === rhythm) : seasonal;
   const useSeason = (dayIndex(day) + COURSE_ORDER.indexOf(course)) % 2 === 0;
-  const pool = useSeason ? (tuned.length ? tuned : seasonal) : all;
+  const inSeason = all.filter(r => !r.season || r.season === season);
+  const pool = useSeason ? (tuned.length ? tuned : seasonal.length ? seasonal : inSeason) : inSeason;
   // Element dishes lead the list so the order stays personal while still rotating through every dish.
   return [...pool.filter(r => r.element === element), ...pool.filter(r => r.element !== element)];
 }
