@@ -57,6 +57,6 @@ export function courseCandidates(course: Course, element: Element, day = '', bir
 /** One dish per course, rotating consecutively through the large catalogue so a daily user meets new dishes. */
 export const recipesForElement = (element: Element, day = '', birthDate?: string) => COURSE_ORDER.map((course, i) => {
   const pool = courseCandidates(course, element, day, birthDate);
-  const idx = day ? dayIndex(day) * 3 + ELEMENTS.indexOf(element) * 5 + i * 7 : 0;
-  return pool[((Math.floor(idx / 2)) % pool.length + pool.length) % pool.length]!;
+  const idx = day ? Math.floor(dayIndex(day) / 2) + ELEMENTS.indexOf(element) * 5 + i * 7 : 0;
+  return pool[(idx % pool.length + pool.length) % pool.length]!;
 });
