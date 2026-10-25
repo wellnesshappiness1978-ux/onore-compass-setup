@@ -160,7 +160,7 @@ html[data-font-size="small"] { font-size: 14px; }
 html[data-font-size="large"] { font-size: 18px; }
 body { overflow-x: clip; }
 body p, body li, body h1, body h2, body h3, body h4, body span, body label, body summary, body button, body td, body th { overflow-wrap: anywhere; word-break: normal; min-width: 0; }
-.sacred-disclosure-scroll { max-height: 65dvh; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; overflow-wrap: anywhere; }
+.sacred-disclosure-scroll { max-height: 70dvh; overflow-y: auto; overflow-x: hidden; overscroll-behavior-y: auto; overscroll-behavior-x: contain; touch-action: pan-y pinch-zoom; overflow-wrap: anywhere; }
 @media (prefers-reduced-motion: reduce) { .sacred-modal, .sacred-overlay, .sacred-accordion-content { animation: none !important; transition: none !important; } }
 .agolmen-story-dialog {
   background-color: var(--card);
@@ -1473,3 +1473,14 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 
 .lucky-color-surface :is(h3,p,strong,span) { text-shadow: none; }
 .lucky-color-surface .text-primary { color: var(--primary); }
+
+/* Scroll gutters: large tabs and cards never reach the screen edges, so the background beside them always scrolls the whole page. */
+@media (max-width: 767px) {
+  .design-main { padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right)); }
+  .design-main .tab-content { padding-inline: 0.25rem; padding-bottom: 1.5rem; }
+  .design-main .tab-content > * + * { margin-top: 1rem; }
+}
+/* Inner scrolling areas hand the gesture back to the page at their edges; horizontal carousels keep their sideways swipe. */
+[data-radix-scroll-area-viewport], .overflow-y-auto { overscroll-behavior-y: auto; touch-action: pan-y pinch-zoom; }
+[role="dialog"] .overflow-y-auto, [role="dialog"].overflow-y-auto { overscroll-behavior-y: contain; }
+.overflow-x-auto { touch-action: pan-x pan-y pinch-zoom; }
