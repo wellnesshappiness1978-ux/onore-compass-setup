@@ -137,7 +137,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   }, [focus, profile, language, iso]);
   const fortune = useTodayFortune(fortuneReq);
   const el = dayElement(iso);
-  const dailyRecipes = recipesForElement(el, iso);
+  const dailyRecipes = recipesForElement(el, iso, profile.birthDate);
   const selectedRecipe = recipeIndex === null ? null : dailyRecipes[recipeIndex];
   const recipe = selectedRecipe ? recipeDetails(selectedRecipe, language) : null;
   const starPoem = useMemo(() => {

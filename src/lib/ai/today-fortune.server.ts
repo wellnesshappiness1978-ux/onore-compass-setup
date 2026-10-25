@@ -9,6 +9,7 @@ import { createLovableAiGatewayRunIdFetch } from "./run-id.server";
 import { personal } from '../day-compass';
 import { RECIPE_SERVINGS } from '../reading-presentation';
 import { luckyRecipes, recipeCourse, recipeDetails } from '../lucky-recipes';
+import { seasonOf, rhythmOf } from '../seasonal-recipes';
 import { z } from 'zod';
 import { validateRecipeIdentities } from '../recipe-identity';
 import { deeperEssencePrompt } from '../deeper-essence';
@@ -26,6 +27,9 @@ export async function runReading(data: ReturnType<typeof todayFortuneRequestSche
     const monthStart = new Date(`${day.slice(0, 7)}-01T12:00:00Z`);
     const monthDays = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth() + 1, 0)).getUTCDate();
     const monthContext = members.map(m => ({ name: m.nameKanji || 'SUBJECT', rhythms: Array.from({ length: monthDays }, (_, i) => { const date = new Date(Date.UTC(monthStart.getUTCFullYear(), monthStart.getUTCMonth(), i + 1, 12)); const r = personal(m.birthDate, date); return { day: i + 1, total: r.total, physical: r.physical, emotional: r.emotional, intellectual: r.intellectual }; }) }));
+    const season = seasonOf(day), rhythm = rhythmOf(members[0]?.birthDate, day);
+    // Evergreen dishes plus this season's dishes keep the prompt compact while offering a broad daily choice.
+    const catalogue = luckyRecipes.filter(r => !r.season || r.season === season);
     const runIdFetch = createLovableAiGatewayRunIdFetch();
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
@@ -39,7 +43,7 @@ export async function runReading(data: ReturnType<typeof todayFortuneRequestSche
       maxRetries: 0,
       ...(signal ? { abortSignal: signal } : {}),
       model: provider.responses("openai/gpt-6-astra"),
-      output: Output.object({ schema: todayFortuneSchema.extend({ foods: z.array(todayFortuneSchema.shape.foods.element.extend({ recipeId: z.enum(luckyRecipes.map(r => r.id) as [string, ...string[]]) })).length(5) }) }),
+      output: Output.object({ schema: todayFortuneSchema.extend({ foods: z.array(todayFortuneSchema.shape.foods.element.extend({ recipeId: z.enum(catalogue.map(r => r.id) as [string, ...string[]]) })).length(5) }) }),
       prompt: `Write TODAY'S FORTUNE for ${who}, dated ${day}, entirely in language code ${language}.
 This reading is created only for this subject and this date. ${isGroup ? "NEVER reuse an individual owner reading: weave every member's data, pair compatibility, sibling structures and today's per-member rhythms into one reading for the group." : ""}
 ${groupSizeDirective(isGroup ? members.length : 0)}
@@ -72,8 +76,8 @@ Fields:
 - luckyColor: a color (localized poetic name + #RRGGBB hex) that complements today's lowest rhythm${isGroup ? " and boosts every member together (composite color)" : ""}; reason ~80 chars.
 - luckyWord: a short soul-resonant word or phrase for the goal and today's state, plus a ~220 Japanese char message: the meaning behind today’s feeling, one concrete action with timing, and an evening reflection question.
 - foods: EXACTLY 5 DISTINCT recipeId values in this fixed course order — [1] course "main", [2] course "soup", [3] course "drink", [4] course "side", [5] course "dessert" — each chosen ONLY from that course in the catalogue below, matching this subject's element/rhythm/goal and avoiding recent names where feasible. Each photo is tied to that exact recipeId, so DO NOT invent a dish, change its name, add a main ingredient, substitute its protein or change its cooking method. Use the exact localized catalogue name and ingredients/quantities for TWO servings; seasonings already listed must not be duplicated. Provide personalized why (~160 Japanese chars) distinguishing symbolic selection from factual nutrition, no health or luck guarantee. Explain 5–8 beginner steps (washing, cut size, heat, timing, doneness, plating) faithfully expanding the supplied method, with safe meat/fish/egg heating, and optional symbolic tip. servings always localized TWO people, regardless of group size. Never select the same recipeId twice.
-RECIPE CATALOGUE (id, element, exact localized name/ingredients, method):
-${JSON.stringify(luckyRecipes.map(r => ({ recipeId: r.id, course: recipeCourse(r.id), element: r.element, ...recipeDetails(r, language) })))}
+RECIPE CATALOGUE (id, element, season, rhythm, exact localized name/ingredients, method). Current season: ${season}. Prefer seasonal dishes${rhythm ? ` and dishes whose rhythm is "${rhythm}" (today's physical biorhythm)` : ''} when they fit, but rotate widely so the same dish rarely returns:
+${JSON.stringify(catalogue.map(r => ({ recipeId: r.id, course: recipeCourse(r.id), element: r.element, season: r.season ?? 'all', rhythm: r.rhythm ?? 'any', ...recipeDetails(r, language) })))}
 Symbolic reference only; no medical, financial or guaranteed outcome claims.`,
       providerOptions: { openai: { forceReasoning: true, reasoningEffort: "low", reasoningSummary: "auto", store: false, include: ["reasoning.encrypted_content"] } },
     });
