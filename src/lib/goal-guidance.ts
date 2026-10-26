@@ -13,7 +13,7 @@ const directives: Record<GoalTheme, string> = {
 
 /** Which preset themes are present in a goal string (preset labels in any supported language). */
 export function goalThemes(goal: string): GoalTheme[] {
-  const text = goal.replaceAll('家族','ファミリー').toLowerCase(); // Legacy saved preset, never a displayed label.
+  const text = goal.replaceAll('\u5bb6\u65cf','ファミリー').toLowerCase(); // Legacy saved preset, never a displayed label.
   return goalPresets.filter(p => (Object.keys(focusCopy) as Language[]).some(l => {
     const label = focusCopy[l].presets[p].toLowerCase();
     return text.split(/\s*\/\s*/).some(part => part === label);
