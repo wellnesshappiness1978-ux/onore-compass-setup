@@ -194,17 +194,17 @@ export function FamilyGroupButtons({ language, plan, onUpgrade }: { language: La
     try {
       const payload = { name: name.trim(), nickname: nick.trim(), memberIds: ids };
       if (editing) {
-        if (ctx.serverBacked) await upd({ data: { ...payload, id: editing.id } }); else writeLocal(ctx.groups.map(g => g.id === editing.id ? { ...g, ...payload } : g));
+        if (!ctx.localWrites) await upd({ data: { ...payload, id: editing.id } }); else writeLocal(ctx.groups.map(g => g.id === editing.id ? { ...g, ...payload } : g));
       } else {
         if (!canAddGroup(plan, ctx.groups.length)) { setLimitOpen(true); return; }
-        if (ctx.serverBacked) await add({ data: payload }); else writeLocal([...ctx.groups, { id: crypto.randomUUID(), ...payload }]);
+        if (!ctx.localWrites) await add({ data: payload }); else writeLocal([...ctx.groups, { id: crypto.randomUUID(), ...payload }]);
       }
-      if (ctx.serverBacked) ctx.reload();
+      if (!ctx.localWrites) ctx.reload();
       reset();
     } catch (e) { if (e instanceof Error && e.message.includes("GROUP_MEMBER_LIMIT")) onUpgrade(); else if (e instanceof Error && e.message.includes("GROUP_LIMIT")) setLimitOpen(true); else toast.error("Error"); }
     finally { setBusy(false); }
   };
-  const remove = async (g: TeamGroup) => { if (ctx.serverBacked) { await del({ data: { id: g.id } }); ctx.reload(); } else writeLocal(ctx.groups.filter(x => x.id !== g.id)); };
+  const remove = async (g: TeamGroup) => { if (!ctx.localWrites) { await del({ data: { id: g.id } }); ctx.reload(); } else writeLocal(ctx.groups.filter(x => x.id !== g.id)); };
   return <>
     <div role="tablist" className="mb-5 grid grid-cols-2 gap-2">
       {([["family", UserRound, t.familyEdit, () => { window.dispatchEvent(new Event("onore-family-edit")); window.setTimeout(() => document.getElementById("family-roster-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); }], ["group", Users, t.groupEdit, () => { reset(); setOpen(true); }]] as const).map(([key, Icon, label, act]) => { const on = active === key; return <Button key={key} role="tab" aria-selected={on} variant="outline" className={`h-12 border-2 transition-all md:h-14 md:text-base ${on ? "border-primary bg-primary/20 font-bold text-primary shadow-champagne after:absolute after:inset-x-3 after:bottom-1 after:h-1 after:rounded-full after:bg-primary relative" : "border-primary/30 text-muted-foreground hover:text-foreground"}`} onClick={() => { setActive(key); act(); }}><Icon className={on ? "size-5 text-primary" : "size-4"} />{label}</Button>; })}
