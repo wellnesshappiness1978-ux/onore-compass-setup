@@ -1,10 +1,11 @@
 # Roadmap
 
 ## Cross-device sync, sequential upgrades and durable Family readings
-- [ ] Owner-scoped realtime and focus refresh without restarting AI; synchronize account settings.
-- [ ] Prioritize the next tier without changing actual feature gates.
-- [ ] Save one six-field Family generation with database single-flight and no automatic retries.
-- [ ] Run regression tests, verify live flows and automatic build.
+- [x] Owner-filtered realtime, tab/focus refresh, shared account choices and private hashed reading copies; local changes protected during initial hydration. Two separate signed-in 1280/390px contexts confirmed notification pause/resume arriving without reload; original value restored.
+- [x] Next-tier cards prioritized and highlighted using actual membership; Free shows Standard first, not VIP. Feature gates, prices and capacities unchanged.
+- [x] Explicit six-field Family generation with database unique pending lock; saved/pending/failed/competing lock paths make zero AI calls in regression tests. One synthetic live Gateway request validated all six fields; 390px all six real-reference dialogs opened without overflow/errors.
+- [x] 353 tests across 78 files passed; latest automatic build OK; signed-in settings synchronization and six preview displays verified.
+- [ ] Paid Family end-to-end generation/save/readback and cross-device family CRUD: blocked by requesting account's actual Free membership (no paid roster capacity). No entitlement fabricated; synthetic Gateway verification does not establish paid-account persistence.
 
 ## Family registration and explicit editor entry (2026-10-26)
 - [x] Separate registration capacity from Family analysis and display preview; show actual registration plan with existing 0/3/10/30/100 caps.
