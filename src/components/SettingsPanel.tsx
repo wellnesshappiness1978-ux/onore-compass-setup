@@ -1,6 +1,9 @@
 import { planDetails } from "@/lib/plan-details";
 import { planOrder as tierOrder } from "@/lib/plans";
 import ReminderMasterSwitch from "./ReminderMasterSwitch";
+import { FocusSettingsCard } from "./FocusPanels";
+import TodayReminders from "./TodayReminders";
+import DailyRelationshipGuide from "./DailyRelationshipGuide";
 import { ThemeSample } from "./ThemeSample";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -164,14 +167,15 @@ export default function SettingsPanel({
     <div className="space-y-5">
       <h2 className="font-serif text-2xl text-gradient-gold">{t.title}</h2>
 
-      <section className={card}>
-        <div className="flex items-center gap-4">
-          <div className="grid size-16 place-items-center rounded-full border border-primary/40 bg-primary/10 shadow-[0_0_20px_var(--gold-glow)]">
+      <div className="grid min-w-0 items-start gap-4 md:grid-cols-2" data-settings-overview>
+      <section className="min-w-0 rounded-lg border border-primary/20 bg-card/60 p-4">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4">
+          <div className="grid size-16 shrink-0 place-items-center rounded-full border border-primary/40 bg-primary/10 shadow-[0_0_20px_var(--gold-glow)]">
             <User className="size-7 text-primary" aria-hidden="true" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-serif text-lg">{t.guest}</p>
-            <p className="truncate text-xs text-muted-foreground">{birth}</p>
+            <p className="font-serif text-lg">{profile.nameKanji || profile.nameRomaji || t.guest}</p>
+            <p className="text-xs leading-6 text-muted-foreground">{birth}</p>
             <span
               className={`mt-2 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs ${plan === "free" ? "border-border text-muted-foreground" : "border-primary/60 bg-primary/15 text-primary shadow-[0_0_16px_var(--gold-glow)]"}`}
             >
@@ -209,6 +213,9 @@ export default function SettingsPanel({
             : <p className="mt-2 text-[11px] text-muted-foreground">{t.planTestNote}</p>}
         </div>}
       </section>
+
+      <FocusSettingsCard language={language} />
+      </div>
 
       {signedIn && debugAllowed && <DebugPlanSwitcher plan={actualPlan} language={language} onChanged={onDebugPlanChanged} />}
 
@@ -362,6 +369,10 @@ export default function SettingsPanel({
           </p>
         )}
       </section>
+      <div className="space-y-4" data-settings-reminders>
+        <TodayReminders kind="bgm" language={language} plan={plan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} />
+        <DailyRelationshipGuide language={language} plan={plan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} />
+      </div>
       <Dialog open={lockedMode !== null} onOpenChange={(open) => { if (!open) setLockedMode(null); }}>
         <DialogContent className="theme-preview-dialog flex h-[min(92dvh,900px)] w-[min(100vw,760px)] max-w-none flex-col gap-0 overflow-hidden border-primary/30 bg-card p-0 text-foreground">
           {lockedTheme && <>

@@ -1386,6 +1386,17 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 .design-canvas:not([data-tab=home]) .design-header { height: calc(146px + env(safe-area-inset-top)); border: 0; }
 .design-canvas:not([data-tab=home]) .design-header > div { display: none; }
 
+@media (min-width: 768px) {
+  .mobile-fixed-header { grid-template-columns: 40px minmax(0,1fr) auto; grid-template-rows: 50px; height: calc(56px + env(safe-area-inset-top)); column-gap: 16px; }
+  .mobile-fixed-header > .subject-goal-badge { grid-row: 1; grid-column: 2; width: 100%; }
+  .mobile-fixed-header > div:last-child { grid-column: 3; }
+  html { scroll-padding-top: calc(var(--preview-bar-height) + 68px + env(safe-area-inset-top)); }
+  body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 62px + env(safe-area-inset-top)); }
+  .design-canvas .design-header { padding-top: calc(102px + env(safe-area-inset-top)); }
+  .design-canvas:not([data-tab=home]) .design-header { height: calc(102px + env(safe-area-inset-top)); }
+  .design-canvas[data-tab=settings] .tab-content { padding-top: 0; }
+}
+
 @media (max-width: 767px) {
   html { scroll-padding-top: calc(var(--preview-bar-height) + 106px + env(safe-area-inset-top)); }
   body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 106px + env(safe-area-inset-top)); left: 12px; right: auto; max-width: calc(100vw - 160px); display: flex; }
