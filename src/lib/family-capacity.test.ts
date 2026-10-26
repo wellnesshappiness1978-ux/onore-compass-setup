@@ -34,3 +34,18 @@ describe('owner-excluded family and group capacity', () => {
     expect(familyRegistrationAccess(true, 'free', 'standard', 0)).toEqual({ plan: 'free', limit: 0, canAdd: false });
   });
 });
+import { limitUpgradeTarget } from './family-capacity';
+describe('test preview plan bar drives registration', () => {
+  it('preview Family Premium on a signed-in Free account allows 100 test members', () => {
+    expect(familyRegistrationAccess(true, 'free', 'b2b-premium', 0, true)).toEqual({ plan: 'b2b-premium', limit: 100, canAdd: true });
+  });
+  it('preview Standard allows adding until 3', () => {
+    expect(familyRegistrationAccess(true, 'free', 'standard', 2, true).canAdd).toBe(true);
+    expect(familyRegistrationAccess(true, 'free', 'standard', 3, true).canAdd).toBe(false);
+  });
+  it('limit suggestion is always a higher plan', () => {
+    expect(limitUpgradeTarget('standard', 4)).toBe('vip');
+    expect(limitUpgradeTarget('vip', 11)).toBe('b2b');
+    expect(limitUpgradeTarget('b2b-premium', 101)).toBe('max');
+  });
+});
