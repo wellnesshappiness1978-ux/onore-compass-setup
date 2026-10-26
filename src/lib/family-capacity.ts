@@ -5,8 +5,8 @@ import type { Plan } from './design-modes';
 import { memberLimit } from './plans';
 
 /** Registration never depends on Family analytics or a signed-in display preview. */
-export function familyRegistrationAccess(signedIn: boolean, actualPlan: Plan, displayPlan: Plan, count: number) {
-  const plan = signedIn ? actualPlan : displayPlan;
+export function familyRegistrationAccess(signedIn: boolean, actualPlan: Plan, displayPlan: Plan, count: number, testPreview = false) {
+  const plan = signedIn && !testPreview ? actualPlan : displayPlan;
   const limit = memberLimit[plan];
   return { plan, limit, canAdd: count < limit };
 }
@@ -30,3 +30,8 @@ export const familyCapacityCopy: Record<Language, OwnerCopy> = {
   es: { owner: 'Titular de la cuenta', excluded: 'El titular no ocupa una plaza', capacity: (n,l) => `Otros miembros ${n} / ${l}` },
   fr: { owner: 'Titulaire du compte', excluded: 'Le titulaire ne prend aucune place', capacity: (n,l) => `Autres membres ${n} / ${l}` },
 };
+/** Upgrade suggestion when the limit is reached: the smallest higher plan that fits, never the current or a lower one. */
+export function limitUpgradeTarget(current: Plan, nextCount: number): Plan | 'max' {
+  const order: Plan[] = ['free', 'standard', 'vip', 'b2b', 'b2b-premium'];
+  return order.slice(order.indexOf(current) + 1).find(p => memberLimit[p] >= nextCount) ?? 'max';
+}

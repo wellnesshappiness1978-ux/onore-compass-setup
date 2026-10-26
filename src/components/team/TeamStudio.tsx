@@ -26,7 +26,8 @@ import GroupSimulator from "./GroupSimulator";
 import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
 import { useFocus, ownerAsMember } from '../FocusProvider';
-import { familyCapacityCopy, familyRegistrationAccess } from '@/lib/family-capacity';
+import { familyCapacityCopy, familyRegistrationAccess, limitUpgradeTarget } from '@/lib/family-capacity';
+import { usePlan } from '@/components/PlanProvider';
 
 type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string; active: boolean };
 const LOCAL = "onore-team";
@@ -55,9 +56,11 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
   const add = useServerFn(addTeamMember);
   const update = useServerFn(updateTeamMember);
   const del = useServerFn(deleteTeamMember);
+  const { enabled: testPreview } = usePlan();
+  const testMode = signedIn && testPreview && plan !== actualPlan;
   const previewOnly = plan !== actualPlan;
-  const localMode = !signedIn;
-  const registration = familyRegistrationAccess(signedIn, actualPlan, plan, members.length);
+  const localMode = !signedIn || testMode;
+  const registration = familyRegistrationAccess(signedIn, actualPlan, plan, members.length, testPreview);
   const max = registration.limit;
   useEffect(() => {
     if (!active) setEditorOpen(false);
@@ -72,11 +75,11 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     else { try { setMembers(JSON.parse(localStorage.getItem(LOCAL) ?? "[]")); } catch { setMembers([]); } }
     return () => { active = false; };
   }, [localMode, list]);
-  useEffect(()=>{ if (focus?.serverBacked) setMembers(focus.members); },[focus?.members,focus?.serverBacked]);
+  useEffect(()=>{ if (focus?.serverBacked && !testMode) setMembers(focus.members); },[focus?.members,focus?.serverBacked,testMode]);
   const persistLocal = (next: TeamMember[]) => { setMembers(next); try { localStorage.setItem(LOCAL, JSON.stringify(next)); window.dispatchEvent(new Event("onore-focus-reload")); } catch { /* ignore */ } };
 
   const addMember = async (m: Omit<TeamMember, "id">) => {
-    if (!registration.canAdd) { setLimitDialog(planForCount(members.length + 1) ?? "max"); return false; }
+    if (!registration.canAdd) { setLimitDialog(limitUpgradeTarget(registration.plan, members.length + 1)); return false; }
     if (!localMode) setMembers([...members, await add({ data: m as never })]);
     else persistLocal([...members, { ...m, id: crypto.randomUUID() }]);
     return true;
@@ -131,7 +134,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <Button size="sm" className="mt-3 w-full" onClick={() => { window.dispatchEvent(new Event('onore-upgrade-plans')); }}><Crown className="size-4" />{t.planNames[nextPlan(signedIn ? actualPlan : plan) ?? plan]}</Button>
           </div>
         ) : feature === "roster" ? (
-          <Roster t={t} owner={owner} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly && localMode} language={language} formOpen={editorOpen} onFormOpenChange={setEditorOpen} onAdd={addMember} onEdit={editMember} onRemove={removeMember} onLimit={() => setLimitDialog(planForCount(members.length + 1) ?? "max")} />
+          <Roster t={t} owner={owner} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly && localMode && !testPreview} language={language} formOpen={editorOpen} onFormOpenChange={setEditorOpen} onAdd={addMember} onEdit={editMember} onRemove={removeMember} onLimit={() => setLimitDialog(limitUpgradeTarget(registration.plan, members.length + 1))} />
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
@@ -159,7 +162,6 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <DialogTitle>{t.limitTitle}</DialogTitle>
             <DialogDescription>{limitDialog === "max" ? t.absoluteLimit : limitDialog && t.limitBody(t.planNames[limitDialog], memberLimit[limitDialog])}</DialogDescription>
           </DialogHeader>
-          {limitDialog !== "max" && <p className="text-xs text-muted-foreground">{t.upgradePending}</p>}
           <DialogFooter>
             <Button variant="outline" onClick={() => setLimitDialog(null)}>{t.later}</Button>
             {limitDialog !== "max" && <Button onClick={() => { setLimitDialog(null); document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{t.switchPlan}</Button>}
