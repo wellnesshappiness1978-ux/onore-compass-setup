@@ -8,6 +8,7 @@ import type { generateHomeReading } from '@/lib/ai/home-reading.functions';
 import type { UserProfile } from '@/components/Onboarding';
 import type { Language } from '@/lib/translations';
 import { essenceKeys, approachKeys } from '@/lib/trait-reading';
+import { readCloudReading, saveCloudReading } from '@/lib/cloud-reading-cache';
 
 type Reading = Awaited<ReturnType<typeof generateHomeReading>>;
 type Request = { profile: UserProfile; language: Language; goal?: string; subject?: { label: string; isSelf: boolean }; group?: { name: string; members: UserProfile[] } };
@@ -48,10 +49,17 @@ export function usePersonalReading(request: Request, kind: 'full' | 'quick' = 'f
         const listeners = new Set<(p: PartialReading) => void>();
         const epoch = readingCacheEpoch();
         const next: Flight = { listeners, promise: Promise.resolve(undefined) };
-        next.promise = fetch('/api/readings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...normalized, kind }) }).then(response => consumeReadingStream(response, value => {
+        next.promise = (async () => {
+          const saved = await readCloudReading(key,schema);
+          if (saved) { writeReadingCache(key,saved); return saved; }
+          const response = await fetch('/api/readings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...normalized, kind }) });
+          const value = await consumeReadingStream(response, value => {
           next.partial = value as PartialReading;
           for (const listener of listeners) listener(next.partial);
-        })).then(value => { if (epoch === readingCacheEpoch()) writeReadingCache(key, value); return value; }).finally(() => flights.delete(key));
+          });
+          if (epoch === readingCacheEpoch()) { writeReadingCache(key,value); await saveCloudReading(key,value).catch(()=>undefined); }
+          return value;
+        })().finally(() => flights.delete(key));
         flights.set(key, next); flight = next;
       }
       return await flight.promise as Reading;

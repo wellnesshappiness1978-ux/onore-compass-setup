@@ -1,12 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
-import { Output } from 'ai';
 import { createResponsesCall } from './ai/responses.server';
 import { familyReadingInput, familyReadingSchema, familyFingerprint } from './family-reading';
 import type { z } from 'zod';
 import { parentsFromRow } from './parent-data';
 import { analyzeFamily } from './family-analysis';
-import { ownerAsMember } from '@/components/FocusProvider';
 import type { UserProfile } from '@/components/Onboarding';
 import { memberToProfile } from './focus';
 import { supportiveWritingVoice } from './ai/writing-voice';
@@ -23,7 +21,7 @@ export async function familyReadingOperation(context: { supabase: SupabaseClient
   ]);
   if (ownerError || memberError || !owner?.birth_date) throw new Error('Unable to load family profiles');
   const profile: UserProfile = { nameKanji:owner.name_kanji,nameKana:owner.name_kana,nameRomaji:owner.name_romaji,birthDate:owner.birth_date,birthTime:owner.birth_time?.slice(0,5) ?? '',birthTimeUnknown:owner.birth_time_unknown,birthPlace:owner.birth_place,birthCity:owner.birth_city,gender:owner.gender as UserProfile['gender'],bloodType:owner.blood_type,siblingOrder:owner.sibling_order,...parentsFromRow(owner.parents) };
-  let members = [ownerAsMember(profile), ...(rows ?? []).map(r => ({ id:r.id,name:r.name,nickname:r.nickname,nameKana:r.name_kana,birthDate:r.birth_date,birthTime:r.birth_time?.slice(0,5) ?? '',birthTimeUnknown:r.birth_time_unknown,birthPlace:r.birth_place,birthCity:r.birth_city,gender:r.gender,bloodType:r.blood_type,siblingOrder:r.sibling_order,relationship:r.relationship,relationshipType:r.relationship_type,role:r.role,skills:r.skills,...parentsFromRow(r.parents) }))];
+  let members = [{id:SELF_MEMBER_ID,name:profile.nameKanji || profile.nameRomaji,nameKana:profile.nameKana,birthDate:profile.birthDate,birthTime:profile.birthTime,birthTimeUnknown:profile.birthTimeUnknown,birthPlace:profile.birthPlace,birthCity:profile.birthCity,gender:profile.gender,bloodType:profile.bloodType,siblingOrder:profile.siblingOrder,role:'',skills:[] as string[],...parentsFromRow(owner.parents)}, ...(rows ?? []).map(r => ({ id:r.id,name:r.name,nickname:r.nickname,nameKana:r.name_kana,birthDate:r.birth_date,birthTime:r.birth_time?.slice(0,5) ?? '',birthTimeUnknown:r.birth_time_unknown,birthPlace:r.birth_place,birthCity:r.birth_city,gender:r.gender,bloodType:r.blood_type,siblingOrder:r.sibling_order,relationship:r.relationship,relationshipType:r.relationship_type,role:r.role,skills:r.skills,...parentsFromRow(r.parents) }))];
   let name = 'Family';
   if (input.groupId) {
     const { data: group, error } = await supabase.from('team_groups').select('*').eq('user_id',userId).eq('id',input.groupId).single();

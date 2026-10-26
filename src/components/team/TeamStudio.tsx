@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 import { familySampleCopy } from "@/lib/family-sample-copy";
-import { hasFeature, memberLimit, planForCount, requiredPlanFor, type TeamFeature } from "@/lib/plans";
+import { hasFeature, memberLimit, planForCount, requiredPlanFor, nextPlan, type TeamFeature } from "@/lib/plans";
 import { teamCopy, type TeamCopy } from "@/lib/team-copy";
 import {
   biorhythm, dayElement, dayScore, elements, lifePath, matrixPoint, orgBalance, pairScore, purposes, roleOf, teamDiagnosis, teamRoles, todayIso,
@@ -72,6 +72,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     else { try { setMembers(JSON.parse(localStorage.getItem(LOCAL) ?? "[]")); } catch { setMembers([]); } }
     return () => { active = false; };
   }, [localMode, list]);
+  useEffect(()=>{ if (focus?.serverBacked) setMembers(focus.members); },[focus?.members,focus?.serverBacked]);
   const persistLocal = (next: TeamMember[]) => { setMembers(next); try { localStorage.setItem(LOCAL, JSON.stringify(next)); window.dispatchEvent(new Event("onore-focus-reload")); } catch { /* ignore */ } };
 
   const addMember = async (m: Omit<TeamMember, "id">) => {
@@ -127,7 +128,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
                 <p className="text-[11px] text-muted-foreground">{t.locked(t.planNames[requiredPlanFor(feature)])}</p>
               </div>
             </div>
-            <Button size="sm" className="mt-3 w-full" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Crown className="size-4" />{t.upgradeFamily}</Button>
+            <Button size="sm" className="mt-3 w-full" onClick={() => { window.dispatchEvent(new Event('onore-upgrade-plans')); }}><Crown className="size-4" />{t.planNames[nextPlan(signedIn ? actualPlan : plan) ?? plan]}</Button>
           </div>
         ) : feature === "roster" ? (
           <Roster t={t} owner={owner} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly && localMode} language={language} formOpen={editorOpen} onFormOpenChange={setEditorOpen} onAdd={addMember} onEdit={editMember} onRemove={removeMember} onLimit={() => setLimitDialog(planForCount(members.length + 1) ?? "max")} />

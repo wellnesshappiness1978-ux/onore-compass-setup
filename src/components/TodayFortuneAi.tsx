@@ -16,6 +16,7 @@ import DailyLuckyColor from './DailyLuckyColor';
 import RecipeStep, { cleanRecipeSteps } from './RecipeStep';
 import { recipeLabels } from '@/lib/recipe-presentation';
 import { todayBenefitCopy } from '@/lib/today-benefits';
+import { readCloudReading,saveCloudReading } from '@/lib/cloud-reading-cache';
 
 type Base = Omit<TodayFortuneRequest, "avoid">;
 const pendingFortunes = new Map<string, Promise<TodayFortune>>();
@@ -29,6 +30,16 @@ export function useTodayFortune(req: Base | null): FortuneState {
   const [state, setState] = useState<{ data: TodayFortune | null; loading: boolean; error: string | null; sig?: string }>({ data: null, loading: false, error: null });
   const [nonce, setNonce] = useState(0);
   const sig = req ? JSON.stringify(req) : "";
+  useEffect(()=>{
+    const sync = (event: StorageEvent) => {
+      if (!req || event.key !== cacheKey(req)) return;
+      const parsed = todayFortuneSchema.safeParse(JSON.parse(event.newValue ?? 'null'));
+      if (!parsed.success) return;
+      resolvedFortunes.set(cacheKey(req),{epoch:readingCacheEpoch(),data:parsed.data});
+      setState({data:parsed.data,loading:false,error:null,sig});
+    };
+    window.addEventListener('storage',sync);return ()=>window.removeEventListener('storage',sync);
+  },[sig]);
   useEffect(() => {
     if (!req) { setState({ data: null, loading: false, error: null }); return; }
     const key = cacheKey(req);
@@ -44,13 +55,14 @@ export function useTodayFortune(req: Base | null): FortuneState {
     let request = pendingFortunes.get(key);
     if (!request) {
       const epoch = readingCacheEpoch();
-      request = fetch('/api/readings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...req, kind: 'today', avoid: avoidFromHistory(readHistory(), req.subject.key, req.day) }) })
+      request = readCloudReading(key,todayFortuneSchema).then(saved=> saved ?? fetch('/api/readings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...req, kind: 'today', avoid: avoidFromHistory(readHistory(), req.subject.key, req.day) }) })
         .then(response => consumeReadingStream(response, value => { for (const notify of listeners) notify(value as Partial<TodayFortune>); }))
-        .then(value => todayFortuneSchema.parse(value)).then(data => {
+        .then(value => todayFortuneSchema.parse(value))).then(async data => {
         if (epoch === readingCacheEpoch()) {
           resolvedFortunes.set(key, { epoch, data });
           try { localStorage.setItem(key, JSON.stringify(data)); } catch { /* full */ }
           pushHistory(req.subject.key, req.day, data);
+          await saveCloudReading(key,data).catch(()=>undefined);
         }
         return data;
       });

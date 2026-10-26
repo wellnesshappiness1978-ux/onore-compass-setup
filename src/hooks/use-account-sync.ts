@@ -1,9 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { cloudTables, CLOUD_SYNC_EVENT, syncedSettingKeys } from '@/lib/account-sync';
+import { writeReadingCache } from '@/lib/reading-cache';
+import { useQueryClient } from '@tanstack/react-query';
 
 /** One channel per signed-in mount; only authoritative reads are refreshed, never AI mutations. */
 export function useAccountSync(userId: string | null, onProfile: () => Promise<void>) {
+  const client = useQueryClient();
   const callback = useRef(onProfile); callback.current = onProfile;
   useEffect(() => {
     if (!userId) return;
@@ -11,6 +14,14 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
     let timer: ReturnType<typeof setTimeout> | undefined;
     const snapshot = new Map(syncedSettingKeys.map(k => [k, localStorage.getItem(k)]));
     const changed = new Set<string>();
+    const readCaches = async () => {
+      const { data,error } = await supabase.from('reading_device_cache').select('cache_key,result').eq('user_id',userId).order('updated_at',{ascending:false}).limit(16);
+      if (error || !active) return;
+      for (const row of data ?? []) {
+        if (row.cache_key.startsWith('onore-reading:')) { writeReadingCache(row.cache_key,row.result); client.setQueryData([row.cache_key],row.result); }
+        else if (row.cache_key.startsWith('onore-today-ai:')) { localStorage.setItem(row.cache_key,JSON.stringify(row.result)); window.dispatchEvent(new StorageEvent('storage',{key:row.cache_key,newValue:JSON.stringify(row.result),storageArea:localStorage})); }
+      }
+    };
     const readSettings = async () => {
       const { data, error } = await supabase.from('account_settings').select('key,value').eq('user_id', userId);
       if (error || !active) return;
@@ -29,14 +40,14 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
     const refresh = async () => {
       if (!active || refreshing) return;
       refreshing = true;
-      try { await Promise.all([callback.current(), readSettings()]); }
+      try { await Promise.all([callback.current(), readSettings(),readCaches()]); }
       finally { refreshing = false; }
       if (active) window.dispatchEvent(new Event(CLOUD_SYNC_EVENT));
     };
     const schedule = () => { clearTimeout(timer); timer = setTimeout(() => void refresh(), 150); };
     let channel = supabase.channel(`account-${userId}-${crypto.randomUUID()}`);
     for (const table of cloudTables) channel = channel.on('postgres_changes', { event: '*', schema: 'public', table, filter: `user_id=eq.${userId}` }, () => {
-      if (table === 'account_settings' || table === 'profiles') schedule();
+      if (table === 'account_settings' || table === 'profiles' || table === 'reading_device_cache') schedule();
       else window.dispatchEvent(new CustomEvent(CLOUD_SYNC_EVENT, { detail: table }));
     });
     channel.subscribe(status => { if (status === 'SUBSCRIBED') schedule(); });
@@ -60,5 +71,5 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
     }, 1000);
     void readSettings();
     return () => { active = false; clearTimeout(timer); clearInterval(poll); window.removeEventListener('focus', focus); document.removeEventListener('visibilitychange', focus); void supabase.removeChannel(channel); };
-  }, [userId]);
+  }, [userId,client]);
 }
