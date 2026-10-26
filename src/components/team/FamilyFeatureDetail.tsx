@@ -21,6 +21,7 @@ export default function FamilyFeatureDetail({ feature, language, plan, actualPla
   const members = useMemo(() => focus?.group ? focus.group.members : focus ? [ownerAsMember(focus.owner), ...focus.members] : [], [focus?.group, focus?.owner, focus?.members]);
   const data = useMemo(() => analyzeFamily(members, todayIso()), [members]);
   const palette = data.palette;
+  const groupSubject = useMemo(() => ({ id: focus?.group?.group.id ?? "family-live", name: focus?.group ? focus.label(language) : c.title, nickname: "", memberIds: members.map(m=>m.id) }), [focus?.group?.group.id, focus?.group, language, members, c.title]);
   if (!focus || members.length < 2) return <p className="py-6 text-sm text-muted-foreground">{c.empty}</p>;
   const name = (m: typeof members[number]) => memberDisplayName(m);
   const personRows = data.entries.map(e => <article key={e.member.id} className="min-w-0 border-b border-primary/20 py-4">
@@ -32,7 +33,7 @@ export default function FamilyFeatureDetail({ feature, language, plan, actualPla
   </article>);
   const pairs = (feature === "friction" ? [...data.pairs].sort((a,b)=>a.score-b.score) : [...data.pairs].sort((a,b)=>b.score-a.score)).slice(0,30);
   return <div className="min-w-0">
-    <p className="mb-4 text-xs leading-6 text-muted-foreground">{focus.label(language)} · {members.length} · {focus.focus.goal}</p>
+    <p className="mb-4 text-xs leading-6 text-muted-foreground">{groupSubject.name} · {members.length} · {focus.focus.goal}</p>
     {feature === "matrix" && <>
       <div className="relative mx-auto aspect-square w-full max-w-sm overflow-hidden rounded-full border border-primary/40 bg-background" aria-label={c.titles[0]}>
         <div className="absolute inset-[15%] rounded-full border border-primary/20"/><div className="absolute inset-[30%] rounded-full border border-primary/20"/>
@@ -55,7 +56,7 @@ export default function FamilyFeatureDetail({ feature, language, plan, actualPla
       {d.lead && <p className="mt-2 text-sm leading-7">{name(d.lead)} · {t.roles[data.entries.find(e=>e.member.id===d.lead?.id)?.role ?? "coordinator"]}</p>}
       {d.support && <p className="mt-1 text-xs leading-6 text-muted-foreground">{g.care(name(d.support))}</p>}
     </li>)}</ol>}
-    {feature === "consult" && <ConsultationPanel profile={focus.owner} language={language} plan={plan} actualPlan={actualPlan} signedIn={signedIn} previewMode={previewMode} goal={focus.focus.goal} onVip={onUpgrade} groupSubject={{id:"family-live",name:focus.label(language),nickname:"",memberIds:members.map(m=>m.id)}} />}
+    {feature === "consult" && <ConsultationPanel profile={focus.owner} language={language} plan={plan} actualPlan={actualPlan} signedIn={signedIn} previewMode={previewMode} goal={focus.focus.goal} onVip={onUpgrade} groupSubject={groupSubject} />}
     {feature === "colors" && <>
       <p className="mb-4 text-sm leading-7">{c.color}</p>
       {palette && <div className="mb-4 flex gap-2" aria-label={c.titles[5]}>{groupPaletteRoles.map(role=><span key={role} className="aspect-square min-w-0 flex-1 rounded-full border border-primary/30" style={{backgroundColor:palette[role].code}} title={localizeBirthColorName(palette[role].name,language)}/>)}</div>}
