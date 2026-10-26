@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fitsMemberCapacity, groupInput, registeredMemberCount } from './family-capacity';
+import { familyRegistrationAccess, fitsMemberCapacity, groupInput, registeredMemberCount } from './family-capacity';
 import { SELF_MEMBER_ID } from './group-insight';
 const ids = Array.from({ length: 101 }, (_, i) => `11111111-1111-4111-8111-${String(i).padStart(12,'0')}`);
 describe('owner-excluded family and group capacity', () => {
@@ -22,5 +22,15 @@ describe('owner-excluded family and group capacity', () => {
   });
   it('duplicate IDs consume one slot and normalize before saving', () => {
     expect(registeredMemberCount([SELF_MEMBER_ID, ids[0] ?? '', ids[0] ?? ''])).toBe(1);
+  });
+});
+ describe('registration independent of Family analytics', () => {
+  it.each([['standard', 3], ['vip', 10], ['b2b', 30], ['b2b-premium', 100]] as const)('%s registers through its %s slots', (plan, limit) => {
+    expect(familyRegistrationAccess(true, plan, 'free', 0)).toEqual({ plan, limit, canAdd: true });
+    expect(familyRegistrationAccess(true, plan, 'free', limit - 1).canAdd).toBe(true);
+    expect(familyRegistrationAccess(true, plan, 'free', limit).canAdd).toBe(false);
+  });
+  it('preview Standard never grants writes to a signed-in Free account', () => {
+    expect(familyRegistrationAccess(true, 'free', 'standard', 0)).toEqual({ plan: 'free', limit: 0, canAdd: false });
   });
 });

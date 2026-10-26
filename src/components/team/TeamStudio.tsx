@@ -26,9 +26,9 @@ import GroupSimulator from "./GroupSimulator";
 import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
 import { useFocus, ownerAsMember } from '../FocusProvider';
-import { familyCapacityCopy } from '@/lib/family-capacity';
+import { familyCapacityCopy, familyRegistrationAccess } from '@/lib/family-capacity';
 
-type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string };
+type Props = { plan: Plan; actualPlan: Plan; language: Language; signedIn: boolean; ownerBirthDate: string; active: boolean };
 const LOCAL = "onore-team";
 const card = "rounded-2xl border border-primary/15 bg-background/40 p-4";
 const tabFeatures: TeamFeature[] = ["roster", "teamDiagnosis", "simulator", "draft", "catalog", "calendar", "balance", "oneOnOne", "recruit"];
@@ -41,13 +41,14 @@ const summary = (m: TeamMember, t: TeamCopy) => ({
   element: dayElement(m.birthDate), lifePath: lifePath(m.birthDate), biorhythm: biorhythm(m.birthDate, todayIso()).total,
 });
 
-export default function TeamStudio({ plan, actualPlan, language, signedIn, ownerBirthDate }: Props) {
+export default function TeamStudio({ plan, actualPlan, language, signedIn, ownerBirthDate, active }: Props) {
   const focus = useFocus();
   const owner = focus ? ownerAsMember(focus.owner) : null;
   const t = teamCopy[language];
   const sample = familySampleCopy[language];
   const profileUi = profileUiCopy[language];
   const [tab, setTab] = useState(0);
+  const [editorOpen, setEditorOpen] = useState(false);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [limitDialog, setLimitDialog] = useState<Plan | "max" | null>(null);
   const list = useServerFn(listTeamMembers);
@@ -56,7 +57,14 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
   const del = useServerFn(deleteTeamMember);
   const previewOnly = plan !== actualPlan;
   const localMode = !signedIn;
-  const max = memberLimit[signedIn ? actualPlan : plan];
+  const registration = familyRegistrationAccess(signedIn, actualPlan, plan, members.length);
+  const max = registration.limit;
+  useEffect(() => {
+    if (!active) setEditorOpen(false);
+    const open = () => { if (active) { setTab(0); setEditorOpen(true); } };
+    window.addEventListener('onore-family-edit', open);
+    return () => window.removeEventListener('onore-family-edit', open);
+  }, [active]);
 
   useEffect(() => {
     let active = true;
@@ -67,7 +75,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
   const persistLocal = (next: TeamMember[]) => { setMembers(next); try { localStorage.setItem(LOCAL, JSON.stringify(next)); window.dispatchEvent(new Event("onore-focus-reload")); } catch { /* ignore */ } };
 
   const addMember = async (m: Omit<TeamMember, "id">) => {
-    if (members.length + 1 > max) { setLimitDialog(planForCount(members.length + 1) ?? "max"); return false; }
+    if (!registration.canAdd) { setLimitDialog(planForCount(members.length + 1) ?? "max"); return false; }
     if (!localMode) setMembers([...members, await add({ data: m as never })]);
     else persistLocal([...members, { ...m, id: crypto.randomUUID() }]);
     return true;
@@ -90,7 +98,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     <section className="rounded-3xl border border-primary/20 bg-card/60 p-4 backdrop-blur-md sm:p-5" aria-label={t.title}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-serif text-lg text-primary">{t.title}</h3>
-        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[plan]} · {t.limit(members.length, max)}</span>
+        <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs text-primary">{t.planNames[registration.plan]} · {t.limit(members.length, max)}</span>
       </div>
       <p className="mt-1 text-[11px] text-muted-foreground">{t.note}</p>
       {plan === "b2b-premium" && <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-primary"><Crown className="size-3" />{t.priority}</p>}
@@ -122,7 +130,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <Button size="sm" className="mt-3 w-full" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Crown className="size-4" />{t.upgradeFamily}</Button>
           </div>
         ) : feature === "roster" ? (
-          <Roster t={t} owner={owner} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly && localMode} language={language} onAdd={addMember} onEdit={editMember} onRemove={removeMember} onLimit={() => setLimitDialog(planForCount(members.length + 1) ?? "max")} />
+          <Roster t={t} owner={owner} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly && localMode} language={language} formOpen={editorOpen} onFormOpenChange={setEditorOpen} onAdd={addMember} onEdit={editMember} onRemove={removeMember} onLimit={() => setLimitDialog(planForCount(members.length + 1) ?? "max")} />
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
@@ -177,18 +185,15 @@ const rosterExtra: Record<Language, { kana: string; time: string; timeUnknown: s
 const RELATIONSHIP_TYPE_VALUES = ["", "partner", "lover", "fiance", "family", "mother", "father", "son", "daughter", "sibling", "relative", "friend", "business", "boss", "subordinate", "employee", "other"] as const;
 const emptyMemberForm = { name: "", nickname: "", nameKana: "", birthDate: "", birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", siblingOrder: "", gender: "undisclosed", bloodType: "", relationship: "", relationshipType: "", role: "", skills: "", father: null as ParentBirth | null, mother: null as ParentBirth | null };
 
-function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd, onEdit, onRemove, onLimit }: { t: TeamCopy; owner: TeamMember | null; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void; onLimit: () => void }) {
+function Roster({ t, owner, members, max, signedIn, previewOnly, language, formOpen, onFormOpenChange, onAdd, onEdit, onRemove, onLimit }: { t: TeamCopy; owner: TeamMember | null; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; formOpen: boolean; onFormOpenChange: (open: boolean) => void; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void; onLimit: () => void }) {
   const x = rosterExtra[language];
   const [form, setForm] = useState(emptyMemberForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
   useEffect(() => {
-    const open = () => { setFormOpen(v => !v); };
-    window.addEventListener("onore-family-edit", open);
-    return () => window.removeEventListener("onore-family-edit", open);
-  }, []);
+    if (!formOpen) { setEditingId(null); setForm(emptyMemberForm); setError(false); }
+  }, [formOpen]);
   const atCap = !editingId && members.length >= max;
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,7 +203,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
     try {
       const member = { name: form.name.trim(), nickname: form.nickname.trim(), nameKana: form.nameKana.trim(), birthDate: form.birthDate, birthTime: form.birthTimeUnknown ? "" : form.birthTime, birthTimeUnknown: form.birthTimeUnknown, birthPlace: form.birthPlace.trim(), birthCity: form.birthCity.trim(), siblingOrder: form.siblingOrder.trim(), gender: form.gender, bloodType: form.bloodType, relationship: form.relationship.trim(), relationshipType: form.relationshipType, role: form.role.trim(), skills: form.skills.split(/[,、，]/).map((s) => s.trim()).filter(Boolean).slice(0, 12), father: validParent(form.father), mother: validParent(form.mother) };
       const ok = editingId ? await onEdit({ ...member, id: editingId }) : await onAdd(member);
-      if (ok) { setForm(emptyMemberForm); setEditingId(null); window.dispatchEvent(new Event("onore-focus-reload")); }
+      if (ok) { setForm(emptyMemberForm); setEditingId(null); onFormOpenChange(false); window.dispatchEvent(new Event("onore-focus-reload")); }
     } catch { setError(true);
     } finally { setBusy(false); }
   };
@@ -206,6 +211,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
     <div className="space-y-4">
       {owner && <ul aria-label={familyCapacityCopy[language].owner} className="grid gap-2 sm:grid-cols-2"><li className="flex items-center gap-3 rounded-md border border-primary/40 bg-primary/10 p-3"><div className="min-w-0 flex-1"><p className="truncate text-base font-bold text-primary">{memberDisplayName(owner)}</p><p className="text-xs text-primary">{familyCapacityCopy[language].owner}</p><p className="mt-1 text-xs text-muted-foreground">{familyCapacityCopy[language].excluded}</p></div></li></ul>}
       {!signedIn && <p className="text-[11px] text-muted-foreground">{previewOnly ? x.preview : t.guestNote}</p>}
+      <Button type="button" variant="outline" aria-expanded={formOpen} aria-controls="family-roster-form" onClick={() => onFormOpenChange(!formOpen)}><UserPlus className="size-4" />{formOpen ? x.cancel : focusCopy[language].familyEdit}</Button>
       {formOpen && atCap && <div role="note" className={`${card} border-primary/40 bg-primary/10 p-4 text-center`}><p className="font-bold text-primary">{t.limitTitle}</p><p className="mt-1 text-xs text-muted-foreground">{familyCapacityCopy[language].capacity(members.length, max)}</p><Button size="sm" variant="outline" className="mt-3" onClick={onLimit}><Crown className="size-3.5" />{t.upgradeFamily}</Button></div>}
       {formOpen && !atCap && <form id="family-roster-form" onSubmit={submit} className={`${card} grid items-start gap-2 sm:grid-cols-2`}>
         <Input required aria-label={t.name} placeholder={`${t.name} *`} value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -236,7 +242,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, onAdd
                 {m.nickname && <p className="truncate text-[11px] text-muted-foreground">{m.name}</p>}
                 <p className="truncate text-[11px] text-muted-foreground">{m.birthDate} · {m.relationship || m.role || "—"}</p>
               </div>
-              <Button size="icon" variant="ghost" aria-label={`${x.edit} ${m.name}`} onClick={() => { setFormOpen(true); setEditingId(m.id); setForm({ name: m.name, nickname: m.nickname ?? "", nameKana: m.nameKana ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", birthCity: m.birthCity ?? "", siblingOrder: m.siblingOrder ?? "", gender: m.gender || "undisclosed", bloodType: m.bloodType || "", relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", role: m.role, skills: m.skills.join(", "), father: m.father ? { birthDate: m.father.birthDate, birthPlace: m.father.birthPlace ?? "", birthCity: m.father.birthCity ?? "" } : null, mother: m.mother ? { birthDate: m.mother.birthDate, birthPlace: m.mother.birthPlace ?? "", birthCity: m.mother.birthCity ?? "" } : null }); }}><Pencil className="size-4" /></Button>
+              <Button size="icon" variant="ghost" aria-label={`${x.edit} ${m.name}`} onClick={() => { onFormOpenChange(true); setEditingId(m.id); setForm({ name: m.name, nickname: m.nickname ?? "", nameKana: m.nameKana ?? "", birthDate: m.birthDate, birthTime: m.birthTime ?? "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: m.birthPlace ?? "", birthCity: m.birthCity ?? "", siblingOrder: m.siblingOrder ?? "", gender: m.gender || "undisclosed", bloodType: m.bloodType || "", relationship: m.relationship ?? "", relationshipType: m.relationshipType ?? "", role: m.role, skills: m.skills.join(", "), father: m.father ? { birthDate: m.father.birthDate, birthPlace: m.father.birthPlace ?? "", birthCity: m.father.birthCity ?? "" } : null, mother: m.mother ? { birthDate: m.mother.birthDate, birthPlace: m.mother.birthPlace ?? "", birthCity: m.mother.birthCity ?? "" } : null }); }}><Pencil className="size-4" /></Button>
               <Button size="icon" variant="ghost" aria-label={`${t.remove} ${m.name}`} onClick={() => onRemove(m.id)}><Trash2 className="size-4" /></Button>
             </li>
           ))}

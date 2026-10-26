@@ -1,6 +1,15 @@
 import { z } from 'zod';
 import { SELF_MEMBER_ID } from './group-insight';
 import type { Language } from './translations';
+import type { Plan } from './design-modes';
+import { memberLimit } from './plans';
+
+/** Registration never depends on Family analytics or a signed-in display preview. */
+export function familyRegistrationAccess(signedIn: boolean, actualPlan: Plan, displayPlan: Plan, count: number) {
+  const plan = signedIn ? actualPlan : displayPlan;
+  const limit = memberLimit[plan];
+  return { plan, limit, canAdd: count < limit };
+}
 
 export const otherMemberIds = (ids: readonly string[]) => [...new Set(ids)].filter(id => id !== SELF_MEMBER_ID);
 export const registeredMemberCount = (ids: readonly string[]) => otherMemberIds(ids).length;

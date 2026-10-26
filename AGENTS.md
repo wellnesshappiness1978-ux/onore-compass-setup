@@ -46,3 +46,5 @@
 - Profile text fields that the UI composes (e.g. sibling_order) use DB length limits, not value-list CHECK constraints. Why: legacy enums silently rejected new structured values.
 - Parent persistence uses the shared parent-data contract and database-returned parent records; omitted parent keys never clear saved parents. Signed-in family CRUD always uses actual membership, independently of display previews. Why: avoid silent field loss and device-only saves mistaken for cloud persistence.
 - The six Family catalogue entries share one cumulative Family gate and render actual FocusProvider members, including the owner; detailed analytics and consultation use those structured profiles. Why: remove disconnected sample actions and Premium-only catalogue locks without changing write caps or AI quotas.
+
+- Family registration uses familyRegistrationAccess independently of analytics gates; signed-in capacity always uses server membership. TeamStudio owns editor state and opens idempotently from onore-family-edit, closing on tab departure or successful save. Why: registration remains available to Standard+ without accidental form opening or preview write access.

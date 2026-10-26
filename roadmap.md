@@ -1,5 +1,11 @@
 # Roadmap
 
+## Family registration and explicit editor entry (2026-10-26)
+- [x] Separate registration capacity from Family analysis and display preview; show actual registration plan with existing 0/3/10/30/100 caps.
+- [x] Explicit registration button and idempotent editor opening return to roster from every analysis tab; close editor on save and tab departure.
+- [ ] Run regression tests, confirm live editor flow and automatic build.
+- [ ] Actual Standard+ cloud add/readback: requesting account has no membership row (Free); verify without inventing paid access.
+
 ## Parent persistence and six Family features (2026-10-26)
 - [x] Shared parent validation and lossless JSONB mapping; omitted fields retain saved data. Signed-in family CRUD uses actual membership rather than preview-only local storage. Owner parent dates saved/restored through UI reload and original dates restored.
 - [x] All six catalogue functions use one Family+ gate and actual member analysis, not disconnected sample buttons.
