@@ -275,18 +275,21 @@ export type Database = {
       reading_device_cache: {
         Row: {
           cache_key: string
+          local_key: string | null
           result: Json
           updated_at: string
           user_id: string
         }
         Insert: {
           cache_key: string
+          local_key?: string | null
           result: Json
           updated_at?: string
           user_id: string
         }
         Update: {
           cache_key?: string
+          local_key?: string | null
           result?: Json
           updated_at?: string
           user_id?: string

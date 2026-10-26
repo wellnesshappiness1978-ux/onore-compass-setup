@@ -1,0 +1,2 @@
+ALTER TABLE public.reading_device_cache ADD COLUMN local_key text;
+COMMENT ON COLUMN public.reading_device_cache.cache_key IS 'SHA-256 indexed identity; complete private input key retained in local_key';
