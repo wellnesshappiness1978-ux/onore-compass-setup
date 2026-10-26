@@ -1,5 +1,11 @@
 # Roadmap
 
+## Inclusive Family catalogue, map and planning tools (2026-10-26)
+- [ ] Replace Japanese 家族 copy throughout app and AI instructions with inclusive Family wording.
+- [ ] Six-feature v2 contract, explicit atomic saved generation and durable no-retry restoration.
+- [ ] Identifiable map with axes, member legend, guide and three conclusions; shared direction/date simulation and overlaid rhythm alert calendar.
+- [ ] Regression tests, automatic build and desktop/mobile browser checks; actual paid generation subject to available membership.
+
 ## Cross-device sync, sequential upgrades and durable Family readings
 - [x] Owner-filtered realtime, tab/focus refresh, shared account choices and private hashed reading copies; local changes protected during initial hydration. Two separate signed-in 1280/390px contexts confirmed notification pause/resume arriving without reload; original value restored.
 - [x] Next-tier cards prioritized and highlighted using actual membership; Free shows Standard first, not VIP. Feature gates, prices and capacities unchanged.
