@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 import { familySampleCopy } from "@/lib/family-sample-copy";
-import { hasFeature, memberLimit, planForCount, requiredPlanFor, nextPlan, type TeamFeature } from "@/lib/plans";
+import { hasFeature, memberLimit, requiredPlanFor, nextPlan, type TeamFeature } from "@/lib/plans";
 import { teamCopy, type TeamCopy } from "@/lib/team-copy";
 import {
   biorhythm, dayElement, dayScore, elements, lifePath, matrixPoint, orgBalance, pairScore, purposes, roleOf, teamDiagnosis, teamRoles, todayIso,
