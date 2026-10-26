@@ -192,7 +192,7 @@ export default function SettingsPanel({
         </div>
         {devOverrideEnabled && <div className="mt-4 border-t border-primary/10 pt-3">
           <p className="mb-2 text-xs text-muted-foreground">{t.planTest}</p>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5" role="radiogroup" aria-label={t.planTest}>
+          <div className="grid grid-cols-3 gap-2 md:grid-cols-3 xl:grid-cols-5" role="radiogroup" aria-label={t.planTest}>
             {planOrder.map((p) => (
               <Button
                 key={p}
@@ -202,7 +202,7 @@ export default function SettingsPanel({
                 size="sm"
                 disabled={!devOverrideEnabled && planOrder.indexOf(p) > planOrder.indexOf(actualPlan)}
                 onClick={() => onPlanChange(p)}
-                className={`text-[10px] ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
+                className={`h-auto min-h-10 min-w-0 whitespace-normal px-1 py-2 text-[10px] leading-relaxed ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
               >
                 {appearanceCopy.plans[p]}
               </Button>
