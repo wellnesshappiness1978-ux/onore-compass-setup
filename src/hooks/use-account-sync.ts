@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { cloudTables, CLOUD_SYNC_EVENT, syncedSettingKeys } from '@/lib/account-sync';
+import { cloudTables, CLOUD_SYNC_EVENT, syncedSettingKeys,canApplyRemoteSetting } from '@/lib/account-sync';
 import { writeReadingCache } from '@/lib/reading-cache';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -31,7 +31,7 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
       if (error || !active) return;
       for (const row of data ?? []) {
         const key = syncedSettingKeys.find(k => k === row.key);
-        if (!key || changed.has(key) || (initialized && snapshot.get(key) !== localStorage.getItem(key))) continue;
+        if (!key || !canApplyRemoteSetting(snapshot.get(key),localStorage.getItem(key),changed.has(key))) continue;
         const oldValue = localStorage.getItem(key);
         if (oldValue === row.value) { snapshot.set(key,row.value); continue; }
         if (row.value === null) localStorage.removeItem(key); else localStorage.setItem(key, row.value);
