@@ -3,7 +3,7 @@ import { z } from 'zod';
 const mock=vi.hoisted(()=>({session:vi.fn(),from:vi.fn(),upsert:vi.fn(),maybeSingle:vi.fn(),eq:vi.fn()}));
 vi.mock('@/integrations/supabase/client',()=>({supabase:{auth:{getSession:mock.session},from:mock.from}}));
 import { readCloudReading,saveCloudReading } from './cloud-reading-cache';
-beforeEach(()=>{vi.clearAllMocks();mock.session.mockResolvedValue({data:{session:{user:{id:'owner'}}}});const q={select:()=>q,eq:mock.eq,m aybeSingle:mock.maybeSingle};mock.eq.mockReturnValue(q);mock.from.mockReturnValue({...q,upsert:mock.upsert});mock.upsert.mockResolvedValue({error:null});});
+beforeEach(()=>{vi.clearAllMocks();mock.session.mockResolvedValue({data:{session:{user:{id:'owner'}}}});const q={select:()=>q,eq:mock.eq,maybeSingle:mock.maybeSingle};mock.eq.mockReturnValue(q);mock.from.mockReturnValue({...q,upsert:mock.upsert});mock.upsert.mockResolvedValue({error:null});});
 it('guest cache never writes private cloud rows',async()=>{mock.session.mockResolvedValue({data:{session:null}});await saveCloudReading('guest-key',{});expect(mock.from).not.toHaveBeenCalled();});
 it('copies a result under a short hashed key once, retaining exact private identity',async()=>{
  await saveCloudReading('onore-reading:test-original',{text:'saved'});await saveCloudReading('onore-reading:test-original',{text:'saved'});
