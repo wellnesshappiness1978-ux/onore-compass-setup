@@ -19,4 +19,16 @@ describe('saved compatibility targets', () => {
     const other = { ...member, id: 'two', birthDate: '1981-11-04' };
     expect(savedGroupMembers({ id: 'group', name: '家族', nickname: '', memberIds: ['two'] }, [member, other])).toEqual([other]);
   });
+  it('includes every group member across roster sources, once, excluding the owner', () => {
+    const a = { ...member, id: 'a' }, b = { ...member, id: 'b' }, c = { ...member, id: 'c' };
+    const g = { id: 'g', name: 'G', nickname: '', memberIds: ['00000000-0000-0000-0000-000000000000', 'a', 'b', 'c', 'a'] };
+    expect(savedGroupMembers(g, [a, b], [b, c]).map(m => m.id)).toEqual(['a', 'b', 'c']);
+  });
+  it('shows owner traits once and keeps member text pair-specific', () => {
+    const s = splitGroupReading('あなたは、熱意が魅力です。お相手は、丁寧さが魅力です。\n\n二人は近い。');
+    expect(s.owner).toBe('あなたは、熱意が魅力です。');
+    expect(s.pair).not.toContain('あなたは');
+    expect(s.pair).toContain('二人は近い。');
+  });
+
 });
