@@ -4,7 +4,7 @@ import { approachKeys, traitReadingCopy, type ApproachKey } from './trait-readin
 import type { Language } from './translations';
 
 const logicFor: Partial<Record<ApproachKey, ArtsLogicId>> = {
-  western: 'westernAstrology', indian: 'vedicAstrology', ziwei: 'ziWei', eastern: 'easternAstrology', earth: 'helioCompass', pillars: 'fourPillars', sanmei: 'sanmeigaku', nineStars: 'nineStarKi', lunarMansion: 'sukuyo', animal: 'animalLayers', numerology: 'numerology', maya: 'mayaTzolkin', color: 'birthColor', blood: 'bloodType', siblings: 'siblingOrder',
+  western: 'westernAstrology', indian: 'vedicAstrology', ziwei: 'ziWei', eastern: 'easternAstrology', earth: 'helioCompass', pillars: 'fourPillars', sanmei: 'sanmeigaku', nineStars: 'nineStarKi', lunarMansion: 'sukuyo', animal: 'animalLayers', numerology: 'numerology', maya: 'mayaTzolkin', color: 'birthColor', blood: 'bloodType', nameReading: 'nameAnalysis', siblings: 'siblingOrder',
 };
 
 /** Same editorial explanation on both surfaces, with history first and practical scope last. */
