@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { consultationDailyLimit, dailyUsageLimit } from "@/lib/plans";
 import type { Plan } from "@/lib/design-modes";
+import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 
 export type UsageFeature = "consultation" | "compatibility";
 const localDay = () => new Date().toLocaleDateString("en-CA");
@@ -45,6 +46,8 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
 
   useEffect(() => {
     void refresh();
+    window.addEventListener(CLOUD_SYNC_EVENT,refresh);
+    return ()=>window.removeEventListener(CLOUD_SYNC_EVENT,refresh);
   }, [refresh]);
   useEffect(() => {
     const id = window.setInterval(() => {

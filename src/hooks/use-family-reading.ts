@@ -11,7 +11,7 @@ export function useFamilyReading(input: { groupId: string | null; language: Lang
   const client = useQueryClient();
   const key = ['family-reading',input,signature];
   const query = useQuery({queryKey:key,queryFn:()=>read({data:input}),enabled,staleTime:Infinity,gcTime:Infinity,retry:false,retryOnMount:false,refetchOnWindowFocus:false});
-  const mutation = useMutation({ mutationFn:()=>generate({data:input}),retry:false,onSuccess:value=>client.setQueryData(key,value) });
+  const mutation = useMutation({ mutationFn:async ()=>({value:await generate({data:input}),key}),retry:false,onSuccess:({value,key:savedKey})=>client.setQueryData(savedKey,value) });
   useEffect(()=>{
     const refresh = () => { if (enabled) void client.invalidateQueries({queryKey:['family-reading']}); };
     window.addEventListener(CLOUD_SYNC_EVENT,refresh);

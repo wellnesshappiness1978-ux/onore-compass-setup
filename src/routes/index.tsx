@@ -50,6 +50,7 @@ function Index() {
   const [editing, setEditing] = useState(false);
   const [language, setLanguage] = useState<Language>("ja");
   useEffect(() => { const stored = localStorage.getItem("onore-language"); if (stored && ["ja","en","zh-TW","zh-CN","ko","es","fr"].includes(stored)) { setLanguage(stored as Language); document.documentElement.lang = stored; } }, []);
+  useEffect(()=>{const sync=(event:StorageEvent)=>{if(event.key==='onore-language' && event.newValue && ['ja','en','zh-TW','zh-CN','ko','es','fr'].includes(event.newValue))setLanguage(event.newValue as Language);};window.addEventListener('storage',sync);return()=>window.removeEventListener('storage',sync);},[]);
   const initialLanguageRender = useRef(true);
   useEffect(() => {
     if (initialLanguageRender.current) { initialLanguageRender.current = false; return; }

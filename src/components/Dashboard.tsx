@@ -878,7 +878,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 profile={profile}
                 language={language}
                 plan={previewPlan}
-                actualPlan={actualPlan}
+                actualPlan={serverPlan}
                 debugAllowed={debugAllowed}
                 devOverrideEnabled={devOverrideEnabled}
                 onDebugPlanChanged={(p) => setActualPlan(p)}

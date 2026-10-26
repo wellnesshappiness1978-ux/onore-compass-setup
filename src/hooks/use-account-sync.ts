@@ -10,7 +10,7 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
   const callback = useRef(onProfile); callback.current = onProfile;
   useEffect(() => {
     if (!userId) return;
-    let active = true, refreshing = false;
+    let active = true, refreshing = false, initialized = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const snapshot = new Map(syncedSettingKeys.map(k => [k, localStorage.getItem(k)]));
     const changed = new Set<string>();
@@ -28,7 +28,7 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
       if (error || !active) return;
       for (const row of data ?? []) {
         const key = syncedSettingKeys.find(k => k === row.key);
-        if (!key || changed.has(key)) continue;
+        if (!key || changed.has(key) || (initialized && snapshot.get(key) !== localStorage.getItem(key))) continue;
         const oldValue = localStorage.getItem(key);
         if (oldValue === row.value) continue;
         if (row.value === null) localStorage.removeItem(key); else localStorage.setItem(key, row.value);
@@ -37,6 +37,12 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
       }
       window.dispatchEvent(new Event('onore-notify-change'));
       window.dispatchEvent(new Event('onore-relations-preferences-change'));
+      if (!initialized) {
+        const present = new Set((data ?? []).map(row=>row.key));
+        const rows = syncedSettingKeys.flatMap(key=>{const value=localStorage.getItem(key);return !present.has(key) && value !== null ? [{user_id:userId,key,value}] : [];});
+        if (rows.length) await supabase.from('account_settings').upsert(rows,{ignoreDuplicates:true});
+        initialized = true;
+      }
     };
     const refresh = async () => {
       if (!active || refreshing) return;
@@ -57,7 +63,7 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
     // Detect legacy setting writers without replacing browser storage APIs. Unchanged values never produce requests.
     let saving = false;
     const poll = setInterval(async () => {
-      if (!active || saving) return;
+      if (!active || saving || !initialized) return;
       const rows = syncedSettingKeys.flatMap(key => {
         const value = localStorage.getItem(key);
         if (snapshot.get(key) === value) return [];

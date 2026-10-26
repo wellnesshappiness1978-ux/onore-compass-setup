@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 import { createResponsesCall } from './ai/responses.server';
-import { familyReadingInput, familyReadingSchema, familyFingerprint } from './family-reading';
+import { familyReadingInput, familyReadingSchema, familyReadingWireSchema, familyFingerprint } from './family-reading';
 import type { z } from 'zod';
 import { parentsFromRow } from './parent-data';
 import { analyzeFamily } from './family-analysis';
