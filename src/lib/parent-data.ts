@@ -5,7 +5,9 @@ export const parentBirthSchema = z.object({
   birthDate: z.string().date(),
   birthPlace: z.string().max(80).default(""),
   birthCity: z.string().max(80).default(""),
-}).passthrough();
+}).catchall(z.lazy(() => parentJsonSchema));
+type ParentJson = string | number | boolean | null | ParentJson[] | { [key: string]: ParentJson };
+const parentJsonSchema: z.ZodType<ParentJson> = z.lazy(() => z.union([z.string(),z.number(),z.boolean(),z.null(),z.array(parentJsonSchema),z.record(parentJsonSchema)]));
 export type ParentBirth = z.infer<typeof parentBirthSchema>;
 export const emptyParent: ParentBirth = { birthDate: "", birthPlace: "", birthCity: "" };
 export function validParent(value: unknown): ParentBirth | null {
