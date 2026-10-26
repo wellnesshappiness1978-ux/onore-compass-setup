@@ -19,7 +19,7 @@ import type { Plan } from "@/lib/design-modes";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import BirthColorGuide from "./BirthColorGuide";
 import { SacredDisclosure } from "./ui/sacred-disclosure";
-import { essenceKeys, traitReadingCopy } from "@/lib/trait-reading";
+import { essenceKeys, traitReadingCopy, type ApproachKey } from "@/lib/trait-reading";
 import { useFocus } from './FocusProvider';
 import DeeperEssenceSections from './DeeperEssenceSections';
 import { useQueryClient } from '@tanstack/react-query';
@@ -115,8 +115,7 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
           {!top && isError && quick.isError && <Button variant="outline" className="mt-3" onClick={() => { void quick.refetch(); void refetch(); }}>{t.retry}</Button>}
           {experienceOnly && <DeeperEssenceSections profile={profile} language={language} passages={data?.deeperEssence ?? partial.deeperEssence} />}
         </section>
-        {nameDetails}
-        <div className="-mx-5 sm:-mx-8"><GrandSummaryCard profile={profile} language={language} plan={activePlan} embedded part="approaches" /></div>
+        <div className="-mx-5 sm:-mx-8"><GrandSummaryCard profile={profile} language={language} plan={activePlan} embedded part="approaches" detailExtra={nameDetailExtra} /></div>
         {palette && <section aria-label="color" className="pb-6 pt-6"><BirthColorGuide profile={profile} plan={activePlan} language={language} /></section>}
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>
