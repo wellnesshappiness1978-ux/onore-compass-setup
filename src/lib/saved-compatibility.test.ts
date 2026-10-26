@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { savedPartner, savedGroupMembers } from './saved-compatibility';
+import { savedPartner, savedGroupMembers, splitGroupReading } from './saved-compatibility';
 import type { TeamMember } from './team-analysis';
 const member: TeamMember = { id: 'one', name: '山田 花子', birthDate: '1990-03-12', gender: 'female', bloodType: 'A', role: '', skills: [], birthTime: '08:45:00', birthTimeUnknown: false, birthPlace: '東京都', birthCity: '渋谷区', nameKana: 'やまだ はなこ', siblingOrder: 'first' };
 describe('saved compatibility targets', () => {
