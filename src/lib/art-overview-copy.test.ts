@@ -5,7 +5,7 @@ import type { Language } from "./translations";
 
 const languages: Language[] = ["ja", "en", "zh-CN", "zh-TW", "ko", "es", "fr"];
 
-describe("sixteen art overviews", () => {
+describe("seventeen art overviews", () => {
   it("covers every approach key in every language with a substantial text", () => {
     for (const lang of languages) {
       for (const key of approachKeys) {
@@ -22,7 +22,7 @@ describe("sixteen art overviews", () => {
       }
     }
   });
-  it("describes all sixteen lens principles for AI prompts", () => {
+  it("describes all seventeen lens principles for AI prompts", () => {
     for (const key of approachKeys) expect(artPrinciplesPrompt).toContain(`${key}:`);
     expect(artPrinciplesPrompt).toContain("MULTI-LAYER RESONANCE");
   });
