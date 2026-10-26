@@ -6,7 +6,7 @@ import { familyReadingOperation } from './family-reading.server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 const input={groupId:null,language:'ja' as const,day:'2026-10-26'};
-const six=Object.fromEntries(['matrix','layers','friction','roadmap','consult','colors'].map(k=>[k,'診断'.repeat(80)]));
+const six=Object.fromEntries(['matrix','layers','friction','roadmap','directions','rhythm'].map(k=>[k,'診断'.repeat(80)]));
 function context(saved:unknown,plan='b2b') {
  const datasets:Record<string,unknown>={plan_memberships:{plan},profiles:{birth_date:'1980-02-12',name_kanji:'A',name_kana:'',name_romaji:'A',birth_time:null,birth_time_unknown:true,birth_place:'東京都',birth_city:'',gender:'male',blood_type:'',sibling_order:'',parents:null,goal:'尊重'},team_members:[{id:'b',name:'B',birth_date:'1988-08-10',birth_time_unknown:true,birth_place:'東京都',skills:[],parents:null}],family_readings:saved};
  const from=vi.fn((table:string)=>{const result={data:datasets[table],error:null};const q={select:()=>q,eq:()=>q,order:()=>Promise.resolve(result),single:()=>Promise.resolve(result),maybeSingle:()=>Promise.resolve(result)};return q;});

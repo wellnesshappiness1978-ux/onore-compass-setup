@@ -108,7 +108,7 @@ const months: { flower: Pair; meaning: Pair; why: Pair; action: Pair; item: Pair
   { flower: P("アサガオ", "Morning glory"), meaning: P("固い絆", "Firm bonds"), why: P("朝に開く花が、早起きのリズムで運気を整える今月に合うから。", "Opening at dawn, it suits an early-rising rhythm."), action: P("朝15分を自分の時間にする", "Keep 15 morning minutes for yourself"), item: P("ガラスのコップ", "A glass tumbler") },
   { flower: P("リンドウ", "Gentian"), meaning: P("誠実", "Sincerity"), why: P("秋の始まりに凛と咲く青が、誠実な積み重ねを後押しするから。", "Its autumn blue supports sincere, steady effort."), action: P("学びたいことの本を一冊読む", "Read one book on something you want to learn"), item: P("藍色のブックカバー", "An indigo book cover") },
   { flower: P("キンモクセイ", "Osmanthus"), meaning: P("謙虚・真実", "Humility, truth"), why: P("遠くまで届く香りが、静かな実力が周りに伝わる今月を象徴するから。", "Its far-reaching scent symbolizes quiet skill being noticed."), action: P("成果を一つ見える形にまとめる", "Summarize one achievement visibly"), item: P("金色のしおり", "A gold bookmark") },
-  { flower: P("キク", "Chrysanthemum"), meaning: P("高貴・長寿", "Nobility, longevity"), why: P("実りの季節に咲く花が、これまでの努力を味わう時期に寄り添うから。", "Blooming at harvest, it honors effort so far."), action: P("家族や仲間に労いを伝える", "Thank family or teammates for their effort"), item: P("小さな財布", "A small wallet") },
+  { flower: P("キク", "Chrysanthemum"), meaning: P("高貴・長寿", "Nobility, longevity"), why: P("実りの季節に咲く花が、これまでの努力を味わう時期に寄り添うから。", "Blooming at harvest, it honors effort so far."), action: P("ファミリーや仲間に労いを伝える", "Thank family or teammates for their effort"), item: P("小さな財布", "A small wallet") },
   { flower: P("ポインセチア", "Poinsettia"), meaning: P("祝福", "Blessing"), why: P("冬を彩る赤が、一年を祝い次へつなぐ今月の締めくくりに合うから。", "Its winter red celebrates the year and bridges to the next."), action: P("一年の振り返りと来年の一文を書く", "Review the year and write one line for next year"), item: P("赤いリボン", "A red ribbon") },
 ];
 const dirNames: Record<Direction, Pair> = { N: P("北", "North"), NE: P("北東", "Northeast"), E: P("東", "East"), SE: P("南東", "Southeast"), S: P("南", "South"), SW: P("南西", "Southwest"), W: P("西", "West"), NW: P("北西", "Northwest") };
@@ -537,7 +537,7 @@ function SampleFamily({ ja }: { ja: boolean }) {
   const members = [ja ? "わたし" : "Me", ja ? "パートナー" : "Partner", ja ? "長女" : "Daughter", ja ? "長男" : "Son"];
   const cls = ["stroke-primary", "stroke-chart-2", "stroke-chart-3", "stroke-chart-4"];
   return <div>
-    <svg viewBox="0 0 120 50" className="h-36 w-full" role="img" aria-label={ja ? "家族4人のバイオリズム重ね合わせ（例）" : "Four-person biorhythm overlay (sample)"}>
+    <svg viewBox="0 0 120 50" className="h-36 w-full" role="img" aria-label={ja ? "ファミリー4人のバイオリズム重ね合わせ（例）" : "Four-person biorhythm overlay (sample)"}>
       {members.map((_, k) => <polyline key={k} fill="none" className={cls[k]} strokeWidth="1" points={Array.from({ length: 61 }, (_, x) => `${x * 2},${25 - 18 * Math.sin((x + k * 9) / (5 + k))}`).join(" ")} />)}
     </svg>
     <ul className="mt-2 grid grid-cols-2 gap-1 text-xs">{members.map((m, k) => <li key={m} className="flex items-center gap-2"><span className={`h-0.5 w-5 border-t-2 ${cls[k]!.replace("stroke", "border")}`} />{m}</li>)}</ul>

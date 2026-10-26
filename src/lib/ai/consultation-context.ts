@@ -66,7 +66,7 @@ export function consultationContext(profile: Input, day: string) {
       directions: directionEnergy(profile.birthDate, date),
     },
     colorNote: colors?.parentInfluence
-      ? `バースカラーはご両親（${colors.parentInfluence === "both" ? "父・母" : colors.parentInfluence === "father" ? "父" : "母"}）の生年月日・出生地を掛け合わせて精緻化済み。家族の波動の共鳴として時折自然に言及してよいが、遺伝や科学的測定の主張はしない`
+      ? `バースカラーはご両親（${colors.parentInfluence === "both" ? "父・母" : colors.parentInfluence === "father" ? "父" : "母"}）の生年月日・出生地を掛け合わせて精緻化済み。ファミリーの波動の共鳴として時折自然に言及してよいが、遺伝や科学的測定の主張はしない`
       : null,
     boundaries:
       "All seventeen perspective methods (including Indian, Ziwei, Sanmei, lunar mansion, Maya and the twelve branches) are computed from the birth data and supplied as reference values; weave them naturally as symbolic context. Blood, siblings and birthplace are context only, never personality evidence. Unknown birth time uses JST noon reference for the sky; hour pillar/ASC stay unset. Biorhythm sinusoids, day direction scores, phase and colors are illustrative reflection tools, NOT measured energy, medical evidence, guaranteed luck or predictions. Use traditional Gua directions separately from daily direction scores. Never substitute another method for a missing chart.",

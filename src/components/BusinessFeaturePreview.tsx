@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, CalendarDays, Crown, Lock, Network, Sparkles, UserRoundCheck, UsersRound } from "lucide-react";
+import { BarChart3, CalendarDays, Crown, Lock, Network, Compass, Activity, UserRoundCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import type { Plan } from "@/lib/design-modes";
@@ -17,7 +17,7 @@ import ChunkedText from './ChunkedText';
 const items = [
   { icon: Network, tier: "Family", key: "matrix" }, { icon: BarChart3, tier: "Family", key: "layers" },
   { icon: UserRoundCheck, tier: "Family", key: "friction" }, { icon: CalendarDays, tier: "Family", key: "roadmap" },
-  { icon: UsersRound, tier: "Family", key: "consult" }, { icon: Sparkles, tier: "Family", key: "colors" },
+  { icon: Compass, tier: "Family", key: "directions" }, { icon: Activity, tier: "Family", key: "rhythm" },
 ] as const;
 
 const copy: Record<Language, { upgrade: string; upgradeFamily: string }> = {
