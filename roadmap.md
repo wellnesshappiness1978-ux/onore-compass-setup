@@ -194,3 +194,9 @@
 - [x] Settings notification guide (pause note + closed-app delivery + registration status) now always renders on mobile
 - [x] axisSummary prompt rewritten: four direct elements (nature, strengths, pitfalls, happiness guidelines); roundabout micro-instructions/analogies banned; cache bumped to full-four-elements-v5; 304 tests pass, build OK
 - [x] "機能表示" removal: six layer card grid, value boxes, badges, source line and Ming Gua display replaced by direct per-perspective reading accordions
+
+## Family members missing from subject selectors (2026-10-26)
+- [ ] FocusProvider merges device-local test roster/groups when signed-in test preview differs from server plan; selectors refresh on registration
+- [ ] Group create/edit/delete writes locally in test mode (localWrites flag)
+- [ ] ConsultationPanel/TodayGuide refetch roster on onore-focus-reload
+- [ ] Tests + tsgo + build
