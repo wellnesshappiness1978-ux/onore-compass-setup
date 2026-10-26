@@ -1,5 +1,12 @@
 # Roadmap
 
+## Parent persistence and six Family features (2026-10-26)
+- [x] Shared parent validation and lossless JSONB mapping; omitted fields retain saved data. Signed-in family CRUD uses actual membership rather than preview-only local storage. Owner parent dates saved/restored through UI reload and original dates restored.
+- [x] All six catalogue functions use one Family+ gate and actual member analysis, not disconnected sample buttons.
+- [x] Separate pair element/sky/rhythm signals, member strengths, friction guidance, seven-date shared roadmap, structured family consultation and individual/shared color meanings.
+- [x] 329 regression tests passed; automatic build OK; all six dialogs at 390px opened with two local members and no overflow/runtime errors.
+- [ ] Signed-in family add/update/readback and actual new family AI answer: blocked by requesting account's missing paid membership (Free member capacity zero); no paid entitlement was fabricated for verification.
+
 ## Cosmic wording, individual essence, cached perspectives and text size (2026-10-24)
 - [x] Replace cosmic color captions with a compact whole-natal-sky compass interpretation; signed-in card has no seven-color row
 - [x] Keep essence visible with independent sections 1–10, including while generating; ten controls verified at 320px

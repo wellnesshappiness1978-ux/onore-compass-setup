@@ -1,12 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-
-const parentSchema = z.object({
-  birthDate: z.string().date(),
-  birthPlace: z.string().max(80),
-  birthCity: z.string().max(80),
-}).nullable();
+import { optionalParentSchema, parentsFromRow, parentsToRow } from "./parent-data";
 
 const profileSchema = z.object({
   nameKanji: z.string().max(40),
@@ -20,8 +15,8 @@ const profileSchema = z.object({
   birthPlace: z.string().min(1).max(80),
   bloodType: z.enum(["", "A", "B", "O", "AB"]),
   siblingOrder: z.string().trim().max(80),
-  father: parentSchema.optional(),
-  mother: parentSchema.optional(),
+  father: optionalParentSchema,
+  mother: optionalParentSchema,
 }).refine((p) => p.birthTimeUnknown || Boolean(p.birthTime), { message: "Birth time is required unless unknown" });
 
 export type StoredProfileInput = z.infer<typeof profileSchema>;
@@ -44,16 +39,15 @@ export const readMyProfile = createServerFn({ method: "GET" })
       birthPlace: data.birth_place,
       bloodType: data.blood_type,
       siblingOrder: data.sibling_order,
-      father: (data.parents as { father?: unknown } | null)?.father ?? null,
-      mother: (data.parents as { mother?: unknown } | null)?.mother ?? null,
+      ...parentsFromRow(data.parents),
     };
   });
 
 export const saveMyProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: unknown) => profileSchema.parse(input))
+  .inputValidator((input: unknown) => profileSchema.parse(input))
   .handler(async ({ context, data }) => {
-    const { error } = await context.supabase.from("profiles").upsert({
+    const { data: saved, error } = await context.supabase.from("profiles").upsert({
       user_id: context.userId,
       name_kanji: data.nameKanji.trim(),
       name_kana: data.nameKana.trim(),
@@ -66,10 +60,10 @@ export const saveMyProfile = createServerFn({ method: "POST" })
       birth_place: data.birthPlace,
       blood_type: data.bloodType,
       sibling_order: data.siblingOrder,
-      parents: data.father || data.mother ? { father: data.father ?? null, mother: data.mother ?? null } : null,
+      ...(data.father !== undefined || data.mother !== undefined ? { parents: parentsToRow(data) } : {}),
       profile_version: crypto.randomUUID(),
       updated_at: new Date().toISOString(),
-    }, { onConflict: "user_id" });
+    }, { onConflict: "user_id" }).select("parents").single();
     if (error) throw error;
-    return { ok: true };
+    return { ok: true, ...parentsFromRow(saved.parents) };
   });

@@ -3,30 +3,40 @@ import { BarChart3, CalendarDays, Crown, Lock, Network, Sparkles, UserRoundCheck
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import type { Plan } from "@/lib/design-modes";
-import { planOrder } from "@/lib/plans";
+import { canUseFamilyFeature, familyFeatureCopy, type FamilyFeature } from "@/lib/family-features";
+import FamilyFeatureDetail from "./team/FamilyFeatureDetail";
 import type { Language } from "@/lib/translations";
 
 const items = [
-  { icon: Network, tier: "Family", key: "matrix" }, { icon: BarChart3, tier: "Family", key: "rhythm" },
-  { icon: UserRoundCheck, tier: "Family", key: "one" }, { icon: UsersRound, tier: "Family", key: "team" },
-  { icon: CalendarDays, tier: "Family", key: "calendar" }, { icon: Sparkles, tier: "Family Premium", key: "priority" },
+  { icon: Network, tier: "Family", key: "matrix" }, { icon: BarChart3, tier: "Family", key: "layers" },
+  { icon: UserRoundCheck, tier: "Family", key: "friction" }, { icon: CalendarDays, tier: "Family", key: "roadmap" },
+  { icon: UsersRound, tier: "Family", key: "consult" }, { icon: Sparkles, tier: "Family", key: "colors" },
 ] as const;
-const tierPlan: Record<(typeof items)[number]["tier"], Plan> = { Family: "b2b", "Family Premium": "b2b-premium" };
 
-const copy: Record<Language, { title: string; body: string; sample: string; upgrade: string; upgradeFamily: string; openFeature: string; names: Record<(typeof items)[number]["key"], [string, string, string]> }> = {
-  ja: { title: "ファミリー機能一覧", body: "説明とサンプルはどなたでも確認できます。実データの利用枠はプランにより異なります。", sample: "サンプルを見る", upgrade: "プランを確認", upgradeFamily: "ファミリープランへアップグレード", openFeature: "この機能を開く", names: { matrix: ["チーム相性マトリクス", "メンバー同士の協働傾向を一覧比較。", "相性線と役割分布の見本を表示します。"], rhythm: ["組織バイオリズム", "チーム全体の波を日付ごとに整理。", "高低の波と行動候補を確認できます。"], one: ["1on1指導書", "相手に届きやすい伝え方を整理。", "褒め方・避けたい指示・低調時の支援例。"], team: ["AI人員選抜", "目的に合わせた編成案を作成。", "候補順位と注意点のサンプルを表示します。"], calendar: ["事業アラートカレンダー", "商談・契約・面談の参考日を一覧化。", "月間カレンダーと日別助言の見本です。"], priority: ["優先AI・100名運用", "大規模チーム向けの上位運用枠。", "優先生成は案内表示で、提供状況はプラン画面で確認します。"] } },
-  en: { title: "Family feature preview", body: "Everyone can open descriptions and samples. Live data access depends on plan.", sample: "View sample", upgrade: "View plans", upgradeFamily: "Upgrade to the Family plan", openFeature: "Open this feature", names: { matrix: ["Team compatibility matrix", "Compare collaboration patterns across a team.", "Sample links and role distribution."], rhythm: ["Organization biorhythm", "Organize the team's cycle by date.", "Sample highs, lows and action cues."], one: ["1on1 coaching guide", "Structure communication for each person.", "Sample praise, cautions and support."], team: ["AI team draft", "Create a lineup for a stated goal.", "Sample ranking and watch points."], calendar: ["Family alert calendar", "Review dates for meetings and decisions.", "Sample monthly calendar and daily cue."], priority: ["Priority AI · 100 members", "Higher-capacity operation for larger teams.", "Availability is confirmed on the plan screen."] } },
-  "zh-CN": { title: "家庭功能预览", body: "所有人均可查看说明与样例，实际数据权限取决于方案。", sample: "查看样例", upgrade: "查看方案", upgradeFamily: "升级到家庭方案", openFeature: "打开此功能", names: { matrix: ["团队相性矩阵", "比较成员协作倾向。", "展示关系线与角色分布样例。"], rhythm: ["组织生物节律", "按日期整理团队周期。", "展示高低波动与行动建议。"], one: ["1on1指导书", "整理适合每个人的沟通方式。", "展示表扬、禁忌与支持样例。"], team: ["AI人员选拔", "按目标生成团队方案。", "展示候选排序与注意点。"], calendar: ["事业提醒日历", "查看商谈与决策参考日。", "展示月历与每日建议。"], priority: ["优先AI・100人", "面向大型团队的高阶容量。", "请在方案页面确认提供状态。"] } },
-  "zh-TW": { title: "家庭功能預覽", body: "所有人均可查看說明與範例，實際資料權限依方案而定。", sample: "查看範例", upgrade: "查看方案", upgradeFamily: "升級到家庭方案", openFeature: "開啟此功能", names: { matrix: ["團隊相性矩陣", "比較成員協作傾向。", "顯示關係線與角色分布範例。"], rhythm: ["組織生物節律", "依日期整理團隊週期。", "顯示高低波動與行動建議。"], one: ["1on1指導書", "整理適合每個人的溝通方式。", "顯示稱讚、禁忌與支持範例。"], team: ["AI人員選拔", "依目標產生團隊方案。", "顯示候選排序與注意點。"], calendar: ["事業提醒日曆", "查看商談與決策參考日。", "顯示月曆與每日建議。"], priority: ["優先AI・100人", "大型團隊的高階容量。", "請在方案頁確認提供狀態。"] } },
-  ko: { title: "패밀리 기능 미리보기", body: "누구나 설명과 샘플을 볼 수 있으며 실제 데이터 권한은 플랜에 따라 다릅니다.", sample: "샘플 보기", upgrade: "플랜 보기", upgradeFamily: "패밀리 플랜으로 업그레이드", openFeature: "이 기능 열기", names: { matrix: ["팀 궁합 매트릭스", "협업 경향을 비교합니다.", "관계선과 역할 분포 예시입니다."], rhythm: ["조직 바이오리듬", "팀 주기를 날짜별로 정리합니다.", "흐름과 행동 예시를 봅니다."], one: ["1on1 지도서", "사람별 소통법을 정리합니다.", "칭찬과 주의 지시의 예시입니다."], team: ["AI 인원 선발", "목표별 팀 구성을 만듭니다.", "후보 순위와 주의점 예시입니다."], calendar: ["사업 알림 캘린더", "회의와 결정 참고일을 봅니다.", "월간 달력 예시입니다."], priority: ["우선 AI・100명", "대규모 팀용 상위 운영 범위입니다.", "플랜 화면에서 제공 여부를 확인합니다."] } },
-  es: { title: "Vista de funciones Familia", body: "Todos pueden abrir descripciones y muestras; el acceso real depende del plan.", sample: "Ver muestra", upgrade: "Ver planes", upgradeFamily: "Mejorar al plan Familia", openFeature: "Abrir esta función", names: { matrix: ["Matriz de compatibilidad", "Compara patrones de colaboración.", "Muestra de vínculos y roles."], rhythm: ["Biorritmo organizativo", "Ordena el ciclo del equipo por fecha.", "Muestra de ritmos y acciones."], one: ["Guía 1on1", "Estructura la comunicación individual.", "Ejemplos de apoyo y cautela."], team: ["Selección IA", "Propone equipos según el objetivo.", "Muestra de ranking y alertas."], calendar: ["Calendario empresarial", "Fechas de referencia para decisiones.", "Muestra mensual y consejo diario."], priority: ["IA prioritaria · 100 miembros", "Capacidad superior para equipos grandes.", "Confirma disponibilidad en planes."] } },
-  fr: { title: "Aperçu des fonctions Famille", body: "Tous peuvent consulter les explications et exemples ; l'accès réel dépend de l'offre.", sample: "Voir l’exemple", upgrade: "Voir les offres", upgradeFamily: "Passer au forfait Famille", openFeature: "Ouvrir cette fonction", names: { matrix: ["Matrice de compatibilité", "Compare les modes de collaboration.", "Exemple de liens et de rôles."], rhythm: ["Biorythme d’organisation", "Classe le cycle de l’équipe par date.", "Exemple de rythmes et d’actions."], one: ["Guide 1on1", "Structure la communication individuelle.", "Exemples de soutien et vigilance."], team: ["Sélection IA", "Propose une équipe selon l’objectif.", "Exemple de classement et alertes."], calendar: ["Calendrier d’entreprise", "Dates de référence pour décider.", "Exemple mensuel et conseil quotidien."], priority: ["IA prioritaire · 100 membres", "Capacité supérieure pour grandes équipes.", "Disponibilité à confirmer dans les offres."] } },
+const copy: Record<Language, { upgrade: string; upgradeFamily: string }> = {
+  ja: { upgrade: "プランを確認", upgradeFamily: "ファミリープランへアップグレード" },
+  en: { upgrade: "View plans", upgradeFamily: "Upgrade to the Family plan" },
+  "zh-CN": { upgrade: "查看方案", upgradeFamily: "升级到家庭方案" },
+  "zh-TW": { upgrade: "查看方案", upgradeFamily: "升級到家庭方案" },
+  ko: { upgrade: "플랜 보기", upgradeFamily: "패밀리 플랜으로 업그레이드" },
+  es: { upgrade: "Ver planes", upgradeFamily: "Mejorar al plan Familia" },
+  fr: { upgrade: "Voir les offres", upgradeFamily: "Passer à l’offre Famille" },
 };
 
-export default function BusinessFeaturePreview({ language, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void }) {
-  const t = copy[language];
-  const [selected, setSelected] = useState<(typeof items)[number] | null>(null);
-  const locked = (item: (typeof items)[number]) => planOrder.indexOf(plan) < planOrder.indexOf(tierPlan[item.tier]);
-  const openStudio = () => { setSelected(null); document.getElementById("team-studio-entry")?.scrollIntoView({ behavior: "smooth", block: "start" }); };
-  return <section className="mb-6 border-y border-primary/25 py-6 text-left"><h3 className="font-serif text-xl text-primary">{t.title}</h3><p className="mt-2 text-sm leading-7 text-muted-foreground">{t.body}</p><div className="mt-5 grid gap-3 sm:grid-cols-2">{items.map((item) => { const [name, description] = t.names[item.key]; const isLocked = locked(item); return <Button key={item.key} variant="outline" onClick={() => setSelected(item)} className="h-auto min-h-24 justify-start whitespace-normal p-4 text-left"><item.icon className="size-5 shrink-0 text-primary"/><span><strong className="flex items-center gap-1.5 text-foreground">{isLocked && <Lock className="size-3.5 shrink-0 text-primary" aria-hidden="true" />}{name}</strong><span className="mt-1 block text-xs text-muted-foreground">{description}</span><span className="mt-2 block text-[10px] text-primary">{item.tier}</span></span></Button>; })}</div><Dialog open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)}><DialogContent className="border-primary/30 bg-card"><DialogTitle className="font-serif text-xl text-primary">{selected ? t.names[selected.key][0] : ""}</DialogTitle><DialogDescription className="leading-7">{selected ? t.names[selected.key][1] : ""}</DialogDescription>{selected && <div className="border-y border-primary/20 py-5"><div className="grid grid-cols-5 items-end gap-2" aria-hidden>{[45,72,58,88,66].map((height, index) => <span key={index} className="rounded-sm bg-primary/60" style={{ height }} />)}</div><p className="mt-4 text-sm leading-7 text-muted-foreground">{t.names[selected.key][2]}</p></div>}{selected && (locked(selected) ? <Button onClick={onUpgrade}><Crown className="size-4"/>{t.upgradeFamily}</Button> : <Button onClick={openStudio}><Sparkles className="size-4"/>{t.openFeature}</Button>)}</DialogContent></Dialog></section>;
+export default function BusinessFeaturePreview({ language, plan, actualPlan, signedIn, previewMode, onUpgrade }: { language: Language; plan: Plan; actualPlan: Plan; signedIn: boolean; previewMode: boolean; onUpgrade: () => void }) {
+  const t = copy[language], c = familyFeatureCopy[language];
+  const [selected, setSelected] = useState<FamilyFeature | null>(null);
+  return <section className="mb-6 border-y border-primary/25 py-6 text-left">
+    <h3 className="font-serif text-xl text-primary">{c.title}</h3>
+    <div className="mt-5 grid gap-3 sm:grid-cols-2">{items.map((item,i) => <Button key={item.key} variant="outline" onClick={() => setSelected(item.key)} className="h-auto min-h-20 justify-start whitespace-normal p-4 text-left">
+      <item.icon className="size-5 shrink-0 text-primary"/><span className="min-w-0"><strong className="flex items-center gap-1.5 text-foreground">{!canUseFamilyFeature(plan,item.key) && <Lock className="size-3.5 shrink-0 text-primary"/>}{c.titles[i]}</strong></span>
+    </Button>)}</div>
+    <Dialog open={selected !== null} onOpenChange={open => !open && setSelected(null)}>
+      <DialogContent className="max-w-3xl border-primary/30 bg-card">
+        <DialogTitle className="font-serif text-xl text-primary">{selected ? c.titles[items.findIndex(i=>i.key===selected)] : c.title}</DialogTitle>
+        <DialogDescription className="text-xs leading-6">{c.note}</DialogDescription>
+        {selected && (canUseFamilyFeature(plan,selected) ? <FamilyFeatureDetail feature={selected} language={language} plan={plan} actualPlan={actualPlan} signedIn={signedIn} previewMode={previewMode} onUpgrade={onUpgrade}/> : <div className="py-6"><p className="mb-4 text-sm leading-7">{t.upgradeFamily}</p><Button onClick={() => {setSelected(null);onUpgrade();}}><Crown className="size-4"/>{t.upgrade}</Button></div>)}
+      </DialogContent>
+    </Dialog>
+  </section>;
 }

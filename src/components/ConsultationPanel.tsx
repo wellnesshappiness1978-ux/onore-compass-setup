@@ -58,6 +58,7 @@ import {
 } from "@/components/ui/dialog";
 
 type Props = {
+  groupSubject?: import("@/lib/focus").TeamGroup;
   profile: UserProfile;
   language: Language;
   plan: Plan;
@@ -77,6 +78,7 @@ const hms = (ms: number) => {
 
 export default function ConsultationPanel({
   profile,
+  groupSubject,
   language,
   plan,
   actualPlan,
@@ -90,7 +92,7 @@ export default function ConsultationPanel({
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [targetId, setTargetId] = useState("owner");
   const focusCtx = useFocus();
-  const groups = focusCtx?.groups ?? [];
+  const groups = useMemo(() => groupSubject ? [groupSubject] : focusCtx?.groups ?? [], [groupSubject, focusCtx?.groups]);
   useEffect(() => {
     let active = true;
     if (signedIn && plan === actualPlan)
@@ -113,10 +115,11 @@ export default function ConsultationPanel({
     } else if (!members.some((m) => m.id === targetId)) setTargetId("owner");
   }, [members, groups, targetId]);
   useEffect(() => {
+    if (groupSubject) { setTargetId(`group:${groupSubject.id}`); return; }
     if (focusCtx?.group) setTargetId(`group:${focusCtx.group.group.id}`);
     else if (focusTargetId && members.some((m) => m.id === focusTargetId)) setTargetId(focusTargetId);
     else if (focusCtx?.focus.targetKind === "self") setTargetId("owner");
-  }, [focusTargetId, members, focusCtx?.group?.group.id, focusCtx?.focus.targetKind]);
+  }, [groupSubject, focusTargetId, members, focusCtx?.group?.group.id, focusCtx?.focus.targetKind]);
   const target = members.find((m) => m.id === targetId);
   const selGroupIndex = targetId.startsWith("group:") ? groups.findIndex((g) => g.id === targetId.slice(6)) : -1;
   const selGroup = selGroupIndex >= 0 ? groups[selGroupIndex] ?? null : null;
