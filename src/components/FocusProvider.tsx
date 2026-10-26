@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { useServerFn } from "@tanstack/react-start";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import { getFocus, listTeamGroups, saveFocus } from "@/lib/team-groups.functions";
-import { readPreviewMembers } from "@/lib/consultation-targets";
+import { mergeRosterMembers, readPreviewMembers } from "@/lib/consultation-targets";
 import type { TeamMember } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
 import { defaultFocus, FOCUS_KEY, selfReadingLabel, groupDisplayName, memberDisplayName, memberToProfile, readLocalFocus, readLocalGroups, type Focus, type TeamGroup } from "@/lib/focus";

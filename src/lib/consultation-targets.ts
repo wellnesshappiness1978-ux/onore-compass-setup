@@ -16,3 +16,8 @@ export function readPreviewMembers(): TeamMember[] {
   if (typeof window === "undefined") return [];
   try { const raw: unknown = JSON.parse(localStorage.getItem("onore-team") ?? "[]"); return (Array.isArray(raw) ? raw : []).slice(0, 100).flatMap(item => { const r = memberSchema.safeParse(item); return r.success ? [r.data as TeamMember] : []; }); } catch { return []; }
 }
+/** Server rows stay authoritative; device-local test rows fill in without duplicating ids. */
+export function mergeRosterMembers(primary: TeamMember[], local: TeamMember[]): TeamMember[] {
+  const seen = new Set(primary.map(m => m.id));
+  return [...primary, ...local.filter(m => !seen.has(m.id))];
+}
