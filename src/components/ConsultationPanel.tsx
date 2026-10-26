@@ -93,6 +93,12 @@ export default function ConsultationPanel({
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [targetId, setTargetId] = useState("owner");
   const focusCtx = useFocus();
+  const [rosterTick, setRosterTick] = useState(0);
+  useEffect(() => {
+    const onReload = () => setRosterTick((v) => v + 1);
+    window.addEventListener("onore-focus-reload", onReload);
+    return () => window.removeEventListener("onore-focus-reload", onReload);
+  }, []);
   const groups = useMemo(() => groupSubject ? [groupSubject] : focusCtx?.groups ?? [], [groupSubject, focusCtx?.groups]);
   useEffect(() => {
     let active = true;
@@ -108,7 +114,7 @@ export default function ConsultationPanel({
     return () => {
       active = false;
     };
-  }, [signedIn, plan, actualPlan, listMembers]);
+  }, [signedIn, plan, actualPlan, listMembers, rosterTick]);
   useEffect(() => {
     if (targetId === "owner") return;
     if (targetId.startsWith("group:")) {

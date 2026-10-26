@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { useServerFn } from "@tanstack/react-start";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import { getFocus, listTeamGroups, saveFocus } from "@/lib/team-groups.functions";
-import { readPreviewMembers } from "@/lib/consultation-targets";
+import { mergeRosterMembers, readPreviewMembers } from "@/lib/consultation-targets";
 import type { TeamMember } from "@/lib/team-analysis";
 import type { Language } from "@/lib/translations";
 import { defaultFocus, FOCUS_KEY, selfReadingLabel, groupDisplayName, memberDisplayName, memberToProfile, readLocalFocus, readLocalGroups, type Focus, type TeamGroup } from "@/lib/focus";
@@ -16,6 +16,8 @@ type Ctx = {
   owner: UserProfile;
   focus: Focus; setFocus: (f: Focus) => Promise<void>;
   members: TeamMember[]; groups: TeamGroup[]; reload: () => void; serverBacked: boolean;
+  /** True when roster/group writes must stay on this device (guest or signed-in test preview). */
+  localWrites: boolean;
   /** Selected family member (resolved), or null. */
   member: TeamMember | null;
   /** Selected group (resolved) with its index, or null. */
@@ -27,7 +29,7 @@ type Ctx = {
 };
 const FocusContext = createContext<Ctx | null>(null);
 
-export function FocusProvider({ owner, serverBacked, children }: { owner: UserProfile; serverBacked: boolean; children: ReactNode }) {
+export function FocusProvider({ owner, serverBacked, mergeLocal = false, children }: { owner: UserProfile; serverBacked: boolean; mergeLocal?: boolean; children: ReactNode }) {
   const [focus, setLocal] = useState<Focus>(defaultFocus);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [groups, setGroups] = useState<TeamGroup[]>([]);
@@ -41,12 +43,15 @@ export function FocusProvider({ owner, serverBacked, children }: { owner: UserPr
     let active = true;
     setLocal(readLocalFocus());
     if (serverBacked) {
-      listM().then(v => active && setMembers(v)).catch(() => active && setMembers([]));
-      listG().then(v => active && setGroups(v)).catch(() => active && setGroups([]));
+      // Test preview: device-local roster/group rows join the server rows so every subject selector sees them.
+      const localM = () => (mergeLocal ? readPreviewMembers() : []);
+      const localG = () => (mergeLocal ? readLocalGroups() : []);
+      listM().then(v => active && setMembers(mergeRosterMembers(v, localM()))).catch(() => active && setMembers(localM()));
+      listG().then(v => active && setGroups(mergeRosterMembers(v, localG()))).catch(() => active && setGroups(localG()));
       getF().then(v => { if (active && v) { setLocal(v); localStorage.setItem(FOCUS_KEY, JSON.stringify(v)); } }).catch(() => undefined);
     } else { setMembers(readPreviewMembers()); setGroups(readLocalGroups()); }
     return () => { active = false; };
-  }, [serverBacked, tick, listM, listG, getF]);
+  }, [serverBacked, mergeLocal, tick, listM, listG, getF]);
   useEffect(() => {
     const onStorage = (e: StorageEvent) => { if (e.key === "onore-team" || e.key === "onore-groups") reload(); };
     window.addEventListener("storage", onStorage);
@@ -65,11 +70,11 @@ export function FocusProvider({ owner, serverBacked, children }: { owner: UserPr
     const g = gi >= 0 ? groups[gi] ?? null : null;
     const group = g ? { group: g, index: gi, members: [...(g.memberIds.includes(SELF_MEMBER_ID) && owner.birthDate ? [ownerAsMember(owner)] : []), ...members.filter(m => g.memberIds.includes(m.id))] } : null;
     return {
-      owner, focus, setFocus, members, groups, reload, serverBacked, member, group,
+      owner, focus, setFocus, members, groups, reload, serverBacked, localWrites: !serverBacked || mergeLocal, member, group,
       label: (language) => member ? memberDisplayName(member) : group ? groupDisplayName(group.group, group.index, language) : selfReadingLabel[language],
       readingProfile: member ? memberToProfile(member) : owner,
     };
-  }, [focus, setFocus, members, groups, reload, serverBacked, owner]);
+  }, [focus, setFocus, members, groups, reload, serverBacked, mergeLocal, owner]);
   return <FocusContext.Provider value={value}>{children}</FocusContext.Provider>;
 }
 

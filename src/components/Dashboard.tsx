@@ -755,7 +755,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
 
   return (
-    <FocusProvider owner={profile} serverBacked={signedIn}>
+    <FocusProvider owner={profile} serverBacked={signedIn} mergeLocal={signedIn && devOverrideEnabled && previewPlan !== serverPlan}>
     <DailyReminderCatalogue language={language} plan={previewPlan} />
     <FocusGoalBridge onChange={(id, g, label) => { setFocusMemberId(id); setFocusGoal(g); setTraitsLabel(label); }} language={language} />
     <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
