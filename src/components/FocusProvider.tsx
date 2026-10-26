@@ -43,12 +43,15 @@ export function FocusProvider({ owner, serverBacked, mergeLocal = false, childre
     let active = true;
     setLocal(readLocalFocus());
     if (serverBacked) {
-      listM().then(v => active && setMembers(v)).catch(() => active && setMembers([]));
-      listG().then(v => active && setGroups(v)).catch(() => active && setGroups([]));
+      // Test preview: device-local roster/group rows join the server rows so every subject selector sees them.
+      const localM = () => (mergeLocal ? readPreviewMembers() : []);
+      const localG = () => (mergeLocal ? readLocalGroups() : []);
+      listM().then(v => active && setMembers(mergeRosterMembers(v, localM()))).catch(() => active && setMembers(localM()));
+      listG().then(v => active && setGroups(mergeRosterMembers(v, localG()))).catch(() => active && setGroups(localG()));
       getF().then(v => { if (active && v) { setLocal(v); localStorage.setItem(FOCUS_KEY, JSON.stringify(v)); } }).catch(() => undefined);
     } else { setMembers(readPreviewMembers()); setGroups(readLocalGroups()); }
     return () => { active = false; };
-  }, [serverBacked, tick, listM, listG, getF]);
+  }, [serverBacked, mergeLocal, tick, listM, listG, getF]);
   useEffect(() => {
     const onStorage = (e: StorageEvent) => { if (e.key === "onore-team" || e.key === "onore-groups") reload(); };
     window.addEventListener("storage", onStorage);
