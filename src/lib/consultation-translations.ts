@@ -63,7 +63,7 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
     error: "相談を受け取れませんでした。表示された内容を確認して、もう一度お試しください。",
     quickTopics: [
       "🎯 今日の決断・勝負時のアドバイス",
-      "🤝 特定の相手（チーム/家族）との円滑な接し方",
+      "🤝 特定の相手（チーム/ファミリー）との円滑な接し方",
       "🧭 本日の吉方位とおすすめ開運アクション",
       "🧘 今日のエネルギーを整えるリセット法",
     ],

@@ -32,7 +32,7 @@ const M: Record<Family, Record<Language, Meaning>> = {
     fr: { name: "Lien de flamme pourpre", essence: "Une couleur où passion et élan se rejoignent pour avancer.", energy: "Une vibration chaude et rapide qui transforme vite les décisions en actes.", role: "L'étincelle qui brise la stagnation, idéale pour lancer un projet.", advice: "Marquez une pause avant de décider et écoutez chaque voix." },
   },
   orange: {
-    ja: { name: "陽橙の交歓色", essence: "明るさと親しみやすさが集まる、場を温める色です。", energy: "社交的で弾む波動。会話から自然にアイデアが生まれやすい組み合わせです。", role: "人と人をつなぐ潤滑油。家族行事やチームの雰囲気づくりに向きます。", advice: "楽しさが先行しやすいので、役割と期限を一行で共有しておくと安心です。" },
+    ja: { name: "陽橙の交歓色", essence: "明るさと親しみやすさが集まる、場を温める色です。", energy: "社交的で弾む波動。会話から自然にアイデアが生まれやすい組み合わせです。", role: "人と人をつなぐ潤滑油。ファミリー行事やチームの雰囲気づくりに向きます。", advice: "楽しさが先行しやすいので、役割と期限を一行で共有しておくと安心です。" },
     en: { name: "Sunlit Orange Harmony", essence: "A warm color where brightness and friendliness gather.", energy: "A sociable, buoyant vibration — ideas tend to arise from conversation.", role: "The connector between people; great for gatherings and team mood.", advice: "Fun can lead the way, so share roles and deadlines in one line." },
     "zh-CN": { name: "阳橙交欢色", essence: "明亮与亲切汇聚、温暖气氛的颜色。", energy: "社交而轻快的波动，容易在对话中自然产生点子。", role: "连接人与人的润滑剂，适合家庭活动与团队氛围。", advice: "容易以快乐为先，用一句话共享分工和期限会更安心。" },
     "zh-TW": { name: "陽橙交歡色", essence: "明亮與親切匯聚、溫暖氣氛的顏色。", energy: "社交而輕快的波動，容易在對話中自然產生點子。", role: "連結人與人的潤滑劑，適合家庭活動與團隊氛圍。", advice: "容易以快樂為先，用一句話共享分工與期限會更安心。" },
@@ -86,7 +86,7 @@ const M: Record<Family, Record<Language, Meaning>> = {
     fr: { name: "Inspiration violette", essence: "Une couleur d'intuition où résonnent esprit et sensibilité.", energy: "Vibration mystique et délicate ; les non-dits se ressentent.", role: "Espace de vision : rêves partagés, idéaux et création.", advice: "Avec des idéaux élevés, choisissez un seul pas pour aujourd'hui." },
   },
   rose: {
-    ja: { name: "薔薇の慈愛色", essence: "優しさと受容が満ちる、愛情を育む色です。", energy: "柔らかく包み込む波動。相手を思いやる気持ちが伝わりやすい組み合わせです。", role: "心の安全基地。家族の絆や関係修復の場面で力を発揮します。", advice: "遠慮が重なりやすいので、お願いごとははっきり言葉にすると楽になります。" },
+    ja: { name: "薔薇の慈愛色", essence: "優しさと受容が満ちる、愛情を育む色です。", energy: "柔らかく包み込む波動。相手を思いやる気持ちが伝わりやすい組み合わせです。", role: "心の安全基地。ファミリーの絆や関係修復の場面で力を発揮します。", advice: "遠慮が重なりやすいので、お願いごとははっきり言葉にすると楽になります。" },
     en: { name: "Rose Compassion", essence: "A color full of kindness and acceptance that nurtures affection.", energy: "A soft, enveloping vibration where care is easily felt.", role: "An emotional safe base — family bonds and mending relationships.", advice: "Politeness can pile up; say requests clearly to ease things." },
     "zh-CN": { name: "蔷薇慈爱色", essence: "充满温柔与接纳、培育爱意的颜色。", energy: "柔软包容的波动，体贴之心容易传达。", role: "心灵的安全基地，在家庭羁绊与关系修复中发挥力量。", advice: "容易彼此客气，把请求清楚说出来会更轻松。" },
     "zh-TW": { name: "薔薇慈愛色", essence: "充滿溫柔與接納、培育愛意的顏色。", energy: "柔軟包容的波動，體貼之心容易傳達。", role: "心靈的安全基地，在家庭羈絆與關係修復中發揮力量。", advice: "容易彼此客氣，把請求清楚說出來會更輕鬆。" },
@@ -137,7 +137,7 @@ export const groupDepthCopy: Record<Language, GroupDepthCopy> = {
     synergyTitle: "グループ独自のシナジー",
     synergy: (m, n) => `${n}人の個性が重なり合うと、${m.name}のエネルギーが生まれます。${m.essence}一人では届かない場所へ、互いの得意を掛け合わせることで進めるのがこのグループの特徴です。${m.energy}日常的には、誰かの小さな閃きが別の誰かの行動力に火をつけ、思いがけない成果につながる場面が増えるでしょう。`,
     strengthsTitle: "共有される強み",
-    strengths: (m, n) => `このグループ全員に共通する土台は、${m.name}が象徴する力です。${m.role}${n}人それぞれの得意分野は違っても、根っこの価値観が近いため、大切な場面で方向性が自然と揃いやすい傾向にあります。会議や家族の相談ごとでは、この共通の土台に立ち返ると結論がぶれにくくなります。`,
+    strengths: (m, n) => `このグループ全員に共通する土台は、${m.name}が象徴する力です。${m.role}${n}人それぞれの得意分野は違っても、根っこの価値観が近いため、大切な場面で方向性が自然と揃いやすい傾向にあります。会議やファミリーの相談ごとでは、この共通の土台に立ち返ると結論がぶれにくくなります。`,
     frictionTitle: "すれ違いやすいポイント",
     friction: (m) => `同じ色の波動を共有するぶん、弱みも似たタイミングで表れます。${m.advice}特に全員が疲れている時期は、普段なら笑って流せる言葉が刺さりやすくなります。違和感を覚えたら「誰が悪いか」ではなく「今グループ全体がどんな状態か」に視点を移すと、対立を未然に和らげられます。`,
     coopTitle: "円滑な協力のコツ",

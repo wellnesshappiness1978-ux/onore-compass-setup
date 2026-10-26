@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BarChart3, CalendarDays, Crown, Lock, Network, Sparkles, UserRoundCheck, UsersRound } from "lucide-react";
+import { BarChart3, CalendarDays, Crown, Lock, Network, Compass, Activity, UserRoundCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import type { Plan } from "@/lib/design-modes";
@@ -17,7 +17,7 @@ import ChunkedText from './ChunkedText';
 const items = [
   { icon: Network, tier: "Family", key: "matrix" }, { icon: BarChart3, tier: "Family", key: "layers" },
   { icon: UserRoundCheck, tier: "Family", key: "friction" }, { icon: CalendarDays, tier: "Family", key: "roadmap" },
-  { icon: UsersRound, tier: "Family", key: "consult" }, { icon: Sparkles, tier: "Family", key: "colors" },
+  { icon: Compass, tier: "Family", key: "directions" }, { icon: Activity, tier: "Family", key: "rhythm" },
 ] as const;
 
 const copy: Record<Language, { upgrade: string; upgradeFamily: string }> = {
@@ -41,7 +41,7 @@ export default function BusinessFeaturePreview({ language, plan, actualPlan, sig
   const recommended = nextPlan(signedIn ? actualPlan : plan);
   return <section className="mb-6 border-y border-primary/25 py-6 text-left">
     <h3 className="font-serif text-xl text-primary">{c.title}</h3>
-    {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" className="mt-4 h-auto whitespace-normal" onClick={reading.generate}>{rc.generate}</Button>}
+    {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" className="mt-4 h-auto whitespace-normal" disabled={reading.status==='pending'} onClick={reading.generate}>{rc.generate}</Button>}
     {reading.status === 'pending' && <p role="status" className="mt-3 text-sm text-muted-foreground">{rc.pending}</p>}
     {reading.errorMessage && <p role="alert" className="mt-3 text-sm text-destructive">{rc.failed} {reading.errorMessage}</p>}
     <div className="mt-5 grid gap-3 sm:grid-cols-2">{items.map((item,i) => <Button key={item.key} variant="outline" onClick={() => setSelected(item.key)} className="h-auto min-h-20 justify-start whitespace-normal p-4 text-left">
@@ -52,10 +52,12 @@ export default function BusinessFeaturePreview({ language, plan, actualPlan, sig
         <DialogTitle className="font-serif text-xl text-primary">{selected ? c.titles[items.findIndex(i=>i.key===selected)] : c.title}</DialogTitle>
         <DialogDescription className="text-xs leading-6">{c.note}</DialogDescription>
         {selected && (canUseFamilyFeature(plan,selected) ? <>
-          {reading.reading && <ChunkedText text={reading.reading[selected]} className="mb-5 text-sm leading-7"/>}
           {!eligible && <p className="mb-3 text-xs text-muted-foreground">{rc.preview}</p>}
-          {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" onClick={reading.generate}>{rc.generate}</Button>}
+          {reading.status==='pending' && <p role="status" className="text-sm text-muted-foreground">{rc.pending}</p>}
+          {reading.errorMessage && <p role="alert" className="text-sm text-destructive">{rc.failed} {reading.errorMessage}</p>}
+          {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" disabled={reading.status==='pending'} onClick={reading.generate}>{rc.generate}</Button>}
           <FamilyFeatureDetail feature={selected} language={language} plan={plan} actualPlan={actualPlan} signedIn={signedIn} previewMode={previewMode} onUpgrade={onUpgrade}/>
+          {reading.reading && <ChunkedText text={reading.reading[selected]} className="mt-5 border-t border-primary/25 pt-4 text-sm leading-7"/>}
         </> : <div className="py-6"><p className="mb-2 text-sm leading-7">{recommended ? teamCopy[language].planNames[recommended] : ''}</p><Button onClick={() => {setSelected(null);onUpgrade();}}><Crown className="size-4"/>{t.upgrade}</Button></div>)}
       </DialogContent>
     </Dialog>

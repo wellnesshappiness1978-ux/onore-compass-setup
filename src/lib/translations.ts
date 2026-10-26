@@ -161,7 +161,7 @@ export const torisetsuTranslations: Record<Language, TorisetsuTranslation> = {
     colorsTitle: "パーソナルカラー", colorsIntro: "6つのテーマを支える色", colorLabels: ["総合", "金運", "仕事", "恋愛", "対人", "健康"], colorNames: ["シャンパンゴールド", "翡翠", "瑠璃", "珊瑚", "藤", "琥珀"],
     partnerName: "お相手のお名前・ニックネーム", partnerNamePlaceholder: "例：山田 太郎", partnerKana: "お相手のよみがな", partnerGender: "お相手の性別",
     partnerTime: "お相手の出生時間", partnerPlace: "お相手の出生地", optional: "任意",
-    relationLabel: "関係性カテゴリ", relations: ["仕事・協働", "上司・部下", "恋愛・パートナー", "友人・家族"],
+    relationLabel: "関係性カテゴリ", relations: ["仕事・協働", "上司・部下", "恋愛・パートナー", "友人・ファミリー"],
     analyzeCta: "多層統合占術×動物占いで相性をクロス解析する", coreLabel: "相性の核ダイナミクス",
     coreDynamics: ["互いの専門性を認め合う「戦友型」。目的を共有すると進捗が加速します。", "役割が自然に分かれる「補完型」。指示より対話で合意を作ると強みが生きます。", "感情の温度が近い「共鳴型」。距離感を確認し合うと絆が長持ちします。", "気負わず過ごせる「安らぎ型」。何も求め合わない時間が関係を深めます。"],
     partnerBirthDate: "お相手の生年月日", partnerHint: "多層統合占術×動物占いの相性診断イメージ。生年月日と関係性からデモスコアを表示します。", calculate: "相性を診る", score: "相性スコア",
