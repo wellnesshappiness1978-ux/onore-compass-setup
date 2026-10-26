@@ -3,8 +3,8 @@
 ## Family registration and explicit editor entry (2026-10-26)
 - [x] Separate registration capacity from Family analysis and display preview; show actual registration plan with existing 0/3/10/30/100 caps.
 - [x] Explicit registration button and idempotent editor opening return to roster from every analysis tab; close editor on save and tab departure.
-- [ ] Run regression tests, confirm live editor flow and automatic build.
-- [ ] Actual Standard+ cloud add/readback: requesting account has no membership row (Free); verify without inventing paid access.
+- [x] 334 tests passed, final 28 affected tests passed, automatic build OK. Live Standard guest add and visible roster, repeated explicit open, reopening from analysis, save/tab-departure close verified without runtime errors. Signed-in Free shows actual zero capacity, not preview capacity.
+- [ ] Actual Standard+ cloud add/readback: blocked by requesting account having no membership row (Free); paid access was not invented. Existing owner-only policies and live trigger correctly allow Standard 3 / VIP 10 / Family 30 / Premium 100.
 
 ## Parent persistence and six Family features (2026-10-26)
 - [x] Shared parent validation and lossless JSONB mapping; omitted fields retain saved data. Signed-in family CRUD uses actual membership rather than preview-only local storage. Owner parent dates saved/restored through UI reload and original dates restored.
