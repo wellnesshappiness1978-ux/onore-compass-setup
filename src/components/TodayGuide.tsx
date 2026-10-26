@@ -23,7 +23,8 @@ import FengShuiGuide from "./FengShuiGuide";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { higherTodayBenefits, todayBenefitCategories, todayBenefitCopy, todayBenefitCount } from "@/lib/today-benefits";
 import { recipesForElement, recipeDetails, COURSE_ORDER, courseLabels } from "@/lib/lucky-recipes";
-import { flowerImageForMonth } from "@/lib/flower-images";
+import { pickMonthlyFlower, flowerCopy } from "@/lib/seasonal-flowers";
+import MonthlyFlowerCard from "@/components/MonthlyFlowerCard";
 import RecipeStep, { cleanRecipeSteps } from "./RecipeStep";
 import { recipeLabels, recipeReason } from "@/lib/recipe-presentation";
 import { buildTodayDepth, type DeepSection } from "@/lib/today-depth";
@@ -140,6 +141,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   }, [focus, profile, language, iso]);
   const fortune = useTodayFortune(fortuneReq);
   const el = dayElement(iso);
+  const flowerPick = useMemo(() => pickMonthlyFlower((fortuneReq?.members ?? []).map(m => m.birthDate), today), [JSON.stringify(fortuneReq?.members?.map(m => m.birthDate)), today.getFullYear(), today.getMonth()]);
+  const flowerName = flowerPick.flower.name[language];
   const dailyRecipes = recipesForElement(el, iso, profile.birthDate);
   const selectedRecipe = recipeIndex === null ? null : dailyRecipes[recipeIndex];
   const recipe = selectedRecipe ? recipeDetails(selectedRecipe, language) : null;
@@ -336,11 +339,10 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       </>,
     },
     monthlyLucky: {
-      notify: `${L(month.flower)} / ${L(month.action)}`,
+      notify: `${flowerName} / ${L(month.action)}`,
       body: <div className="space-y-3">
-        <img src={flowerImageForMonth(today.getMonth() + 1)} alt={L(month.flower)} loading="lazy" width={1024} height={768} className="w-full rounded-md border border-primary/25 object-cover shadow-champagne" />
+        <MonthlyFlowerCard pick={flowerPick} language={language} />
         <ul className="space-y-2 text-sm leading-6">
-          <li><strong className="text-primary">{ja ? "ラッキーフラワー" : "Lucky flower"}</strong>：{L(month.flower)}（{ja ? "花言葉" : "Meaning"}：{L(month.meaning)}）<br /><span className="text-muted-foreground">{L(month.why)}</span></li>
           <li><strong className="text-primary">{ja ? "ラッキー行動と目標" : "Lucky action & goal"}</strong>：{L(month.action)}</li>
           <li><strong className="text-primary">{ja ? "ラッキーアイテム" : "Lucky item"}</strong>：{L(month.item)}</li>
         </ul>
@@ -376,7 +378,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   content.decision = { notify: fortune.data?.decision.advance ?? content.decision.notify, body: fortune.data ? <div className="space-y-3 text-sm leading-7"><h4 className="text-primary">{access.advance}</h4><p>{fortune.data.decision.advance}</p><h4 className="text-primary">{access.protect}</h4><p>{fortune.data.decision.protect}</p><p><strong>{access.reason}：</strong>{fortune.data.decision.reason}</p></div> : <TodayInsight state={fortune} language={language} /> };
   content.shopping = { notify: fortune.data?.shopping.action ?? access.loading, body: fortune.data ? guide(fortune.data.shopping) : <TodayInsight state={fortune} language={language} /> };
   content.health = { notify: fortune.data?.maintenance.action ?? access.loading, body: fortune.data ? guide(fortune.data.maintenance) : <TodayInsight state={fortune} language={language} /> };
-  content.monthlyLucky = { notify: fortune.data?.monthly.action.action ?? access.loading, body: fortune.data ? <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]"><p className="font-serif text-lg text-primary">{readingDate(iso, language, true)}</p><div className="grid min-w-0 gap-3">{[fortune.data.monthly.action, fortune.data.monthly.item, fortune.data.monthly.flower].map((item, i) => <article key={i} className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne"><h4 className="mb-3 font-serif text-base text-primary">{i + 1}. {monthlyLabels[language][i]}</h4>{i === 2 && <img src={flowerImageForMonth(today.getMonth() + 1)} alt={item.action} loading="lazy" width={1024} height={768} className="mb-3 w-full rounded-md border border-primary/25 object-cover" />}{guide(item)}</article>)}</div><p className="text-sm leading-7">{fortune.data.monthly.outlook}</p></div> : <TodayInsight state={fortune} language={language} /> };
+  content.monthlyLucky = { notify: fortune.data?.monthly.action.action ?? access.loading, body: fortune.data ? <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]"><p className="font-serif text-lg text-primary">{readingDate(iso, language, true)}</p><div className="grid min-w-0 gap-3">{[fortune.data.monthly.action, fortune.data.monthly.item].map((item, i) => <article key={i} className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne"><h4 className="mb-3 font-serif text-base text-primary">{i + 1}. {monthlyLabels[language][i]}</h4>{guide(item)}</article>)}<article className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne"><h4 className="mb-3 font-serif text-base text-primary">3. {flowerPick.group ? flowerCopy[language].group : monthlyLabels[language][2]}</h4><MonthlyFlowerCard pick={flowerPick} language={language} /></article></div><p className="text-sm leading-7">{fortune.data.monthly.outlook}</p></div> : <TodayInsight state={fortune} language={language} /> };
   if (focus?.group) {
     const group = focus.group;
     const each = (render: (p: UserProfile) => ReactNode) => <div className="space-y-3">{group.members.map(m => <details key={m.id} className="border-t border-primary/25 pt-3"><summary className="cursor-pointer font-serif text-primary">{m.nickname || m.name}</summary><div className="mt-3">{render(memberToProfile(m))}</div></details>)}</div>;
@@ -434,7 +436,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         `${ja ? "地球暦" : "Earth Calendar"}: ${ja ? `一年の${dayIdx + 1}日目` : `day ${dayIdx + 1}`}`,
       ] : []),
       ...(rank(plan) >= rank("vip") ? [
-        `${ja ? "今月の3ラッキー" : "Monthly lucky"}: ${fortune.data ? [fortune.data.monthly.flower.action, fortune.data.monthly.action.action, fortune.data.monthly.item.action].join(' / ') : access.loading}`,
+        `${ja ? "今月の3ラッキー" : "Monthly lucky"}: ${fortune.data ? [flowerName, fortune.data.monthly.action.action, fortune.data.monthly.item.action].join(' / ') : access.loading}`,
         ...(yearDir ? [`${ja ? `${stars.year}年の大開運方位` : `${stars.year} direction`}: ${L(dirNames[yearDir])}`] : []),
         `${ja ? "対人" : "Relations"}: ${advice ? L(advice[0]) : (ja ? "感謝をひとつ具体的に伝える" : "Share one specific thanks")}`,
         `${ja ? "バイオリズム" : "Biorhythm"}: ${Math.round(rhythm.total)}`,
