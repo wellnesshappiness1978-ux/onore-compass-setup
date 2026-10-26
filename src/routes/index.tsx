@@ -110,7 +110,10 @@ function Index() {
   }, [read]);
 
   const saveProfile = async (next: UserProfile) => {
-    if (userId) await save({ data: next });
+    if (userId) {
+      const saved = await save({ data: next });
+      next = { ...next, father: saved.father, mother: saved.mother };
+    }
     writeLocal(next);
     setProfile(next);
     setEditing(false);
