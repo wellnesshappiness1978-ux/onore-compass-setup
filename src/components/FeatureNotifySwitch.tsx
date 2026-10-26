@@ -122,7 +122,7 @@ export default function FeatureNotifySwitch({ id, title, body, language, disable
   };
 
   return (
-    <div className={`feature-notify mt-3 rounded-lg border p-3 text-foreground transition-all ${effectiveReminder(s, paused, !disabled) ? "border-primary bg-background/95" : "border-primary/40 bg-background/95"}`}>
+    <div data-locked={disabled && !paused ? "true" : undefined} className={`feature-notify mt-3 rounded-lg border p-3 text-foreground transition-all ${effectiveReminder(s, paused, !disabled) ? "border-primary bg-background/95" : "border-primary/40 bg-background/95"}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <label className="flex min-w-0 flex-wrap items-center gap-2 text-sm text-foreground">
           <span className={`grid size-9 shrink-0 place-items-center rounded-full border ${effectiveReminder(s, paused, !disabled) ? "notify-on border-primary bg-primary text-primary-foreground" : "border-muted-foreground/60 bg-muted text-muted-foreground"}`}><BellRing className="size-5" /></span>
