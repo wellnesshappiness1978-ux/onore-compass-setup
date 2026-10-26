@@ -5,7 +5,7 @@ export type GoalTheme = (typeof goalPresets)[number];
 const directives: Record<GoalTheme, string> = {
   work: "WORK goal: center the reading on business and career — concrete strategy, positioning, timing of proposals, collaboration and skill moves.",
   love: "LOVE goal: center the reading on romance and partnership — specific ways to make the relationship go well (how to approach, communicate, when to talk, what to avoid).",
-  family: "FAMILY goal: center the reading on family harmony and repairing relationships — how to treat each family member, words to use, and a guiding path for home life.",
+  family: "FAMILY goal: center the reading on family harmony and repairing relationships — inclusive member communication, mutual support and shared daily/project life; do not assume household roles or kinship beyond supplied data.",
   health: "HEALTH goal: center the reading on keeping body, mind and fortune steady — daily rhythm, rest, small self-care habits (no medical diagnosis or treatment claims).",
   money: "MONEY goal: center the reading on raising financial fortune — mindset, money habits and lessons, decision timing (no investment guarantees or financial advice).",
   growth: "SELF-GROWTH goal: center the reading on self-realization — strengths to develop, a growth plan with steps and strong encouragement.",
@@ -13,7 +13,7 @@ const directives: Record<GoalTheme, string> = {
 
 /** Which preset themes are present in a goal string (preset labels in any supported language). */
 export function goalThemes(goal: string): GoalTheme[] {
-  const text = goal.toLowerCase();
+  const text = goal.replaceAll('家族','ファミリー').toLowerCase(); // Legacy saved preset, never a displayed label.
   return goalPresets.filter(p => (Object.keys(focusCopy) as Language[]).some(l => {
     const label = focusCopy[l].presets[p].toLowerCase();
     return text.split(/\s*\/\s*/).some(part => part === label);

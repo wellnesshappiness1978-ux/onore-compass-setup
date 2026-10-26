@@ -10,8 +10,8 @@ import type { TeamMember } from '@/lib/team-analysis';
 import type { Language } from '@/lib/translations';
 import { directions } from '@/lib/day-compass';
 
-const strokes=['stroke-primary','stroke-chart-2','stroke-chart-3','stroke-chart-4','stroke-chart-5'];
-const borders=['border-primary','border-chart-2','border-chart-3','border-chart-4','border-chart-5'];
+const strokes=['stroke-primary','stroke-profile-work','stroke-profile-love','stroke-profile-social','stroke-fortune-good'];
+const borders=['border-primary','border-profile-work','border-profile-love','border-profile-social','border-fortune-good'];
 export default function FamilyPlanningView({members,day,language,mode}:{members:TeamMember[];day:string;language:Language;mode:'directions'|'rhythm'}) {
  const c=familyVisualCopy[language];
  const [offset,setOffset]=useState(0),[picked,setPicked]=useState<string | null>(null),[cycle,setCycle]=useState<'physical'|'emotional'|'intellectual'>('emotional');
