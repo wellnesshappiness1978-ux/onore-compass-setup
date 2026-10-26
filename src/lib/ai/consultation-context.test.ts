@@ -28,7 +28,7 @@ describe("consultation context boundaries", () => {
     expect(data.sky?.approximate).toBe(true);
     expect(data.today.day).toBe("2026-10-16");
     expect(data.today.directions).toHaveLength(8);
-    expect(data.boundaries).toContain("All sixteen perspective methods");
+    expect(data.boundaries).toContain("All seventeen perspective methods");
     expect(data.boundaries).toContain("illustrative");
     for (const label of ["インド占星術", "紫微斗数", "算命学", "宿曜占星術", "マヤ暦"]) expect(data.extended).toContain(label);
   });

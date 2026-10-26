@@ -10,7 +10,7 @@ import { birthColorSpectrum, localizeBirthColorName } from "@/lib/birth-color-sp
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
 import { AgolmenLoading, useCompletionHold } from "./AgolmenSpiral";
-import { approachKeys, traitReadingCopy } from "@/lib/trait-reading";
+import { approachKeys, traitReadingCopy, type ApproachKey } from "@/lib/trait-reading";
 import { detailLinkLabel } from "@/lib/art-overview-copy";
 import { useFocus } from "./FocusProvider";
 
@@ -24,7 +24,7 @@ const titles: Record<Language, [string, string, string]> = {
   fr: ["Lectures par méthode (17 arts)", "Partager votre carte", "Lire l’explication"],
 };
 
-export default function GrandSummaryCard({ profile, language, plan, embedded = false, part = "all" }: { profile: UserProfile; language: Language; plan: Plan; embedded?: boolean; part?: "all" | "approaches" | "summary" | "share" }) {
+export default function GrandSummaryCard({ profile, language, plan, embedded = false, part = "all", detailExtra }: { profile: UserProfile; language: Language; plan: Plan; embedded?: boolean; part?: "all" | "approaches" | "summary" | "share"; detailExtra?: (key: ApproachKey) => React.ReactNode }) {
   const focus = useFocus();
   const subject = { label: focus?.label(language) ?? 'you', isSelf: !focus?.member && !focus?.group };
   const { data, isPending, partial } = usePersonalReading({ profile, language, goal: focus ? goalText(focus.focus, language) : '', subject });
@@ -58,10 +58,11 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
       </div>
       {showApproaches && <MethodExplanationList language={language} detail={key => {
         const body = data?.approaches[key] ?? partial.approaches?.[key];
-        if (data?.approachAvailability[key] === "unavailable") return null;
+        if (data?.approachAvailability[key] === "unavailable") return detailExtra?.(key) ?? null;
         return <details className="group mt-3 rounded-md border border-primary/25 bg-primary/5">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm text-primary [&::-webkit-details-marker]:hidden">{readMore}<ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
           {body ? <div aria-busy={isPending}><ChunkedText className="px-3 pb-3 text-[15px] leading-7 text-foreground" text={body} /></div> : <AgolmenLoading compact label={copy.loading} />}
+          {detailExtra?.(key)}
         </details>;
       }} />}
 

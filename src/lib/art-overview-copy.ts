@@ -22,6 +22,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     maya: "古代マヤ文明が育んだ神聖暦ツォルキンは、13の音と20の太陽の紋章を組み合わせた260日のサイクルです。生まれた日のKIN（音と紋章）から、その人が象徴的に携えるエネルギーの質と巡るリズムを読みます。現代では、直感や感性のサイクルを意識し、日々に物語性のある意味づけをする象徴的な鏡として楽しまれています。",
     color: "生年月日と太陽の位置から導く1440通りのバースカラーは、色彩心理の考え方を取り入れた現代的な象徴システムです。色が持つ心理的なイメージを通して、意識を向ける先や気分の整え方のヒントを得られます。科学的な測定ではなく、日々の装いや空間づくりに「自分らしさの色」を添えるための、感覚的な参考として楽しむものです。",
     blood: "大正時代以降に日本で広まった、血液型による気質分類の文化的な話題です。科学的な根拠は確立していませんが、A型・B型・O型・AB型それぞれの「あるある」的な archetype（典型像）は、世代を超えて親しまれてきました。自分を決めつけるものではなく、会話のきっかけや自己観察の遊び心ある視点として楽しむエンターテインメントです。",
+    nameReading: "古代中国の漢字画数の思想を源流とし、日本で独自に発展した姓名の占術です。姓と名の画数から天運・人運・地運・外運・総運という5つの運を導き、人生の軸・対人関係・社会的な強みを読み解きます。現代では、名前に込められた響きや構えを通して、自分らしい立ち回り方を振り返る伝統的な参考として親しまれています。",
     siblings: "家族の中で育った順番や構成が、振る舞いのクセに影響するかもしれないという、心理学由来の視点です。長子・中間子・末子・一人っ子それぞれに語られてきた役割の物語があります。決まった性格を示すものではなく、「こんな場面に覚えはありませんか？」と自分の経験を振り返る、共感のための問いかけとして用います。",
     region: regionalContextCopy["ja"],
   },
@@ -40,6 +41,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     maya: "The Tzolkin sacred calendar of the ancient Maya civilization is a 260-day cycle combining 13 tones with 20 solar seals. From the KIN of your birth day it reads the symbolic quality of energy you carry and its cycling rhythm. Today it is enjoyed as a symbolic mirror that brings awareness to cycles of intuition and gives daily life a storied meaning.",
     color: "The 1,440-slot birth color palette, derived from your birth date and the Sun's position, is a modern symbolic system informed by color psychology. Through the psychological imagery of colors it offers hints for where to direct attention and how to settle your mood. Not a scientific measurement — enjoy it as a sensory reference for adding your own color to daily dress and spaces.",
     blood: "A cultural topic of temperament categories by blood type that spread in Japan from the Taisho era. Though scientifically unestablished, the familiar archetypes of types A, B, O and AB have been loved across generations. It does not define you — enjoy it as entertainment: a conversation starter and a playful lens for self-observation.",
+    nameReading: "A name-reading art that grew in Japan from the Chinese tradition of counting character strokes. From the strokes of surname and given name it derives five grids — heaven, person, earth, outer and total — reading your life axis, relationships and social strengths. Today it is cherished as a traditional reference for reflecting on how you carry yourself, through the resonance held in your name.",
     siblings: "A psychology-derived perspective that the order and composition you grew up in may shape habits of behavior. Eldest, middle, youngest and only children each carry stories of roles long told about them. It shows no fixed personality; it is an empathetic question — does this scene sound familiar? — for looking back on your own experience.",
     region: regionalContextCopy["en"],
   },
@@ -58,6 +60,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     maya: "古代玛雅文明孕育的神圣历卓尔金，是13个音调与20个太阳印记组合而成的260天周期。从出生日的KIN（音调与印记）解读你象征性携带的能量质地与循环节奏。如今，它作为让人觉察直觉与感性周期、为日常赋予故事性意义的象征之镜而被欣赏。",
     color: "由生日与太阳位置导出的1440种出生色彩，是融入色彩心理学观点的现代象征体系。通过色彩的心理意象，获得注意力投向与情绪整理的提示。它并非科学测量，而是为日常穿搭与空间点缀「属于自己的颜色」的感性参考。",
     blood: "自日本大正时代起流传的血型气质分类文化话题。虽然科学根据尚未确立，但A型、B型、O型、AB型各自的「典型形象」被世代喜爱。它不决定你是谁——作为谈资与自我观察的趣味视角，请当作娱乐来享受。",
+    nameReading: "源于古代中国汉字笔画思想、在日本独自发展的姓名占术。由姓与名的笔画数导出天运、人运、地运、外运、总运五运，解读人生轴心、人际关系与社会性优势。如今，它作为通过名字所蕴含的音韵与构造来回顾自己处世方式的传统参考而受到喜爱。",
     siblings: "一种源自心理学的视角：成长的排行与家庭构成或许会影响行为习惯。长子、中间子、幺子、独生子女各自都有流传已久的角色故事。它不显示固定性格，而是共感的提问——「这样的场景你有印象吗？」——用来回顾自己的经历。",
     region: regionalContextCopy["zh-CN"],
   },
@@ -76,6 +79,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     maya: "古代瑪雅文明孕育的神聖曆卓爾金，是13個音調與20個太陽印記組合而成的260天週期。從出生日的KIN（音調與印記）解讀你象徵性攜帶的能量質地與循環節奏。如今，它作為讓人覺察直覺與感性週期、為日常賦予故事性意義的象徵之鏡而被欣賞。",
     color: "由生日與太陽位置導出的1440種出生色彩，是融入色彩心理學觀點的現代象徵體系。透過色彩的心理意象，獲得注意力投向與情緒整理的提示。它並非科學測量，而是為日常穿搭與空間點綴「屬於自己的顏色」的感性參考。",
     blood: "自日本大正時代起流傳的血型氣質分類文化話題。雖然科學根據尚未確立，但A型、B型、O型、AB型各自的「典型形象」被世代喜愛。它不決定你是誰——作為談資與自我觀察的趣味視角，請當作娛樂來享受。",
+    nameReading: "源於古代中國漢字筆畫思想、在日本獨自發展的姓名占術。由姓與名的筆畫數導出天運、人運、地運、外運、總運五運，解讀人生軸心、人際關係與社會性優勢。如今，它作為透過名字所蘊含的音韻與結構來回顧自己處世方式的傳統參考而受到喜愛。",
     siblings: "一種源自心理學的視角：成長的排行與家庭構成或許會影響行為習慣。長子、中間子、么子、獨生子女各自都有流傳已久的角色故事。它不顯示固定性格，而是共感的提問——「這樣的場景你有印象嗎？」——用來回顧自己的經歷。",
     region: regionalContextCopy["zh-TW"],
   },
@@ -94,6 +98,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     maya: "고대 마야 문명이 가꾼 신성력 졸킨은 13의 음과 20의 태양의 문장을 조합한 260일 주기입니다. 태어난 날의 KIN(음과 문장)에서 그 사람이 상징적으로 지닌 에너지의 질과 도는 리듬을 읽습니다. 오늘날에는 직감과 감성의 주기를 의식하고 일상에 이야기성 있는 의미를 부여하는 상징의 거울로 즐겨집니다.",
     color: "생년월일과 태양의 위치에서 이끌어내는 1440가지 탄생 색상은 색채 심리의 관점을 담은 현대적인 상징 체계입니다. 색이 지닌 심리적 이미지를 통해 의식을 향할 곳과 기분을 가다듬는 힌트를 얻을 수 있습니다. 과학적 측정이 아니라, 매일의 옷차림과 공간 만들기에 '나다운 색'을 더하는 감각적인 참고로 즐기는 것입니다.",
     blood: "다이쇼 시대 이후 일본에서 퍼진, 혈액형에 따른 기질 분류라는 문화적 화제입니다. 과학적 근거는 확립되어 있지 않지만, A형·B형·O형·AB형 각각의 '전형적인 이미지'는 세대를 넘어 사랑받아 왔습니다. 자신을 규정하는 것이 아니라, 대화의 계기나 자기 관찰의 유쾌한 관점으로 즐기는 엔터테인먼트입니다.",
+    nameReading: "고대 중국의 한자 획수 사상에 뿌리를 두고 일본에서 독자적으로 발전한 성명 점술입니다. 성과 이름의 획수에서 천운·인운·지운·외운·총운이라는 다섯 운을 도출해 인생의 축, 대인관계, 사회적 강점을 읽어 냅니다. 오늘날에는 이름에 담긴 울림과 구조를 통해 자신다운 처신을 돌아보는 전통적인 참고로 사랑받고 있습니다.",
     siblings: "가족 안에서 자란 순서나 구성이 행동의 버릇에 영향을 줄지도 모른다는, 심리학에서 온 관점입니다. 장남·장녀, 중간, 막내, 외동 각각에 오랫동안 이야기되어 온 역할의 이야기가 있습니다. 정해진 성격을 보여주는 것이 아니라, '이런 장면에 기억이 있나요?'라고 자신의 경험을 돌아보는 공감의 질문으로 사용합니다.",
     region: regionalContextCopy["ko"],
   },
@@ -112,6 +117,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     maya: "El calendario sagrado Tzolkin de la antigua civilización maya es un ciclo de 260 días que combina 13 tonos con 20 sellos solares. Del KIN de tu día de nacimiento lee la cualidad simbólica de la energía que portas y su ritmo cíclico. Hoy se disfruta como un espejo simbólico que vuelve conscientes los ciclos de la intuición y da a la vida diaria un significado narrado.",
     color: "La paleta de 1.440 colores de nacimiento, derivada de tu fecha de nacimiento y la posición del Sol, es un sistema simbólico moderno inspirado en la psicología del color. A través de las imágenes psicológicas de los colores ofrece pistas sobre dónde dirigir la atención y cómo serenar el ánimo. No es una medición científica: disfrútala como referencia sensorial para añadir tu propio color a la ropa y los espacios.",
     blood: "Un tema cultural de categorías de temperamento por grupo sanguíneo que se difundió en Japón desde la era Taisho. Aunque sin base científica establecida, los arquetipos familiares de los tipos A, B, O y AB han sido queridos por generaciones. No te define: disfrútalo como entretenimiento, un inicio de conversación y una lente lúdica de autoobservación.",
+    nameReading: "Un arte de lectura del nombre que creció en Japón a partir de la tradición china de contar los trazos de los caracteres. A partir de los trazos del apellido y el nombre deriva cinco rejillas —cielo, persona, tierra, exterior y total— que revelan tu eje vital, tus relaciones y tus fortalezas sociales. Hoy se aprecia como una referencia tradicional para reflexionar sobre tu manera de actuar a través de la resonancia de tu nombre.",
     siblings: "Una perspectiva derivada de la psicología: el orden y la composición en que creciste pueden moldear hábitos de conducta. Los mayores, los del medio, los menores y los hijos únicos cargan historias de roles contadas desde hace mucho. No muestra una personalidad fija; es una pregunta empática —¿te suena esta escena?— para mirar hacia tu propia experiencia.",
     region: regionalContextCopy["es"],
   },
@@ -130,6 +136,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
     maya: "Le calendrier sacré Tzolkin de l'ancienne civilisation maya est un cycle de 260 jours combinant 13 tons et 20 sceaux solaires. Du KIN de votre jour de naissance, il lit la qualité symbolique de l'énergie que vous portez et son rythme cyclique. Aujourd'hui, on l'apprécie comme un miroir symbolique qui rend conscients les cycles de l'intuition et donne à la vie quotidienne une signification racontée.",
     color: "La palette de 1 440 couleurs de naissance, dérivée de votre date de naissance et de la position du Soleil, est un système symbolique moderne inspiré de la psychologie de la couleur. À travers l'imagerie psychologique des couleurs, elle offre des pistes sur où diriger l'attention et comment apaiser l'humeur. Ce n'est pas une mesure scientifique : savourez-la comme une référence sensorielle pour ajouter votre couleur propre à vos tenues et vos espaces.",
     blood: "Un sujet culturel de catégories de tempérament par groupe sanguin, répandu au Japon depuis l'ère Taishô. Bien que scientifiquement non établi, les archétypes familiers des types A, B, O et AB sont aimés depuis des générations. Il ne vous définit pas : appréciez-le comme un divertissement, un amorceur de conversation et une lentille ludique d'auto-observation.",
+    nameReading: "Un art de lecture du nom développé au Japon à partir de la tradition chinoise du comptage des traits. À partir des traits du nom de famille et du prénom, il déduit cinq grilles — ciel, personne, terre, extérieur et total — révélant votre axe de vie, vos relations et vos forces sociales. Aujourd’hui, il sert de référence traditionnelle pour réfléchir à votre manière d’être, à travers la résonance de votre nom.",
     siblings: "Une perspective issue de la psychologie : l'ordre et la composition dans lesquels vous avez grandi peuvent façonner des habitudes de comportement. Aînés, cadets, benjamins et enfants uniques portent chacun des histoires de rôles racontées de longue date. Elle ne montre aucune personnalité figée ; c'est une question empathique — cette scène vous rappelle-t-elle quelque chose ? — pour revisiter votre propre expérience.",
     region: regionalContextCopy["fr"],
   },
@@ -137,8 +144,8 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
 
 /** Short principle lines for AI prompts: each art's analytical strength, so
  * readings weave all seventeen lenses instead of listing them. */
-export const artPrinciplesPrompt = `SIXTEEN LENS PRINCIPLES (use each lens for its strength; never list them):
-western: emotion/thinking/relating contrast from Sun, Moon, Mercury, Venus. indian: deep soul motives from sidereal Sun and Moon nakshatra. ziwei: life posture (Ming) and maturing domain (Shen). eastern: temperament and ~12-year rhythm from the year branch's animal, element, yin/yang. earth: seasonal planning phase only, never personality. pillars: energy allocation and endurance from five-element balance. sanmei: shifting roles across early/middle/late life via ten master stars. nineStars: environmental and routine affinities. lunarMansion: relational style from the birth mansion. animal: action tempo and decision rhythm (core only). numerology: growth themes and priorities. maya: symbolic energy cycle from the Tzolkin kin. color: symbolic attention cues, never health claims. blood: attributed entertainment archetype only, never personality evidence. siblings: family-role scene as a question, never facts. region: neutral self-reflection prompt only. ${regionalContextPrompt}
+export const artPrinciplesPrompt = `SEVENTEEN LENS PRINCIPLES (use each lens for its strength; never list them):
+western: emotion/thinking/relating contrast from Sun, Moon, Mercury, Venus. indian: deep soul motives from sidereal Sun and Moon nakshatra. ziwei: life posture (Ming) and maturing domain (Shen). eastern: temperament and ~12-year rhythm from the year branch's animal, element, yin/yang. earth: seasonal planning phase only, never personality. pillars: energy allocation and endurance from five-element balance. sanmei: shifting roles across early/middle/late life via ten master stars. nineStars: environmental and routine affinities. lunarMansion: relational style from the birth mansion. animal: action tempo and decision rhythm (core only). numerology: growth themes and priorities. maya: symbolic energy cycle from the Tzolkin kin. color: symbolic attention cues, never health claims. blood: attributed entertainment archetype only, never personality evidence. nameReading: life axis and social strengths from the five name grids (heaven/person/earth/outer/total stroke counts). siblings: family-role scene as a question, never facts. region: neutral self-reflection prompt only. ${regionalContextPrompt}
 MULTI-LAYER RESONANCE (required): do not enumerate method results. Let 2-4 lenses intersect into one observation the reader recognizes from daily life; where two lenses point the same way, say what that convergence means; where they tension, describe the creative friction. Every passage should feel impossible to write for a different birth date.`;
 
 /** Dynamic label for the per-art detail disclosure, naming the current subject. */

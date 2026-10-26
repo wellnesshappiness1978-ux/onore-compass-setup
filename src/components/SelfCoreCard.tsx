@@ -19,21 +19,21 @@ import type { Plan } from "@/lib/design-modes";
 import { birthColorSpectrum } from "@/lib/birth-color-spectrum";
 import BirthColorGuide from "./BirthColorGuide";
 import { SacredDisclosure } from "./ui/sacred-disclosure";
-import { essenceKeys, traitReadingCopy } from "@/lib/trait-reading";
+import { essenceKeys, traitReadingCopy, type ApproachKey } from "@/lib/trait-reading";
 import { useFocus } from './FocusProvider';
 import DeeperEssenceSections from './DeeperEssenceSections';
 import { useQueryClient } from '@tanstack/react-query';
 import { localIso } from '@/lib/day-compass';
 
 
-const nameCopy: Record<Language, { title: string; grids: [string, string, string, string, string]; fortune: string; split: string; save: string; note: string }> = {
-  ja: { title: "本格 姓名判断（五運と人生の軸）", grids: ["天格（家系運）", "人格（主運・内面）", "地格（基礎運）", "外格（対人・環境運）", "総格（総合・晩年運）"], fortune: "名前が示す社会的な強みと引き寄せる運命", split: "姓と名の区切りを選ぶと五運を算出して保存します", save: "この区切りで保存", note: "現代字体の画数・霊数を外格のみに加える方式・一般的な81数の吉凶表に基づく参考値です。流派により異なります。" },
-  en: { title: "Name reading (five grids)", grids: ["Heaven (family)", "Person (core)", "Earth (foundation)", "Outer (social)", "Total (overall)"], fortune: "Social strengths your name suggests", split: "Choose where your surname ends to calculate and save the five grids", save: "Save this split", note: "Reference values using modern stroke counts and a common 81-number table; schools differ." },
-  "zh-CN": { title: "姓名五格", grids: ["天格", "人格", "地格", "外格", "总格"], fortune: "姓名显示的社会优势", split: "选择姓与名的分界以计算并保存五格", save: "按此保存", note: "基于现代笔画与常见81数吉凶表的参考值，流派不同结果可能不同。" },
-  "zh-TW": { title: "姓名五格", grids: ["天格", "人格", "地格", "外格", "總格"], fortune: "姓名顯示的社會優勢", split: "選擇姓與名的分界以計算並儲存五格", save: "依此儲存", note: "基於現代筆畫與常見81數吉凶表的參考值，流派不同結果可能不同。" },
-  ko: { title: "성명 오격", grids: ["천격", "인격", "지격", "외격", "총격"], fortune: "이름이 보여주는 사회적 강점", split: "성과 이름의 경계를 선택하면 오격을 계산해 저장합니다", save: "이대로 저장", note: "현대 획수와 일반적인 81수 길흉표에 따른 참고값이며 유파마다 다릅니다." },
-  es: { title: "Lectura del nombre (cinco cuadros)", grids: ["Cielo", "Persona", "Tierra", "Exterior", "Total"], fortune: "Fortalezas sociales que sugiere tu nombre", split: "Elige dónde termina tu apellido para calcular y guardar", save: "Guardar", note: "Valores de referencia con trazos modernos y una tabla común de 81 números." },
-  fr: { title: "Lecture du nom (cinq cadres)", grids: ["Ciel", "Personne", "Terre", "Extérieur", "Total"], fortune: "Forces sociales suggérées par votre nom", split: "Choisissez la fin du nom de famille pour calculer et enregistrer", save: "Enregistrer", note: "Valeurs de référence avec traits modernes et une table courante de 81 nombres." },
+const nameCopy: Record<Language, { fortune: string; split: string; save: string; note: string }> = {
+  ja: { fortune: "名前が示す社会的な強みと引き寄せる運命", split: "姓と名の区切りを選ぶと五運を算出して保存します", save: "この区切りで保存", note: "現代字体の画数・霊数を外格のみに加える方式・一般的な81数の吉凶表に基づく参考値です。流派により異なります。" },
+  en: { fortune: "Social strengths your name suggests", split: "Choose where your surname ends to calculate and save the five grids", save: "Save this split", note: "Reference values using modern stroke counts and a common 81-number table; schools differ." },
+  "zh-CN": { fortune: "姓名显示的社会优势", split: "选择姓与名的分界以计算并保存五格", save: "按此保存", note: "基于现代笔画与常见81数吉凶表的参考值，流派不同结果可能不同。" },
+  "zh-TW": { fortune: "姓名顯示的社會優勢", split: "選擇姓與名的分界以計算並儲存五格", save: "依此儲存", note: "基於現代筆畫與常見81數吉凶表的參考值，流派不同結果可能不同。" },
+  ko: { fortune: "이름이 보여주는 사회적 강점", split: "성과 이름의 경계를 선택하면 오격을 계산해 저장합니다", save: "이대로 저장", note: "현대 획수와 일반적인 81수 길흉표에 따른 참고값이며 유파마다 다릅니다." },
+  es: { fortune: "Fortalezas sociales que sugiere tu nombre", split: "Elige dónde termina tu apellido para calcular y guardar", save: "Guardar", note: "Valores de referencia con trazos modernos y una tabla común de 81 números." },
+  fr: { fortune: "Forces sociales suggérées par votre nom", split: "Choisissez la fin du nom de famille pour calculer et enregistrer", save: "Enregistrer", note: "Valeurs de référence avec traits modernes et une table courante de 81 nombres." },
 };
 
 const planIcons: Record<HomePlanId, typeof Sprout> = { standard: Sprout, vip: Gem, b2b: Building2, "b2b-premium": Crown };
@@ -77,19 +77,21 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
   const coreSections = language === "ja" ? ["コアアイデンティティ", "思考バイアス", "前進と静観の内的な差"] : ["Core identity", "Decision patterns", "Advance and pause tendencies"];
   const icons = [Dna, Fingerprint, Orbit, Heart, Sparkles];
 
-  const nameDetails = (
-<section aria-label={n.title} className="my-6 border-y border-primary/25 py-5">
-            <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
-            {localLayers?.name ? <>
-              {data?.nameFortune && <><h4 className="mt-5 font-serif text-sm text-primary">{n.fortune}</h4><p className="mt-2 whitespace-pre-line text-sm leading-8 text-foreground sm:text-base">{data?.nameFortune}</p></>}
-
-            </> : chars && onProfileChange ? <div className="mt-3">
-              <p className="text-sm text-muted-foreground">{n.split}</p>
-              <div className="mt-3 flex flex-wrap gap-2">{chars.slice(0, -1).map((_, i) => <Button key={i} size="sm" variant={cut === i + 1 ? "default" : "outline"} onClick={() => setCut(i + 1)}>{chars.slice(0, i + 1).join("")}　{chars.slice(i + 1).join("")}</Button>)}</div>
-              <Button className="mt-3" disabled={saving} onClick={async () => { setSaving(true); try { await onProfileChange({ ...profile, nameKanji: `${chars.slice(0, cut).join("")} ${chars.slice(cut).join("")}` }); } finally { setSaving(false); } }}>{n.save}</Button>
-            </div> : <p className="mt-3 text-sm text-muted-foreground">{f.nameNote}</p>}
-          </section>
-  );
+  // The full name reading lives in the 分類別診断 accordion (art 15); this adds the
+  // fortune passage and the surname/given-name split picker to that accordion item.
+  const nameDetailExtra = (key: ApproachKey) => {
+    if (key !== "nameReading") return null;
+    return <div className="px-3 pb-3">
+      {localLayers?.name ? <>
+        {data?.nameFortune && <><h4 className="mt-2 font-serif text-sm text-primary">{n.fortune}</h4><p className="mt-2 whitespace-pre-line text-sm leading-8 text-foreground sm:text-base">{data.nameFortune}</p></>}
+        <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{n.note}</p>
+      </> : chars && onProfileChange ? <div className="mt-1">
+        <p className="text-sm text-muted-foreground">{n.split}</p>
+        <div className="mt-3 flex flex-wrap gap-2">{chars.slice(0, -1).map((_, i) => <Button key={i} size="sm" variant={cut === i + 1 ? "default" : "outline"} onClick={() => setCut(i + 1)}>{chars.slice(0, i + 1).join("")}　{chars.slice(i + 1).join("")}</Button>)}</div>
+        <Button className="mt-3" disabled={saving} onClick={async () => { setSaving(true); try { await onProfileChange({ ...profile, nameKanji: `${chars.slice(0, cut).join("")} ${chars.slice(cut).join("")}` }); } finally { setSaving(false); } }}>{n.save}</Button>
+      </div> : <p className="mt-1 text-sm text-muted-foreground">{f.nameNote}</p>}
+    </div>;
+  };
 
   return (
     <section aria-label={t.title} className="min-w-0 overflow-hidden rounded-lg border border-primary/35 bg-card/75 shadow-champagne backdrop-blur-md">
@@ -113,8 +115,7 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
           {!top && isError && quick.isError && <Button variant="outline" className="mt-3" onClick={() => { void quick.refetch(); void refetch(); }}>{t.retry}</Button>}
           {experienceOnly && <DeeperEssenceSections profile={profile} language={language} passages={data?.deeperEssence ?? partial.deeperEssence} />}
         </section>
-        {nameDetails}
-        <div className="-mx-5 sm:-mx-8"><GrandSummaryCard profile={profile} language={language} plan={activePlan} embedded part="approaches" /></div>
+        <div className="-mx-5 sm:-mx-8"><GrandSummaryCard profile={profile} language={language} plan={activePlan} embedded part="approaches" detailExtra={nameDetailExtra} /></div>
         {palette && <section aria-label="color" className="pb-6 pt-6"><BirthColorGuide profile={profile} plan={activePlan} language={language} /></section>}
         <div className="space-y-1 border-t border-primary/20 py-4 text-xs leading-6 text-muted-foreground"><p>{t.preview}</p><p>{f.nameNote} {e?.zodiacBoundary ? f.boundaryNote : ""} {e?.uncertainYear ? f.yearNote : ""}</p><p>{f.method}</p></div>
       </div>

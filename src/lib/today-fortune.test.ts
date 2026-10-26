@@ -3,7 +3,7 @@ import { avoidFromHistory, cacheKey, dailyAngle, daySeed, normalizeFortune, toda
 
 const food = (name: string) => ({ name, why: "w", servings: "2人分", ingredients: [{ item: "豆腐", amount: "300g" }], seasonings: [{ item: "しょうゆ", amount: "大さじ1" }], steps: [{ text: "切る", tip: "t" }] });
 const guidance = { action: 'a', reason: 'r', benefit: 'b' };
-const base: TodayFortune = { decision: { advance: 'a', protect: 'p', reason: 'r' }, shopping: guidance, maintenance: guidance, monthly: { flower: guidance, action: guidance, item: guidance, outlook: 'o' }, headline: "h", insight: "i", dynamics: "d", actions: ["a"], caution: "c", luckyColor: { name: "若葉", hex: "#aabbcc", reason: "r" }, luckyWord: { word: "w", message: "m" }, foods: [] };
+const base: TodayFortune = { decision: { advance: 'a', protect: 'p', reason: 'r' }, shopping: guidance, maintenance: guidance, monthly: { flower: guidance, action: guidance, item: guidance, outlook: 'o' }, headline: "h", insight: "i", dynamics: "d", actions: ["a"], caution: "c", luckyColor: { name: "若葉", hex: "#aabbcc", reason: "r", usage: "u" }, luckyWord: { word: "w", message: "m" }, foods: [] };
 
 describe("today fortune", () => {
   it("returns exactly five complete foods", () => {

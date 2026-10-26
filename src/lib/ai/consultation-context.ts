@@ -39,6 +39,7 @@ export function consultationContext(profile: Input, day: string) {
     nineStars: Boolean(nineStars),
     color: Boolean(colors),
     blood: Boolean(profile.bloodType),
+    name: Boolean(profile.nameKanji?.trim()),
     siblings: Boolean(profile.siblingOrder),
     region: Boolean(profile.birthPlace || profile.birthCity),
   });
