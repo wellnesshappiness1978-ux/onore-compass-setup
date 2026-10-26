@@ -64,7 +64,7 @@ import { groupBirthPalette } from "@/lib/group-palette";
 import type { ArtSubject } from "./NineStarsPanel";
 import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, GroupFocusCard, GroupMembersToday, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
 import { focusCopy, goalText, groupDisplayName, memberDisplayName, memberToProfile } from "@/lib/focus";
-import { savedPartner, savedGroupMembers } from "@/lib/saved-compatibility";
+import { savedPartner, savedGroupMembers, splitGroupReading } from "@/lib/saved-compatibility";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
