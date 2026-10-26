@@ -128,7 +128,7 @@ const jaFeatures: Record<HomePlanId, string[]> = {
     "吉方位・開運エネルギー（生まれの方位タイプと今年の方位）解放",
     "7色バースカラー完全解放（総合・サブ・金運・仕事運・恋愛運・健康運・内面）",
     `相性診断＆相手の攻略トリセツ（${times(dailyUsageLimit.standard)}）`,
-    "全16占術統合詳細レポート＆トリセツ完全解放",
+    "全17占術統合詳細レポート＆トリセツ完全解放",
     "「今日の占い」買い物・健康など詳細アドバイス＆テーマカラー",
     `地球暦カレンダー 前後${helioRangeDays.standard}日の閲覧`,
     `「アゴルメンの羅針盤」AI相談（${times(consultationDailyLimit.standard)}）`,

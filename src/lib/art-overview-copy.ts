@@ -1,4 +1,4 @@
-// Rich beginner-friendly overviews of all sixteen reading arts: each entry
+// Rich beginner-friendly overviews of all seventeen reading arts: each entry
 // covers (1) origin and history, (2) the mechanism that reads fortune or
 // character, and (3) the role it plays in modern daily life. Reference
 // education only — never scientific or deterministic claims.
@@ -136,7 +136,7 @@ export const artOverviewCopy: Record<Language, Record<ApproachKey, string>> = {
 };
 
 /** Short principle lines for AI prompts: each art's analytical strength, so
- * readings weave all sixteen lenses instead of listing them. */
+ * readings weave all seventeen lenses instead of listing them. */
 export const artPrinciplesPrompt = `SIXTEEN LENS PRINCIPLES (use each lens for its strength; never list them):
 western: emotion/thinking/relating contrast from Sun, Moon, Mercury, Venus. indian: deep soul motives from sidereal Sun and Moon nakshatra. ziwei: life posture (Ming) and maturing domain (Shen). eastern: temperament and ~12-year rhythm from the year branch's animal, element, yin/yang. earth: seasonal planning phase only, never personality. pillars: energy allocation and endurance from five-element balance. sanmei: shifting roles across early/middle/late life via ten master stars. nineStars: environmental and routine affinities. lunarMansion: relational style from the birth mansion. animal: action tempo and decision rhythm (core only). numerology: growth themes and priorities. maya: symbolic energy cycle from the Tzolkin kin. color: symbolic attention cues, never health claims. blood: attributed entertainment archetype only, never personality evidence. siblings: family-role scene as a question, never facts. region: neutral self-reflection prompt only. ${regionalContextPrompt}
 MULTI-LAYER RESONANCE (required): do not enumerate method results. Let 2-4 lenses intersect into one observation the reader recognizes from daily life; where two lenses point the same way, say what that convergence means; where they tension, describe the creative friction. Every passage should feel impossible to write for a different birth date.`;

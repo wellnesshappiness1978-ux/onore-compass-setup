@@ -27,7 +27,7 @@ const readingSchema = z.object({
   catchphrase: z.string(),
   essence: z.object({ outward: z.string(), inner: z.string(), growth: z.string(), resilience: z.string(), relationships: z.string(), gift: z.string() }),
   deeperEssence: z.object({ roots: z.string(), energy: z.string(), learning: z.string(), guidance: z.string() }),
-  approaches: z.object({ western: z.string(), indian: z.string(), ziwei: z.string(), eastern: z.string(), earth: z.string(), pillars: z.string(), sanmei: z.string(), nineStars: z.string(), lunarMansion: z.string(), animal: z.string(), numerology: z.string(), maya: z.string(), color: z.string(), blood: z.string(), siblings: z.string(), region: z.string() }),
+  approaches: z.object({ western: z.string(), indian: z.string(), ziwei: z.string(), eastern: z.string(), earth: z.string(), pillars: z.string(), sanmei: z.string(), nineStars: z.string(), lunarMansion: z.string(), animal: z.string(), numerology: z.string(), maya: z.string(), color: z.string(), blood: z.string(), nameReading: z.string(), siblings: z.string(), region: z.string() }),
   axisSummary: z.string(),
   synthesis: z.string().min(60).max(1100),
   name: z.string().min(30).max(750),
@@ -62,7 +62,7 @@ export async function runReading(data: z.infer<typeof inputSchema>, onPartial?: 
     const gua = mingGua(profile.birthDate, profile.gender ?? "undisclosed");
     const nineStars = nineStarProfile(profile.birthDate, profile.birthTime, profile.birthTimeUnknown, profile.gender);
     const extended = computeExtendedArts(profile.birthDate, profile.birthTime, profile.birthTimeUnknown);
-    const approachAvailability = approachStatuses({ core: Boolean(layers), earth: Boolean(helio), nineStars: Boolean(nineStars), color: Boolean(color), blood: Boolean(elements.blood), siblings: Boolean(profile.siblingOrder), region: Boolean(profile.birthPlace || profile.birthCity) });
+    const approachAvailability = approachStatuses({ core: Boolean(layers), earth: Boolean(helio), nineStars: Boolean(nineStars), color: Boolean(color), blood: Boolean(elements.blood), name: Boolean(elements.name), siblings: Boolean(profile.siblingOrder), region: Boolean(profile.birthPlace || profile.birthCity) });
     let runId: string | undefined;
     const provider = createOpenAI({
       baseURL: "https://ai.gateway.lovable.dev/v1", apiKey,
