@@ -9,8 +9,8 @@ import type { Language } from '@/lib/translations';
 export function useFamilyReading(input: { groupId: string | null; language: Language; day: string }, signature: string, enabled: boolean) {
   const read = useServerFn(readFamilyReading), generate = useServerFn(generateFamilyReading);
   const client = useQueryClient();
-  const key = ['family-reading',input,signature];
-  const query = useQuery({queryKey:key,queryFn:()=>read({data:input}),enabled,staleTime:Infinity,gcTime:Infinity,retry:false,retryOnMount:false,refetchOnWindowFocus:false});
+  const key = ['family-reading','v2-planning',input,signature];
+  const query = useQuery({queryKey:key,queryFn:()=>read({data:input}),enabled,staleTime:Infinity,gcTime:Infinity,retry:false,retryOnMount:false,refetchOnWindowFocus:false,refetchInterval:q=>q.state.data?.status==='pending'?5000:false});
   const mutation = useMutation({ mutationFn:async ()=>({value:await generate({data:input}),key}),retry:false,onSuccess:({value,key:savedKey})=>client.setQueryData(savedKey,value) });
   useEffect(()=>{
     const refresh = () => { if (enabled) void client.invalidateQueries({queryKey:['family-reading']}); };
@@ -18,5 +18,5 @@ export function useFamilyReading(input: { groupId: string | null; language: Lang
     return ()=>window.removeEventListener(CLOUD_SYNC_EVENT,refresh);
   },[client,enabled]);
   const parsed = familyReadingSchema.safeParse(query.data?.result);
-  return { ...query, reading:parsed.success?parsed.data:null, status:mutation.isPending?'pending':query.data?.status, errorMessage:query.data?.error ?? (mutation.error instanceof Error ? mutation.error.message : query.error instanceof Error ? query.error.message : null), generate:()=> { if (!mutation.isPending && !query.data) mutation.mutate(); } };
+  return { ...query, reading:parsed.success?parsed.data:null, status:mutation.isPending?'pending':query.data?.status, errorMessage:query.data?.error ?? (mutation.error instanceof Error ? mutation.error.message : query.error instanceof Error ? query.error.message : null), generate:()=> { if (enabled && !query.isPending && !query.isError && !mutation.isPending && !query.data) mutation.mutate(); } };
 }
