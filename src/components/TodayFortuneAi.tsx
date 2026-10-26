@@ -45,7 +45,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
     const key = cacheKey(req);
     try {
       const cached = todayFortuneSchema.safeParse(JSON.parse(localStorage.getItem(key) ?? "null"));
-      if (cached.success && nonce === 0) { resolvedFortunes.set(key, { epoch: readingCacheEpoch(), data: cached.data }); setState({ data: cached.data, loading: false, error: null, sig }); return; }
+      if (cached.success && nonce === 0) { resolvedFortunes.set(key, { epoch: readingCacheEpoch(), data: cached.data }); setState({ data: cached.data, loading: false, error: null, sig }); void saveCloudReading(key,cached.data).catch(()=>undefined); return; }
     } catch { /* ignore */ }
     let active = true;
     const listener = (value: Partial<TodayFortune>) => { if (active) setPartial({ sig, value }); };

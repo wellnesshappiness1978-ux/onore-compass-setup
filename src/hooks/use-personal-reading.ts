@@ -32,7 +32,7 @@ export function usePersonalReading(request: Request, kind: 'full' | 'quick' = 'f
       const next = readingCacheKey(kind, localIso(new Date()), normalized, data.session?.user.id ?? 'guest');
       const schema = kind === 'full' ? cacheSchema : z.object({ catchphrase: z.string(), essence: stringMap(essenceKeys) });
       const cached = readReadingCache(next, schema);
-      if (cached) client.setQueryData([next], cached);
+      if (cached) { client.setQueryData([next], cached); void saveCloudReading(next,cached).catch(()=>undefined); }
       setIdentity({ key: next, sig });
     });
     return () => { active = false; };
