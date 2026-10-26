@@ -29,7 +29,8 @@ export async function familyReadingOperation(context: { supabase: SupabaseClient
     members = members.filter(m => group.member_ids.includes(m.id)); name = group.nickname || group.name;
   }
   if (members.length < 2) throw new Error('At least two registered profiles are required');
-  const fingerprint = familyFingerprint({ ...input, goal:owner.goal,name,members });
+  const encoded = new TextEncoder().encode(familyFingerprint({ ...input, goal:owner.goal,name,members }));
+  const fingerprint = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',encoded)),v=>v.toString(16).padStart(2,'0')).join('');
   const { data: saved, error: readError } = await supabase.from('family_readings').select('status,result,error').eq('user_id',userId).eq('fingerprint',fingerprint).maybeSingle();
   if (readError) throw readError;
   if (saved || !generate) return saved;

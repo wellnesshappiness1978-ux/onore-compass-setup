@@ -38,7 +38,7 @@ export default function BusinessFeaturePreview({ language, plan, actualPlan, sig
   const signature = JSON.stringify([focus?.owner,focus?.members,focus?.group,focus?.focus.goal]);
   const reading = useFamilyReading({groupId:focus?.group?.group.id ?? null,language,day:todayIso()},signature,eligible);
   const rc = familyReadingCopy[language];
-  const recommended = nextPlan(actualPlan);
+  const recommended = nextPlan(signedIn ? actualPlan : plan);
   return <section className="mb-6 border-y border-primary/25 py-6 text-left">
     <h3 className="font-serif text-xl text-primary">{c.title}</h3>
     {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" className="mt-4 h-auto whitespace-normal" onClick={reading.generate}>{rc.generate}</Button>}
@@ -56,7 +56,7 @@ export default function BusinessFeaturePreview({ language, plan, actualPlan, sig
           {!eligible && <p className="mb-3 text-xs text-muted-foreground">{rc.preview}</p>}
           {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" onClick={reading.generate}>{rc.generate}</Button>}
           <FamilyFeatureDetail feature={selected} language={language} plan={plan} actualPlan={actualPlan} signedIn={signedIn} previewMode={previewMode} onUpgrade={onUpgrade}/>
-        </> : <div className="py-6"><p className="mb-2 text-sm leading-7">{recommended ? teamCopy[language].planNames[recommended] : ''}</p><p className="mb-4 text-xs text-muted-foreground">{t.upgradeFamily}</p><Button onClick={() => {setSelected(null);onUpgrade();}}><Crown className="size-4"/>{t.upgrade}</Button></div>)}
+        </> : <div className="py-6"><p className="mb-2 text-sm leading-7">{recommended ? teamCopy[language].planNames[recommended] : ''}</p><Button onClick={() => {setSelected(null);onUpgrade();}}><Crown className="size-4"/>{t.upgrade}</Button></div>)}
       </DialogContent>
     </Dialog>
   </section>;

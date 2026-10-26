@@ -24,7 +24,7 @@ import { settingsTranslations, type SettingsTranslation, type PricingTier } from
 import DebugPlanSwitcher from "@/components/DebugPlanSwitcher";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
-import { memberLimit, planOrder, isUpgradePlan } from "@/lib/plans";
+import { memberLimit, planOrder, isUpgradePlan, nextPlan } from "@/lib/plans";
 import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
@@ -125,7 +125,9 @@ export default function SettingsPanel({
   const [showAllPlans, setShowAllPlans] = useState(false);
   const pd = planDetails[language];
   const hiddenLower = carouselCards.filter(c => tierOrder.indexOf(c.id as Plan) < tierOrder.indexOf(plan)).length;
-  const visibleCards = showAllPlans ? carouselCards : carouselCards.filter(c => isUpgradePlan(signedIn ? actualPlan : plan, c.id));
+  const currentMembership = signedIn ? actualPlan : plan;
+  const recommendation = nextPlan(currentMembership);
+  const visibleCards = (showAllPlans ? carouselCards : carouselCards.filter(c => isUpgradePlan(currentMembership, c.id))).slice().sort((a,b)=>Number(b.id===recommendation)-Number(a.id===recommendation));
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const onCarouselScroll = () => {
@@ -282,8 +284,8 @@ export default function SettingsPanel({
           {visibleCards.map((item) => {
             const tier = allTiers.find(tr => tr.id === item.id);
             if (!tier) return null;
-            const isVip = item.id === "vip";
-            const isCurrent = plan === item.id;
+            const isVip = item.id === recommendation;
+            const isCurrent = currentMembership === item.id;
             const price = yearly ? tier.priceYearly : tier.priceMonthly;
             const period = yearly ? t.perYear : t.perMonth;
             const CardIcon = item.id === "free" ? User : planIcon[item.id];

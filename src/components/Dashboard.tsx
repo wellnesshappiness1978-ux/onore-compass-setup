@@ -628,6 +628,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   // Visited tabs stay mounted (hidden) so returning shows loaded readings instantly without refetching.
   const [visitedTabs, setVisitedTabs] = useState<Set<Tab>>(() => new Set<Tab>(["home"]));
   useEffect(() => { setVisitedTabs(prev => prev.has(tab) ? prev : new Set(prev).add(tab)); }, [tab]);
+  useEffect(()=>{const open=()=>{setTab('settings');window.scrollTo({top:0});};window.addEventListener('onore-upgrade-plans',open);return()=>window.removeEventListener('onore-upgrade-plans',open);},[]);
   const [focusMemberId, setFocusMemberId] = useState<string | null>(null);
   const [focusGoal, setFocusGoal] = useState("");
   const [traitsLabel, setTraitsLabel] = useState(traitsNavigationLabel(language));

@@ -28,7 +28,7 @@ export function createResponsesCall(
     ...(schema ? { output: Output.object({ schema }) } : {}),
     model: provider.responses(config.model),
     // AI SDK 6 lacks `instructions`: rename this key to `system` there.
-    ...(instructions ? { system: instructions } : {}),
+    ...(instructions ? { instructions } : {}),
     messages,
     abortSignal: request.signal,
     providerOptions: {

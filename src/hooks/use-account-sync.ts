@@ -15,11 +15,12 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
     const snapshot = new Map(syncedSettingKeys.map(k => [k, localStorage.getItem(k)]));
     const changed = new Set<string>();
     const readCaches = async () => {
-      const { data,error } = await supabase.from('reading_device_cache').select('cache_key,result').eq('user_id',userId).order('updated_at',{ascending:false}).limit(16);
+      const { data,error } = await supabase.from('reading_device_cache').select('local_key,result').eq('user_id',userId).order('updated_at',{ascending:false}).limit(16);
       if (error || !active) return;
       for (const row of data ?? []) {
-        if (row.cache_key.startsWith('onore-reading:')) { writeReadingCache(row.cache_key,row.result); client.setQueryData([row.cache_key],row.result); }
-        else if (row.cache_key.startsWith('onore-today-ai:')) { localStorage.setItem(row.cache_key,JSON.stringify(row.result)); window.dispatchEvent(new StorageEvent('storage',{key:row.cache_key,newValue:JSON.stringify(row.result),storageArea:localStorage})); }
+        if (!row.local_key) continue;
+        if (row.local_key.startsWith('onore-reading:')) { writeReadingCache(row.local_key,row.result); client.setQueryData([row.local_key],row.result); }
+        else if (row.local_key.startsWith('onore-today-ai:')) { localStorage.setItem(row.local_key,JSON.stringify(row.result)); window.dispatchEvent(new StorageEvent('storage',{key:row.local_key,newValue:JSON.stringify(row.result),storageArea:localStorage})); }
       }
     };
     const readSettings = async () => {
