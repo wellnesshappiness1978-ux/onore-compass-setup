@@ -35,7 +35,7 @@ export const todayFortuneSchema = z.object({
   dynamics: z.string(),
   actions: z.array(z.string()),
   caution: z.string(),
-  luckyColor: z.object({ name: z.string(), hex: z.string(), reason: z.string() }),
+  luckyColor: z.object({ name: z.string(), hex: z.string(), reason: z.string(), usage: z.string().optional().default("") }),
   luckyWord: z.object({ word: z.string(), message: z.string() }),
   foods: z.array(z.object({
     recipeId: z.string().optional(), name: z.string(), why: z.string(), servings: z.string(),
@@ -73,7 +73,7 @@ export function normalizeFortune(f: TodayFortune, language: keyof typeof serving
 
 const HISTORY_KEY = "onore-today-ai-history";
 type HistoryEntry = { key: string; day: string; color: string; word: string; foods: string[] };
-export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string | undefined; members?: TodayFortuneRequest['members'] }) => `onore-today-ai:v7:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}:${daySeed(r.members ? fortuneFingerprint({ members: r.members, subject: { ...r.subject, kind: 'self', label: '' } }) : '', '')}`;
+export const cacheKey = (r: { subject: { key: string }; day: string; language: string; goal?: string | undefined; members?: TodayFortuneRequest['members'] }) => `onore-today-ai:v8:${r.subject.key}:${r.day}:${r.language}:${daySeed(r.goal ?? "", "")}:${daySeed(r.members ? fortuneFingerprint({ members: r.members, subject: { ...r.subject, kind: 'self', label: '' } }) : '', '')}`;
 
 /** Recent picks to avoid: same subject's colors/words, every subject's foods, last 7 days excluding today. */
 export function avoidFromHistory(history: HistoryEntry[], key: string, day: string) {
