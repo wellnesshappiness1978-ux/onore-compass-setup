@@ -8,6 +8,7 @@ import type { Language } from "@/lib/translations";
 import { defaultFocus, FOCUS_KEY, selfReadingLabel, groupDisplayName, memberDisplayName, memberToProfile, readLocalFocus, readLocalGroups, type Focus, type TeamGroup } from "@/lib/focus";
 import type { UserProfile } from "./Onboarding";
 import { SELF_MEMBER_ID } from "@/lib/group-insight";
+import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 
 export const ownerAsMember = (o: UserProfile): TeamMember => ({ id: SELF_MEMBER_ID, name: o.nameKanji || o.nameRomaji || selfReadingLabel.ja, nameKana: o.nameKana, birthDate: o.birthDate, birthTime: o.birthTime, birthTimeUnknown: o.birthTimeUnknown, birthPlace: o.birthPlace, birthCity: o.birthCity, siblingOrder: o.siblingOrder, father: o.father ?? null, mother: o.mother ?? null, gender: o.gender, bloodType: o.bloodType, role: "", skills: [] });
 
@@ -50,7 +51,8 @@ export function FocusProvider({ owner, serverBacked, children }: { owner: UserPr
     const onStorage = (e: StorageEvent) => { if (e.key === "onore-team" || e.key === "onore-groups") reload(); };
     window.addEventListener("storage", onStorage);
     window.addEventListener("onore-focus-reload", reload);
-    return () => { window.removeEventListener("storage", onStorage); window.removeEventListener("onore-focus-reload", reload); };
+    window.addEventListener(CLOUD_SYNC_EVENT, reload);
+    return () => { window.removeEventListener("storage", onStorage); window.removeEventListener("onore-focus-reload", reload); window.removeEventListener(CLOUD_SYNC_EVENT, reload); };
   }, [reload]);
   const setFocus = useCallback(async (f: Focus) => {
     setLocal(f);
@@ -60,7 +62,7 @@ export function FocusProvider({ owner, serverBacked, children }: { owner: UserPr
   const value = useMemo<Ctx>(() => {
     const member = focus.targetKind === "family" ? members.find(m => m.id === focus.targetId) ?? null : null;
     const gi = focus.targetKind === "group" ? groups.findIndex(g => g.id === focus.targetId) : -1;
-    const g = gi >= 0 ? groups[gi]! : null;
+    const g = gi >= 0 ? groups[gi] ?? null : null;
     const group = g ? { group: g, index: gi, members: [...(g.memberIds.includes(SELF_MEMBER_ID) && owner.birthDate ? [ownerAsMember(owner)] : []), ...members.filter(m => g.memberIds.includes(m.id))] } : null;
     return {
       owner, focus, setFocus, members, groups, reload, serverBacked, member, group,

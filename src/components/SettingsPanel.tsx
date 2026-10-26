@@ -24,7 +24,7 @@ import { settingsTranslations, type SettingsTranslation, type PricingTier } from
 import DebugPlanSwitcher from "@/components/DebugPlanSwitcher";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
-import { memberLimit, planOrder } from "@/lib/plans";
+import { memberLimit, planOrder, isUpgradePlan } from "@/lib/plans";
 import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
@@ -125,7 +125,7 @@ export default function SettingsPanel({
   const [showAllPlans, setShowAllPlans] = useState(false);
   const pd = planDetails[language];
   const hiddenLower = carouselCards.filter(c => tierOrder.indexOf(c.id as Plan) < tierOrder.indexOf(plan)).length;
-  const visibleCards = showAllPlans ? carouselCards : carouselCards.filter(c => tierOrder.indexOf(c.id as Plan) >= tierOrder.indexOf(plan));
+  const visibleCards = showAllPlans ? carouselCards : carouselCards.filter(c => isUpgradePlan(signedIn ? actualPlan : plan, c.id));
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const onCarouselScroll = () => {

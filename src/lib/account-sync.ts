@@ -1,0 +1,3 @@
+export const syncedSettingKeys = ['onore-design','onore-appearance-parts','onore-feature-notify','onore-notify-paused','onore-bgm-reminder-preferences','onore-relations-reminder-person','onore-relations-reminder-goal'] as const;
+export const CLOUD_SYNC_EVENT = 'onore-cloud-sync';
+export const cloudTables = ['profiles','team_members','team_groups','plan_memberships','divination_results','consultation_bookmarks','daily_usage','account_settings','family_readings'] as const;

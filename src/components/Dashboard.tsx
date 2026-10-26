@@ -43,6 +43,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { type DesignMode, type Plan } from "@/lib/design-modes";
 import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
 import { canUse, planOrder, quickCompatibilityLimit } from "@/lib/plans";
+import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 import { useDailyUsage } from "@/hooks/use-daily-usage";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
@@ -672,6 +673,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const previewPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
   const membership = useServerFn(getMyMembership);
   const checkDebugAccess = useServerFn(canManageDebugPlan);
+  useEffect(() => {
+    const refresh = () => { if (signedIn) void membership().then(setActualPlan).catch(() => undefined); };
+    window.addEventListener(CLOUD_SYNC_EVENT, refresh);
+    return () => window.removeEventListener(CLOUD_SYNC_EVENT, refresh);
+  }, [signedIn, membership]);
   useEffect(() => {
     let active = true;
     setActualPlan("free");
