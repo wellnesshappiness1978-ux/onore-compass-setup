@@ -193,13 +193,19 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const [pick, setPick] = useState("");
   const list = useServerFn(listTeamMembers);
   const wantsMembers = rank(plan) >= rank("vip");
+  const [rosterTick, setRosterTick] = useState(0);
+  useEffect(() => {
+    const onReload = () => setRosterTick((v) => v + 1);
+    window.addEventListener("onore-focus-reload", onReload);
+    return () => window.removeEventListener("onore-focus-reload", onReload);
+  }, []);
   useEffect(() => {
     let active = true;
     if (!wantsMembers) { setMembers([]); return; }
     if (signedIn) list().then((v) => { if (active) setMembers(v); }).catch(() => { if (active) setMembers([]); });
     else { try { const v = JSON.parse(localStorage.getItem("onore-team") ?? "[]"); setMembers(Array.isArray(v) ? v : []); } catch { setMembers([]); } }
     return () => { active = false; };
-  }, [wantsMembers, signedIn, list]);
+  }, [wantsMembers, signedIn, list, rosterTick]);
   const me: TeamMember = { id: "me", name: "", birthDate: birth, gender: "", bloodType: "", role: "", skills: [] };
   const target = members.find((m) => m.id === pick);
   const advice = target ? talk[relation(me, target)] : null;
