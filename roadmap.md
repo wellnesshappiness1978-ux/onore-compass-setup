@@ -1,5 +1,11 @@
 # Roadmap
 
+## Cross-device sync, sequential upgrades and durable Family readings
+- [ ] Owner-scoped realtime and focus refresh without restarting AI; synchronize account settings.
+- [ ] Prioritize the next tier without changing actual feature gates.
+- [ ] Save one six-field Family generation with database single-flight and no automatic retries.
+- [ ] Run regression tests, verify live flows and automatic build.
+
 ## Family registration and explicit editor entry (2026-10-26)
 - [x] Separate registration capacity from Family analysis and display preview; show actual registration plan with existing 0/3/10/30/100 caps.
 - [x] Explicit registration button and idempotent editor opening return to roster from every analysis tab; close editor on save and tab departure.

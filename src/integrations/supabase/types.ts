@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          user_id: string
+          value: string | null
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          user_id: string
+          value?: string | null
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          user_id?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
       consultation_bookmarks: {
         Row: {
           content: string
@@ -91,6 +112,36 @@ export type Database = {
           methodology?: string
           profile_version?: string
           result?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      family_readings: {
+        Row: {
+          created_at: string
+          error: string | null
+          fingerprint: string
+          result: Json | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          fingerprint: string
+          result?: Json | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          fingerprint?: string
+          result?: Json | null
+          status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
