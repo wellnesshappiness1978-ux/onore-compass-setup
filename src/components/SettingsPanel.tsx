@@ -190,28 +190,6 @@ export default function SettingsPanel({
             </span>
           </div>
         </div>
-        {devOverrideEnabled && <div className="mt-4 border-t border-primary/10 pt-3">
-          <p className="mb-2 text-xs text-muted-foreground">{t.planTest}</p>
-          <div className="grid grid-cols-3 gap-2 md:grid-cols-3 xl:grid-cols-5" role="radiogroup" aria-label={t.planTest}>
-            {planOrder.map((p) => (
-              <Button
-                key={p}
-                role="radio"
-                aria-checked={plan === p}
-                variant="outline"
-                size="sm"
-                disabled={!devOverrideEnabled && planOrder.indexOf(p) > planOrder.indexOf(actualPlan)}
-                onClick={() => onPlanChange(p)}
-                className={`h-auto min-h-10 min-w-0 whitespace-normal px-1 py-2 text-[10px] leading-relaxed ${plan === p ? "border-primary bg-primary/15 text-primary" : "border-primary/20 bg-transparent"}`}
-              >
-                {appearanceCopy.plans[p]}
-              </Button>
-            ))}
-          </div>
-          {devOverrideEnabled
-            ? <p className="mt-2 text-[11px] text-primary">{previewModeNote[language]}</p>
-            : <p className="mt-2 text-[11px] text-muted-foreground">{t.planTestNote}</p>}
-        </div>}
       </section>
 
       <FocusSettingsCard language={language} />
@@ -356,13 +334,6 @@ export default function SettingsPanel({
           <PenLine className="size-4 text-primary" /> {t.editBirth}
         </Button>
 
-        <div className="mt-5 border-t border-primary/20 pt-4">
-          <h4 className="mb-3 font-serif text-base text-primary">{fontCopy.title}</h4>
-          <div role="radiogroup" aria-label={fontCopy.title} className="grid grid-cols-3 gap-2">
-            {fontSizes.map(size => <Button key={size} role="radio" aria-checked={font.size === size} variant={font.size === size ? 'default' : 'outline'} onClick={() => font.select(size)} className="h-auto min-h-12 min-w-0 whitespace-normal px-2 py-2 text-xs leading-relaxed">{fontCopy.labels[size]}</Button>)}
-          </div>
-        </div>
-        <ReminderMasterSwitch language={language} />
         {notice && (
           <p role="status" className="mt-2 text-xs text-muted-foreground">
             {notice}: {t.soon}
@@ -373,6 +344,13 @@ export default function SettingsPanel({
         <TodayReminders kind="bgm" language={language} plan={plan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} />
         <DailyRelationshipGuide language={language} plan={plan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} />
       </div>
+      <section className="border-t border-primary/20 pt-4" data-settings-font-size>
+        <h4 className="mb-3 font-serif text-base text-primary">{fontCopy.title}</h4>
+        <div role="radiogroup" aria-label={fontCopy.title} className="grid grid-cols-3 gap-2">
+          {fontSizes.map(size => <Button key={size} role="radio" aria-checked={font.size === size} variant={font.size === size ? 'default' : 'outline'} onClick={() => font.select(size)} className="h-auto min-h-12 min-w-0 whitespace-normal px-2 py-2 text-xs leading-relaxed">{fontCopy.labels[size]}</Button>)}
+        </div>
+      </section>
+      <div data-settings-pause><ReminderMasterSwitch language={language} /></div>
       <Dialog open={lockedMode !== null} onOpenChange={(open) => { if (!open) setLockedMode(null); }}>
         <DialogContent className="theme-preview-dialog flex h-[min(92dvh,900px)] w-[min(100vw,760px)] max-w-none flex-col gap-0 overflow-hidden border-primary/30 bg-card p-0 text-foreground">
           {lockedTheme && <>

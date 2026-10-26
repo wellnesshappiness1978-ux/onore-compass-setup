@@ -64,7 +64,7 @@ import { groupBirthPalette } from "@/lib/group-palette";
 import type { ArtSubject } from "./NineStarsPanel";
 import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, GroupFocusCard, GroupMembersToday, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
 import { focusCopy, goalText, groupDisplayName, memberDisplayName, memberToProfile } from "@/lib/focus";
-import { savedPartner, savedGroupMembers } from "@/lib/saved-compatibility";
+import { savedPartner, savedGroupMembers, splitGroupReading } from "@/lib/saved-compatibility";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
@@ -178,7 +178,7 @@ function TorisetsuPanel({
   const members = focusContext?.members.length ? focusContext.members : fetchedMembers;
   const groups = focusContext?.groups ?? [];
   const ux = consultationUxCopy[language];
-  const [groupResults, setGroupResults] = useState<{ name: string; reading: NonNullable<ReturnType<typeof analyzeCompatibility>> }[]>([]);
+  const [groupResults, setGroupResults] = useState<{ id: string; name: string; reading: NonNullable<ReturnType<typeof analyzeCompatibility>> }[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const listMembers = useServerFn(listTeamMembers);
   useEffect(() => {
@@ -212,14 +212,15 @@ function TorisetsuPanel({
   const rhythmPartner = partnerSchema.safeParse(partnerInput).success ? Math.round(personal(partnerDate, todayDate).total) : null;
   useEffect(() => { if (entryMode === "manual") setAnalyzed(false); }, [partnerName, partnerKana, partnerGender, partnerDate, partnerTime, partnerTimeUnknown, partnerPlace, partnerCity, partnerBlood, partnerSibling, relation, readingTheme, concern, profile, language, entryMode]);
 
-  const runAnalysis = async (inputs: { name: string; input: PartnerInput }[], saved = false, group = false) => {
+  const runAnalysis = async (inputs: { id?: string; name: string; input: PartnerInput; relationshipType?: string }[], saved = false, group = false) => {
     if (analyzing || !inputs.length) return;
     if (remaining <= 0) { setLimitOpen(true); return; }
     setAnalyzing(true);
     try {
-      const readings = inputs.flatMap(item => {
-        const reading = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, item.input, language, { relationship: saved ? kindFromRelationshipType(pickedMember?.relationshipType ?? "") : relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern });
-        return reading ? [{ name: item.name, reading }] : [];
+      const readings = inputs.flatMap((item, index) => {
+        const relationshipType = group ? item.relationshipType ?? "" : pickedMember?.relationshipType ?? "";
+        const reading = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, item.input, language, { relationship: saved ? kindFromRelationshipType(relationshipType) : relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern });
+        return reading ? [{ id: item.id ?? `${index}`, name: item.name, reading }] : [];
       });
       if (!readings.length) return;
       if (!(await usage.consume())) { setLimitOpen(true); return; }
@@ -341,7 +342,7 @@ function TorisetsuPanel({
                             } else {
                               setPickedId(event.target.value);
                               const g = groups.find(x => `group:${x.id}` === event.target.value);
-                              if (g) void runAnalysis(savedGroupMembers(g, focusContext?.members ?? members).map(member => ({ name: memberDisplayName(member), input: savedPartner(member) })), true, true);
+                              if (g) void runAnalysis(savedGroupMembers(g, focusContext?.members ?? [], fetchedMembers, members).map(member => ({ id: member.id, name: memberDisplayName(member), input: savedPartner(member), relationshipType: member.relationshipType ?? "" })), true, true);
                             }
                           }}
                         >
@@ -497,7 +498,23 @@ function TorisetsuPanel({
             </div>
           </section>
            {remaining <= 0 && !analyzed && <div role="status" className="mt-3 text-center"><p className="text-sm text-primary">{q.refresh}</p>{plan !== "b2b-premium" && <Button type="button" variant="champagne" onClick={onVip} className="mt-3 text-xs">{q.limit} →</Button>}</div>}
-          {analyzed && groupResults.length > 0 && <section aria-live="polite" className="mt-6 space-y-4"><h3 className="font-serif text-xl text-primary">{ux.compatibility} · {ux.groups}</h3>{groupResults.map(item => <article key={item.name} className="rounded-lg border border-primary/25 p-4"><h4 className="font-semibold text-primary">{item.name} · {item.reading.score}%</h4><p className="mt-2 text-sm leading-7">{item.reading.sentences[0]}</p>{planOrder.indexOf(plan) >= planOrder.indexOf("vip") && <p className="mt-3 text-sm leading-7">{item.reading.sentences[2]}</p>}<p className="mt-3 text-xs text-muted-foreground">{item.reading.note}</p></article>)}</section>}
+          {analyzed && groupResults.length > 0 && (() => {
+            const ownerText = splitGroupReading(groupResults[0]!.reading.sentences[0]).owner;
+            const ja = language === "ja";
+            return <section aria-live="polite" className="mt-6 space-y-4">
+              <h3 className="font-serif text-xl text-primary">{ux.compatibility} · {ux.groups} ({groupResults.length})</h3>
+              <article className="rounded-lg border border-primary/50 bg-primary/5 p-4">
+                <h4 className="font-semibold text-primary">{ja ? "主対象者のエネルギー特性・共通基盤" : "Main subject · shared foundation"}</h4>
+                <p className="mt-2 whitespace-pre-line text-sm leading-7">{ownerText}</p>
+              </article>
+              {groupResults.map(item => { const pair = splitGroupReading(item.reading.sentences[0]).pair; return <article key={item.id} className="rounded-lg border border-primary/25 p-4">
+                <h4 className="font-semibold text-primary">{item.name} · {item.reading.score}%</h4>
+                {pair ? <p className="mt-2 whitespace-pre-line text-sm leading-7">{pair}</p> : <p className="mt-2 text-sm leading-7">{item.reading.elementPair}</p>}
+              </article>; })}
+              {planOrder.indexOf(plan) >= planOrder.indexOf("vip") && <p className="whitespace-pre-line text-sm leading-7">{groupResults[0]!.reading.sentences[2]}</p>}
+              <p className="text-xs text-muted-foreground">{groupResults[0]!.reading.note}</p>
+            </section>;
+          })()}
           {analyzed && result && groupResults.length === 0 ? (
             <section className="py-8" aria-live="polite">
               {partnerName ? (

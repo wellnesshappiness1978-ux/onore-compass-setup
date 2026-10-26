@@ -1495,3 +1495,13 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 [data-radix-scroll-area-viewport], .overflow-y-auto { overscroll-behavior-y: auto; touch-action: pan-y pinch-zoom; }
 [role="dialog"] .overflow-y-auto, [role="dialog"].overflow-y-auto { overscroll-behavior-y: contain; }
 .overflow-x-auto { touch-action: pan-x pan-y pinch-zoom; }
+
+/* Locked (plan-gated) controls: dimmed and desaturated so they read as unavailable at a glance. */
+:is(button, a, [role="tab"], [role="menuitem"], [role="option"], [role="radio"]):has(svg.lucide-lock, svg.lucide-lock-keyhole),
+[data-locked="true"] {
+  opacity: 0.6;
+  filter: grayscale(0.45);
+  transition: opacity 0.2s, filter 0.2s;
+}
+:is(button, a, [role="tab"], [role="menuitem"], [role="option"], [role="radio"]):has(svg.lucide-lock, svg.lucide-lock-keyhole):hover,
+[data-locked="true"]:hover { opacity: 0.8; }

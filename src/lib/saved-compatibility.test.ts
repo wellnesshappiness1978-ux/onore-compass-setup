@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { savedPartner, savedGroupMembers } from './saved-compatibility';
+import { savedPartner, savedGroupMembers, splitGroupReading } from './saved-compatibility';
 import type { TeamMember } from './team-analysis';
 const member: TeamMember = { id: 'one', name: '山田 花子', birthDate: '1990-03-12', gender: 'female', bloodType: 'A', role: '', skills: [], birthTime: '08:45:00', birthTimeUnknown: false, birthPlace: '東京都', birthCity: '渋谷区', nameKana: 'やまだ はなこ', siblingOrder: 'first' };
 describe('saved compatibility targets', () => {
@@ -19,4 +19,16 @@ describe('saved compatibility targets', () => {
     const other = { ...member, id: 'two', birthDate: '1981-11-04' };
     expect(savedGroupMembers({ id: 'group', name: '家族', nickname: '', memberIds: ['two'] }, [member, other])).toEqual([other]);
   });
+  it('includes every group member across roster sources, once, excluding the owner', () => {
+    const a = { ...member, id: 'a' }, b = { ...member, id: 'b' }, c = { ...member, id: 'c' };
+    const g = { id: 'g', name: 'G', nickname: '', memberIds: ['00000000-0000-0000-0000-000000000000', 'a', 'b', 'c', 'a'] };
+    expect(savedGroupMembers(g, [a, b], [b, c]).map(m => m.id)).toEqual(['a', 'b', 'c']);
+  });
+  it('shows owner traits once and keeps member text pair-specific', () => {
+    const s = splitGroupReading('あなたは、熱意が魅力です。お相手は、丁寧さが魅力です。\n\n二人は近い。');
+    expect(s.owner).toBe('あなたは、熱意が魅力です。');
+    expect(s.pair).not.toContain('あなたは');
+    expect(s.pair).toContain('二人は近い。');
+  });
+
 });
