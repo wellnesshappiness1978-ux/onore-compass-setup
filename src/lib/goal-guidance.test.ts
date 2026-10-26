@@ -5,6 +5,7 @@ import { birthColorNameForHex } from "./birth-color-spectrum";
 
 describe("goal guidance", () => {
   it("maps Japanese preset 仕事 to business/career", () => { expect(goalThemes("仕事")).toEqual(["work"]); expect(goalDirective("仕事")).toContain("business and career"); });
+  it("preserves the legacy saved Family goal without changing free text",()=>{expect(goalThemes('\u5bb6\u65cf / 秋までに転職')).toEqual(['family']);expect(goalDirective('\u5bb6\u65cf / 秋までに転職')).toContain('秋までに転職');});
   it("maps 恋愛 to partnership", () => expect(goalDirective("恋愛")).toContain("partnership"));
   it("maps お金 to financial fortune", () => expect(goalDirective("お金 / 貯金したい")).toContain("financial fortune"));
   it("keeps free text faithfully", () => { const d = goalDirective("ファミリー / 秋までに転職"); expect(d).toContain("family harmony"); expect(d).toContain("秋までに転職"); });

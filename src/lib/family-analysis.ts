@@ -14,7 +14,7 @@ export function analyzeFamily(members: TeamMember[], day: string) {
     const profile = memberToProfile(member);
     const core = computeCoreLayers(profile, new Date(`${day}T12:00:00Z`));
     const colors = birthColorSpectrum(profile);
-    const earth = helioPhase(profile.birthDate);
+    const earth = helioPhase(profile.birthDate, new Date(`${day}T12:00:00Z`));
     const nineStars = nineStarProfile(profile.birthDate,profile.birthTime,profile.birthTimeUnknown,profile.gender);
     const extended = computeExtendedArts(profile.birthDate,profile.birthTime,profile.birthTimeUnknown);
     const availability = approachStatuses({core:Boolean(core),earth:Boolean(earth),nineStars:Boolean(nineStars),color:Boolean(colors),blood:Boolean(profile.bloodType),name:Boolean(core?.name),siblings:Boolean(profile.siblingOrder),region:Boolean(profile.birthPlace || profile.birthCity)});
