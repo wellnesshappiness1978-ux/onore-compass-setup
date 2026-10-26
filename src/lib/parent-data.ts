@@ -16,7 +16,7 @@ export function validParent(value: unknown): ParentBirth | null {
   return parentBirthSchema.parse(value);
 }
 export const optionalParentSchema = parentBirthSchema.nullable().optional();
-export function parentsToRow(value: { father?: ParentBirth | null; mother?: ParentBirth | null }) {
+export function parentsToRow(value: { father?: ParentBirth | null | undefined; mother?: ParentBirth | null | undefined }) {
   return value.father || value.mother ? { father: value.father ?? null, mother: value.mother ?? null } : null;
 }
 export function parentsFromRow(value: unknown) {

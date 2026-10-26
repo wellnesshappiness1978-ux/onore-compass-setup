@@ -20,6 +20,7 @@ export default function FamilyFeatureDetail({ feature, language, plan, actualPla
   const c = familyFeatureCopy[language], t = teamCopy[language], g = groupInsightCopy[language];
   const members = useMemo(() => focus?.group ? focus.group.members : focus ? [ownerAsMember(focus.owner), ...focus.members] : [], [focus?.group, focus?.owner, focus?.members]);
   const data = useMemo(() => analyzeFamily(members, todayIso()), [members]);
+  const palette = data.palette;
   if (!focus || members.length < 2) return <p className="py-6 text-sm text-muted-foreground">{c.empty}</p>;
   const name = (m: typeof members[number]) => memberDisplayName(m);
   const personRows = data.entries.map(e => <article key={e.member.id} className="min-w-0 border-b border-primary/20 py-4">
@@ -57,7 +58,7 @@ export default function FamilyFeatureDetail({ feature, language, plan, actualPla
     {feature === "consult" && <ConsultationPanel profile={focus.owner} language={language} plan={plan} actualPlan={actualPlan} signedIn={signedIn} previewMode={previewMode} goal={focus.focus.goal} onVip={onUpgrade} groupSubject={{id:"family-live",name:focus.label(language),nickname:"",memberIds:members.map(m=>m.id)}} />}
     {feature === "colors" && <>
       <p className="mb-4 text-sm leading-7">{c.color}</p>
-      {data.palette && <div className="mb-4 flex gap-2" aria-label={c.titles[5]}>{groupPaletteRoles.map(role=><span key={role} className="aspect-square min-w-0 flex-1 rounded-full border border-primary/30" style={{backgroundColor:data.palette?.[role].code}} title={localizeBirthColorName(data.palette[role].name,language)}/>)}</div>}
+      {palette && <div className="mb-4 flex gap-2" aria-label={c.titles[5]}>{groupPaletteRoles.map(role=><span key={role} className="aspect-square min-w-0 flex-1 rounded-full border border-primary/30" style={{backgroundColor:palette[role].code}} title={localizeBirthColorName(palette[role].name,language)}/>)}</div>}
       {data.entries.map(e=>{ const hex=e.colors?.main.code; if(!hex)return null; const meaning=groupColorMeaning(hex,language); return <article key={e.member.id} className="border-b border-primary/20 py-4"><h4 className="flex items-center gap-3 font-semibold text-primary"><span className="size-6 shrink-0 rounded-full border border-primary/30" style={{backgroundColor:hex}}/>{name(e.member)} · {localizeBirthColorName(birthColorNameForHex(hex),language)}</h4><p className="mt-2 text-sm leading-7">{meaning.essence}</p><p className="mt-2 text-sm leading-7">{meaning.role}</p><p className="mt-2 text-sm leading-7">{meaning.advice}</p></article>;})}
     </>}
     <p className="mt-5 text-xs leading-6 text-muted-foreground">{c.note}</p>
