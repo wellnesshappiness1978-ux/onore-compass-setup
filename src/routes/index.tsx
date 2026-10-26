@@ -12,6 +12,7 @@ import { readMyProfile, saveMyProfile } from "@/lib/profile-storage.functions";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { clearReadingCaches } from "@/lib/reading-cache";
 import { type Language } from "@/lib/translations";
+import { useAccountSync } from '@/hooks/use-account-sync';
 
 const pageTitles: Record<Language, string> = { ja: "アゴルメンの羅針盤 | 自分を知る・今日を整える", en: "Agolmen's Compass | Know yourself, shape today", "zh-CN": "阿戈尔曼罗盘｜认识自己，调整今天", "zh-TW": "阿戈爾曼羅盤｜認識自己，調整今天", ko: "아골멘의 나침반 | 나를 알고 오늘을 정돈하다", es: "La brújula de Agolmen | Conócete y orienta tu día", fr: "La boussole d’Agolmen | Se connaître et orienter sa journée" };
 
@@ -49,6 +50,7 @@ function Index() {
   const [editing, setEditing] = useState(false);
   const [language, setLanguage] = useState<Language>("ja");
   useEffect(() => { const stored = localStorage.getItem("onore-language"); if (stored && ["ja","en","zh-TW","zh-CN","ko","es","fr"].includes(stored)) { setLanguage(stored as Language); document.documentElement.lang = stored; } }, []);
+  useEffect(()=>{const sync=(event:StorageEvent)=>{if(event.key==='onore-language' && event.newValue && ['ja','en','zh-TW','zh-CN','ko','es','fr'].includes(event.newValue))setLanguage(event.newValue as Language);};window.addEventListener('storage',sync);return()=>window.removeEventListener('storage',sync);},[]);
   const initialLanguageRender = useRef(true);
   useEffect(() => {
     if (initialLanguageRender.current) { initialLanguageRender.current = false; return; }
@@ -66,6 +68,16 @@ function Index() {
   const read = useServerFn(readMyProfile);
   const save = useServerFn(saveMyProfile);
   const copy = profileStorageCopy[language];
+  useAccountSync(userId, async () => {
+    const owner = loadedUser.current;
+    if (!owner) return;
+    try {
+      const saved = await read();
+      if (loadedUser.current !== owner) return;
+      writeLocal(saved as UserProfile | null);
+      setProfile(current => JSON.stringify(current) === JSON.stringify(saved) ? current : saved as UserProfile | null);
+    } catch { /* Retain the last successful profile while offline. */ }
+  });
 
   useEffect(() => {
     let active = true;

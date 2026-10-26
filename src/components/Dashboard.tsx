@@ -43,6 +43,7 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { type DesignMode, type Plan } from "@/lib/design-modes";
 import { canManageDebugPlan, getMyMembership } from "@/lib/membership.functions";
 import { canUse, planOrder, quickCompatibilityLimit } from "@/lib/plans";
+import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 import { useDailyUsage } from "@/hooks/use-daily-usage";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
@@ -627,6 +628,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   // Visited tabs stay mounted (hidden) so returning shows loaded readings instantly without refetching.
   const [visitedTabs, setVisitedTabs] = useState<Set<Tab>>(() => new Set<Tab>(["home"]));
   useEffect(() => { setVisitedTabs(prev => prev.has(tab) ? prev : new Set(prev).add(tab)); }, [tab]);
+  useEffect(()=>{window.dispatchEvent(new Event('onore-account-refresh'));},[tab]);
+  useEffect(()=>{const open=()=>{setTab('settings');window.scrollTo({top:0});};window.addEventListener('onore-upgrade-plans',open);return()=>window.removeEventListener('onore-upgrade-plans',open);},[]);
   const [focusMemberId, setFocusMemberId] = useState<string | null>(null);
   const [focusGoal, setFocusGoal] = useState("");
   const [traitsLabel, setTraitsLabel] = useState(traitsNavigationLabel(language));
@@ -672,6 +675,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const previewPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
   const membership = useServerFn(getMyMembership);
   const checkDebugAccess = useServerFn(canManageDebugPlan);
+  useEffect(() => {
+    const refresh = () => { if (signedIn) void membership().then(setActualPlan).catch(() => undefined); };
+    window.addEventListener(CLOUD_SYNC_EVENT, refresh);
+    return () => window.removeEventListener(CLOUD_SYNC_EVENT, refresh);
+  }, [signedIn, membership]);
   useEffect(() => {
     let active = true;
     setActualPlan("free");
@@ -871,7 +879,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 profile={profile}
                 language={language}
                 plan={previewPlan}
-                actualPlan={actualPlan}
+                actualPlan={serverPlan}
                 debugAllowed={debugAllowed}
                 devOverrideEnabled={devOverrideEnabled}
                 onDebugPlanChanged={(p) => setActualPlan(p)}

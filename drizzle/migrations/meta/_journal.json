@@ -148,6 +148,27 @@
       "when": 1792935433064,
       "tag": "0020_relax_sibling_order",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793000232751,
+      "tag": "0021_private_sync_family_readings",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793000389007,
+      "tag": "0022_owner_reading_device_cache",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793000503876,
+      "tag": "0023_reading_cache_local_identity",
+      "breakpoints": true
     }
   ]
 }

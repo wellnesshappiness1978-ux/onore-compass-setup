@@ -1,0 +1,11 @@
+CREATE TABLE public.account_settings (user_id uuid NOT NULL, key text NOT NULL, value text, updated_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(user_id,key));
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.account_settings TO authenticated;
+GRANT ALL ON public.account_settings TO service_role;
+ALTER TABLE public.account_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Own account settings" ON public.account_settings FOR ALL TO authenticated USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+CREATE TABLE public.family_readings (user_id uuid NOT NULL, fingerprint text NOT NULL, status text NOT NULL DEFAULT 'pending', result jsonb, error text, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(user_id,fingerprint));
+GRANT SELECT ON public.family_readings TO authenticated;
+GRANT ALL ON public.family_readings TO service_role;
+ALTER TABLE public.family_readings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Own saved family readings" ON public.family_readings FOR SELECT TO authenticated USING (user_id = auth.uid());
+DO $$ DECLARE t text; BEGIN FOREACH t IN ARRAY ARRAY['profiles','team_members','team_groups','plan_memberships','divination_results','consultation_bookmarks','daily_usage','account_settings','family_readings'] LOOP IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND schemaname='public' AND tablename=t) THEN EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE public.%I',t); END IF; END LOOP; END $$;
