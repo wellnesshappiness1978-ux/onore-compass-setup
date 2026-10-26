@@ -58,12 +58,11 @@ import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
 import TodayReminders, { DailyReminderCatalogue } from "./TodayReminders";
-import DailyRelationshipGuide from './DailyRelationshipGuide';
 import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
 import { groupBirthPalette } from "@/lib/group-palette";
 import type { ArtSubject } from "./NineStarsPanel";
-import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, FocusSettingsCard, GroupFocusCard, GroupMembersToday, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
+import { ArtOwnerOnlyNotice, FamilyGroupButtons, SubjectHeaderBadge, GroupFocusCard, GroupMembersToday, SubjectDailyNote, SubjectVoice } from "./FocusPanels";
 import { focusCopy, goalText, groupDisplayName, memberDisplayName, memberToProfile } from "@/lib/focus";
 import { savedPartner, savedGroupMembers } from "@/lib/saved-compatibility";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
@@ -825,7 +824,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         {(visitedTabs.has("home") || tab === "home") && <div hidden={tab !== "home"}><ArtsGuide language={language} /></div>}
         {(["traits", "today", "consult", "business", "art", "settings"] as const).filter(id => visitedTabs.has(id) || tab === id).map(id => (
           <section key={id} hidden={tab !== id} className="tab-content animate-in fade-in slide-in-from-bottom-1 duration-300 mx-auto min-w-0 max-w-3xl pt-3 md:pt-10">
-            <div className="tab-heading mb-4 text-center md:mb-8">
+            <div hidden={id === "settings"} className="tab-heading mb-4 text-center md:mb-8">
               <NautilusIcon className="mx-auto hidden size-12 text-primary md:block" />
               <h2 className="mt-1 font-serif text-2xl text-gradient-gold md:mt-3">
                 {navigation.find((n) => n.id === id)?.label}
@@ -875,7 +874,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
             ) : id === "art" ? (
               <><ArtOwnerOnlyNotice language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /><FocusedArt language={language} owner={profile} plan={previewPlan} render={(p, subject) => <NineStarsPanel key={subject?.key ?? "self"} subject={subject} language={language} profile={p} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} />} /></>
             ) : id === "settings" ? (
-              <><FocusSettingsCard language={language} /><div className="mt-4 space-y-4"><TodayReminders kind="bgm" language={language} plan={previewPlan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} /><DailyRelationshipGuide language={language} plan={previewPlan} onUpgrade={() => document.getElementById('membership-plans')?.scrollIntoView({ behavior: 'smooth' })} /></div><div className="h-6" /><SettingsPanel
+              <><SettingsPanel
                 profile={profile}
                 language={language}
                 plan={previewPlan}

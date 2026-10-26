@@ -33,17 +33,28 @@ export type Course = 'main' | 'soup' | 'drink' | 'side' | 'dessert';
 /** Slot order matches luckyFoodLimit (1 / 3 / 5). */
 export const COURSE_ORDER: Course[] = ['main', 'soup', 'drink', 'side', 'dessert'];
 export const COURSE_RECIPES: Record<Course, string[]> = {"main": ["lemon-chicken", "tomato-egg", "stuffed-pepper", "champuru", "nikujaga", "yellowtail-daikon", "whitefish", "pork-daikon", "salmon-foil", "salmon-cabbage-foil"], "soup": ["komatsuna-miso", "pork-soup", "napa-tofu", "wakame-miso", "clam-miso", "napa-mushroom"], "side": ["spinach-tuna", "sesame-broccoli", "cucumber-pickle", "carrot-egg", "pumpkin", "sweet-rice", "corn-fritters", "lotus", "hijiki-beans", "nameko-daikon", "broccoli-tofu", "pepper-carrot"], "drink": ["matcha-latte", "mint-lemon-water", "hibiscus-tea", "hojicha-latte", "yuzu-ginger", "blueberry-smoothie"], "dessert": ["strawberry-yogurt", "pumpkin-sweetpotato", "matcha-warabimochi", "apple-compote", "kinako-shiratama", "peach-jelly", "sesame-pudding"]};
-export const recipeCourse = (id: string | undefined): Course | undefined => COURSE_ORDER.find(c => id && COURSE_RECIPES[c].includes(id));
+/** Dessert needs a sweet method and no savory stock/protein/seasonings, not merely a bucket tag. */
+export function isSweetDessert(recipe: Recipe) {
+  return ['dessert', 'yogurt'].includes(recipe.method) && !recipe.ingredients.some(i => ['dashi', 'soy', 'miso', 'ponzu', 'chicken', 'pork', 'beef', 'mince', 'tuna', 'salmon', 'whitefish', 'yellowtail', 'clams', 'rice'].includes(i.id));
+}
+export const recipeCourse = (id: string | undefined): Course | undefined => {
+  const recipe = luckyRecipes.find(r => r.id === id);
+  if (!recipe) return undefined;
+  return COURSE_ORDER.find(c => COURSE_RECIPES[c].includes(recipe.id) && (c !== 'dessert' || isSweetDessert(recipe)));
+};
 export const courseLabels: Record<Language, Record<Course, string>> = {"ja": {"main": "開運メインディッシュ", "soup": "開運汁物", "drink": "開運ドリンク", "side": "開運副菜", "dessert": "開運デザート"}, "en": {"main": "Lucky main dish", "soup": "Lucky soup", "drink": "Lucky drink", "side": "Lucky side dish", "dessert": "Lucky dessert"}, "zh-CN": {"main": "开运主菜", "soup": "开运汤品", "drink": "开运饮品", "side": "开运配菜", "dessert": "开运甜点"}, "zh-TW": {"main": "開運主菜", "soup": "開運湯品", "drink": "開運飲品", "side": "開運配菜", "dessert": "開運甜點"}, "ko": {"main": "행운의 메인 요리", "soup": "행운의 국물 요리", "drink": "행운의 음료", "side": "행운의 반찬", "dessert": "행운의 디저트"}, "es": {"main": "Plato principal de la suerte", "soup": "Sopa de la suerte", "drink": "Bebida de la suerte", "side": "Guarnición de la suerte", "dessert": "Postre de la suerte"}, "fr": {"main": "Plat principal porte-bonheur", "soup": "Soupe porte-bonheur", "drink": "Boisson porte-bonheur", "side": "Accompagnement porte-bonheur", "dessert": "Dessert porte-bonheur"}};
 
 // ── Seasonal & biorhythm repertoire ──
 Object.assign(ingredients, seasonalIngredients);
 for (const x of seasonalRecipes) { luckyRecipes.push({ id: x.id, element: x.element, season: x.season, rhythm: x.rhythm, names: x.names, ingredients: x.ingredients, method: x.method }); COURSE_RECIPES[x.course].push(x.id); }
+// The pumpkin/soy-stock stew is a side, not a sweet-potato dessert. Preserve its ID/photo.
+COURSE_RECIPES.dessert = COURSE_RECIPES.dessert.filter(id => id !== 'pumpkin-sweetpotato');
+COURSE_RECIPES.side.push('pumpkin-sweetpotato');
 const ELEMENTS: Element[] = ['wood', 'fire', 'earth', 'metal', 'water'];
 const dayIndex = (day: string) => { const t = Date.parse(`${day}T00:00:00Z`); return Number.isFinite(t) ? Math.floor(t / 86400000) : 0; };
 /** Daily candidates for one course: in-season dishes (matching the biorhythm when known) on alternating days, evergreen plus in-season dishes otherwise. */
 export function courseCandidates(course: Course, element: Element, day = '', birthDate?: string) {
-  const all = COURSE_RECIPES[course].map(id => luckyRecipes.find(r => r.id === id)!).filter(Boolean);
+  const all = luckyRecipes.filter(r => recipeCourse(r.id) === course);
   if (!day) return all;
   const season = seasonOf(day), rhythm = rhythmOf(birthDate, day);
   const seasonal = all.filter(r => r.season === season);

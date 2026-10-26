@@ -9,6 +9,15 @@ it('every recipe has its own exact image identity, independent of order', () => 
   expect(recipeImage('strawberry-yogurt')).toContain('dish-strawberry-yogurt');
   expect(recipeImage('unknown')).toBeUndefined();
 });
+it('rejects a savory stew substituted for the dessert in AI output', () => {
+  const foods = ['lemon-chicken', 'komatsuna-miso', 'matcha-latte', 'spinach-tuna', 'pumpkin-sweetpotato'].map(recipeId => ({ recipeId, name: 'dish' }));
+  expect(() => validateRecipeIdentities(foods, 'ja')).toThrow('One recipe per course required');
+});
+it('recognizes seasonal dessert identity even in unordered model output', () => {
+  const foods = ['mango-pudding', 'spinach-tuna', 'matcha-latte', 'komatsuna-miso', 'lemon-chicken'].map(recipeId => ({ recipeId, name: 'dish' }));
+  expect(validateRecipeIdentities(foods, 'ja').map(f => recipeCourse(f.recipeId))).toEqual(COURSE_ORDER);
+  expect(validateRecipeIdentities(foods, 'ja')[4]?.recipeId).toBe('mango-pudding');
+});
 it('canonicalizes the exact five menus in all seven languages', () => {
   for (const lang of ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'es', 'fr'] as const) {
     const picks = COURSE_ORDER.map(c => luckyRecipes.find(r => recipeCourse(r.id) === c)!);

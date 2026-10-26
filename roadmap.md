@@ -1,5 +1,11 @@
 # Roadmap
 
+## Header/settings layout and dessert identity (2026-10-26)
+- [x] Single-row desktop navigation; mobile two-row readability preserved.
+- [x] Top-left settings title, equal profile/focus columns, BGM/caution/relationship reminders below account settings.
+- [x] Savory pumpkin stew reclassified as side; strict dessert candidate filter, identity-based labels and local legacy-cache repair without extra generation; AI prompt/catalogue narrowed.
+- [x] 374 tests across 82 files passed, automatic build OK; signed-in 1280/768/390/320px layout and reminder order checked without overflow/page errors; saved dessert opened as strawberry yogurt with its exact photo. Fresh full AI generation not separately exercised.
+
 ## Inclusive Family catalogue, map and planning tools (2026-10-26)
 - [x] Japanese app copy uses inclusive ファミリー wording; shared AI voice/context applies the same convention, legacy saved goal still resolves without changing free text.
 - [x] Six-feature v2 contract preserves the private atomic pending lock, no automatic generation/retry, completion polling and owner/input-scoped bounded device restoration with sign-out clearing.

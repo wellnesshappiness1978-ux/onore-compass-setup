@@ -44,7 +44,7 @@ export function FocusSettingsCard({ language }: { language: Language }) {
   const set = (patch: Partial<typeof f>) => setDraft({ ...f, ...patch });
   const kinds: TargetKind[] = ["self", "family", "group"];
   return (
-    <details id="focus-settings" className="group mx-auto w-full max-w-2xl scroll-mt-28 rounded-lg border border-destructive bg-card/60" aria-label={t.cardTitle}>
+    <details id="focus-settings" className="group min-w-0 w-full scroll-mt-28 rounded-lg border border-destructive bg-card/60" aria-label={t.cardTitle}>
       <summary className="grid min-h-12 cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-3 py-3 sm:px-4 [&::-webkit-details-marker]:hidden">
         <span className="flex min-w-0 items-start gap-2 font-serif text-[0.95rem] leading-snug text-primary sm:items-center sm:text-lg"><Target className="mt-0.5 size-5 shrink-0 sm:mt-0" /><span className="min-w-0 [overflow-wrap:anywhere]"><span className="mb-1 block w-fit rounded-sm bg-destructive px-2 py-0.5 font-sans text-[11px] font-bold text-destructive-foreground">{birthAddressCopy[language].important}</span>{t.cardTitle}</span></span>
         <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
