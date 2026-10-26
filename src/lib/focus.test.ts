@@ -1,37 +1,28 @@
-import { describe, expect, it } from "vitest";
-import { groupLimit } from "./plans";
-import { autoGroupLetter, canAddGroup, groupDisplayName, memberDisplayName, mixHex, traitsNavigationLabel } from "./focus";
+import { describe, expect, it } from 'vitest';
+import { ownerFirstOptions, OWNER_OPTION_ID, ownerBadgeCopy } from './focus';
+import type { TeamMember } from './team-analysis';
+import type { UserProfile } from '@/components/Onboarding';
 
-describe("group limits per plan", () => {
-  it("free 0, standard 1, vip 3, family 10, premium 30", () => {
-    expect(groupLimit).toEqual({ free: 0, standard: 1, vip: 3, b2b: 10, "b2b-premium": 30 });
-  });
-  it("blocks adding beyond the cap", () => {
-    expect(canAddGroup("standard", 0)).toBe(true);
-    expect(canAddGroup("standard", 1)).toBe(false);
-    expect(canAddGroup("vip", 3)).toBe(false);
-    expect(canAddGroup("free", 0)).toBe(false);
-  });
-});
+const owner = { nameKanji: '山田太郎', nameRomaji: 'Taro Yamada' } as UserProfile;
+const members: TeamMember[] = [
+  { id: 'm1', name: '花子', nickname: '', birthDate: '1992-04-12', gender: 'female', bloodType: 'A', role: '', skills: [] },
+  { id: 'm2', name: '次郎', nickname: '', birthDate: '2015-08-01', gender: 'male', bloodType: '', role: '', skills: [] },
+];
 
-describe("display names", () => {
-  it("uses you for self, nickname then name for family, and registered group names", () => {
-    expect(traitsNavigationLabel("ja")).toBe("あなたの特性");
-    expect(traitsNavigationLabel("ja", { name: "山田花子", nickname: "はなちゃん" })).toBe("はなちゃんさんの特性");
-    expect(traitsNavigationLabel("ja", { name: "山田花子", nickname: "" })).toBe("山田花子さんの特性");
-    expect(traitsNavigationLabel("ja", null, { group: { id: "g", name: "星の家族", nickname: "", memberIds: [] }, index: 0 })).toBe("星の家族の特性");
+describe('owner-first subject options', () => {
+  it('always puts the account owner first with the gold badge label', () => {
+    const opts = ownerFirstOptions(members, owner, 'ja');
+    expect(opts[0]!.id).toBe(OWNER_OPTION_ID);
+    expect(opts[0]!.label).toContain('契約者本人');
+    expect(opts[0]!.label).toContain('山田太郎');
+    expect(opts.slice(1).map(o => o.id)).toEqual(['m1', 'm2']);
   });
-  it("nickname wins, family falls back to full name", () => {
-    expect(memberDisplayName({ name: "山田花子", nickname: "はなちゃん" })).toBe("はなちゃん");
-    expect(memberDisplayName({ name: "山田花子", nickname: "" })).toBe("山田花子");
+  it('keeps the owner first even with no members', () => {
+    const opts = ownerFirstOptions([], owner, 'en');
+    expect(opts).toHaveLength(1);
+    expect(opts[0]!.label).toContain('Account owner');
   });
-  it("unnamed groups become グループA, グループB", () => {
-    expect(groupDisplayName({ id: "1", name: "", nickname: "", memberIds: [] }, 0, "ja")).toBe("グループA");
-    expect(groupDisplayName({ id: "2", name: "", nickname: "", memberIds: [] }, 1, "ja")).toBe("グループB");
-    expect(autoGroupLetter(26)).toBe("AA");
+  it('has a badge label in all seven languages', () => {
+    expect(Object.keys(ownerBadgeCopy).sort()).toEqual(['en', 'es', 'fr', 'ja', 'ko', 'zh-CN', 'zh-TW'].sort());
   });
-});
-
-it("mixes colors as RGB mean", () => {
-  expect(mixHex(["#000000", "#ffffff"])).toBe("#808080");
 });

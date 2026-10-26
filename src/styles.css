@@ -1435,32 +1435,32 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 /* Today screen: the daily lucky color tints card borders, section dividers and a soft aura (20–30% opacity keeps text readable). */
 .today-guide.lucky-themed .design-daily-panel {
   position: relative;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   background:
     linear-gradient(var(--design-surface, var(--card)), var(--design-surface, var(--card))) padding-box,
-    linear-gradient(135deg, color-mix(in oklab, var(--lucky-color) 45%, transparent), color-mix(in oklab, var(--lucky-color) 14%, transparent) 55%, transparent) border-box;
-  box-shadow: 0 0 28px -6px color-mix(in oklab, var(--lucky-color) 28%, transparent);
+    linear-gradient(135deg, color-mix(in oklab, var(--lucky-color) 65%, transparent), color-mix(in oklab, var(--lucky-color) 35%, transparent) 55%, color-mix(in oklab, var(--lucky-color) 12%, transparent)) border-box;
+  box-shadow: 0 0 36px -4px color-mix(in oklab, var(--lucky-color) 50%, transparent), 0 0 90px -24px color-mix(in oklab, var(--lucky-color) 40%, transparent);
 }
 .design-canvas[data-design="pure-white"] .today-guide.lucky-themed .design-daily-panel {
   background:
     linear-gradient(color-mix(in oklab, white 93%, transparent), color-mix(in oklab, white 93%, transparent)) padding-box,
-    linear-gradient(135deg, color-mix(in oklab, var(--lucky-color) 45%, transparent), color-mix(in oklab, var(--lucky-color) 14%, transparent) 55%, transparent) border-box;
+    linear-gradient(135deg, color-mix(in oklab, var(--lucky-color) 65%, transparent), color-mix(in oklab, var(--lucky-color) 35%, transparent) 55%, color-mix(in oklab, var(--lucky-color) 12%, transparent)) border-box;
 }
 .today-guide.lucky-themed .design-daily-panel::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(130% 55% at 50% 0%, color-mix(in oklab, var(--lucky-color) 22%, transparent), transparent 62%);
+  background: radial-gradient(130% 55% at 50% 0%, color-mix(in oklab, var(--lucky-color) 42%, transparent), transparent 58%);
   pointer-events: none;
 }
 .today-guide.lucky-themed .today-feature details[open] > div {
-  border-top: 1px solid;
-  border-image: linear-gradient(90deg, color-mix(in oklab, var(--lucky-color) 50%, transparent), transparent 72%) 1;
+  border-top: 2px solid;
+  border-image: linear-gradient(90deg, color-mix(in oklab, var(--lucky-color) 70%, transparent), color-mix(in oklab, var(--lucky-color) 20%, transparent) 72%, transparent) 1;
   padding-top: 0.5rem;
 }
 .today-guide.lucky-themed .today-feature :where(.border-primary\/15, .border-primary\/20, .border-primary\/25) {
-  border-color: color-mix(in oklab, var(--lucky-color) 32%, transparent);
+  border-color: color-mix(in oklab, var(--lucky-color) 48%, transparent);
 }
 .feature-notify select { background: rgba(255,255,255,.88) !important; color: #0B132B !important; border-color: rgba(11,19,43,.35) !important; }
 .feature-notify select option { background: #ffffff; color: #0B132B; }

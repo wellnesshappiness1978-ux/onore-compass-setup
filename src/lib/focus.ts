@@ -25,6 +25,19 @@ export const autoGroupLetter = (index: number) => {
   return s;
 };
 export const memberDisplayName = (m: Pick<TeamMember, "name" | "nickname">) => m.nickname?.trim() || m.name;
+/** Gold badge label marking the account owner in people lists. */
+export const ownerBadgeCopy: Record<Language, string> = {
+  ja: "契約者本人", en: "Account owner", "zh-CN": "签约本人", "zh-TW": "簽約本人", ko: "계약자 본인", es: "Titular de la cuenta", fr: "Titulaire du compte",
+};
+/** Special option id in subject selectors: choosing it means the account owner (self). */
+export const OWNER_OPTION_ID = "__owner__";
+/** Owner-first option list for subject selectors; the owner always leads, members follow. */
+export function ownerFirstOptions(members: TeamMember[], owner: UserProfile, language: Language) {
+  return [
+    { id: OWNER_OPTION_ID, label: `👑 ${ownerBadgeCopy[language]}（${owner.nameKanji || owner.nameRomaji || selfReadingLabel[language]}）` },
+    ...members.map(m => ({ id: m.id, label: memberDisplayName(m) })),
+  ];
+}
 export const groupDisplayName = (g: TeamGroup, index: number, language: Language) =>
   g.nickname.trim() || g.name.trim() || `${focusCopy[language].groupWord}${autoGroupLetter(index)}`;
 

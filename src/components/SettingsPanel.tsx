@@ -191,7 +191,7 @@ export default function SettingsPanel({
         </div>
       </section>
 
-      <FocusSettingsCard language={language} />
+      <FocusSettingsCard language={language} plan={plan} />
       </div>
 
       {signedIn && debugAllowed && <DebugPlanSwitcher plan={actualPlan} language={language} onChanged={onDebugPlanChanged} />}

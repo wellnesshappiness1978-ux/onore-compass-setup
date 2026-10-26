@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Plan } from "@/lib/design-modes";
 import type { Language } from "@/lib/translations";
+import type { UserProfile } from "../Onboarding";
 import { familySampleCopy } from "@/lib/family-sample-copy";
 import { hasFeature, memberLimit, requiredPlanFor, nextPlan, type TeamFeature } from "@/lib/plans";
 import { teamCopy, type TeamCopy } from "@/lib/team-copy";
@@ -26,6 +27,7 @@ import GroupSimulator from "./GroupSimulator";
 import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
 import { useFocus, ownerAsMember } from '../FocusProvider';
+import OwnerCard from '../OwnerCard';
 import { familyCapacityCopy, familyRegistrationAccess, limitUpgradeTarget } from '@/lib/family-capacity';
 import { usePlan } from '@/components/PlanProvider';
 
@@ -134,7 +136,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <Button size="sm" className="mt-3 w-full" onClick={() => { window.dispatchEvent(new Event('onore-upgrade-plans')); }}><Crown className="size-4" />{t.planNames[nextPlan(signedIn ? actualPlan : plan) ?? plan]}</Button>
           </div>
         ) : feature === "roster" ? (
-          <Roster t={t} owner={owner} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly && localMode && !testPreview} language={language} formOpen={editorOpen} onFormOpenChange={setEditorOpen} onAdd={addMember} onEdit={editMember} onRemove={removeMember} onLimit={() => setLimitDialog(limitUpgradeTarget(registration.plan, members.length + 1))} />
+          <Roster t={t} owner={owner} ownerProfile={focus?.owner ?? null} plan={plan} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly && localMode && !testPreview} language={language} formOpen={editorOpen} onFormOpenChange={setEditorOpen} onAdd={addMember} onEdit={editMember} onRemove={removeMember} onLimit={() => setLimitDialog(limitUpgradeTarget(registration.plan, members.length + 1))} />
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
@@ -188,7 +190,7 @@ const rosterExtra: Record<Language, { kana: string; time: string; timeUnknown: s
 const RELATIONSHIP_TYPE_VALUES = ["", "partner", "lover", "fiance", "family", "mother", "father", "son", "daughter", "sibling", "relative", "friend", "business", "boss", "subordinate", "employee", "other"] as const;
 const emptyMemberForm = { name: "", nickname: "", nameKana: "", birthDate: "", birthTime: "", birthTimeUnknown: true, birthPlace: "", birthCity: "", siblingOrder: "", gender: "undisclosed", bloodType: "", relationship: "", relationshipType: "", role: "", skills: "", father: null as ParentBirth | null, mother: null as ParentBirth | null };
 
-function Roster({ t, owner, members, max, signedIn, previewOnly, language, formOpen, onFormOpenChange, onAdd, onEdit, onRemove, onLimit }: { t: TeamCopy; owner: TeamMember | null; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; formOpen: boolean; onFormOpenChange: (open: boolean) => void; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void; onLimit: () => void }) {
+function Roster({ t, owner, ownerProfile, plan, members, max, signedIn, previewOnly, language, formOpen, onFormOpenChange, onAdd, onEdit, onRemove, onLimit }: { t: TeamCopy; owner: TeamMember | null; ownerProfile: UserProfile | null; plan: Plan; members: TeamMember[]; max: number; signedIn: boolean; previewOnly: boolean; language: Language; formOpen: boolean; onFormOpenChange: (open: boolean) => void; onAdd: (m: Omit<TeamMember, "id">) => Promise<boolean>; onEdit: (m: TeamMember) => Promise<boolean>; onRemove: (id: string) => void; onLimit: () => void }) {
   const x = rosterExtra[language];
   const [form, setForm] = useState(emptyMemberForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -212,7 +214,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, formO
   };
   return (
     <div className="space-y-4">
-      {owner && <ul aria-label={familyCapacityCopy[language].owner} className="grid gap-2 sm:grid-cols-2"><li className="flex items-center gap-3 rounded-md border border-primary/40 bg-primary/10 p-3"><div className="min-w-0 flex-1"><p className="truncate text-base font-bold text-primary">{memberDisplayName(owner)}</p><p className="text-xs text-primary">{familyCapacityCopy[language].owner}</p><p className="mt-1 text-xs text-muted-foreground">{familyCapacityCopy[language].excluded}</p></div></li></ul>}
+      {ownerProfile ? <OwnerCard profile={ownerProfile} plan={plan} language={language} /> : owner && <ul aria-label={familyCapacityCopy[language].owner} className="grid gap-2 sm:grid-cols-2"><li className="flex items-center gap-3 rounded-md border border-primary/40 bg-primary/10 p-3"><div className="min-w-0 flex-1"><p className="truncate text-base font-bold text-primary">{memberDisplayName(owner)}</p><p className="text-xs text-primary">{familyCapacityCopy[language].owner}</p><p className="mt-1 text-xs text-muted-foreground">{familyCapacityCopy[language].excluded}</p></div></li></ul>}
       {!signedIn && <p className="text-[11px] text-muted-foreground">{previewOnly ? x.preview : t.guestNote}</p>}
       <Button type="button" variant="outline" aria-expanded={formOpen} aria-controls="family-roster-form" onClick={() => onFormOpenChange(!formOpen)}><UserPlus className="size-4" />{formOpen ? x.cancel : focusCopy[language].familyEdit}</Button>
       {formOpen && atCap && <div role="note" className={`${card} border-primary/40 bg-primary/10 p-4 text-center`}><p className="font-bold text-primary">{t.limitTitle}</p><p className="mt-1 text-xs text-muted-foreground">{familyCapacityCopy[language].capacity(members.length, max)}</p><Button size="sm" variant="outline" className="mt-3" onClick={onLimit}><Crown className="size-3.5" />{t.upgradeFamily}</Button></div>}
