@@ -1,5 +1,11 @@
 # Roadmap
 
+## Header/settings layout and dessert identity (2026-10-26)
+- [ ] Single-row desktop navigation; mobile readability preserved.
+- [ ] Top-left settings title, equal profile/focus columns, reminders below account settings.
+- [ ] Strict sweet-dessert selection across generated and fallback recipes with regression coverage.
+- [ ] Run tests and inspect automatic build and desktop/mobile UI.
+
 ## Inclusive Family catalogue, map and planning tools (2026-10-26)
 - [x] Japanese app copy uses inclusive ファミリー wording; shared AI voice/context applies the same convention, legacy saved goal still resolves without changing free text.
 - [x] Six-feature v2 contract preserves the private atomic pending lock, no automatic generation/retry, completion polling and owner/input-scoped bounded device restoration with sign-out clearing.
