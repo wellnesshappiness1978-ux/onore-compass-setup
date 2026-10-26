@@ -26,6 +26,7 @@ import GroupSimulator from "./GroupSimulator";
 import { AgolmenLoading } from "@/components/AgolmenSpiral";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
 import { useFocus, ownerAsMember } from '../FocusProvider';
+import OwnerCard from '../OwnerCard';
 import { familyCapacityCopy, familyRegistrationAccess, limitUpgradeTarget } from '@/lib/family-capacity';
 import { usePlan } from '@/components/PlanProvider';
 
@@ -236,6 +237,7 @@ function Roster({ t, owner, members, max, signedIn, previewOnly, language, formO
         {atCap && <div role="note" className="rounded-md border border-primary/40 bg-primary/10 p-3 text-xs sm:col-span-2"><p className="font-bold text-primary">{t.limitTitle}</p><Button size="sm" variant="outline" className="mt-2" onClick={onLimit}><Crown className="size-3.5" />{t.upgradeFamily}</Button></div>}
         {error && <p role="alert" className="text-xs text-destructive sm:col-span-2">{t.saveError}</p>}
       </form>}
+      {focus && <div className="mb-3"><OwnerCard profile={focus.owner} plan={plan} language={language} /></div>}
       {members.length === 0 ? <p className="text-sm text-muted-foreground">{t.empty}</p> : (
         <ul className="grid gap-2 sm:grid-cols-2">
           {members.map((m) => (

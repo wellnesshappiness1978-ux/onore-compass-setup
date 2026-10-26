@@ -34,7 +34,7 @@ import { SacredDisclosure } from './ui/sacred-disclosure';
 const mainColor = (m: TeamMember) => birthColorSpectrum(memberToProfile(m))?.main ?? null;
 
 /** Settings card: goal + main subject. */
-export function FocusSettingsCard({ language }: { language: Language }) {
+export function FocusSettingsCard({ language, plan }: { language: Language; plan: Plan }) {
   const ctx = useFocus();
   const t = focusCopy[language];
   const [draft, setDraft] = useState<import("@/lib/focus").Focus | undefined>(undefined);
@@ -50,15 +50,17 @@ export function FocusSettingsCard({ language }: { language: Language }) {
         <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
       </summary>
       <div className="border-t border-primary/15 p-4 sm:p-5">
-      <div role="note" className="relative overflow-hidden rounded-lg border-2 border-primary/70 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent p-4 shadow-champagne"><span className="mb-2 inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground"><Sparkles className="size-3" aria-hidden="true" />{t.targetLabel}</span><p className="text-sm font-bold leading-6 text-foreground">{t.cardIntro}</p></div>
+      <OwnerCard profile={ctx.owner} plan={plan} language={language} />
+      <div role="note" className="relative mt-3 overflow-hidden rounded-lg border-2 border-primary/70 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent p-4 shadow-champagne"><span className="mb-2 inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground"><Sparkles className="size-3" aria-hidden="true" />{t.targetLabel}</span><p className="text-sm font-bold leading-6 text-foreground">{t.cardIntro}</p></div>
       <p className="mt-4 text-sm text-primary">{t.goalLabel}</p>
       <div className="mt-2 flex flex-wrap gap-2">{goalPresets.map(p => <Button key={p} type="button" size="sm" variant={f.goalPreset === p ? "default" : "outline"} aria-pressed={f.goalPreset === p} onClick={() => set({ goalPreset: f.goalPreset === p ? "" : p })}>{t.presets[p]}</Button>)}</div>
       <Input className="mt-2" aria-label={t.goalLabel} placeholder={t.goalPlaceholder} maxLength={200} value={f.goal} onChange={e => set({ goal: e.target.value })} />
       <p className="mt-4 text-sm text-primary">{t.targetLabel}</p>
       <div className="mt-2 grid grid-cols-3 gap-2">{kinds.map(k => <Button key={k} type="button" variant={f.targetKind === k ? "default" : "outline"} aria-pressed={f.targetKind === k} onClick={() => set({ targetKind: k, targetId: k === "self" ? null : (k === "family" ? ctx.members[0]?.id : ctx.groups[0]?.id) ?? null })}>{t[k]}</Button>)}</div>
       {f.targetKind !== "self" && (() => {
-        const options = f.targetKind === "family" ? ctx.members.map(m => ({ id: m.id, label: memberDisplayName(m) })) : ctx.groups.map((g, i) => ({ id: g.id, label: groupDisplayName(g, i, language) }));
-        return options.length ? <select aria-label={f.targetKind === "family" ? t.choosePerson : t.chooseGroup} value={f.targetId ?? ""} onChange={e => set({ targetId: e.target.value })} className="mt-2 min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm">{options.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}</select> : <p className="mt-2 text-xs text-muted-foreground">{t.none}</p>;
+        // The account owner always leads the people list; choosing the owner resets the subject to self.
+        const options = f.targetKind === "family" ? ownerFirstOptions(ctx.members, ctx.owner, language) : ctx.groups.map((g, i) => ({ id: g.id, label: groupDisplayName(g, i, language) }));
+        return options.length ? <select aria-label={f.targetKind === "family" ? t.choosePerson : t.chooseGroup} value={f.targetId ?? ""} onChange={e => e.target.value === OWNER_OPTION_ID ? set({ targetKind: "self", targetId: null }) : set({ targetId: e.target.value })} className="mt-2 min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm">{options.map(o => <option key={o.id} value={o.id}>{o.label}</option>)}</select> : <p className="mt-2 text-xs text-muted-foreground">{t.none}</p>;
       })()}
       <Button className="mt-4 w-full" disabled={saving || (f.targetKind !== "self" && !f.targetId)} onClick={async () => { setSaving(true); try { await ctx.setFocus(f); setDraft(undefined); toast.success(t.saved); } catch { toast.error("Error"); } finally { setSaving(false); } }}>{t.save}</Button>
       </div>
