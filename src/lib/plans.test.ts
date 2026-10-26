@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hasFeature, memberLimit, isUpgradePlan, planForCount, planOrder, canUse, consultationDailyLimit, dailyUsageLimit } from './plans';
+import { hasFeature, memberLimit, isUpgradePlan, planForCount, planOrder, canUse, consultationDailyLimit, dailyUsageLimit, currentAndHigherPlans, nextPlan } from './plans';
 describe('consultation limits', () => {
   it.each([['free', 1], ['standard', 3], ['vip', 10], ['b2b', 30], ['b2b-premium', Infinity]] as const)('%s allows %s consultations per day', (plan, cap) => {
     expect(consultationDailyLimit[plan]).toBe(cap);
@@ -55,5 +55,19 @@ describe('unified AI daily caps', () => {
     expect(hasFeature('b2b', 'teamDiagnosis')).toBe(true);
     expect(memberLimit.b2b).toBe(30);
     expect(memberLimit['b2b-premium']).toBe(100);
+  });
+});
+
+describe('plan comparison visibility', () => {
+  it('shows the current plan and higher tiers only, never lower ones', () => {
+    expect(currentAndHigherPlans('free')).toEqual(planOrder);
+    expect(currentAndHigherPlans('standard')).toEqual(['standard', 'vip', 'b2b', 'b2b-premium']);
+    expect(currentAndHigherPlans('vip')).toEqual(['vip', 'b2b', 'b2b-premium']);
+    expect(currentAndHigherPlans('b2b')).toEqual(['b2b', 'b2b-premium']);
+    expect(currentAndHigherPlans('b2b-premium')).toEqual(['b2b-premium']);
+  });
+  it('has no upgrade beyond the top plan', () => {
+    expect(nextPlan('b2b-premium')).toBeNull();
+    expect(nextPlan('standard')).toBe('vip');
   });
 });

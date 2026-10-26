@@ -4,12 +4,12 @@ import { groupLimit } from "@/lib/plans";
 import { reminderCopy } from "./reminder-copy";
 import { planReadingLines } from './today-access-copy';
 
-type Detail = { label: string; showAll: string; hideLower: string; items: Record<Plan, string[]> };
+type Detail = { label: string; topPlan: string; items: Record<Plan, string[]> };
 
 /** Tap-to-open "benefits & how to use" copy for each plan card. Upgrades remain preview-only. */
 const baseDetails: Record<Language, Detail> = {
   ja: {
-    label: "具体的なメリットと使い方", showAll: "すべてのプランを表示", hideLower: "下位プランを隠す",
+    label: "具体的なメリットと使い方", topPlan: "最高峰プランをご利用中です。すべての特典が解放されています。",
     items: {
       free: ["【自分を知る入口】「あなたの特性」で生まれ持った強み・つまずきやすい癖を言語化。自己紹介や就活・転職の自己分析にもそのまま使えます。", "【毎日の羅針盤】今日の占いの基本4項目で、朝1分で一日の過ごし方の指針が手に入ります。", "【AIをお試し】アゴルメン相談室・相性診断を1日1回ずつ。悩みを言葉にするだけで心が軽くなる体験を。", "【星音のBGMを試聴】528Hzを20秒試聴し、音で気分を整える感覚を体験できます。"],
       standard: ["【迷いを減らす】相談室・相性診断が1日3回に。仕事・恋愛・ファミリーなど複数のテーマを同じ日に深掘りでき、決断のスピードが上がります。", "【暮らしに活かす】買い物ガイドと健康アドバイスで、服選び・贈り物・体調管理など日々の小さな選択が自分らしく整います。", "【計画が立てやすい】地球暦を前後1ヶ月表示。商談・旅行・記念日の候補日を先回りで押さえられます。", "【大切な人を理解】ファミリー登録でパートナーやファミリーの傾向を把握し、すれ違いを未然に防ぎます。"],
@@ -19,7 +19,7 @@ const baseDetails: Record<Language, Detail> = {
     },
   },
   en: {
-    label: "Benefits & how to use", showAll: "Show all plans", hideLower: "Hide lower plans",
+    label: "Benefits & how to use", topPlan: "You're enjoying the flagship plan — every benefit is unlocked.",
     items: {
       free: ["[Know yourself] Your traits put your natural strengths and habits into words — handy for self-introductions and career reflection.", "[Daily compass] Four daily fortune items give you a one-minute plan for the day.", "[Try the AI] Consultation and compatibility once a day each — feel lighter just by putting worries into words.", "[Sample Celestial BGM] Hear 528 Hz for 20 seconds and feel how sound resets your mood."],
       standard: ["[Decide faster] Consultation and compatibility 3/day each, so you can explore work, love and family on the same day.", "[Everyday choices] Shopping and health tips help with outfits, gifts and self-care.", "[Plan ahead] Earth Calendar ±1 month to secure good dates for meetings, trips and anniversaries.", "[Understand loved ones] Family registration reveals tendencies and prevents misunderstandings."],
@@ -29,7 +29,7 @@ const baseDetails: Record<Language, Detail> = {
     },
   },
   "zh-CN": {
-    label: "具体优点与使用方法", showAll: "显示全部方案", hideLower: "隐藏较低方案",
+    label: "具体优点与使用方法", topPlan: "您正在使用最高级方案，所有特权均已解锁。",
     items: {
       free: ["【认识自己】用「个人特质」把天生优势与习惯化为语言，可直接用于自我介绍与职业分析。", "【每日罗盘】今日运势4项，早上1分钟掌握一天的方向。", "【体验AI】AI咨询与契合诊断每天各1次，把烦恼说出口就轻松许多。", "【试听星音BGM】试听528Hz 20秒，感受用声音调整心情。"],
       standard: ["【更快决断】咨询与契合诊断各每天3次，同一天深挖工作、恋爱、家庭。", "【融入生活】购物指南与健康建议，让穿搭、送礼与身体管理更有自己的风格。", "【提前规划】地球历前后1个月，提前锁定商谈、旅行、纪念日的好日子。", "【理解重要的人】登记家人掌握其倾向，防止误会。"],
@@ -39,7 +39,7 @@ const baseDetails: Record<Language, Detail> = {
     },
   },
   "zh-TW": {
-    label: "具體優點與使用方式", showAll: "顯示全部方案", hideLower: "隱藏較低方案",
+    label: "具體優點與使用方式", topPlan: "您正在使用最高級方案，所有特權均已解鎖。",
     items: {
       free: ["【認識自己】用「個人特質」把天生優勢與習慣化為語言，可直接用於自我介紹與職涯分析。", "【每日羅盤】今日運勢4項，早上1分鐘掌握一天的方向。", "【體驗AI】AI諮詢與契合診斷每天各1次，把煩惱說出口就輕鬆許多。", "【試聽星音BGM】試聽528Hz 20秒，感受用聲音調整心情。"],
       standard: ["【更快決斷】諮詢與契合診斷各每天3次，同一天深挖工作、戀愛、家庭。", "【融入生活】購物指南與健康建議，讓穿搭、送禮與身體管理更有自己的風格。", "【提前規劃】地球曆前後1個月，提前鎖定商談、旅行、紀念日的好日子。", "【理解重要的人】登錄家人掌握其傾向，防止誤會。"],
@@ -49,7 +49,7 @@ const baseDetails: Record<Language, Detail> = {
     },
   },
   ko: {
-    label: "구체적인 장점과 사용법", showAll: "모든 플랜 보기", hideLower: "하위 플랜 숨기기",
+    label: "구체적인 장점과 사용법", topPlan: "최상위 플랜을 이용 중입니다. 모든 혜택이 열려 있습니다.",
     items: {
       free: ["【나를 아는 입구】'나의 특성'으로 타고난 강점과 습관을 언어화. 자기소개·커리어 분석에 바로 활용.", "【매일의 나침반】오늘의 운세 4항목으로 아침 1분에 하루 방향을 잡습니다.", "【AI 체험】AI 상담·궁합 진단 하루 1회씩. 고민을 말로 꺼내는 것만으로 가벼워집니다.", "【별빛 BGM 미리듣기】528Hz를 20초 들어보며 소리로 기분을 정돈하는 감각을 체험."],
       standard: ["【빠른 결단】상담·궁합 각 하루 3회로 일·연애·가족을 같은 날 깊이 탐색.", "【생활에 활용】쇼핑 가이드와 건강 조언으로 옷·선물·컨디션 관리가 나답게.", "【미리 계획】지구력 전후 1개월로 미팅·여행·기념일 좋은 날을 선점.", "【소중한 사람 이해】가족 등록으로 성향을 파악해 오해를 예방."],
@@ -59,7 +59,7 @@ const baseDetails: Record<Language, Detail> = {
     },
   },
   es: {
-    label: "Beneficios y cómo usarlo", showAll: "Ver todos los planes", hideLower: "Ocultar planes inferiores",
+    label: "Beneficios y cómo usarlo", topPlan: "Estás disfrutando del plan insignia: todas las ventajas están desbloqueadas.",
     items: {
       free: ["[Conócete] Tus rasgos ponen en palabras tus fortalezas y hábitos, útil para presentarte o reflexionar sobre tu carrera.", "[Brújula diaria] Cuatro elementos diarios te dan un plan del día en un minuto.", "[Prueba la IA] Consulta y compatibilidad una vez al día: poner las preocupaciones en palabras alivia.", "[Prueba la BGM celeste] Escucha 528 Hz durante 20 segundos."],
       standard: ["[Decide antes] Consulta y compatibilidad 3 al día para explorar trabajo, amor y familia el mismo día.", "[Día a día] Guía de compras y salud para ropa, regalos y autocuidado.", "[Planifica] Calendario de la Tierra ±1 mes para fijar buenas fechas.", "[Entiende a los tuyos] El registro familiar revela tendencias y evita malentendidos."],
@@ -69,7 +69,7 @@ const baseDetails: Record<Language, Detail> = {
     },
   },
   fr: {
-    label: "Avantages et utilisation", showAll: "Afficher toutes les formules", hideLower: "Masquer les formules inférieures",
+    label: "Avantages et utilisation", topPlan: "Vous profitez de la formule suprême : tous les avantages sont débloqués.",
     items: {
       free: ["[Se connaître] Vos traits mettent en mots vos forces et habitudes, utile pour se présenter ou réfléchir à sa carrière.", "[Boussole du jour] Quatre éléments quotidiens pour orienter votre journée en une minute.", "[Essayer l’IA] Consultation et compatibilité une fois par jour : formuler ses soucis soulage.", "[Écouter la BGM céleste] 528 Hz pendant 20 secondes."],
       standard: ["[Décider plus vite] Consultation et compatibilité 3/jour pour explorer travail, amour et famille le même jour.", "[Au quotidien] Guide d’achats et conseils santé pour tenues, cadeaux et bien-être.", "[Anticiper] Calendrier terrestre ±1 mois pour réserver les bonnes dates.", "[Comprendre ses proches] Le registre familial révèle les tendances et évite les malentendus."],

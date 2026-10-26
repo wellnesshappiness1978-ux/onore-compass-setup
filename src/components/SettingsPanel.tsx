@@ -27,7 +27,7 @@ import { settingsTranslations, type SettingsTranslation, type PricingTier } from
 import DebugPlanSwitcher from "@/components/DebugPlanSwitcher";
 import { teamCopy } from "@/lib/team-copy";
 import { canPreviewDesign, designCopy, designModes, type DesignMode, type Plan } from "@/lib/design-modes";
-import { memberLimit, planOrder, isUpgradePlan, nextPlan } from "@/lib/plans";
+import { memberLimit, planOrder, nextPlan } from "@/lib/plans";
 import { planCardsCopy, type PaidPlanId } from "@/lib/plan-cards";
 import type { UserProfile } from "./Onboarding";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
@@ -125,12 +125,11 @@ export default function SettingsPanel({
     ...(freeTier ? [{ id: "free" as const, features: freeTier.features }] : []),
     ...pc.cards,
   ];
-  const [showAllPlans, setShowAllPlans] = useState(false);
   const pd = planDetails[language];
-  const hiddenLower = carouselCards.filter(c => tierOrder.indexOf(c.id as Plan) < tierOrder.indexOf(plan)).length;
   const currentMembership = signedIn ? actualPlan : plan;
   const recommendation = nextPlan(currentMembership);
-  const visibleCards = (showAllPlans ? carouselCards : carouselCards.filter(c => isUpgradePlan(currentMembership, c.id))).slice().sort((a,b)=>Number(b.id===recommendation)-Number(a.id===recommendation));
+  // Comparisons show the current plan and higher tiers only; lower plans stay hidden.
+  const visibleCards = carouselCards.filter(c => tierOrder.indexOf(c.id as Plan) >= tierOrder.indexOf(currentMembership)).slice().sort((a,b)=>Number(b.id===recommendation)-Number(a.id===recommendation));
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const onCarouselScroll = () => {
@@ -252,6 +251,11 @@ export default function SettingsPanel({
           </div>
         </div>
 
+        {!recommendation && (
+          <p className="mt-3 flex items-center justify-center gap-2 rounded-lg border border-primary/50 bg-primary/10 px-4 py-3 text-center font-serif text-sm text-primary shadow-champagne">
+            <Crown className="size-4 shrink-0" aria-hidden="true" />{pd.topPlan}
+          </p>
+        )}
         <div className="mt-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={t.plansHeading}>
           {visibleCards.map((item, index) => {
             const active = activeIndex === index;
@@ -320,7 +324,6 @@ export default function SettingsPanel({
           {visibleCards.map((item, index) => <span key={item.id} className={`h-1.5 rounded-full transition-all ${activeIndex === index ? "w-5 bg-primary" : "w-1.5 bg-primary/30"}`} />)}
         </div>
 
-        {hiddenLower > 0 && <div className="mt-2 text-center"><Button variant="ghost" size="sm" className="text-xs text-primary" onClick={() => { setShowAllPlans(v => !v); setActiveIndex(0); }}>{showAllPlans ? pd.hideLower : `${pd.showAll} (+${hiddenLower})`}</Button></div>}
         {!devOverrideEnabled && <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>}
       </section>
 
