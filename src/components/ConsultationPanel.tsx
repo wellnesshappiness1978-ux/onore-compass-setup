@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { ArrowUpRight, Bookmark, BookmarkCheck, Crown, Radio, Trash2 } from "lucide-react";
@@ -180,16 +181,19 @@ export default function ConsultationPanel({
   useEffect(() => {
     let active = true;
     setFavorites([]);
-    if (signedIn)
+    const refresh = () => { if (signedIn)
       void listFavorites()
         .then((rows) => {
           if (active) setFavorites(rows);
         })
         .catch(() => {
           if (active) setNotice(t.bookmarkError);
-        });
+        }); };
+    refresh();
+    window.addEventListener(CLOUD_SYNC_EVENT,refresh);
     return () => {
       active = false;
+      window.removeEventListener(CLOUD_SYNC_EVENT,refresh);
     };
   }, [signedIn, listFavorites, t.bookmarkError]);
   const [notice, setNotice] = useState<string | null>(null);

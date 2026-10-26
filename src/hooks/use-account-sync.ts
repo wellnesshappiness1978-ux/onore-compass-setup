@@ -60,6 +60,7 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
     channel.subscribe(status => { if (status === 'SUBSCRIBED') schedule(); });
     const focus = () => { if (document.visibilityState === 'visible') schedule(); };
     window.addEventListener('focus', focus); document.addEventListener('visibilitychange', focus);
+    window.addEventListener('onore-account-refresh',schedule);
     // Detect legacy setting writers without replacing browser storage APIs. Unchanged values never produce requests.
     let saving = false;
     const poll = setInterval(async () => {
@@ -77,6 +78,6 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
       } finally { saving = false; }
     }, 1000);
     void readSettings();
-    return () => { active = false; clearTimeout(timer); clearInterval(poll); window.removeEventListener('focus', focus); document.removeEventListener('visibilitychange', focus); void supabase.removeChannel(channel); };
+    return () => { active = false; clearTimeout(timer); clearInterval(poll); window.removeEventListener('focus', focus); window.removeEventListener('onore-account-refresh',schedule); document.removeEventListener('visibilitychange', focus); void supabase.removeChannel(channel); };
   }, [userId,client]);
 }
