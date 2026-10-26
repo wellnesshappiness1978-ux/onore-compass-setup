@@ -25,7 +25,7 @@ export default function FamilyFeatureDetail({ feature, language, plan, actualPla
   const personRows = data.entries.map(e => <article key={e.member.id} className="min-w-0 border-b border-primary/20 py-4">
     <h4 className="font-serif text-base text-primary">{name(e.member)}</h4>
     <p className="mt-2 text-sm leading-7">{t.roles[e.role]} · {t.roleDesc[e.role]}</p>
-    <p className="mt-2 text-xs leading-6 text-muted-foreground">{e.core ? `${signInfo(e.core.western.sun)[language].name} · ${branchInfo(e.core.eastern.branchIndex)[language].name}` : ""}</p>
+    <p className="mt-2 text-xs leading-6 text-muted-foreground">{e.core ? `${signInfo(e.core.western.sun,language)?.name ?? ""} · ${branchInfo(e.core.eastern.branchIndex,language).name}` : ""}</p>
     <p className="mt-2 text-sm leading-7">{c.support}：{t.roleWords[e.role]}</p>
     <dl className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">{[[g.physical,e.rhythm.physical],[g.emotional,e.rhythm.emotional],[g.intellectual,e.rhythm.intellectual]].map(([label,v]) => <div key={String(label)} className="border-l border-primary/20 px-2"><dt className="text-muted-foreground">{label}</dt><dd className="mt-1 font-semibold text-primary">{Math.round((Number(v)+1)*50)}/100</dd></div>)}</dl>
   </article>);

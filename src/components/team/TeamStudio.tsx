@@ -55,8 +55,8 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
   const update = useServerFn(updateTeamMember);
   const del = useServerFn(deleteTeamMember);
   const previewOnly = plan !== actualPlan;
-  const localMode = !signedIn || previewOnly;
-  const max = memberLimit[previewOnly ? plan : actualPlan];
+  const localMode = !signedIn;
+  const max = memberLimit[signedIn ? actualPlan : plan];
 
   useEffect(() => {
     let active = true;
@@ -83,7 +83,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
     } else persistLocal(members.map((item) => item.id === m.id ? m : item));
     return true;
   };
-  const feature = tabFeatures[tab]!;
+  const feature = tabFeatures[tab] ?? "roster";
   const unlocked = hasFeature(plan, feature);
 
   return (
@@ -122,7 +122,7 @@ export default function TeamStudio({ plan, actualPlan, language, signedIn, owner
             <Button size="sm" className="mt-3 w-full" onClick={() => document.getElementById("membership-plans")?.scrollIntoView({ behavior: "smooth", block: "start" })}><Crown className="size-4" />{t.upgradeFamily}</Button>
           </div>
         ) : feature === "roster" ? (
-          <Roster t={t} owner={owner} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly} language={language} onAdd={addMember} onEdit={editMember} onRemove={removeMember} onLimit={() => setLimitDialog(planForCount(members.length + 1) ?? "max")} />
+          <Roster t={t} owner={owner} members={members} max={max} signedIn={!localMode} previewOnly={previewOnly && localMode} language={language} onAdd={addMember} onEdit={editMember} onRemove={removeMember} onLimit={() => setLimitDialog(planForCount(members.length + 1) ?? "max")} />
         ) : members.length === 0 ? (
           <p className={`${card} text-sm text-muted-foreground`}>{t.empty}</p>
         ) : feature === "teamDiagnosis" ? (
