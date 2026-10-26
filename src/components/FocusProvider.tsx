@@ -70,7 +70,7 @@ export function FocusProvider({ owner, serverBacked, mergeLocal = false, childre
     const g = gi >= 0 ? groups[gi] ?? null : null;
     const group = g ? { group: g, index: gi, members: [...(g.memberIds.includes(SELF_MEMBER_ID) && owner.birthDate ? [ownerAsMember(owner)] : []), ...members.filter(m => g.memberIds.includes(m.id))] } : null;
     return {
-      owner, focus, setFocus, members, groups, reload, serverBacked, member, group,
+      owner, focus, setFocus, members, groups, reload, serverBacked, localWrites: !serverBacked || mergeLocal, member, group,
       label: (language) => member ? memberDisplayName(member) : group ? groupDisplayName(group.group, group.index, language) : selfReadingLabel[language],
       readingProfile: member ? memberToProfile(member) : owner,
     };
