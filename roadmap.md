@@ -1,5 +1,11 @@
 # Roadmap
 
+## Parent persistence and six Family features (2026-10-26)
+- [ ] Repair shared parent validation, write/read mapping and owner/family restoration; verify signed-in round trips.
+- [ ] Connect all six catalogue entries to real Family features with one cumulative gate.
+- [ ] Deepen member-specific harmony, strengths, friction, roadmap, consultation and color analysis.
+- [ ] Run regression tests, inspect automatic build and check desktop/mobile flows.
+
 ## Cosmic wording, individual essence, cached perspectives and text size (2026-10-24)
 - [x] Replace cosmic color captions with a compact whole-natal-sky compass interpretation; signed-in card has no seven-color row
 - [x] Keep essence visible with independent sections 1–10, including while generating; ten controls verified at 320px
