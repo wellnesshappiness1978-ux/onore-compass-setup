@@ -52,13 +52,13 @@ export function createAmbientGraph(ctx: BaseAudioContext, hz: number, volume: nu
   const highpass = ctx.createBiquadFilter(); highpass.type = 'highpass'; highpass.frequency.value = 25; highpass.Q.value = .5;
   const lowpass = ctx.createBiquadFilter(); lowpass.type = 'lowpass'; lowpass.frequency.value = 6200; lowpass.Q.value = .5;
   const compressor = ctx.createDynamicsCompressor();
-  compressor.threshold.value = -12; compressor.knee.value = 12; compressor.ratio.value = 3; compressor.attack.value = .015; compressor.release.value = .3;
+  compressor.threshold.value = -18; compressor.knee.value = 10; compressor.ratio.value = 4; compressor.attack.value = .02; compressor.release.value = .3;
   const master = ctx.createGain();
   // Headroom precedes output volume; never use a hard-clipping waveshaper.
-  const headroom = ctx.createGain(); headroom.gain.value = .65;
+  const headroom = ctx.createGain(); headroom.gain.value = .5;
   bus.connect(highpass).connect(lowpass).connect(compressor).connect(headroom).connect(master).connect(ctx.destination);
   master.gain.setValueAtTime(0, start);
-  master.gain.linearRampToValueAtTime(safePianoVolume(volume), start + .9);
+  master.gain.linearRampToValueAtTime(safePianoVolume(volume) * .85, start + 1.8);
   const dry = ctx.createGain(); dry.gain.value = .85; dry.connect(bus);
   const reverb = ctx.createConvolver(); reverb.normalize = false;
   const impulse = ctx.createBuffer(2, Math.ceil(ctx.sampleRate * 3), ctx.sampleRate);
@@ -130,7 +130,7 @@ export function createAmbientGraph(ctx: BaseAudioContext, hz: number, volume: nu
     setVolume(value: number) {
       if (stopping) return;
       master.gain.cancelAndHoldAtTime(ctx.currentTime);
-      master.gain.linearRampToValueAtTime(safePianoVolume(value), ctx.currentTime + .25);
+      master.gain.linearRampToValueAtTime(safePianoVolume(value) * .85, ctx.currentTime + .25);
     },
     fadeOut(at = ctx.currentTime) {
       if (stopping) return;
@@ -145,7 +145,7 @@ export function createAmbientGraph(ctx: BaseAudioContext, hz: number, volume: nu
   };
 }
 export async function createAmbientPiano(hz: number, volume: number): Promise<AmbientPiano> {
-  const ctx = playbackContext ?? new AudioContext();
+  const ctx = playbackContext ?? new AudioContext({ latencyHint: 'playback' });
   playbackContext = ctx; playbackUsers++;
   const release = async () => {
     playbackUsers--;
@@ -157,8 +157,8 @@ export async function createAmbientPiano(hz: number, volume: number): Promise<Am
   try {
     await ctx.resume();
     const graph = createAmbientGraph(ctx, hz, volume);
-    graph.scheduleUntil(ctx.currentTime + .5);
-    const timer = window.setInterval(() => { if (ctx.state === 'running') graph.scheduleUntil(ctx.currentTime + .5); }, 100);
+    graph.scheduleUntil(ctx.currentTime + 1.5);
+    const timer = window.setInterval(() => { if (ctx.state === 'running') graph.scheduleUntil(ctx.currentTime + 1.5); }, 250);
     let stopping: Promise<void> | undefined;
     return {
       setVolume: graph.setVolume,

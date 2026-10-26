@@ -1377,7 +1377,8 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .mobile-fixed-header > .subject-goal-badge { grid-row: 2; grid-column: 1 / -1; width: min(680px, 100%); max-width: 100%; justify-self: center; }
 .mobile-fixed-header > button:first-child { grid-row: 1; grid-column: 1; justify-self: start; }
 .mobile-fixed-header > div:last-child { grid-row: 1; grid-column: 2; justify-self: end; }
-.subject-goal-badge button { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+.subject-goal-badge { font-size: clamp(10px, 2.6vw, 12px); }
+.subject-goal-badge button { font-size: inherit !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
 
 html { scroll-padding-top: calc(var(--preview-bar-height) + 112px + env(safe-area-inset-top)); }
 body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 106px + env(safe-area-inset-top)); left: 12px; right: auto; max-width: calc(100vw - 160px); }
@@ -1386,8 +1387,8 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 .design-canvas:not([data-tab=home]) .design-header { height: calc(146px + env(safe-area-inset-top)); border: 0; }
 .design-canvas:not([data-tab=home]) .design-header > div { display: none; }
 
-@media (min-width: 768px) {
-  .mobile-fixed-header { grid-template-columns: 40px minmax(0,1fr) auto; grid-template-rows: 50px; height: calc(56px + env(safe-area-inset-top)); column-gap: 16px; }
+@media (min-width: 400px) {
+  .mobile-fixed-header { grid-template-columns: 40px minmax(0,1fr) auto; grid-template-rows: 50px; height: calc(56px + env(safe-area-inset-top)); column-gap: clamp(4px, 1.5vw, 16px); }
   .mobile-fixed-header > .subject-goal-badge { grid-row: 1; grid-column: 2; width: 100%; }
   .mobile-fixed-header > div:last-child { grid-column: 3; }
   html { scroll-padding-top: calc(var(--preview-bar-height) + 68px + env(safe-area-inset-top)); }
@@ -1432,35 +1433,39 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 .design-canvas[data-design="pure-white"] :is(.card-lux, .design-daily-panel, .today-feature) :is(.text-muted-foreground) { color: oklch(.36 .03 265); }
 .design-canvas[data-design="pure-white"] :is(.card-lux, .design-daily-panel, .today-feature) :is(.text-primary) { color: oklch(.47 .11 70); }
 
-/* Today screen: the daily lucky color tints card borders, section dividers and a soft aura (20–30% opacity keeps text readable). */
-.today-guide.lucky-themed .design-daily-panel {
-  position: relative;
-  border: 2px solid transparent;
+/* Today screen: only the "today's three lucky picks" card carries the lucky-color treatment, at high intensity. */
+.today-guide.lucky-themed #today-dailyLucky {
+  position: relative; isolation: isolate;
+  border: 3px solid transparent;
   background:
+    radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, var(--lucky-color) 38%, transparent), transparent 60%) padding-box,
+    radial-gradient(120% 80% at 100% 100%, color-mix(in oklab, var(--lucky-color) 30%, transparent), transparent 62%) padding-box,
     linear-gradient(var(--design-surface, var(--card)), var(--design-surface, var(--card))) padding-box,
-    linear-gradient(135deg, color-mix(in oklab, var(--lucky-color) 65%, transparent), color-mix(in oklab, var(--lucky-color) 35%, transparent) 55%, color-mix(in oklab, var(--lucky-color) 12%, transparent)) border-box;
-  box-shadow: 0 0 36px -4px color-mix(in oklab, var(--lucky-color) 50%, transparent), 0 0 90px -24px color-mix(in oklab, var(--lucky-color) 40%, transparent);
+    linear-gradient(135deg, var(--lucky-color), color-mix(in oklab, var(--lucky-color) 70%, white) 45%, var(--lucky-color) 70%, color-mix(in oklab, var(--lucky-color) 55%, transparent)) border-box;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--lucky-color) 60%, transparent), 0 0 28px 2px color-mix(in oklab, var(--lucky-color) 70%, transparent), 0 0 80px -6px color-mix(in oklab, var(--lucky-color) 60%, transparent);
 }
-.design-canvas[data-design="pure-white"] .today-guide.lucky-themed .design-daily-panel {
+.design-canvas[data-design="pure-white"] .today-guide.lucky-themed #today-dailyLucky {
   background:
-    linear-gradient(color-mix(in oklab, white 93%, transparent), color-mix(in oklab, white 93%, transparent)) padding-box,
-    linear-gradient(135deg, color-mix(in oklab, var(--lucky-color) 65%, transparent), color-mix(in oklab, var(--lucky-color) 35%, transparent) 55%, color-mix(in oklab, var(--lucky-color) 12%, transparent)) border-box;
+    radial-gradient(120% 80% at 0% 0%, color-mix(in oklab, var(--lucky-color) 26%, transparent), transparent 60%) padding-box,
+    linear-gradient(color-mix(in oklab, white 94%, transparent), color-mix(in oklab, white 94%, transparent)) padding-box,
+    linear-gradient(135deg, var(--lucky-color), color-mix(in oklab, var(--lucky-color) 60%, white) 50%, var(--lucky-color)) border-box;
 }
-.today-guide.lucky-themed .design-daily-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(130% 55% at 50% 0%, color-mix(in oklab, var(--lucky-color) 42%, transparent), transparent 58%);
-  pointer-events: none;
-}
-.today-guide.lucky-themed .today-feature details[open] > div {
-  border-top: 2px solid;
-  border-image: linear-gradient(90deg, color-mix(in oklab, var(--lucky-color) 70%, transparent), color-mix(in oklab, var(--lucky-color) 20%, transparent) 72%, transparent) 1;
-  padding-top: 0.5rem;
-}
-.today-guide.lucky-themed .today-feature :where(.border-primary\/15, .border-primary\/20, .border-primary\/25) {
-  border-color: color-mix(in oklab, var(--lucky-color) 48%, transparent);
+.today-guide.lucky-themed #today-dailyLucky h3 { text-shadow: 0 0 14px color-mix(in oklab, var(--lucky-color) 70%, transparent); }
+.today-guide.lucky-themed #today-dailyLucky h3::after { content: ""; display: block; height: 3px; margin-top: .35rem; border-radius: 999px; background: linear-gradient(90deg, var(--lucky-color), color-mix(in oklab, var(--lucky-color) 40%, transparent) 70%, transparent); flex-basis: 100%; }
+.today-guide.lucky-themed #today-dailyLucky h3 { flex-wrap: wrap; }
+.today-guide.lucky-themed #today-dailyLucky details[open] > div { border-top: 3px solid; border-image: linear-gradient(90deg, var(--lucky-color), color-mix(in oklab, var(--lucky-color) 30%, transparent) 75%, transparent) 1; padding-top: .5rem; }
+.today-guide.lucky-themed #today-dailyLucky :where(.border-primary\/15, .border-primary\/20, .border-primary\/25, .border-primary\/30) { border-color: color-mix(in oklab, var(--lucky-color) 75%, transparent); }
+
+/* Small screens: long words, URLs and labels wrap instead of escaping their card. */
+.design-canvas .design-main :is(h1, h2, h3, h4, h5, p, li, dt, dd, label, summary, td, th, blockquote) { overflow-wrap: anywhere; min-width: 0; }
+.design-canvas .design-main :is(button, a, [role="tab"]) { min-width: 0; max-width: 100%; }
+.design-canvas .design-main :is(button, a, [role="tab"]):not(.truncate) { overflow-wrap: anywhere; }
+[role="dialog"] :is(h2, p, li, label, summary) { overflow-wrap: anywhere; }
+@media (max-width: 639px) {
+  .design-canvas .design-main :is(.text-2xl, .text-3xl) { font-size: 1.3rem; line-height: 1.35; }
+  .design-canvas .design-main .text-xl { font-size: 1.125rem; }
+  .design-canvas .design-main .text-lg { font-size: 1.0625rem; }
+  .design-canvas .design-main :is(button, [role="tab"]).whitespace-nowrap:not(.truncate) { white-space: normal; }
 }
 .feature-notify select { background: rgba(255,255,255,.88) !important; color: #0B132B !important; border-color: rgba(11,19,43,.35) !important; }
 .feature-notify select option { background: #ffffff; color: #0B132B; }
