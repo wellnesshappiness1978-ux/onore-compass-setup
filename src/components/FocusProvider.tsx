@@ -74,7 +74,7 @@ export function FocusProvider({ owner, serverBacked, mergeLocal = false, childre
       label: (language) => member ? memberDisplayName(member) : group ? groupDisplayName(group.group, group.index, language) : selfReadingLabel[language],
       readingProfile: member ? memberToProfile(member) : owner,
     };
-  }, [focus, setFocus, members, groups, reload, serverBacked, owner]);
+  }, [focus, setFocus, members, groups, reload, serverBacked, mergeLocal, owner]);
   return <FocusContext.Provider value={value}>{children}</FocusContext.Provider>;
 }
 
