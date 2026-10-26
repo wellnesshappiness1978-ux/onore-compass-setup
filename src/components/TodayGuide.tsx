@@ -23,6 +23,7 @@ import FengShuiGuide from "./FengShuiGuide";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { higherTodayBenefits, todayBenefitCategories, todayBenefitCopy, todayBenefitCount } from "@/lib/today-benefits";
 import { recipesForElement, recipeDetails, COURSE_ORDER, courseLabels } from "@/lib/lucky-recipes";
+import { flowerImageForMonth } from "@/lib/flower-images";
 import RecipeStep, { cleanRecipeSteps } from "./RecipeStep";
 import { recipeLabels, recipeReason } from "@/lib/recipe-presentation";
 import { buildTodayDepth, type DeepSection } from "@/lib/today-depth";
@@ -330,11 +331,14 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     },
     monthlyLucky: {
       notify: `${L(month.flower)} / ${L(month.action)}`,
-      body: <ul className="space-y-2 text-sm leading-6">
-        <li><strong className="text-primary">{ja ? "ラッキーフラワー" : "Lucky flower"}</strong>：{L(month.flower)}（{ja ? "花言葉" : "Meaning"}：{L(month.meaning)}）<br /><span className="text-muted-foreground">{L(month.why)}</span></li>
-        <li><strong className="text-primary">{ja ? "ラッキー行動と目標" : "Lucky action & goal"}</strong>：{L(month.action)}</li>
-        <li><strong className="text-primary">{ja ? "ラッキーアイテム" : "Lucky item"}</strong>：{L(month.item)}</li>
-      </ul>,
+      body: <div className="space-y-3">
+        <img src={flowerImageForMonth(today.getMonth() + 1)} alt={L(month.flower)} loading="lazy" width={1024} height={768} className="w-full rounded-md border border-primary/25 object-cover shadow-champagne" />
+        <ul className="space-y-2 text-sm leading-6">
+          <li><strong className="text-primary">{ja ? "ラッキーフラワー" : "Lucky flower"}</strong>：{L(month.flower)}（{ja ? "花言葉" : "Meaning"}：{L(month.meaning)}）<br /><span className="text-muted-foreground">{L(month.why)}</span></li>
+          <li><strong className="text-primary">{ja ? "ラッキー行動と目標" : "Lucky action & goal"}</strong>：{L(month.action)}</li>
+          <li><strong className="text-primary">{ja ? "ラッキーアイテム" : "Lucky item"}</strong>：{L(month.item)}</li>
+        </ul>
+      </div>,
     },
     helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>{rangeBanner}<DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /><h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "今日のカレンダー（どなたでも閲覧できます）" : "Today's calendar (open to everyone)"}</h4><HelioCalendar hideDirections date={today} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} /></> },
     biorhythm365: {
