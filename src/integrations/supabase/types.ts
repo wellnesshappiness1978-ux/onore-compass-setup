@@ -272,6 +272,27 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_device_cache: {
+        Row: {
+          cache_key: string
+          result: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cache_key: string
+          result: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cache_key?: string
+          result?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       support_requests: {
         Row: {
           category: string
