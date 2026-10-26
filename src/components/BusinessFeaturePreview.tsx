@@ -6,6 +6,13 @@ import type { Plan } from "@/lib/design-modes";
 import { canUseFamilyFeature, familyFeatureCopy, type FamilyFeature } from "@/lib/family-features";
 import FamilyFeatureDetail from "./team/FamilyFeatureDetail";
 import type { Language } from "@/lib/translations";
+import { useFocus } from './FocusProvider';
+import { useFamilyReading } from '@/hooks/use-family-reading';
+import { todayIso } from '@/lib/team-analysis';
+import { familyReadingCopy } from '@/lib/family-reading-copy';
+import { nextPlan } from '@/lib/plans';
+import { teamCopy } from '@/lib/team-copy';
+import ChunkedText from './ChunkedText';
 
 const items = [
   { icon: Network, tier: "Family", key: "matrix" }, { icon: BarChart3, tier: "Family", key: "layers" },
@@ -26,8 +33,17 @@ const copy: Record<Language, { upgrade: string; upgradeFamily: string }> = {
 export default function BusinessFeaturePreview({ language, plan, actualPlan, signedIn, previewMode, onUpgrade }: { language: Language; plan: Plan; actualPlan: Plan; signedIn: boolean; previewMode: boolean; onUpgrade: () => void }) {
   const t = copy[language], c = familyFeatureCopy[language];
   const [selected, setSelected] = useState<FamilyFeature | null>(null);
+  const focus = useFocus();
+  const eligible = signedIn && (actualPlan === 'b2b' || actualPlan === 'b2b-premium') && !previewMode;
+  const signature = JSON.stringify([focus?.owner,focus?.members,focus?.group,focus?.focus.goal]);
+  const reading = useFamilyReading({groupId:focus?.group?.group.id ?? null,language,day:todayIso()},signature,eligible);
+  const rc = familyReadingCopy[language];
+  const recommended = nextPlan(actualPlan);
   return <section className="mb-6 border-y border-primary/25 py-6 text-left">
     <h3 className="font-serif text-xl text-primary">{c.title}</h3>
+    {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" className="mt-4 h-auto whitespace-normal" onClick={reading.generate}>{rc.generate}</Button>}
+    {reading.status === 'pending' && <p role="status" className="mt-3 text-sm text-muted-foreground">{rc.pending}</p>}
+    {reading.errorMessage && <p role="alert" className="mt-3 text-sm text-destructive">{rc.failed} {reading.errorMessage}</p>}
     <div className="mt-5 grid gap-3 sm:grid-cols-2">{items.map((item,i) => <Button key={item.key} variant="outline" onClick={() => setSelected(item.key)} className="h-auto min-h-20 justify-start whitespace-normal p-4 text-left">
       <item.icon className="size-5 shrink-0 text-primary"/><span className="min-w-0"><strong className="flex items-center gap-1.5 text-foreground">{!canUseFamilyFeature(plan,item.key) && <Lock className="size-3.5 shrink-0 text-primary"/>}{c.titles[i]}</strong></span>
     </Button>)}</div>
@@ -35,7 +51,12 @@ export default function BusinessFeaturePreview({ language, plan, actualPlan, sig
       <DialogContent className="max-w-3xl border-primary/30 bg-card">
         <DialogTitle className="font-serif text-xl text-primary">{selected ? c.titles[items.findIndex(i=>i.key===selected)] : c.title}</DialogTitle>
         <DialogDescription className="text-xs leading-6">{c.note}</DialogDescription>
-        {selected && (canUseFamilyFeature(plan,selected) ? <FamilyFeatureDetail feature={selected} language={language} plan={plan} actualPlan={actualPlan} signedIn={signedIn} previewMode={previewMode} onUpgrade={onUpgrade}/> : <div className="py-6"><p className="mb-4 text-sm leading-7">{t.upgradeFamily}</p><Button onClick={() => {setSelected(null);onUpgrade();}}><Crown className="size-4"/>{t.upgrade}</Button></div>)}
+        {selected && (canUseFamilyFeature(plan,selected) ? <>
+          {reading.reading && <ChunkedText text={reading.reading[selected]} className="mb-5 text-sm leading-7"/>}
+          {!eligible && <p className="mb-3 text-xs text-muted-foreground">{rc.preview}</p>}
+          {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" onClick={reading.generate}>{rc.generate}</Button>}
+          <FamilyFeatureDetail feature={selected} language={language} plan={plan} actualPlan={actualPlan} signedIn={signedIn} previewMode={previewMode} onUpgrade={onUpgrade}/>
+        </> : <div className="py-6"><p className="mb-2 text-sm leading-7">{recommended ? teamCopy[language].planNames[recommended] : ''}</p><p className="mb-4 text-xs text-muted-foreground">{t.upgradeFamily}</p><Button onClick={() => {setSelected(null);onUpgrade();}}><Crown className="size-4"/>{t.upgrade}</Button></div>)}
       </DialogContent>
     </Dialog>
   </section>;
