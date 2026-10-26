@@ -15,13 +15,13 @@ import { detailLinkLabel } from "@/lib/art-overview-copy";
 import { useFocus } from "./FocusProvider";
 
 const titles: Record<Language, [string, string, string]> = {
-  ja: ["分類別診断（16占術）", "あなたの診断カードをシェア", "詳しい解説を読む"],
-  en: ["Readings by method (16 arts)", "Share your reading card", "Read the detailed reading"],
-  "zh-CN": ["分类别诊断（16种占术）", "分享你的诊断卡", "阅读详细解说"],
-  "zh-TW": ["分類別診斷（16種占術）", "分享你的診斷卡", "閱讀詳細解說"],
-  ko: ["분류별 분석 (16가지 점술)", "나의 진단 카드 공유", "자세한 해설 읽기"],
-  es: ["Lecturas por método (16 artes)", "Compartir tu tarjeta", "Leer la explicación"],
-  fr: ["Lectures par méthode (16 arts)", "Partager votre carte", "Lire l’explication"],
+  ja: ["分類別診断（17占術）", "あなたの診断カードをシェア", "詳しい解説を読む"],
+  en: ["Readings by method (17 arts)", "Share your reading card", "Read the detailed reading"],
+  "zh-CN": ["分类别诊断（17种占术）", "分享你的诊断卡", "阅读详细解说"],
+  "zh-TW": ["分類別診斷（17種占術）", "分享你的診斷卡", "閱讀詳細解說"],
+  ko: ["분류별 분석 (17가지 점술)", "나의 진단 카드 공유", "자세한 해설 읽기"],
+  es: ["Lecturas por método (17 artes)", "Compartir tu tarjeta", "Leer la explicación"],
+  fr: ["Lectures par méthode (17 arts)", "Partager votre carte", "Lire l’explication"],
 };
 
 export default function GrandSummaryCard({ profile, language, plan, embedded = false, part = "all" }: { profile: UserProfile; language: Language; plan: Plan; embedded?: boolean; part?: "all" | "approaches" | "summary" | "share" }) {
