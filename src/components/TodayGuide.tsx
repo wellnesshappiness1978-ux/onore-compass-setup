@@ -446,8 +446,10 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const share = (key: string) => <div key={key} className="flex justify-center"><ShareCardButton language={language} autoOpen={false} label={ja ? "今日の占いを1タップでシェア" : "Share today's guide"} className="h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto" data={shareData} /></div>;
 
 
+  // The daily lucky color becomes the screen's accent: card borders, dividers and a soft aura follow it.
+  const luckyTheme = luckyHex && /^#[0-9a-f]{6}$/i.test(luckyHex) ? luckyHex : null;
   return (
-    <div className="today-guide mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 text-left md:gap-4">
+    <div className={`today-guide mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 text-left md:gap-4${luckyTheme ? " lucky-themed" : ""}`} style={luckyTheme ? ({ "--lucky-color": luckyTheme } as CSSProperties) : undefined}>
       <section className="card-lux design-daily-panel rounded-lg p-3 md:p-4" aria-label={ja ? "プラン特典の解放状況" : "Plan unlock progress"}>
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm">
           <p className="min-w-0 text-foreground">{benefit.current}：<strong className="text-primary">{names[plan]}</strong></p>
