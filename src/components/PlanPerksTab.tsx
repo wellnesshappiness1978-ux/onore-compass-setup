@@ -26,9 +26,11 @@ const ui: Record<Language, { title: string; lead: string; active: string; locked
 export default function PlanPerksTab({ profile, language, plan, actualPlan, signedIn, go }: { profile: UserProfile; language: Language; plan: Plan; actualPlan: Plan; signedIn: boolean; go: (target: PerkTarget) => void }) {
   const copy = planCardsCopy[language];
   const t = ui[language];
-  const initial = (copy.cards.find((c) => c.id === plan)?.id ?? "standard") as PaidPlanId;
+  // Show the current plan and higher tiers only; lower plans stay hidden.
+  const visible = copy.cards.filter((c) => planOrder.indexOf(c.id) >= planOrder.indexOf(plan));
+  const initial = (visible.find((c) => c.id === plan)?.id ?? visible[0]?.id ?? "standard") as PaidPlanId;
   const [active, setActive] = useState<PaidPlanId>(initial);
-  const card = copy.cards.find((c) => c.id === active) ?? copy.cards[0];
+  const card = visible.find((c) => c.id === active) ?? visible[0];
   const unlocked = planOrder.indexOf(plan) >= planOrder.indexOf(active);
   const upgrade = () => go("plans");
   if (!card) return null;
@@ -36,7 +38,7 @@ export default function PlanPerksTab({ profile, language, plan, actualPlan, sign
     <div className="space-y-6">
       <p className="text-center text-sm leading-7 text-muted-foreground">{t.lead}</p>
       <div role="tablist" aria-label={t.title} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {copy.cards.map((c) => {
+        {visible.map((c) => {
           const open = planOrder.indexOf(plan) >= planOrder.indexOf(c.id);
           return (
             <Button key={c.id} type="button" role="tab" aria-selected={active === c.id} variant={active === c.id ? "default" : "outline"} onClick={() => setActive(c.id)} className="h-auto min-h-12 whitespace-normal px-2 text-sm">
