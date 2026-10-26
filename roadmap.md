@@ -196,7 +196,7 @@
 - [x] "機能表示" removal: six layer card grid, value boxes, badges, source line and Ming Gua display replaced by direct per-perspective reading accordions
 
 ## Family members missing from subject selectors (2026-10-26)
-- [ ] FocusProvider merges device-local test roster/groups when signed-in test preview differs from server plan; selectors refresh on registration
-- [ ] Group create/edit/delete writes locally in test mode (localWrites flag)
-- [ ] ConsultationPanel/TodayGuide refetch roster on onore-focus-reload
-- [ ] Tests + tsgo + build
+- [x] FocusProvider merges device-local test roster/groups when signed-in test preview differs from server plan; selectors refresh on registration
+- [x] Group create/edit/delete writes locally in test mode (localWrites flag)
+- [x] ConsultationPanel/TodayGuide refetch roster on onore-focus-reload
+- [x] Tests + tsgo + build
