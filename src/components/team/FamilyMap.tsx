@@ -7,12 +7,12 @@ import { familyVisualCopy } from '@/lib/family-visual-copy';
 import { memberDisplayName } from '@/lib/focus';
 import { matrixPoint, type TeamMember } from '@/lib/team-analysis';
 import { teamCopy } from '@/lib/team-copy';
-import { siblingLabels } from '@/lib/sibling-order';
+import { familyRelationshipCopy } from '@/lib/family-relationship-copy';
 import type { analyzeFamily } from '@/lib/family-analysis';
 import type { Language } from '@/lib/translations';
 
 export function memberRelationship(member: TeamMember, language: Language) {
-  return [member.relationship || siblingLabels[language].relationTypes[member.relationshipType ?? ''],member.role].filter(Boolean).join(' · ') || '—';
+  return [member.relationship || familyRelationshipCopy[language][member.relationshipType ?? ''],member.role].filter(Boolean).join(' · ') || '—';
 }
 export default function FamilyMap({ data, language }: { data: ReturnType<typeof analyzeFamily>; language: Language }) {
  const c=familyVisualCopy[language],t=teamCopy[language];
