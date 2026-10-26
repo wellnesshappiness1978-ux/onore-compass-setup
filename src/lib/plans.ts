@@ -40,6 +40,8 @@ export const dailyUsageLimit: Record<Plan, number> = { free: 1, standard: 3, vip
 export const consultationDailyLimit: Record<Plan, number> = { free: 1, standard: 3, vip: 10, b2b: 30, "b2b-premium": Infinity };
 export { quickCompatibilityLimit };
 export const nextPlan = (plan: Plan): Plan | null => planOrder[rank(plan) + 1] ?? null;
+/** Current plan plus every higher tier, ascending — the only plans shown in comparisons and upgrade guidance. */
+export const currentAndHigherPlans = (current: Plan): Plan[] => planOrder.filter((p) => rank(p) >= rank(current));
 /** Minimum plan for birth-color and earth-calendar sections. */
 export type ContentFeature = "birthColorsFull" | "helioPersonal" | "helioDirections" | "helioBusiness" | "mandalaArt" | "cosmicGenesisArt" | "groupColorsFull" | "subjectArt";
 const contentMin: Record<ContentFeature, Plan> = {

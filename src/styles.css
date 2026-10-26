@@ -1432,20 +1432,41 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 .design-canvas[data-design="pure-white"] :is(.card-lux, .design-daily-panel, .today-feature) :is(.text-muted-foreground) { color: oklch(.36 .03 265); }
 .design-canvas[data-design="pure-white"] :is(.card-lux, .design-daily-panel, .today-feature) :is(.text-primary) { color: oklch(.47 .11 70); }
 
-/* Today's lucky card: background follows the lucky color; text flips by luminance. */
-.today-feature.lucky-themed, .design-canvas .today-feature.lucky-themed { color: var(--lucky-fg) !important; border-color: color-mix(in srgb, var(--lucky-accent) 45%, transparent) !important; }
-.today-feature.lucky-themed :is(.text-foreground, h3, li, p, span, label, strong) { color: var(--lucky-fg) !important; }
-.today-feature.lucky-themed :is(.text-primary, strong.text-primary, svg.text-primary) { color: var(--lucky-accent) !important; }
-.today-feature.lucky-themed .text-muted-foreground { color: var(--lucky-muted) !important; }
-.today-feature.lucky-themed .lucky-shine-title { background: linear-gradient(100deg, #8a6a12 0%, #f4d03f 22%, #fffbe6 40%, #f4d03f 58%, #b8860b 80%, #fff3b0 100%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent !important; -webkit-text-fill-color: transparent; filter: drop-shadow(0 1px 0 rgba(11,19,43,.85)) drop-shadow(0 0 6px rgba(255,243,176,.7)); font-weight: 700; animation: lucky-shine 4s linear infinite; }
-@keyframes lucky-shine { to { background-position: -200% 0; } }
-@media (prefers-reduced-motion: reduce) { .today-feature.lucky-themed .lucky-shine-title { animation: none; } }
-.feature-notify select, .today-feature.lucky-themed .feature-notify select { background: rgba(255,255,255,.88) !important; color: #0B132B !important; border-color: rgba(11,19,43,.35) !important; }
+/* Today screen: the daily lucky color tints card borders, section dividers and a soft aura (20–30% opacity keeps text readable). */
+.today-guide.lucky-themed .design-daily-panel {
+  position: relative;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--design-surface, var(--card)), var(--design-surface, var(--card))) padding-box,
+    linear-gradient(135deg, color-mix(in oklab, var(--lucky-color) 45%, transparent), color-mix(in oklab, var(--lucky-color) 14%, transparent) 55%, transparent) border-box;
+  box-shadow: 0 0 28px -6px color-mix(in oklab, var(--lucky-color) 28%, transparent);
+}
+.design-canvas[data-design="pure-white"] .today-guide.lucky-themed .design-daily-panel {
+  background:
+    linear-gradient(color-mix(in oklab, white 93%, transparent), color-mix(in oklab, white 93%, transparent)) padding-box,
+    linear-gradient(135deg, color-mix(in oklab, var(--lucky-color) 45%, transparent), color-mix(in oklab, var(--lucky-color) 14%, transparent) 55%, transparent) border-box;
+}
+.today-guide.lucky-themed .design-daily-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(130% 55% at 50% 0%, color-mix(in oklab, var(--lucky-color) 22%, transparent), transparent 62%);
+  pointer-events: none;
+}
+.today-guide.lucky-themed .today-feature details[open] > div {
+  border-top: 1px solid;
+  border-image: linear-gradient(90deg, color-mix(in oklab, var(--lucky-color) 50%, transparent), transparent 72%) 1;
+  padding-top: 0.5rem;
+}
+.today-guide.lucky-themed .today-feature :where(.border-primary\/15, .border-primary\/20, .border-primary\/25) {
+  border-color: color-mix(in oklab, var(--lucky-color) 32%, transparent);
+}
+.feature-notify select { background: rgba(255,255,255,.88) !important; color: #0B132B !important; border-color: rgba(11,19,43,.35) !important; }
 .feature-notify select option { background: #ffffff; color: #0B132B; }
-.today-feature.lucky-themed .border-primary\/20 { border-color: color-mix(in srgb, var(--lucky-fg) 30%, transparent) !important; }
 
 /* Notification panel keeps its own high-contrast palette on every card/theme. */
-.today-feature .feature-notify :is(p, span, label, strong), .today-feature.lucky-themed .feature-notify :is(p, span, label, strong) { color: var(--foreground) !important; }
+.today-feature .feature-notify :is(p, span, label, strong) { color: var(--foreground) !important; }
 .today-feature .feature-notify .text-muted-foreground { color: var(--muted-foreground) !important; }
 .today-feature .feature-notify .notify-on, .today-feature .feature-notify .notify-on * { color: var(--primary-foreground) !important; }
 .today-feature .feature-notify .notify-off { color: var(--destructive) !important; }
@@ -1457,11 +1478,6 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
   text-shadow: 0 0 2px oklch(0.1 0.03 260 / 0.95), 0 1px 3px oklch(0.1 0.03 260 / 0.85), 0 0 8px oklch(0.1 0.03 260 / 0.6);
 }
 
-/* Lucky-color card: strong outline so text stays legible on any vivid color. */
-.lucky-themed :where(p, span, strong, h3, h4, li, label, a, button) {
-  text-shadow: 0 0 1px var(--lucky-outline, rgba(5, 8, 20, 0.95)), 0 0 2px var(--lucky-outline, rgba(5, 8, 20, 0.95)), 0 1px 3px var(--lucky-outline, rgba(5, 8, 20, 0.9));
-  font-weight: 600;
-}
 
 /* Preserve the full painted master; enhancement never redraws its details. */
 .mandala-masterpiece {
