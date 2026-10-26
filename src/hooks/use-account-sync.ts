@@ -10,7 +10,7 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
   const callback = useRef(onProfile); callback.current = onProfile;
   useEffect(() => {
     if (!userId) return;
-    let active = true, refreshing = false, initialized = false;
+    let active = true, refreshing = false, initialized = false, settingsReading = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const snapshot = new Map(syncedSettingKeys.map(k => [k, localStorage.getItem(k)]));
     const changed = new Set<string>();
@@ -24,13 +24,16 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
       }
     };
     const readSettings = async () => {
+      if (settingsReading) return;
+      settingsReading = true;
+      try {
       const { data, error } = await supabase.from('account_settings').select('key,value').eq('user_id', userId);
       if (error || !active) return;
       for (const row of data ?? []) {
         const key = syncedSettingKeys.find(k => k === row.key);
         if (!key || changed.has(key) || (initialized && snapshot.get(key) !== localStorage.getItem(key))) continue;
         const oldValue = localStorage.getItem(key);
-        if (oldValue === row.value) continue;
+        if (oldValue === row.value) { snapshot.set(key,row.value); continue; }
         if (row.value === null) localStorage.removeItem(key); else localStorage.setItem(key, row.value);
         snapshot.set(key, row.value);
         window.dispatchEvent(new StorageEvent('storage', { key, oldValue, newValue: row.value, storageArea: localStorage }));
@@ -43,6 +46,7 @@ export function useAccountSync(userId: string | null, onProfile: () => Promise<v
         if (rows.length) await supabase.from('account_settings').upsert(rows,{ignoreDuplicates:true});
         initialized = true;
       }
+      } finally { settingsReading = false; }
     };
     const refresh = async () => {
       if (!active || refreshing) return;
