@@ -35,7 +35,7 @@ export const todayFortuneSchema = z.object({
   dynamics: z.string(),
   actions: z.array(z.string()),
   caution: z.string(),
-  luckyColor: z.object({ name: z.string(), hex: z.string(), reason: z.string(), usage: z.string().optional().default("") }),
+  luckyColor: z.object({ name: z.string(), hex: z.string(), reason: z.string(), usage: z.string() }),
   luckyWord: z.object({ word: z.string(), message: z.string() }),
   foods: z.array(z.object({
     recipeId: z.string().optional(), name: z.string(), why: z.string(), servings: z.string(),
