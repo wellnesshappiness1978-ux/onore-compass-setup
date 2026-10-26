@@ -16,6 +16,8 @@ type Ctx = {
   owner: UserProfile;
   focus: Focus; setFocus: (f: Focus) => Promise<void>;
   members: TeamMember[]; groups: TeamGroup[]; reload: () => void; serverBacked: boolean;
+  /** True when roster/group writes must stay on this device (guest or signed-in test preview). */
+  localWrites: boolean;
   /** Selected family member (resolved), or null. */
   member: TeamMember | null;
   /** Selected group (resolved) with its index, or null. */
@@ -27,7 +29,7 @@ type Ctx = {
 };
 const FocusContext = createContext<Ctx | null>(null);
 
-export function FocusProvider({ owner, serverBacked, children }: { owner: UserProfile; serverBacked: boolean; children: ReactNode }) {
+export function FocusProvider({ owner, serverBacked, mergeLocal = false, children }: { owner: UserProfile; serverBacked: boolean; mergeLocal?: boolean; children: ReactNode }) {
   const [focus, setLocal] = useState<Focus>(defaultFocus);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [groups, setGroups] = useState<TeamGroup[]>([]);
