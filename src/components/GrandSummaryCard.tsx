@@ -58,7 +58,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
       </div>
       {showApproaches && <MethodExplanationList language={language} detail={key => {
         const body = data?.approaches[key] ?? partial.approaches?.[key];
-        if (data?.approachAvailability[key] === "unavailable") return null;
+        if (data?.approachAvailability[key] === "unavailable") return detailExtra?.(key) ?? null;
         return <details className="group mt-3 rounded-md border border-primary/25 bg-primary/5">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm text-primary [&::-webkit-details-marker]:hidden">{readMore}<ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
           {body ? <div aria-busy={isPending}><ChunkedText className="px-3 pb-3 text-[15px] leading-7 text-foreground" text={body} /></div> : <AgolmenLoading compact label={copy.loading} />}

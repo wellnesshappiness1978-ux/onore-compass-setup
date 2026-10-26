@@ -77,19 +77,21 @@ export default function SelfCoreCard({ title, goal = "", profile, language, onDi
   const coreSections = language === "ja" ? ["コアアイデンティティ", "思考バイアス", "前進と静観の内的な差"] : ["Core identity", "Decision patterns", "Advance and pause tendencies"];
   const icons = [Dna, Fingerprint, Orbit, Heart, Sparkles];
 
-  const nameDetails = (
-<section aria-label={n.title} className="my-6 border-y border-primary/25 py-5">
-            <h3 className="font-serif text-lg text-gradient-gold sm:text-xl">{n.title}</h3>
-            {localLayers?.name ? <>
-              {data?.nameFortune && <><h4 className="mt-5 font-serif text-sm text-primary">{n.fortune}</h4><p className="mt-2 whitespace-pre-line text-sm leading-8 text-foreground sm:text-base">{data?.nameFortune}</p></>}
-
-            </> : chars && onProfileChange ? <div className="mt-3">
-              <p className="text-sm text-muted-foreground">{n.split}</p>
-              <div className="mt-3 flex flex-wrap gap-2">{chars.slice(0, -1).map((_, i) => <Button key={i} size="sm" variant={cut === i + 1 ? "default" : "outline"} onClick={() => setCut(i + 1)}>{chars.slice(0, i + 1).join("")}　{chars.slice(i + 1).join("")}</Button>)}</div>
-              <Button className="mt-3" disabled={saving} onClick={async () => { setSaving(true); try { await onProfileChange({ ...profile, nameKanji: `${chars.slice(0, cut).join("")} ${chars.slice(cut).join("")}` }); } finally { setSaving(false); } }}>{n.save}</Button>
-            </div> : <p className="mt-3 text-sm text-muted-foreground">{f.nameNote}</p>}
-          </section>
-  );
+  // The full name reading lives in the 分類別診断 accordion (art 15); this adds the
+  // fortune passage and the surname/given-name split picker to that accordion item.
+  const nameDetailExtra = (key: ApproachKey) => {
+    if (key !== "nameReading") return null;
+    return <div className="px-3 pb-3">
+      {localLayers?.name ? <>
+        {data?.nameFortune && <><h4 className="mt-2 font-serif text-sm text-primary">{n.fortune}</h4><p className="mt-2 whitespace-pre-line text-sm leading-8 text-foreground sm:text-base">{data.nameFortune}</p></>}
+        <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{n.note}</p>
+      </> : chars && onProfileChange ? <div className="mt-1">
+        <p className="text-sm text-muted-foreground">{n.split}</p>
+        <div className="mt-3 flex flex-wrap gap-2">{chars.slice(0, -1).map((_, i) => <Button key={i} size="sm" variant={cut === i + 1 ? "default" : "outline"} onClick={() => setCut(i + 1)}>{chars.slice(0, i + 1).join("")}　{chars.slice(i + 1).join("")}</Button>)}</div>
+        <Button className="mt-3" disabled={saving} onClick={async () => { setSaving(true); try { await onProfileChange({ ...profile, nameKanji: `${chars.slice(0, cut).join("")} ${chars.slice(cut).join("")}` }); } finally { setSaving(false); } }}>{n.save}</Button>
+      </div> : <p className="mt-1 text-sm text-muted-foreground">{f.nameNote}</p>}
+    </div>;
+  };
 
   return (
     <section aria-label={t.title} className="min-w-0 overflow-hidden rounded-lg border border-primary/35 bg-card/75 shadow-champagne backdrop-blur-md">
