@@ -1,10 +1,11 @@
 # Roadmap
 
 ## Inclusive Family catalogue, map and planning tools (2026-10-26)
-- [ ] Replace Japanese 家族 copy throughout app and AI instructions with inclusive Family wording.
-- [ ] Six-feature v2 contract, explicit atomic saved generation and durable no-retry restoration.
-- [ ] Identifiable map with axes, member legend, guide and three conclusions; shared direction/date simulation and overlaid rhythm alert calendar.
-- [ ] Regression tests, automatic build and desktop/mobile browser checks; actual paid generation subject to available membership.
+- [x] Japanese app copy uses inclusive ファミリー wording; shared AI voice/context applies the same convention, legacy saved goal still resolves without changing free text.
+- [x] Six-feature v2 contract preserves the private atomic pending lock, no automatic generation/retry, completion polling and owner/input-scoped bounded device restoration with sign-out clearing.
+- [x] Identifiable interactive map with name/relationship/role/avatar legend, honest axes/guide and three conclusions; eight-direction consensus/compromise simulation and 30-day overlapping 3-cycle alert calendar.
+- [x] 368 tests across 82 files passed; latest automatic build OK. Signed-in display preview at 1280/390px: all three changed dialogs, map guide and rhythm cycle selection checked, no overflow/page errors. One live AI request using fictional profiles validated six new narratives (522–561 characters), inclusive wording confirmed.
+- [ ] Actual paid Family generate/save/readback across devices: requesting account has no membership row (Free); no entitlement fabricated. Mocked atomic write/readback and live AI schema checks passed but do not establish paid-account UI persistence. Cold cloud read and initial generation remain network-dependent, not a guaranteed zero-second operation.
 
 ## Cross-device sync, sequential upgrades and durable Family readings
 - [x] Owner-filtered realtime, tab/focus refresh, shared account choices and private hashed reading copies; local changes protected during initial hydration. Two separate signed-in 1280/390px contexts confirmed notification pause/resume arriving without reload; original value restored.
