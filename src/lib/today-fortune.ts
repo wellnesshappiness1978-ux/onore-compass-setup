@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { readingProfileSchema } from "./profile-reading-context";
 import { fortuneFingerprint } from "./today-subject";
-import { luckyRecipes } from './lucky-recipes';
+import { COURSE_ORDER, luckyRecipes, recipeCourse, recipeDetails } from './lucky-recipes';
 import { servingsLabel } from './reading-presentation';
 
 /** Shared (client + server) contract for the AI "Today's fortune" reading. */
@@ -60,14 +60,29 @@ const angles = [
 /** Deterministic daily angle so consecutive days never share the same framing. */
 export const dailyAngle = (key: string, day: string) => angles[daySeed(key, day) % angles.length]!;
 
-/** Normalise model output: exactly the first five complete foods, valid hex color. */
+/** Repair legacy course order locally without another AI request or changing menu/photo identity. */
+export function normalizeFoods(foods: TodayFortune['foods'], language: keyof typeof servingsLabel) {
+  const complete = foods.filter(x => x.name && x.ingredients.length && x.steps.length);
+  return COURSE_ORDER.flatMap(course => {
+    const food = complete.find(x => recipeCourse(x.recipeId) === course);
+    if (food) return [{ ...food, name: luckyRecipes.find(r => r.id === food.recipeId)?.names[language] ?? food.name, servings: servingsLabel[language] }];
+    // Older saved fifth slots could contain the savory pumpkin stew. Replace only the missing dessert.
+    if (course !== 'dessert' || complete.length < 5) return [];
+    const recipe = luckyRecipes.find(r => recipeCourse(r.id) === 'dessert');
+    if (!recipe) return [];
+    const details = recipeDetails(recipe, language);
+    return [{ recipeId: recipe.id, name: details.name, why: '', servings: servingsLabel[language], ingredients: details.ingredients.map(text => { const [item, amount] = text.split(' · '); return { item: item ?? '', amount: amount ?? '' }; }), seasonings: [], steps: details.steps.map(text => ({ text, tip: '' })) }];
+  });
+}
+
+/** Normalise model output and legacy device/cloud copies using recognized course identities. */
 export function normalizeFortune(f: TodayFortune, language: keyof typeof servingsLabel = 'ja'): TodayFortune {
   const hex = /^#[0-9a-f]{6}$/i.test(f.luckyColor.hex.trim()) ? f.luckyColor.hex.trim().toUpperCase() : "#D4AF37";
   return {
     ...f,
     actions: f.actions.filter(Boolean).slice(0, 4),
     luckyColor: { ...f.luckyColor, hex },
-    foods: f.foods.filter(x => x.name && x.ingredients.length && x.steps.length).slice(0, 5).map(food => ({ ...food, name: luckyRecipes.find(r => r.id === food.recipeId)?.names[language] ?? food.name, servings: servingsLabel[language] })),
+    foods: normalizeFoods(f.foods, language),
   };
 }
 

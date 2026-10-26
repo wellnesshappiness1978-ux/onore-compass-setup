@@ -3,14 +3,14 @@ import { useEffect, useState } from "react";
 import { ChefHat, Loader2, RefreshCw, Sparkles, LockKeyhole } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { avoidFromHistory, cacheKey, pushHistory, readHistory, todayFortuneSchema, type TodayFortune, type TodayFortuneRequest } from "@/lib/today-fortune";
+import { avoidFromHistory, cacheKey, pushHistory, readHistory, todayFortuneSchema, normalizeFortune, normalizeFoods, type TodayFortune, type TodayFortuneRequest } from "@/lib/today-fortune";
 import type { Language } from "@/lib/translations";
 import type { Plan } from '@/lib/design-modes';
 import { luckyFoodLimit } from '@/lib/plans';
 import { todayAccessCopy } from '@/lib/today-access-copy';
 import { servingsLabel } from '@/lib/reading-presentation';
 import { recipeImage } from '@/lib/recipe-images';
-import { COURSE_ORDER, courseLabels } from '@/lib/lucky-recipes';
+import { recipeCourse, courseLabels } from '@/lib/lucky-recipes';
 import { consumeReadingStream, readingCacheEpoch } from '@/lib/reading-cache';
 import DailyLuckyColor from './DailyLuckyColor';
 import RecipeStep, { cleanRecipeSteps } from './RecipeStep';
@@ -35,8 +35,9 @@ export function useTodayFortune(req: Base | null): FortuneState {
       if (!req || event.key !== cacheKey(req)) return;
       const parsed = todayFortuneSchema.safeParse(JSON.parse(event.newValue ?? 'null'));
       if (!parsed.success) return;
-      resolvedFortunes.set(cacheKey(req),{epoch:readingCacheEpoch(),data:parsed.data});
-      setState({data:parsed.data,loading:false,error:null,sig});
+      const data = normalizeFortune(parsed.data, req.language);
+      resolvedFortunes.set(cacheKey(req),{epoch:readingCacheEpoch(),data});
+      setState({data,loading:false,error:null,sig});
     };
     window.addEventListener('storage',sync);return ()=>window.removeEventListener('storage',sync);
   },[sig]);
@@ -45,7 +46,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
     const key = cacheKey(req);
     try {
       const cached = todayFortuneSchema.safeParse(JSON.parse(localStorage.getItem(key) ?? "null"));
-      if (cached.success && nonce === 0) { resolvedFortunes.set(key, { epoch: readingCacheEpoch(), data: cached.data }); setState({ data: cached.data, loading: false, error: null, sig }); void saveCloudReading(key,cached.data).catch(()=>undefined); return; }
+      if (cached.success && nonce === 0) { const data = normalizeFortune(cached.data, req.language); resolvedFortunes.set(key, { epoch: readingCacheEpoch(), data }); setState({ data, loading: false, error: null, sig }); void saveCloudReading(key,data).catch(()=>undefined); return; }
     } catch { /* ignore */ }
     let active = true;
     const listener = (value: Partial<TodayFortune>) => { if (active) setPartial({ sig, value }); };
@@ -57,7 +58,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
       const epoch = readingCacheEpoch();
       request = readCloudReading(key,todayFortuneSchema).then(saved=> saved ?? fetch('/api/readings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...req, kind: 'today', avoid: avoidFromHistory(readHistory(), req.subject.key, req.day) }) })
         .then(response => consumeReadingStream(response, value => { for (const notify of listeners) notify(value as Partial<TodayFortune>); }))
-        .then(value => todayFortuneSchema.parse(value))).then(async data => {
+        .then(value => todayFortuneSchema.parse(value))).then(value => normalizeFortune(value, req.language)).then(async data => {
         if (epoch === readingCacheEpoch()) {
           resolvedFortunes.set(key, { epoch, data });
           try { localStorage.setItem(key, JSON.stringify(data)); } catch { /* full */ }
@@ -116,8 +117,8 @@ export function TodayLuckyTrio({ state, language, fallback, plan, onUpgrade }: {
       <p className="flex items-center gap-1.5 font-serif text-primary"><ChefHat className="size-4" />{c.allFoods}</p>
       <p className="mt-2 text-xs leading-6">{c.rules}</p>
       <Accordion type="multiple" className="mt-2 min-w-0 rounded-md border border-primary/25 bg-card px-3 text-foreground">
-        {f.foods.map((food, i) => i >= luckyFoodLimit[plan] ? <div key={i} className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/20 py-3"><span className="flex items-center gap-2"><LockKeyhole className="size-4 text-primary" />{courseLabels[language][COURSE_ORDER[i]!]} · {i < 3 ? 'Standard+' : 'VIP+'}</span><Button size="sm" variant="outline" onClick={onUpgrade}>{c.plans}</Button></div> : <AccordionItem key={food.name + i} value={String(i)}>
-          <AccordionTrigger className="min-w-0 gap-2 text-left">{recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt="" loading="lazy" width={384} height={512} className="h-20 w-16 shrink-0 rounded object-cover" />}<span className="min-w-0 flex-1 break-words"><span className="block text-xs text-primary">{courseLabels[language][COURSE_ORDER[i]!]}</span>{food.name}<span className="mt-1 block text-sm font-normal text-muted-foreground">{servingsLabel[language]}</span></span></AccordionTrigger>
+        {normalizeFoods(f.foods, language).map((food, i) => i >= luckyFoodLimit[plan] ? <div key={food.recipeId} className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/20 py-3"><span className="flex items-center gap-2"><LockKeyhole className="size-4 text-primary" />{courseLabels[language][recipeCourse(food.recipeId) ?? 'main']} · {i < 3 ? 'Standard+' : 'VIP+'}</span><Button size="sm" variant="outline" onClick={onUpgrade}>{c.plans}</Button></div> : <AccordionItem key={food.recipeId} value={String(i)}>
+          <AccordionTrigger className="min-w-0 gap-2 text-left">{recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt="" loading="lazy" width={384} height={512} className="h-20 w-16 shrink-0 rounded object-cover" />}<span className="min-w-0 flex-1 break-words"><span className="block text-xs text-primary">{courseLabels[language][recipeCourse(food.recipeId) ?? 'main']}</span>{food.name}<span className="mt-1 block text-sm font-normal text-muted-foreground">{servingsLabel[language]}</span></span></AccordionTrigger>
           <AccordionContent className="min-w-0 space-y-3 text-[15px] leading-7 [overflow-wrap:anywhere]">
             {recipeImage(food.recipeId) && <img src={recipeImage(food.recipeId)} alt={food.name} loading="lazy" width={1024} height={640} className="w-full rounded-md border border-primary/25 object-cover shadow-champagne" />}
             <section className="rounded-md border border-primary/30 bg-primary/5 p-3"><h5 className="font-serif text-sm text-primary">{recipeLabels[language].why}</h5><ChunkedText className="mt-1 text-sm" text={food.why} /></section>
