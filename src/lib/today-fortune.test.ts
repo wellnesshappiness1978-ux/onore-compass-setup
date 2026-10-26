@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { avoidFromHistory, cacheKey, dailyAngle, daySeed, normalizeFortune, todayFortuneRequestSchema, type TodayFortune } from "./today-fortune";
+import { COURSE_ORDER, luckyRecipes, recipeCourse } from './lucky-recipes';
 
 const food = (name: string) => ({ name, why: "w", servings: "2人分", ingredients: [{ item: "豆腐", amount: "300g" }], seasonings: [{ item: "しょうゆ", amount: "大さじ1" }], steps: [{ text: "切る", tip: "t" }] });
 const guidance = { action: 'a', reason: 'r', benefit: 'b' };
@@ -7,14 +8,25 @@ const base: TodayFortune = { decision: { advance: 'a', protect: 'p', reason: 'r'
 
 describe("today fortune", () => {
   it("returns exactly five complete foods", () => {
-    const f = normalizeFortune({ ...base, foods: [1, 2, 3, 4, 5, 6, 7].map(n => food(`料理${n}`)) });
+    const foods = COURSE_ORDER.map(course => { const recipe = luckyRecipes.find(r => recipeCourse(r.id) === course); return { ...food('dish'), recipeId: recipe?.id }; });
+    const f = normalizeFortune({ ...base, foods: [...foods, ...foods] });
     expect(f.foods).toHaveLength(5);
     expect(f.luckyColor.hex).toBe("#AABBCC");
   });
   it('fixes recipes at two servings without altering their quantities', () => {
-    const result = normalizeFortune({ ...base, foods: [{ ...food('豆腐'), servings: '30人分' }] });
+    const result = normalizeFortune({ ...base, foods: [{ ...food('豆腐'), recipeId: 'lemon-chicken', servings: '30人分' }] });
     expect(result.foods[0]?.servings).toBe('2人前');
     expect(result.foods[0]?.ingredients).toEqual([{ item: '豆腐', amount: '300g' }]);
+  });
+  it('repairs an old savory fifth slot from the catalogue without generating again', () => {
+    const ids = ['lemon-chicken', 'komatsuna-miso', 'matcha-latte', 'spinach-tuna', 'pumpkin-sweetpotato'];
+    const result = normalizeFortune({ ...base, foods: ids.map(recipeId => ({ ...food('dish'), recipeId })) });
+    expect(result.foods.map(f => recipeCourse(f.recipeId))).toEqual(COURSE_ORDER);
+    expect(result.foods[4]?.recipeId).toBe('strawberry-yogurt');
+    expect(result.foods[4]?.ingredients.map(i => i.item)).toEqual(['いちご', '無糖ヨーグルト']);
+  });
+  it('does not expose name-only unknown recipes as a dessert', () => {
+    expect(normalizeFortune({ ...base, foods: [food('カレー')] }).foods).toEqual([]);
   });
   it("differs per subject and per day", () => {
     expect(daySeed("self", "2026-10-22")).not.toBe(daySeed("self", "2026-10-23"));
