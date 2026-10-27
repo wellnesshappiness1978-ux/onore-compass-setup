@@ -15,6 +15,15 @@ describe('share content contract', () => {
   it('selection exports only chosen items including the full message', () => {
     expect(shareText({ title: 'Today', names: [], lines: [], sections }, ['message'])).toBe('Today\n\nMessage\nPersonal message');
   });
+  it('unlocked lucky items can be independently selected', () => {
+    const items = [{ id: 'luckyColor', feature: 'dailyLucky' as const, title: 'Color', text: 'Blue' }, { id: 'food-1', feature: 'dailyLucky' as const, title: 'Food', text: 'Soup' }];
+    expect(unlockedShareSections('free', items)).toEqual(items);
+    expect(shareText({ title: 'Today', names: [], lines: [], sections: items }, ['luckyColor'])).not.toContain('Soup');
+  });
+  it('names embedded in private reading prose require opt-in', () => {
+    expect(shareText({ title: '山田の診断', names: ['山田'], lines: ['山田の強み'] })).not.toContain('山田');
+    expect(shareText({ title: '診断', names: ['山田'], lines: ['山田の強み'] }, undefined, true)).toContain('山田の強み');
+  });
   it('full compatibility prose and final advice are never truncated', () => {
     const passage = '詳細相性解説'.repeat(1000);
     const exported = shareText({ title: '相性', names: ['private'], lines: [passage, '各占術のバランス', '最終アドバイス全文'] });

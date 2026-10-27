@@ -2,7 +2,7 @@ import type { Language } from './translations';
 import type { Plan } from './design-modes';
 import { canUseToday, type TodayFeature } from './plans';
 
-export type ShareSection = { id: string; title: string; text: string };
+export type ShareSection = { id: string; title: string; text: string; feature?: TodayFeature };
 export const APP_SHARE_URL = 'https://cosmic-beginnings-onboard.lovable.app';
 type ShareUi = { select: string; all: string; text: string; copy: string; copied: string; empty: string; daily: string; app: string; tagline: string; previous: string; next: string };
 export const shareUi: Record<Language, ShareUi> = {
@@ -17,12 +17,17 @@ export const shareUi: Record<Language, ShareUi> = {
 
 export function unlockedShareSections(plan: Plan, sections: ShareSection[]): ShareSection[] {
   const features: TodayFeature[] = ['decision', 'starPath', 'dailyLucky', 'direction', 'helio', 'shopping', 'health', 'monthlyLucky', 'directionExtended', 'relations', 'biorhythm365', 'familyRoadmap'];
-  return sections.filter(s => s.text.trim() && (s.id === 'message' || (features.includes(s.id as TodayFeature) && canUseToday(plan, s.id as TodayFeature))));
+  return sections.filter(s => s.text.trim() && (s.id === 'message' || (features.includes((s.feature ?? s.id) as TodayFeature) && canUseToday(plan, (s.feature ?? s.id) as TodayFeature))));
+}
+
+export function privateShareText(text: string, names: string[], includeName: boolean): string {
+  if (includeName) return text;
+  return [...new Set(names)].filter(Boolean).sort((a, b) => b.length - a.length).reduce((result, name, i) => result.split(name).join(`(${i + 1})`), text);
 }
 
 export function shareText(data: { title: string; names: string[]; lines: string[]; caution?: string | undefined; url?: string; sections?: ShareSection[] }, selected?: string[], includeName = false): string {
   const content = data.sections ? data.sections.filter(s => !selected || selected.includes(s.id)).map(s => `${s.title}\n${s.text}`) : data.lines;
-  return [data.title, ...(includeName ? data.names : []), ...content, data.caution, data.url].filter(Boolean).join('\n\n');
+  return privateShareText([data.title, ...(includeName ? data.names : []), ...content, data.caution, data.url].filter(Boolean).join('\n\n'), data.names, includeName);
 }
 
 /** Read all already-rendered details, including collapsed panels, without opening them or generating readings. */

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from '@/components/ui/checkbox';
-import { shareText, shareUi } from '@/lib/share-content';
+import { privateShareText, shareText, shareUi } from '@/lib/share-content';
 import { Copy, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import type { Language } from "@/lib/translations";
 import {
@@ -86,7 +86,7 @@ export default function ShareCardButton({
         if (source.sections && !selectedSections?.length) { setRendering(false); setStatus(ui.empty); return; }
         const canvases = await renderShareCards(
           format,
-          { ...source, names: includeName ? source.names : [], lines: selectedSections ? selectedSections.map(s => `${s.title}\n${s.text}`) : source.lines },
+          { ...source, title: privateShareText(source.title, source.names, includeName), caution: source.caution ? privateShareText(source.caution, source.names, includeName) : undefined, names: includeName ? source.names : [], lines: (selectedSections ? selectedSections.map(s => `${s.title}\n${s.text}`) : source.lines).map(line => privateShareText(line, source.names, includeName)) },
           language,
         );
         if (!active) return;

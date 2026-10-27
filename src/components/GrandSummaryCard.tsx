@@ -42,7 +42,7 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
   const colors = palette ? (plan === "free" ? [palette.main] : [palette.main, palette.sub, palette.money, palette.work, palette.love, palette.health, palette.mind]) : [];
   const available = data ? approachKeys.filter(k => data.approachAvailability[k] !== "unavailable" && data.approaches[k]?.trim()) : [];
   const shareData = data && (data.keySummary || text) ? {
-    kicker: "", title: "", names: [] as string[],
+    kicker: traits.final, title: traits.final, names: [profile.nameKanji, profile.nameRomaji].filter(Boolean),
     lines: [text ?? ""].filter(Boolean),
     fullContent: true,
     caution: data.caution,

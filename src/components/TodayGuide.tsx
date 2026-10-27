@@ -432,10 +432,19 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     if (!root) return;
     const sections: ShareSection[] = [];
     const message = root.querySelector('[data-today-share="message"]');
-    if (message) sections.push({ id: 'message', title: shareUi[language].select + ' · ' + (ja ? '本日のメッセージ' : "Today's message"), text: readingElementText(message) });
+    if (message) sections.push({ id: 'message', title: ja ? '本日のメッセージ' : "Today's message", text: readingElementText(message) });
     for (const feature of [...todayFeatures.map(f => f.id), 'directionExtended' as const, 'familyRoadmap' as const]) {
       const elements = root.querySelectorAll(`[data-today-share="${feature}"]`);
       if (elements.length) sections.push({ id: feature, title: L(titles[feature]), text: Array.from(elements).map(readingElementText).join('\n\n') });
+    }
+    if (fortune.data) {
+      const f = fortune.data;
+      const daily = sections.findIndex(s => s.id === 'dailyLucky');
+      if (daily >= 0) sections.splice(daily, 1,
+        { id: 'luckyColor', feature: 'dailyLucky', title: ja ? 'ラッキーカラー' : 'Lucky color', text: `${f.luckyColor.name} ${f.luckyColor.hex}\n${f.luckyColor.reason}\n${f.luckyColor.usage}` },
+        { id: 'luckyWord', feature: 'dailyLucky', title: ja ? 'ラッキーワード' : 'Lucky word', text: `${f.luckyWord.word}\n${f.luckyWord.message}` },
+        ...f.foods.slice(0, luckyFoodLimit[plan]).map((food, i) => ({ id: `food-${food.recipeId}`, feature: 'dailyLucky' as const, title: `${i + 1}. ${food.name}`, text: `${food.why}\n${food.ingredients.map(v => `${v.item} ${v.amount}`).join('\n')}\n${food.seasonings.map(v => `${v.item} ${v.amount}`).join('\n')}\n${food.steps.map(s => `${s.text}\n${s.tip}`).join('\n')}` })),
+      );
     }
     setShareSections(unlockedShareSections(plan, sections));
   };
