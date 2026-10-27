@@ -1380,8 +1380,8 @@ html { scroll-padding-top: calc(var(--preview-bar-height) + 16px); }
 .mobile-fixed-header > button:first-child { grid-row: 1; grid-column: 1; justify-self: start; }
 .mobile-fixed-header > div:last-child { grid-row: 1; grid-column: 2; justify-self: end; }
 .subject-goal-badge { font-size: clamp(10px, 2.6vw, 12px); min-width: min(220px, 100%); }
-.subject-goal-badge button { font-size: inherit !important; white-space: normal; overflow-wrap: anywhere; word-break: break-word; line-height: 1.3; height: auto; min-height: 2rem; padding-block: 2px; }
-@media (min-width: 640px) { .subject-goal-badge { font-size: 14px; } }
+.subject-goal-badge button { font-size: inherit !important; white-space: normal; overflow-wrap: anywhere; word-break: break-word; line-height: 1.3; height: auto; min-height: 2rem; padding-block: 2px; align-self: stretch; }
+.subject-goal-badge > span { align-items: stretch; }
 
 html { scroll-padding-top: calc(var(--preview-bar-height) + 112px + env(safe-area-inset-top)); }
 body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height) + 106px + env(safe-area-inset-top)); left: 12px; right: auto; max-width: calc(100vw - 160px); }
