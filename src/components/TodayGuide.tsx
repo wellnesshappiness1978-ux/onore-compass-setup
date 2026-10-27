@@ -434,8 +434,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     const message = root.querySelector('[data-today-share="message"]');
     if (message) sections.push({ id: 'message', title: shareUi[language].select + ' · ' + (ja ? '本日のメッセージ' : "Today's message"), text: readingElementText(message) });
     for (const feature of [...todayFeatures.map(f => f.id), 'directionExtended' as const, 'familyRoadmap' as const]) {
-      const element = root.querySelector(`[data-today-share="${feature}"]`);
-      if (element) sections.push({ id: feature, title: L(titles[feature]), text: readingElementText(element) });
+      const elements = root.querySelectorAll(`[data-today-share="${feature}"]`);
+      if (elements.length) sections.push({ id: feature, title: L(titles[feature]), text: Array.from(elements).map(readingElementText).join('\n\n') });
     }
     setShareSections(unlockedShareSections(plan, sections));
   };

@@ -59,8 +59,7 @@ export default function ShareCardButton({
 
   useEffect(() => {
     if (!open) return;
-    let active = true,
-      imageUrl: string | undefined;
+    let active = true;
     const imageUrls: string[] = [];
     setUrl(null);
     setBlob(null);
@@ -105,7 +104,6 @@ export default function ShareCardButton({
     void build();
     return () => {
       active = false;
-      if (imageUrl) URL.revokeObjectURL(imageUrl);
       imageUrls.forEach(url => URL.revokeObjectURL(url));
     };
   }, [open, payload, language, format, includeName, loading, selected]);
@@ -130,7 +128,7 @@ export default function ShareCardButton({
     if (!blob || sharing) return;
     const files = pages.map((page, i) => new File([page.blob], filename.replace('.png', `-${i + 1}.png`), { type: 'image/png' }));
     if (!navigator.canShare?.({ files })) {
-      if (data?.kind === 'app' && navigator.share) { try { await navigator.share({ title: data.title, text, url: data.url }); } catch (e) { if (!(e instanceof DOMException && e.name === 'AbortError')) setStatus(t.error); } return; }
+      if (data?.kind === 'app' && navigator.share) { try { await navigator.share({ title: data.title, text, ...(data.url ? { url: data.url } : {}) }); } catch (e) { if (!(e instanceof DOMException && e.name === 'AbortError')) setStatus(t.error); } return; }
       save();
       return;
     }
