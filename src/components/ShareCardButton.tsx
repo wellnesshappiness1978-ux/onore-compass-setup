@@ -61,6 +61,7 @@ export default function ShareCardButton({
     if (!open) return;
     let active = true,
       imageUrl: string | undefined;
+    const imageUrls: string[] = [];
     setUrl(null);
     setBlob(null);
     setStatus("");

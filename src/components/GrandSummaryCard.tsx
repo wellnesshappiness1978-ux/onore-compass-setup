@@ -43,7 +43,8 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
   const available = data ? approachKeys.filter(k => data.approachAvailability[k] !== "unavailable" && data.approaches[k]?.trim()) : [];
   const shareData = data && (data.keySummary || text) ? {
     kicker: "", title: "", names: [] as string[],
-    lines: [data.catchphrase, data.keySummary || (text ?? "").slice(0, 120)].filter(Boolean),
+    lines: [text ?? ""].filter(Boolean),
+    fullContent: true,
     caution: data.caution,
     keywords: available.slice(0, 6).map(k => traits.methods[approachKeys.indexOf(k)] ?? ""),
     palette: colors.slice(0, 6).map(c => ({ label: localizeBirthColorName(c.name, language), code: c.code })),

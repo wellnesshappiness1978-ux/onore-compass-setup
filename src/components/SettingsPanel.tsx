@@ -54,6 +54,7 @@ type Props = {
   appearance: AppearanceSelection;
   onAppearanceSave: (selection: AppearanceSelection) => void;
   signedIn?: boolean;
+  accountControl?: React.ReactNode;
 };
 
 const card = "border-b border-primary/20 py-6";
@@ -73,6 +74,7 @@ export default function SettingsPanel({
   appearance,
   onAppearanceSave,
   signedIn = false,
+  accountControl,
 }: Props) {
   const t = settingsTranslations[language];
   const font = useFontSize();
@@ -354,6 +356,7 @@ export default function SettingsPanel({
         </div>
       </section>
       <div data-settings-pause><ReminderMasterSwitch language={language} /></div>
+      <div data-settings-auth>{accountControl}</div>
       <Dialog open={lockedMode !== null} onOpenChange={(open) => { if (!open) setLockedMode(null); }}>
         <DialogContent className="theme-preview-dialog flex h-[min(92dvh,900px)] w-[min(100vw,760px)] max-w-none flex-col gap-0 overflow-hidden border-primary/30 bg-card p-0 text-foreground">
           {lockedTheme && <>
