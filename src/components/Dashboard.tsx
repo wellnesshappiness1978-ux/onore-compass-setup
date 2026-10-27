@@ -85,6 +85,7 @@ type Props = {
   language: Language;
   onLanguageChange: (language: Language) => void;
   signedIn?: boolean;
+  accountControl?: ReactNode;
 };
 type Tab = "home" | "traits" | "today" | "consult" | "art" | "business" | "settings";
 
@@ -513,6 +514,7 @@ function TorisetsuPanel({
               </article>; })}
               {planOrder.indexOf(plan) >= planOrder.indexOf("vip") && <p className="whitespace-pre-line text-sm leading-7">{groupResults[0]!.reading.sentences[2]}</p>}
               <p className="text-xs text-muted-foreground">{groupResults[0]!.reading.note}</p>
+              <ShareCardButton language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: q.title, title: q.title, score: 0, names: groupResults.map(item => item.name), fullContent: true, lines: [ownerText, ...groupResults.map((item, index) => `${index + 1}. ${item.reading.score}%\n${splitGroupReading(item.reading.sentences[0]).pair || item.reading.elementPair}\n${item.reading.sentences.slice(1).join("\n")}\n${item.reading.elementPair}`), q.weekAction], caution: groupResults[0]?.reading.note }} />
             </section>;
           })()}
           {analyzed && result && groupResults.length === 0 ? (
@@ -561,7 +563,7 @@ function TorisetsuPanel({
                 <p className="mt-3 text-sm leading-7 text-foreground">{q.weekAction}</p>
               </article>
                <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
-              <ShareCardButton className="mt-6" language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: language === "ja" ? "アゴルメン相性診断" : "Agolmen compatibility", title: q.title, score, names: partnerName ? [partnerName] : [], lines: [t.coreDynamics[relation ?? 0] ?? ""], palette: result.colors.filter((c): c is string => Boolean(c)).map((code, i) => ({ label: i === 0 ? q.rhythmYou : q.rhythmPartner, code })), caution: result.note }} />
+              <ShareCardButton className="mt-6" language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: language === "ja" ? "アゴルメン相性診断" : "Agolmen compatibility", title: q.title, score, names: partnerName ? [partnerName] : [], fullContent: true, lines: [t.coreDynamics[relation ?? 0] ?? "", ...result.sentences.map((sentence, i) => `${result.titles[i] ?? ""}\n${sentence}`), result.elementPair, `${q.rhythmYou}: ${rhythmYou ?? "—"} / ${q.rhythmPartner}: ${rhythmPartner ?? "—"}`, q.weekAction], palette: result.colors.filter((c): c is string => Boolean(c)).map((code, i) => ({ label: i === 0 ? q.rhythmYou : q.rhythmPartner, code })), caution: result.note }} />
             </section>
           ) : null}
           {plan === "free" && <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
@@ -637,7 +639,7 @@ function FocusedToday({ language, render, plan, onUpgrade }: { language: Languag
   return <SubjectVoice language={language}><SubjectDailyNote language={language} />{ctx.group && <GroupMembersToday language={language} />}{render(ctx.readingProfile)}</SubjectVoice>;
 }
 
-export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false }: Props) {
+export default function Dashboard({ profile, onEdit, onProfileChange, language, onLanguageChange, signedIn = false, accountControl }: Props) {
   const t = dashboardTranslations[language];
   const base = translations[language];
   const [tab, setTab] = useState<Tab>("home");
@@ -905,6 +907,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 appearance={effectiveAppearance}
                 onAppearanceSave={saveAppearance}
                 signedIn={signedIn}
+                accountControl={accountControl}
                 onEdit={() => setModal("profile")}
               /></>
             ) : null}

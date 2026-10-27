@@ -45,7 +45,8 @@
 - Completed personal readings restore from bounded in-memory/device caches with explicit access-time eviction, while core calculations reuse profile/day query entries; sign-out clears both. Why: fast repeated views without cross-owner stale results.
 - Profile text fields that the UI composes (e.g. sibling_order) use DB length limits, not value-list CHECK constraints. Why: legacy enums silently rejected new structured values.
 - Parent persistence uses the shared parent-data contract and database-returned parent records; omitted parent keys never clear saved parents. Signed-in family CRUD always uses actual membership, independently of display previews. Why: avoid silent field loss and device-only saves mistaken for cloud persistence.
-- Family catalogue uses one Family gate and FocusProvider members including owner. Why: consistent access and actual profiles.
+- Family catalogue shares its gate and owner-inclusive roster. Why: consistency.
+- Shares reuse readings and paginate full prose; Today exports unlocked bodies; footer shares only the app. Why: no extra AI or artwork disclosure.
 
 - Family registration uses familyRegistrationAccess independently of analytics gates; signed-in capacity always uses server membership. TeamStudio owns editor state and opens idempotently from onore-family-edit, closing on tab departure or successful save. Why: registration remains available to Standard+ without accidental form opening or preview write access.
 - Account sync owns one owner-filtered Realtime channel; refresh reads, not AI. Private reading copies use hashed cloud keys; font size/preview stay local. Why: cross-device freshness without repeat charges.

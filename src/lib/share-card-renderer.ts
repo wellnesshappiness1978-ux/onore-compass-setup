@@ -3,7 +3,7 @@ import logoAsset from "@/assets/agolmen-v10-compass-final.png.asset.json";
 
 const logoUrl = logoAsset.url;
 
-export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility" | "daily" | "biorhythm" | "consultation"; caution?: string; keywords?: string[]; palette?: { label: string; code: string }[] };
+export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility" | "daily" | "biorhythm" | "consultation" | "app"; caution?: string | undefined; keywords?: string[]; palette?: { label: string; code: string }[]; sections?: import('./share-content').ShareSection[]; url?: string; fullContent?: boolean; pageLabel?: string };
 export type CardFormat = "story" | "x";
 export const shareCopy = {
   ja: { cta: "あなたの診断カードをシェア", title: "あなたの本質を、一枚に。", description: "あなたの診断カード", essence: "あなたの本質", bias: "陥りがちな罠・思考バイアス", palette: "バースカラーパレット", roles: ["メイン", "サブ", "金運", "愛情", "健康", "内面"], reference: "自己理解のための参考解釈・参考色", search: "アゴルメンの羅針盤で検索", hashtags: "#アゴルメンの羅針盤 #バースカラー #自己理解", name: "名前を載せる", privacy: "名前・出生情報は初期設定で非表示", save: "画像を保存", share: "端末でシェア", story: "縦型 9:16", x: "横型 16:9", note: "共有先は端末で選択します。Instagram・TikTokへの直接投稿は保証されません。画像共有に未対応の場合は保存し、各アプリで画像を選んでください。Xの投稿画面には画像は自動添付されません。", saved: "画像を保存しました", shared: "端末の共有画面を開きました", error: "画像を作成・共有できませんでした。もう一度お試しください。", loading: "選択した言語の診断カードを作成中…", match: "相性スコア" },
@@ -84,7 +84,8 @@ export async function renderShareCard(format: CardFormat, data: ShareCardData, l
   ctx.fillStyle = gold; ctx.font = '500 24px "Noto Sans JP", sans-serif'; ctx.fillText(data.kind === "identity" ? t.essence : data.kind === "compatibility" ? t.match : kindLabel(data.kind, language), x, story ? 338 : 204);
   const textGradient = ctx.createLinearGradient(x, 0, x + width, 0); textGradient.addColorStop(0, paper); textGradient.addColorStop(.5, gold); textGradient.addColorStop(1, paper); ctx.fillStyle = textGradient;
   const main = data.kind === "identity" ? data.lines.join("\n") : `${data.title}${data.score ? ` · ${data.score}%` : ""}\n${data.lines.join("\n")}`;
-  fittedText(ctx, main, x, story ? 382 : 229, width, story ? 450 : 290, story ? 60 : 33, story ? 30 : 20);
+  fittedText(ctx, main, x, story ? 382 : 229, width, story ? 450 : 290, data.fullContent ? (story ? 32 : 20) : story ? 60 : 33, story ? 30 : 20);
+  if (data.pageLabel) { ctx.fillStyle = gold; ctx.font = '500 22px sans-serif'; ctx.fillText(data.pageLabel, x, story ? 855 : 535); }
   if (data.names.length) { ctx.fillStyle = paper; ctx.font = '400 25px "Noto Sans JP", sans-serif'; ctx.fillText(data.names.join(" × "), x, story ? 887 : 548, width); }
   if (data.keywords?.length) { ctx.fillStyle = gold; ctx.font = `500 ${story ? 23 : 15}px "Noto Sans JP", sans-serif`; ctx.fillText(data.keywords.slice(0, 6).join("  ·  "), x, story ? 930 : 572, width); }
   const bx = story ? 100 : 640, by = story ? 963 : 190, bw = story ? 880 : 470, bh = story ? 315 : 200;
@@ -93,16 +94,29 @@ export async function renderShareCard(format: CardFormat, data: ShareCardData, l
     ctx.fillStyle = gold; ctx.font = `500 ${story ? 28 : 21}px "Noto Sans JP", sans-serif`; ctx.fillText(t.bias, bx + 28, by + 49, bw - 56);
     ctx.fillStyle = paper; fittedText(ctx, data.caution, bx + 28, by + 70, bw - 56, bh - 92, story ? 33 : 23, story ? 24 : 17, false);
   }
-  const py = story ? 1360 : 425; ctx.fillStyle = gold; ctx.font = `500 ${story ? 25 : 19}px "Noto Sans JP", sans-serif`; ctx.fillText(t.palette, bx, py);
+  const py = story ? 1360 : 425; ctx.fillStyle = gold; ctx.font = `500 ${story ? 25 : 19}px "Noto Sans JP", sans-serif`; if (palette.length) ctx.fillText(t.palette, bx, py);
   palette.forEach((color, i) => {
     const columns = story ? 3 : 3, cw = bw / columns, row = Math.floor(i / columns), chipX = bx + (i % columns) * cw, chipY = py + 35 + row * (story ? 92 : 57);
     ctx.fillStyle = color.code; ctx.fillRect(chipX, chipY, story ? 42 : 25, story ? 42 : 25);
     ctx.fillStyle = paper; ctx.font = `400 ${story ? 21 : 15}px "Noto Sans JP", sans-serif`; ctx.fillText(color.label, chipX + (story ? 56 : 35), chipY + (story ? 17 : 10), cw - 62);
     ctx.font = `${story ? 20 : 14}px monospace`; ctx.fillText(color.code, chipX + (story ? 56 : 35), chipY + (story ? 44 : 30));
   });
-  ctx.textAlign = "center"; ctx.fillStyle = paper; ctx.font = `${story ? 22 : 16}px "Noto Sans JP", sans-serif`; ctx.fillText(t.hashtags, w / 2, story ? 1730 : 590, w - 140);
+  ctx.textAlign = "center"; ctx.fillStyle = paper; ctx.font = `${story ? 22 : 16}px "Noto Sans JP", sans-serif`; if (data.kind !== 'app') ctx.fillText(t.hashtags, w / 2, story ? 1730 : 590, w - 140);
   ctx.strokeStyle = gold; ctx.globalAlpha = .45; ctx.strokeRect(w / 2 - 235, story ? 1760 : 607, 470, story ? 64 : 30); ctx.globalAlpha = 1;
-  ctx.fillStyle = gold; ctx.font = `${story ? 23 : 16}px "Noto Sans JP", sans-serif`; ctx.fillText(t.search, w / 2, story ? 1801 : 629);
+  ctx.fillStyle = gold; ctx.font = `${story ? 23 : 16}px "Noto Sans JP", sans-serif`; ctx.fillText(data.url ?? t.search, w / 2, story ? 1801 : 629, w - 140);
   ctx.fillStyle = paper; ctx.font = `${story ? 19 : 13}px "Noto Sans JP", sans-serif`; ctx.fillText(t.reference, w / 2, h - 58);
   return canvas;
+}
+
+/** Paginate full readings instead of ellipsizing any exported passage. */
+export async function renderShareCards(format: CardFormat, data: ShareCardData, language: Language): Promise<HTMLCanvasElement[]> {
+  if (!data.fullContent) return [await renderShareCard(format, data, language)];
+  const measure = document.createElement('canvas').getContext('2d');
+  if (!measure) throw new Error(cardCopy(language).error);
+  measure.font = `600 ${format === 'story' ? 32 : 20}px "Noto Serif JP", sans-serif`;
+  const wrapped = lines(measure, [data.title, ...data.lines, data.caution].filter(Boolean).join('\n\n'), format === 'story' ? 880 : 500);
+  const pages: HTMLCanvasElement[] = [];
+  const total = Math.max(1, Math.ceil(wrapped.length / 8));
+  for (let i = 0; i < total; i++) pages.push(await renderShareCard(format, { ...data, title: '', score: 0, caution: undefined, lines: wrapped.slice(i * 8, (i + 1) * 8), pageLabel: `${i + 1} / ${total}` }, language));
+  return pages;
 }
