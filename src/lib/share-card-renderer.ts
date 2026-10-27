@@ -1,4 +1,5 @@
 import type { Language } from "./translations";
+import { packShareLines } from "./share-content";
 import logoAsset from "@/assets/agolmen-v10-compass-final.png.asset.json";
 
 const logoUrl = logoAsset.url;
@@ -83,11 +84,11 @@ export async function renderShareCard(format: CardFormat, data: ShareCardData, l
   const x = story ? 100 : 90, width = story ? 880 : 500;
   ctx.fillStyle = gold; ctx.font = '500 24px "Noto Sans JP", sans-serif'; ctx.fillText(data.kind === "identity" ? t.essence : data.kind === "compatibility" ? t.match : kindLabel(data.kind, language), x, story ? 338 : 204);
   const textGradient = ctx.createLinearGradient(x, 0, x + width, 0); textGradient.addColorStop(0, paper); textGradient.addColorStop(.5, gold); textGradient.addColorStop(1, paper); ctx.fillStyle = textGradient;
-  const main = data.kind === "identity" ? data.lines.join("\n") : `${data.title}${data.score ? ` · ${data.score}%` : ""}\n${data.lines.join("\n")}`;
-  fittedText(ctx, main, x, story ? 382 : 229, width, story ? 450 : 290, data.fullContent ? (story ? 32 : 20) : story ? 60 : 33, story ? 30 : 20);
-  if (data.pageLabel) { ctx.fillStyle = gold; ctx.font = '500 22px sans-serif'; ctx.fillText(data.pageLabel, x, story ? 855 : 535); }
-  if (data.names.length) { ctx.fillStyle = paper; ctx.font = '400 25px "Noto Sans JP", sans-serif'; ctx.fillText(data.names.join(" × "), x, story ? 887 : 548, width); }
-  if (data.keywords?.length) { ctx.fillStyle = gold; ctx.font = `500 ${story ? 23 : 15}px "Noto Sans JP", sans-serif`; ctx.fillText(data.keywords.slice(0, 6).join("  ·  "), x, story ? 930 : 572, width); }
+  const main = data.fullContent || data.kind === "identity" ? data.lines.join("\n") : `${data.title}${data.score ? ` · ${data.score}%` : ""}\n${data.lines.join("\n")}`;
+  fittedText(ctx, main, x, story ? 382 : 229, width, data.fullContent ? (story ? FULL_STORY_H : 290) : story ? 450 : 290, data.fullContent ? (story ? 32 : 20) : story ? 60 : 33, story ? 30 : 20);
+  if (data.pageLabel) { ctx.fillStyle = gold; ctx.font = '500 22px sans-serif'; ctx.fillText(data.pageLabel, x, story ? (data.fullContent ? 1290 : 855) : 535); }
+  if (data.names.length) { ctx.fillStyle = paper; ctx.font = '400 25px "Noto Sans JP", sans-serif'; ctx.fillText(data.names.join(" × "), x, story ? (data.fullContent ? 1325 : 887) : 548, width); }
+  if (data.keywords?.length && !data.fullContent) { ctx.fillStyle = gold; ctx.font = `500 ${story ? 23 : 15}px "Noto Sans JP", sans-serif`; ctx.fillText(data.keywords.slice(0, 6).join("  ·  "), x, story ? 930 : 572, width); }
   const bx = story ? 100 : 640, by = story ? 963 : 190, bw = story ? 880 : 470, bh = story ? 315 : 200;
   if (data.caution) {
     ctx.fillStyle = token("--share-panel"); ctx.fillRect(bx, by, bw, bh); ctx.strokeStyle = gold; ctx.globalAlpha = .45; ctx.strokeRect(bx, by, bw, bh); ctx.globalAlpha = 1;
@@ -108,15 +109,19 @@ export async function renderShareCard(format: CardFormat, data: ShareCardData, l
   return canvas;
 }
 
-/** Paginate full readings instead of ellipsizing any exported passage. */
+const FULL_STORY_H = 880;
+/** Lines one fullContent page holds at the fixed 32/20px body size and 1.55 leading. */
+export const fullLinesPerPage = (format: CardFormat) => Math.floor((format === 'story' ? FULL_STORY_H : 290) / ((format === 'story' ? 32 : 20) * 1.55));
+
+/** Paginate full readings instead of ellipsizing; short items share one card and only long items continue. */
 export async function renderShareCards(format: CardFormat, data: ShareCardData, language: Language): Promise<HTMLCanvasElement[]> {
   if (!data.fullContent) return [await renderShareCard(format, data, language)];
   const measure = document.createElement('canvas').getContext('2d');
   if (!measure) throw new Error(cardCopy(language).error);
   measure.font = `600 ${format === 'story' ? 32 : 20}px "Noto Serif JP", sans-serif`;
-  const wrapped = lines(measure, [data.title, ...data.lines, data.caution].filter(Boolean).join('\n\n'), format === 'story' ? 880 : 500);
+  const blocks = [data.title, ...data.lines, data.caution].filter((v): v is string => Boolean(v && v.trim())).map(block => lines(measure, block, format === 'story' ? 880 : 500));
+  const packed = packShareLines(blocks, fullLinesPerPage(format));
   const pages: HTMLCanvasElement[] = [];
-  const total = Math.max(1, Math.ceil(wrapped.length / 8));
-  for (let i = 0; i < total; i++) pages.push(await renderShareCard(format, { ...data, title: '', score: 0, caution: undefined, lines: wrapped.slice(i * 8, (i + 1) * 8), pageLabel: `${i + 1} / ${total}` }, language));
+  for (let i = 0; i < packed.length; i++) pages.push(await renderShareCard(format, { ...data, title: '', score: 0, caution: undefined, lines: packed[i] ?? [], pageLabel: packed.length > 1 ? `${i + 1} / ${packed.length}` : undefined }, language));
   return pages;
 }
