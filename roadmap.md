@@ -1,5 +1,11 @@
 # Roadmap
 
+## Diagnostic sharing and account controls (2026-10-27)
+- [ ] Move account sign-in/out immediately below the notification master pause.
+- [ ] Share actual personal/group integrated diagnosis and complete compatibility without truncation.
+- [ ] Select all unlocked Today sections, including the daily message; footer shares the app only.
+- [ ] Run regression tests and verify desktop/mobile sharing and automatic build.
+
 ## Header/settings layout and dessert identity (2026-10-26)
 - [x] Single-row desktop navigation; mobile two-row readability preserved.
 - [x] Top-left settings title, equal profile/focus columns, BGM/caution/relationship reminders below account settings.
