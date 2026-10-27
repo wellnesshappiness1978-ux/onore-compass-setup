@@ -1391,7 +1391,7 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 .design-canvas:not([data-tab=home]) .design-header { height: calc(146px + env(safe-area-inset-top)); border: 0; }
 .design-canvas:not([data-tab=home]) .design-header > div { display: none; }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .mobile-fixed-header { grid-template-columns: 40px minmax(0,1fr) auto; grid-template-rows: minmax(50px, auto); min-height: calc(56px + env(safe-area-inset-top)); column-gap: clamp(4px, 1.5vw, 16px); }
   .mobile-fixed-header > .subject-goal-badge { grid-row: 1; grid-column: 2; width: 100%; }
   .mobile-fixed-header > div:last-child { grid-column: 3; }
