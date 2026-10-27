@@ -33,7 +33,7 @@ export function shareText(data: { title: string; names: string[]; lines: string[
 /** Read all already-rendered details, including collapsed panels, without opening them or generating readings. */
 export function readingElementText(element: Element): string {
   const clone = element.cloneNode(true) as Element;
-  clone.querySelectorAll('.feature-notify, button, svg, [data-share-exclude], [aria-hidden="true"], [role="status"]').forEach(node => node.remove());
+  clone.querySelectorAll('.feature-notify, button, svg, [data-share-exclude], [data-locked="true"], [aria-hidden="true"], [role="status"]').forEach(node => node.remove());
   const walk = (node: Node): string => {
     if (node.nodeType === 3) return node.textContent ?? '';
     const content = Array.from(node.childNodes).map(walk).join('');

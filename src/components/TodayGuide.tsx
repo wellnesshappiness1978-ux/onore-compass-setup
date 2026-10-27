@@ -410,7 +410,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     {content.biorhythm365.body}
     <h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "ファミリーのロードマップとバイオリズム" : "Family roadmap & biorhythm"}</h4>
     {planOrder.indexOf(plan) >= planOrder.indexOf(familyRoadmapMin) ? <div data-today-share="familyRoadmap">{content.familyRoadmap.body}</div> : (
-      <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/25 p-3 text-sm">
+      <div data-share-exclude className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/25 p-3 text-sm">
         <span>{teaser.familyRoadmap ?? (ja ? "ファミリーの1年の流れを一緒に見られます。" : "See your family's year together.")}</span>
         <span className="flex gap-2"><Button size="sm" variant="outline" className="border-primary/40" onClick={() => setSample("familyRoadmap")}>{ja ? "サンプルを見る" : "See sample"}</Button><Button size="sm" variant="champagne" onClick={onUpgrade}>{ja ? "プランを見る" : "See plans"}</Button></span>
       </div>)}
@@ -489,7 +489,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
               <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className={`min-w-0 break-words ${lucky ? "font-semibold" : ""}`}>{L(titles[id])}</span></h3>
               {!open && <span className="shrink-0 rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">{names[min]}+</span>}
             </div>}>
-            {open ? <><div data-today-share={id}>{content[id].body}{id === "starPath" || id === "helio" ? renderDepth(id) : id === "biorhythm365" ? <>{canReadThreeWaves(plan) ? renderDepth("biorhythm") : <div className="mt-3 border-t border-primary/25 pt-3"><p className="text-sm text-primary">{access.waves}</p><Button variant="outline" onClick={onUpgrade}><LockKeyhole className="size-4" />{access.plans}</Button></div>}{renderDepth("family")}</> : null}</div></> : (
+            {open ? <><div data-today-share={id}>{content[id].body}{id === "starPath" || id === "helio" ? renderDepth(id) : id === "biorhythm365" ? <>{canReadThreeWaves(plan) ? renderDepth("biorhythm") : <div data-share-exclude className="mt-3 border-t border-primary/25 pt-3"><p className="text-sm text-primary">{access.waves}</p><Button variant="outline" onClick={onUpgrade}><LockKeyhole className="size-4" />{access.plans}</Button></div>}{renderDepth("family")}</> : null}</div></> : (
               <div className="relative overflow-hidden rounded-md border border-primary/20 p-3">
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-champagne-gradient opacity-10 blur-sm" />
                 <div className="relative flex flex-col items-center gap-2 text-center">

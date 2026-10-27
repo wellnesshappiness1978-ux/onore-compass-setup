@@ -1,10 +1,10 @@
 # Roadmap
 
 ## Diagnostic sharing and account controls (2026-10-27)
-- [ ] Move account sign-in/out immediately below the notification master pause.
-- [ ] Share actual personal/group integrated diagnosis and complete compatibility without truncation.
-- [ ] Select all unlocked Today sections, including the daily message; footer shares the app only.
-- [ ] Run regression tests and verify desktop/mobile sharing and automatic build.
+- [x] Move account sign-in/out immediately below the notification master pause; signed-in UI adjacency verified.
+- [x] Share actual personal/group integrated diagnosis and complete compatibility with locally paginated images and full text; no share-time AI calls.
+- [x] Select unlocked Today sections, daily message, individual lucky color/word/allowed recipes; footer shares only the app introduction and public URL.
+- [x] 388 regression tests passed and automatic build OK. Signed-in PC/390px: app card, Today selection/full-text download, personal integrated 7-page card, compatibility 12-page card and 1929-character complete text with final advice verified; no page errors/overflow. Native OS share destinations and a fresh group AI result were not exercised.
 
 ## Header/settings layout and dessert identity (2026-10-26)
 - [x] Single-row desktop navigation; mobile two-row readability preserved.
