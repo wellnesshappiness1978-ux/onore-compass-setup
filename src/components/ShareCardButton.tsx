@@ -9,10 +9,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from '@/components/ui/checkbox';
+import { shareText, shareUi } from '@/lib/share-content';
+import { Copy, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import type { Language } from "@/lib/translations";
 import {
   cardCopy,
-  renderShareCard,
+  renderShareCards,
   type CardFormat,
   type ShareCardData,
 } from "@/lib/share-card-renderer";
@@ -27,6 +30,7 @@ export default function ShareCardButton({
   label,
   autoOpen = true,
   iconOnly = false,
+  onPrepare,
 }: {
   data: ShareCardData | null;
   language: Language;
@@ -35,8 +39,10 @@ export default function ShareCardButton({
   label?: string;
   autoOpen?: boolean;
   iconOnly?: boolean;
+  onPrepare?: () => void;
 }) {
   const t = cardCopy(language);
+  const ui = shareUi[language];
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState<CardFormat>("story");
   const [url, setUrl] = useState<string | null>(null);
@@ -45,6 +51,10 @@ export default function ShareCardButton({
   const [includeName, setIncludeName] = useState(false);
   const [rendering, setRendering] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [selected, setSelected] = useState<string[] | null>(null);
+  const [pages, setPages] = useState<{ url: string; blob: Blob }[]>([]);
+  const [pageIndex, setPageIndex] = useState(0);
+  const text = data ? shareText(data, selected ?? undefined, includeName) : '';
   const payload = data ? JSON.stringify(data) : "";
 
   useEffect(() => {
@@ -55,6 +65,8 @@ export default function ShareCardButton({
     setBlob(null);
     setStatus("");
     setRendering(true);
+    setPages([]);
+    setPageIndex(0);
     if (!payload || loading) {
       if (!loading) {
         setRendering(false);
@@ -69,24 +81,19 @@ export default function ShareCardButton({
         await document.fonts.ready;
         if (!active) return;
         const source = JSON.parse(payload) as ShareCardData;
-        const canvas = await renderShareCard(
+        const selectedSections = source.sections?.filter(s => selected === null || selected.includes(s.id));
+        if (source.sections && !selectedSections?.length) { setRendering(false); setStatus(ui.empty); return; }
+        const canvases = await renderShareCards(
           format,
-          { ...source, names: includeName ? source.names : [] },
+          { ...source, names: includeName ? source.names : [], lines: selectedSections ? selectedSections.map(s => `${s.title}\n${s.text}`) : source.lines },
           language,
         );
         if (!active) return;
-        canvas.toBlob((image) => {
-          if (!active) return;
-          if (!image) {
-            setStatus(t.error);
-            setRendering(false);
-            return;
-          }
-          imageUrl = URL.createObjectURL(image);
-          setUrl(imageUrl);
-          setBlob(image);
-          setRendering(false);
-        }, "image/png");
+        const images = await Promise.all(canvases.map(canvas => new Promise<Blob>((resolve, reject) => canvas.toBlob(image => image ? resolve(image) : reject(new Error(t.error)), 'image/png'))));
+        if (!active) return;
+        const next = images.map(blob => ({ blob, url: URL.createObjectURL(blob) }));
+        imageUrls.push(...next.map(p => p.url));
+        setPages(next); setUrl(next[0]?.url ?? null); setBlob(next[0]?.blob ?? null); setRendering(false);
       } catch {
         if (active) {
           setStatus(t.error);
@@ -98,8 +105,9 @@ export default function ShareCardButton({
     return () => {
       active = false;
       if (imageUrl) URL.revokeObjectURL(imageUrl);
+      imageUrls.forEach(url => URL.revokeObjectURL(url));
     };
-  }, [open, payload, language, format, includeName, loading]);
+  }, [open, payload, language, format, includeName, loading, selected]);
 
   useEffect(() => {
     if (data?.kind !== "identity" || !autoOpen) return;
@@ -114,22 +122,20 @@ export default function ShareCardButton({
   const ready = Boolean(url && blob && !rendering && !loading);
   const save = () => {
     if (!url) return;
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
+    pages.forEach((page, i) => { const a = document.createElement('a'); a.href = page.url; a.download = filename.replace('.png', `-${i + 1}.png`); a.click(); });
     setStatus(t.saved);
   };
   const share = async () => {
     if (!blob || sharing) return;
-    const file = new File([blob], filename, { type: "image/png" });
-    if (!navigator.canShare?.({ files: [file] })) {
+    const files = pages.map((page, i) => new File([page.blob], filename.replace('.png', `-${i + 1}.png`), { type: 'image/png' }));
+    if (!navigator.canShare?.({ files })) {
+      if (data?.kind === 'app' && navigator.share) { try { await navigator.share({ title: data.title, text, url: data.url }); } catch (e) { if (!(e instanceof DOMException && e.name === 'AbortError')) setStatus(t.error); } return; }
       save();
       return;
     }
     setSharing(true);
     try {
-      await navigator.share({ files: [file], title: t.description });
+      await navigator.share({ files, title: data?.title || t.description, ...(data?.kind === 'app' ? { text, url: data.url } : {}) });
       setStatus(t.shared);
     } catch (error) {
       if (!(error instanceof DOMException && error.name === "AbortError")) setStatus(t.error);
@@ -138,10 +144,9 @@ export default function ShareCardButton({
     }
   };
   const post = () => {
-    const appUrl = window.location.origin;
+    const appUrl = data?.url ?? 'https://cosmic-beginnings-onboard.lovable.app';
     // Never include opt-in names or the full private reading in a text-only post.
-    const text = t.hashtags;
-    const href = `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(appUrl)}`;
+    const href = `https://x.com/intent/post?text=${encodeURIComponent(data?.kind === 'app' ? text : t.hashtags)}&url=${encodeURIComponent(appUrl)}`;
     window.open(href, "_blank", "noopener,noreferrer");
     save();
   };
@@ -155,8 +160,10 @@ export default function ShareCardButton({
         aria-label={label ?? t.cta}
         className={className ?? "mt-6 h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto"}
         onClick={() => {
+          onPrepare?.();
           setFormat("story");
           setIncludeName(false);
+          setSelected(null);
           setOpen(true);
         }}
       >
@@ -215,10 +222,12 @@ export default function ShareCardButton({
               <p className="mt-2 text-center text-xs text-muted-foreground">
                 {format === "story" ? "1080 × 1920" : "1200 × 675"} · PNG
               </p>
+              {pages.length > 1 && <div className="mt-3 flex items-center justify-center gap-3"><Button variant="outline" size="icon" aria-label={ui.previous} disabled={pageIndex === 0} onClick={() => { const i = pageIndex - 1; setPageIndex(i); setUrl(pages[i]?.url ?? null); }}><ChevronLeft /></Button><span className="text-sm">{pageIndex + 1} / {pages.length}</span><Button variant="outline" size="icon" aria-label={ui.next} disabled={pageIndex === pages.length - 1} onClick={() => { const i = pageIndex + 1; setPageIndex(i); setUrl(pages[i]?.url ?? null); }}><ChevronRight /></Button></div>}
             </div>
             <div className="flex min-w-0 flex-col gap-5 md:pt-1">
+              {data?.sections && <fieldset className="space-y-3"><legend className="mb-2 font-semibold text-primary">{ui.select}</legend><Button variant="outline" size="sm" onClick={() => setSelected(null)}>{ui.all}</Button>{data.sections.map(section => <label key={section.id} className="flex items-start gap-3 text-sm"><Checkbox checked={selected === null || selected.includes(section.id)} onCheckedChange={checked => setSelected(current => { const ids = current ?? data.sections?.map(s => s.id) ?? []; return checked ? [...ids, section.id] : ids.filter(id => id !== section.id); })} /><span className="min-w-0 break-words">{section.title}</span></label>)}</fieldset>}
               <div className="border-b border-primary/20 pb-5">
-                {data?.kind !== "consultation" && (
+                {data?.kind !== "consultation" && data?.kind !== 'app' && (
                   <label
                     htmlFor="share-card-name"
                     className="flex items-center justify-between gap-3 text-sm text-foreground"
@@ -234,6 +243,7 @@ export default function ShareCardButton({
                 <p className="mt-2 text-xs leading-6 text-muted-foreground">{t.privacy}</p>
               </div>
               <div className="grid gap-2">
+                {text && <><Button variant="outline" onClick={() => { const a = document.createElement('a'); const u = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' })); a.href = u; a.download = 'agolmen-reading.txt'; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1000); }}><FileText className="size-4" />{ui.text}</Button><Button variant="outline" onClick={() => void navigator.clipboard.writeText(text).then(() => setStatus(ui.copied)).catch(() => setStatus(t.error))}><Copy className="size-4" />{ui.copy}</Button></>}
                 <Button disabled={!ready} onClick={save} className="min-h-12">
                   <Download className="size-4" />
                   {t.save}
