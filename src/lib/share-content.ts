@@ -20,7 +20,7 @@ export function unlockedShareSections(plan: Plan, sections: ShareSection[]): Sha
   return sections.filter(s => s.text.trim() && (s.id === 'message' || (features.includes(s.id as TodayFeature) && canUseToday(plan, s.id as TodayFeature))));
 }
 
-export function shareText(data: { title: string; names: string[]; lines: string[]; caution?: string; url?: string; sections?: ShareSection[] }, selected?: string[], includeName = false): string {
+export function shareText(data: { title: string; names: string[]; lines: string[]; caution?: string | undefined; url?: string; sections?: ShareSection[] }, selected?: string[], includeName = false): string {
   const content = data.sections ? data.sections.filter(s => !selected || selected.includes(s.id)).map(s => `${s.title}\n${s.text}`) : data.lines;
   return [data.title, ...(includeName ? data.names : []), ...content, data.caution, data.url].filter(Boolean).join('\n\n');
 }
