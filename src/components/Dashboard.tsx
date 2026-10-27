@@ -757,18 +757,66 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   };
   const swipeOrder: Tab[] = ["home", "traits", "today", "consult", "art", "business", "settings"];
   const swipeStart = useRef<{ x: number; y: number; t: number } | null>(null);
+  const swipeAxis = useRef<"x" | "y" | null>(null);
+  const mainRef = useRef<HTMLElement | null>(null);
+  const clearDrag = (animate: boolean) => {
+    const el = mainRef.current;
+    if (!el || !el.style.translate) return;
+    if (animate) {
+      el.style.transition = "translate .18s ease-out";
+      window.setTimeout(() => { if (mainRef.current) mainRef.current.style.transition = ""; }, 200);
+    }
+    el.style.translate = "0 0";
+  };
   const onSwipeStart = (e: ReactTouchEvent) => {
     const target = e.target as HTMLElement;
+    swipeAxis.current = null;
     if (e.touches.length !== 1 || (window.visualViewport?.scale ?? 1) > 1 || window.innerWidth >= 768 || target.closest("input,textarea,select,canvas,[data-no-swipe],.overflow-x-auto,[role=dialog]")) { swipeStart.current = null; return; }
     const p = e.touches[0]; if (p) swipeStart.current = { x: p.clientX, y: p.clientY, t: Date.now() };
   };
+  const onSwipeMove = (e: ReactTouchEvent) => {
+    if (e.touches.length > 1) { swipeStart.current = null; swipeAxis.current = null; clearDrag(false); return; }
+    const s = swipeStart.current; const p = e.touches[0];
+    if (!s || !p) return;
+    const dx = p.clientX - s.x, dy = p.clientY - s.y;
+    if (!swipeAxis.current) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      swipeAxis.current = Math.abs(dx) > Math.abs(dy) * 1.5 ? "x" : "y";
+    }
+    if (swipeAxis.current !== "x") return;
+    const el = mainRef.current;
+    if (!el) return;
+    el.style.transition = "none";
+    el.style.translate = `${Math.max(-90, Math.min(90, dx * 0.35))}px 0`;
+  };
   const onSwipeEnd = (e: ReactTouchEvent) => {
-    const s = swipeStart.current; swipeStart.current = null; const p = e.changedTouches[0];
+    const s = swipeStart.current; swipeStart.current = null; swipeAxis.current = null; const p = e.changedTouches[0];
+    clearDrag(true);
     if (!s || !p || e.touches.length || (window.visualViewport?.scale ?? 1) > 1) return;
     const dx = p.clientX - s.x, dy = p.clientY - s.y;
     if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8 || Date.now() - s.t > 700) return;
     const i = swipeOrder.indexOf(tab); const next = swipeOrder[i + (dx < 0 ? 1 : -1)];
     if (next) goToTab(next);
+  };
+  const dialogDragY = useRef<number | null>(null);
+  const onDialogTouchStart = (e: ReactTouchEvent) => {
+    dialogDragY.current = e.touches.length === 1 && e.touches[0] ? e.touches[0].clientY : null;
+  };
+  const onDialogTouchMove = (e: ReactTouchEvent) => {
+    const startY = dialogDragY.current; const p = e.touches[0];
+    if (startY == null || !p || e.touches.length > 1) return;
+    const dy = p.clientY - startY;
+    const el = e.currentTarget as HTMLElement;
+    if (dy > 0) { el.style.transition = "none"; el.style.translate = `0 ${Math.min(dy, 160)}px`; }
+  };
+  const onDialogTouchEnd = (e: ReactTouchEvent) => {
+    const startY = dialogDragY.current; dialogDragY.current = null;
+    const el = e.currentTarget as HTMLElement;
+    const p = e.changedTouches[0];
+    const dy = startY != null && p ? p.clientY - startY : 0;
+    el.style.transition = "translate .18s ease-out";
+    el.style.translate = "0 0";
+    if (dy > 90) setModal(null);
   };
 
 
@@ -839,7 +887,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
         </div>
       </header>
 
-      <main onTouchStart={onSwipeStart} onTouchMove={e => { if (e.touches.length > 1) swipeStart.current = null; }} onTouchEnd={onSwipeEnd} onTouchCancel={() => { swipeStart.current = null; }} className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
+      <main ref={mainRef} onTouchStart={onSwipeStart} onTouchMove={onSwipeMove} onTouchEnd={onSwipeEnd} onTouchCancel={() => { swipeStart.current = null; swipeAxis.current = null; clearDrag(false); }} className="design-main relative z-10 mx-auto max-w-5xl px-4 pt-5 sm:px-8 sm:pt-8">
         {(visitedTabs.has("home") || tab === "home") && <div hidden={tab !== "home"}><ArtsGuide language={language} /></div>}
         {(["traits", "today", "consult", "business", "art", "settings"] as const).filter(id => visitedTabs.has(id) || tab === id).map(id => (
           <section key={id} hidden={tab !== id} className="tab-content animate-in fade-in slide-in-from-bottom-1 duration-300 mx-auto min-w-0 max-w-3xl pt-3 md:pt-10">
@@ -942,7 +990,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
           if (!open) setModal(null);
         }}
       >
-        <DialogContent className="card-lux mx-auto w-[calc(100%-2rem)] max-w-sm rounded-lg border-primary/30 bg-card p-6 text-foreground">
+        <DialogContent onTouchStart={onDialogTouchStart} onTouchMove={onDialogTouchMove} onTouchEnd={onDialogTouchEnd} onTouchCancel={onDialogTouchEnd} className="card-lux mx-auto w-[calc(100%-2rem)] max-w-sm rounded-lg border-primary/30 bg-card p-6 text-foreground">
           <DialogTitle className="pr-8 font-serif text-xl text-gradient-gold">
             {modal === "profile"
               ? t.profile
