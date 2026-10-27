@@ -4,7 +4,7 @@ import logoAsset from "@/assets/agolmen-v10-compass-final.png.asset.json";
 
 const logoUrl = logoAsset.url;
 
-export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility" | "daily" | "biorhythm" | "consultation" | "app"; caution?: string | undefined; keywords?: string[]; palette?: { label: string; code: string }[]; sections?: import('./share-content').ShareSection[]; url?: string; fullContent?: boolean; pageLabel?: string };
+export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility" | "daily" | "biorhythm" | "consultation" | "app"; caution?: string | undefined; keywords?: string[]; palette?: { label: string; code: string }[]; sections?: import('./share-content').ShareSection[]; url?: string; fullContent?: boolean | undefined; pageLabel?: string | undefined };
 export type CardFormat = "story" | "x";
 export const shareCopy = {
   ja: { cta: "あなたの診断カードをシェア", title: "あなたの本質を、一枚に。", description: "あなたの診断カード", essence: "あなたの本質", bias: "陥りがちな罠・思考バイアス", palette: "バースカラーパレット", roles: ["メイン", "サブ", "金運", "愛情", "健康", "内面"], reference: "自己理解のための参考解釈・参考色", search: "アゴルメンの羅針盤で検索", hashtags: "#アゴルメンの羅針盤 #バースカラー #自己理解", name: "名前を載せる", privacy: "名前・出生情報は初期設定で非表示", save: "画像を保存", share: "端末でシェア", story: "縦型 9:16", x: "横型 16:9", note: "共有先は端末で選択します。Instagram・TikTokへの直接投稿は保証されません。画像共有に未対応の場合は保存し、各アプリで画像を選んでください。Xの投稿画面には画像は自動添付されません。", saved: "画像を保存しました", shared: "端末の共有画面を開きました", error: "画像を作成・共有できませんでした。もう一度お試しください。", loading: "選択した言語の診断カードを作成中…", match: "相性スコア" },
