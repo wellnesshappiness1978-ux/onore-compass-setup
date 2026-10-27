@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { BriefcaseBusiness, CalendarHeart, CalendarRange, ChefHat, ChevronRight, Compass, Crown, Eye, Flower2, HeartPulse, LineChart, LockKeyhole, MessageCircleHeart, ShoppingBag, Sparkles, Stars, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { companionCopy } from "@/lib/companion-copy";
 import { teamCopy } from "@/lib/team-copy";
 import { annualFlyingStars, mingGua } from "@/lib/feng-shui";
 import ShareCardButton from "./ShareCardButton";
+import { readingElementText, unlockedShareSections, shareUi, type ShareSection } from "@/lib/share-content";
 import FeatureNotifySwitch from "./FeatureNotifySwitch";
 import DayCompass from "./DayCompass";
 import HelioCalendar from "./HelioCalendar";
@@ -304,7 +305,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
                 <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180">▼</span>
               </summary>
               <div className="space-y-3 border-t border-primary/15 px-3 pb-3 pt-3">
-                {extBody}
+                <div data-today-share="directionExtended">{extBody}</div>
                 <FengShuiGuide profile={profile} date={today} language={language} />
               </div>
             </details>
@@ -384,7 +385,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     const each = (render: (p: UserProfile) => ReactNode) => <div className="space-y-3">{group.members.map(m => <details key={m.id} className="border-t border-primary/25 pt-3"><summary className="cursor-pointer font-serif text-primary">{m.nickname || m.name}</summary><div className="mt-3">{render(memberToProfile(m))}</div></details>)}</div>;
     content.starPath = { notify: fortune.data?.headline ?? access.loading, body: <TodayInsight state={fortune} language={language} /> };
     content.directionExtended = { notify: access.action, body: each(p => <FengShuiGuide profile={p} date={today} language={language} />) };
-    content.direction = { ...content.direction, body: <><p className="text-sm">{focus.label(language)} · {L(dirNames[best.dir])}（{best.score}）</p>{each(p => <><p className="text-sm">{subjectDirections([p], today).map(e => `${L(dirNames[e.dir])} ${e.score}`).join(' / ')}</p>{canUseToday(plan, 'directionExtended') && <FengShuiGuide profile={p} date={today} language={language} />}</>)}</> };
+    content.direction = { ...content.direction, body: <><p className="text-sm">{focus.label(language)} · {L(dirNames[best.dir])}（{best.score}）</p>{each(p => <><p className="text-sm">{subjectDirections([p], today).map(e => `${L(dirNames[e.dir])} ${e.score}`).join(' / ')}</p>{canUseToday(plan, 'directionExtended') && <div data-today-share="directionExtended"><FengShuiGuide profile={p} date={today} language={language} /></div>}</>)}</> };
     content.helio = { ...content.helio, body: <>{rangeBanner}{each(p => <><DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={p} language={language} plan={plan} onUpgrade={onUpgrade} /><HelioCalendar hideDirections date={today} profile={p} plan={plan} language={language} onUpgrade={onUpgrade} /></>)}</> };
     content.familyRoadmap = { ...content.familyRoadmap, body: each(p => <DayCompass rangeDays={helioRangeDays[plan]} profile={p} language={language} plan={plan} onUpgrade={onUpgrade} />) };
   }
@@ -408,7 +409,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     <p className="mb-2 text-xs text-primary">{access.rhythm}</p><h4 className="mb-1 font-serif text-sm text-primary">{focus?.label(language)} · {titles.biorhythm365[ja ? "ja" : "en"]}</h4>
     {content.biorhythm365.body}
     <h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "ファミリーのロードマップとバイオリズム" : "Family roadmap & biorhythm"}</h4>
-    {planOrder.indexOf(plan) >= planOrder.indexOf(familyRoadmapMin) ? content.familyRoadmap.body : (
+    {planOrder.indexOf(plan) >= planOrder.indexOf(familyRoadmapMin) ? <div data-today-share="familyRoadmap">{content.familyRoadmap.body}</div> : (
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-primary/25 p-3 text-sm">
         <span>{teaser.familyRoadmap ?? (ja ? "ファミリーの1年の流れを一緒に見られます。" : "See your family's year together.")}</span>
         <span className="flex gap-2"><Button size="sm" variant="outline" className="border-primary/40" onClick={() => setSample("familyRoadmap")}>{ja ? "サンプルを見る" : "See sample"}</Button><Button size="sm" variant="champagne" onClick={onUpgrade}>{ja ? "プランを見る" : "See plans"}</Button></span>
@@ -424,34 +425,33 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     return reading ? <div data-reading-depth={section} className="mt-5 space-y-3 border-t border-primary/20 pt-4"><h4 className="font-serif text-sm text-primary">{reading.title}</h4>{reading.paragraphs.map((paragraph, index) => <p key={index} className="text-sm leading-7 text-foreground">{paragraph}</p>)}</div> : null;
   };
 
-  const shareData = {
-    kicker: ja ? "今日の占い" : "Today's guide", title: iso, score: Math.round(rhythm.total), names: focus?.group ? [focus.label(language)] : profile.nameKanji ? [profile.nameKanji] : [], kind: "daily" as const,
-    lines: [
-      fortune.data?.decision.advance ?? (rhythm.total >= 55 ? (ja ? "決断：準備した一歩を小さく試す日" : "Decision: test one prepared step") : (ja ? "決断：確認と余白を整える日" : "Decision: verify and leave space")),
-      fortune.data ? `${ja ? "3ラッキー" : "3 lucky"}: ${fortune.data.luckyColor.name} / ${fortune.data.luckyWord.word} / ${fortune.data.foods[0]?.name ?? ""}` : `${ja ? "3ラッキー" : "3 lucky"}: ${luckyColor ? localizeBirthColorName(luckyColor.name, language) : "—"} / ${L(word)} / ${L(foods[el][0]!)}`,
-      `${ja ? "吉方位" : "Direction"}: ${L(dirNames[best.dir])}（${best.score}）`,
-      ...(rank(plan) >= rank("standard") ? [
-        `${ja ? "買い物" : "Shopping"}: ${firstSentence(fortune.data?.shopping.action ?? access.loading)}`,
-        `${ja ? "健康" : "Health"}: ${firstSentence(fortune.data?.maintenance.action ?? access.loading)}`,
-        `${ja ? "地球暦" : "Earth Calendar"}: ${ja ? `一年の${dayIdx + 1}日目` : `day ${dayIdx + 1}`}`,
-      ] : []),
-      ...(rank(plan) >= rank("vip") ? [
-        `${ja ? "今月の3ラッキー" : "Monthly lucky"}: ${fortune.data ? [flowerName, fortune.data.monthly.action.action, fortune.data.monthly.item.action].join(' / ') : access.loading}`,
-        ...(yearDir ? [`${ja ? `${stars.year}年の大開運方位` : `${stars.year} direction`}: ${L(dirNames[yearDir])}`] : []),
-        `${ja ? "対人" : "Relations"}: ${advice ? L(advice[0]) : (ja ? "感謝をひとつ具体的に伝える" : "Share one specific thanks")}`,
-        `${ja ? "バイオリズム" : "Biorhythm"}: ${Math.round(rhythm.total)}`,
-      ] : []),
-      ...(rank(plan) >= rank("b2b") && members.length ? [`${ja ? "ファミリー運気" : "Family rhythm"}: ${ja ? `${members.length}名の平均` : `avg of ${members.length}`} ${Math.round(members.reduce((t, m) => t + personal(m.birthDate, today).total, 0) / members.length)}`] : []),
-    ],
-    palette: luckyHex ? [{ label: ja ? "ラッキーカラー" : "Lucky color", code: luckyHex }] : [],
+  const shareRoot = useRef<HTMLDivElement>(null);
+  const [shareSections, setShareSections] = useState<ShareSection[]>([]);
+  const prepareShare = () => {
+    const root = shareRoot.current;
+    if (!root) return;
+    const sections: ShareSection[] = [];
+    const message = root.querySelector('[data-today-share="message"]');
+    if (message) sections.push({ id: 'message', title: shareUi[language].select + ' · ' + (ja ? '本日のメッセージ' : "Today's message"), text: readingElementText(message) });
+    for (const feature of [...todayFeatures.map(f => f.id), 'directionExtended' as const, 'familyRoadmap' as const]) {
+      const element = root.querySelector(`[data-today-share="${feature}"]`);
+      if (element) sections.push({ id: feature, title: L(titles[feature]), text: readingElementText(element) });
+    }
+    setShareSections(unlockedShareSections(plan, sections));
   };
-  const share = (key: string) => <div key={key} className="flex justify-center"><ShareCardButton language={language} autoOpen={false} label={ja ? "今日の占いを1タップでシェア" : "Share today's guide"} className="h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto" data={shareData} /></div>;
+  const shareData = {
+    kicker: ja ? '今日の占い' : "Today's guide", title: iso, score: 0,
+    names: focus?.group ? focus.group.members.map(m => m.nickname || m.name) : [profile.nameKanji || profile.nameRomaji || ''].filter(Boolean),
+    kind: 'daily' as const, lines: [], sections: shareSections, fullContent: true,
+    palette: luckyHex ? [{ label: ja ? 'ラッキーカラー' : 'Lucky color', code: luckyHex }] : [],
+  };
+  const share = (key: string) => <div key={key} className="flex justify-center"><ShareCardButton language={language} autoOpen={false} onPrepare={prepareShare} label={shareUi[language].daily} className="h-auto min-h-12 w-full whitespace-normal px-4 py-3 sm:w-auto" data={shareData} /></div>;
 
 
   // The daily lucky color becomes the screen's accent: card borders, dividers and a soft aura follow it.
   const luckyTheme = luckyHex && /^#[0-9a-f]{6}$/i.test(luckyHex) ? luckyHex : null;
   return (
-    <div className={`today-guide mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 text-left md:gap-4${luckyTheme ? " lucky-themed" : ""}`} style={luckyTheme ? ({ "--lucky-color": luckyTheme } as CSSProperties) : undefined}>
+    <div ref={shareRoot} className={`today-guide mx-auto mt-4 grid min-w-0 w-full max-w-4xl grid-cols-[minmax(0,1fr)] gap-3 text-left md:gap-4${luckyTheme ? " lucky-themed" : ""}`} style={luckyTheme ? ({ "--lucky-color": luckyTheme } as CSSProperties) : undefined}>
       <section className="card-lux design-daily-panel rounded-lg p-3 md:p-4" aria-label={ja ? "プラン特典の解放状況" : "Plan unlock progress"}>
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm">
           <p className="min-w-0 text-foreground">{benefit.current}：<strong className="text-primary">{names[plan]}</strong></p>
@@ -467,7 +467,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       </section>
       <TodayCard id="today-insight" title={ja ? "今日だけの深層リーディング" : "Today's deep reading"} summary={<h3 className="flex items-center gap-2 font-serif text-lg text-foreground"><Sparkles className="size-4 text-primary" />{ja ? "今日だけの深層リーディング" : "Today's deep reading"}</h3>}>
         <p className="mb-4 text-base font-medium tabular-nums text-primary">{readingDate(iso, language)}</p>
-        <TodayInsight state={fortune} language={language} />
+        <div data-today-share="message"><TodayInsight state={fortune} language={language} /></div>
         <FeatureNotifySwitch id="insight" title={`🔮 ${ja ? "今日の深層リーディング" : "Today's deep reading"}`} body={fortune.data?.headline ?? (ja ? "今日だけのメッセージが届いています" : "Your message for today is ready")} language={language} />
       </TodayCard>
       {todayFeatures.filter(f => f.id !== "relations").map(({ id, min }, i) => {
@@ -480,7 +480,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
               <h3 className="flex min-w-0 items-start gap-2 font-serif text-lg text-foreground"><span className="text-primary">{i + 1}.</span><Icon className="mt-1 size-4 shrink-0 text-primary" /><span className={`min-w-0 break-words ${lucky ? "font-semibold" : ""}`}>{L(titles[id])}</span></h3>
               {!open && <span className="shrink-0 rounded-md border border-primary/30 px-2 py-0.5 text-[10px] text-primary">{names[min]}+</span>}
             </div>}>
-            {open ? <>{content[id].body}{id === "starPath" || id === "helio" ? renderDepth(id) : id === "biorhythm365" ? <>{canReadThreeWaves(plan) ? renderDepth("biorhythm") : <div className="mt-3 border-t border-primary/25 pt-3"><p className="text-sm text-primary">{access.waves}</p><Button variant="outline" onClick={onUpgrade}><LockKeyhole className="size-4" />{access.plans}</Button></div>}{renderDepth("family")}</> : null}</> : (
+            {open ? <><div data-today-share={id}>{content[id].body}{id === "starPath" || id === "helio" ? renderDepth(id) : id === "biorhythm365" ? <>{canReadThreeWaves(plan) ? renderDepth("biorhythm") : <div className="mt-3 border-t border-primary/25 pt-3"><p className="text-sm text-primary">{access.waves}</p><Button variant="outline" onClick={onUpgrade}><LockKeyhole className="size-4" />{access.plans}</Button></div>}{renderDepth("family")}</> : null}</div></> : (
               <div className="relative overflow-hidden rounded-md border border-primary/20 p-3">
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-champagne-gradient opacity-10 blur-sm" />
                 <div className="relative flex flex-col items-center gap-2 text-center">
