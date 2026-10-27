@@ -53,6 +53,16 @@ export function consultationSummary(text: string, privateValues: string[] = []) 
   return Array.from(summary).slice(0, 320).join("");
 }
 
+const cleanMarkdown = (value: string) => value.replace(/[*_`#]/g, "").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").trim();
+const scrub = (value: string, privateValues: string[]) => privateValues.filter((v) => v && v.trim().length > 0).sort((a, b) => b.length - a.length).reduce((out, v) => out.split(v).join("…"), value);
+
+/** Split an answer into its headed sections (or paragraphs) for per-item sharing; full text, never truncated. */
+export function consultationSections(text: string, privateValues: string[] = []) {
+  const headed = text.split(/^###\s+/m).map((part) => part.trim()).filter(Boolean);
+  const parts = headed.length > 1 ? headed.map((part) => { const [first = "", ...rest] = part.split("\n"); return { title: cleanMarkdown(first), text: cleanMarkdown(rest.join("\n")) }; }) : text.split(/\n{2,}/).map((part) => ({ title: "", text: cleanMarkdown(part) }));
+  return parts.filter((p) => p.text || p.title).map((p, i) => ({ id: `answer-${i}`, title: scrub(p.title, privateValues), text: scrub(p.text || p.title, privateValues) }));
+}
+
 export function consultationCard(
   text: string,
   profile: Parameters<typeof birthColorSpectrum>[0] & {
@@ -71,8 +81,11 @@ export function consultationCard(
         : [colors.main, colors.sub, colors.money, colors.love, colors.health, colors.mind]
       ).map((color) => ({ label: localizeBirthColorName(color.name, language), code: color.code }))
     : [];
+  const privateValues = [profile.nameKanji ?? "", profile.nameKana ?? "", profile.nameRomaji ?? "", profile.birthDate, profile.birthTime, profile.birthPlace, profile.birthCity ?? ""];
   return {
     kind: "consultation",
+    fullContent: true,
+    sections: consultationSections(text, privateValues),
     kicker: "AGOLMEN AI",
     title: consultationHeadings[language][0].replace(/^①\s*/, ""),
     score: 0,

@@ -16,7 +16,7 @@ import { companionCopy } from "@/lib/companion-copy";
 import { teamCopy } from "@/lib/team-copy";
 import { annualFlyingStars, mingGua } from "@/lib/feng-shui";
 import ShareCardButton from "./ShareCardButton";
-import { readingElementText, unlockedShareSections, shareUi, type ShareSection } from "@/lib/share-content";
+import { readingElementText, unlockedShareSections, withLockedSections, shareUi, type ShareSection } from "@/lib/share-content";
 import FeatureNotifySwitch from "./FeatureNotifySwitch";
 import DayCompass from "./DayCompass";
 import HelioCalendar from "./HelioCalendar";
@@ -446,7 +446,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         ...f.foods.slice(0, luckyFoodLimit[plan]).map((food, i) => ({ id: `food-${food.recipeId}`, feature: 'dailyLucky' as const, title: `${i + 1}. ${food.name}`, text: `${food.why}\n${food.ingredients.map(v => `${v.item} ${v.amount}`).join('\n')}\n${food.seasonings.map(v => `${v.item} ${v.amount}`).join('\n')}\n${food.steps.map(s => `${s.text}\n${s.tip}`).join('\n')}` })),
       );
     }
-    setShareSections(unlockedShareSections(plan, sections));
+    setShareSections(withLockedSections(unlockedShareSections(plan, sections), todayFeatures.map(f => ({ id: f.id, title: L(titles[f.id]), open: canUseToday(plan, f.id) }))));
   };
   const shareData = {
     kicker: ja ? '今日の占い' : "Today's guide", title: iso, score: 0,

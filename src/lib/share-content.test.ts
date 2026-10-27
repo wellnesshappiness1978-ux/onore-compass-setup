@@ -36,3 +36,37 @@ describe('share content contract', () => {
     expect(shareText({ title: 'アゴルメンの羅針盤', names: [], lines: ['自分を知り、今日を整える。'], url: APP_SHARE_URL })).toContain(APP_SHARE_URL);
   });
 });
+import { packShareLines, shareSectionsOf, withLockedSections } from './share-content';
+import { consultationSections } from './consultation-card';
+import { dailyLimitFor, remainingUses } from '@/hooks/use-daily-usage';
+describe('three-action share v2', () => {
+  it('short items share one page and nothing is dropped', () => {
+    expect(packShareLines([['a'], ['b'], ['c']], 17)).toEqual([['a', '', 'b', '', 'c']]);
+  });
+  it('a block that does not fit starts a new page; oversize blocks continue', () => {
+    const pages = packShareLines([['a', 'b'], Array.from({ length: 20 }, (_, i) => `x${i}`)], 17);
+    expect(pages.flat().filter(Boolean)).toHaveLength(22);
+    expect(pages.every(p => p.length <= 17)).toBe(true);
+  });
+  it('locked plan items are listed but marked locked', () => {
+    const out = withLockedSections([{ id: 'message', title: 'M', text: 'x' }], [{ id: 'shopping', title: 'S', open: false }, { id: 'dailyLucky', title: 'L', open: true }]);
+    expect(out.map(s => [s.id, Boolean(s.locked)])).toEqual([['message', false], ['shopping', true]]);
+  });
+  it('single-text readings become paragraph items', () => {
+    expect(shareSectionsOf({ lines: ['one\n\ntwo'] }).map(s => s.text)).toEqual(['one', 'two']);
+  });
+  it('consultation answers split into all four sections without truncation or names', () => {
+    const long = '深'.repeat(900);
+    const s = consultationSections(`### ① 要約\n山田さんへ\n### ② 深層\n${long}\n### ③ 行動\nA\n### ④ 言葉\nB`, ['山田']);
+    expect(s).toHaveLength(4);
+    expect(s[1]?.text).toBe(long);
+    expect(s[0]?.text).not.toContain('山田');
+  });
+  it('consultation remaining count follows each plan cap', () => {
+    expect(remainingUses(dailyLimitFor('consultation', 'free'), 1)).toBe(0);
+    expect(remainingUses(dailyLimitFor('consultation', 'standard'), 1)).toBe(2);
+    expect(remainingUses(dailyLimitFor('consultation', 'vip'), 4)).toBe(6);
+    expect(remainingUses(dailyLimitFor('consultation', 'b2b'), 0)).toBe(30);
+    expect(remainingUses(dailyLimitFor('consultation', 'b2b-premium'), 99)).toBe(Infinity);
+  });
+});

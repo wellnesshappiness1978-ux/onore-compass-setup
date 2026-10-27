@@ -6,8 +6,11 @@ import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 
 export type UsageFeature = "consultation" | "compatibility";
 const localDay = () => new Date().toLocaleDateString("en-CA");
-const localKey = (feature: UsageFeature, plan: Plan) =>
-  `onore-usage:${feature}:${plan}:${localDay()}`;
+// One device counter per feature/day: switching the displayed plan changes the cap, never resets what was used.
+const localKey = (feature: UsageFeature) => `onore-usage:${feature}:${localDay()}`;
+const legacyKey = (feature: UsageFeature, plan: Plan) => `onore-usage:${feature}:${plan}:${localDay()}`;
+export const dailyLimitFor = (feature: UsageFeature, plan: Plan) => (feature === "consultation" ? consultationDailyLimit[plan] : dailyUsageLimit[plan]);
+export const remainingUses = (limit: number, used: number) => (Number.isFinite(limit) ? Math.max(0, limit - used) : Infinity);
 export const msUntilMidnight = () => {
   const n = new Date();
   return new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1).getTime() - n.getTime();
@@ -19,7 +22,7 @@ export const msUntilMidnight = () => {
  * guests and preview-plan views use a device-local counter. Resets at local midnight.
  */
 export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: boolean) {
-  const limit = feature === "consultation" ? consultationDailyLimit[plan] : dailyUsageLimit[plan];
+  const limit = dailyLimitFor(feature, plan);
   const unlimited = !Number.isFinite(limit);
   const [used, setUsed] = useState(0);
   const [day, setDay] = useState(localDay);
@@ -37,7 +40,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
       setUsed(data?.used ?? 0);
     } else {
       try {
-        setUsed(Number(localStorage.getItem(localKey(feature, plan))) || 0);
+        setUsed(Math.max(Number(localStorage.getItem(localKey(feature))) || 0, Number(localStorage.getItem(legacyKey(feature, plan))) || 0));
       } catch {
         setUsed(0);
       }
@@ -74,7 +77,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
     if (used >= limit) return false;
     const next = used + 1;
     try {
-      localStorage.setItem(localKey(feature, plan), String(next));
+      localStorage.setItem(localKey(feature), String(next));
     } catch {
       /* private browsing */
     }
@@ -86,7 +89,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
     used,
     limit,
     unlimited,
-    remaining: unlimited ? Infinity : Math.max(0, limit - used),
+    remaining: remainingUses(limit, used),
     consume,
     refresh,
   };
