@@ -43,6 +43,7 @@ export default function ShareCardButton({
 }) {
   const t = cardCopy(language);
   const ui = shareUi[language];
+  const description = data?.kind === 'app' ? ui.app : data?.kind === 'daily' ? ui.daily : data?.kicker || t.description;
   const [open, setOpen] = useState(false);
   const [format, setFormat] = useState<CardFormat>("story");
   const [url, setUrl] = useState<string | null>(null);
@@ -173,10 +174,10 @@ export default function ShareCardButton({
         <DialogContent className="share-card-modal max-h-[92dvh] w-[calc(100%-1.5rem)] overflow-y-auto rounded-lg border-primary/35 p-5 sm:max-w-4xl sm:p-7">
           <DialogHeader className="pr-6 text-left">
             <DialogDescription className="text-xs text-primary">
-              AGOLMEN'S COMPASS · {t.description}
+              AGOLMEN'S COMPASS · {description}
             </DialogDescription>
             <DialogTitle className="font-serif text-xl leading-relaxed sm:text-2xl">
-              {t.title}
+              {data?.kind === 'app' ? data.title : description}
             </DialogTitle>
           </DialogHeader>
           <div className="grid min-w-0 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">

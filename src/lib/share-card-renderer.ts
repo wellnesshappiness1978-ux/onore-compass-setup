@@ -94,14 +94,14 @@ export async function renderShareCard(format: CardFormat, data: ShareCardData, l
     ctx.fillStyle = gold; ctx.font = `500 ${story ? 28 : 21}px "Noto Sans JP", sans-serif`; ctx.fillText(t.bias, bx + 28, by + 49, bw - 56);
     ctx.fillStyle = paper; fittedText(ctx, data.caution, bx + 28, by + 70, bw - 56, bh - 92, story ? 33 : 23, story ? 24 : 17, false);
   }
-  const py = story ? 1360 : 425; ctx.fillStyle = gold; ctx.font = `500 ${story ? 25 : 19}px "Noto Sans JP", sans-serif`; ctx.fillText(t.palette, bx, py);
+  const py = story ? 1360 : 425; ctx.fillStyle = gold; ctx.font = `500 ${story ? 25 : 19}px "Noto Sans JP", sans-serif`; if (palette.length) ctx.fillText(t.palette, bx, py);
   palette.forEach((color, i) => {
     const columns = story ? 3 : 3, cw = bw / columns, row = Math.floor(i / columns), chipX = bx + (i % columns) * cw, chipY = py + 35 + row * (story ? 92 : 57);
     ctx.fillStyle = color.code; ctx.fillRect(chipX, chipY, story ? 42 : 25, story ? 42 : 25);
     ctx.fillStyle = paper; ctx.font = `400 ${story ? 21 : 15}px "Noto Sans JP", sans-serif`; ctx.fillText(color.label, chipX + (story ? 56 : 35), chipY + (story ? 17 : 10), cw - 62);
     ctx.font = `${story ? 20 : 14}px monospace`; ctx.fillText(color.code, chipX + (story ? 56 : 35), chipY + (story ? 44 : 30));
   });
-  ctx.textAlign = "center"; ctx.fillStyle = paper; ctx.font = `${story ? 22 : 16}px "Noto Sans JP", sans-serif`; ctx.fillText(t.hashtags, w / 2, story ? 1730 : 590, w - 140);
+  ctx.textAlign = "center"; ctx.fillStyle = paper; ctx.font = `${story ? 22 : 16}px "Noto Sans JP", sans-serif`; if (data.kind !== 'app') ctx.fillText(t.hashtags, w / 2, story ? 1730 : 590, w - 140);
   ctx.strokeStyle = gold; ctx.globalAlpha = .45; ctx.strokeRect(w / 2 - 235, story ? 1760 : 607, 470, story ? 64 : 30); ctx.globalAlpha = 1;
   ctx.fillStyle = gold; ctx.font = `${story ? 23 : 16}px "Noto Sans JP", sans-serif`; ctx.fillText(data.url ?? t.search, w / 2, story ? 1801 : 629, w - 140);
   ctx.fillStyle = paper; ctx.font = `${story ? 19 : 13}px "Noto Sans JP", sans-serif`; ctx.fillText(t.reference, w / 2, h - 58);
