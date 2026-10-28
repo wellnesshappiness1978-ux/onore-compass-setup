@@ -61,7 +61,7 @@ describe('特定商取引法に基づく表記', () => {
     for (const language of languages) {
       const entry = legalContentByLanguage[language].commerce;
       expect(entry.sections).toHaveLength(9);
-      const prices = entry.sections[5][1];
+      const prices = entry.sections[5]?.[1] ?? "";
       for (const figure of ['333', '3,333', '777', '7,777', '3,580', '8,888']) {
         expect(prices).toContain(figure);
       }
