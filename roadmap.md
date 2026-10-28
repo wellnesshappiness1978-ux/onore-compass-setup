@@ -1,5 +1,10 @@
 # Roadmap
 
+## Unified diagnosis and consultation caps (2026-10-28)
+- [ ] Share one maintained 1/3/10/30/100 configuration across display, device checks and atomic database enforcement.
+- [ ] Align authenticated counters and submission checks with actual membership; retain preview-only access boundaries.
+- [ ] Run cap/boundary regressions and verify the signed-in flow and automatic build.
+
 ## AI consultation plan aliases and daily limits (2026-10-28)
 - [x] Normalize plan aliases and share exact 1/3/10/30/unlimited limits across membership, preview and consultation.
 - [x] Keep authenticated sending tied to actual usage; preserve device counts across plan switches including unlimited usage.
