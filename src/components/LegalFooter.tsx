@@ -11,7 +11,7 @@ import SupportForm from "./SupportForm";
 import { createTranslator } from "@/lib/ui-i18n";
 
 export function LegalText({ kind, language = "ja" }: { kind: LegalKey; language?: Language }) {
-  return <div className="space-y-6">{legalContentByLanguage[language][kind].sections.map(([title, body]) => <section key={title}><h3 className="font-serif text-lg text-primary">{title}</h3><p className="mt-2 text-base leading-8 text-foreground">{body}</p></section>)}</div>;
+  return <div className="space-y-6">{legalContentByLanguage[language][kind].sections.map(([title, body]) => <section key={title}><h3 className="font-serif text-lg text-primary break-words">{title}</h3><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground break-words">{body}</p></section>)}</div>;
 }
 export default function LegalFooter() {
   const [language, setLanguage] = useState<Language>("ja");
