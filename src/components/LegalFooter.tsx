@@ -31,7 +31,7 @@ export default function LegalFooter() {
     window.addEventListener("onore-language-change", update);
     return () => window.removeEventListener("onore-language-change", update);
   }, []);
-  return <footer data-legal-open={open ?? ""} className="relative border-t border-primary/20 bg-background px-4 pb-32 pt-8 text-foreground">
+  return <footer className="relative border-t border-primary/20 bg-background px-4 pb-32 pt-8 text-foreground">
     <div className="mx-auto max-w-5xl"><p className="font-serif text-xl text-primary">{text.brand}</p>
       <nav aria-label={text.nav} className="mt-3 flex flex-wrap gap-x-4 gap-y-2">{(Object.keys(legalContent) as LegalKey[]).map(kind => <Button key={kind} variant="link" className="h-auto whitespace-normal p-0 text-left text-xs" onClick={() => setOpen(kind)}>{legalContent[kind].title}</Button>)}<Button variant="link" className="h-auto p-0 text-xs" onClick={() => setOpen("support")}>{text.support}</Button></nav>
       <ShareCardButton language={language} autoOpen={false} label={text.share} data={{ kind: 'app', title: 'アゴルメンの羅針盤', kicker: shareUi[language].app, names: [], score: 0, lines: [shareUi[language].tagline], url: APP_SHARE_URL }} />
