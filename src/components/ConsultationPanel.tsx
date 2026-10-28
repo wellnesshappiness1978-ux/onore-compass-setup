@@ -167,15 +167,20 @@ export default function ConsultationPanel({
   const previewUsage = useDailyUsage("consultation", plan, false);
   const usage = previewMode && signedIn ? previewUsage : actualUsage;
   const { limit, unlimited, remaining } = usage;
+  // A display preview must not cap (or increase) authenticated API access.
+  const sendRemaining = signedIn ? actualUsage.remaining : remaining;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
     return () => window.clearInterval(id);
   }, []);
-  const limitPlan = signedIn && actualUsage.remaining <= 0 ? actualPlan : usagePlan;
+  const limitPlan = signedIn ? actualPlan : usagePlan;
   const upgradeTo =
     planOrder.indexOf(limitPlan) < planOrder.indexOf("vip") ? "vip" : nextPlan(limitPlan);
   const [limitOpen, setLimitOpen] = useState(false);
+  useEffect(() => {
+    if (sendRemaining > 0) { setLimitOpen(false); setNotice(null); }
+  }, [usagePlan, actualPlan, sendRemaining]);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [favorites, setFavorites] = useState<Awaited<ReturnType<typeof listConsultationBookmarks>>>(
     [],
@@ -264,14 +269,14 @@ export default function ConsultationPanel({
       textareaRef.current?.focus({ preventScroll: true });
       return;
     }
-    if (remaining <= 0 || (signedIn && actualUsage.remaining <= 0)) {
+    if (sendRemaining <= 0) {
       setNotice(t.limit);
       setLimitOpen(true);
       return;
     }
     setNotice(null);
     clearError();
-    if ((!signedIn || previewMode) && !(await usage.consume())) {
+    if (!signedIn && !(await usage.consume())) {
       setNotice(t.limit);
       setLimitOpen(true);
       return;
@@ -541,7 +546,7 @@ export default function ConsultationPanel({
             <PromptInputTextarea
               ref={textareaRef}
               placeholder={t.placeholder}
-              disabled={remaining <= 0}
+              disabled={sendRemaining <= 0}
               className="min-h-20 text-sm text-foreground placeholder:text-muted-foreground"
             />
             <PromptInputFooter className="items-end justify-between gap-3 px-3 pb-2">
@@ -551,7 +556,7 @@ export default function ConsultationPanel({
               <PromptInputSubmit
                 status={status}
                 onStop={stop}
-                disabled={!busy && remaining <= 0}
+                disabled={!busy && sendRemaining <= 0}
                 aria-label={t.send}
                 className="size-9 shrink-0 rounded-full bg-champagne-gradient text-primary-foreground shadow-champagne hover:brightness-110"
               />

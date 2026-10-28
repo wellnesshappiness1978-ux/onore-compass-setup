@@ -1,5 +1,10 @@
 # Roadmap
 
+## AI consultation plan aliases and daily limits (2026-10-28)
+- [x] Normalize plan aliases and share exact 1/3/10/30/unlimited limits across membership, preview and consultation.
+- [x] Keep authenticated sending tied to actual usage; preserve device counts across plan switches including unlimited usage.
+- [ ] Update and verify atomic server quota lookup; run regression tests and exercise consultation counters through the UI.
+
 ## Dashboard modal touch regression (2026-10-28)
 - [x] Separate drag transform from Tailwind centering; clear inline movement styles after taps, end and cancellation.
 - [x] Only initiate downward dismiss from unscrolled dialog/nested content; preserve native scroll, horizontal gestures and pinch.
