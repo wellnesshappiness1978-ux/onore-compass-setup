@@ -12,7 +12,7 @@
 <!-- LOVABLE:END -->
 - Restore guests from `onore-profile`; signed-in profiles use private rows and sign-out clears the local copy. Why: preserve privacy without losing guest work.
 - Keep complete illustrative self-core reading free and before upgrade proposals; never claim verified 15-art results, paid access, or billing. Why: references are not entitlements.
-- PlanProvider overrides are preview-only; plan-identity normalizes external labels to legacy IDs, missing membership is Free, and authenticated AI uses actual caps. Why: label aliases and previews must not change entitlements.
+- Plan previews grant no access; normalize aliases to legacy IDs, default Free. Daily caps use one JSON source compiled into SQL; authenticated counters/sends use actual membership and owner usage. Why: prevent drift and preview access.
 - Admin debug overrides require server-verified roles, expire after 24 hours, and restore original membership and team caps. Why: tests must not overwrite entitlements.
 - Preserve legacy storage, event, and ICS identifiers and use the cropped brand logo. Why: avoid lost data and watermarks.
 - Keep support authenticated with owner-only RLS and legal content in shareable leaf pages. Why: protect personal information and avoid invented legal identity.

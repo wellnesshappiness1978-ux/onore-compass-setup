@@ -1,5 +1,11 @@
 # Roadmap
 
+## Unified diagnosis and consultation caps (2026-10-28)
+- [x] Share one maintained 1/3/10/30/100 JSON configuration across display, device checks and generated database enforcement; SQL payload equality regression retained.
+- [x] Align authenticated counters and submission checks with server-resolved actual membership and owner usage; refresh on submit/focus/sync, preserve counts on failed reads, retain preview-only boundaries.
+- [x] 442 tests across 88 files passed, including every plan's final-use/block boundary and failed-read regression; automatic build OK. Signed-in actual Free 0/1 matched disabled composer and atomic rejection; Premium preview did not grant access. Live database aliases returned 1/3/10/30/100.
+- [ ] Fresh authenticated answer with remaining quota, including paid Premium: requesting account has exhausted actual Free quota; no quota reset or paid membership fabricated. Boundary consumption/remaining synchronization covered with mocked accounting tests.
+
 ## AI consultation plan aliases and daily limits (2026-10-28)
 - [x] Normalize plan aliases and share exact 1/3/10/30/unlimited limits across membership, preview and consultation.
 - [x] Keep authenticated sending tied to actual usage; preserve device counts across plan switches including unlimited usage.
