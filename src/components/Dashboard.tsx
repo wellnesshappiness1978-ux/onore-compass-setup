@@ -47,7 +47,7 @@ import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 import { useDailyUsage } from "@/hooks/use-daily-usage";
 import { analyzeCompatibility, partnerSchema, type PartnerInput } from "@/lib/compatibility-analysis";
 import { listTeamMembers } from "@/lib/team-members.functions";
-import { readPreviewMembers } from "@/lib/consultation-targets";
+import { readPreviewMembers, MANUAL_CONSULT_EVENT, MANUAL_PARTNER_ID } from "@/lib/consultation-targets";
 import { personal } from "@/lib/day-compass";
 import type { TeamMember } from "@/lib/team-analysis";
 import { compatibilityContextCopy, kindFromRelationshipType, readingThemes, relationshipKinds, type ReadingTheme } from "@/lib/compatibility-context";
@@ -565,6 +565,7 @@ function TorisetsuPanel({
               </article>
                <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
               <ShareCardButton className="mt-6" language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: language === "ja" ? "アゴルメン相性診断" : "Agolmen compatibility", title: q.title, score, names: partnerName ? [partnerName] : [], fullContent: true, lines: [t.coreDynamics[relation ?? 0] ?? "", ...result.sentences.map((sentence, i) => `${result.titles[i] ?? ""}\n${sentence}`), result.elementPair, `${q.rhythmYou}: ${rhythmYou ?? "—"} / ${q.rhythmPartner}: ${rhythmPartner ?? "—"}`, q.weekAction], palette: result.colors.filter((c): c is string => Boolean(c)).map((code, i) => ({ label: i === 0 ? q.rhythmYou : q.rhythmPartner, code })), caution: result.note }} />
+              <Button type="button" variant="outline" className="mt-3 h-auto min-h-11 w-full whitespace-normal" onClick={() => window.dispatchEvent(new CustomEvent(MANUAL_CONSULT_EVENT, { detail: { id: MANUAL_PARTNER_ID, name: partnerName || q.rhythmPartner, nameKana: partnerKana, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthTimeUnknown: partnerTimeUnknown || !partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, siblingOrder: partnerSibling, gender: partnerGender ?? "undisclosed", bloodType: partnerBlood, relationshipType: pickedMember?.relationshipType ?? "", role: "", skills: [] } satisfies TeamMember }))}><WandSparkles className="size-4 shrink-0" />{q.askAi}</Button>
             </section>
           ) : null}
           {plan === "free" && <section className="card-lux relative mt-2 min-h-56 overflow-hidden rounded-lg p-6 text-center">
@@ -653,6 +654,11 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const [focusGoal, setFocusGoal] = useState("");
   const [traitsLabel, setTraitsLabel] = useState(traitsNavigationLabel(language));
   const [consultMode, setConsultMode] = useState<"compatibility" | "consultation">("consultation");
+  useEffect(() => {
+    const open = () => setConsultMode("consultation");
+    window.addEventListener(MANUAL_CONSULT_EVENT, open);
+    return () => window.removeEventListener(MANUAL_CONSULT_EVENT, open);
+  }, []);
   useEffect(() => {
     const open = (target: string | null) => {
       if (target === "compass") { setTab("today"); window.scrollTo({ top: 0 }); }
