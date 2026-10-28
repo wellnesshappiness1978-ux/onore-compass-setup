@@ -1,5 +1,10 @@
 # Roadmap
 
+## Dashboard modal touch regression (2026-10-28)
+- [x] Separate drag transform from Tailwind centering; clear inline movement styles after taps, end and cancellation.
+- [x] Only initiate downward dismiss from unscrolled dialog/nested content; preserve native scroll, horizontal gestures and pinch.
+- [ ] Run gesture regressions and verify signed-in modal placement, cleanup and internal scrolling on touch viewports; inspect automatic build output.
+
 ## Diagnostic sharing and account controls (2026-10-27)
 - [x] Move account sign-in/out immediately below the notification master pause; signed-in UI adjacency verified.
 - [x] Share actual personal/group integrated diagnosis and complete compatibility with locally paginated images and full text; no share-time AI calls.
