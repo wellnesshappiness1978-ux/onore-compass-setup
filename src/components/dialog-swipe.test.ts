@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { TouchEvent } from 'react';
 import { createDialogSwipeHandlers } from './dialog-swipe';
 
@@ -8,6 +8,7 @@ function setup() {
   dialog.style.overflowY = 'auto';
   const child = document.createElement('div');
   dialog.append(child);
+  document.body.append(dialog);
   const close = vi.fn();
   const handlers = createDialogSwipeHandlers(close);
   const event = (y: number, count = 1, target: HTMLElement = child, x = 20) => ({
@@ -22,6 +23,8 @@ function setup() {
   };
   return { dialog, child, close, handlers, event, clean };
 }
+
+afterEach(() => document.body.replaceChildren());
 
 describe('Dashboard dialog touch gestures', () => {
   it('moves downward from scrollTop 0 independently of centering and closes beyond 90px', () => {
