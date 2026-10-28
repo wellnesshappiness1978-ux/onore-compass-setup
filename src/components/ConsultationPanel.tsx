@@ -35,6 +35,7 @@ import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
 import compassAvatar from "@/assets/onore-ai-compass.png";
 import ConsultationVoice from "./ConsultationVoice";
+import { MANUAL_PARTNER_ID, MANUAL_CONSULT_EVENT } from "@/lib/consultation-targets";
 import { listTeamMembers } from "@/lib/team-members.functions";
 import { readPreviewMembers } from "@/lib/consultation-targets";
 import { ownerAsMember, useFocus } from "./FocusProvider";
@@ -70,8 +71,6 @@ type Props = {
   onVip: () => void;
 };
 
-export const MANUAL_PARTNER_ID = "manual-partner";
-export const MANUAL_CONSULT_EVENT = "onore-consult-manual";
 const untilMidnight = msUntilMidnight;
 const hms = (ms: number) => {
   const s = Math.max(0, Math.floor(ms / 1000));
