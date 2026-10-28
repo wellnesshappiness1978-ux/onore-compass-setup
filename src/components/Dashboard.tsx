@@ -57,6 +57,7 @@ import { quickCompatibilityCopy } from "@/lib/quick-compatibility-copy";
 import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
+import { createDialogSwipeHandlers } from './dialog-swipe';
 import TodayReminders, { DailyReminderCatalogue } from "./TodayReminders";
 import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
@@ -798,26 +799,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     const i = swipeOrder.indexOf(tab); const next = swipeOrder[i + (dx < 0 ? 1 : -1)];
     if (next) goToTab(next);
   };
-  const dialogDragY = useRef<number | null>(null);
-  const onDialogTouchStart = (e: ReactTouchEvent) => {
-    dialogDragY.current = e.touches.length === 1 && e.touches[0] ? e.touches[0].clientY : null;
-  };
-  const onDialogTouchMove = (e: ReactTouchEvent) => {
-    const startY = dialogDragY.current; const p = e.touches[0];
-    if (startY == null || !p || e.touches.length > 1) return;
-    const dy = p.clientY - startY;
-    const el = e.currentTarget as HTMLElement;
-    if (dy > 0) { el.style.transition = "none"; el.style.translate = `0 ${Math.min(dy, 160)}px`; }
-  };
-  const onDialogTouchEnd = (e: ReactTouchEvent) => {
-    const startY = dialogDragY.current; dialogDragY.current = null;
-    const el = e.currentTarget as HTMLElement;
-    const p = e.changedTouches[0];
-    const dy = startY != null && p ? p.clientY - startY : 0;
-    el.style.transition = "translate .18s ease-out";
-    el.style.translate = "0 0";
-    if (dy > 90) setModal(null);
-  };
+  const [dialogTouchHandlers] = useState(() => createDialogSwipeHandlers(() => setModal(null)));
 
 
   return (
@@ -990,7 +972,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
           if (!open) setModal(null);
         }}
       >
-        <DialogContent onTouchStart={onDialogTouchStart} onTouchMove={onDialogTouchMove} onTouchEnd={onDialogTouchEnd} onTouchCancel={onDialogTouchEnd} className="card-lux mx-auto w-[calc(100%-2rem)] max-w-sm rounded-lg border-primary/30 bg-card p-6 text-foreground">
+        <DialogContent {...dialogTouchHandlers} className="card-lux mx-auto w-[calc(100%-2rem)] max-w-sm rounded-lg border-primary/30 bg-card p-6 text-foreground">
           <DialogTitle className="pr-8 font-serif text-xl text-gradient-gold">
             {modal === "profile"
               ? t.profile
