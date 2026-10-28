@@ -453,6 +453,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      plan_daily_usage_limit: { Args: { p_plan: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

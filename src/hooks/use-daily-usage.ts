@@ -76,7 +76,8 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
       setUsed(Number(data) || 0);
       return true;
     }
-    const stored = Number(localStorage.getItem(localKey(feature))) || 0;
+    let stored = 0;
+    try { stored = Number(localStorage.getItem(localKey(feature))) || 0; } catch { /* private browsing */ }
     const current = Math.max(used, stored);
     if (current >= limit) return false;
     const next = current + 1;
