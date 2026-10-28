@@ -41,7 +41,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
         if (!auth.user) { setReady(false); return null; }
         const [usageResult, capResult] = await Promise.all([
           supabase.from("daily_usage").select("used").eq("user_id", auth.user.id).eq("feature", feature).eq("usage_day", today).maybeSingle(),
-          supabase.rpc("plan_daily_usage_limit", { p_plan: plan }),
+          supabase.rpc("current_plan_daily_usage_limit"),
         ]);
         if (usageResult.error || capResult.error || typeof capResult.data !== "number") {
           setReady(false);
