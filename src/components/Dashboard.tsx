@@ -600,7 +600,7 @@ function TorisetsuPanel({
           <Dialog open={limitOpen} onOpenChange={setLimitOpen}>
             <DialogContent className="max-w-md border-primary/40">
               <DialogTitle className="font-serif leading-7 text-gradient-gold">{q.modalTitle}</DialogTitle>
-              <DialogDescription className="leading-6">{q.modalBody} {q.refresh}</DialogDescription>
+              <DialogDescription className="leading-6">{q.limit} · {usage.used}/{usage.limit} {q.refresh}</DialogDescription>
               <div className="mt-4 grid gap-2">
                 <Button variant="champagne" onClick={() => { setLimitOpen(false); onVip(); }} className="min-h-11"><Crown className="size-4" />{q.modalCta}</Button>
                 <Button variant="outline" onClick={() => setLimitOpen(false)} className="min-h-11">{q.modalClose}</Button>
@@ -911,7 +911,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 <div role="tablist" aria-label={consultationUxCopy[language].switchLabel} className="mb-5 grid grid-cols-2 gap-2" data-no-swipe>
                   {(["compatibility", "consultation"] as const).map(mode => <Button key={mode} role="tab" aria-selected={consultMode === mode} aria-controls={`ai-${mode}`} variant={consultMode === mode ? "champagne" : "outline"} className="h-auto min-h-12 whitespace-normal px-2 py-2 text-xs sm:text-sm" onClick={() => setConsultMode(mode)}>{mode === "compatibility" ? <HeartHandshake className="size-4 shrink-0" /> : <WandSparkles className="size-4 shrink-0" />}{consultationUxCopy[language][mode]}</Button>)}
                 </div>
-                <div id="ai-compatibility" role="tabpanel" hidden={consultMode !== "compatibility"} className="mb-8"><TorisetsuPanel only="compatibility" plan={previewPlan} serverCounted={signedIn && !devOverrideEnabled && previewPlan === serverPlan} signedIn={signedIn} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
+                <div id="ai-compatibility" role="tabpanel" hidden={consultMode !== "compatibility"} className="mb-8"><TorisetsuPanel only="compatibility" plan={signedIn ? serverPlan : previewPlan} serverCounted={signedIn} signedIn={signedIn} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
                 <div id="ai-consultation" role="tabpanel" hidden={consultMode !== "consultation"}><SubjectVoice language={language}><ConsultationPanel
                   previewMode={devOverrideEnabled}
                   profile={profile}

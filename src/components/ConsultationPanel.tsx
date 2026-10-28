@@ -29,7 +29,7 @@ import { consultationGoal } from "@/lib/consultation-request";
 import type { Plan } from "@/lib/design-modes";
 import { nextPlan, planOrder } from "@/lib/plans";
 import { normalizePlan } from '@/lib/plan-identity';
-import { useDailyUsage, msUntilMidnight, dailyLimitFor, remainingUses } from "@/hooks/use-daily-usage";
+import { useDailyUsage, msUntilMidnight } from "@/hooks/use-daily-usage";
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
@@ -182,14 +182,10 @@ export default function ConsultationPanel({
   const planNames = teamCopy[language].planNames;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const ux = consultationUxCopy[language];
-  const usagePlan = signedIn && !previewMode ? actualPlan : plan;
-  const actualUsage = useDailyUsage("consultation", signedIn ? actualPlan : plan, signedIn);
-  const displayLimit = dailyLimitFor('consultation', usagePlan);
-  const usage = { ...actualUsage, limit: displayLimit, unlimited: !Number.isFinite(displayLimit), remaining: remainingUses(displayLimit, actualUsage.used) };
+  const usagePlan = signedIn ? actualPlan : plan;
+  const usage = useDailyUsage("consultation", usagePlan, signedIn);
   const { limit, unlimited, remaining } = usage;
-  // A display preview must not cap (or increase) authenticated API access.
-  // Signed-in caps are enforced by the server; a stale or failed client count must never lock the input.
-  const sendRemaining = signedIn ? Infinity : remaining;
+  const sendRemaining = remaining;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
@@ -268,11 +264,9 @@ export default function ConsultationPanel({
       }
       setNotice(message || t.error);
       void usage.refresh();
-      void actualUsage.refresh();
     },
     onFinish: () => {
       void usage.refresh();
-      void actualUsage.refresh();
       textareaRef.current?.focus({ preventScroll: true });
     },
   });
@@ -290,7 +284,9 @@ export default function ConsultationPanel({
       textareaRef.current?.focus({ preventScroll: true });
       return;
     }
-    if (sendRemaining <= 0) {
+    const current = await usage.refresh();
+    if (!current) { setNotice(t.error); return; }
+    if (current.remaining <= 0) {
       setNotice(t.limit);
       setLimitOpen(true);
       return;
@@ -424,7 +420,7 @@ export default function ConsultationPanel({
             {planNames[usagePlan]} · {remaining}/{limit}<br />{ux.reset(hms(countdown))}
           </p>
         )}
-        {previewMode && signedIn && <p className="w-full text-xs leading-5 text-muted-foreground">{ux.preview}<br />{planNames[actualPlan]} · {actualUsage.unlimited ? t.unlimitedBadge : t.badge(actualUsage.remaining)}</p>}
+        {previewMode && signedIn && <p className="w-full text-xs leading-5 text-muted-foreground">{ux.preview}</p>}
         {!unlimited && remaining <= 0 && (
           <Button variant="champagne" onClick={() => setLimitOpen(true)}>
             <Crown className="size-4" />
