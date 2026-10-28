@@ -70,6 +70,8 @@ type Props = {
   onVip: () => void;
 };
 
+export const MANUAL_PARTNER_ID = "manual-partner";
+export const MANUAL_CONSULT_EVENT = "onore-consult-manual";
 const untilMidnight = msUntilMidnight;
 const hms = (ms: number) => {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -95,6 +97,21 @@ export default function ConsultationPanel({
   const listMembers = useServerFn(listTeamMembers);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [targetId, setTargetId] = useState("owner");
+  // A partner typed into the compatibility form; device-only, never saved to the roster.
+  const [manualPartner, setManualPartner] = useState<TeamMember | null>(null);
+  const manualActive = useRef(false);
+  useEffect(() => {
+    const onManual = (event: Event) => {
+      const detail = (event as CustomEvent<TeamMember>).detail;
+      if (!detail?.birthDate) return;
+      manualActive.current = true;
+      setManualPartner({ ...detail, id: MANUAL_PARTNER_ID });
+      setTargetId(MANUAL_PARTNER_ID);
+    };
+    window.addEventListener(MANUAL_CONSULT_EVENT, onManual);
+    return () => window.removeEventListener(MANUAL_CONSULT_EVENT, onManual);
+  }, []);
+  useEffect(() => { manualActive.current = targetId === MANUAL_PARTNER_ID; }, [targetId]);
   const focusCtx = useFocus();
   const [rosterTick, setRosterTick] = useState(0);
   useEffect(() => {
@@ -119,18 +136,19 @@ export default function ConsultationPanel({
     };
   }, [signedIn, plan, actualPlan, listMembers, rosterTick]);
   useEffect(() => {
-    if (targetId === "owner") return;
+    if (targetId === "owner" || targetId === MANUAL_PARTNER_ID) return;
     if (targetId.startsWith("group:")) {
       if (!groups.some((g) => g.id === targetId.slice(6))) setTargetId("owner");
     } else if (!members.some((m) => m.id === targetId)) setTargetId("owner");
   }, [members, groups, targetId]);
   useEffect(() => {
+    if (manualActive.current) return;
     if (groupSubject) { setTargetId(`group:${groupSubject.id}`); return; }
     if (focusCtx?.group) setTargetId(`group:${focusCtx.group.group.id}`);
     else if (focusTargetId && members.some((m) => m.id === focusTargetId)) setTargetId(focusTargetId);
     else if (focusCtx?.focus.targetKind === "self") setTargetId("owner");
   }, [groupSubject, focusTargetId, members, focusCtx?.group?.group.id, focusCtx?.focus.targetKind]);
-  const target = members.find((m) => m.id === targetId);
+  const target = targetId === MANUAL_PARTNER_ID && manualPartner ? manualPartner : members.find((m) => m.id === targetId);
   const selGroupIndex = targetId.startsWith("group:") ? groups.findIndex((g) => g.id === targetId.slice(6)) : -1;
   const selGroup = selGroupIndex >= 0 ? groups[selGroupIndex] ?? null : null;
   const selGroupMembers = useMemo(
@@ -171,7 +189,8 @@ export default function ConsultationPanel({
   const usage = { ...actualUsage, limit: displayLimit, unlimited: !Number.isFinite(displayLimit), remaining: remainingUses(displayLimit, actualUsage.used) };
   const { limit, unlimited, remaining } = usage;
   // A display preview must not cap (or increase) authenticated API access.
-  const sendRemaining = signedIn ? actualUsage.remaining : remaining;
+  // Signed-in caps are enforced by the server; a stale or failed client count must never lock the input.
+  const sendRemaining = signedIn ? Infinity : remaining;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
@@ -350,6 +369,7 @@ export default function ConsultationPanel({
           }}
         >
           <option value="owner">{consultationTranslations[language].ownerLabel}</option>
+          {manualPartner && <option value={MANUAL_PARTNER_ID}>{memberDisplayName(manualPartner)} · {manualPartner.birthDate}</option>}
           {members.length > 0 && (
             <optgroup label={language === "ja" ? "登録ファミリー" : "Registered family"}>
               {members.map((m) => (
