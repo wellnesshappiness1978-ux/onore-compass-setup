@@ -216,9 +216,11 @@ function TorisetsuPanel({
 
   const runAnalysis = async (inputs: { id?: string; name: string; input: PartnerInput; relationshipType?: string }[], saved = false, group = false) => {
     if (analyzing || !inputs.length) return;
-    if (remaining <= 0) { setLimitOpen(true); return; }
     setAnalyzing(true);
     try {
+      const current = await usage.refresh();
+      if (!current) return;
+      if (current.remaining <= 0) { setLimitOpen(true); return; }
       const readings = inputs.flatMap((item, index) => {
         const relationshipType = group ? item.relationshipType ?? "" : pickedMember?.relationshipType ?? "";
         const reading = analyzeCompatibility({ name: profile.nameKanji, nameRomaji: profile.nameRomaji, birthDate: profile.birthDate, birthTime: profile.birthTime, birthTimeUnknown: profile.birthTimeUnknown, birthPlace: profile.birthPlace, birthCity: profile.birthCity, bloodType: profile.bloodType, siblingOrder: profile.siblingOrder, gender: profile.gender }, item.input, language, { relationship: saved ? kindFromRelationshipType(relationshipType) : relationshipKinds[relation ?? 2] ?? "romance", theme: readingTheme, concern });
