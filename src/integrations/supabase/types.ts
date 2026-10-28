@@ -446,6 +446,7 @@ export type Database = {
         Args: { p_day: string; p_feature: string }
         Returns: number
       }
+      current_plan_daily_usage_limit: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
