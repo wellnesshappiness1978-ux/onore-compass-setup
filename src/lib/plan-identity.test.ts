@@ -26,6 +26,7 @@ describe('AI consultation plan identities', () => {
   });
   it('missing or unknown membership stays Free rather than granting access', () => {
     expect(parsePlanIdentity('admin')).toBeNull();
+    expect(parsePlanIdentity('constructor')).toBeNull();
     expect(normalizePlan(null)).toBe('free');
     expect(getPlanConsultationLimit('premium')).toBe(1);
   });
