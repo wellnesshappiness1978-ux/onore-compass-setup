@@ -90,6 +90,11 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
     }, 1000);
     return () => window.clearInterval(id);
   }, [day, refresh]);
+  useEffect(() => {
+    if (!serverCounted) return;
+    const id = window.setInterval(() => { void refresh(); }, 15000);
+    return () => window.clearInterval(id);
+  }, [serverCounted, refresh]);
 
   /** Returns true when one use was recorded; false when the daily cap is reached. */
   const consume = useCallback(async () => {

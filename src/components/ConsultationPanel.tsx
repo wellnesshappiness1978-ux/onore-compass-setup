@@ -564,7 +564,7 @@ export default function ConsultationPanel({
             <PromptInputTextarea
               ref={textareaRef}
               placeholder={t.placeholder}
-              disabled={sendRemaining <= 0}
+              disabled={!usage.ready || sendRemaining <= 0}
               className="min-h-20 text-sm text-foreground placeholder:text-muted-foreground"
             />
             <PromptInputFooter className="items-end justify-between gap-3 px-3 pb-2">
@@ -574,7 +574,7 @@ export default function ConsultationPanel({
               <PromptInputSubmit
                 status={status}
                 onStop={stop}
-                disabled={!busy && sendRemaining <= 0}
+                disabled={!busy && (!usage.ready || sendRemaining <= 0)}
                 aria-label={t.send}
                 className="size-9 shrink-0 rounded-full bg-champagne-gradient text-primary-foreground shadow-champagne hover:brightness-110"
               />
