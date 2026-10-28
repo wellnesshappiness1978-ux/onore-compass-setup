@@ -169,6 +169,13 @@
       "when": 1793000503876,
       "tag": "0023_reading_cache_local_identity",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793165768675,
+      "tag": "0024_normalize_ai_daily_plan_limits",
+      "breakpoints": true
     }
   ]
 }

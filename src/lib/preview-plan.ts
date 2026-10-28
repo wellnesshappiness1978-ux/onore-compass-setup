@@ -1,5 +1,6 @@
 import type { Plan } from "./design-modes";
 import type { Language } from "./translations";
+import { parsePlanIdentity } from './plan-identity';
 
 export const planQuery: Record<Plan, string> = { free: "free", standard: "standard", vip: "vip", b2b: "business", "b2b-premium": "business_premium" };
 export const planLabels: Record<Plan, string> = { free: "無料会員", standard: "スタンダード会員", vip: "VIP会員", b2b: "ファミリー会員", "b2b-premium": "ファミリープレミアム会員" };
@@ -13,7 +14,7 @@ export const localizedPlanLabels: Record<Language, Record<Plan, string>> = {
   fr: { free: "Membre Gratuit", standard: "Membre Standard", vip: "Membre VIP", b2b: "Membre Famille", "b2b-premium": "Famille Premium" },
 };
 export function parsePlan(value: string | null): Plan | null {
-  return Object.entries(planQuery).find(([id, query]) => value === id || value === query)?.[0] as Plan | undefined ?? null;
+  return parsePlanIdentity(value);
 }
 export function isTestPreview(host: string): boolean {
   return import.meta.env.DEV || host === "localhost" || /^id-preview--[a-f0-9-]+\.lovable\.app$/.test(host) || /^project--[a-f0-9-]+-dev\.lovable\.app$/.test(host) || /^preview--[a-z0-9-]+\.lovable\.app$/.test(host) || /^[a-f0-9-]+\.lovableproject\.com$/.test(host);

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { consultationDailyLimit, dailyUsageLimit } from "@/lib/plans";
+import { getPlanConsultationLimit, dailyUsageLimit, planOrder } from "@/lib/plans";
+import { normalizePlan } from '@/lib/plan-identity';
 import type { Plan } from "@/lib/design-modes";
 import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 
@@ -9,7 +10,7 @@ const localDay = () => new Date().toLocaleDateString("en-CA");
 // One device counter per feature/day: switching the displayed plan changes the cap, never resets what was used.
 const localKey = (feature: UsageFeature) => `onore-usage:${feature}:${localDay()}`;
 const legacyKey = (feature: UsageFeature, plan: Plan) => `onore-usage:${feature}:${plan}:${localDay()}`;
-export const dailyLimitFor = (feature: UsageFeature, plan: Plan) => (feature === "consultation" ? consultationDailyLimit[plan] : dailyUsageLimit[plan]);
+export const dailyLimitFor = (feature: UsageFeature, plan: unknown) => (feature === "consultation" ? getPlanConsultationLimit(plan) : dailyUsageLimit[normalizePlan(plan)]);
 export const remainingUses = (limit: number, used: number) => (Number.isFinite(limit) ? Math.max(0, limit - used) : Infinity);
 export const msUntilMidnight = () => {
   const n = new Date();
@@ -40,7 +41,9 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
       setUsed(data?.used ?? 0);
     } else {
       try {
-        setUsed(Math.max(Number(localStorage.getItem(localKey(feature))) || 0, Number(localStorage.getItem(legacyKey(feature, plan))) || 0));
+        const restored = Math.max(Number(localStorage.getItem(localKey(feature))) || 0, ...planOrder.map(p => Number(localStorage.getItem(legacyKey(feature, p))) || 0));
+        localStorage.setItem(localKey(feature), String(restored));
+        setUsed(restored);
       } catch {
         setUsed(0);
       }
@@ -73,9 +76,11 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
       setUsed(Number(data) || 0);
       return true;
     }
-    if (unlimited) return true;
-    if (used >= limit) return false;
-    const next = used + 1;
+    let stored = 0;
+    try { stored = Number(localStorage.getItem(localKey(feature))) || 0; } catch { /* private browsing */ }
+    const current = Math.max(used, stored);
+    if (current >= limit) return false;
+    const next = current + 1;
     try {
       localStorage.setItem(localKey(feature), String(next));
     } catch {

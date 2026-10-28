@@ -28,7 +28,8 @@ import { consultationTranslations } from "@/lib/consultation-translations";
 import { consultationGoal } from "@/lib/consultation-request";
 import type { Plan } from "@/lib/design-modes";
 import { nextPlan, planOrder } from "@/lib/plans";
-import { useDailyUsage, msUntilMidnight } from "@/hooks/use-daily-usage";
+import { normalizePlan } from '@/lib/plan-identity';
+import { useDailyUsage, msUntilMidnight, dailyLimitFor, remainingUses } from "@/hooks/use-daily-usage";
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
@@ -81,14 +82,16 @@ export default function ConsultationPanel({
   profile,
   groupSubject,
   language,
-  plan,
-  actualPlan,
+  plan: inputPlan,
+  actualPlan: inputActualPlan,
   signedIn,
   previewMode = false,
   onVip,
   focusTargetId = null,
   goal = "",
 }: Props & { focusTargetId?: string | null; goal?: string }) {
+  const plan = normalizePlan(inputPlan);
+  const actualPlan = normalizePlan(inputActualPlan);
   const listMembers = useServerFn(listTeamMembers);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [targetId, setTargetId] = useState("owner");
@@ -164,18 +167,23 @@ export default function ConsultationPanel({
   const ux = consultationUxCopy[language];
   const usagePlan = signedIn && !previewMode ? actualPlan : plan;
   const actualUsage = useDailyUsage("consultation", signedIn ? actualPlan : plan, signedIn);
-  const previewUsage = useDailyUsage("consultation", plan, false);
-  const usage = previewMode && signedIn ? previewUsage : actualUsage;
+  const displayLimit = dailyLimitFor('consultation', usagePlan);
+  const usage = { ...actualUsage, limit: displayLimit, unlimited: !Number.isFinite(displayLimit), remaining: remainingUses(displayLimit, actualUsage.used) };
   const { limit, unlimited, remaining } = usage;
+  // A display preview must not cap (or increase) authenticated API access.
+  const sendRemaining = signedIn ? actualUsage.remaining : remaining;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
     return () => window.clearInterval(id);
   }, []);
-  const limitPlan = signedIn && actualUsage.remaining <= 0 ? actualPlan : usagePlan;
+  const limitPlan = signedIn ? actualPlan : usagePlan;
   const upgradeTo =
     planOrder.indexOf(limitPlan) < planOrder.indexOf("vip") ? "vip" : nextPlan(limitPlan);
   const [limitOpen, setLimitOpen] = useState(false);
+  useEffect(() => {
+    if (sendRemaining > 0) { setLimitOpen(false); setNotice(null); }
+  }, [usagePlan, actualPlan, sendRemaining]);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [favorites, setFavorites] = useState<Awaited<ReturnType<typeof listConsultationBookmarks>>>(
     [],
@@ -264,14 +272,14 @@ export default function ConsultationPanel({
       textareaRef.current?.focus({ preventScroll: true });
       return;
     }
-    if (remaining <= 0 || (signedIn && actualUsage.remaining <= 0)) {
+    if (sendRemaining <= 0) {
       setNotice(t.limit);
       setLimitOpen(true);
       return;
     }
     setNotice(null);
     clearError();
-    if ((!signedIn || previewMode) && !(await usage.consume())) {
+    if (!signedIn && !(await usage.consume())) {
       setNotice(t.limit);
       setLimitOpen(true);
       return;
@@ -541,7 +549,7 @@ export default function ConsultationPanel({
             <PromptInputTextarea
               ref={textareaRef}
               placeholder={t.placeholder}
-              disabled={remaining <= 0}
+              disabled={sendRemaining <= 0}
               className="min-h-20 text-sm text-foreground placeholder:text-muted-foreground"
             />
             <PromptInputFooter className="items-end justify-between gap-3 px-3 pb-2">
@@ -551,7 +559,7 @@ export default function ConsultationPanel({
               <PromptInputSubmit
                 status={status}
                 onStop={stop}
-                disabled={!busy && remaining <= 0}
+                disabled={!busy && sendRemaining <= 0}
                 aria-label={t.send}
                 className="size-9 shrink-0 rounded-full bg-champagne-gradient text-primary-foreground shadow-champagne hover:brightness-110"
               />

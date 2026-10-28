@@ -1,9 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import type { Plan } from "./design-modes";
-
-const validPlans: Plan[] = ["free", "standard", "vip", "b2b", "b2b-premium"];
+import { normalizePlan } from './plan-identity';
 
 /** Only a server-verified administrator may assign a temporary test plan. */
 export const getMyMembership = createServerFn({ method: "GET" })
@@ -14,7 +12,7 @@ export const getMyMembership = createServerFn({ method: "GET" })
     if (error) throw error;
     const effective = data?.debug_expires_at && Date.parse(data.debug_expires_at) <= Date.now()
       ? data.debug_previous_plan : data?.plan;
-    return validPlans.find((plan) => plan === effective) ?? "free";
+    return normalizePlan(effective);
   });
 
 export const canManageDebugPlan = createServerFn({ method: "GET" })
@@ -35,7 +33,7 @@ export const setMyDebugPlan = createServerFn({ method: "POST" })
     const { data: current, error: readError } = await context.supabase.from("plan_memberships")
       .select("plan, debug_expires_at, debug_previous_plan").eq("user_id", context.userId).maybeSingle();
     if (readError) throw readError;
-    const originalPlan = current?.debug_expires_at ? current.debug_previous_plan ?? "free" : current?.plan ?? "free";
+    const originalPlan = normalizePlan(current?.debug_expires_at ? current.debug_previous_plan : current?.plan);
     const { error } = await supabaseAdmin.from("plan_memberships").upsert({
       user_id: context.userId,
       plan: data.plan,
