@@ -226,7 +226,7 @@ export default function ShareCardButton({
                 <div className="space-y-3">
                   <div role="radiogroup" aria-label={ui.select} className="grid grid-cols-2 gap-2">
                     {(["all", "select"] as const).map((s) => (
-                      <Button key={s} type="button" role="radio" aria-checked={scope === s} variant={scope === s ? "default" : "outline"} className="h-auto min-h-11 whitespace-normal" onClick={() => { setScope(s); if (s === "select" && !selected.length) setSelected(available.map((a) => a.id)); }}>
+                      <Button key={s} type="button" role="radio" aria-checked={scope === s} variant={scope === s ? "default" : "outline"} className="h-auto min-h-11 whitespace-normal" onClick={() => { setScope(s); }}>
                         {s === "all" ? ui.scopeAll : ui.scopeSelect}
                       </Button>
                     ))}

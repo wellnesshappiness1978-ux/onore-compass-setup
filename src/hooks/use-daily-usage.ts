@@ -12,6 +12,7 @@ const localKey = (feature: UsageFeature) => `onore-usage:${feature}:${localDay()
 const legacyKey = (feature: UsageFeature, plan: Plan) => `onore-usage:${feature}:${plan}:${localDay()}`;
 export const dailyLimitFor = (feature: UsageFeature, plan: unknown) => (feature === "consultation" ? getPlanConsultationLimit(plan) : dailyUsageLimit[normalizePlan(plan)]);
 export const remainingUses = (limit: number, used: number) => (Number.isFinite(limit) ? Math.max(0, limit - used) : Infinity);
+export const isDailyLimitError = (error: { code?: string } | null | undefined) => error?.code === "23514";
 export const msUntilMidnight = () => {
   const n = new Date();
   return new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1).getTime() - n.getTime();
@@ -32,13 +33,18 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
     const today = localDay();
     setDay(today);
     if (serverCounted) {
-      const { data } = await supabase
-        .from("daily_usage")
-        .select("used")
-        .eq("feature", feature)
-        .eq("usage_day", today)
-        .maybeSingle();
-      setUsed(data?.used ?? 0);
+      try {
+        const { data, error } = await supabase
+          .from("daily_usage")
+          .select("used")
+          .eq("feature", feature)
+          .eq("usage_day", today)
+          .maybeSingle();
+        // A failed read must not lock the feature; the server still enforces the cap.
+        setUsed(error ? 0 : (data?.used ?? 0));
+      } catch {
+        setUsed(0);
+      }
     } else {
       try {
         const restored = Math.max(Number(localStorage.getItem(localKey(feature))) || 0, ...planOrder.map(p => Number(localStorage.getItem(legacyKey(feature, p))) || 0));
@@ -71,7 +77,8 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
       });
       if (error) {
         await refresh();
-        return false;
+        // Only a confirmed daily-limit response blocks; transient/config errors fall back to allowing use.
+        return !isDailyLimitError(error);
       }
       setUsed(Number(data) || 0);
       return true;

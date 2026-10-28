@@ -21,3 +21,7 @@ export function mergeRosterMembers<T extends { id: string }>(primary: T[], local
   const seen = new Set(primary.map(m => m.id));
   return [...primary, ...local.filter(m => !seen.has(m.id))];
 }
+
+/** Device-only partner typed into the compatibility form, handed to AI consultation. */
+export const MANUAL_PARTNER_ID = "manual-partner";
+export const MANUAL_CONSULT_EVENT = "onore-consult-manual";
