@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getPlanConsultationLimit, dailyUsageLimit, planOrder } from "@/lib/plans";
-import { normalizePlan } from '@/lib/plan-identity';
+import { planOrder } from "@/lib/plans";
+import { getPlanConsultationLimit, remainingUses } from "@/lib/plan-usage";
 import type { Plan } from "@/lib/design-modes";
 import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 
@@ -10,8 +10,8 @@ const localDay = () => new Date().toLocaleDateString("en-CA");
 // One device counter per feature/day: switching the displayed plan changes the cap, never resets what was used.
 const localKey = (feature: UsageFeature) => `onore-usage:${feature}:${localDay()}`;
 const legacyKey = (feature: UsageFeature, plan: Plan) => `onore-usage:${feature}:${plan}:${localDay()}`;
-export const dailyLimitFor = (feature: UsageFeature, plan: unknown) => (feature === "consultation" ? getPlanConsultationLimit(plan) : dailyUsageLimit[normalizePlan(plan)]);
-export const remainingUses = (limit: number, used: number) => (Number.isFinite(limit) ? Math.max(0, limit - used) : Infinity);
+export const dailyLimitFor = (_feature: UsageFeature, plan: unknown) => getPlanConsultationLimit(plan);
+export { remainingUses };
 export const isDailyLimitError = (error: { code?: string } | null | undefined) => error?.code === "23514";
 export const msUntilMidnight = () => {
   const n = new Date();
@@ -24,7 +24,10 @@ export const msUntilMidnight = () => {
  * guests and preview-plan views use a device-local counter. Resets at local midnight.
  */
 export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: boolean) {
-  const limit = dailyLimitFor(feature, plan);
+  const configuredLimit = dailyLimitFor(feature, plan);
+  const [serverLimit, setServerLimit] = useState<number | null>(null);
+  const [ready, setReady] = useState(false);
+  const limit = serverCounted ? (serverLimit ?? configuredLimit) : configuredLimit;
   const unlimited = !Number.isFinite(limit);
   const [used, setUsed] = useState(0);
   const [day, setDay] = useState(localDay);
@@ -34,32 +37,52 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
     setDay(today);
     if (serverCounted) {
       try {
-        const { data, error } = await supabase
-          .from("daily_usage")
-          .select("used")
-          .eq("feature", feature)
-          .eq("usage_day", today)
-          .maybeSingle();
-        // A failed read must not lock the feature; the server still enforces the cap.
-        setUsed(error ? 0 : (data?.used ?? 0));
+        const { data: auth } = await supabase.auth.getUser();
+        if (!auth.user) { setReady(false); return null; }
+        const [usageResult, capResult] = await Promise.all([
+          supabase.from("daily_usage").select("used").eq("user_id", auth.user.id).eq("feature", feature).eq("usage_day", today).maybeSingle(),
+          supabase.rpc("plan_daily_usage_limit", { p_plan: plan }),
+        ]);
+        if (usageResult.error || capResult.error || typeof capResult.data !== "number") {
+          setReady(false);
+          return null;
+        }
+        const count = usageResult.data?.used ?? 0;
+        setUsed(count);
+        setServerLimit(capResult.data);
+        setReady(true);
+        return { used: count, limit: capResult.data, remaining: remainingUses(capResult.data, count) };
       } catch {
-        setUsed(0);
+        setReady(false);
+        return null;
       }
     } else {
       try {
         const restored = Math.max(Number(localStorage.getItem(localKey(feature))) || 0, ...planOrder.map(p => Number(localStorage.getItem(legacyKey(feature, p))) || 0));
         localStorage.setItem(localKey(feature), String(restored));
         setUsed(restored);
+        setReady(true);
+        return { used: restored, limit: configuredLimit, remaining: remainingUses(configuredLimit, restored) };
       } catch {
         setUsed(0);
+        setReady(true);
+        return { used: 0, limit: configuredLimit, remaining: configuredLimit };
       }
     }
-  }, [feature, plan, serverCounted]);
+  }, [feature, plan, serverCounted, configuredLimit]);
 
   useEffect(() => {
-    void refresh();
-    window.addEventListener(CLOUD_SYNC_EVENT,refresh);
-    return ()=>window.removeEventListener(CLOUD_SYNC_EVENT,refresh);
+    setReady(false);
+    const onRefresh = () => { void refresh(); };
+    onRefresh();
+    window.addEventListener(CLOUD_SYNC_EVENT, onRefresh);
+    window.addEventListener("focus", onRefresh);
+    window.addEventListener("storage", onRefresh);
+    return () => {
+      window.removeEventListener(CLOUD_SYNC_EVENT, onRefresh);
+      window.removeEventListener("focus", onRefresh);
+      window.removeEventListener("storage", onRefresh);
+    };
   }, [refresh]);
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -77,8 +100,9 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
       });
       if (error) {
         await refresh();
-        // Only a confirmed daily-limit response blocks; transient/config errors fall back to allowing use.
-        return !isDailyLimitError(error);
+        // Failed accounting cannot grant uncounted diagnoses.
+        if (!isDailyLimitError(error)) throw new Error(error.message);
+        return false;
       }
       setUsed(Number(data) || 0);
       return true;
@@ -99,6 +123,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
 
   return {
     used,
+    ready,
     limit,
     unlimited,
     remaining: remainingUses(limit, used),
