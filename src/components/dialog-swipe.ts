@@ -2,8 +2,11 @@ import type { TouchEvent } from 'react';
 
 /** Keep Tailwind's individual translate (dialog centering) separate from dragging. */
 export function resetDialogDrag(element: HTMLElement) {
+  // Commit the reset without the dialog's CSS duration animating the old offset.
+  element.style.transition = 'none';
   element.style.translate = '';
   element.style.transform = '';
+  void element.offsetHeight;
   element.style.transition = '';
 }
 
