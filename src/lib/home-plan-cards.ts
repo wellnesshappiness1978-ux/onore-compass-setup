@@ -122,7 +122,7 @@ const times = (n: number) => (Number.isFinite(n) ? `1日${n}回` : "無制限");
 /** Japanese feature lists are derived from the live caps in plans.ts so the guide never drifts from enforcement. */
 const jaFeatures: Record<HomePlanId, string[]> = {
   standard: [
-    "無料プランの全機能（基本個別診断・当日の地球暦とコンパス・本日のメッセージ・今日の決断・目的/目標設定・今日の占い基本機能・基本バースカラー・AI相談 1日1回）",
+    `無料プランの全機能（基本個別診断・当日の地球暦とコンパス・本日のメッセージ・今日の決断・目的/目標設定・今日の占い基本機能・基本バースカラー・AI相談 ${times(consultationDailyLimit.free)}）`,
     "「バースカラー曼陀羅アート」完全解放",
     "「9つの周波数BGM」全周波数の継続再生（タブ移動中も継続）",
     "吉方位・開運エネルギー（生まれの方位タイプと今年の方位）解放",
@@ -160,4 +160,23 @@ const jaFeatures: Record<HomePlanId, string[]> = {
     "優先AI処理（Priority AI）",
   ],
 };
-export const homePlanCardsCopy: typeof basehomePlanCardsCopy = Object.fromEntries((Object.keys(basehomePlanCardsCopy) as Language[]).map(language => [language, { ...basehomePlanCardsCopy[language], cards: basehomePlanCardsCopy[language].cards.map(card => ({ ...card, features: [...planReadingLines(card.id, language), ...(language === "ja" ? jaFeatures[card.id] : [reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : []), ...card.features])] })) }])) as typeof basehomePlanCardsCopy;
+const dailyFeatureCopy: Record<Language, { compatibility: (n: number) => string; consultation: (n: number) => string }> = {
+  ja: { compatibility: n => `アゴルメン相性診断 1日${n}回`, consultation: n => `アゴルメン相談室 1日${n}回` },
+  en: { compatibility: n => `Quick compatibility: ${n}/day`, consultation: n => `AI consultation: ${n}/day` },
+  'zh-CN': { compatibility: n => `快速契合诊断 每天${n}次`, consultation: n => `AI咨询 每天${n}次` },
+  'zh-TW': { compatibility: n => `快速契合診斷 每天${n}次`, consultation: n => `AI諮詢 每天${n}次` },
+  ko: { compatibility: n => `빠른 궁합 진단 하루 ${n}회`, consultation: n => `AI 상담 하루 ${n}회` },
+  es: { compatibility: n => `Compatibilidad rápida: ${n}/día`, consultation: n => `Consulta de IA: ${n}/día` },
+  fr: { compatibility: n => `Affinités rapides : ${n}/jour`, consultation: n => `Consultation IA : ${n}/jour` },
+};
+export const homePlanCardsCopy: typeof basehomePlanCardsCopy = Object.fromEntries(
+  (Object.keys(basehomePlanCardsCopy) as Language[]).map(language => [language, {
+    ...basehomePlanCardsCopy[language],
+    cards: basehomePlanCardsCopy[language].cards.map(card => {
+      const features = card.features.map((feature, index) => index === 0
+        ? dailyFeatureCopy[language].compatibility(dailyUsageLimit[card.id])
+        : index === 2 ? dailyFeatureCopy[language].consultation(consultationDailyLimit[card.id]) : feature);
+      return { ...card, features: [...planReadingLines(card.id, language), ...(language === "ja" ? jaFeatures[card.id] : [reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : []), ...features])] };
+    }),
+  }]),
+) as typeof basehomePlanCardsCopy;
