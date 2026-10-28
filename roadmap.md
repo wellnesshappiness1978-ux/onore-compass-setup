@@ -1,5 +1,10 @@
 # Roadmap
 
+## Non-public commercial disclosure (2026-10-28)
+- [x] Replace the 「特定商取引法に基づく表記」 notice with the requested non-public wording in all seven languages: office name only, 運営責任者/所在地/電話番号 disclose-on-request, in-app contact form, fixed prices, packet fees, immediate delivery, digital-content no-refund with OS cancellation.
+- [x] Price list renders one tier per line in the modal and on /legal/commerce; 450 tests across 89 files passed, typecheck clean, automatic build OK. Phone and desktop modal text verified in the browser with no page errors.
+
+
 ## Unified diagnosis and consultation caps (2026-10-28)
 - [x] Share one maintained 1/3/10/30/100 JSON configuration across display, device checks and generated database enforcement; SQL payload equality regression retained.
 - [x] Align authenticated counters and submission checks with server-resolved actual membership and owner usage; refresh on submit/focus/sync, preserve counts on failed reads, retain preview-only boundaries.
