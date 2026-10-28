@@ -31,3 +31,11 @@ describe('AI consultation plan identities', () => {
     expect(getPlanConsultationLimit('premium')).toBe(1);
   });
 });
+import { isDailyLimitError } from "@/hooks/use-daily-usage";
+describe("daily usage error fallback", () => {
+  it("blocks only on a confirmed daily-limit error", () => {
+    expect(isDailyLimitError({ code: "23514" })).toBe(true);
+    expect(isDailyLimitError({ code: "500" })).toBe(false);
+    expect(isDailyLimitError(null)).toBe(false);
+  });
+});
