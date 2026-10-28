@@ -1,0 +1,59 @@
+// @vitest-environment happy-dom
+import { act } from 'react';
+import { createRoot } from 'react-dom/client';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { Plan } from '@/lib/design-modes';
+import { useDailyUsage } from './use-daily-usage';
+
+const db = vi.hoisted(() => ({ used: 0, cap: 1, fail: false }));
+vi.mock('@/integrations/supabase/client', () => ({ supabase: {
+  auth: { getUser: async () => ({ data: { user: { id: 'owner' } } }) },
+  from: () => {
+    const query = { select: () => query, eq: () => query, maybeSingle: async () => ({ data: { used: db.used }, error: db.fail ? { message: 'offline' } : null }) };
+    return query;
+  },
+  rpc: async (name: string) => {
+    if (name === 'current_plan_daily_usage_limit') return { data: db.cap, error: null };
+    if (db.used >= db.cap) return { data: null, error: { code: '23514', message: 'limit' } };
+    db.used += 1;
+    return { data: db.used, error: null };
+  },
+} }));
+(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+const roots: ReturnType<typeof createRoot>[] = [];
+afterEach(() => { act(() => roots.splice(0).forEach(root => root.unmount())); db.fail = false; });
+
+async function mount(plan: Plan) {
+  const probe: { current?: ReturnType<typeof useDailyUsage> } = {};
+  function Probe() { probe.current = useDailyUsage('consultation', plan, true); return null; }
+  const root = createRoot(document.createElement('div'));
+  roots.push(root);
+  await act(async () => { root.render(<Probe />); });
+  return probe;
+}
+describe('authenticated displayed counts and atomic checks agree', () => {
+  it.each([['free', 1], ['standard', 3], ['vip', 10], ['b2b', 30], ['b2b-premium', 100]] as const)('%s allows its final use and then blocks', async (plan, cap) => {
+    db.cap = cap; db.used = cap - 1;
+    const probe = await mount(plan);
+    expect(probe.current?.limit).toBe(cap);
+    expect(probe.current?.remaining).toBe(1);
+    await act(async () => { expect(await probe.current?.consume()).toBe(true); });
+    expect(probe.current?.remaining).toBe(0);
+    await act(async () => { expect(await probe.current?.consume()).toBe(false); });
+    expect(db.used).toBe(cap);
+  });
+  it('uses the actual server cap instead of granting a Premium preview', async () => {
+    db.cap = 1; db.used = 1;
+    const probe = await mount('b2b-premium');
+    expect(probe.current?.limit).toBe(1);
+    expect(probe.current?.remaining).toBe(0);
+  });
+  it('failed reads do not reset used counts or grant a new allowance', async () => {
+    db.cap = 100; db.used = 99;
+    const probe = await mount('b2b-premium');
+    db.fail = true;
+    await act(async () => { expect(await probe.current?.refresh()).toBeNull(); });
+    expect(probe.current?.used).toBe(99);
+    expect(probe.current?.ready).toBe(false);
+  });
+});
