@@ -1,5 +1,10 @@
 # Roadmap
 
+## Stripe membership purchase (2026-10-29)
+- [ ] Add authenticated Checkout for existing monthly paid prices and Standard/VIP yearly prices; prevent duplicate subscriptions.
+- [ ] Verify Stripe ownership/payment server-side before updating membership; provide renewal/cancellation management.
+- [ ] Test price mapping, authorization and purchase navigation on phone/desktop; never submit a live payment during verification.
+
 ## Monthly lucky name-first layout (2026-10-29)
 - [x] Separate concrete action/item/flower target names from detailed reasons; require explicit names for new AI results and adapt old copies locally without extra generation.
 - [x] Name-first extra-bold layout preserves complete explanations, seasonal photo identity and plan gates; actual signed-in saved results show 週ごとに約束を1つ確認 / 月間予定表 / キンモクセイ.
