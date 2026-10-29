@@ -5,7 +5,7 @@ import MonthlyFlowerCard from './MonthlyFlowerCard';
 import { pickMonthlyFlower } from '../lib/seasonal-flowers';
 
 /** The keyword line is the only place the three cards must agree on colour. */
-const keyword = (html: string) => html.match(/<p class="([^"]+)" data-monthly-lucky-keyword>([\s\S]*?)<\/p>/);
+const keyword = (html: string) => html.match(/<p class="([^"]+)" data-monthly-lucky-keyword(?:="[^"]*")?>([\s\S]*?)<\/p>/);
 
 describe('monthly-lucky keyword colour', () => {
   it('renders the keyword as a gold paragraph, never a heading', () => {
