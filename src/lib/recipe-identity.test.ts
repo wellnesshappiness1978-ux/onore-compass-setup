@@ -30,3 +30,9 @@ it('rejects duplicate or missing identities instead of showing a wrong picture',
   expect(() => validateRecipeIdentities([...foods.slice(0, 4), foods[0] as typeof foods[number]], 'ja')).toThrow();
   expect(() => validateRecipeIdentities(foods.map((f, i) => i === 0 ? { ...f, recipeId: 'unknown' } : f), 'ja')).toThrow();
 });
+it('rejects a valid but nonselected menu rather than violating the daily rotation', () => {
+  const ids=['lemon-chicken','komatsuna-miso','matcha-latte','spinach-tuna','strawberry-yogurt'];
+  const foods=ids.map(recipeId=>({recipeId,name:'menu'}));
+  expect(validateRecipeIdentities(foods,'ja',ids).map(f=>f.recipeId)).toEqual(ids);
+  expect(()=>validateRecipeIdentities(foods.map((f,i)=>i===0?{...f,recipeId:'whitefish'}:f),'ja',ids)).toThrow('Daily selected recipe identities required');
+});

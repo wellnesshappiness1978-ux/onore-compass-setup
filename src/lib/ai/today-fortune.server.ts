@@ -86,11 +86,11 @@ Symbolic reference only; no medical, financial or guaranteed outcome claims.`,
     try {
       if (onPartial) for await (const partial of result.partialOutputStream) onPartial(partial);
       const output = await result.output;
-      return normalizeFortune({ ...output, foods: validateRecipeIdentities(output.foods, language) }, language);
+      return normalizeFortune({ ...output, foods: validateRecipeIdentities(output.foods, language, catalogue.map(r=>r.id)) }, language);
     } catch (error) {
       if (NoObjectGeneratedError.isInstance(error) && error.text) {
         const parsed = todayFortuneSchema.safeParse(JSON.parse(error.text));
-        if (parsed.success) return normalizeFortune({ ...parsed.data, foods: validateRecipeIdentities(parsed.data.foods, language) }, language);
+        if (parsed.success) return normalizeFortune({ ...parsed.data, foods: validateRecipeIdentities(parsed.data.foods, language, catalogue.map(r=>r.id)) }, language);
       }
       throw error;
     }

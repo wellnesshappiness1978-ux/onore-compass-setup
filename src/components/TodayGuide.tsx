@@ -24,7 +24,7 @@ import FengShuiGuide from "./FengShuiGuide";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { higherTodayBenefits, todayBenefitCategories, todayBenefitCopy, todayBenefitCount } from "@/lib/today-benefits";
 import { recipesForElement, recipeDetails, COURSE_ORDER, courseLabels } from "@/lib/lucky-recipes";
-import { pickMonthlyFlower, flowerCopy } from "@/lib/seasonal-flowers";
+import { pickMonthlyFlower } from "@/lib/seasonal-flowers";
 import MonthlyFlowerCard from "@/components/MonthlyFlowerCard";
 import RecipeStep, { cleanRecipeSteps } from "./RecipeStep";
 import { recipeLabels, recipeReason } from "@/lib/recipe-presentation";
@@ -144,7 +144,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   const el = dayElement(iso);
   const flowerPick = useMemo(() => pickMonthlyFlower((fortuneReq?.members ?? []).map(m => m.birthDate), today), [JSON.stringify(fortuneReq?.members?.map(m => m.birthDate)), today.getFullYear(), today.getMonth()]);
   const flowerName = flowerPick.flower.name[language];
-  const dailyRecipes = recipesForElement(el, iso, profile.birthDate);
+  const dailyRecipes = recipesForElement(el, iso, fortuneReq?.members.map(m=>m.birthDate) ?? profile.birthDate);
   const selectedRecipe = recipeIndex === null ? null : dailyRecipes[recipeIndex];
   const recipe = selectedRecipe ? recipeDetails(selectedRecipe, language) : null;
   const starPoem = useMemo(() => {
