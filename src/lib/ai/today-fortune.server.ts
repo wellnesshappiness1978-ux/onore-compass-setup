@@ -14,6 +14,7 @@ import { seasonOf, rhythmOf } from '../seasonal-recipes';
 import { z } from 'zod';
 import { validateRecipeIdentities } from '../recipe-identity';
 import { deeperEssencePrompt } from '../deeper-essence';
+import { monthlyLuckySchema } from '../monthly-lucky';
 
 export async function runReading(data: ReturnType<typeof todayFortuneRequestSchema.parse>, onPartial?: (value: unknown) => void, signal?: AbortSignal): Promise<TodayFortune> {
     const apiKey = process.env["LOVABLE_API_KEY"];
@@ -44,7 +45,7 @@ export async function runReading(data: ReturnType<typeof todayFortuneRequestSche
       maxRetries: 0,
       ...(signal ? { abortSignal: signal } : {}),
       model: provider.responses("openai/gpt-6-astra"),
-      output: Output.object({ schema: todayFortuneSchema.extend({ foods: z.array(todayFortuneSchema.shape.foods.element.extend({ recipeId: z.enum(catalogue.map(r => r.id) as [string, ...string[]]) })).length(5) }) }),
+      output: Output.object({ schema: todayFortuneSchema.extend({ monthly: z.object({ flower: monthlyLuckySchema.required(), action: monthlyLuckySchema.required(), item: monthlyLuckySchema.required(), outlook: z.string() }), foods: z.array(todayFortuneSchema.shape.foods.element.extend({ recipeId: z.enum(catalogue.map(r => r.id) as [string, ...string[]]) })).length(5) }) }),
       prompt: `Write TODAY'S FORTUNE for ${who}, dated ${day}, entirely in language code ${language}.
 This reading is created only for this subject and this date. ${isGroup ? "NEVER reuse an individual owner reading: weave every member's data, pair compatibility, sibling structures and today's per-member rhythms into one reading for the group." : ""}
 ${groupSizeDirective(isGroup ? members.length : 0)}
@@ -68,7 +69,7 @@ Fields:
 - decision: advance (a reversible specific step), protect (a different verification/rest step), reason (explain this subject's individual rhythms, or all members' differing rhythms; never the owner's birthday in place of a group). Each ~150 Japanese chars and tied to the saved goal. No lucky-hour prediction.
 - shopping: action (one specific affordable item, spending cap and how to use it), reason (why this subject's profile/rhythm/goal fits it today, ~180 Japanese chars), benefit (practical improvement such as fewer forgotten tasks or easier shared meals, ~150 chars). Rotate by date AND subject; do not recommend spending for its own sake.
 - maintenance: action (gentle specific daily practice with duration), reason (today's symbolic per-person rhythm, not organ diagnosis), benefit (practical comfort/rest/communication benefit). Each ~150 Japanese chars. Respect actual health, no treatment or physiological guarantees.
-- monthly: flower, action, item (each action/reason/benefit ~100–150 Japanese chars), outlook (~350 Japanese chars). Cover the whole calendar month: early/middle/late phases using this subject's calculated daily rhythms, goals and members; choose a realistic flower/item, provide weekly steps and review criteria, not generic calendar-month prose. Symbolism is not a predicted event.
+- monthly: flower, action, item MUST each separate target_name (a concise concrete name ONLY, usually 2–12 Japanese characters or 2–6 words in other languages) from description (how to use/do it, ~100–150 Japanese chars), reason (why this subject's monthly rhythms and goal fit it, ~100–150 chars), benefit (practical result, ~100–150 chars). action is the same concise value as target_name for legacy compatibility. A target_name must name the actual flower, object or practice, never an introductory sentence, advice, explanation or list. Cover the whole calendar month in description/reason/benefit: early/middle/late phases using this subject's calculated daily rhythms, goals and members, weekly steps and review criteria. outlook (~350 Japanese chars). Symbolism is not a predicted event.
 - headline: one striking line (~30 Japanese chars) naming today's theme for this subject.
 - insight: ~420 Japanese chars. Why today feels the way it does from today's rhythm × birth layers${isGroup ? " × member interplay" : ""}, the essential truth behind the current hesitation, and the turning point.
 - dynamics: ~150 Japanese chars. ${isGroup ? (members.length === 2 ? "How these two can understand and support each other today, by name." : "Who leads, who supports, who needs care today, by name, using pair scores and rhythms.") : "How today's rhythm meets this person's innate pattern in relationships and the goal."}
