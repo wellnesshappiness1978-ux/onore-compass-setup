@@ -56,4 +56,16 @@ describe('authenticated displayed counts and atomic checks agree', () => {
     expect(probe.current?.used).toBe(99);
     expect(probe.current?.ready).toBe(false);
   });
+  it('an unresolved paid membership never displays a Free fallback or unlimited allowance', async () => {
+    db.fail = true; db.cap = 100; db.used = 99;
+    const probe = await mount('b2b-premium');
+    expect(probe.current?.ready).toBe(false);
+    expect(probe.current?.limit).toBe(0);
+    expect(probe.current?.unlimited).toBe(false);
+    db.fail = false;
+    await act(async () => { await probe.current?.refresh(); });
+    expect(probe.current?.ready).toBe(true);
+    expect(probe.current?.limit).toBe(100);
+    expect(probe.current?.remaining).toBe(1);
+  });
 });

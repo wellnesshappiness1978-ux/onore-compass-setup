@@ -1,5 +1,14 @@
 # Roadmap
 
+## Five uploaded improvements (2026-10-29)
+- [x] Show lucky-color hex codes and swatches consistently; actual signed-in result #E8B58C and detail dialog verified at desktop/390px.
+- [x] Ensure every course changes on adjacent days with birth/day rhythm inputs, including leap/season/year boundaries and group inputs; enforce exact preselected AI recipe IDs.
+- [x] Emphasize the three monthly lucky values at the top of their items; actual saved results verified at desktop/390px with no truncated text.
+- [x] Parallel cache-only warm-up for completed private readings, bookmarks, core and authorized Family READs; session-long cache, bounded device copies, sign-out epoch guards, no extra AI pre-generation. Signed-in tab re-entry made zero /api requests after restoration.
+- [x] Remove unresolved signed-in cap fallback; loading/retry UI, shared local day, authoritative current membership/usage and 1/3/10/30/100 enforcement. Live database definitions confirmed; no user_subscriptions table or profiles.plan exists, so existing plan_memberships stays authoritative.
+- [x] Regression suite and automatic build passed; signed-in actual Free exhausted 0/1 matched disabled composer and preview did not grant paid access.
+- [ ] Actual paid-account answer generation: current testing account resolves to Free and has exhausted today's allowance; no membership or usage fabricated. No live paid-contract record was supplied to verify the reported paid-to-Free mismatch.
+
 ## Non-public commercial disclosure (2026-10-28)
 - [x] Replace the 「特定商取引法に基づく表記」 notice with the requested non-public wording in all seven languages: office name only, 運営責任者/所在地/電話番号 disclose-on-request, in-app contact form, fixed prices, packet fees, immediate delivery, digital-content no-refund with OS cancellation.
 - [x] Price list renders one tier per line in the modal and on /legal/commerce; 450 tests across 89 files passed, typecheck clean, automatic build OK. Phone and desktop modal text verified in the browser with no page errors.

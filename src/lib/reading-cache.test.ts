@@ -16,7 +16,7 @@ describe('progressive readings', () => {
     writeReadingCache(last, { result: last });
     expect(localStorage.getItem(first)).not.toBeNull();
     expect(localStorage.getItem(second)).toBeNull();
-    expect(readReadingCache(second, z.object({ result: z.string() }))).toBeUndefined();
+    expect(readReadingCache(second, z.object({ result: z.string() }))).toEqual({ result: second });
   });
   it('clears completed in-memory readings on sign-out', () => {
     const key = readingCacheKey('full', '2026-10-24', {}, 'owner');

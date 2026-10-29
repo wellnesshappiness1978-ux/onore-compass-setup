@@ -4,9 +4,11 @@ import { planOrder } from "@/lib/plans";
 import { getPlanConsultationLimit, remainingUses } from "@/lib/plan-usage";
 import type { Plan } from "@/lib/design-modes";
 import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
+import { localIso } from '@/lib/day-compass';
 
 export type UsageFeature = "consultation" | "compatibility";
-const localDay = () => new Date().toLocaleDateString("en-CA");
+export const usageDay = () => localIso(new Date());
+const localDay = usageDay;
 // One device counter per feature/day: switching the displayed plan changes the cap, never resets what was used.
 const localKey = (feature: UsageFeature) => `onore-usage:${feature}:${localDay()}`;
 const legacyKey = (feature: UsageFeature, plan: Plan) => `onore-usage:${feature}:${plan}:${localDay()}`;
@@ -27,15 +29,18 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
   const configuredLimit = dailyLimitFor(feature, plan);
   const [serverLimit, setServerLimit] = useState<number | null>(null);
   const [ready, setReady] = useState(false);
-  const limit = serverCounted ? (serverLimit ?? configuredLimit) : configuredLimit;
+  // Unknown is not Free and not unlimited. No allowance is shown until the server confirms it.
+  const limit = serverCounted ? (serverLimit ?? 0) : configuredLimit;
   const unlimited = !Number.isFinite(limit);
   const [used, setUsed] = useState(0);
   const [day, setDay] = useState(localDay);
+  const [refreshing, setRefreshing] = useState(false);
 
   const refresh = useCallback(async () => {
     const today = localDay();
     setDay(today);
     if (serverCounted) {
+      setRefreshing(true);
       try {
         const { data: auth } = await supabase.auth.getUser();
         if (!auth.user) { setReady(false); return null; }
@@ -55,6 +60,8 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
       } catch {
         setReady(false);
         return null;
+      } finally {
+        setRefreshing(false);
       }
     } else {
       try {
@@ -73,6 +80,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
 
   useEffect(() => {
     setReady(false);
+    setServerLimit(null);
     const onRefresh = () => { void refresh(); };
     onRefresh();
     window.addEventListener(CLOUD_SYNC_EVENT, onRefresh);
@@ -129,6 +137,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
   return {
     used,
     ready,
+    refreshing,
     limit,
     unlimited,
     remaining: remainingUses(limit, used),
