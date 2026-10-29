@@ -18,4 +18,9 @@ describe('monthly lucky name and explanation contract', () => {
     expect(legacyLuckyName('朝の散歩。毎朝新しい道を選びます。')).toBe('朝の散歩');
     expect(legacyLuckyName("This month's item is a silk handkerchief. Carry it to meetings.")).toBe('a silk handkerchief');
   });
+  it('extracts the actual practice from an older monthly recommendation introduction', () => {
+    const action = '今月の振り返りは、週ごとに約束を1つ確認する形がおすすめです。月末に返事が必要な用件を見直します。';
+    expect(monthlyLuckyValue({ action, reason: '理由', benefit: '効果' }).target_name).toBe('週ごとに約束を1つ確認');
+    expect(monthlyLuckyValue({ action, reason: '理由', benefit: '効果' }).description).toContain(action);
+  });
 });

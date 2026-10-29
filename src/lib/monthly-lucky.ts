@@ -21,6 +21,8 @@ export function legacyLuckyName(text: string): string {
   // An explicit quoted target in an introductory sentence is safer than guessing a noun.
   const quoted = opening.match(/^(?:今月|おすすめ|ラッキー).*?[「『]([^」』]+)[」』]/u);
   if (quoted?.[1]) return quoted[1].trim();
+  const practice = opening.match(/^今月[^、。]*は[、\s]*(.+?)(?:する形がおすすめ|することがおすすめ|がおすすめ)/u);
+  if (practice?.[1]) return practice[1].trim();
   return opening.replace(/^(?:今月の(?:行動|アクション)(?:は|には)[、\s]*)/u, '').replace(/[。.!]$/u, '').trim();
 }
 
