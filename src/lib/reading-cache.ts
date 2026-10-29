@@ -26,7 +26,6 @@ export function readReadingCache<T>(key: string, schema: z.ZodType<T>): T | unde
 }
 export function writeReadingCache(key: string, value: unknown) {
   memory.set(key, value);
-  if (memory.size > 16) memory.delete(memory.keys().next().value ?? '');
   try {
     // Bound device storage; eviction affects only regenerable readings.
     const keys = Object.keys(localStorage).filter(k => k.startsWith(PREFIX));
@@ -35,7 +34,7 @@ export function writeReadingCache(key: string, value: unknown) {
       try { times = JSON.parse(localStorage.getItem(ACCESS_KEY) ?? '{}'); } catch { /* old storage */ }
       const oldest = keys.sort((a, b) => (times[a] ?? 0) - (times[b] ?? 0))[0] ?? '';
       localStorage.removeItem(oldest);
-      memory.delete(oldest);
+      // Device copies remain bounded; session memory survives device eviction until sign-out.
     }
     localStorage.setItem(key, JSON.stringify(value));
     touch(key);

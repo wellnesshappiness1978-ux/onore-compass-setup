@@ -4,10 +4,11 @@ import { todayFortuneSchema, normalizeFortune } from './today-fortune';
 import type { Language } from './translations';
 
 /** Restore completed private results only; this path never generates AI or consumes quota. */
-export function restoreSessionReadings(client: QueryClient, rows: { local_key: string; result: unknown }[], epoch: number) {
+export function restoreSessionReadings(client: QueryClient, rows: { local_key: string | null; result: unknown }[], epoch: number) {
   if (epoch !== readingCacheEpoch()) return;
   for (const row of rows) {
     const key = row.local_key;
+    if (!key) continue;
     if (key.startsWith('onore-reading:v1:')) {
       writeReadingCache(key, row.result);
       client.setQueryDefaults([key], { staleTime: Infinity, gcTime: Infinity });
