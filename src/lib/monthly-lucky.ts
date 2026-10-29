@@ -14,6 +14,8 @@ export type MonthlyLucky = { target_name: string; description: string };
 /** Extract a complete phrase, never a character slice; keep the original prose below. */
 export function legacyLuckyName(text: string): string {
   const opening = text.trim().split(/\n|(?<=[。！？.!?])\s*/u)[0] ?? '';
+  const practice = opening.match(/^今月[^、。]*は[、\s]*(.+?)(?:する形がおすすめ|することがおすすめ|がおすすめ)/u);
+  if (practice?.[1]) return practice[1].trim();
   const named = opening.match(/^(?:今月の(?:道具|アイテム|花|フラワー|行動|アクション)(?:は|には)[、\s]*)?(?:手元の)?(.+?)(?:です|をおすすめします|をお勧めします)[。！]?$/u);
   if (named?.[1]) return named[1].trim();
   const introduced = opening.match(/^(?:This month's (?:item|action|flower) is|The (?:item|action|flower) for this month is)\s+(.+?)[.!]?$/i);
@@ -21,8 +23,6 @@ export function legacyLuckyName(text: string): string {
   // An explicit quoted target in an introductory sentence is safer than guessing a noun.
   const quoted = opening.match(/^(?:今月|おすすめ|ラッキー).*?[「『]([^」』]+)[」』]/u);
   if (quoted?.[1]) return quoted[1].trim();
-  const practice = opening.match(/^今月[^、。]*は[、\s]*(.+?)(?:する形がおすすめ|することがおすすめ|がおすすめ)/u);
-  if (practice?.[1]) return practice[1].trim();
   return opening.replace(/^(?:今月の(?:行動|アクション)(?:は|には)[、\s]*)/u, '').replace(/[。.!]$/u, '').trim();
 }
 
