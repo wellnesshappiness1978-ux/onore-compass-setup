@@ -1,5 +1,13 @@
 # Roadmap
 
+## Five uploaded improvements (2026-10-29)
+- [ ] Show lucky-color hex codes and swatches consistently.
+- [ ] Ensure adjacent-day food variation with birth/day rhythm inputs and course identity preserved.
+- [ ] Emphasize the three monthly lucky values at the top of their items.
+- [ ] Prefetch safe existing data in parallel and retain session caches without repeat AI generation; preserve owner/day/input invalidation.
+- [ ] Verify actual paid membership and synchronize usage loading/counters/sends with confirmed 1/3/10/30/100 caps.
+- [ ] Run regression tests and verify central UI flows and automatic build.
+
 ## Non-public commercial disclosure (2026-10-28)
 - [x] Replace the 「特定商取引法に基づく表記」 notice with the requested non-public wording in all seven languages: office name only, 運営責任者/所在地/電話番号 disclose-on-request, in-app contact form, fixed prices, packet fees, immediate delivery, digital-content no-refund with OS cancellation.
 - [x] Price list renders one tier per line in the modal and on /legal/commerce; 450 tests across 89 files passed, typecheck clean, automatic build OK. Phone and desktop modal text verified in the browser with no page errors.
