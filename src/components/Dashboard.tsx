@@ -58,6 +58,8 @@ import { homeReadingCopy } from "@/lib/home-reading-copy";
 import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
 import { createDialogSwipeHandlers } from './dialog-swipe';
+import SessionPrefetch from './SessionPrefetch';
+import { usageStatusCopy } from '@/lib/usage-status-copy';
 import TodayReminders, { DailyReminderCatalogue } from "./TodayReminders";
 import { siblingDisplay } from "@/lib/sibling-order";
 import { FocusProvider, useFocus } from "./FocusProvider";
@@ -319,7 +321,7 @@ function TorisetsuPanel({
             <h3 className="mt-3 font-serif text-xl text-gradient-gold sm:text-2xl">
                {q.title}
             </h3>
-             <p className="mt-2 text-sm text-muted-foreground">{q.hint}</p><p className="mt-2 text-xs text-primary">{q.remaining(remaining)}</p>
+             <p className="mt-2 text-sm text-muted-foreground">{q.hint}</p><p className="mt-2 text-xs text-primary">{usage.ready ? q.remaining(remaining) : usage.refreshing ? usageStatusCopy[language].checking : usageStatusCopy[language].unavailable}</p>{!usage.ready && <Button variant="outline" disabled={usage.refreshing} onClick={() => void usage.refresh()}>{usageStatusCopy[language].retry}</Button>}
           </div>
           <section className="card-lux mt-6 rounded-lg p-5 sm:p-7" aria-label={language === "ja" ? "アゴルメン相性診断" : t.compatibility}>
             <div className="space-y-5">
@@ -490,18 +492,18 @@ function TorisetsuPanel({
               <Button
                 type="button"
                 variant="champagne"
-                disabled={!canAnalyze}
+                disabled={!canAnalyze || !usage.ready}
                 onClick={() => void runAnalysis([{ name: partnerName, input: partnerInput }])}
                  className="h-14 w-full whitespace-normal rounded-lg px-3 text-sm font-bold transition-all duration-300 disabled:opacity-35 disabled:shadow-none sm:text-base"
               >
                 <Sparkles className="size-4 shrink-0" aria-hidden="true" />
-                 {remaining <= 0 ? q.limit : q.action}
+                 {usage.ready && remaining <= 0 ? q.limit : q.action}
               </Button></>}
               {pickedGroup && <p className="text-sm text-primary">{groupDisplayName(pickedGroup, groups.indexOf(pickedGroup), language)}</p>}
               {analyzing && <AgolmenLoading compact label={q.action} />}
             </div>
           </section>
-           {remaining <= 0 && !analyzed && <div role="status" className="mt-3 text-center"><p className="text-sm text-primary">{q.refresh}</p>{plan !== "b2b-premium" && <Button type="button" variant="champagne" onClick={onVip} className="mt-3 text-xs">{q.limit} →</Button>}</div>}
+           {usage.ready && remaining <= 0 && !analyzed && <div role="status" className="mt-3 text-center"><p className="text-sm text-primary">{q.refresh}</p>{plan !== "b2b-premium" && <Button type="button" variant="champagne" onClick={onVip} className="mt-3 text-xs">{q.limit} →</Button>}</div>}
           {analyzed && groupResults.length > 0 && (() => {
             const ownerText = splitGroupReading(groupResults[0]!.reading.sentences[0]).owner;
             const ja = language === "ja";
@@ -812,6 +814,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
 
   return (
     <FocusProvider owner={profile} serverBacked={signedIn} mergeLocal={signedIn && devOverrideEnabled && previewPlan !== serverPlan}>
+    <SessionPrefetch signedIn={signedIn} actualPlan={serverPlan} language={language} />
     <DailyReminderCatalogue language={language} plan={previewPlan} />
     <FocusGoalBridge onChange={(id, g, label) => { setFocusMemberId(id); setFocusGoal(g); setTraitsLabel(label); }} language={language} />
     <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
