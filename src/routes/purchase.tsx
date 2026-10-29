@@ -18,7 +18,7 @@ import type { Plan } from '@/lib/design-modes';
 import logo from '@/assets/agolmen-logo-shell.png';
 
 export const Route = createFileRoute('/purchase')({
- validateSearch: (s: Record<string, unknown>) => ({ session_id: typeof s.session_id === 'string' && /^cs_(test_|live_)?[a-zA-Z0-9]+$/.test(s.session_id) ? s.session_id : undefined, canceled: s.canceled === 'true' || s.canceled === true }),
+ validateSearch: (s: Record<string, unknown>): { session_id?: string; canceled?: boolean } => ({ ...(typeof s['session_id'] === 'string' && /^cs_(test_|live_)?[a-zA-Z0-9]+$/.test(s['session_id']) ? {session_id:s['session_id']} : {}), ...(s['canceled'] === 'true' || s['canceled'] === true ? {canceled:true} : {}) }),
  head: () => ({ meta: [{ title:'会員登録・プラン購入 | アゴルメンの羅針盤' },{ name:'description',content:'スタンダード・VIP・ファミリーの料金を比較し、Stripeで安全に会員登録。' },{ property:'og:title',content:'会員登録・プラン購入 | アゴルメンの羅針盤' },{ property:'og:description',content:'有料プランの料金比較・購入・契約管理。' },{ property:'og:type',content:'website' },{ name:'twitter:card',content:'summary_large_image' }] }),
  component: Purchase,
 });

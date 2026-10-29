@@ -79,8 +79,7 @@ export async function checkoutBilling(userId: string, plan: BillingPlan, yearly:
     'subscription_data[billing_mode][type]': 'flexible',
     success_url: `${origin}/purchase?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/purchase?canceled=true`,
-    'consent_collection[terms_of_service]': 'required',
-    'custom_text[terms_of_service_acceptance][message]': `利用規約・購入条件をご確認ください: ${origin}/legal/commerce`,
+    'automatic_tax[enabled]': 'true', 'customer_update[address]': 'auto',
   }, `agolmen-checkout-${userId}-${price.price}-${Math.floor(Date.now()/1800000)}`);
   if (!session.url?.startsWith('https://checkout.stripe.com/')) throw new Error('Checkout unavailable');
   return { url: session.url, portal: false };
@@ -90,7 +89,7 @@ export async function portalBilling(userId: string) {
   const customer = await customerFor(userId);
   if (!customer) throw new Error('No Stripe customer');
   const origin = new URL(getRequest().url).origin;
-  const session = await stripe<{ url: string }>('billing_portal/sessions', { customer, return_url: `${origin}/purchase` });
+  const session = await stripe<{ url: string }>('billing_portal/sessions', { customer, configuration: 'bpc_1UVv16C3Xvb52V8U0fMEFSeu', return_url: `${origin}/purchase` });
   return session.url;
 }
 
