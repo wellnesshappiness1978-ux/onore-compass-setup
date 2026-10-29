@@ -133,8 +133,8 @@ export default function SettingsPanel({
   const pd = planDetails[language];
   const currentMembership = signedIn ? actualPlan : plan;
   const recommendation = nextPlan(currentMembership);
-  // Comparisons show the current plan and higher tiers only; lower plans stay hidden.
-  const visibleCards = carouselCards.filter(c => tierOrder.indexOf(c.id as Plan) >= tierOrder.indexOf(currentMembership)).slice().sort((a,b)=>Number(b.id===recommendation)-Number(a.id===recommendation));
+  // Free is always first (left), then paid plans in ascending tier order.
+  const visibleCards = carouselCards.slice().sort((a,b)=>tierOrder.indexOf(a.id as Plan)-tierOrder.indexOf(b.id as Plan));
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const onCarouselScroll = () => {
