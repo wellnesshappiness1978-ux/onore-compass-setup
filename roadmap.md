@@ -1,5 +1,10 @@
 # Roadmap
 
+## Monthly lucky name-first layout (2026-10-29)
+- [ ] Separate concrete action/item/flower target names from detailed reasons and reuse the contract across monthly displays.
+- [ ] Display every target name first in large extra-bold type, with explanation below; preserve seasonal photos and plan gates.
+- [ ] Run data regressions and verify phone/desktop display and automatic build.
+
 ## Five uploaded improvements (2026-10-29)
 - [x] Show lucky-color hex codes and swatches consistently; actual signed-in result #E8B58C and detail dialog verified at desktop/390px.
 - [x] Ensure every course changes on adjacent days with birth/day rhythm inputs, including leap/season/year boundaries and group inputs; enforce exact preselected AI recipe IDs.
