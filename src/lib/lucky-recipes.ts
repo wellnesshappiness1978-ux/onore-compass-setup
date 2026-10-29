@@ -65,9 +65,20 @@ export function courseCandidates(course: Course, element: Element, day = '', bir
   // Element dishes lead the list so the order stays personal while still rotating through every dish.
   return [...pool.filter(r => r.element === element), ...pool.filter(r => r.element !== element)];
 }
-/** One dish per course, rotating consecutively through the large catalogue so a daily user meets new dishes. */
-export const recipesForElement = (element: Element, day = '', birthDate?: string) => COURSE_ORDER.map((course, i) => {
-  const pool = courseCandidates(course, element, day, birthDate);
-  const idx = day ? Math.floor(dayIndex(day) / 2) + ELEMENTS.indexOf(element) * 5 + i * 7 : 0;
-  return pool[(idx % pool.length + pool.length) % pool.length]!;
+/** Disjoint calendar-day lanes guarantee no adjacent-day repeats, even at season/year boundaries. */
+export const recipesForElement = (element: Element, day = '', births?: string | string[]) => COURSE_ORDER.flatMap((course, i) => {
+  const dates = (Array.isArray(births) ? births : births ? [births] : []).filter(Boolean).sort();
+  if (!day) return courseCandidates(course, element).slice(0, 1);
+  const ordinal = dayIndex(day);
+  const all = luckyRecipes.filter(r => recipeCourse(r.id) === course);
+  const lane = all.filter((_, index) => index % 2 === ((ordinal % 2) + 2) % 2);
+  const season = seasonOf(day);
+  const seasonal = lane.filter(r => !r.season || r.season === season);
+  const pool = seasonal.length ? seasonal : lane;
+  const seed = dates.join('|').split('').reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261);
+  const score = (r: Recipe) => Number(r.element === element) * 2 + Number(r.season === season) * 2 + dates.filter(b => r.rhythm && r.rhythm === rhythmOf(b, day)).length;
+  const ordered = [...pool].sort((a, b) => score(b) - score(a) || a.id.localeCompare(b.id));
+  const index = (Math.floor(ordinal / 2) + seed + ELEMENTS.indexOf(element) * 5 + i * 7) % ordered.length;
+  const recipe = ordered[(index + ordered.length) % ordered.length];
+  return recipe ? [recipe] : [];
 });
