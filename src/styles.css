@@ -1506,6 +1506,9 @@ body:has(.design-canvas) .account-controls { top: calc(var(--preview-bar-height)
 
 /* Opaque, theme-aware heading ink avoids dark gradient tails and heavy outlines. */
 .design-canvas :is(h1,h2,h3,h4,h5,h6) { color: var(--foreground); text-shadow: none; -webkit-text-stroke: 0; letter-spacing: 0; }
+/* Monthly-lucky keywords keep the gold token even if a heading tag is ever introduced. */
+.design-canvas [data-monthly-lucky-keyword] { color: var(--primary); }
+
 .design-canvas :is(.text-gradient-gold,.arts-shimmer) { background: none; color: var(--primary); -webkit-text-fill-color: var(--primary); text-shadow: none; }
 .lucky-color-chip { background: var(--daily-color); box-shadow: 0 0 22px color-mix(in srgb, var(--daily-color) 45%, transparent), inset 0 0 0 2px color-mix(in srgb, var(--foreground) 35%, transparent); }
 .lucky-color-surface { background: linear-gradient(120deg, color-mix(in srgb, var(--daily-color) 16%, var(--card)), var(--card) 75%); border-color: color-mix(in srgb, var(--daily-color) 55%, var(--border)); }

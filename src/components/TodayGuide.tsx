@@ -26,6 +26,8 @@ import { higherTodayBenefits, todayBenefitCategories, todayBenefitCopy, todayBen
 import { recipesForElement, recipeDetails, COURSE_ORDER, courseLabels } from "@/lib/lucky-recipes";
 import { pickMonthlyFlower } from "@/lib/seasonal-flowers";
 import MonthlyFlowerCard from "@/components/MonthlyFlowerCard";
+import MonthlyLuckyCard from "@/components/MonthlyLuckyCard";
+
 import RecipeStep, { cleanRecipeSteps } from "./RecipeStep";
 import { recipeLabels, recipeReason } from "@/lib/recipe-presentation";
 import { buildTodayDepth, type DeepSection } from "@/lib/today-depth";
@@ -387,9 +389,8 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       <p className="font-serif text-lg text-primary">{readingDate(iso, language, true)}</p>
       <div className="grid min-w-0 gap-3">
         {monthly.map((item, i) => <article key={i} data-monthly-lucky={i === 0 ? 'action' : 'item'} className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne">
-          <h4 className="break-words text-2xl font-extrabold leading-snug text-primary sm:text-3xl">{item.target_name}</h4>
-          <p className="mt-2 font-serif text-xs text-muted-foreground">{monthlyLabels[language][i]}</p>
-          <p className="mt-3 whitespace-pre-line break-words text-sm leading-7">{item.description}</p>
+          <MonthlyLuckyCard label={monthlyLabels[language][i]} name={item.target_name} description={item.description} />
+
         </article>)}
         <article data-monthly-lucky="flower" className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne"><MonthlyFlowerCard pick={flowerPick} language={language} /></article>
       </div>
