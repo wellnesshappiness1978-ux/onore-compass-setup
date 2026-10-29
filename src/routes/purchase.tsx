@@ -85,7 +85,7 @@ function Purchase() {
      <p className="text-sm">{t.current}: <strong className="text-primary">{names[plan]}</strong></p>
      <div role="radiogroup" aria-label={t.title} className="flex gap-2">{[false,true].map(value=><Button key={String(value)} variant={yearly===value?'default':'outline'} role="radio" aria-checked={yearly===value} onClick={()=>setYearly(value)}>{value?t.yearly:t.monthly}</Button>)}</div>
    </div>
-   {!signedIn && <Button disabled={!ready || busy!==null} className="mb-6 min-h-11 h-auto whitespace-normal" onClick={async()=>{setBusy('signin');try {const result=await lovable.auth.signInWithOAuth('google',{ redirect_uri:`${window.location.origin}/purchase` });if(result.error)setMessage('error');}catch{setMessage('error');}finally{setBusy(null);}}><ShieldCheck className="size-4" />{ready?t.signin:t.loading}</Button>}
+   {!signedIn && <Button disabled={!ready || busy!==null} className="mb-6 min-h-11 h-auto whitespace-normal" onClick={async()=>{setBusy('signin');try {const result=await lovable.auth.signInWithOAuth('google',{ redirect_uri:`${window.location.origin}/purchase` });if(result.error)setMessage('error');}catch{setMessage('error');}finally{setBusy(null);}}}><ShieldCheck className="size-4" />{ready?t.signin:t.loading}</Button>}
    <div className="grid min-w-0 gap-4 md:grid-cols-2">
      {billingPlans.map(entry=>{
        const price=yearly?entry.yearly:entry.monthly;
