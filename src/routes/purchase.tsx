@@ -16,6 +16,7 @@ import { storedLanguage } from '@/lib/support-copy';
 import type { Language } from '@/lib/translations';
 import type { Plan } from '@/lib/design-modes';
 import logo from '@/assets/agolmen-logo-shell.png';
+import { legalContentByLanguage } from '@/lib/legal-content';
 
 export const Route = createFileRoute('/purchase')({
  validateSearch: (s: Record<string, unknown>): { session_id?: string; canceled?: boolean } => ({ ...(typeof s['session_id'] === 'string' && /^cs_(test_|live_)?[a-zA-Z0-9]+$/.test(s['session_id']) ? {session_id:s['session_id']} : {}), ...(s['canceled'] === 'true' || s['canceled'] === true ? {canceled:true} : {}) }),
@@ -101,7 +102,7 @@ function Purchase() {
    </div>
    <section className="mt-6 space-y-4 border-t border-primary/25 py-6">
      <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed"><Checkbox checked={consent} onCheckedChange={v=>setConsent(v===true)} className="mt-1 shrink-0" /><span>{t.terms}</span></label>
-     <div className="flex flex-wrap gap-4 text-sm text-primary"><Link to="/legal/$document" params={{document:'terms'}}>Terms</Link><Link to="/legal/$document" params={{document:'commerce'}}>購入条件 / Purchase conditions</Link><Link to="/legal/$document" params={{document:'privacy'}}>Privacy</Link></div>
+     <div className="flex flex-wrap gap-4 text-sm text-primary">{(['terms','commerce','privacy'] as const).map(document=><Link key={document} to="/legal/$document" params={{document}}>{legalContentByLanguage[language][document].title}</Link>)}</div>
      <p className="text-sm leading-relaxed text-muted-foreground">{t.notice}</p>
      {signedIn && <div className="flex flex-wrap gap-3"><Button variant="outline" disabled={busy!==null} onClick={()=>void refresh()}><RefreshCw className="size-4" />{t.refresh}</Button>{linked && <Button variant="outline" className="h-auto min-h-11 whitespace-normal" disabled={busy!==null} onClick={()=>void open()}><Settings className="size-4" />{t.manage}</Button>}</div>}
    </section>

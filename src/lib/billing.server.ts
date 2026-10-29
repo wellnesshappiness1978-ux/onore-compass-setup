@@ -47,14 +47,22 @@ export async function refreshBilling(userId: string, sessionId?: string) {
   const item = active?.items.data[0];
   const plan = verifiedBillingPlan(item?.price.id ?? '', active?.status ?? '', active?.latest_invoice?.paid === true);
   const until = item ? new Date(item.current_period_end * 1000).toISOString() : null;
-  const { data: membership, error: readError } = await supabaseAdmin.from('plan_memberships').select('debug_expires_at').eq('user_id', userId).maybeSingle();
+  const { data: membership, error: readError } = await supabaseAdmin.from('plan_memberships').select('plan, debug_previous_plan, debug_expires_at, stripe_subscription_id, stripe_status, stripe_valid_until').eq('user_id', userId).maybeSingle();
   if (readError) throw readError;
   const debugging = membership?.debug_expires_at && Date.parse(membership.debug_expires_at) > Date.now();
-  const { error } = await supabaseAdmin.from('plan_memberships').update({
+  const patch = {
     ...(debugging ? { debug_previous_plan: plan } : { plan }),
-    stripe_subscription_id: active?.id ?? null, stripe_status: active?.status ?? 'inactive', stripe_valid_until: until, updated_at: new Date().toISOString(),
-  }).eq('user_id', userId);
-  if (error) throw error;
+    stripe_subscription_id: active?.id ?? null, stripe_status: active?.status ?? 'inactive', stripe_valid_until: until,
+  };
+  // Reads must not trigger another Realtime refresh when Stripe state is unchanged.
+  const changed = (debugging ? membership?.debug_previous_plan : membership?.plan) !== plan
+    || membership?.stripe_subscription_id !== patch.stripe_subscription_id
+    || membership?.stripe_status !== patch.stripe_status
+    || (membership?.stripe_valid_until ? Date.parse(membership.stripe_valid_until) : null) !== (until ? Date.parse(until) : null);
+  if (changed) {
+    const { error } = await supabaseAdmin.from('plan_memberships').update({ ...patch, updated_at: new Date().toISOString() }).eq('user_id', userId);
+    if (error) throw error;
+  }
   return { linked: true, plan, status: active?.status ?? 'inactive', until, pending };
 }
 
