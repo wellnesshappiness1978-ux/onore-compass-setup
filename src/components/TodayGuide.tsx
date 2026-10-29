@@ -26,6 +26,8 @@ import { higherTodayBenefits, todayBenefitCategories, todayBenefitCopy, todayBen
 import { recipesForElement, recipeDetails, COURSE_ORDER, courseLabels } from "@/lib/lucky-recipes";
 import { pickMonthlyFlower } from "@/lib/seasonal-flowers";
 import MonthlyFlowerCard from "@/components/MonthlyFlowerCard";
+import MonthlyLuckyCard from "@/components/MonthlyLuckyCard";
+
 import RecipeStep, { cleanRecipeSteps } from "./RecipeStep";
 import { recipeLabels, recipeReason } from "@/lib/recipe-presentation";
 import { buildTodayDepth, type DeepSection } from "@/lib/today-depth";
