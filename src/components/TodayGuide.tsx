@@ -41,6 +41,7 @@ import { readingDate, monthlyLabels, servingsLabel } from "@/lib/reading-present
 import { recipeImage } from "@/lib/recipe-images";
 import { groupBirthPalette } from '@/lib/group-palette';
 import DailyLuckyColor from './DailyLuckyColor';
+import { monthlyLuckyValue } from '@/lib/monthly-lucky';
 
 // Deterministic reference values from birth date and today's calendar; not verified readings or predictions.
 type Pair = { ja: string; en: string };
@@ -379,7 +380,22 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   content.decision = { notify: fortune.data?.decision.advance ?? content.decision.notify, body: fortune.data ? <div className="space-y-3 text-sm leading-7"><h4 className="text-primary">{access.advance}</h4><p>{fortune.data.decision.advance}</p><h4 className="text-primary">{access.protect}</h4><p>{fortune.data.decision.protect}</p><p><strong>{access.reason}：</strong>{fortune.data.decision.reason}</p></div> : <TodayInsight state={fortune} language={language} /> };
   content.shopping = { notify: fortune.data?.shopping.action ?? access.loading, body: fortune.data ? guide(fortune.data.shopping) : <TodayInsight state={fortune} language={language} /> };
   content.health = { notify: fortune.data?.maintenance.action ?? access.loading, body: fortune.data ? guide(fortune.data.maintenance) : <TodayInsight state={fortune} language={language} /> };
-  content.monthlyLucky = { notify: fortune.data?.monthly.action.action ?? access.loading, body: fortune.data ? <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]"><p className="font-serif text-lg text-primary">{readingDate(iso, language, true)}</p><div className="grid min-w-0 gap-3">{[fortune.data.monthly.action, fortune.data.monthly.item].map((item, i) => <article key={i} className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne"><p className="mb-3 break-words text-2xl font-extrabold leading-snug text-primary sm:text-3xl">{item.action}</p><h4 className="mb-3 font-serif text-sm text-primary">{i + 1}. {monthlyLabels[language][i]}</h4><div className="space-y-3 text-sm leading-7"><p><strong>{access.reason}：</strong>{item.reason}</p><p><strong>{access.benefit}：</strong>{item.benefit}</p></div></article>)}<article className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne"><MonthlyFlowerCard pick={flowerPick} language={language} /></article></div><p className="text-sm leading-7">{fortune.data.monthly.outlook}</p></div> : <TodayInsight state={fortune} language={language} /> };
+  const monthly = fortune.data ? [fortune.data.monthly.action, fortune.data.monthly.item].map(monthlyLuckyValue) : [];
+  content.monthlyLucky = {
+    notify: monthly[0]?.target_name ?? access.loading,
+    body: fortune.data ? <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
+      <p className="font-serif text-lg text-primary">{readingDate(iso, language, true)}</p>
+      <div className="grid min-w-0 gap-3">
+        {monthly.map((item, i) => <article key={i} data-monthly-lucky={i === 0 ? 'action' : 'item'} className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne">
+          <h4 className="break-words text-2xl font-extrabold leading-snug text-primary sm:text-3xl">{item.target_name}</h4>
+          <p className="mt-2 font-serif text-xs text-muted-foreground">{monthlyLabels[language][i]}</p>
+          <p className="mt-3 whitespace-pre-line break-words text-sm leading-7">{item.description}</p>
+        </article>)}
+        <article data-monthly-lucky="flower" className="min-w-0 rounded-md border border-primary/30 bg-card p-4 shadow-champagne"><MonthlyFlowerCard pick={flowerPick} language={language} /></article>
+      </div>
+      <p className="text-sm leading-7">{fortune.data.monthly.outlook}</p>
+    </div> : <TodayInsight state={fortune} language={language} />,
+  };
   if (focus?.group) {
     const group = focus.group;
     const each = (render: (p: UserProfile) => ReactNode) => <div className="space-y-3">{group.members.map(m => <details key={m.id} className="border-t border-primary/25 pt-3"><summary className="cursor-pointer font-serif text-primary">{m.nickname || m.name}</summary><div className="mt-3">{render(memberToProfile(m))}</div></details>)}</div>;

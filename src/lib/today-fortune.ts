@@ -3,6 +3,7 @@ import { readingProfileSchema } from "./profile-reading-context";
 import { fortuneFingerprint } from "./today-subject";
 import { COURSE_ORDER, luckyRecipes, recipeCourse, recipeDetails } from './lucky-recipes';
 import { servingsLabel } from './reading-presentation';
+import { monthlyLuckySchema } from './monthly-lucky';
 
 /** Shared (client + server) contract for the AI "Today's fortune" reading. */
 export const todayMemberSchema = readingProfileSchema.extend({
@@ -29,7 +30,7 @@ export const todayFortuneSchema = z.object({
   decision: z.object({ advance: z.string(), protect: z.string(), reason: z.string() }),
   shopping: guidance,
   maintenance: guidance,
-  monthly: z.object({ flower: guidance, action: guidance, item: guidance, outlook: z.string() }),
+  monthly: z.object({ flower: monthlyLuckySchema, action: monthlyLuckySchema, item: monthlyLuckySchema, outlook: z.string() }),
   headline: z.string(),
   insight: z.string(),
   dynamics: z.string(),

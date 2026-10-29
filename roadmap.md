@@ -1,5 +1,10 @@
 # Roadmap
 
+## Monthly lucky name-first layout (2026-10-29)
+- [x] Separate concrete action/item/flower target names from detailed reasons; require explicit names for new AI results and adapt old copies locally without extra generation.
+- [x] Name-first extra-bold layout preserves complete explanations, seasonal photo identity and plan gates; actual signed-in saved results show 週ごとに約束を1つ確認 / 月間予定表 / キンモクセイ.
+- [x] 462 tests across 91 files and automatic build passed; 320/390/1280px actual saved result verified without overflow or page errors. Fresh AI generation was not triggered for this presentation change.
+
 ## Five uploaded improvements (2026-10-29)
 - [x] Show lucky-color hex codes and swatches consistently; actual signed-in result #E8B58C and detail dialog verified at desktop/390px.
 - [x] Ensure every course changes on adjacent days with birth/day rhythm inputs, including leap/season/year boundaries and group inputs; enforce exact preselected AI recipe IDs.
