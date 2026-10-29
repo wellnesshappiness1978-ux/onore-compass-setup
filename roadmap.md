@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Stripe membership purchase (2026-10-29)
-- [ ] Add authenticated Checkout for existing monthly paid prices and Standard/VIP yearly prices; prevent duplicate subscriptions.
-- [ ] Verify Stripe ownership/payment server-side before updating membership; provide renewal/cancellation management.
-- [ ] Test price mapping, authorization and purchase navigation on phone/desktop; never submit a live payment during verification.
+- [x] Authenticated Checkout uses existing monthly prices and Standard/VIP yearly prices; active subscriptions route to management instead of duplicate purchase.
+- [x] Owner-bound Stripe verification and paid-invoice/expiry gates update membership; management portal supports payment methods and period-end cancellation. No webhook; external changes reconcile on app re-entry/refresh.
+- [x] 476 tests passed, automatic build OK; signed-in VIP Checkout shows ¥777, annual prices and locked Family annual option verified, unpaid remains Free, portal opens, phone has no horizontal overflow/page errors. No live payment submitted.
+- [ ] Paid completion and renewed membership UI readback: requires an actual payment or separate test-mode Stripe account; no charge or paid entitlement fabricated.
 
 ## Monthly lucky name-first layout (2026-10-29)
 - [x] Separate concrete action/item/flower target names from detailed reasons; require explicit names for new AI results and adapt old copies locally without extra generation.

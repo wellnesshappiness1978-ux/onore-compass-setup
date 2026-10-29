@@ -47,14 +47,22 @@ export async function refreshBilling(userId: string, sessionId?: string) {
   const item = active?.items.data[0];
   const plan = verifiedBillingPlan(item?.price.id ?? '', active?.status ?? '', active?.latest_invoice?.paid === true);
   const until = item ? new Date(item.current_period_end * 1000).toISOString() : null;
-  const { data: membership, error: readError } = await supabaseAdmin.from('plan_memberships').select('debug_expires_at').eq('user_id', userId).maybeSingle();
+  const { data: membership, error: readError } = await supabaseAdmin.from('plan_memberships').select('plan, debug_previous_plan, debug_expires_at, stripe_subscription_id, stripe_status, stripe_valid_until').eq('user_id', userId).maybeSingle();
   if (readError) throw readError;
   const debugging = membership?.debug_expires_at && Date.parse(membership.debug_expires_at) > Date.now();
-  const { error } = await supabaseAdmin.from('plan_memberships').update({
+  const patch = {
     ...(debugging ? { debug_previous_plan: plan } : { plan }),
-    stripe_subscription_id: active?.id ?? null, stripe_status: active?.status ?? 'inactive', stripe_valid_until: until, updated_at: new Date().toISOString(),
-  }).eq('user_id', userId);
-  if (error) throw error;
+    stripe_subscription_id: active?.id ?? null, stripe_status: active?.status ?? 'inactive', stripe_valid_until: until,
+  };
+  // Reads must not trigger another Realtime refresh when Stripe state is unchanged.
+  const changed = (debugging ? membership?.debug_previous_plan : membership?.plan) !== plan
+    || membership?.stripe_subscription_id !== patch.stripe_subscription_id
+    || membership?.stripe_status !== patch.stripe_status
+    || (membership?.stripe_valid_until ? Date.parse(membership.stripe_valid_until) : null) !== (until ? Date.parse(until) : null);
+  if (changed) {
+    const { error } = await supabaseAdmin.from('plan_memberships').update({ ...patch, updated_at: new Date().toISOString() }).eq('user_id', userId);
+    if (error) throw error;
+  }
   return { linked: true, plan, status: active?.status ?? 'inactive', until, pending };
 }
 
@@ -79,8 +87,7 @@ export async function checkoutBilling(userId: string, plan: BillingPlan, yearly:
     'subscription_data[billing_mode][type]': 'flexible',
     success_url: `${origin}/purchase?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/purchase?canceled=true`,
-    'consent_collection[terms_of_service]': 'required',
-    'custom_text[terms_of_service_acceptance][message]': `利用規約・購入条件をご確認ください: ${origin}/legal/commerce`,
+    'automatic_tax[enabled]': 'true', 'customer_update[address]': 'auto',
   }, `agolmen-checkout-${userId}-${price.price}-${Math.floor(Date.now()/1800000)}`);
   if (!session.url?.startsWith('https://checkout.stripe.com/')) throw new Error('Checkout unavailable');
   return { url: session.url, portal: false };
@@ -90,7 +97,7 @@ export async function portalBilling(userId: string) {
   const customer = await customerFor(userId);
   if (!customer) throw new Error('No Stripe customer');
   const origin = new URL(getRequest().url).origin;
-  const session = await stripe<{ url: string }>('billing_portal/sessions', { customer, return_url: `${origin}/purchase` });
+  const session = await stripe<{ url: string }>('billing_portal/sessions', { customer, configuration: 'bpc_1UVv16C3Xvb52V8U0fMEFSeu', return_url: `${origin}/purchase` });
   return session.url;
 }
 

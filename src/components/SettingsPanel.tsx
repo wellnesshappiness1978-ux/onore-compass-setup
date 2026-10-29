@@ -40,6 +40,7 @@ import { useFontSize } from '@/hooks/use-font-size';
 import { fontSizeCopy, fontSizes } from '@/lib/font-size';
 import { Link } from '@tanstack/react-router';
 import { billingCopy } from '@/lib/billing-copy';
+import { billingPlans } from '@/lib/billing-plans';
 
 type Props = {
   profile: UserProfile;
@@ -279,8 +280,10 @@ export default function SettingsPanel({
             if (!tier) return null;
             const isVip = item.id === recommendation;
             const isCurrent = currentMembership === item.id;
-            const price = yearly ? tier.priceYearly : tier.priceMonthly;
-            const period = yearly ? t.perYear : t.perMonth;
+            const bill = billingPlans.find(p => p.plan === item.id);
+            const yearlyAvailable = Boolean(bill?.yearly);
+            const price = bill ? `¥${(yearly && bill.yearly ? bill.yearly : bill.monthly).amount.toLocaleString('ja-JP')}` : tier.priceMonthly;
+            const period = yearly && yearlyAvailable ? t.perYear : t.perMonth;
             const CardIcon = item.id === "free" ? User : planIcon[item.id];
             const name = item.id === "free" ? t.planFree : appearanceCopy.plans[item.id];
             return (
@@ -298,7 +301,7 @@ export default function SettingsPanel({
                 </div>
                 <p className="mt-3 flex flex-wrap items-baseline gap-1">
                   <span className={`text-2xl font-semibold ${isVip ? "text-gradient-gold" : "text-foreground"}`}>{price}</span>
-                  <span className="text-[11px] text-muted-foreground">{tier.id === "b2b" ? tier.priceNote : period}</span>
+                  <span className="text-[11px] text-muted-foreground">{period}</span>
                   {tier.priceNote && tier.id !== "b2b" && <span className="text-[10px] text-primary">{tier.priceNote}</span>}
                 </p>
                 <ul className="mt-3 flex-1 space-y-2">
@@ -329,7 +332,7 @@ export default function SettingsPanel({
           {visibleCards.map((item, index) => <span key={item.id} className={`h-1.5 rounded-full transition-all ${activeIndex === index ? "w-5 bg-primary" : "w-1.5 bg-primary/30"}`} />)}
         </div>
 
-        {!devOverrideEnabled && <p className="mt-3 text-center text-[11px] text-muted-foreground">{t.upgradeNote}</p>}
+        <p className="mt-3 text-center text-[11px] text-muted-foreground">{billingCopy[language].notice}</p>
       </section>
 
       <section className={card}>
