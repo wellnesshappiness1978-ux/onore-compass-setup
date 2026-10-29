@@ -23,7 +23,7 @@ export default function MonthlyLuckyCard({
   children,
   footer,
 }: {
-  label?: string;
+  label?: string | undefined;
   name: string;
   description: string;
   children?: ReactNode;
