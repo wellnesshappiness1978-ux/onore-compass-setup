@@ -65,14 +65,12 @@ function Purchase() {
  },[refresh]);
  const open = async (selected?: BillingPlan) => {
    setBusy(selected ?? 'portal'); setMessage(null);
-   // Open during the user's click so mobile popup blockers don't discard the checkout.
-   const tab = window.open('about:blank','_blank');
-   if (tab) tab.opener=null;
    try {
      const result = selected ? await checkout({ data:{ plan:selected,yearly } }) : await portal();
-     if (!result.ok || !/^https:\/\/(checkout|billing)\.stripe\.com\//.test(result.url)) { tab?.close(); setMessage('error'); return; }
-     if (tab) tab.location.href=result.url; else window.location.assign(result.url);
-   } catch { tab?.close(); setMessage('error'); } finally { setBusy(null); }
+     if (!result.ok || !/^https:\/\/(checkout|billing)\.stripe\.com\//.test(result.url)) { setMessage('error'); return; }
+     // Same-tab redirect: popups are blocked on mobile Safari/Chrome and in-app browsers.
+     window.location.href=result.url; return;
+   } catch { setMessage('error'); } finally { setBusy(null); }
  };
  return <main className="design-canvas mx-auto min-h-screen max-w-5xl px-4 py-8 text-foreground sm:px-8">
    <Button asChild variant="ghost" className="mb-6"><Link to="/"><ArrowLeft className="size-4" />{t.return}</Link></Button>
