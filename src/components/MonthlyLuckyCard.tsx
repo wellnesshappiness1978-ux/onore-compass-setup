@@ -23,7 +23,7 @@ export default function MonthlyLuckyCard({
   children,
   footer,
 }: {
-  label: string;
+  label?: string;
   name: string;
   description: string;
   children?: ReactNode;
@@ -32,7 +32,7 @@ export default function MonthlyLuckyCard({
   return (
     <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
       <MonthlyLuckyKeyword name={name} />
-      <p className="font-serif text-xs text-primary">{label}</p>
+      {label ? <p className="font-serif text-xs text-primary">{label}</p> : null}
       {children}
       <p className="whitespace-pre-line break-words text-sm leading-7">{description}</p>
       {footer}
