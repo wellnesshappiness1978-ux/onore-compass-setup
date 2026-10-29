@@ -29,7 +29,8 @@ import { consultationGoal } from "@/lib/consultation-request";
 import type { Plan } from "@/lib/design-modes";
 import { nextPlan, planOrder } from "@/lib/plans";
 import { normalizePlan } from '@/lib/plan-identity';
-import { useDailyUsage, msUntilMidnight } from "@/hooks/use-daily-usage";
+import { useDailyUsage, msUntilMidnight, usageDay } from "@/hooks/use-daily-usage";
+import { usageStatusCopy } from '@/lib/usage-status-copy';
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
@@ -243,7 +244,7 @@ export default function ConsultationPanel({
           targetLabel,
           goal: effectiveGoal,
           language,
-          day: new Date().toLocaleDateString("en-CA"),
+          day: usageDay(),
           group: selGroup ? { name: targetLabel.slice(0, 60), members: selGroupMembers.filter((m) => /^\d{4}-\d{2}-\d{2}$/.test(m.birthDate)).slice(0, 101).map((m) => ({ name: memberDisplayName(m).slice(0, 40), nameRomaji: m.id === SELF_MEMBER_ID ? profile.nameRomaji : '', father: m.father ?? null, mother: m.mother ?? null, birthDate: m.birthDate, birthTime: m.birthTimeUnknown === false ? (m.birthTime ?? "").slice(0, 5) : "", birthTimeUnknown: m.birthTimeUnknown ?? true, birthPlace: (m.birthPlace ?? "").slice(0, 80), birthCity: (m.birthCity ?? "").slice(0, 80), bloodType: m.bloodType ?? "", gender: m.gender ?? "undisclosed", siblingOrder: (m.siblingOrder ?? "").slice(0, 80), relationship: (m.relationship ?? "").slice(0, 60), relationshipType: (m.relationshipType ?? "").slice(0, 30) })) } : undefined,
         }),
       }),
@@ -409,19 +410,20 @@ export default function ConsultationPanel({
           className="flex min-w-0 items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary"
         >
           <Radio className="size-4 shrink-0" />
-          <span>{unlimited ? t.unlimitedBadge : t.badge(remaining)}</span>
+          <span>{!usage.ready ? usage.refreshing ? usageStatusCopy[language].checking : usageStatusCopy[language].unavailable : unlimited ? t.unlimitedBadge : t.badge(remaining)}</span>
         </div>
         <Button variant="outline" size="sm" onClick={() => setFavoritesOpen(true)}>
           <Bookmark className="size-4" />
           {t.bookmarked} · {favorites.length}
         </Button>
-        {!unlimited && (
+        {!usage.ready && <Button variant="outline" size="sm" disabled={usage.refreshing} onClick={() => void usage.refresh()}>{usageStatusCopy[language].retry}</Button>}
+        {usage.ready && !unlimited && (
           <p className="w-full text-xs text-muted-foreground">
             {planNames[usagePlan]} · {remaining}/{limit}<br />{ux.reset(hms(countdown))}
           </p>
         )}
         {previewMode && signedIn && <p className="w-full text-xs leading-5 text-muted-foreground">{ux.preview}</p>}
-        {!unlimited && remaining <= 0 && (
+        {usage.ready && !unlimited && remaining <= 0 && (
           <Button variant="champagne" onClick={() => setLimitOpen(true)}>
             <Crown className="size-4" />
             {t.modalTitle}
@@ -546,7 +548,7 @@ export default function ConsultationPanel({
                 key={prompt}
                 type="button"
                 variant="outline"
-                disabled={busy}
+                disabled={busy || !usage.ready || sendRemaining <= 0}
                 onClick={() =>
                   void submit(index === 1 && target ? `${prompt} · ${target.name}` : prompt)
                 }
