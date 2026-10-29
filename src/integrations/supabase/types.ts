@@ -151,6 +151,10 @@ export type Database = {
           debug_expires_at: string | null
           debug_previous_plan: string | null
           plan: string
+          stripe_customer_id: string | null
+          stripe_status: string | null
+          stripe_subscription_id: string | null
+          stripe_valid_until: string | null
           updated_at: string
           user_id: string
         }
@@ -158,6 +162,10 @@ export type Database = {
           debug_expires_at?: string | null
           debug_previous_plan?: string | null
           plan?: string
+          stripe_customer_id?: string | null
+          stripe_status?: string | null
+          stripe_subscription_id?: string | null
+          stripe_valid_until?: string | null
           updated_at?: string
           user_id: string
         }
@@ -165,6 +173,10 @@ export type Database = {
           debug_expires_at?: string | null
           debug_previous_plan?: string | null
           plan?: string
+          stripe_customer_id?: string | null
+          stripe_status?: string | null
+          stripe_subscription_id?: string | null
+          stripe_valid_until?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -447,6 +459,10 @@ export type Database = {
         Returns: number
       }
       current_plan_daily_usage_limit: { Args: never; Returns: number }
+      expire_stripe_membership_plan: {
+        Args: { p_customer: string; p_plan: string; p_until: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

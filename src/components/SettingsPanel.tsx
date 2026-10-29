@@ -38,6 +38,8 @@ import { appearanceUiCopy } from '@/lib/appearance-ui-copy';
 import { planReadingLines } from '@/lib/today-access-copy';
 import { useFontSize } from '@/hooks/use-font-size';
 import { fontSizeCopy, fontSizes } from '@/lib/font-size';
+import { Link } from '@tanstack/react-router';
+import { billingCopy } from '@/lib/billing-copy';
 
 type Props = {
   profile: UserProfile;
@@ -270,7 +272,7 @@ export default function SettingsPanel({
             );
           })}
         </div>
-        <p className="mt-2 inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] text-primary">{demoCopy[language].badge}</p>
+        <Button asChild variant="outline" className="mt-3 min-h-11 whitespace-normal"><Link to="/purchase">{billingCopy[language].title}</Link></Button>
         <div ref={carouselRef} onScroll={onCarouselScroll} className="plan-carousel -mx-1 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-1 pb-3">
           {visibleCards.map((item) => {
             const tier = allTiers.find(tr => tr.id === item.id);
@@ -312,11 +314,12 @@ export default function SettingsPanel({
                   <ul className="space-y-1.5 px-3 pb-3 text-xs leading-5 text-foreground/90">{pd.items[item.id as Plan].map(d => <li key={d}>・{d}</li>)}</ul>
                 </details>
                 {(item.id !== "free" || previewPlan.enabled) && <Button
-                  onClick={() => previewPlan.enabled ? previewPlan.selectPlan(item.id as Plan) : toast(demoCopy[language].toast, { description: name })}
+                  asChild={item.id !== 'free'}
+                  onClick={item.id === 'free' ? () => previewPlan.selectPlan('free') : undefined}
                   disabled={isCurrent}
                   size="sm" variant={isVip ? "default" : "outline"}
                   className="mt-4 h-10 w-full whitespace-normal text-xs">
-                  <Sparkles className="size-4 shrink-0" /> {isCurrent ? profileUi.settings.active : pc.unlockCta}
+                  {item.id !== 'free' ? <Link to="/purchase"><Sparkles className="size-4 shrink-0" />{isCurrent ? profileUi.settings.active : billingCopy[language].title}</Link> : <><Sparkles className="size-4 shrink-0" />{profileUi.settings.active}</>}
                 </Button>}
               </div>
             );
