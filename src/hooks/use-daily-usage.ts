@@ -97,7 +97,6 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
   useEffect(() => {
     setReady(false);
     setServerLimit(null);
-    setConfirmedPlan(null);
     const onRefresh = () => { void refresh(); };
     onRefresh();
     window.addEventListener(CLOUD_SYNC_EVENT, onRefresh);
@@ -156,7 +155,6 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
     used,
     ready,
     refreshing,
-    confirmedPlan,
     limit,
     unlimited,
     remaining: remainingUses(limit, used),
