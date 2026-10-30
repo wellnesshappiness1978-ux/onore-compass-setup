@@ -2,7 +2,7 @@ import type { Language } from './translations';
 import type { Plan } from './design-modes';
 import { canUseToday, type TodayFeature } from './plans';
 
-export type ShareSection = { id: string; title: string; text: string; feature?: TodayFeature; locked?: boolean; image?: string };
+export type ShareSection = { id: string; title: string; text: string; feature?: TodayFeature; locked?: boolean; image?: string | undefined };
 export const APP_SHARE_URL = 'https://cosmic-beginnings-onboard.lovable.app';
 type ShareUi = { scopeAll: string; scopeSelect: string; saveImage: string; sns: string; copyLink: string; linkCopied: string; locked: string; snsNote: string; select: string; all: string; text: string; copy: string; copied: string; empty: string; daily: string; app: string; tagline: string; previous: string; next: string };
 export const shareUi: Record<Language, ShareUi> = {
