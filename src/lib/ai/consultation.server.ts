@@ -78,6 +78,8 @@ export async function handleConsultation(request: Request) {
     // Privileged accounting is reachable only after this caller's bearer is verified.
     const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
     const userId = claims.claims.sub;
+    // Reconcile Stripe billing so the reservation never judges a stale free plan.
+    try { const { refreshBilling } = await import('@/lib/billing.server'); await refreshBilling(userId); } catch { /* Use last verified, unexpired membership. */ }
     const { data: reservation, error: usageError } = await supabaseAdmin.rpc('reserve_consultation_usage', { p_user_id: userId, p_day: day });
     if (usageError)
       return Response.json(
