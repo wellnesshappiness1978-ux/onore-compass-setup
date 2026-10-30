@@ -30,7 +30,7 @@ import { consultationGoal } from "@/lib/consultation-request";
 import type { Plan } from "@/lib/design-modes";
 import { nextPlan, planOrder } from "@/lib/plans";
 import { normalizePlan } from '@/lib/plan-identity';
-import { useDailyUsage, msUntilMidnight, usageDay } from "@/hooks/use-daily-usage";
+import { useDailyUsage, msUntilMidnight, usageDay, countedUsagePlan } from "@/hooks/use-daily-usage";
 import { usageStatusCopy } from '@/lib/usage-status-copy';
 import { planBenefitsCopy } from '@/lib/plan-benefits';
 import { teamCopy } from "@/lib/team-copy";
@@ -72,6 +72,7 @@ type Props = {
   actualPlan: Plan;
   signedIn: boolean;
   previewMode?: boolean;
+  planResolved?: boolean;
   onVip: () => void;
 };
 
@@ -91,6 +92,7 @@ export default function ConsultationPanel({
   actualPlan: inputActualPlan,
   signedIn,
   previewMode = false,
+  planResolved = true,
   onVip,
   focusTargetId = null,
   goal = "",
@@ -186,16 +188,19 @@ export default function ConsultationPanel({
   const planNames = teamCopy[language].planNames;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const ux = consultationUxCopy[language];
-  const usagePlan = signedIn ? actualPlan : plan;
+  // Guests preview; a signed-in session uses the one server-verified membership every other feature reads.
+  const usagePlan = countedUsagePlan(signedIn, actualPlan, plan);
   const usage = useDailyUsage("consultation", usagePlan, signedIn);
   const { limit, unlimited, remaining } = usage;
+  const planKnown = !signedIn || planResolved;
+  const ready = usage.ready && planKnown;
   const sendRemaining = remaining;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
     return () => window.clearInterval(id);
   }, []);
-  const limitPlan = usage.confirmedPlan ?? (signedIn ? actualPlan : usagePlan);
+  const limitPlan = usagePlan;
   const upgradeTo = nextPlan(limitPlan);
   const [limitOpen, setLimitOpen] = useState(false);
   useEffect(() => {
