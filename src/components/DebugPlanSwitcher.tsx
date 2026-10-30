@@ -8,13 +8,13 @@ import type { Language } from "@/lib/translations";
 import { localizedPlanLabels } from "@/lib/preview-plan";
 
 const copy: Record<Language, { label: string; title: string; note: string; group: string; saving: string; error: string }> = {
-  ja: { label: "開発用プラン切替", title: "開発用プラン切替", note: "管理者専用。選択したプランはこのアカウントに24時間だけ適用されます。課金は発生しません。", group: "テストプラン", saving: "切り替えています…", error: "切り替えできませんでした。もう一度お試しください。" },
-  en: { label: "Development plan switcher", title: "Development plan switcher", note: "Administrators only. The selected plan applies to this account for 24 hours without billing.", group: "Test plans", saving: "Switching…", error: "Could not switch plans. Please try again." },
-  "zh-CN": { label: "开发方案切换", title: "开发方案切换", note: "仅限管理员。所选方案在此账号生效24小时，不会产生费用。", group: "测试方案", saving: "正在切换…", error: "无法切换方案，请重试。" },
-  "zh-TW": { label: "開發方案切換", title: "開發方案切換", note: "僅限管理員。所選方案在此帳號生效24小時，不會產生費用。", group: "測試方案", saving: "正在切換…", error: "無法切換方案，請重試。" },
-  ko: { label: "개발 플랜 전환", title: "개발 플랜 전환", note: "관리자 전용입니다. 선택한 플랜은 이 계정에 24시간 적용되며 결제되지 않습니다.", group: "테스트 플랜", saving: "전환 중…", error: "플랜을 전환하지 못했습니다. 다시 시도해 주세요." },
-  es: { label: "Selector de planes de desarrollo", title: "Selector de planes de desarrollo", note: "Solo para administradores. El plan elegido se aplica durante 24 horas sin cargos.", group: "Planes de prueba", saving: "Cambiando…", error: "No se pudo cambiar el plan. Inténtalo de nuevo." },
-  fr: { label: "Sélecteur d’offre de développement", title: "Sélecteur d’offre de développement", note: "Réservé aux administrateurs. L’offre choisie s’applique 24 heures sans facturation.", group: "Offres de test", saving: "Changement en cours…", error: "Impossible de changer d’offre. Réessayez." },
+  ja: { label: "[テスト用] プラン切り替え", title: "[テスト用] プラン切り替え", note: "管理者・関係者専用。選択したプランはこのアカウントに24時間だけ適用されます。課金は発生しません。", group: "テストプラン", saving: "切り替えています…", error: "切り替えできませんでした。もう一度お試しください。" },
+  en: { label: "Development plan switcher", title: "Development plan switcher", note: "Administrators and whitelisted members only. The selected plan applies to this account for 24 hours without billing.", group: "Test plans", saving: "Switching…", error: "Could not switch plans. Please try again." },
+  "zh-CN": { label: "开发方案切换", title: "开发方案切换", note: "仅限管理员和相关人员。所选方案在此账号生效24小时，不会产生费用。", group: "测试方案", saving: "正在切换…", error: "无法切换方案，请重试。" },
+  "zh-TW": { label: "開發方案切換", title: "開發方案切換", note: "僅限管理員與相關人員。所選方案在此帳號生效24小時，不會產生費用。", group: "測試方案", saving: "正在切換…", error: "無法切換方案，請重試。" },
+  ko: { label: "개발 플랜 전환", title: "개발 플랜 전환", note: "관리자 및 관계자 전용입니다. 선택한 플랜은 이 계정에 24시간 적용되며 결제되지 않습니다.", group: "테스트 플랜", saving: "전환 중…", error: "플랜을 전환하지 못했습니다. 다시 시도해 주세요." },
+  es: { label: "Selector de planes de desarrollo", title: "Selector de planes de desarrollo", note: "Solo para administradores y personas autorizadas. El plan elegido se aplica durante 24 horas sin cargos.", group: "Planes de prueba", saving: "Cambiando…", error: "No se pudo cambiar el plan. Inténtalo de nuevo." },
+  fr: { label: "Sélecteur d’offre de développement", title: "Sélecteur d’offre de développement", note: "Réservé aux administrateurs et proches autorisés. L’offre choisie s’applique 24 heures sans facturation.", group: "Offres de test", saving: "Changement en cours…", error: "Impossible de changer d’offre. Réessayez." },
 };
 
 export default function DebugPlanSwitcher({ plan, language, onChanged }: { plan: Plan; language: Language; onChanged: (plan: Plan) => void }) {
