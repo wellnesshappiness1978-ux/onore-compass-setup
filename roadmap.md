@@ -1,5 +1,12 @@
 # Roadmap
 
+## Consultation plan-reference unification (2026-10-30)
+- [x] Drop the consultation screen's own plan lookup: header label and daily cap now come from the same server-verified membership every other feature reads (getMyMembership over plan_memberships), the status query supplies only completed counts, and the shared 1/3/10/30/unlimited configuration drives the allowance.
+- [x] Header and composer stay in the loading state until that membership resolves; switching the display preview cannot move the counted allowance.
+- [x] 507 regression tests passed and automatic build/typecheck OK; signed-in screen reads 無料会員：本日あと0回利用可能 / 1 matching the app-wide label, and previewing VIP keeps the counted allowance at Free with no page errors.
+- [ ] Live paid-member cap readback (VIP 10 / Family 30 / Premium unlimited): the requesting account has no active paid subscription (plan_memberships.plan is free, Stripe status inactive) and today's free allowance is spent; membership rows cannot be written from the sandbox, so no entitlement was fabricated to test this.
+
+
 ## Consultation strict limits and success-only accounting (2026-10-30)
 - [x] Apply Free 1 / Standard 3 / VIP 10 / Family 30 / Premium unlimited from shared JSON; live authenticated RPC confirms all five caps and aliases.
 - [x] Reserve capacity before AI with owner lock, count only completed nonempty answers once, release errors/cancellations; no guest API bypass or client consumption.
