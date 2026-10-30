@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Plan } from '@/lib/design-modes';
 import { useDailyUsage } from './use-daily-usage';
 
-const db = vi.hoisted(() => ({ used: 0, cap: 1, fail: false }));
+const db = vi.hoisted(() => ({ used: 0, cap: 1 as number | null, fail: false }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: {
   auth: { getUser: async () => ({ data: { user: { id: 'owner' } } }) },
   from: () => {
@@ -13,8 +13,8 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: {
     return query;
   },
   rpc: async (name: string) => {
-    if (name === 'current_plan_daily_usage_limit') return { data: db.cap, error: null };
-    if (db.used >= db.cap) return { data: null, error: { code: '23514', message: 'limit' } };
+    if (name === 'current_feature_daily_usage_limit') return { data: db.cap, error: null };
+    if (db.cap !== null && db.used >= db.cap) return { data: null, error: { code: '23514', message: 'limit' } };
     db.used += 1;
     return { data: db.used, error: null };
   },
@@ -32,7 +32,8 @@ async function mount(plan: Plan) {
   return probe;
 }
 describe('authenticated displayed counts and atomic checks agree', () => {
-  it.each([['free', 1], ['standard', 3], ['vip', 10], ['b2b', 30], ['b2b-premium', 100]] as const)('%s allows its final use and then blocks', async (plan, cap) => {
+  it.each(['vip','b2b','b2b-premium'] as const)('%s confirms null as unlimited and continues counting', async plan => { db.cap=null; db.used=100; const probe=await mount(plan); expect(probe.current?.unlimited).toBe(true); expect(probe.current?.remaining).toBe(Infinity); await act(async()=>{expect(await probe.current?.consume()).toBe(true);}); expect(db.used).toBe(101); });
+  it.each([['free', 1], ['standard', 10]] as const)('%s allows its final use and then blocks', async (plan, cap) => {
     db.cap = cap; db.used = cap - 1;
     const probe = await mount(plan);
     expect(probe.current?.limit).toBe(cap);

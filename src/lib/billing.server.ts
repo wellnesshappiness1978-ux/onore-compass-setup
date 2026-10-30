@@ -2,6 +2,7 @@ import { getRequest } from '@tanstack/react-start/server';
 import { billingPrice, verifiedBillingPlan, type BillingPlan } from './billing-plans';
 import { normalizePlan } from './plan-identity';
 import { supabaseAdmin } from '@/integrations/supabase/client.server';
+import { BillingError, stripeFailureCode } from './billing-errors';
 
 type StripeCustomer = { id: string; metadata: { user_id?: string }; deleted?: boolean };
 type Subscription = { id: string; status: string; customer: string; items: { data: { price: { id: string }; current_period_end: number }[] }; latest_invoice: { status: string; paid: boolean } | null };
@@ -9,14 +10,19 @@ type Session = { id: string; customer: string; client_reference_id: string; stat
 
 async function stripe<T>(path: string, form?: Record<string, string>, idempotency?: string): Promise<T> {
   const key = process.env['STRIPE_SECRET_KEY'];
-  if (!key) throw new Error('Billing unavailable');
+  if (!key) throw new BillingError('missing_key');
   const response = await fetch(`https://api.stripe.com/v1/${path}`, {
     method: form ? 'POST' : 'GET',
     headers: { Authorization: `Bearer ${key}`, 'Stripe-Version': '2025-08-27.basil', ...(form ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {}), ...(idempotency ? { 'Idempotency-Key': idempotency } : {}) },
     ...(form ? { body: new URLSearchParams(form) } : {}),
     signal: AbortSignal.timeout(20000),
-  });
-  if (!response.ok) { console.error('Stripe request failed', response.status, path.split('?')[0]); throw new Error('Billing unavailable'); }
+  }).catch(() => { throw new BillingError('network'); });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null) as { error?: { code?: string; param?: string } } | null;
+    const code = stripeFailureCode(response.status, body?.error?.code, body?.error?.param);
+    console.error('Stripe request failed', response.status, code);
+    throw new BillingError(code);
+  }
   return response.json() as Promise<T>;
 }
 
@@ -89,7 +95,7 @@ export async function checkoutBilling(userId: string, plan: BillingPlan, yearly:
     cancel_url: `${origin}/purchase?canceled=true`,
     'automatic_tax[enabled]': 'true', 'customer_update[address]': 'auto',
   }, `agolmen-checkout-${userId}-${price.price}-${Math.floor(Date.now()/1800000)}`);
-  if (!session.url?.startsWith('https://checkout.stripe.com/')) throw new Error('Checkout unavailable');
+  if (!session.url?.startsWith('https://checkout.stripe.com/')) throw new BillingError('checkout');
   return { url: session.url, portal: false };
 }
 
