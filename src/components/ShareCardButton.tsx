@@ -94,7 +94,7 @@ export default function ShareCardButton({
         const body = usesSections ? picked.map((s) => (s.title ? `${s.title}\n${s.text}` : s.text)) : source.lines;
         const canvases = await renderShareCards(
           format,
-          { ...source, fullContent: source.fullContent || picked.length > 1 || undefined, title: privateShareText(source.title, source.names, includeName), caution: source.caution ? privateShareText(source.caution, source.names, includeName) : undefined, names: includeName ? source.names : [], lines: body.map((line) => privateShareText(line, source.names, includeName)) },
+          { ...source, fullContent: source.fullContent || picked.length > 1 || undefined, title: privateShareText(source.title, source.names, includeName), caution: source.caution ? privateShareText(source.caution, source.names, includeName) : undefined, names: includeName ? source.names : [], lines: body.map((line) => privateShareText(line, source.names, includeName)), photos: picked.filter((s) => s.image).map((s) => ({ src: s.image!, caption: privateShareText(`${s.title}\n${s.text}`, source.names, includeName) })) },
           language,
         );
         if (!active) return;

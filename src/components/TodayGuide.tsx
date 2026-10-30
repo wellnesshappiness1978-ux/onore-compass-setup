@@ -16,7 +16,7 @@ import { companionCopy } from "@/lib/companion-copy";
 import { teamCopy } from "@/lib/team-copy";
 import { annualFlyingStars, mingGua } from "@/lib/feng-shui";
 import ShareCardButton from "./ShareCardButton";
-import { readingElementText, unlockedShareSections, withLockedSections, shareUi, type ShareSection } from "@/lib/share-content";
+import { readingElementText, stripSystemLines, unlockedShareSections, withLockedSections, shareUi, type ShareSection } from "@/lib/share-content";
 import FeatureNotifySwitch from "./FeatureNotifySwitch";
 import DayCompass from "./DayCompass";
 import HelioCalendar from "./HelioCalendar";

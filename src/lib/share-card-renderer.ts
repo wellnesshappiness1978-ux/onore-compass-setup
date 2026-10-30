@@ -4,7 +4,7 @@ import logoAsset from "@/assets/agolmen-v10-compass-final.png.asset.json";
 
 const logoUrl = logoAsset.url;
 
-export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility" | "daily" | "biorhythm" | "consultation" | "app"; caution?: string | undefined; keywords?: string[]; palette?: { label: string; code: string }[]; sections?: import('./share-content').ShareSection[]; url?: string; fullContent?: boolean | undefined; pageLabel?: string | undefined };
+export type ShareCardData = { kicker: string; title: string; score: number; names: string[]; lines: string[]; kind?: "identity" | "compatibility" | "daily" | "biorhythm" | "consultation" | "app"; caution?: string | undefined; keywords?: string[]; palette?: { label: string; code: string }[]; sections?: import('./share-content').ShareSection[]; url?: string; fullContent?: boolean | undefined; pageLabel?: string | undefined; photos?: { src: string; caption: string }[]; photo?: { src: string; caption: string } | undefined };
 export type CardFormat = "story" | "x";
 export const shareCopy = {
   ja: { cta: "あなたの診断カードをシェア", title: "あなたの本質を、一枚に。", description: "あなたの診断カード", essence: "あなたの本質", bias: "陥りがちな罠・思考バイアス", palette: "バースカラーパレット", roles: ["メイン", "サブ", "金運", "愛情", "健康", "内面"], reference: "自己理解のための参考解釈・参考色", search: "アゴルメンの羅針盤で検索", hashtags: "#アゴルメンの羅針盤 #バースカラー #自己理解", name: "名前を載せる", privacy: "名前・出生情報は初期設定で非表示", save: "画像を保存", share: "端末でシェア", story: "縦型 9:16", x: "横型 16:9", note: "共有先は端末で選択します。Instagram・TikTokへの直接投稿は保証されません。画像共有に未対応の場合は保存し、各アプリで画像を選んでください。Xの投稿画面には画像は自動添付されません。", saved: "画像を保存しました", shared: "端末の共有画面を開きました", error: "画像を作成・共有できませんでした。もう一度お試しください。", loading: "選択した言語の診断カードを作成中…", match: "相性スコア" },
@@ -84,7 +84,19 @@ export async function renderShareCard(format: CardFormat, data: ShareCardData, l
   const x = story ? 100 : 90, width = story ? 880 : 500;
   ctx.fillStyle = gold; ctx.font = '500 24px "Noto Sans JP", sans-serif'; ctx.fillText(data.kind === "identity" ? t.essence : data.kind === "compatibility" ? t.match : kindLabel(data.kind, language), x, story ? 338 : 204);
   const textGradient = ctx.createLinearGradient(x, 0, x + width, 0); textGradient.addColorStop(0, paper); textGradient.addColorStop(.5, gold); textGradient.addColorStop(1, paper); ctx.fillStyle = textGradient;
-  const main = data.fullContent || data.kind === "identity" ? data.lines.join("\n") : `${data.title}${data.score ? ` · ${data.score}%` : ""}\n${data.lines.join("\n")}`;
+  if (data.photo) {
+    const img = new Image(); img.crossOrigin = 'anonymous'; img.src = data.photo.src;
+    try { await img.decode(); } catch { /* text-only fallback */ }
+    const px = story ? 100 : 640, pyy = story ? 382 : 190, pw = story ? 880 : 470, ph = story ? 700 : 340;
+    if (img.naturalWidth) {
+      const scale = Math.max(pw / img.naturalWidth, ph / img.naturalHeight), sw = pw / scale, sh = ph / scale;
+      ctx.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) / 2, sw, sh, px, pyy, pw, ph);
+      ctx.strokeStyle = gold; ctx.globalAlpha = .6; ctx.lineWidth = 2; ctx.strokeRect(px, pyy, pw, ph); ctx.globalAlpha = 1;
+    }
+    ctx.fillStyle = textGradient;
+    fittedText(ctx, data.photo.caption, x, story ? 1110 : 229, story ? width : 500, story ? 560 : 330, story ? 34 : 22, story ? 22 : 15);
+  }
+  const main = data.photo ? '' : data.fullContent || data.kind === "identity" ? data.lines.join("\n") : `${data.title}${data.score ? ` · ${data.score}%` : ""}\n${data.lines.join("\n")}`;
   fittedText(ctx, main, x, story ? 382 : 229, width, data.fullContent ? (story ? FULL_STORY_H : 290) : story ? 450 : 290, data.fullContent ? (story ? 32 : 20) : story ? 60 : 33, story ? 30 : 20);
   if (data.pageLabel) { ctx.fillStyle = gold; ctx.font = '500 22px sans-serif'; ctx.fillText(data.pageLabel, x, story ? (data.fullContent ? 1290 : 855) : 535); }
   if (data.names.length) { ctx.fillStyle = paper; ctx.font = '400 25px "Noto Sans JP", sans-serif'; ctx.fillText(data.names.join(" × "), x, story ? (data.fullContent ? 1325 : 887) : 548, width); }
@@ -115,7 +127,7 @@ export const fullLinesPerPage = (format: CardFormat) => Math.floor((format === '
 
 /** Paginate full readings instead of ellipsizing; short items share one card and only long items continue. */
 export async function renderShareCards(format: CardFormat, data: ShareCardData, language: Language): Promise<HTMLCanvasElement[]> {
-  if (!data.fullContent) return [await renderShareCard(format, data, language)];
+  if (!data.fullContent) return [await renderShareCard(format, data, language), ...await Promise.all((data.photos ?? []).map(photo => renderShareCard(format, { ...data, lines: [], palette: [], photo }, language)))];
   const measure = document.createElement('canvas').getContext('2d');
   if (!measure) throw new Error(cardCopy(language).error);
   measure.font = `600 ${format === 'story' ? 32 : 20}px "Noto Serif JP", sans-serif`;
@@ -123,5 +135,6 @@ export async function renderShareCards(format: CardFormat, data: ShareCardData, 
   const packed = packShareLines(blocks, fullLinesPerPage(format));
   const pages: HTMLCanvasElement[] = [];
   for (let i = 0; i < packed.length; i++) pages.push(await renderShareCard(format, { ...data, title: '', score: 0, caution: undefined, lines: packed[i] ?? [], pageLabel: packed.length > 1 ? `${i + 1} / ${packed.length}` : undefined }, language));
+  for (const photo of data.photos ?? []) pages.push(await renderShareCard(format, { ...data, title: '', score: 0, caution: undefined, lines: [], palette: [], photo, pageLabel: undefined }, language));
   return pages;
 }
