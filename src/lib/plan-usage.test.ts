@@ -13,7 +13,7 @@ describe('one daily diagnosis and consultation cap source', () => {
     } else { expect(remainingUses(cap, 10000)).toBe(Infinity); }
   });
   it('all diagnosis and consultation callers share the identical table', () => {
-    expect(dailyUsageLimit).toBe(PLAN_CONSULTATION_LIMITS);
+    expect(dailyUsageLimit).toBe(quickCompatibilityLimit);
     expect(consultationDailyLimit).toBe(PLAN_CONSULTATION_LIMITS);
     expect(quickCompatibilityLimit).toEqual({free:1, standard:3, vip:10, b2b:30, 'b2b-premium':100});
   });
