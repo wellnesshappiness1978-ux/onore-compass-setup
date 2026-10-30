@@ -48,6 +48,8 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
         const { data: auth } = await supabase.auth.getUser();
         if (!auth.user) { setReady(false); return null; }
         if (feature === 'consultation') {
+          // Reconcile Stripe billing first so the status RPC never reads a stale free plan.
+          try { await getMyMembership(); } catch { /* Offline: fall back to the last verified membership. */ }
           const { data, error } = await supabase.rpc('consultation_usage_status');
           if (error || !data || typeof data !== 'object' || Array.isArray(data)
             || (data['limit'] !== null && typeof data['limit'] !== 'number') || typeof data['plan'] !== 'string') {
