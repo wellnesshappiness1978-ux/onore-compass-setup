@@ -611,7 +611,7 @@ export default function ConsultationPanel({
               variant="champagne"
               asChild
             >
-              <Link to="/purchase" search={{ plan: upgradeTo }}>
+              <Link to="/purchase">
               <Crown className="size-4" />
               {planNames[upgradeTo]}
               </Link>

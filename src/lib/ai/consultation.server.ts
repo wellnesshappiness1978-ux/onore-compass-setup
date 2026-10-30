@@ -167,7 +167,7 @@ Keep the four sections concise but useful (roughly 500–800 Japanese characters
     result.toUIMessageStreamResponse({
       originalMessages: messages as UIMessage[],
       sendReasoning: true,
-      onFinish: async event => {
+      onEnd: async event => {
         request.signal.removeEventListener('abort', onAbort);
         await settle?.(consultationSucceeded(event));
       },

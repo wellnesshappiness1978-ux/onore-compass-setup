@@ -49,13 +49,13 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
         if (feature === 'consultation') {
           const { data, error } = await supabase.rpc('consultation_usage_status');
           if (error || !data || typeof data !== 'object' || Array.isArray(data)
-            || (data.limit !== null && typeof data.limit !== 'number') || typeof data.plan !== 'string') {
+            || (data['limit'] !== null && typeof data['limit'] !== 'number') || typeof data['plan'] !== 'string') {
             setReady(false); return null;
           }
-          const counts = data.counts;
+          const counts = data['counts'];
           const count = counts && typeof counts === 'object' && !Array.isArray(counts) && typeof counts[today] === 'number' ? counts[today] : 0;
-          const cap = data.limit === null ? Infinity : data.limit;
-          setUsed(count); setServerLimit(cap); setConfirmedPlan(normalizePlan(data.plan)); setReady(true);
+          const cap = data['limit'] === null ? Infinity : data['limit'];
+          setUsed(count); setServerLimit(cap); setConfirmedPlan(normalizePlan(data['plan'])); setReady(true);
           return { used: count, limit: cap, remaining: remainingUses(cap, count) };
         }
         const [usageResult, capResult] = await Promise.all([
