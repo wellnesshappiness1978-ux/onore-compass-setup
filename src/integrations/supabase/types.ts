@@ -62,6 +62,33 @@ export type Database = {
         }
         Relationships: []
       }
+      consultation_usage_requests: {
+        Row: {
+          created_at: string
+          id: string
+          status: string
+          updated_at: string
+          usage_day: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          usage_day: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          usage_day?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_usage: {
         Row: {
           feature: string
@@ -454,6 +481,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consultation_usage_status: { Args: never; Returns: Json }
       consume_daily_usage: {
         Args: { p_day: string; p_feature: string }
         Returns: number
@@ -479,6 +507,14 @@ export type Database = {
         Returns: number
       }
       plan_daily_usage_limit: { Args: { p_plan: string }; Returns: number }
+      reserve_consultation_usage: {
+        Args: { p_day: string; p_user_id: string }
+        Returns: string
+      }
+      settle_consultation_usage: {
+        Args: { p_request_id: string; p_success: boolean; p_user_id: string }
+        Returns: number
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

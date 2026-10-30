@@ -3,6 +3,7 @@ import { planBenefitsCopy } from './plan-benefits';
 
 export type ConsultationTranslation = {
   title: string;
+  signIn?: string;
   subtitle: string;
   active: string;
   engine: string;
@@ -59,7 +60,7 @@ const baseConsultationTranslations: Record<Language, ConsultationTranslation> = 
     send: "相談を送る",
     thinking: "方角を読み解いています…",
     empty: "相談内容を入力してください",
-    limit: "本日のAI相談回数を使い切りました。",
+    limit: "本日の相談上限に達しました。",
     disclaimer: "AIによる内省サポートです。占術の実計算・未来の保証・専門家の助言ではありません。",
     error: "相談を受け取れませんでした。表示された内容を確認して、もう一度お試しください。",
     quickTopics: [
@@ -352,4 +353,5 @@ const baseConsultationTranslations: Record<Language, ConsultationTranslation> = 
       "Seules les informations du forfait sont affichées actuellement ; aucun paiement n’est effectué.",
   },
 };
-export const consultationTranslations: Record<Language, ConsultationTranslation> = Object.fromEntries((Object.keys(baseConsultationTranslations) as Language[]).map(language=>[language,{...baseConsultationTranslations[language],vip:planBenefitsCopy[language].unlimitedBadge,modalBody:planBenefitsCopy[language].freeReached,unlimitedBadge:planBenefitsCopy[language].unlimitedBadge}])) as Record<Language, ConsultationTranslation>;
+const signInCopy: Record<Language,string> = { ja:'AI相談にはサインインしてください', en:'Sign in to consult AI', 'zh-CN':'请登录后进行AI咨询', 'zh-TW':'請登入後進行AI諮詢', ko:'AI 상담을 위해 로그인하세요', es:'Accede para consultar a la IA', fr:'Connectez-vous pour consulter l’IA' };
+export const consultationTranslations: Record<Language, ConsultationTranslation> = Object.fromEntries((Object.keys(baseConsultationTranslations) as Language[]).map(language=>[language,{...baseConsultationTranslations[language],signIn:signInCopy[language],vip:baseConsultationTranslations[language].vip,modalBody:planBenefitsCopy[language].freeReached,unlimitedBadge:planBenefitsCopy[language].unlimitedBadge}])) as Record<Language, ConsultationTranslation>;

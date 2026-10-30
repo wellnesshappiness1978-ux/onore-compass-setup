@@ -5,6 +5,7 @@ import { getFeatureUsageLimit, remainingUses } from "@/lib/plan-usage";
 import type { Plan } from "@/lib/design-modes";
 import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 import { localIso } from '@/lib/day-compass';
+import { normalizePlan } from '@/lib/plan-identity';
 
 export type UsageFeature = "consultation" | "compatibility";
 export const usageDay = () => localIso(new Date());
@@ -35,6 +36,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
   const [used, setUsed] = useState(0);
   const [day, setDay] = useState(localDay);
   const [refreshing, setRefreshing] = useState(false);
+  const [confirmedPlan, setConfirmedPlan] = useState<Plan | null>(null);
 
   const refresh = useCallback(async () => {
     const today = localDay();
@@ -44,6 +46,18 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
       try {
         const { data: auth } = await supabase.auth.getUser();
         if (!auth.user) { setReady(false); return null; }
+        if (feature === 'consultation') {
+          const { data, error } = await supabase.rpc('consultation_usage_status');
+          if (error || !data || typeof data !== 'object' || Array.isArray(data)
+            || (data['limit'] !== null && typeof data['limit'] !== 'number') || typeof data['plan'] !== 'string') {
+            setReady(false); return null;
+          }
+          const counts = data['counts'];
+          const count = counts && typeof counts === 'object' && !Array.isArray(counts) && typeof counts[today] === 'number' ? counts[today] : 0;
+          const cap = data['limit'] === null ? Infinity : data['limit'];
+          setUsed(count); setServerLimit(cap); setConfirmedPlan(normalizePlan(data['plan'])); setReady(true);
+          return { used: count, limit: cap, remaining: remainingUses(cap, count) };
+        }
         const [usageResult, capResult] = await Promise.all([
           supabase.from("daily_usage").select("used").eq("user_id", auth.user.id).eq("feature", feature).eq("usage_day", today).maybeSingle(),
           supabase.rpc("current_feature_daily_usage_limit", { p_feature: feature }),
@@ -82,6 +96,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
   useEffect(() => {
     setReady(false);
     setServerLimit(null);
+    setConfirmedPlan(null);
     const onRefresh = () => { void refresh(); };
     onRefresh();
     window.addEventListener(CLOUD_SYNC_EVENT, onRefresh);
@@ -108,6 +123,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
   /** Returns true when one use was recorded; false when the daily cap is reached. */
   const consume = useCallback(async () => {
     if (serverCounted) {
+      if (feature === 'consultation') throw new Error('Consultation usage is recorded by completed server responses.');
       const { data, error } = await supabase.rpc("consume_daily_usage", {
         p_feature: feature,
         p_day: localDay(),
@@ -139,6 +155,7 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
     used,
     ready,
     refreshing,
+    confirmedPlan,
     limit,
     unlimited,
     remaining: remainingUses(limit, used),

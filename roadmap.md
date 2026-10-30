@@ -1,5 +1,11 @@
 # Roadmap
 
+## Consultation strict limits and success-only accounting (2026-10-30)
+- [x] Apply Free 1 / Standard 3 / VIP 10 / Family 30 / Premium unlimited from shared JSON; live authenticated RPC confirms all five caps and aliases.
+- [x] Reserve capacity before AI with owner lock, count only completed nonempty answers once, release errors/cancellations; no guest API bypass or client consumption.
+- [x] Synchronize server-confirmed membership/count display and sequential upgrade guidance; 507 regression tests passed, automatic build OK, signed-in Free exhausted 0/1 disables composer.
+- [ ] Verify fresh paid answer completion and count readback: requesting account is Free with today's allowance exhausted; no quota reset or entitlement fabricated. Provider billing for partially generated failed requests cannot be guaranteed refundable.
+
 ## Payment and consultation policy revision (2026-10-30)
 - [x] Stripe account and server secret were already connected; signed-in mobile direct Checkout opens successfully. Safe specific errors and retry remain in confirmation.
 - [x] Consultation Free 1 / Standard 10 / VIP+ unlimited applied through nullable shared configuration and feature-specific atomic database RPC; existing compatibility caps unchanged, previews grant nothing.
