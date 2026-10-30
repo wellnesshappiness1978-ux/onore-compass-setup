@@ -6,6 +6,7 @@ import type { Plan } from "@/lib/design-modes";
 import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 import { localIso } from '@/lib/day-compass';
 import { normalizePlan } from '@/lib/plan-identity';
+import { getMyMembership } from '@/lib/membership.functions';
 
 export type UsageFeature = "consultation" | "compatibility";
 export const usageDay = () => localIso(new Date());
