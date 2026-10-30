@@ -599,6 +599,7 @@ export default function ConsultationPanel({
       </div>
       <p className="mt-3 text-center text-[10px] leading-5 text-muted-foreground">{t.disclaimer}</p>
       {!signedIn && <Button variant="outline" className="mt-3" onClick={onVip}>{t.signIn}</Button>}
+      {signedIn && usage.ready && remaining <= 0 && upgradeTo && <Button variant="champagne" className="mt-3" asChild><Link to="/purchase"><Crown className="size-4" />{planNames[upgradeTo]}</Link></Button>}
       <Dialog open={limitOpen} onOpenChange={setLimitOpen}>
         <DialogContent className="max-w-md border-primary/40">
           <DialogHeader>
