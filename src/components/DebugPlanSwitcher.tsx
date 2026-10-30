@@ -70,9 +70,9 @@ export default function DebugPlanSwitcher({ plan, language, onChanged }: { plan:
           <span className="truncate">{t.title}</span>
         </span>
         <span className="hidden min-w-0 truncate text-[11px] text-muted-foreground sm:inline">{t.current}: {localizedPlanLabels[language][plan]}</span>
-        <div role="group" aria-label={t.group} className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-1">
+        <div role="group" aria-label={t.group} className="grid w-full grid-cols-2 gap-1 sm:ml-auto sm:flex sm:w-auto sm:min-w-0 sm:flex-wrap sm:items-center sm:justify-end">
           {planOrder.map((option) => (
-            <Button key={option} type="button" size="sm" variant={plan === option ? "default" : "outline"} aria-pressed={plan === option} disabled={saving} onClick={() => void select(option)} className="min-h-8 shrink-0 px-1.5 text-[11px] sm:min-h-9 sm:px-2 sm:text-xs">
+            <Button key={option} type="button" size="sm" variant={plan === option ? "default" : "outline"} aria-pressed={plan === option} disabled={saving} onClick={() => void select(option)} className="min-h-8 whitespace-normal px-1 text-center text-[11px] [&:last-child]:col-span-2 sm:min-h-9 sm:shrink-0 sm:px-2 sm:text-xs">
               {localizedPlanLabels[language][option]}
             </Button>
           ))}
