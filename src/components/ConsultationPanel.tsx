@@ -30,7 +30,7 @@ import { consultationGoal } from "@/lib/consultation-request";
 import type { Plan } from "@/lib/design-modes";
 import { nextPlan, planOrder } from "@/lib/plans";
 import { normalizePlan } from '@/lib/plan-identity';
-import { useDailyUsage, msUntilMidnight, usageDay } from "@/hooks/use-daily-usage";
+import { useDailyUsage, msUntilMidnight, usageDay, countedUsagePlan } from "@/hooks/use-daily-usage";
 import { usageStatusCopy } from '@/lib/usage-status-copy';
 import { planBenefitsCopy } from '@/lib/plan-benefits';
 import { teamCopy } from "@/lib/team-copy";
@@ -72,6 +72,7 @@ type Props = {
   actualPlan: Plan;
   signedIn: boolean;
   previewMode?: boolean;
+  planResolved?: boolean;
   onVip: () => void;
 };
 
@@ -91,6 +92,7 @@ export default function ConsultationPanel({
   actualPlan: inputActualPlan,
   signedIn,
   previewMode = false,
+  planResolved = true,
   onVip,
   focusTargetId = null,
   goal = "",
@@ -186,16 +188,19 @@ export default function ConsultationPanel({
   const planNames = teamCopy[language].planNames;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const ux = consultationUxCopy[language];
-  const usagePlan = signedIn ? actualPlan : plan;
+  // Guests preview; a signed-in session uses the one server-verified membership every other feature reads.
+  const usagePlan = countedUsagePlan(signedIn, actualPlan, plan);
   const usage = useDailyUsage("consultation", usagePlan, signedIn);
   const { limit, unlimited, remaining } = usage;
+  const planKnown = !signedIn || planResolved;
+  const ready = usage.ready && planKnown;
   const sendRemaining = remaining;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
     return () => window.clearInterval(id);
   }, []);
-  const limitPlan = usage.confirmedPlan ?? (signedIn ? actualPlan : usagePlan);
+  const limitPlan = usagePlan;
   const upgradeTo = nextPlan(limitPlan);
   const [limitOpen, setLimitOpen] = useState(false);
   useEffect(() => {
@@ -423,20 +428,20 @@ export default function ConsultationPanel({
           className="flex min-w-0 items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary"
         >
           <Radio className="size-4 shrink-0" />
-          <span>{!usage.ready ? usage.refreshing ? usageStatusCopy[language].checking : usageStatusCopy[language].unavailable : `${planNames[limitPlan]}：${unlimited ? t.unlimitedBadge : `${planBenefitsCopy[language].remaining.replace('{n}',String(remaining))} / ${limit}`}`}</span>
+          <span>{!ready ? (planKnown && !usage.refreshing ? usageStatusCopy[language].unavailable : usageStatusCopy[language].checking) : `${planNames[limitPlan]}：${unlimited ? t.unlimitedBadge : `${planBenefitsCopy[language].remaining.replace('{n}',String(remaining))} / ${limit}`}`}</span>
         </div>
         <Button variant="outline" size="sm" onClick={() => setFavoritesOpen(true)}>
           <Bookmark className="size-4" />
           {t.bookmarked} · {favorites.length}
         </Button>
-        {!usage.ready && <Button variant="outline" size="sm" disabled={usage.refreshing} onClick={() => void usage.refresh()}>{usageStatusCopy[language].retry}</Button>}
-        {usage.ready && !unlimited && (
+        {!ready && planKnown && <Button variant="outline" size="sm" disabled={usage.refreshing} onClick={() => void usage.refresh()}>{usageStatusCopy[language].retry}</Button>}
+        {ready && !unlimited && (
           <p className="w-full text-xs text-muted-foreground">
             {ux.reset(hms(countdown))}
           </p>
         )}
         {previewMode && signedIn && <p className="w-full text-xs leading-5 text-muted-foreground">{ux.preview}</p>}
-        {usage.ready && !unlimited && remaining <= 0 && (
+        {ready && !unlimited && remaining <= 0 && (
           <Button variant="champagne" onClick={() => setLimitOpen(true)}>
             <Crown className="size-4" />
             {t.modalTitle}
@@ -561,7 +566,7 @@ export default function ConsultationPanel({
                 key={prompt}
                 type="button"
                 variant="outline"
-                disabled={busy || !usage.ready || sendRemaining <= 0}
+                disabled={busy || !ready || sendRemaining <= 0}
                 onClick={() =>
                   void submit(index === 1 && target ? `${prompt} · ${target.name}` : prompt)
                 }
@@ -579,7 +584,7 @@ export default function ConsultationPanel({
             <PromptInputTextarea
               ref={textareaRef}
               placeholder={t.placeholder}
-              disabled={!usage.ready || sendRemaining <= 0}
+              disabled={!ready || sendRemaining <= 0}
               className="min-h-20 text-sm text-foreground placeholder:text-muted-foreground"
             />
             <PromptInputFooter className="items-end justify-between gap-3 px-3 pb-2">
@@ -589,7 +594,7 @@ export default function ConsultationPanel({
               <PromptInputSubmit
                 status={status}
                 onStop={stop}
-                disabled={!busy && (!usage.ready || sendRemaining <= 0)}
+                disabled={!busy && (!ready || sendRemaining <= 0)}
                 aria-label={t.send}
                 className="size-9 shrink-0 rounded-full bg-champagne-gradient text-primary-foreground shadow-champagne hover:brightness-110"
               />
@@ -599,7 +604,7 @@ export default function ConsultationPanel({
       </div>
       <p className="mt-3 text-center text-[10px] leading-5 text-muted-foreground">{t.disclaimer}</p>
       {!signedIn && <Button variant="outline" className="mt-3" onClick={onVip}>{t.signIn}</Button>}
-      {signedIn && usage.ready && remaining <= 0 && upgradeTo && <Button variant="champagne" className="mt-3" asChild><Link to="/purchase"><Crown className="size-4" />{planNames[upgradeTo]}</Link></Button>}
+      {signedIn && ready && remaining <= 0 && upgradeTo && <Button variant="champagne" className="mt-3" asChild><Link to="/purchase"><Crown className="size-4" />{planNames[upgradeTo]}</Link></Button>}
       <Dialog open={limitOpen} onOpenChange={setLimitOpen}>
         <DialogContent className="max-w-md border-primary/40">
           <DialogHeader>

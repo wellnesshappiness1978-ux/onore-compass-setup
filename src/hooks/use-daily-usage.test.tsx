@@ -3,9 +3,9 @@ import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Plan } from '@/lib/design-modes';
-import { useDailyUsage } from './use-daily-usage';
+import { countedUsagePlan, useDailyUsage } from './use-daily-usage';
 
-const db = vi.hoisted(() => ({ used: 0, cap: 1 as number | null, fail: false }));
+const db = vi.hoisted(() => ({ used: 0, cap: 1 as number | null, plan: 'free', fail: false }));
 vi.mock('@/integrations/supabase/client', () => ({ supabase: {
   auth: { getUser: async () => ({ data: { user: { id: 'owner' } } }) },
   from: () => {
@@ -13,7 +13,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: {
     return query;
   },
   rpc: async (name: string) => {
-    if (name === 'consultation_usage_status') return { data: { plan: db.cap === 3 ? 'standard' : db.cap === 10 ? 'vip' : db.cap === 30 ? 'family' : db.cap === null ? 'family_premium' : 'free', limit: db.cap, counts: { [new Date().toLocaleDateString('en-CA')]: db.used } }, error: db.fail ? { message: 'offline' } : null };
+    if (name === 'consultation_usage_status') return { data: { plan: db.plan, limit: db.cap, counts: { [new Date().toLocaleDateString('en-CA')]: db.used } }, error: db.fail ? { message: 'offline' } : null };
     if (name === 'current_feature_daily_usage_limit') return { data: db.cap, error: null };
     if (db.cap !== null && db.used >= db.cap) return { data: null, error: { code: '23514', message: 'limit' } };
     db.used += 1;
@@ -45,17 +45,15 @@ describe('authenticated displayed counts and atomic checks agree', () => {
     await expect(probe.current?.consume()).rejects.toThrow('completed server responses');
     expect(db.used).toBe(cap);
   });
-  it('displays the server-confirmed plan, not a stale prop', async () => {
-    db.cap=10; db.used=4;
-    const probe=await mount('free');
-    expect(probe.current?.confirmedPlan).toBe('vip');
+  it('the shared membership reference sets the cap while the server only supplies the count', async () => {
+    db.plan = 'free'; db.cap = 1; db.used = 4;
+    const probe = await mount('vip');
+    expect(probe.current?.limit).toBe(10);
     expect(probe.current?.remaining).toBe(6);
   });
-  it('uses the actual server cap instead of granting a Premium preview', async () => {
-    db.cap = 1; db.used = 1;
-    const probe = await mount('b2b-premium');
-    expect(probe.current?.limit).toBe(1);
-    expect(probe.current?.remaining).toBe(0);
+  it('a display preview plan never drives the counted allowance', () => {
+    expect(countedUsagePlan(true, 'vip', 'b2b-premium')).toBe('vip');
+    expect(countedUsagePlan(false, 'free', 'b2b-premium')).toBe('b2b-premium');
   });
   it('failed reads do not reset used counts or grant a new allowance', async () => {
     db.cap = 100; db.used = 99;
@@ -66,15 +64,15 @@ describe('authenticated displayed counts and atomic checks agree', () => {
     expect(probe.current?.ready).toBe(false);
   });
   it('an unresolved paid membership never displays a Free fallback or unlimited allowance', async () => {
-    db.fail = true; db.cap = 100; db.used = 99;
-    const probe = await mount('b2b-premium');
+    db.fail = true; db.plan = 'vip'; db.cap = 10; db.used = 9;
+    const probe = await mount('vip');
     expect(probe.current?.ready).toBe(false);
     expect(probe.current?.limit).toBe(0);
     expect(probe.current?.unlimited).toBe(false);
     db.fail = false;
     await act(async () => { await probe.current?.refresh(); });
     expect(probe.current?.ready).toBe(true);
-    expect(probe.current?.limit).toBe(100);
+    expect(probe.current?.limit).toBe(10);
     expect(probe.current?.remaining).toBe(1);
   });
 });
