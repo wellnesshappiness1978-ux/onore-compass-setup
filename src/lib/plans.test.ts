@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { hasFeature, memberLimit, isUpgradePlan, planForCount, planOrder, canUse, consultationDailyLimit, dailyUsageLimit, currentAndHigherPlans, nextPlan } from './plans';
 describe('consultation limits', () => {
-  it.each([['free', 1], ['standard', 10], ['vip', Infinity], ['b2b', Infinity], ['b2b-premium', Infinity]] as const)('%s allows %s consultations per day', (plan, cap) => {
+  it.each([['free', 1], ['standard', 3], ['vip', 10], ['b2b', 30], ['b2b-premium', Infinity]] as const)('%s allows %s consultations per day', (plan, cap) => {
     expect(consultationDailyLimit[plan]).toBe(cap);
   });
   it('does not change compatibility limits', () => {
@@ -47,7 +47,7 @@ describe('plan value display', () => {
 
 describe('unified AI daily caps', () => {
   it('consultation policy changes without altering compatibility', () => {
-    expect(planOrder.map(p => consultationDailyLimit[p])).toEqual([1, 10, Infinity, Infinity, Infinity]);
+    expect(planOrder.map(p => consultationDailyLimit[p])).toEqual([1, 3, 10, 30, Infinity]);
     expect(planOrder.map(p => dailyUsageLimit[p])).toEqual([1, 3, 10, 30, 100]);
   });
   it('Family tools need Family, 100 members only Premium', () => {
