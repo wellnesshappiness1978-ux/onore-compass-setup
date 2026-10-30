@@ -38,6 +38,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import ConsultationPanel from "@/components/ConsultationPanel";
 import NineStarsPanel from "@/components/NineStarsPanel";
 import SettingsPanel from "@/components/SettingsPanel";
+import DebugPlanSwitcher from "@/components/DebugPlanSwitcher";
 import TeamStudio from "@/components/team/TeamStudio";
 import BusinessFeaturePreview from "@/components/BusinessFeaturePreview";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -830,6 +831,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     <DailyReminderCatalogue language={language} plan={previewPlan} />
     <FocusGoalBridge onChange={(id, g, label) => { setFocusMemberId(id); setFocusGoal(g); setTraitsLabel(label); }} language={language} />
     <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
+      {signedIn && debugAllowed && <DebugPlanSwitcher plan={serverPlan} language={language} onChanged={(p) => setActualPlan(p)} />}
       <div className="celestial-stars" aria-hidden="true" />
       <div className="mobile-fixed-header fixed inset-x-0 z-[60] grid grid-cols-[1fr_auto_1fr] items-center border-b border-primary/25 bg-background/95 px-2 backdrop-blur-xl">
         <Button size="icon" variant="ghost" onClick={() => goToTab("home")} aria-label={t.home} title={t.home} aria-current={tab === "home" ? "page" : undefined} className="size-10 shrink-0 text-primary [&_svg]:size-6">
@@ -952,9 +954,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 language={language}
                 plan={previewPlan}
                 actualPlan={serverPlan}
-                debugAllowed={debugAllowed}
                 devOverrideEnabled={devOverrideEnabled}
-                onDebugPlanChanged={(p) => setActualPlan(p)}
                 onPlanChange={applyDevOverride}
                 designMode={designMode}
                 onDesignModeChange={setDesignMode}

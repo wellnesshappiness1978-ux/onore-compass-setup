@@ -830,11 +830,9 @@ body p, body li, body h1, body h2, body h3, body h4, body span, body label, body
 .design-canvas [class*="text-[11px]"] { font-size: 13px !important; }
 
 :root { --preview-bar-height: 0px; }
-html[data-test-preview="true"] { --preview-bar-height: 104px; }
-@media (min-width: 700px) { html[data-test-preview="true"] { --preview-bar-height: 56px; } }
-.preview-plan-bar { position: fixed; inset: 0 0 auto; height: var(--preview-bar-height); z-index: 70; background: var(--background); border-bottom: 1px solid var(--primary); }
-.preview-plan-bar > div { min-height: 100%; }
-@media (max-width: 699px) { .preview-plan-bar [role="group"] { flex-basis: 100%; } }
+/* Pinned administrator plan switcher; its measured height is written into --preview-bar-height. */
+.debug-plan-bar { position: fixed; inset: 0 0 auto; z-index: 70; background: var(--background); border-bottom: 1px solid var(--primary); }
+.debug-plan-bar > div { min-height: 100%; }
 .app-content { padding-top: var(--preview-bar-height); }
 .account-controls, .language-controls { top: calc(var(--preview-bar-height) + 16px); }
 .app-alert { top: calc(var(--preview-bar-height) + 80px); }
