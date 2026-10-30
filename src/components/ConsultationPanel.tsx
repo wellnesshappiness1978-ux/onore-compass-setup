@@ -3,6 +3,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
+import { RotateCcw } from "lucide-react";
+
+/** Survives tab switches (component unmount) for the app session; cleared on reload/close or manual reset. */
+const consultationSessionCache = new Map<string, UIMessage[]>();
 import { ArrowUpRight, Bookmark, BookmarkCheck, Crown, Radio, Trash2 } from "lucide-react";
 
 import {
@@ -265,9 +269,10 @@ export default function ConsultationPanel({
       }),
     [targetProfile, profile, targetLabel, language, target, effectiveGoal, selGroup, selGroupMembers],
   );
+  const chatId = `onore-consult-${targetId}-${language}`;
   const { messages, sendMessage, status, stop, error, clearError, setMessages } = useChat({
-    id: `onore-consult-${targetId}-${language}`,
-    messages: initialMessages,
+    id: chatId,
+    messages: consultationSessionCache.get(chatId) ?? initialMessages,
     transport,
     onError: (failure) => {
       let message = failure.message;
@@ -287,9 +292,20 @@ export default function ConsultationPanel({
     },
   });
   useEffect(() => {
-    setMessages(initialMessages);
+    setMessages(consultationSessionCache.get(chatId) ?? initialMessages);
     clearError();
-  }, [targetId, language, setMessages, clearError, initialMessages]);
+  }, [chatId, setMessages, clearError, initialMessages]);
+  useEffect(() => {
+    if (status !== "ready" && status !== "error") return;
+    if (messages.some((m) => m.role === "user")) consultationSessionCache.set(chatId, messages);
+  }, [chatId, messages, status]);
+  const resetConversation = () => {
+    stop();
+    consultationSessionCache.delete(chatId);
+    setMessages(initialMessages);
+    setNotice(null);
+    clearError();
+  };
   const busy = status === "submitted" || status === "streaming";
   const submitting = useRef(false);
 
@@ -434,6 +450,12 @@ export default function ConsultationPanel({
           <Bookmark className="size-4" />
           {t.bookmarked} · {favorites.length}
         </Button>
+        {messages.some((m) => m.role === "user") && (
+          <Button variant="outline" size="sm" onClick={resetConversation} disabled={busy}>
+            <RotateCcw className="size-4" />
+            {language === "ja" ? "会話をリセット" : "Reset chat"}
+          </Button>
+        )}
         {!ready && planKnown && <Button variant="outline" size="sm" disabled={usage.refreshing} onClick={() => void usage.refresh()}>{usageStatusCopy[language].retry}</Button>}
         {ready && !unlimited && (
           <p className="w-full text-xs text-muted-foreground">
@@ -449,9 +471,9 @@ export default function ConsultationPanel({
         )}
       </div>
 
-      <div className="card-lux mt-5 flex h-[min(76dvh,850px)] min-h-[530px] min-w-0 flex-col overflow-hidden rounded-lg">
+      <div className="card-lux -mx-3 mt-4 flex h-[min(84dvh,880px)] min-h-[560px] sm:mx-0 sm:mt-5 sm:h-[min(76dvh,850px)] min-w-0 flex-col overflow-hidden rounded-lg">
         <Conversation className="min-h-0">
-          <ConversationContent className="gap-5 px-4 py-6 sm:px-6">
+          <ConversationContent className="gap-4 px-2.5 py-4 sm:gap-5 sm:px-6 sm:py-6">
             {messages.map((message) => (
               <Message key={message.id} from={message.role}>
                 {message.role === "assistant" ? (
@@ -471,7 +493,7 @@ export default function ConsultationPanel({
                   className={
                     message.role === "user"
                       ? "border border-primary/25 bg-primary text-primary-foreground shadow-champagne"
-                      : "max-w-2xl leading-7"
+                      : "w-full max-w-full text-[0.9rem] leading-[1.65] sm:max-w-2xl sm:text-base sm:leading-7"
                   }
                 >
                   {message.parts.map((part, index) =>
@@ -539,7 +561,7 @@ export default function ConsultationPanel({
                   )}
               </Message>
             ))}
-            {status === "submitted" ? (
+            {status === "submitted" || (status === "streaming" && !(messages.at(-1)?.role === "assistant" && messages.at(-1)?.parts.some((p) => p.type === "text" && p.text.trim()))) ? (
               <Message from="assistant">
                 <AgolmenLoading compact label={t.thinking} />
               </Message>
@@ -556,7 +578,7 @@ export default function ConsultationPanel({
           <ConversationScrollButton className="border-primary/30 bg-card text-primary hover:bg-primary/10" />
         </Conversation>
 
-        <div className="min-w-0 border-t border-primary/15 bg-background/70 p-3 backdrop-blur-xl sm:p-4">
+        <div className="min-w-0 border-t border-primary/15 bg-background/70 p-2 backdrop-blur-xl sm:p-4">
           <div
             aria-label={t.quickLabel}
             className="mb-3 flex snap-x gap-2 overflow-x-auto pb-2 [scrollbar-width:thin]"
