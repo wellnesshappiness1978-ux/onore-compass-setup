@@ -13,6 +13,7 @@ vi.mock('@/integrations/supabase/client', () => ({ supabase: {
     return query;
   },
   rpc: async (name: string) => {
+    if (name === 'consultation_usage_status') return { data: { plan: db.cap === 3 ? 'standard' : db.cap === 10 ? 'vip' : db.cap === 30 ? 'family' : db.cap === null ? 'family_premium' : 'free', limit: db.cap, counts: { [new Date().toLocaleDateString('en-CA')]: db.used } }, error: db.fail ? { message: 'offline' } : null };
     if (name === 'current_feature_daily_usage_limit') return { data: db.cap, error: null };
     if (db.cap !== null && db.used >= db.cap) return { data: null, error: { code: '23514', message: 'limit' } };
     db.used += 1;
@@ -32,16 +33,23 @@ async function mount(plan: Plan) {
   return probe;
 }
 describe('authenticated displayed counts and atomic checks agree', () => {
-  it.each(['vip','b2b','b2b-premium'] as const)('%s confirms null as unlimited and continues counting', async plan => { db.cap=null; db.used=100; const probe=await mount(plan); expect(probe.current?.unlimited).toBe(true); expect(probe.current?.remaining).toBe(Infinity); await act(async()=>{expect(await probe.current?.consume()).toBe(true);}); expect(db.used).toBe(101); });
-  it.each([['free', 1], ['standard', 10]] as const)('%s allows its final use and then blocks', async (plan, cap) => {
+  it('Premium confirms null as unlimited after repeated successful responses', async () => { db.cap=null; db.used=100; const probe=await mount('b2b-premium'); expect(probe.current?.unlimited).toBe(true); db.used=101; await act(async()=>{await probe.current?.refresh();}); expect(probe.current?.remaining).toBe(Infinity); expect(probe.current?.used).toBe(101); });
+  it.each([['free', 1], ['standard', 3], ['vip', 10], ['b2b', 30]] as const)('%s displays final use and then the completed server count', async (plan, cap) => {
     db.cap = cap; db.used = cap - 1;
     const probe = await mount(plan);
     expect(probe.current?.limit).toBe(cap);
     expect(probe.current?.remaining).toBe(1);
-    await act(async () => { expect(await probe.current?.consume()).toBe(true); });
+    db.used += 1;
+    await act(async () => { await probe.current?.refresh(); });
     expect(probe.current?.remaining).toBe(0);
-    await act(async () => { expect(await probe.current?.consume()).toBe(false); });
+    await expect(probe.current?.consume()).rejects.toThrow('completed server responses');
     expect(db.used).toBe(cap);
+  });
+  it('displays the server-confirmed plan, not a stale prop', async () => {
+    db.cap=10; db.used=4;
+    const probe=await mount('free');
+    expect(probe.current?.confirmedPlan).toBe('vip');
+    expect(probe.current?.remaining).toBe(6);
   });
   it('uses the actual server cap instead of granting a Premium preview', async () => {
     db.cap = 1; db.used = 1;
