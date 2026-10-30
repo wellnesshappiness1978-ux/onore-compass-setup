@@ -64,15 +64,15 @@ export default function DebugPlanSwitcher({ plan, language, onChanged }: { plan:
   return (
     <aside ref={barRef} className="debug-plan-bar" aria-label={t.label} title={t.note}>
       <p className="sr-only">{t.note}</p>
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-2 gap-y-1.5 px-2 py-1.5 sm:gap-x-3 sm:gap-y-2 sm:px-3 sm:py-2">
         <span className="flex min-w-0 items-center gap-1.5 text-xs font-semibold text-primary">
           <FlaskConical className="size-4 shrink-0" aria-hidden="true" />
           <span className="truncate">{t.title}</span>
         </span>
-        <span className="min-w-0 truncate text-[11px] text-muted-foreground">{t.current}: {localizedPlanLabels[language][plan]}</span>
+        <span className="hidden min-w-0 truncate text-[11px] text-muted-foreground sm:inline">{t.current}: {localizedPlanLabels[language][plan]}</span>
         <div role="group" aria-label={t.group} className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-1">
           {planOrder.map((option) => (
-            <Button key={option} type="button" size="sm" variant={plan === option ? "default" : "outline"} aria-pressed={plan === option} disabled={saving} onClick={() => void select(option)} className="min-h-9 shrink-0 px-2 text-xs">
+            <Button key={option} type="button" size="sm" variant={plan === option ? "default" : "outline"} aria-pressed={plan === option} disabled={saving} onClick={() => void select(option)} className="min-h-8 shrink-0 px-1.5 text-[11px] sm:min-h-9 sm:px-2 sm:text-xs">
               {localizedPlanLabels[language][option]}
             </Button>
           ))}
