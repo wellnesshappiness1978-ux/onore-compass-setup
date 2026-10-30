@@ -14,6 +14,7 @@
 - Self-core stays free. Authenticated Stripe billing verifies owner, price, paid invoice and expiry; previews grant nothing. No webhooks. Why: protect readings and entitlements.
 - Previews grant no access; nullable consultation JSON compiles into SQL. Server-only reservations settle successful answers; owner status resolves plan/counts together; compatibility keeps separate caps. Why: prevent quota races and forged consumption.
 - Admin debug overrides require server-verified roles, expire after 24 hours, and restore original membership and team caps. Why: tests must not overwrite entitlements.
+- The pinned administrator test-plan bar mounted in Dashboard is the only plan-switch UI; no read-only duplicate may be mounted elsewhere, and it publishes its measured height into `--preview-bar-height`. Why: one place to change plans and no layout gap where a bar was removed.
 - Preserve legacy storage, event, and ICS identifiers and use the cropped brand logo. Why: avoid lost data and watermarks.
 - Keep support authenticated with owner-only RLS and legal content in shareable leaf pages. Why: protect personal information and avoid invented legal identity.
 - SettingsPanel owns profile/focus overview, account, plan, appearance and reminders after account settings; other switches stay beside Today readings, header owns language/music. Why: one composition without duplicate controls.
