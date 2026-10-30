@@ -1,11 +1,12 @@
 # Roadmap
 
 ## Payment and consultation policy revision (2026-10-30)
-- [ ] Diagnose Stripe connection and display safe specific checkout errors with direct navigation.
-- [ ] Apply consultation Free 1 / Standard 10 / VIP+ unlimited in shared configuration, database and UI without granting previews.
-- [ ] Share detailed plan benefits between Settings, purchase and pre-checkout confirmation.
-- [ ] Gate deep compatibility at VIP+ server and UI, including sharing; generate four AI advice domains.
-- [ ] Run regression tests and verify signed-in browser flows; report actual payment/paid-account blockers.
+- [x] Stripe account and server secret were already connected; signed-in mobile direct Checkout opens successfully. Safe specific errors and retry remain in confirmation.
+- [x] Consultation Free 1 / Standard 10 / VIP+ unlimited applied through nullable shared configuration and feature-specific atomic database RPC; existing compatibility caps unchanged, previews grant nothing.
+- [x] One seven-language benefit catalogue drives Settings, purchase, expanded details and pre-checkout confirmation.
+- [x] Deep compatibility is VIP+ in UI/server and exports; explicit AI generation produces values/communication/romance/long-term fields. Free overview and VIP invitation verified with manual partner.
+- [x] 489 regression tests and automatic build passed; signed-in mobile Checkout/confirmation, exhausted actual Free quota and VIP lock checked with no page errors or overflow.
+- [ ] Actual paid VIP+ repeated consultation and deep-report generation/readback: requesting account is Free and today's consultation quota is exhausted; no entitlement/usage fabricated. Real payment remains unsubmitted.
 
 ## Stripe membership purchase (2026-10-29)
 - [x] Authenticated Checkout uses existing monthly prices and Standard/VIP yearly prices; active subscriptions route to management instead of duplicate purchase.
