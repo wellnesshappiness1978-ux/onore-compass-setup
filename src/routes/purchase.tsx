@@ -9,7 +9,6 @@ import { lovable } from '@/integrations/lovable';
 import { billingPlans, type BillingPlan } from '@/lib/billing-plans';
 import { billingCopy } from '@/lib/billing-copy';
 import { createBillingCheckout, createBillingPortal, getBillingStatus } from '@/lib/billing.functions';
-import { getPlanConsultationLimit } from '@/lib/plan-usage';
 import { planCardsCopy } from '@/lib/plan-cards';
 import { appearanceUiCopy } from '@/lib/appearance-ui-copy';
 import { storedLanguage } from '@/lib/support-copy';
