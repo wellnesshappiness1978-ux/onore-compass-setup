@@ -53,3 +53,4 @@
 - Family narratives use a server-resolved fingerprint and unique pending lock before explicit AI generation; failed/pending never regenerate. Owner/input-scoped bounded device copies clear on sign-out; pending polls only reads. Why: fast private reopening without duplicate charges.
 
 - Family v2 keys are matrix/layers/friction/roadmap/directions/rhythm; versioned identity excludes old outputs. Shared family-planning drives timelines/consensus directions; 17-lens inputs retain missing values. Why: replace duplicates without asserting universal luck.
+- Effective plan resolves in SQL effective_membership_plan (active debug override > vip_whitelists email > Stripe-expiry plan); all limits and getMyMembership read it. Why: one source so whitelist/test switches apply everywhere.
