@@ -193,7 +193,7 @@ export default function ConsultationPanel({
   const usage = useDailyUsage("consultation", usagePlan, signedIn);
   const { limit, unlimited, remaining } = usage;
   const planKnown = !signedIn || planResolved;
-  const ready = ready && planKnown;
+  const ready = usage.ready && planKnown;
   const sendRemaining = remaining;
   const [countdown, setCountdown] = useState(untilMidnight());
   useEffect(() => {
