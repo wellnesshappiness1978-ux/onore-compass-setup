@@ -46,6 +46,7 @@ import { SELF_MEMBER_ID } from "@/lib/group-insight";
 import { groupDisplayName, memberDisplayName } from "@/lib/focus";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from '@tanstack/react-router';
 import type { TeamMember } from "@/lib/team-analysis";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -194,9 +195,8 @@ export default function ConsultationPanel({
     const id = window.setInterval(() => setCountdown(untilMidnight()), 1000);
     return () => window.clearInterval(id);
   }, []);
-  const limitPlan = signedIn ? actualPlan : usagePlan;
-  const upgradeTo =
-    planOrder.indexOf(limitPlan) < planOrder.indexOf("vip") ? "vip" : nextPlan(limitPlan);
+  const limitPlan = usage.confirmedPlan ?? (signedIn ? actualPlan : usagePlan);
+  const upgradeTo = nextPlan(limitPlan);
   const [limitOpen, setLimitOpen] = useState(false);
   useEffect(() => {
     if (sendRemaining > 0) { setLimitOpen(false); setNotice(null); }
@@ -276,8 +276,9 @@ export default function ConsultationPanel({
       setNotice(message || t.error);
       void usage.refresh();
     },
-    onFinish: () => {
-      void usage.refresh();
+    onFinish: async ({ isAbort, isError, message }) => {
+      if (!signedIn && !isAbort && !isError && message.parts.some(part => part.type === 'text' && part.text.trim())) await usage.consume();
+      await usage.refresh();
       textareaRef.current?.focus({ preventScroll: true });
     },
   });
@@ -286,15 +287,18 @@ export default function ConsultationPanel({
     clearError();
   }, [targetId, language, setMessages, clearError, initialMessages]);
   const busy = status === "submitted" || status === "streaming";
+  const submitting = useRef(false);
 
   const submit = async (text: string) => {
     const prompt = text.trim();
-    if (busy) return;
+    if (busy || submitting.current) return;
     if (!prompt) {
       setNotice(t.empty);
       textareaRef.current?.focus({ preventScroll: true });
       return;
     }
+    submitting.current = true;
+    try {
     const current = await usage.refresh();
     if (!current) { setNotice(t.error); return; }
     if (current.remaining <= 0) {
@@ -304,13 +308,10 @@ export default function ConsultationPanel({
     }
     setNotice(null);
     clearError();
-    if (!signedIn && !(await usage.consume())) {
-      setNotice(t.limit);
-      setLimitOpen(true);
-      return;
-    }
     await sendMessage({ text: prompt });
     requestAnimationFrame(() => textareaRef.current?.focus({ preventScroll: true }));
+    } catch { setNotice(t.error); await usage.refresh(); }
+    finally { submitting.current = false; }
   };
 
   const toggleFavorite = async (messageId: string, content: string) => {
@@ -422,7 +423,7 @@ export default function ConsultationPanel({
           className="flex min-w-0 items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary"
         >
           <Radio className="size-4 shrink-0" />
-          <span>{!usage.ready ? usage.refreshing ? usageStatusCopy[language].checking : usageStatusCopy[language].unavailable : unlimited ? planBenefitsCopy[language].unlimitedBadge : limit===1 && remaining===0 ? planBenefitsCopy[language].freeReached : planBenefitsCopy[language].remaining.replace('{n}',String(remaining))}</span>
+          <span>{!usage.ready ? usage.refreshing ? usageStatusCopy[language].checking : usageStatusCopy[language].unavailable : `${planNames[limitPlan]}：${unlimited ? t.unlimitedBadge : `${planBenefitsCopy[language].remaining.replace('{n}',String(remaining))} / ${limit}`}`}</span>
         </div>
         <Button variant="outline" size="sm" onClick={() => setFavoritesOpen(true)}>
           <Bookmark className="size-4" />
@@ -431,7 +432,7 @@ export default function ConsultationPanel({
         {!usage.ready && <Button variant="outline" size="sm" disabled={usage.refreshing} onClick={() => void usage.refresh()}>{usageStatusCopy[language].retry}</Button>}
         {usage.ready && !unlimited && (
           <p className="w-full text-xs text-muted-foreground">
-            {planNames[usagePlan]} · {remaining}/{limit}<br />{ux.reset(hms(countdown))}
+            {ux.reset(hms(countdown))}
           </p>
         )}
         {previewMode && signedIn && <p className="w-full text-xs leading-5 text-muted-foreground">{ux.preview}</p>}
@@ -602,29 +603,23 @@ export default function ConsultationPanel({
           <DialogHeader>
             <Crown className="mb-2 size-8 text-primary" />
             <DialogTitle className="font-serif leading-7">{t.modalTitle}</DialogTitle>
-            <DialogDescription className="leading-6">
-              {planOrder.indexOf(limitPlan) < planOrder.indexOf("vip") ? t.modalBody : t.limit}
-            </DialogDescription>
+            <DialogDescription className="leading-6">{t.limit}</DialogDescription>
           </DialogHeader>
           <p className="text-center text-sm leading-6 text-primary">{ux.reset(hms(countdown))}</p>
           {upgradeTo && (
             <Button
               variant="champagne"
-              onClick={() => {
-                setLimitOpen(false);
-                onVip();
-              }}
+              asChild
             >
+              <Link to="/purchase" search={{ plan: upgradeTo }}>
               <Crown className="size-4" />
-              {planOrder.indexOf(limitPlan) < planOrder.indexOf("vip")
-                ? t.modalCta
-                : planNames[upgradeTo]}
+              {planNames[upgradeTo]}
+              </Link>
             </Button>
           )}
           <Button variant="outline" onClick={() => setLimitOpen(false)}>
             {t.modalClose}
           </Button>
-          <p className="text-xs leading-5 text-muted-foreground">{t.modalNote}</p>
         </DialogContent>
       </Dialog>
       <Dialog open={favoritesOpen} onOpenChange={setFavoritesOpen}>
