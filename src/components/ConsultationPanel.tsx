@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
 import { consultationGoal } from "@/lib/consultation-request";
 import type { Plan } from "@/lib/design-modes";
-import { nextPlan } from "@/lib/plans";
+import { nextPlan, planOrder } from "@/lib/plans";
 import { normalizePlan } from '@/lib/plan-identity';
 import { useDailyUsage, msUntilMidnight, usageDay } from "@/hooks/use-daily-usage";
 import { usageStatusCopy } from '@/lib/usage-status-copy';
@@ -276,7 +276,7 @@ export default function ConsultationPanel({
       setNotice(message || t.error);
       void usage.refresh();
     },
-    onFinish: async ({ isAbort, isError, message }) => {
+    onFinish: async () => {
       await usage.refresh();
       textareaRef.current?.focus({ preventScroll: true });
     },
