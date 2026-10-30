@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { planOrder } from "@/lib/plans";
-import { getPlanConsultationLimit, remainingUses } from "@/lib/plan-usage";
+import { getFeatureUsageLimit, remainingUses } from "@/lib/plan-usage";
 import type { Plan } from "@/lib/design-modes";
 import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 import { localIso } from '@/lib/day-compass';
@@ -12,7 +12,7 @@ const localDay = usageDay;
 // One device counter per feature/day: switching the displayed plan changes the cap, never resets what was used.
 const localKey = (feature: UsageFeature) => `onore-usage:${feature}:${localDay()}`;
 const legacyKey = (feature: UsageFeature, plan: Plan) => `onore-usage:${feature}:${plan}:${localDay()}`;
-export const dailyLimitFor = (_feature: UsageFeature, plan: unknown) => getPlanConsultationLimit(plan);
+export const dailyLimitFor = (feature: UsageFeature, plan: unknown) => getFeatureUsageLimit(feature, plan);
 export { remainingUses };
 export const isDailyLimitError = (error: { code?: string } | null | undefined) => error?.code === "23514";
 export const msUntilMidnight = () => {
@@ -46,17 +46,18 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
         if (!auth.user) { setReady(false); return null; }
         const [usageResult, capResult] = await Promise.all([
           supabase.from("daily_usage").select("used").eq("user_id", auth.user.id).eq("feature", feature).eq("usage_day", today).maybeSingle(),
-          supabase.rpc("current_plan_daily_usage_limit"),
+          supabase.rpc("current_feature_daily_usage_limit", { p_feature: feature }),
         ]);
-        if (usageResult.error || capResult.error || typeof capResult.data !== "number") {
+        if (usageResult.error || capResult.error || (capResult.data !== null && typeof capResult.data !== "number")) {
           setReady(false);
           return null;
         }
         const count = usageResult.data?.used ?? 0;
         setUsed(count);
-        setServerLimit(capResult.data);
+        const confirmedLimit = capResult.data === null ? Infinity : capResult.data;
+        setServerLimit(confirmedLimit);
         setReady(true);
-        return { used: count, limit: capResult.data, remaining: remainingUses(capResult.data, count) };
+        return { used: count, limit: confirmedLimit, remaining: remainingUses(confirmedLimit, count) };
       } catch {
         setReady(false);
         return null;
