@@ -1,5 +1,6 @@
 import type { Language } from "./translations";
 import { reminderCopy } from "./reminder-copy";
+import { planBenefits } from './plan-benefits';
 
 /** The four paid tiers shown as selectable cards on My Page. Preview copy only — billing is not connected. */
 export type PaidPlanId = "standard" | "vip" | "b2b" | "b2b-premium";
@@ -294,4 +295,4 @@ const baseplanCardsCopy: Record<Language, PlanCardsCopy> = {
   },
 };
 
-export const planCardsCopy: typeof baseplanCardsCopy = Object.fromEntries((Object.keys(baseplanCardsCopy) as Language[]).map(language => [language, { ...baseplanCardsCopy[language], cards: baseplanCardsCopy[language].cards.map(card => ({ ...card, features: [reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : []), ...card.features] })) }])) as typeof baseplanCardsCopy;
+export const planCardsCopy: typeof baseplanCardsCopy = Object.fromEntries((Object.keys(baseplanCardsCopy) as Language[]).map(language => [language, { ...baseplanCardsCopy[language], cards: baseplanCardsCopy[language].cards.map(card => ({ ...card, features: [...planBenefits(card.id, language), reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : [])] })) }])) as typeof baseplanCardsCopy;

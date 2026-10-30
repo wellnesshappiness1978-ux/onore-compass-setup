@@ -41,6 +41,7 @@ import { fontSizeCopy, fontSizes } from '@/lib/font-size';
 import { Link } from '@tanstack/react-router';
 import { billingCopy } from '@/lib/billing-copy';
 import { billingPlans } from '@/lib/billing-plans';
+import { planBenefits } from '@/lib/plan-benefits';
 
 type Props = {
   profile: UserProfile;
@@ -127,7 +128,7 @@ export default function SettingsPanel({
   const allTiers = [...t.tiers, premiumTier];
   const freeTier = allTiers.find(tr => tr.id === "free");
   const carouselCards: { id: PaidPlanId | "free"; badge?: string; tagline?: string; features: string[] }[] = [
-    ...(freeTier ? [{ id: "free" as const, features: freeTier.features }] : []),
+    ...(freeTier ? [{ id: "free" as const, features: planBenefits('free', language) }] : []),
     ...pc.cards,
   ];
   const pd = planDetails[language];
