@@ -13,6 +13,7 @@ import { computeCoreLayers, coreLayersPrompt } from "./core-layers.ts";
 import { fengDirectionNames, mingGua } from "@/lib/feng-shui";
 import { supportiveWritingVoice } from "./writing-voice.ts";
 import { deeperEssencePrompt } from '../deeper-essence';
+import { consultationSettlement, consultationSucceeded } from '../consultation-accounting';
 
 import {
   createLovableAiGatewayRunIdFetch,
@@ -50,6 +51,7 @@ export async function handleConsultation(request: Request) {
   )
     return Response.json({ message: "Invalid consultation date." }, { status: 400 });
   const authorization = request.headers.get("authorization");
+  let settle: ((success: boolean) => Promise<unknown>) | undefined;
   if (authorization) {
     const url = process.env["SUPABASE_URL"],
       key = process.env["SUPABASE_PUBLISHABLE_KEY"];
@@ -72,10 +74,10 @@ export async function handleConsultation(request: Request) {
     const { data: claims, error: authError } = await client.auth.getClaims(token);
     if (authError || !claims?.claims.sub)
       return Response.json({ message: "Please sign in again." }, { status: 401 });
-    const { error: usageError } = await client.rpc("consume_daily_usage", {
-      p_feature: "consultation",
-      p_day: day,
-    });
+    // Privileged accounting is reachable only after this caller's bearer is verified.
+    const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
+    const userId = claims.claims.sub;
+    const { data: reservation, error: usageError } = await supabaseAdmin.rpc('reserve_consultation_usage', { p_user_id: userId, p_day: day });
     if (usageError)
       return Response.json(
         {
@@ -87,7 +89,16 @@ export async function handleConsultation(request: Request) {
         },
         { status: usageError.code === "23514" ? 429 : 500 },
       );
+    if (!reservation) return Response.json({ message: consultationTranslations[language].error }, { status: 500 });
+    settle = consultationSettlement(async success => {
+      const { error } = await supabaseAdmin.rpc('settle_consultation_usage', { p_user_id: userId, p_request_id: reservation, p_success: success });
+      if (error) throw new Error('Consultation accounting unavailable');
+    });
   }
+  const onAbort = () => { void settle?.(false).catch(() => console.error('Consultation cancellation settlement failed')); };
+  request.signal.addEventListener('abort', onAbort, { once: true });
+  try {
+  if (request.signal.aborted) { await settle?.(false); return new Response(null, { status: 499 }); }
   const gua = mingGua(profile.birthDate, profile.gender ?? "undisclosed");
   const feng = gua
     ? gua.branches
@@ -111,6 +122,7 @@ Compare only the available values for both people; missing birth time, birthplac
     fetch: runIdFetch.fetch,
   });
   const result = streamText({
+    maxRetries: 0,
     model: provider.responses("openai/gpt-6-astra"),
     instructions: `You are "アゴルメン AI": a warm, caring life consultant who uses the available computed reference layers to support people of every background — homemakers, students, job seekers, parents, workers and business owners alike. Empathize first with the person's feelings and situation (family, school, relationships, work, health of daily life), then offer practical, doable choices. Do not assume the user is a business person; infer their context from the question, and if unclear, keep examples general (home, study, work).
 ${supportiveWritingVoice}
@@ -155,7 +167,20 @@ Keep the four sections concise but useful (roughly 500–800 Japanese characters
     result.toUIMessageStreamResponse({
       originalMessages: messages as UIMessage[],
       sendReasoning: true,
+      onFinish: async event => {
+        request.signal.removeEventListener('abort', onAbort);
+        await settle?.(consultationSucceeded(event));
+      },
+      onError: () => {
+        void settle?.(false).catch(() => console.error('Consultation error settlement failed'));
+        return consultationTranslations[language].error;
+      },
     }),
     runIdFetch,
   );
+  } catch {
+    request.signal.removeEventListener('abort', onAbort);
+    await settle?.(false).catch(() => console.error('Consultation failure settlement failed'));
+    return Response.json({ message: consultationTranslations[language].error }, { status: request.signal.aborted ? 499 : 500 });
+  }
 }
