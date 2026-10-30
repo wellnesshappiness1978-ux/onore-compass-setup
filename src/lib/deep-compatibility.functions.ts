@@ -3,6 +3,7 @@ import { getRequest } from '@tanstack/react-start/server';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { getMyMembership } from './membership.functions';
 import { hasDeepCompatibility } from './plan-benefits';
+import { withDeepCompatibilityAccess } from './deep-compatibility-access';
 import { partnerSchema } from './compatibility-analysis';
 import { readingProfileSchema } from './profile-reading-context';
 import { z } from 'zod';
@@ -16,6 +17,6 @@ export const generateDeepCompatibility = createServerFn({ method:'POST' }).middl
    if(!hasDeepCompatibility(plan)) return {ok:false as const,locked:true};
    try {
      const { generateDeepReport }=await import('./ai/deep-compatibility.server');
-     return {ok:true as const,report:await generateDeepReport(getRequest(),data)};
+     return await withDeepCompatibilityAccess(plan,()=>generateDeepReport(getRequest(),data));
    } catch { return {ok:false as const,locked:false}; }
  });
