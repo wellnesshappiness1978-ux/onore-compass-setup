@@ -2,27 +2,24 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { normalizePlan } from './plan-identity';
-import { unexpiredMembership } from './billing-plans';
 
-/** Only a server-verified administrator may assign a temporary test plan. */
+/** Only server-verified administrators or whitelisted relatives may assign a temporary test plan. */
 export const getMyMembership = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     // Reconcile renewals on re-entry; offline failures never extend a paid expiry.
     try { const { refreshBilling } = await import('./billing.server'); await refreshBilling(context.userId); } catch { /* Use last verified, unexpired membership. */ }
-    const { data, error } = await context.supabase.from("plan_memberships")
-      .select("plan, debug_expires_at, debug_previous_plan, stripe_customer_id, stripe_valid_until").eq("user_id", context.userId).maybeSingle();
+    // Whitelisted relatives are promoted on every sign-in; the database resolves debug, whitelist and Stripe expiry in one place.
+    try { await context.supabase.rpc("claim_vip_whitelist"); } catch { /* Resolution below still honours the whitelist. */ }
+    const { data, error } = await context.supabase.rpc("my_membership_plan");
     if (error) throw error;
-    const effective = data?.debug_expires_at && Date.parse(data.debug_expires_at) <= Date.now()
-      ? data.debug_previous_plan : data?.plan;
-    const debugging = data?.debug_expires_at && Date.parse(data.debug_expires_at) > Date.now();
-    return normalizePlan(debugging ? effective : unexpiredMembership(effective, data?.stripe_customer_id ?? null, data?.stripe_valid_until ?? null));
+    return normalizePlan(data);
   });
 
 export const canManageDebugPlan = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    const { data, error } = await context.supabase.rpc("can_switch_test_plan");
     if (error) throw error;
     return data === true;
   });
@@ -31,7 +28,7 @@ export const setMyDebugPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ plan: z.enum(["free", "standard", "vip", "b2b", "b2b-premium"]) }).parse(input))
   .handler(async ({ context, data }) => {
-    const { data: allowed, error: roleError } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    const { data: allowed, error: roleError } = await context.supabase.rpc("can_switch_test_plan");
     if (roleError || !allowed) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: current, error: readError } = await context.supabase.from("plan_memberships")
