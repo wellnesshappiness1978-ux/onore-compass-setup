@@ -59,6 +59,9 @@ import TodayGuide from "./TodayGuide";
 import HeaderBgm from "./HeaderBgm";
 import { createDialogSwipeHandlers } from './dialog-swipe';
 import SessionPrefetch from './SessionPrefetch';
+import DeepCompatibilityReport from './DeepCompatibilityReport';
+import { hasDeepCompatibility, planBenefitsCopy } from '@/lib/plan-benefits';
+import type { DeepReport } from '@/lib/deep-compatibility.functions';
 import { usageStatusCopy } from '@/lib/usage-status-copy';
 import TodayReminders, { DailyReminderCatalogue } from "./TodayReminders";
 import { siblingDisplay } from "@/lib/sibling-order";
@@ -169,6 +172,8 @@ function TorisetsuPanel({
   const [partnerBlood, setPartnerBlood] = useState<"" | "A" | "B" | "O" | "AB">("");
   const [partnerSibling, setPartnerSibling] = useState<string>("");
   const [result, setResult] = useState<ReturnType<typeof analyzeCompatibility>>(null);
+  const [deepReport,setDeepReport]=useState<DeepReport|null>(null);
+  const deepAllowed=signedIn&&hasDeepCompatibility(plan);
   const [relation, setRelation] = useState<number | null>(null);
   const [analyzed, setAnalyzed] = useState(false);
   const [readingTheme, setReadingTheme] = useState<ReadingTheme>("connection");
@@ -230,6 +235,7 @@ function TorisetsuPanel({
       });
       if (!readings.length) return;
       if (!(await usage.consume())) { setLimitOpen(true); return; }
+      setDeepReport(null);
       setGroupResults(group ? readings : []);
       setResult(readings[0]?.reading ?? null);
       setAnalyzed(true);
@@ -505,21 +511,22 @@ function TorisetsuPanel({
           </section>
            {usage.ready && remaining <= 0 && !analyzed && <div role="status" className="mt-3 text-center"><p className="text-sm text-primary">{q.refresh}</p>{plan !== "b2b-premium" && <Button type="button" variant="champagne" onClick={onVip} className="mt-3 text-xs">{q.limit} →</Button>}</div>}
           {analyzed && groupResults.length > 0 && (() => {
-            const ownerText = splitGroupReading(groupResults[0]!.reading.sentences[0]).owner;
+            const ownerText = deepAllowed ? splitGroupReading(groupResults[0]?.reading.sentences[0] ?? '').owner : '';
             const ja = language === "ja";
             return <section aria-live="polite" className="mt-6 space-y-4">
               <h3 className="font-serif text-xl text-primary">{ux.compatibility} · {ux.groups} ({groupResults.length})</h3>
-              <article className="rounded-lg border border-primary/50 bg-primary/5 p-4">
+              {deepAllowed && <article className="rounded-lg border border-primary/50 bg-primary/5 p-4">
                 <h4 className="font-semibold text-primary">{ja ? "主対象者のエネルギー特性・共通基盤" : "Main subject · shared foundation"}</h4>
                 <p className="mt-2 whitespace-pre-line text-sm leading-7">{ownerText}</p>
-              </article>
-              {groupResults.map(item => { const pair = splitGroupReading(item.reading.sentences[0]).pair; return <article key={item.id} className="rounded-lg border border-primary/25 p-4">
+              </article>}
+              {groupResults.map(item => { const pair = deepAllowed ? splitGroupReading(item.reading.sentences[0]).pair : item.reading.dynamic; return <article key={item.id} className="rounded-lg border border-primary/25 p-4">
                 <h4 className="font-semibold text-primary">{item.name} · {item.reading.score}%</h4>
                 {pair ? <p className="mt-2 whitespace-pre-line text-sm leading-7">{pair}</p> : <p className="mt-2 text-sm leading-7">{item.reading.elementPair}</p>}
               </article>; })}
-              {planOrder.indexOf(plan) >= planOrder.indexOf("vip") && <p className="whitespace-pre-line text-sm leading-7">{groupResults[0]!.reading.sentences[2]}</p>}
+              {deepAllowed && <p className="whitespace-pre-line text-sm leading-7">{groupResults[0]?.reading.sentences[2]}</p>}
+              {!deepAllowed&&<section className="space-y-3 border-y border-primary/25 py-5"><p className="text-sm leading-7">{planBenefitsCopy[language].lock}</p><Button asChild><Link to="/purchase">{planBenefitsCopy[language].purchase}</Link></Button></section>}
               <p className="text-xs text-muted-foreground">{groupResults[0]!.reading.note}</p>
-              <ShareCardButton language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: q.title, title: q.title, score: 0, names: groupResults.map(item => item.name), fullContent: true, lines: [ownerText, ...groupResults.map((item, index) => `${index + 1}. ${item.reading.score}%\n${splitGroupReading(item.reading.sentences[0]).pair || item.reading.elementPair}\n${item.reading.sentences.slice(1).join("\n")}\n${item.reading.elementPair}`), q.weekAction], caution: groupResults[0]?.reading.note }} />
+              <ShareCardButton language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: q.title, title: q.title, score: 0, names: groupResults.map(item => item.name), fullContent: true, lines: [ownerText, ...groupResults.map((item, index) => deepAllowed ? `${index + 1}. ${item.reading.score}%\n${splitGroupReading(item.reading.sentences[0]).pair || item.reading.elementPair}\n${item.reading.sentences.slice(1).join("\n")}` : `${item.name} · ${item.reading.score}%\n${item.reading.dynamic}`)], caution: groupResults[0]?.reading.note }} />
             </section>;
           })()}
           {analyzed && result && groupResults.length === 0 ? (
@@ -543,7 +550,7 @@ function TorisetsuPanel({
                 </p>
                 <div className="mt-4 flex justify-center gap-3">{result.colors.map((color, j) => color && <span key={j} className="inline-flex items-center gap-2 text-xs text-muted-foreground"><span className="size-5 rounded-sm border border-border" style={{ backgroundColor: color }} />{color}</span>)}</div>
               </article>
-              <article className="mt-4 rounded-lg border border-primary/25 bg-card/50 p-5 text-left sm:p-7">
+              {deepAllowed && <><article className="mt-4 rounded-lg border border-primary/25 bg-card/50 p-5 text-left sm:p-7">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-primary/80">02 / 04 · {q.blocks[1]}</p>
                 <h4 className="mt-2 font-serif text-lg text-primary">{result.titles[0]}</h4>
                 <p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground">{result.sentences[0]}</p>
@@ -567,8 +574,10 @@ function TorisetsuPanel({
                 </div>
                 <p className="mt-3 text-sm leading-7 text-foreground">{q.weekAction}</p>
               </article>
-               <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
-              <ShareCardButton className="mt-6" language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: language === "ja" ? "アゴルメン相性診断" : "Agolmen compatibility", title: q.title, score, names: partnerName ? [partnerName] : [], fullContent: true, lines: [t.coreDynamics[relation ?? 0] ?? "", ...result.sentences.map((sentence, i) => `${result.titles[i] ?? ""}\n${sentence}`), result.elementPair, `${q.rhythmYou}: ${rhythmYou ?? "—"} / ${q.rhythmPartner}: ${rhythmPartner ?? "—"}`, q.weekAction], palette: result.colors.filter((c): c is string => Boolean(c)).map((code, i) => ({ label: i === 0 ? q.rhythmYou : q.rhythmPartner, code })), caution: result.note }} />
+              </>}
+              <DeepCompatibilityReport key={JSON.stringify([partnerInput,readingTheme,concern,language,analyzed])} profile={profile} partner={partnerInput} plan={plan} signedIn={signedIn} language={language} relationship={pickedMember?.relationshipType ?? relationshipKinds[relation ?? 2] ?? 'romance'} concern={concern} onReport={setDeepReport}/>
+              <p className="mx-auto mt-4 max-w-2xl text-left text-xs leading-6 text-muted-foreground">{result.note}</p>
+              <ShareCardButton className="mt-6" language={language} label={q.shareCard} data={{ kind: "compatibility", kicker: language === "ja" ? "アゴルメン相性診断" : "Agolmen compatibility", title: q.title, score, names: partnerName ? [partnerName] : [], fullContent: true, lines: [t.coreDynamics[relation ?? 0] ?? "", ...(deepAllowed ? [...result.sentences.map((sentence, i) => `${result.titles[i] ?? ""}\n${sentence}`), result.elementPair, `${q.rhythmYou}: ${rhythmYou ?? "—"} / ${q.rhythmPartner}: ${rhythmPartner ?? "—"}`, q.weekAction, ...(deepReport ? (['values','communication','romance','longTerm'] as const).map(key=>`${planBenefitsCopy[language][key]}\n${deepReport[key]}`) : [])] : [])], palette: result.colors.filter((c): c is string => Boolean(c)).map((code, i) => ({ label: i === 0 ? q.rhythmYou : q.rhythmPartner, code })), caution: result.note }} />
               <Button type="button" variant="outline" className="mt-3 h-auto min-h-11 w-full whitespace-normal" onClick={() => window.dispatchEvent(new CustomEvent(MANUAL_CONSULT_EVENT, { detail: { id: MANUAL_PARTNER_ID, name: partnerName || q.rhythmPartner, nameKana: partnerKana, birthDate: partnerDate, birthTime: partnerTimeUnknown ? "" : partnerTime, birthTimeUnknown: partnerTimeUnknown || !partnerTime, birthPlace: partnerPlace, birthCity: partnerCity, siblingOrder: partnerSibling, gender: partnerGender ?? "undisclosed", bloodType: partnerBlood, relationshipType: pickedMember?.relationshipType ?? "", role: "", skills: [] } satisfies TeamMember }))}><WandSparkles className="size-4 shrink-0" />{q.askAi}</Button>
             </section>
           ) : null}
