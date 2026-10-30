@@ -5,8 +5,6 @@ import { getFeatureUsageLimit, remainingUses } from "@/lib/plan-usage";
 import type { Plan } from "@/lib/design-modes";
 import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
 import { localIso } from '@/lib/day-compass';
-import { normalizePlan } from '@/lib/plan-identity';
-import { getMyMembership } from '@/lib/membership.functions';
 
 export type UsageFeature = "consultation" | "compatibility";
 export const usageDay = () => localIso(new Date());
@@ -15,6 +13,8 @@ const localDay = usageDay;
 const localKey = (feature: UsageFeature) => `onore-usage:${feature}:${localDay()}`;
 const legacyKey = (feature: UsageFeature, plan: Plan) => `onore-usage:${feature}:${plan}:${localDay()}`;
 export const dailyLimitFor = (feature: UsageFeature, plan: unknown) => getFeatureUsageLimit(feature, plan);
+/** Only the server-verified membership may drive a counted allowance; a display preview never does. */
+export const countedUsagePlan = (serverCounted: boolean, actualPlan: Plan, previewPlan: Plan): Plan => (serverCounted ? actualPlan : previewPlan);
 export { remainingUses };
 export const isDailyLimitError = (error: { code?: string } | null | undefined) => error?.code === "23514";
 export const msUntilMidnight = () => {
@@ -37,7 +37,6 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
   const [used, setUsed] = useState(0);
   const [day, setDay] = useState(localDay);
   const [refreshing, setRefreshing] = useState(false);
-  const [confirmedPlan, setConfirmedPlan] = useState<Plan | null>(null);
 
   const refresh = useCallback(async () => {
     const today = localDay();
@@ -48,18 +47,17 @@ export function useDailyUsage(feature: UsageFeature, plan: Plan, serverCounted: 
         const { data: auth } = await supabase.auth.getUser();
         if (!auth.user) { setReady(false); return null; }
         if (feature === 'consultation') {
-          // Reconcile Stripe billing first so the status RPC never reads a stale free plan.
-          try { await getMyMembership(); } catch { /* Offline: fall back to the last verified membership. */ }
+          // The plan and its allowance come from the one app-wide membership reference;
+          // the database only reports how many answers actually completed today.
           const { data, error } = await supabase.rpc('consultation_usage_status');
           if (error || !data || typeof data !== 'object' || Array.isArray(data)
-            || (data['limit'] !== null && typeof data['limit'] !== 'number') || typeof data['plan'] !== 'string') {
+            || !data['counts'] || typeof data['counts'] !== 'object' || Array.isArray(data['counts'])) {
             setReady(false); return null;
           }
-          const counts = data['counts'];
-          const count = counts && typeof counts === 'object' && !Array.isArray(counts) && typeof counts[today] === 'number' ? counts[today] : 0;
-          const cap = data['limit'] === null ? Infinity : data['limit'];
-          setUsed(count); setServerLimit(cap); setConfirmedPlan(normalizePlan(data['plan'])); setReady(true);
-          return { used: count, limit: cap, remaining: remainingUses(cap, count) };
+          const counts = data['counts'] as Record<string, unknown>;
+          const count = typeof counts[today] === 'number' ? counts[today] : 0;
+          setUsed(count); setServerLimit(configuredLimit); setReady(true);
+          return { used: count, limit: configuredLimit, remaining: remainingUses(configuredLimit, count) };
         }
         const [usageResult, capResult] = await Promise.all([
           supabase.from("daily_usage").select("used").eq("user_id", auth.user.id).eq("feature", feature).eq("usage_day", today).maybeSingle(),
