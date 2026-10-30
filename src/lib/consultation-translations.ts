@@ -3,6 +3,7 @@ import { planBenefitsCopy } from './plan-benefits';
 
 export type ConsultationTranslation = {
   title: string;
+  signIn?: string;
   subtitle: string;
   active: string;
   engine: string;
@@ -352,4 +353,5 @@ const baseConsultationTranslations: Record<Language, ConsultationTranslation> = 
       "Seules les informations du forfait sont affichées actuellement ; aucun paiement n’est effectué.",
   },
 };
-export const consultationTranslations: Record<Language, ConsultationTranslation> = Object.fromEntries((Object.keys(baseConsultationTranslations) as Language[]).map(language=>[language,{...baseConsultationTranslations[language],vip:baseConsultationTranslations[language].vip,modalBody:planBenefitsCopy[language].freeReached,unlimitedBadge:planBenefitsCopy[language].unlimitedBadge}])) as Record<Language, ConsultationTranslation>;
+const signInCopy: Record<Language,string> = { ja:'AI相談にはサインインしてください', en:'Sign in to consult AI', 'zh-CN':'请登录后进行AI咨询', 'zh-TW':'請登入後進行AI諮詢', ko:'AI 상담을 위해 로그인하세요', es:'Accede para consultar a la IA', fr:'Connectez-vous pour consulter l’IA' };
+export const consultationTranslations: Record<Language, ConsultationTranslation> = Object.fromEntries((Object.keys(baseConsultationTranslations) as Language[]).map(language=>[language,{...baseConsultationTranslations[language],signIn:signInCopy[language],vip:baseConsultationTranslations[language].vip,modalBody:planBenefitsCopy[language].freeReached,unlimitedBadge:planBenefitsCopy[language].unlimitedBadge}])) as Record<Language, ConsultationTranslation>;

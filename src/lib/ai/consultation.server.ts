@@ -51,6 +51,7 @@ export async function handleConsultation(request: Request) {
   )
     return Response.json({ message: "Invalid consultation date." }, { status: 400 });
   const authorization = request.headers.get("authorization");
+  if (!authorization) return Response.json({ message: consultationTranslations[language].signIn, code: 'sign_in_required' }, { status: 401 });
   let settle: ((success: boolean) => Promise<unknown>) | undefined;
   if (authorization) {
     const url = process.env["SUPABASE_URL"],

@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { consultationTranslations } from "@/lib/consultation-translations";
 import { consultationGoal } from "@/lib/consultation-request";
 import type { Plan } from "@/lib/design-modes";
-import { nextPlan, planOrder } from "@/lib/plans";
+import { nextPlan } from "@/lib/plans";
 import { normalizePlan } from '@/lib/plan-identity';
 import { useDailyUsage, msUntilMidnight, usageDay } from "@/hooks/use-daily-usage";
 import { usageStatusCopy } from '@/lib/usage-status-copy';
@@ -277,7 +277,6 @@ export default function ConsultationPanel({
       void usage.refresh();
     },
     onFinish: async ({ isAbort, isError, message }) => {
-      if (!signedIn && !isAbort && !isError && message.parts.some(part => part.type === 'text' && part.text.trim())) await usage.consume();
       await usage.refresh();
       textareaRef.current?.focus({ preventScroll: true });
     },
@@ -292,6 +291,7 @@ export default function ConsultationPanel({
   const submit = async (text: string) => {
     const prompt = text.trim();
     if (busy || submitting.current) return;
+    if (!signedIn) { setNotice(t.signIn ?? t.bookmarkSignIn); return; }
     if (!prompt) {
       setNotice(t.empty);
       textareaRef.current?.focus({ preventScroll: true });
@@ -598,6 +598,7 @@ export default function ConsultationPanel({
         </div>
       </div>
       <p className="mt-3 text-center text-[10px] leading-5 text-muted-foreground">{t.disclaimer}</p>
+      {!signedIn && <Button variant="outline" className="mt-3" onClick={onVip}>{t.signIn}</Button>}
       <Dialog open={limitOpen} onOpenChange={setLimitOpen}>
         <DialogContent className="max-w-md border-primary/40">
           <DialogHeader>
