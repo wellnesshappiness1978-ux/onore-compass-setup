@@ -72,12 +72,12 @@ export const todayFeatures: readonly { id: TodayFeature; min: Plan }[] = [
   { id: "starPath", min: "free" },
   { id: "dailyLucky", min: "free" },
   { id: "direction", min: "free" },
+  { id: "helio", min: "free" },
   { id: "shopping", min: "standard" },
   { id: "health", min: "standard" },
   { id: "monthlyLucky", min: "vip" },
   { id: "relations", min: "vip" },
   { id: "biorhythm365", min: "vip" },
-  { id: "helio", min: "free" },
 ];
 /** The family roadmap renders inside the combined biorhythm & calendar card from this plan. */
 export const familyRoadmapMin: Plan = "b2b";

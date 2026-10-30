@@ -32,7 +32,7 @@ describe('plan value display', () => {
 });describe('today features', () => {
   it('keeps the requested order and plan gates', async () => {
     const { todayFeatures, canUseToday } = await import('./plans');
-    expect(todayFeatures.map(f => f.id)).toEqual(['decision','starPath','dailyLucky','direction','shopping','health','monthlyLucky','relations','biorhythm365','helio']);
+    expect(todayFeatures.map(f => f.id)).toEqual(['decision','starPath','dailyLucky','direction','helio','shopping','health','monthlyLucky','relations','biorhythm365']);
     const order = ['free','standard','vip','b2b','b2b-premium'];
     const ranks = todayFeatures.map(f => order.indexOf(f.min));
     const ordered = ranks.slice(0, -1); expect([...ordered].sort((a, b) => a - b)).toEqual(ordered);

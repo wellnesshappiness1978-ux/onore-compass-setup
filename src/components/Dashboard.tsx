@@ -713,6 +713,16 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const [debugAllowed, setDebugAllowed] = useState(false);
+  // The pinned test bar writes the real account plan; every tab must follow it, so the local display
+  // preview (stale devPlanOverride / lower selected plan) is realigned to that plan instead of masking it.
+  const syncDisplayToServerPlan = (next: Plan) => {
+    setPreviewPlan(next);
+    if (devOverrideEnabled && devPlanOverride !== next) selectPlan(next);
+  };
+  useEffect(() => {
+    if (debugAllowed && planResolved) syncDisplayToServerPlan(serverPlan);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debugAllowed, planResolved, serverPlan, devOverrideEnabled]);
   const previewPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
   const membership = useServerFn(getMyMembership);
   const checkDebugAccess = useServerFn(canManageDebugPlan);
@@ -831,7 +841,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     <DailyReminderCatalogue language={language} plan={previewPlan} />
     <FocusGoalBridge onChange={(id, g, label) => { setFocusMemberId(id); setFocusGoal(g); setTraitsLabel(label); }} language={language} />
     <div data-design={effectiveDesign} data-tier={previewPlan} data-appearance={effectiveAppearance.parts} data-background={effectiveAppearance.background} data-icons={effectiveAppearance.icons} data-decoration-tier={decorationTier(effectiveAppearance.parts)} data-background-tier={decorationTier(effectiveAppearance.background)} data-tab={tab} className="design-canvas celestial-scene relative z-10 min-h-screen overflow-x-clip bg-background pb-32 text-foreground">
-      {signedIn && debugAllowed && <DebugPlanSwitcher plan={serverPlan} language={language} onChanged={(p) => setActualPlan(p)} />}
+      {signedIn && debugAllowed && <DebugPlanSwitcher plan={serverPlan} language={language} onChanged={(p) => { setActualPlan(p); syncDisplayToServerPlan(p); window.dispatchEvent(new Event(CLOUD_SYNC_EVENT)); }} />}
       <div className="celestial-stars" aria-hidden="true" />
       <div className="mobile-fixed-header fixed inset-x-0 z-[60] grid grid-cols-[1fr_auto_1fr] items-center border-b border-primary/25 bg-background/95 px-2 backdrop-blur-xl">
         <Button size="icon" variant="ghost" onClick={() => goToTab("home")} aria-label={t.home} title={t.home} aria-current={tab === "home" ? "page" : undefined} className="size-10 shrink-0 text-primary [&_svg]:size-6">
