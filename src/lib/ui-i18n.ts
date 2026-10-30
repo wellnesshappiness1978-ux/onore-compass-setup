@@ -37,7 +37,7 @@ const messages = {
 
   "legal.nav": l("法務とサポート", "Legal and support", "法律与支持", "法律與支援", "법률 및 지원", "Legal y soporte", "Mentions et assistance"),
   "legal.support": l("カスタマーサポート・お問い合わせ", "Customer support", "客户支持与咨询", "客戶支援與諮詢", "고객 지원 및 문의", "Atención al cliente", "Service client"),
-  "legal.share": l("SNSシェア", "Share", "社交平台分享", "社群分享", "SNS 공유", "Compartir", "Partager"),
+  "legal.share": l("アプリをシェア", "Share the app", "分享应用", "分享應用", "앱 공유", "Compartir la app", "Partager l’app"),
   "legal.copied": l("アプリのリンクをコピーしました。", "App link copied.", "应用链接已复制。", "應用程式連結已複製。", "앱 링크를 복사했습니다.", "Enlace copiado.", "Lien copié."),
   "legal.shareFallback": l("診断カードやアート画像は各画面から保存・共有できます。", "Save or share insight cards and artwork from their screens.", "可在相应页面保存或分享解读卡与艺术图。", "可在相應畫面儲存或分享解讀卡與藝術圖。", "각 화면에서 진단 카드와 작품을 저장하거나 공유할 수 있습니다.", "Guarda o comparte tarjetas y obras desde sus pantallas.", "Enregistrez ou partagez cartes et œuvres depuis leurs écrans."),
   "legal.history": l("お問い合わせの受付と履歴", "Requests and history", "咨询与记录", "諮詢與記錄", "문의 및 내역", "Solicitudes e historial", "Demandes et historique"),

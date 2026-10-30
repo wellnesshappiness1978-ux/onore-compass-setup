@@ -16,7 +16,7 @@ import { companionCopy } from "@/lib/companion-copy";
 import { teamCopy } from "@/lib/team-copy";
 import { annualFlyingStars, mingGua } from "@/lib/feng-shui";
 import ShareCardButton from "./ShareCardButton";
-import { readingElementText, unlockedShareSections, withLockedSections, shareUi, type ShareSection } from "@/lib/share-content";
+import { readingElementText, stripSystemLines, unlockedShareSections, withLockedSections, shareUi, type ShareSection } from "@/lib/share-content";
 import FeatureNotifySwitch from "./FeatureNotifySwitch";
 import DayCompass from "./DayCompass";
 import HelioCalendar from "./HelioCalendar";
@@ -24,7 +24,7 @@ import FengShuiGuide from "./FengShuiGuide";
 import { consultationUxCopy } from "@/lib/consultation-ux-copy";
 import { higherTodayBenefits, todayBenefitCategories, todayBenefitCopy, todayBenefitCount } from "@/lib/today-benefits";
 import { recipesForElement, recipeDetails, COURSE_ORDER, courseLabels } from "@/lib/lucky-recipes";
-import { pickMonthlyFlower } from "@/lib/seasonal-flowers";
+import { pickMonthlyFlower, flowerCopy } from "@/lib/seasonal-flowers";
 import MonthlyFlowerCard from "@/components/MonthlyFlowerCard";
 import MonthlyLuckyCard from "@/components/MonthlyLuckyCard";
 
@@ -352,7 +352,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
         </ul>
       </div>,
     },
-    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>{rangeBanner}<DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /><h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "今日のカレンダー（どなたでも閲覧できます）" : "Today's calendar (open to everyone)"}</h4><HelioCalendar hideDirections date={today} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} /></> },
+    helio: { notify: ja ? "今日の地球暦と宇宙の特性が更新されました" : "Today's Earth Calendar is updated", body: <><p data-share-exclude className="mb-1 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>{rangeBanner}<DayCompass dialOnly rangeDays={helioRangeDays[plan]} profile={profile} language={language} plan={plan} onUpgrade={onUpgrade} /><h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "今日のカレンダー（どなたでも閲覧できます）" : "Today's calendar (open to everyone)"}</h4><HelioCalendar hideDirections date={today} profile={profile} plan={plan} language={language} onUpgrade={onUpgrade} /></> },
     biorhythm365: {
       notify: `${ja ? "今日のバイオリズム" : "Today's biorhythm"} ${Math.round(rhythm.total)}`,
       body: yearCurve.length ? <>
@@ -422,7 +422,7 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
   };
 
   content.biorhythm365 = { ...content.biorhythm365, body: <>
-    <p className="mb-2 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>
+    <p data-share-exclude className="mb-2 text-xs text-muted-foreground">{ja ? `閲覧できる期間：${rangeLabel}` : `Browsing range: ${rangeLabel}`}</p>
     <p className="mb-2 text-xs text-primary">{access.rhythm}</p><h4 className="mb-1 font-serif text-sm text-primary">{focus?.label(language)} · {titles.biorhythm365[ja ? "ja" : "en"]}</h4>
     {content.biorhythm365.body}
     <h4 className="mb-1 mt-5 border-t border-primary/20 pt-4 font-serif text-sm text-primary">{ja ? "ファミリーのロードマップとバイオリズム" : "Family roadmap & biorhythm"}</h4>
@@ -449,10 +449,10 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
     if (!root) return;
     const sections: ShareSection[] = [];
     const message = root.querySelector('[data-today-share="message"]');
-    if (message) sections.push({ id: 'message', title: ja ? '本日のメッセージ' : "Today's message", text: readingElementText(message) });
+    if (message) sections.push({ id: 'message', title: ja ? '本日のメッセージ' : "Today's message", text: stripSystemLines(readingElementText(message)) });
     for (const feature of [...todayFeatures.map(f => f.id), 'directionExtended' as const, 'familyRoadmap' as const]) {
       const elements = root.querySelectorAll(`[data-today-share="${feature}"]`);
-      if (elements.length) sections.push({ id: feature, title: L(titles[feature]), text: Array.from(elements).map(readingElementText).join('\n\n') });
+      if (elements.length) sections.push({ id: feature, title: L(titles[feature]), text: stripSystemLines(Array.from(elements).map(readingElementText).join('\n\n')) });
     }
     if (fortune.data) {
       const f = fortune.data;
@@ -460,8 +460,12 @@ export default function TodayGuide({ profile, language, plan, signedIn, onUpgrad
       if (daily >= 0) sections.splice(daily, 1,
         { id: 'luckyColor', feature: 'dailyLucky', title: ja ? 'ラッキーカラー' : 'Lucky color', text: `${f.luckyColor.name} ${f.luckyColor.hex}\n${f.luckyColor.reason}\n${f.luckyColor.usage}` },
         { id: 'luckyWord', feature: 'dailyLucky', title: ja ? 'ラッキーワード' : 'Lucky word', text: `${f.luckyWord.word}\n${f.luckyWord.message}` },
-        ...f.foods.slice(0, luckyFoodLimit[plan]).map((food, i) => ({ id: `food-${food.recipeId}`, feature: 'dailyLucky' as const, title: `${i + 1}. ${food.name}`, text: `${food.why}\n${food.ingredients.map(v => `${v.item} ${v.amount}`).join('\n')}\n${food.seasonings.map(v => `${v.item} ${v.amount}`).join('\n')}\n${food.steps.map(s => `${s.text}\n${s.tip}`).join('\n')}` })),
+        ...f.foods.slice(0, luckyFoodLimit[plan]).map((food, i) => ({ id: `food-${food.recipeId}`, feature: 'dailyLucky' as const, image: recipeImage(food.recipeId) || undefined, title: `${ja ? '運気アップフード' : 'Lucky food'} ${i + 1}. ${food.name}`, text: `${food.why}\n${food.ingredients.map(v => `${v.item} ${v.amount}`).join('\n')}\n${food.seasonings.map(v => `${v.item} ${v.amount}`).join('\n')}\n${food.steps.map(s => `${s.text}\n${s.tip}`).join('\n')}` })),
       );
+    }
+    if (canUseToday(plan, 'monthlyLucky')) {
+      const fc = flowerCopy[language], fl = flowerPick.flower;
+      sections.push({ id: 'luckyFlower', feature: 'monthlyLucky', image: fl.image, title: `${flowerPick.group ? fc.group : fc.title}：${fl.name[language]}`, text: `${fc.meaning}：${fl.meaning[language]}\n${fc.reason(flowerPick)}\n${fc.action(flowerPick)}` });
     }
     setShareSections(withLockedSections(unlockedShareSections(plan, sections), todayFeatures.map(f => ({ id: f.id, title: L(titles[f.id]), open: canUseToday(plan, f.id) }))));
   };

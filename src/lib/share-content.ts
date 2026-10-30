@@ -2,7 +2,7 @@ import type { Language } from './translations';
 import type { Plan } from './design-modes';
 import { canUseToday, type TodayFeature } from './plans';
 
-export type ShareSection = { id: string; title: string; text: string; feature?: TodayFeature; locked?: boolean };
+export type ShareSection = { id: string; title: string; text: string; feature?: TodayFeature; locked?: boolean; image?: string | undefined };
 export const APP_SHARE_URL = 'https://cosmic-beginnings-onboard.lovable.app';
 type ShareUi = { scopeAll: string; scopeSelect: string; saveImage: string; sns: string; copyLink: string; linkCopied: string; locked: string; snsNote: string; select: string; all: string; text: string; copy: string; copied: string; empty: string; daily: string; app: string; tagline: string; previous: string; next: string };
 export const shareUi: Record<Language, ShareUi> = {
@@ -40,6 +40,12 @@ export function readingElementText(element: Element): string {
     return node instanceof Element && /^(P|DIV|LI|H[1-6]|SUMMARY|SECTION|ARTICLE|BR|DT|DD)$/.test(node.tagName) ? `\n${content}\n` : content;
   };
   return walk(clone).replace(/\n[ \t]+/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+/** Remove system/plan chrome (browsing ranges, plan names, upgrade prompts) so only reading content is shared. */
+const SYSTEM_LINE = /閲覧できる期間|Browsing range|(無料|スタンダード|VIP|ファミリー|ファミリープレミアム|Free|Standard|Family|Premium)(会員|プラン)|(Standard|VIP|Family)\+|以上でお楽しみ|or higher|プランを見る|View plans|サンプルを見る|現在のプラン|Current plan|どなたでも閲覧/;
+export function stripSystemLines(text: string): string {
+  return text.split('\n').filter(line => !SYSTEM_LINE.test(line)).join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 /** Every share surface offers its content as selectable items: explicit sections, else one item per line or paragraph. */

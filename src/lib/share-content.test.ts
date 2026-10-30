@@ -70,3 +70,10 @@ describe('three-action share v2', () => {
     expect(remainingUses(dailyLimitFor('consultation', 'b2b-premium'), 99)).toBe(Infinity);
   });
 });
+
+import { stripSystemLines as strip } from './share-content';
+describe('stripSystemLines', () => {
+  it('removes browsing range and plan labels but keeps reading content', () => {
+    expect(strip('閲覧できる期間：前後7日\n今日は東が吉方位です\nVIP会員以上でお楽しみいただけます\n無料会員')).toBe('今日は東が吉方位です');
+  });
+});
