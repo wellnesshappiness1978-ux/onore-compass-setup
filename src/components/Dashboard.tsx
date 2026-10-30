@@ -696,6 +696,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   // Strict entitlement: the read-only membership row decides access. The switch may only preview equal or lower plans.
   const [selectedPlan, setPreviewPlan] = useState<Plan>("b2b-premium");
   const [serverPlan, setActualPlan] = useState<Plan>("free");
+  const [planResolved, setPlanResolved] = useState(false);
   const { enabled: devOverrideEnabled, override: devPlanOverride, selectPlan } = usePlan();
   const applyDevOverride = (next: Plan) => {
     selectPlan(next);
@@ -715,16 +716,17 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
   const membership = useServerFn(getMyMembership);
   const checkDebugAccess = useServerFn(canManageDebugPlan);
   useEffect(() => {
-    const refresh = () => { if (signedIn) void membership().then(setActualPlan).catch(() => undefined); };
+    const refresh = () => { if (signedIn) void membership().then((plan) => { setActualPlan(plan); setPlanResolved(true); }).catch(() => undefined); };
     window.addEventListener(CLOUD_SYNC_EVENT, refresh);
     return () => window.removeEventListener(CLOUD_SYNC_EVENT, refresh);
   }, [signedIn, membership]);
   useEffect(() => {
     let active = true;
     setActualPlan("free");
+    setPlanResolved(false);
     setDebugAllowed(false);
     if (signedIn) {
-      membership().then((plan) => { if (active) setActualPlan(plan); }).catch(() => { if (active) setActualPlan("free"); });
+      membership().then((plan) => { if (active) { setActualPlan(plan); setPlanResolved(true); } }).catch(() => { if (active) { setActualPlan("free"); setPlanResolved(true); } });
       checkDebugAccess().then((allowed) => { if (active) setDebugAllowed(allowed); }).catch(() => { if (active) setDebugAllowed(false); });
     }
     return () => { active = false; };
@@ -936,6 +938,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                   plan={previewPlan}
                   actualPlan={serverPlan}
                   signedIn={signedIn}
+                  planResolved={planResolved}
                   onVip={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 /></SubjectVoice></div>
               </>
