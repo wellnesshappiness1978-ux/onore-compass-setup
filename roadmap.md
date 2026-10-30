@@ -1,5 +1,12 @@
 # Roadmap
 
+## Payment and consultation policy revision (2026-10-30)
+- [ ] Diagnose Stripe connection and display safe specific checkout errors with direct navigation.
+- [ ] Apply consultation Free 1 / Standard 10 / VIP+ unlimited in shared configuration, database and UI without granting previews.
+- [ ] Share detailed plan benefits between Settings, purchase and pre-checkout confirmation.
+- [ ] Gate deep compatibility at VIP+ server and UI, including sharing; generate four AI advice domains.
+- [ ] Run regression tests and verify signed-in browser flows; report actual payment/paid-account blockers.
+
 ## Stripe membership purchase (2026-10-29)
 - [x] Authenticated Checkout uses existing monthly prices and Standard/VIP yearly prices; active subscriptions route to management instead of duplicate purchase.
 - [x] Owner-bound Stripe verification and paid-invoice/expiry gates update membership; management portal supports payment methods and period-end cancellation. No webhook; external changes reconcile on app re-entry/refresh.
