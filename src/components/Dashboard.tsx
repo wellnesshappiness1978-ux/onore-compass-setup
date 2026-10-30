@@ -1,4 +1,5 @@
 import BirthplaceFields from "./BirthplaceFields";
+import { Link } from '@tanstack/react-router';
 import SiblingSelect from "./SiblingSelect";
 import { traitsNavigationLabel } from "@/lib/focus";
 import { ArtsGuide } from "./ArtsGuide";

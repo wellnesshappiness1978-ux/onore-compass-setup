@@ -1,4 +1,5 @@
 # Calculations and model rules
+- Plan benefits share plan-benefits across Settings/purchase/confirmation; billing errors expose safe codes only. Deep compatibility checks actual VIP+ membership before AI, never preview, and sharing excludes locked prose. Why: honest billing and secure detailed advice.
 - Consultation uses a shared availability-aware birth/day context and four localized answer sections; bookmarks alone persist in owner-only private rows, while summary-only story cards reuse the local share renderer. Signed-in AI requests consume the existing atomic daily-usage RPC exactly once, never a preview entitlement. Why: improve relevance, preserve privacy, and keep count enforcement authoritative.
 - Consultation uses nullable JSON caps through plan-usage, SQL payload equality tests and the feature-specific atomic RPC; compatibility retains its separate caps. Signed-in counters/sends use actual membership and database usage, never previews. Why: consultation changes must not accidentally change compatibility quotas.
 - Day compass is deterministic and plan-gated reference data. Why: no invented live readings.
