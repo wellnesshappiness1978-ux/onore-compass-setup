@@ -1,5 +1,10 @@
 # Roadmap
 
+## Consultation strict limits and success-only accounting (2026-10-30)
+- [ ] Apply Free 1 / Standard 3 / VIP 10 / Family 30 / Premium unlimited from the shared configuration to database and UI.
+- [ ] Reserve capacity before AI, count only completed nonempty answers, release errors/cancellations, prevent parallel-request bypass.
+- [ ] Synchronize current membership/count display and sequential upgrade guidance; run regressions and authenticated browser checks.
+
 ## Payment and consultation policy revision (2026-10-30)
 - [x] Stripe account and server secret were already connected; signed-in mobile direct Checkout opens successfully. Safe specific errors and retry remain in confirmation.
 - [x] Consultation Free 1 / Standard 10 / VIP+ unlimited applied through nullable shared configuration and feature-specific atomic database RPC; existing compatibility caps unchanged, previews grant nothing.
