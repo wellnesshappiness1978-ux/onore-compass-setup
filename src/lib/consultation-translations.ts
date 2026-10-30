@@ -1,4 +1,5 @@
 import type { Language } from "./translations";
+import { planBenefitsCopy } from './plan-benefits';
 
 export type ConsultationTranslation = {
   title: string;
@@ -35,7 +36,7 @@ export type ConsultationTranslation = {
   targetLabel: string;
 };
 
-export const consultationTranslations: Record<Language, ConsultationTranslation> = {
+const baseConsultationTranslations: Record<Language, ConsultationTranslation> = {
   ja: {
     ownerLabel: "あなた",
     targetLabel: "相談する対象",
@@ -351,3 +352,4 @@ export const consultationTranslations: Record<Language, ConsultationTranslation>
       "Seules les informations du forfait sont affichées actuellement ; aucun paiement n’est effectué.",
   },
 };
+export const consultationTranslations: Record<Language, ConsultationTranslation> = Object.fromEntries((Object.keys(baseConsultationTranslations) as Language[]).map(language=>[language,{...baseConsultationTranslations[language],vip:planBenefitsCopy[language].unlimitedBadge,modalBody:planBenefitsCopy[language].freeReached,unlimitedBadge:planBenefitsCopy[language].unlimitedBadge}])) as Record<Language, ConsultationTranslation>;

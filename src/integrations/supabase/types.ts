@@ -458,6 +458,10 @@ export type Database = {
         Args: { p_day: string; p_feature: string }
         Returns: number
       }
+      current_feature_daily_usage_limit: {
+        Args: { p_feature: string }
+        Returns: number
+      }
       current_plan_daily_usage_limit: { Args: never; Returns: number }
       expire_stripe_membership_plan: {
         Args: { p_customer: string; p_plan: string; p_until: string }
@@ -469,6 +473,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      plan_consultation_usage_limit: {
+        Args: { p_plan: string }
+        Returns: number
       }
       plan_daily_usage_limit: { Args: { p_plan: string }; Returns: number }
     }

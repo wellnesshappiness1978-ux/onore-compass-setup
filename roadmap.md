@@ -1,5 +1,13 @@
 # Roadmap
 
+## Payment and consultation policy revision (2026-10-30)
+- [x] Stripe account and server secret were already connected; signed-in mobile direct Checkout opens successfully. Safe specific errors and retry remain in confirmation.
+- [x] Consultation Free 1 / Standard 10 / VIP+ unlimited applied through nullable shared configuration and feature-specific atomic database RPC; existing compatibility caps unchanged, previews grant nothing.
+- [x] One seven-language benefit catalogue drives Settings, purchase, expanded details and pre-checkout confirmation.
+- [x] Deep compatibility is VIP+ in UI/server and exports; explicit AI generation produces values/communication/romance/long-term fields. Free overview and VIP invitation verified with manual partner.
+- [x] 494 regression tests and automatic build passed; signed-in mobile Checkout/confirmation, exhausted actual Free quota and VIP lock checked with no page errors or overflow.
+- [ ] Actual paid VIP+ repeated consultation and deep-report generation/readback: requesting account is Free and today's consultation quota is exhausted; no entitlement/usage fabricated. Real payment remains unsubmitted.
+
 ## Stripe membership purchase (2026-10-29)
 - [x] Authenticated Checkout uses existing monthly prices and Standard/VIP yearly prices; active subscriptions route to management instead of duplicate purchase.
 - [x] Owner-bound Stripe verification and paid-invoice/expiry gates update membership; management portal supports payment methods and period-end cancellation. No webhook; external changes reconcile on app re-entry/refresh.

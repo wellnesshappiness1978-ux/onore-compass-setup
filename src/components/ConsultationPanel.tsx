@@ -32,6 +32,7 @@ import { nextPlan, planOrder } from "@/lib/plans";
 import { normalizePlan } from '@/lib/plan-identity';
 import { useDailyUsage, msUntilMidnight, usageDay } from "@/hooks/use-daily-usage";
 import { usageStatusCopy } from '@/lib/usage-status-copy';
+import { planBenefitsCopy } from '@/lib/plan-benefits';
 import { teamCopy } from "@/lib/team-copy";
 import type { Language } from "@/lib/translations";
 import type { UserProfile } from "./Onboarding";
@@ -421,7 +422,7 @@ export default function ConsultationPanel({
           className="flex min-w-0 items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-semibold text-primary"
         >
           <Radio className="size-4 shrink-0" />
-          <span>{!usage.ready ? usage.refreshing ? usageStatusCopy[language].checking : usageStatusCopy[language].unavailable : unlimited ? t.unlimitedBadge : t.badge(remaining)}</span>
+          <span>{!usage.ready ? usage.refreshing ? usageStatusCopy[language].checking : usageStatusCopy[language].unavailable : unlimited ? planBenefitsCopy[language].unlimitedBadge : limit===1 && remaining===0 ? planBenefitsCopy[language].freeReached : planBenefitsCopy[language].remaining.replace('{n}',String(remaining))}</span>
         </div>
         <Button variant="outline" size="sm" onClick={() => setFavoritesOpen(true)}>
           <Bookmark className="size-4" />

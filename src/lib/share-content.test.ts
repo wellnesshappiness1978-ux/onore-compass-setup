@@ -64,9 +64,9 @@ describe('three-action share v2', () => {
   });
   it('consultation remaining count follows each plan cap', () => {
     expect(remainingUses(dailyLimitFor('consultation', 'free'), 1)).toBe(0);
-    expect(remainingUses(dailyLimitFor('consultation', 'standard'), 1)).toBe(2);
-    expect(remainingUses(dailyLimitFor('consultation', 'vip'), 4)).toBe(6);
-    expect(remainingUses(dailyLimitFor('consultation', 'b2b'), 0)).toBe(30);
-    expect(remainingUses(dailyLimitFor('consultation', 'b2b-premium'), 99)).toBe(1);
+    expect(remainingUses(dailyLimitFor('consultation', 'standard'), 1)).toBe(9);
+    expect(remainingUses(dailyLimitFor('consultation', 'vip'), 4)).toBe(Infinity);
+    expect(remainingUses(dailyLimitFor('consultation', 'b2b'), 0)).toBe(Infinity);
+    expect(remainingUses(dailyLimitFor('consultation', 'b2b-premium'), 99)).toBe(Infinity);
   });
 });

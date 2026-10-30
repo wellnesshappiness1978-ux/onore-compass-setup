@@ -12,7 +12,7 @@
 <!-- LOVABLE:END -->
 - Restore guests from `onore-profile`; signed-in profiles use private rows and sign-out clears the local copy. Why: preserve privacy without losing guest work.
 - Self-core stays free. Authenticated Stripe billing verifies owner, price, paid invoice and expiry; previews grant nothing. No webhooks. Why: protect readings and entitlements.
-- Plan previews grant no access; normalize aliases to legacy IDs, default Free. Daily caps use one JSON source compiled into SQL; authenticated counters/sends use actual membership and owner usage. Why: prevent drift and preview access.
+- Previews grant no access; legacy plan aliases default Free. Nullable consultation JSON compiles into SQL; compatibility keeps separate caps. Counters use owner membership. Why: prevent drift and preview access.
 - Admin debug overrides require server-verified roles, expire after 24 hours, and restore original membership and team caps. Why: tests must not overwrite entitlements.
 - Preserve legacy storage, event, and ICS identifiers and use the cropped brand logo. Why: avoid lost data and watermarks.
 - Keep support authenticated with owner-only RLS and legal content in shareable leaf pages. Why: protect personal information and avoid invented legal identity.

@@ -2,6 +2,7 @@ import type { Language } from "./translations";
 import { reminderCopy } from "./reminder-copy";
 import { consultationDailyLimit, dailyUsageLimit, groupLimit, helioRangeDays, memberLimit } from "./plans";
 import { planReadingLines } from './today-access-copy';
+import { consultationAllowanceText, planBenefits } from './plan-benefits';
 
 /** Home "next step" section: four paid-plan privilege cards. Preview copy only — billing is not connected. */
 export type HomePlanId = "standard" | "vip" | "b2b" | "b2b-premium";
@@ -175,8 +176,8 @@ export const homePlanCardsCopy: typeof basehomePlanCardsCopy = Object.fromEntrie
     cards: basehomePlanCardsCopy[language].cards.map(card => {
       const features = card.features.map((feature, index) => index === 0
         ? dailyFeatureCopy[language].compatibility(dailyUsageLimit[card.id])
-        : index === 2 ? dailyFeatureCopy[language].consultation(consultationDailyLimit[card.id]) : feature);
-      return { ...card, features: [...planReadingLines(card.id, language), ...(language === "ja" ? jaFeatures[card.id] : [reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : []), ...features])] };
+        : index === 2 ? consultationAllowanceText(language,card.id) : feature);
+      return { ...card, features: [...planBenefits(card.id,language), ...planReadingLines(card.id, language), reminderCopy[language].fullBenefit, ...(card.id !== "standard" ? [reminderCopy[language].vipBenefit] : [])] };
     }),
   }]),
 ) as typeof basehomePlanCardsCopy;

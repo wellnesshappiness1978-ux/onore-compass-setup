@@ -1,6 +1,6 @@
 import type { Plan } from "./design-modes";
 import { quickCompatibilityLimit } from "./quick-compatibility";
-import { PLAN_CONSULTATION_LIMITS } from './plan-usage';
+import { PLAN_CONSULTATION_LIMITS, PLAN_COMPATIBILITY_LIMITS } from './plan-usage';
 
 export const planOrder: Plan[] = ["free", "standard", "vip", "b2b", "b2b-premium"];
 const rank = (plan: Plan) => planOrder.indexOf(plan);
@@ -37,8 +37,8 @@ export const requiredPlanFor = (feature: TeamFeature) => featureMin[feature];
 /** Smallest plan whose member limit fits `count`. */
 export const planForCount = (count: number): Plan | null => planOrder.find((p) => memberLimit[p] >= count) ?? null;
 /** Compatibility and consultation reference the same maintained configuration. */
-export const dailyUsageLimit = PLAN_CONSULTATION_LIMITS;
-export const consultationDailyLimit = dailyUsageLimit;
+export const dailyUsageLimit = PLAN_COMPATIBILITY_LIMITS;
+export const consultationDailyLimit = PLAN_CONSULTATION_LIMITS;
 export { getPlanConsultationLimit, PLAN_CONSULTATION_LIMITS } from './plan-usage';
 export { quickCompatibilityLimit };
 export const nextPlan = (plan: Plan): Plan | null => planOrder[rank(plan) + 1] ?? null;

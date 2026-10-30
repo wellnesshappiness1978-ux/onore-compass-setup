@@ -23,7 +23,7 @@ const premiumDailyCopy: Record<Language, (n: number) => string> = {
 };
 export const todayBenefitCopy = Object.fromEntries(
   (Object.keys(baseTodayBenefitCopy) as Language[]).map(language => {
-    const premium = premiumDailyCopy[language](getPlanConsultationLimit('b2b-premium'));
+    const premium = Number.isFinite(getPlanConsultationLimit('b2b-premium')) ? premiumDailyCopy[language](getPlanConsultationLimit('b2b-premium')) : baseTodayBenefitCopy[language].premium;
     return [language, { ...baseTodayBenefitCopy[language], premium, familyNext: premium }];
   }),
 ) as Record<Language, Copy>;
