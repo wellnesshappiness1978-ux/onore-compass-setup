@@ -476,11 +476,32 @@ export type Database = {
         }
         Relationships: []
       }
+      vip_whitelists: {
+        Row: {
+          created_at: string
+          email: string
+          note: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          note?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          note?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      am_i_vip_whitelisted: { Args: never; Returns: boolean }
+      can_switch_test_plan: { Args: never; Returns: boolean }
+      claim_vip_whitelist: { Args: never; Returns: boolean }
       consultation_usage_status: { Args: never; Returns: Json }
       consume_daily_usage: {
         Args: { p_day: string; p_feature: string }
@@ -491,6 +512,10 @@ export type Database = {
         Returns: number
       }
       current_plan_daily_usage_limit: { Args: never; Returns: number }
+      effective_membership_plan: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
       expire_stripe_membership_plan: {
         Args: { p_customer: string; p_plan: string; p_until: string }
         Returns: string
@@ -502,6 +527,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_membership_plan: { Args: never; Returns: string }
       plan_consultation_usage_limit: {
         Args: { p_plan: string }
         Returns: number
