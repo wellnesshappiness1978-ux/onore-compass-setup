@@ -204,6 +204,13 @@
       "when": 1793343879381,
       "tag": "0028_consultation_policy_vip_unlimited",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1793345833774,
+      "tag": "0029_consultation_success_accounting",
+      "breakpoints": true
     }
   ]
 }
