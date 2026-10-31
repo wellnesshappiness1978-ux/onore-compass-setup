@@ -35,10 +35,12 @@ export async function handleHelpSupport(request: Request) {
   messages=await validateUIMessages({messages:[...previous,latest],tools});
  }catch{return Response.json({message:'Invalid support message.'},{status:400});}
  const now=new Date().toISOString();
- const {data:locked,error:lockError}=await client.from('ai_support_threads').update({pending_at:now}).eq('id',threadId).eq('user_id',userId).is('pending_at',null).select('id').maybeSingle();
+ const {data:locked,error:lockError}=await supabaseAdmin.from('ai_support_threads').update({pending_at:now}).eq('id',threadId).eq('user_id',userId).is('pending_at',null).select('id,messages').maybeSingle();
  if(lockError||!locked)return Response.json({message:t.thinking},{status:409});
- const release=async()=>{const {error:e}=await client.from('ai_support_threads').update({pending_at:null}).eq('id',threadId).eq('user_id',userId).eq('pending_at',now);if(e)console.error('Support lock release failed');};
- const {error:saveError}=await client.from('ai_support_threads').update({messages:messages as unknown as Json,title:messages.filter(m=>m.role==='user')[0]?.parts.filter(p=>p.type==='text').map(p=>p.text).join('').slice(0,120)||'AI support',updated_at:now}).eq('id',threadId).eq('user_id',userId);
+ const release=async()=>{const {error:e}=await supabaseAdmin.from('ai_support_threads').update({pending_at:null}).eq('id',threadId).eq('user_id',userId).eq('pending_at',now);if(e)console.error('Support lock release failed');};
+ // Re-read locked history so a concurrent completed answer cannot be overwritten.
+ try {const latest=helpUserMessage(parsed.data.messages.at(-1));const previous=Array.isArray(locked.messages)?locked.messages:[];if(previous.some(m=>typeof m==='object'&&m!==null&&'id' in m&&m.id===latest.id)){await release();return Response.json({message:t.error},{status:409});}messages=await validateUIMessages({messages:[...previous,latest],tools});}catch{await release();return Response.json({message:t.error},{status:400});}
+ const {error:saveError}=await supabaseAdmin.from('ai_support_threads').update({messages:messages as unknown as Json,title:messages.filter(m=>m.role==='user')[0]?.parts.filter(p=>p.type==='text').map(p=>p.text).join('').slice(0,120)||'AI support',updated_at:now}).eq('id',threadId).eq('user_id',userId);
  if(saveError){await release();return Response.json({message:t.error},{status:500});}
  let upstreamFailure:{status:number;message:string}|undefined;
  const runId=createLovableAiGatewayRunIdFetch();
@@ -56,7 +58,7 @@ export async function handleHelpSupport(request: Request) {
   messages:await convertToModelMessages(messages),providerOptions:{openai:{forceReasoning:true,reasoningEffort:'low',reasoningSummary:'auto',store:false,include:['reasoning.encrypted_content']}},onError:()=>{failed=true;},
  });
  const stream=result.toUIMessageStreamResponse({originalMessages:messages,sendReasoning:true,onError:()=>upstreamFailure?.message??t.error,onFinish:async({messages:complete,isAborted})=>{
-  try{if(!failed&&!isAborted){const {error:e}=await client.from('ai_support_threads').update({messages:complete as unknown as Json,updated_at:new Date().toISOString()}).eq('id',threadId).eq('user_id',userId);if(e)throw new Error(t.error);}}finally{await release();}
+  try{if(!failed&&!isAborted){const {error:e}=await supabaseAdmin.from('ai_support_threads').update({messages:complete as unknown as Json,updated_at:new Date().toISOString()}).eq('id',threadId).eq('user_id',userId).eq('pending_at',now);if(e)throw new Error(t.error);}}finally{await release();}
  }});
  const response=await withLovableAiGatewayRunIdHeader(stream,runId);
  if(upstreamFailure){await release();void response.body?.cancel();return Response.json({message:upstreamFailure.message},{status:upstreamFailure.status});}
