@@ -218,6 +218,20 @@
       "when": 1793361623255,
       "tag": "0030_vip_whitelist_and_effective_plan",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1793426066380,
+      "tag": "0031_private_ai_support_threads",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1793426575158,
+      "tag": "0032_harden_support_history_writes",
+      "breakpoints": true
     }
   ]
 }

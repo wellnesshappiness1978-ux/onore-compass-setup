@@ -44,6 +44,8 @@ import { planBenefits } from '@/lib/plan-benefits';
 import { legalContentByLanguage, type LegalKey } from '@/lib/legal-content';
 import { supportCopy } from '@/lib/support-copy';
 import { createTranslator } from '@/lib/ui-i18n';
+import StripeManagementButton from './StripeManagementButton';
+import { helpCopy } from '@/lib/help-copy';
 
 type Props = {
   profile: UserProfile;
@@ -221,6 +223,7 @@ export default function SettingsPanel({
       </section>
 
       <section id="membership-plans" className={card}>
+        <div className="mb-5"><StripeManagementButton language={language} signedIn={signedIn} /></div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             <h3 className="font-serif text-xl text-gradient-gold">{pc.sectionTitle}</h3>
@@ -366,6 +369,7 @@ export default function SettingsPanel({
         <nav aria-label={createTranslator(language)('legal.nav')} className="grid gap-2 sm:grid-cols-2">
           {(Object.keys(legalContentByLanguage[language]) as LegalKey[]).map(kind => <Button key={kind} asChild variant="outline" className="h-auto min-h-11 justify-start whitespace-normal text-left"><Link to="/legal/$document" params={{ document: kind }}>{legalContentByLanguage[language][kind].title}</Link></Button>)}
           <Button asChild variant="outline" className="h-auto min-h-11 justify-start whitespace-normal text-left"><Link to="/support">{supportCopy[language].title}</Link></Button>
+          <Button asChild variant="outline" className="h-auto min-h-11 justify-start whitespace-normal text-left"><Link to="/help">{helpCopy[language].faq}</Link></Button>
         </nav>
       </section>
       <Dialog open={lockedMode !== null} onOpenChange={(open) => { if (!open) setLockedMode(null); }}>

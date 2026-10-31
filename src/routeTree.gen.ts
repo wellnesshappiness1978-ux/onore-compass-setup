@@ -10,16 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as PurchaseRouteImport } from './routes/purchase'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as ApiConsultationRouteImport } from './routes/api/consultation'
 import { Route as ApiReadingsRouteImport } from './routes/api/readings'
+import { Route as ApiSupportChatRouteImport } from './routes/api/support-chat'
 import { Route as LegalDocumentRouteImport } from './routes/legal.$document'
+import { Route as SupportThreadIdRouteImport } from './routes/support.$threadId'
 import { Route as ApiPublicJobsSendPushRouteImport } from './routes/api/public/jobs/send-push'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PurchaseRoute = PurchaseRouteImport.update({
@@ -42,10 +50,20 @@ const ApiReadingsRoute = ApiReadingsRouteImport.update({
   path: '/api/readings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSupportChatRoute = ApiSupportChatRouteImport.update({
+  id: '/api/support-chat',
+  path: '/api/support-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LegalDocumentRoute = LegalDocumentRouteImport.update({
   id: '/legal/$document',
   path: '/legal/$document',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SupportThreadIdRoute = SupportThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => SupportRoute,
 } as any)
 const ApiPublicJobsSendPushRoute = ApiPublicJobsSendPushRouteImport.update({
   id: '/api/public/jobs/send-push',
@@ -55,68 +73,88 @@ const ApiPublicJobsSendPushRoute = ApiPublicJobsSendPushRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/help': typeof HelpRoute
   '/purchase': typeof PurchaseRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
+  '/api/support-chat': typeof ApiSupportChatRoute
   '/legal/$document': typeof LegalDocumentRoute
+  '/support/$threadId': typeof SupportThreadIdRoute
   '/api/public/jobs/send-push': typeof ApiPublicJobsSendPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/help': typeof HelpRoute
   '/purchase': typeof PurchaseRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
+  '/api/support-chat': typeof ApiSupportChatRoute
   '/legal/$document': typeof LegalDocumentRoute
+  '/support/$threadId': typeof SupportThreadIdRoute
   '/api/public/jobs/send-push': typeof ApiPublicJobsSendPushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/help': typeof HelpRoute
   '/purchase': typeof PurchaseRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
+  '/api/support-chat': typeof ApiSupportChatRoute
   '/legal/$document': typeof LegalDocumentRoute
+  '/support/$threadId': typeof SupportThreadIdRoute
   '/api/public/jobs/send-push': typeof ApiPublicJobsSendPushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/help'
     | '/purchase'
     | '/support'
     | '/api/consultation'
     | '/api/readings'
+    | '/api/support-chat'
     | '/legal/$document'
+    | '/support/$threadId'
     | '/api/public/jobs/send-push'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/help'
     | '/purchase'
     | '/support'
     | '/api/consultation'
     | '/api/readings'
+    | '/api/support-chat'
     | '/legal/$document'
+    | '/support/$threadId'
     | '/api/public/jobs/send-push'
   id:
     | '__root__'
     | '/'
+    | '/help'
     | '/purchase'
     | '/support'
     | '/api/consultation'
     | '/api/readings'
+    | '/api/support-chat'
     | '/legal/$document'
+    | '/support/$threadId'
     | '/api/public/jobs/send-push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HelpRoute: typeof HelpRoute
   PurchaseRoute: typeof PurchaseRoute
-  SupportRoute: typeof SupportRoute
+  SupportRoute: typeof SupportRouteWithChildren
   ApiConsultationRoute: typeof ApiConsultationRoute
   ApiReadingsRoute: typeof ApiReadingsRoute
+  ApiSupportChatRoute: typeof ApiSupportChatRoute
   LegalDocumentRoute: typeof LegalDocumentRoute
   ApiPublicJobsSendPushRoute: typeof ApiPublicJobsSendPushRoute
 }
@@ -128,6 +166,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/purchase': {
@@ -158,12 +203,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiReadingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/support-chat': {
+      id: '/api/support-chat'
+      path: '/api/support-chat'
+      fullPath: '/api/support-chat'
+      preLoaderRoute: typeof ApiSupportChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/legal/$document': {
       id: '/legal/$document'
       path: '/legal/$document'
       fullPath: '/legal/$document'
       preLoaderRoute: typeof LegalDocumentRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/support/$threadId': {
+      id: '/support/$threadId'
+      path: '/$threadId'
+      fullPath: '/support/$threadId'
+      preLoaderRoute: typeof SupportThreadIdRouteImport
+      parentRoute: typeof SupportRoute
     }
     '/api/public/jobs/send-push': {
       id: '/api/public/jobs/send-push'
@@ -175,12 +234,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SupportRouteChildren {
+  SupportThreadIdRoute: typeof SupportThreadIdRoute
+}
+
+const SupportRouteChildren: SupportRouteChildren = {
+  SupportThreadIdRoute: SupportThreadIdRoute,
+}
+
+const SupportRouteWithChildren =
+  SupportRoute._addFileChildren(SupportRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HelpRoute: HelpRoute,
   PurchaseRoute: PurchaseRoute,
-  SupportRoute: SupportRoute,
+  SupportRoute: SupportRouteWithChildren,
   ApiConsultationRoute: ApiConsultationRoute,
   ApiReadingsRoute: ApiReadingsRoute,
+  ApiSupportChatRoute: ApiSupportChatRoute,
   LegalDocumentRoute: LegalDocumentRoute,
   ApiPublicJobsSendPushRoute: ApiPublicJobsSendPushRoute,
 }
