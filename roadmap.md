@@ -1,5 +1,9 @@
 # Roadmap
 
+## Complete private-identity legal documents (2026-10-31)
+- [ ] Update four shared seven-language documents, table-format commercial disclosure, account/service terms and privacy safeguards without unsupported payment or absolute-liability claims.
+- [ ] Verify Settings and footer entrypoints, four public pages, mobile table layout and relevant regression tests.
+
 ## Share, support and legal navigation (2026-10-31)
 - [x] Consolidate footer app sharing into one control, preserving native share and network fallback.
 - [x] Connect support to the known administrator using an explicit mail-app handoff; the user must send in their mail app, and inbox arrival is not verified.
