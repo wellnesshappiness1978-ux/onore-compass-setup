@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Complete private-identity legal documents (2026-10-31)
-- [ ] Update four shared seven-language documents, table-format commercial disclosure, account/service terms and privacy safeguards without unsupported payment or absolute-liability claims.
-- [ ] Verify Settings and footer entrypoints, four public pages, mobile table layout and relevant regression tests.
+- [x] Update four shared seven-language documents, table-format commercial disclosure, account/service terms and privacy safeguards without unsupported payment or absolute-liability claims.
+- [x] Signed-in Settings opens all four public pages; footer commerce dialog and 390px table verified without overflow/page errors. All 512 tests passed; automatic build OK. Legal compliance requires professional review and is not certified.
 
 ## Share, support and legal navigation (2026-10-31)
 - [x] Consolidate footer app sharing into one control, preserving native share and network fallback.
