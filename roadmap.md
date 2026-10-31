@@ -1,5 +1,11 @@
 # Roadmap
 
+## AI customer support and self-help (2026-10-31)
+- [ ] Add private conversation-per-request AI support with shared factual help content and explicit administrator escalation, separate from reading quotas.
+- [ ] Add seven-language accordion FAQ for accounts, plans, billing/cancellation and readings, accessible from Settings and support.
+- [ ] Expose existing owner-verified Stripe portal in Settings; verify capabilities without making a payment or cancellation.
+- [ ] Run tests and signed-in chat/history/FAQ/portal checks, including mobile layout.
+
 ## Complete private-identity legal documents (2026-10-31)
 - [x] Update four shared seven-language documents, table-format commercial disclosure, account/service terms and privacy safeguards without unsupported payment or absolute-liability claims.
 - [x] Signed-in Settings opens all four public pages; footer commerce dialog and 390px table verified without overflow/page errors. All 512 tests passed; automatic build OK. Legal compliance requires professional review and is not certified.
