@@ -10,7 +10,9 @@ import SupportForm from "./SupportForm";
 import { createTranslator } from "@/lib/ui-i18n";
 
 export function LegalText({ kind, language = "ja" }: { kind: LegalKey; language?: Language }) {
-  return <div className="space-y-6">{legalContentByLanguage[language][kind].sections.map(([title, body]) => <section key={title}><h3 className="font-serif text-lg text-primary break-words">{title}</h3><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground break-words">{body}</p></section>)}</div>;
+  const entry = legalContentByLanguage[language][kind];
+  if (kind === "commerce") return <table aria-label={entry.title} className="w-full table-fixed border-collapse text-left text-sm sm:text-base"><tbody>{entry.sections.map(([title, body]) => <tr key={title} className="border-b border-border"><th scope="row" className="w-[34%] break-words bg-muted/40 px-3 py-4 align-top font-semibold text-foreground">{title}</th><td className="break-words whitespace-pre-line px-3 py-4 align-top leading-7 text-foreground">{body}</td></tr>)}</tbody></table>;
+  return <div className="space-y-6">{entry.sections.map(([title, body]) => <section key={title}><h3 className="font-serif text-lg text-primary break-words">{title}</h3><p className="mt-2 whitespace-pre-line text-base leading-8 text-foreground break-words">{body}</p></section>)}</div>;
 }
 export default function LegalFooter() {
   const [language, setLanguage] = useState<Language>("ja");
