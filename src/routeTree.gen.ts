@@ -17,6 +17,7 @@ import { Route as ApiConsultationRouteImport } from './routes/api/consultation'
 import { Route as ApiReadingsRouteImport } from './routes/api/readings'
 import { Route as ApiSupportChatRouteImport } from './routes/api/support-chat'
 import { Route as LegalDocumentRouteImport } from './routes/legal.$document'
+import { Route as SupportThreadIdRouteImport } from './routes/support.$threadId'
 import { Route as ApiPublicJobsSendPushRouteImport } from './routes/api/public/jobs/send-push'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,11 @@ const LegalDocumentRoute = LegalDocumentRouteImport.update({
   path: '/legal/$document',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SupportThreadIdRoute = SupportThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => SupportRoute,
+} as any)
 const ApiPublicJobsSendPushRoute = ApiPublicJobsSendPushRouteImport.update({
   id: '/api/public/jobs/send-push',
   path: '/api/public/jobs/send-push',
@@ -69,22 +75,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/help': typeof HelpRoute
   '/purchase': typeof PurchaseRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
   '/api/support-chat': typeof ApiSupportChatRoute
   '/legal/$document': typeof LegalDocumentRoute
+  '/support/$threadId': typeof SupportThreadIdRoute
   '/api/public/jobs/send-push': typeof ApiPublicJobsSendPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/help': typeof HelpRoute
   '/purchase': typeof PurchaseRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
   '/api/support-chat': typeof ApiSupportChatRoute
   '/legal/$document': typeof LegalDocumentRoute
+  '/support/$threadId': typeof SupportThreadIdRoute
   '/api/public/jobs/send-push': typeof ApiPublicJobsSendPushRoute
 }
 export interface FileRoutesById {
@@ -92,11 +100,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/help': typeof HelpRoute
   '/purchase': typeof PurchaseRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
   '/api/support-chat': typeof ApiSupportChatRoute
   '/legal/$document': typeof LegalDocumentRoute
+  '/support/$threadId': typeof SupportThreadIdRoute
   '/api/public/jobs/send-push': typeof ApiPublicJobsSendPushRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/api/readings'
     | '/api/support-chat'
     | '/legal/$document'
+    | '/support/$threadId'
     | '/api/public/jobs/send-push'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/api/readings'
     | '/api/support-chat'
     | '/legal/$document'
+    | '/support/$threadId'
     | '/api/public/jobs/send-push'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/api/readings'
     | '/api/support-chat'
     | '/legal/$document'
+    | '/support/$threadId'
     | '/api/public/jobs/send-push'
   fileRoutesById: FileRoutesById
 }
@@ -139,7 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HelpRoute: typeof HelpRoute
   PurchaseRoute: typeof PurchaseRoute
-  SupportRoute: typeof SupportRoute
+  SupportRoute: typeof SupportRouteWithChildren
   ApiConsultationRoute: typeof ApiConsultationRoute
   ApiReadingsRoute: typeof ApiReadingsRoute
   ApiSupportChatRoute: typeof ApiSupportChatRoute
@@ -205,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalDocumentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/support/$threadId': {
+      id: '/support/$threadId'
+      path: '/$threadId'
+      fullPath: '/support/$threadId'
+      preLoaderRoute: typeof SupportThreadIdRouteImport
+      parentRoute: typeof SupportRoute
+    }
     '/api/public/jobs/send-push': {
       id: '/api/public/jobs/send-push'
       path: '/api/public/jobs/send-push'
@@ -215,11 +234,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SupportRouteChildren {
+  SupportThreadIdRoute: typeof SupportThreadIdRoute
+}
+
+const SupportRouteChildren: SupportRouteChildren = {
+  SupportThreadIdRoute: SupportThreadIdRoute,
+}
+
+const SupportRouteWithChildren =
+  SupportRoute._addFileChildren(SupportRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HelpRoute: HelpRoute,
   PurchaseRoute: PurchaseRoute,
-  SupportRoute: SupportRoute,
+  SupportRoute: SupportRouteWithChildren,
   ApiConsultationRoute: ApiConsultationRoute,
   ApiReadingsRoute: ApiReadingsRoute,
   ApiSupportChatRoute: ApiSupportChatRoute,
