@@ -41,6 +41,9 @@ import { Link } from '@tanstack/react-router';
 import { billingCopy } from '@/lib/billing-copy';
 import { billingPlans } from '@/lib/billing-plans';
 import { planBenefits } from '@/lib/plan-benefits';
+import { legalContentByLanguage, type LegalKey } from '@/lib/legal-content';
+import { supportCopy } from '@/lib/support-copy';
+import { createTranslator } from '@/lib/ui-i18n';
 
 type Props = {
   profile: UserProfile;
@@ -358,6 +361,13 @@ export default function SettingsPanel({
       </section>
       <div data-settings-pause><ReminderMasterSwitch language={language} /></div>
       <div data-settings-auth>{accountControl}</div>
+      <section className={card}>
+        <h3 className="mb-3 font-serif text-lg text-primary">{createTranslator(language)('legal.nav')}</h3>
+        <nav aria-label={createTranslator(language)('legal.nav')} className="grid gap-2 sm:grid-cols-2">
+          {(Object.keys(legalContentByLanguage[language]) as LegalKey[]).map(kind => <Button key={kind} asChild variant="outline" className="h-auto min-h-11 justify-start whitespace-normal text-left"><Link to="/legal/$document" params={{ document: kind }}>{legalContentByLanguage[language][kind].title}</Link></Button>)}
+          <Button asChild variant="outline" className="h-auto min-h-11 justify-start whitespace-normal text-left"><Link to="/support">{supportCopy[language].title}</Link></Button>
+        </nav>
+      </section>
       <Dialog open={lockedMode !== null} onOpenChange={(open) => { if (!open) setLockedMode(null); }}>
         <DialogContent className="theme-preview-dialog flex h-[min(92dvh,900px)] w-[min(100vw,760px)] max-w-none flex-col gap-0 overflow-hidden border-primary/30 bg-card p-0 text-foreground">
           {lockedTheme && <>
