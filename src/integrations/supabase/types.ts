@@ -35,6 +35,57 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_support_provider_blocks: {
+        Row: {
+          created_at: string
+          provider: string
+          reason: string
+          status: number
+        }
+        Insert: {
+          created_at?: string
+          provider: string
+          reason: string
+          status?: number
+        }
+        Update: {
+          created_at?: string
+          provider?: string
+          reason?: string
+          status?: number
+        }
+        Relationships: []
+      }
+      ai_support_threads: {
+        Row: {
+          created_at: string
+          id: string
+          messages: Json
+          pending_at: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          messages?: Json
+          pending_at?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          messages?: Json
+          pending_at?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       consultation_bookmarks: {
         Row: {
           content: string
