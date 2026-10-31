@@ -1,5 +1,11 @@
 # Roadmap
 
+## Share, support and legal navigation (2026-10-31)
+- [ ] Consolidate footer app sharing into one control, preserving native share and network fallback.
+- [ ] Connect support to the known administrator using an explicit mail-app handoff; automatic sending requires an owned verified email domain.
+- [ ] Expose all four legal documents and support from Settings, preserve footer dialogs and privacy wording.
+- [ ] Run targeted tests and verify signed-in support saving, email handoff and legal navigation in the browser.
+
 ## Consultation plan-reference unification (2026-10-30)
 - [x] Drop the consultation screen's own plan lookup: header label and daily cap now come from the same server-verified membership every other feature reads (getMyMembership over plan_memberships), the status query supplies only completed counts, and the shared 1/3/10/30/unlimited configuration drives the allowance.
 - [x] Header and composer stay in the loading state until that membership resolves; switching the display preview cannot move the counted allowance.
