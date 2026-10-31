@@ -39,7 +39,7 @@ export async function handleHelpSupport(request: Request) {
  if(lockError||!locked)return Response.json({message:t.thinking},{status:409});
  const release=async()=>{const {error:e}=await supabaseAdmin.from('ai_support_threads').update({pending_at:null}).eq('id',threadId).eq('user_id',userId).eq('pending_at',now);if(e)console.error('Support lock release failed');};
  // Re-read locked history so a concurrent completed answer cannot be overwritten.
- try {const latest=helpUserMessage(parsed.data.messages.at(-1));const previous=Array.isArray(locked.messages)?locked.messages:[];if(previous.some(m=>typeof m==='object'&&m!==null&&'id' in m&&m.id===latest.id)){await release();return Response.json({message:t.error},{status:409});}messages=await validateUIMessages({messages:[...previous,latest],tools});}catch{await release();return Response.json({message:t.error},{status:400});}
+ try {const latest=helpUserMessage(parsed.data.messages.at(-1));const previous=Array.isArray(locked.messages)?locked.messages:[];if(previous.some(m=>typeof m==='object'&&m!==null&&'id' in m&&m['id']===latest.id)){await release();return Response.json({message:t.error},{status:409});}messages=await validateUIMessages({messages:[...previous,latest],tools});}catch{await release();return Response.json({message:t.error},{status:400});}
  const {error:saveError}=await supabaseAdmin.from('ai_support_threads').update({messages:messages as unknown as Json,title:messages.filter(m=>m.role==='user')[0]?.parts.filter(p=>p.type==='text').map(p=>p.text).join('').slice(0,120)||'AI support',updated_at:now}).eq('id',threadId).eq('user_id',userId);
  if(saveError){await release();return Response.json({message:t.error},{status:500});}
  let upstreamFailure:{status:number;message:string}|undefined;

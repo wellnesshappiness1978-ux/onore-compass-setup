@@ -1,10 +1,10 @@
 # Roadmap
 
 ## AI customer support and self-help (2026-10-31)
-- [ ] Add private conversation-per-request AI support with shared factual help content and explicit administrator escalation, separate from reading quotas.
-- [ ] Add seven-language accordion FAQ for accounts, plans, billing/cancellation and readings, accessible from Settings and support.
-- [ ] Expose existing owner-verified Stripe portal in Settings; verify capabilities without making a payment or cancellation.
-- [ ] Run tests and signed-in chat/history/FAQ/portal checks, including mobile layout.
+- [x] Add private conversation-per-request AI support with server-only history updates, shared factual help and explicit non-sending administrator escalation, separate from reading quotas.
+- [x] Add seven-language accordion FAQ for accounts, plans, billing/cancellation and readings from Settings/support; 390px expanded full text has no overflow.
+- [x] Expose owner-verified Stripe portal in Settings; live portal opened. Enable all existing monthly/yearly plan choices while preserving card update and period-end cancellation. No payment, plan change or cancellation submitted.
+- [x] 521 tests passed; signed-in two conversations restored, follow-up retained plan context, actual AI escalation opened administrator form, secured history write/readback and portal navigation verified without page errors. Verification left sample support conversations on the owner's account.
 
 ## Complete private-identity legal documents (2026-10-31)
 - [x] Update four shared seven-language documents, table-format commercial disclosure, account/service terms and privacy safeguards without unsupported payment or absolute-liability claims.
