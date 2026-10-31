@@ -1,0 +1,7 @@
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+import { helpCopy, helpQuestions, helpPlanCatalogue } from '@/lib/help-copy';
+import type { Language } from '@/lib/translations';
+export default function HelpFAQ({ language }: { language: Language }) {
+ const t = helpCopy[language];
+ return <section className="min-w-0"><h2 className="mb-3 font-serif text-xl text-primary">{t.faq}</h2><Accordion type="multiple">{[t.account,t.plans,t.billing,t.readings].map((category, index) => <AccordionItem key={category} value={String(index)}><AccordionTrigger className="text-left">{category}</AccordionTrigger><AccordionContent className="space-y-4 text-sm leading-7">{helpQuestions[language].slice(index*2,index*2+2).map(([q,a]) => <div key={q}><h3 className="font-semibold text-foreground">{q}</h3><p className="text-muted-foreground">{a}</p></div>)}{index===1 && helpPlanCatalogue(language).map(entry=><div key={entry.plan} className="border-t border-border pt-3"><h3 className="font-semibold text-primary">{entry.name}</h3>{entry.prices && <p>¥{entry.prices.monthly.amount.toLocaleString()} / {language==='ja'?'月':'month'} · ¥{entry.prices.yearly.amount.toLocaleString()} / {language==='ja'?'年':'year'}</p>}<ul>{entry.benefits.map(b=><li key={b}>{b}</li>)}</ul></div>)}</AccordionContent></AccordionItem>)}</Accordion></section>;
+}
