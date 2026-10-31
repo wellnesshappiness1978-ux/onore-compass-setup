@@ -23,8 +23,7 @@ export default function AppInviteShare({ label }: { label: string }) {
   };
   return <div className="mt-4 space-y-3">
     <div className="flex flex-wrap gap-2">
-      <Button onClick={() => void share()} className="h-auto min-h-11 whitespace-normal"><Share2 className="size-4 shrink-0" />{label}</Button>
-      <Button variant="outline" onClick={() => setOpen(v => !v)} aria-expanded={open} className="min-h-11">アプリをシェア</Button>
+      <Button onClick={() => void share()} aria-expanded={open} className="h-auto min-h-11 whitespace-normal"><Share2 className="size-4 shrink-0" />{label}</Button>
     </div>
     {open && <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1">
       {(Object.keys(links) as (keyof typeof links)[]).map(k => <Button key={k} asChild variant="outline" className="min-h-11"><a href={links[k]} target="_blank" rel="noopener noreferrer">{labels[k]}</a></Button>)}
