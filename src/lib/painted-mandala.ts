@@ -60,9 +60,25 @@ function smoothEdge(low: number, high: number, value: number) {
 
 const gemPaintings = new Map<string, HTMLCanvasElement>();
 
-/** A local pigment raster, not stroked geometry. Underpainting is opaque;
- * fine directional ridges, glazes and broken gold leaf share the same pixels.
- * Cache only this small personal finish, never the original painting. */
+/** Clear, saturated version of the subject's overall color for the jewel. */
+function clearJewelColor(color: string): [number, number, number] {
+  const rgb = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(color);
+  const [r, g, b] = (rgb ? rgb.slice(1).map(v => Number.parseInt(v, 16) / 255) : [0.6, 0.4, 0.75]) as [number, number, number];
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+  if (d < 0.04) return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  let h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  h = (h * 60 + 360) % 360;
+  const sat = Math.max(0.78, d / (1 - Math.abs(2 * l - 1)));
+  const light = Math.min(0.56, Math.max(0.44, l));
+  const c = (1 - Math.abs(2 * light - 1)) * Math.min(1, sat);
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = light - c / 2;
+  const [a, bb, cc] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return [Math.round((a + m) * 255), Math.round((bb + m) * 255), Math.round((cc + m) * 255)];
+}
+
+/** Round brilliant jewel in a polished gold bezel: diamond-shaped table with a
+ * radiating sunburst, alternating bright/deep crown facets, a luminous lower
+ * glow and fine internal sparkle, all in the subject's clear overall color. */
 function paintGemSurface(color: string) {
   const cached = gemPaintings.get(color);
   if (cached) return cached;
@@ -71,61 +87,62 @@ function paintGemSurface(color: string) {
   surface.height = 640;
   const context = surface.getContext("2d");
   if (!context) return surface;
-  const rgb = /^#([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(color);
-  const channels = rgb ? rgb.slice(1).map(value => Number.parseInt(value, 16)) : [160, 110, 180];
+  const channels = clearJewelColor(color);
   const pixels = context.createImageData(640, 640);
   const radius = 250;
-  const sector = Math.PI / 4;
+  const quarter = Math.PI / 2;
   for (let py = 0; py < 640; py += 1) {
     for (let px = 0; px < 640; px += 1) {
       const x = (px - 319.5) / radius, y = (py - 319.5) / radius;
       const distance = Math.hypot(x, y);
       const angle = Math.atan2(y, x);
-      const local = ((angle + Math.PI / 2 + sector * 8) % sector) - sector / 2;
-      const boundary = Math.cos(sector / 2) / Math.cos(local);
-      const broad = pigmentNoise(x * 7, y * 7, 3) - 0.5;
-      const brush = pigmentNoise(x * 68 + y * 21, y * 13, 19) - 0.5;
-      const tooth = pigmentNoise(x * 185, y * 185, 31) - 0.5;
-       // Hand-cut outline: a gentle, deterministic wobble instead of a CAD line.
-       const edge = boundary + broad * 0.012 + brush * 0.004;
-       const body = 1 - smoothEdge(edge - 0.004, edge + 0.006, distance);
       const offset = (py * 640 + px) * 4;
-      if (body > 0) {
-        // Hand-polished facets: boundaries drift slightly like a natural stone.
-        const facetPosition = (angle + Math.PI / 2 + sector * 8) / sector + broad * 0.06 + brush * 0.02;
-        const facetIndex = Math.floor(facetPosition);
-         const transition = smoothEdge(0.93, 1, facetPosition - facetIndex);
-         const facetLight = (index: number) => Math.sin(index * 2.37 + 0.7) * 0.43
-           + Math.cos(index * sector + 2.3) * 0.29;
-        const cutLight = facetLight(facetIndex) * (1 - transition) + facetLight(facetIndex + 1) * transition;
-         const crown = smoothEdge(0.475, 0.487, distance / boundary);
-         const coreLight = -0.06 - x * 0.23 - y * 0.29 - distance * 0.12;
-        const deepReflection = Math.exp(-((x - 0.28) ** 2 / 0.045 + (y - 0.27) ** 2 / 0.14));
-        const glaze = coreLight * (1 - crown) + cutLight * crown
-           + broad * 0.05 + brush * 0.065 + tooth * 0.04 - deepReflection * 0.34;
-        // A fine, broken brush-shaped reflection, not a circular CG flash.
-         const reflection = Math.exp(-((x + 0.27 + y * 0.16) ** 2 / 0.0007 + (y + 0.28) ** 2 / 0.028));
-         const secondary = Math.exp(-((x - 0.39 + y * 0.38) ** 2 / 0.00045 + (y - 0.23) ** 2 / 0.025));
-         const edgeFlash = Math.exp(-((distance / boundary - 0.482) ** 2) / 0.000045)
-           * Math.max(0, -x * 0.8 - y * 0.65);
-         const sheen = Math.min(1, Math.max(0, reflection * (0.97 + brush * 0.09) + secondary * 0.72 + edgeFlash * 0.6));
+      if (distance <= 1.0) {
+        const edgeAlpha = 1 - smoothEdge(0.993, 1.0, distance);
+        // Diamond (rotated square) table like a top-view brilliant.
+        const diamond = Math.abs(x) + Math.abs(y + 0.04);
+        const inTable = 1 - smoothEdge(0.6, 0.62, diamond);
+        const sparkle = pigmentNoise(x * 22, y * 22, 7);
+        const bubbles = smoothEdge(0.62, 0.8, pigmentNoise(x * 9, y * 9, 13)) * smoothEdge(0.55, 0.95, distance);
+        // Sunburst rays radiating from the table center.
+        const ray = 0.5 + 0.5 * Math.cos(angle * 36);
+        const tableLight = 0.08 + ray * 0.16 - (y + 0.04) * 0.32 + Math.exp(-((y - 0.32) ** 2) / 0.03 - x * x / 0.05) * 0.55;
+        // Crown: 8 kite/star facets alternating light and deep.
+        const local = (((angle + Math.PI / 4) % quarter) + quarter) % quarter / quarter;
+        const index = Math.floor((angle + Math.PI * 2 + Math.PI / 4) / (quarter / 2));
+        const facet = (Math.sin(index * 2.71 + 1.3) * 0.5 + 0.5);
+        const corner = Math.abs(local - 0.5) * 2;
+        const crownLight = -0.55 + facet * 0.95 + corner * 0.2 - y * 0.15 + bubbles * 0.35;
+        let glaze = tableLight * inTable + crownLight * (1 - inTable) + (sparkle - 0.5) * 0.12;
+        // Bright upper facet and luminous bottom glow (the stone's "fire").
+        const topFlash = Math.exp(-(x * x) / 0.02 - ((y + 0.5) ** 2) / 0.04) * 0.7;
+        const bottomGlow = Math.exp(-(x * x) / 0.06 - ((y - 0.62) ** 2) / 0.035);
+        glaze += topFlash;
+        const white = Math.min(1, bottomGlow * 0.85 + Math.max(0, glaze - 0.75) * 0.6);
         for (let channel = 0; channel < 3; channel += 1) {
           const base = channels[channel] ?? 160;
-          const pigment = glaze >= 0 ? base + (255 - base) * glaze : base * (1 + glaze);
-          pixels.data[offset + channel] = Math.max(0, Math.min(255, pigment + (255 - pigment) * sheen));
+          const g = Math.max(-0.75, Math.min(0.75, glaze));
+          const pigment = g >= 0 ? base + (255 - base) * g * 0.7 : base * (1 + g);
+          pixels.data[offset + channel] = Math.max(0, Math.min(255, pigment + (255 - pigment) * white));
         }
-        pixels.data[offset + 3] = Math.round(body * 255);
-      } else {
-        // Irregular leaf in the existing octagonal setting; no continuous stroke.
-        const rimDistance = distance / boundary;
-         const leaf = smoothEdge(1.01 + brush * 0.01, 1.02 + brush * 0.01, rimDistance)
-           * (1 - smoothEdge(1.09 + broad * 0.03, 1.1 + broad * 0.03, rimDistance));
-         const broken = smoothEdge(0.10, 0.26, pigmentNoise(x * 39, y * 39, 71));
-        const relief = Math.max(0, Math.min(1, 0.48 - y * 0.21 + brush * 0.65 + tooth * 0.38));
-        pixels.data[offset] = 127 + relief * 122;
-        pixels.data[offset + 1] = 88 + relief * 137;
-        pixels.data[offset + 2] = 34 + relief * 108;
-        pixels.data[offset + 3] = Math.round(leaf * broken * 238);
+        pixels.data[offset + 3] = Math.round(edgeAlpha * 255);
+        if (distance > 0.993) {
+          // Blend into the bezel lip.
+          pixels.data[offset] = 70; pixels.data[offset + 1] = 44; pixels.data[offset + 2] = 22;
+          pixels.data[offset + 3] = 255;
+        }
+      } else if (distance <= 1.18) {
+        // Polished rounded gold bezel with a soft cylindrical highlight.
+        const t = (distance - 1.0) / 0.18;
+        const profile = Math.sin(t * Math.PI);
+        const lightDir = -(x * 0.55 + y * 0.83) / distance;
+        const shine = Math.max(0, Math.min(1, 0.35 + profile * 0.45 + lightDir * 0.25 * profile + Math.exp(-((t - 0.38) ** 2) / 0.01) * 0.35));
+        const lip = smoothEdge(0, 0.12, t);
+        const outer = 1 - smoothEdge(0.93, 1, t);
+        pixels.data[offset] = Math.round((120 + shine * 130) * (0.55 + lip * 0.45));
+        pixels.data[offset + 1] = Math.round((78 + shine * 128) * (0.55 + lip * 0.45));
+        pixels.data[offset + 2] = Math.round((40 + shine * 100) * (0.55 + lip * 0.45));
+        pixels.data[offset + 3] = Math.round(outer * 255);
       }
     }
   }
