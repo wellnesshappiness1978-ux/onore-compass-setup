@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as LpRouteImport } from './routes/lp'
 import { Route as PurchaseRouteImport } from './routes/purchase'
@@ -24,6 +25,11 @@ import { Route as ApiPublicJobsSendPushRouteImport } from './routes/api/public/j
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpRoute = HelpRouteImport.update({
@@ -79,6 +85,7 @@ const ApiPublicJobsSendPushRoute = ApiPublicJobsSendPushRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/help': typeof HelpRoute
   '/lp': typeof LpRoute
   '/purchase': typeof PurchaseRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/help': typeof HelpRoute
   '/lp': typeof LpRoute
   '/purchase': typeof PurchaseRoute
@@ -106,6 +114,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/help': typeof HelpRoute
   '/lp': typeof LpRoute
   '/purchase': typeof PurchaseRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app'
     | '/help'
     | '/lp'
     | '/purchase'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/app'
     | '/help'
     | '/lp'
     | '/purchase'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/app'
     | '/help'
     | '/lp'
     | '/purchase'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRoute
   HelpRoute: typeof HelpRoute
   LpRoute: typeof LpRoute
   PurchaseRoute: typeof PurchaseRoute
@@ -179,6 +192,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/help': {
@@ -267,6 +287,7 @@ const SupportRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRoute,
   HelpRoute: HelpRoute,
   LpRoute: LpRoute,
   PurchaseRoute: PurchaseRoute,

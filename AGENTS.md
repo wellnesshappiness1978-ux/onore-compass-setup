@@ -55,4 +55,4 @@
 
 - Family v2 keys are matrix/layers/friction/roadmap/directions/rhythm; versioned identity excludes old outputs. Shared family-planning drives timelines/consensus directions; 17-lens inputs retain missing values. Why: replace duplicates without asserting universal luck.
 - Effective plan resolves in SQL effective_membership_plan (active debug override > vip_whitelists email > Stripe-expiry plan); all limits and getMyMembership read it. Why: one source so whitelist/test switches apply everywhere.
-- Keep /lp separate from the / app, with scoped tokens, its own footer and shared prices/caps. Why: marketing must not change app access or appearance.
+- Serve LP at /, app at /app, and redirect /lp to /. Keep LP tokens/footer and shared prices/caps. Why: introduce visitors without changing app access or data.

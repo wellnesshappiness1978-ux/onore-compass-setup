@@ -78,7 +78,7 @@ function Purchase() {
    } catch { setErrorCode('network'); setMessage('error'); } finally { setBusy(null); }
  };
  return <main className="design-canvas mx-auto min-h-screen max-w-5xl px-4 py-8 text-foreground sm:px-8">
-   <Button asChild variant="ghost" className="mb-6"><Link to="/"><ArrowLeft className="size-4" />{t.return}</Link></Button>
+   <Button asChild variant="ghost" className="mb-6"><Link to="/app"><ArrowLeft className="size-4" />{t.return}</Link></Button>
    <header className="mb-8 flex min-w-0 items-center gap-4 border-b border-primary/25 pb-6">
      <img src={logo} alt="" className="size-16 shrink-0 object-contain" />
      <div className="min-w-0"><p className="font-serif text-lg text-primary">アゴルメンの羅針盤</p><h1 className="mt-1 break-words font-serif text-2xl sm:text-3xl">{t.title}</h1></div>

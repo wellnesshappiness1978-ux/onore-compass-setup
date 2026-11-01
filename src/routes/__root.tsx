@@ -165,7 +165,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const isLanding = useRouterState({ select: state => state.location.pathname === '/lp' });
+  const isLanding = useRouterState({ select: state => state.location.pathname === '/' || state.location.pathname === '/lp' });
   useFontSize();
 
   return (
