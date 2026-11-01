@@ -1,8 +1,9 @@
 # Roadmap
 
 ## Landing page as the main entrance (2026-11-01)
-- [ ] Serve the existing black/gold official LP at / with prominent アプリを体験する links to /app; preserve /lp as a redirect.
-- [ ] Preserve existing app data, app return navigation and installed-app entry; verify guest and signed-in entry plus responsive layout.
+- [x] Serve the existing black/gold official LP at / with prominent アプリを体験する links to /app; preserve /lp as a permanent redirect.
+- [x] Preserve existing storage and account restoration; app/support/help/purchase return links, app sign-in return, installed-app entry and notification fallback use /app. Existing purchase/legal/API URLs remain unchanged.
+- [x] LP's 3 price/cap tests and automatic build passed; 1280/390/615px without overflow/page errors, guest entry and requesting owner's saved Dashboard restoration verified. Not published.
 
 ## Official landing page (2026-11-01)
 - [x] Create independent /lp with seven main sections plus footer, original cosmic cover and existing painted mandala, leaving the app at / intact.
