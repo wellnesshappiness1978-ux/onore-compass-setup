@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as LpRouteImport } from './routes/lp'
 import { Route as PurchaseRouteImport } from './routes/purchase'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as ApiConsultationRouteImport } from './routes/api/consultation'
@@ -34,6 +35,11 @@ const AppRoute = AppRouteImport.update({
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LpRoute = LpRouteImport.update({
+  id: '/lp',
+  path: '/lp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PurchaseRoute = PurchaseRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/help': typeof HelpRoute
+  '/lp': typeof LpRoute
   '/purchase': typeof PurchaseRoute
   '/support': typeof SupportRouteWithChildren
   '/api/consultation': typeof ApiConsultationRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/help': typeof HelpRoute
+  '/lp': typeof LpRoute
   '/purchase': typeof PurchaseRoute
   '/support': typeof SupportRouteWithChildren
   '/api/consultation': typeof ApiConsultationRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRoute
   '/help': typeof HelpRoute
+  '/lp': typeof LpRoute
   '/purchase': typeof PurchaseRoute
   '/support': typeof SupportRouteWithChildren
   '/api/consultation': typeof ApiConsultationRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/help'
+    | '/lp'
     | '/purchase'
     | '/support'
     | '/api/consultation'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/help'
+    | '/lp'
     | '/purchase'
     | '/support'
     | '/api/consultation'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/help'
+    | '/lp'
     | '/purchase'
     | '/support'
     | '/api/consultation'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRoute
   HelpRoute: typeof HelpRoute
+  LpRoute: typeof LpRoute
   PurchaseRoute: typeof PurchaseRoute
   SupportRoute: typeof SupportRouteWithChildren
   ApiConsultationRoute: typeof ApiConsultationRoute
@@ -193,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/help'
       fullPath: '/help'
       preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lp': {
+      id: '/lp'
+      path: '/lp'
+      fullPath: '/lp'
+      preLoaderRoute: typeof LpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/purchase': {
@@ -269,6 +289,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRoute,
   HelpRoute: HelpRoute,
+  LpRoute: LpRoute,
   PurchaseRoute: PurchaseRoute,
   SupportRoute: SupportRouteWithChildren,
   ApiConsultationRoute: ApiConsultationRoute,
