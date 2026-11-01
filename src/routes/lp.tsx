@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowDown, ArrowUpRight, Check, Compass, Fingerprint, Layers3, MessageCircle, Orbit, Play, Sparkles, Users, Utensils } from 'lucide-react';
+import { ArrowDown, ArrowUpRight, Check, Compass, Fingerprint, Layers3, MessageCircle, Orbit, Play, Users, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { billingPlans } from '@/lib/billing-plans';
 import { getPlanConsultationLimit } from '@/lib/plan-usage';
