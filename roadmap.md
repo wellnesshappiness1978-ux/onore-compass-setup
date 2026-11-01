@@ -1,5 +1,9 @@
 # Roadmap
 
+## Landing page as the main entrance (2026-11-01)
+- [ ] Serve the existing black/gold official LP at / with prominent アプリを体験する links to /app; preserve /lp as a redirect.
+- [ ] Preserve existing app data, app return navigation and installed-app entry; verify guest and signed-in entry plus responsive layout.
+
 ## Official landing page (2026-11-01)
 - [x] Create independent /lp with seven main sections plus footer, original cosmic cover and existing painted mandala, leaving the app at / intact.
 - [x] Show three monthly plans with actual VIP 10/day; temporary store # links marked under review, requested support mail and existing legal links. Omit unverified 3.5-billion-combination claim; daily biorhythm/group map placement follows actual gates. Support inbox delivery unverified.
