@@ -1,0 +1,52 @@
+import { useEffect, useRef } from 'react';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { ArrowDown, ArrowUpRight, Check, Compass, Fingerprint, Layers3, MessageCircle, Orbit, Play, Users, Utensils } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { billingPlans } from '@/lib/billing-plans';
+import { getPlanConsultationLimit } from '@/lib/plan-usage';
+import cover from '@/assets/lp-compass-universe.jpg';
+import logo from '@/assets/agolmen-logo-shell.png';
+import mandala from '@/assets/mandala-base-vivid.jpg';
+import food from '@/assets/dish-bamboo-rice.jpg';
+import './lp.css';
+
+const title = 'アゴルメンの羅針盤 | 17の占術とAIで、自分を知る';
+const description = '17の多層統合占術とAI解析、7つのバースカラーと曼陀羅アート、毎日の指針と相性分析。アゴルメンの羅針盤の公式サイト。';
+export const Route = createFileRoute('/lp')({
+  head: () => ({ meta: [{ title }, { name: 'description', content: description }, { property: 'og:title', content: title }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { property: 'og:url', content: 'https://cosmic-beginnings-onboard.lovable.app/lp' }, { name: 'twitter:card', content: 'summary_large_image' }, { name: 'theme-color', content: '#0B0B0E' }], links: [{ rel: 'canonical', href: 'https://cosmic-beginnings-onboard.lovable.app/lp' }] }),
+  component: OfficialLandingPage,
+});
+
+function StoreButtons() {
+  return <><div className="lp-stores"><Button asChild variant="outline" className="lp-store"><a href="#" aria-label="App Store ダウンロード（審査中）"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 3.3c.8-1 1.2-2.1 1.1-3.3-1.2.1-2.5.8-3.3 1.7-.7.8-1.3 2-1.2 3.2 1.3.1 2.6-.6 3.4-1.6ZM20.6 17.7c-.5 1.2-.8 1.7-1.5 2.7-1 1.5-2.4 3.3-4.1 3.3-1.5 0-1.9-1-3.9-1-2 0-2.4 1-3.9 1-1.7 0-3-1.6-4-3.1C.5 16.5-.2 11.1 1.5 8.3c1.2-2 3.1-3.1 5-3.1 1.6 0 2.7 1 4 1 1.3 0 2.3-1 4.1-1 1.5 0 3.1.8 4.3 2.2-3.8 2.1-3.2 7.7 1.7 10.3Z"/></svg><span><small>まもなく公開</small><b>App Store</b></span></a></Button><Button asChild variant="outline" className="lp-store"><a href="#" aria-label="Google Play ダウンロード（審査中）"><Play aria-hidden="true"/><span><small>まもなく公開</small><b>Google Play</b></span></a></Button></div><p className="lp-release">iOS / Android アプリは現在審査中です。</p></>;
+}
+
+function OfficialLandingPage() {
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = root.current;
+    if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    element.classList.add('lp-motion');
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('lp-visible'); observer.unobserve(entry.target); } }), { threshold: .08 });
+    element.querySelectorAll('.lp-reveal').forEach(item => observer.observe(item));
+    return () => { observer.disconnect(); element.classList.remove('lp-motion'); };
+  }, []);
+  const plans = [
+    { id: 'free', english: 'FREE', name: '無料会員', price: 0, summary: 'まずは、自分を知ることから。', items: ['基本の本質診断', 'バースカラーの確認', '今日の基本ガイド', `AI相談 1日${getPlanConsultationLimit('free')}回`] },
+    { id: 'standard', english: 'STANDARD', name: 'スタンダード会員', price: billingPlans.find(p => p.plan === 'standard')?.monthly.amount ?? 333, summary: '毎日の選択を、もっと豊かに。', items: ['17占術の詳細・統合レポート', '8方位の吉方位ガイド', 'パーソナル曼陀羅アート', `AI相談 1日${getPlanConsultationLimit('standard')}回`] },
+    { id: 'vip', english: 'VIP', name: 'VIP会員', price: billingPlans.find(p => p.plan === 'vip')?.monthly.amount ?? 777, summary: '自分と大切な人を、深く理解する。', items: ['スタンダードのすべての機能', '曼陀羅アート高画質保存', '365日バイオリズム・フード5選', 'AI深層相性レポート', `AI相談 1日${getPlanConsultationLimit('vip')}回`] },
+  ];
+  return <div ref={root} className="official-lp relative">
+    <header className="lp-header"><div className="lp-container lp-header-inner"><a href="#" className="lp-brand"><img src={logo} width={42} height={42} alt=""/>アゴルメンの羅針盤</a><nav aria-label="公式サイト" className="lp-nav"><a className="lp-nav-detail" href="#concept">コンセプト</a><a className="lp-nav-detail" href="#features">機能紹介</a><a className="lp-nav-detail" href="#pricing">料金プラン</a><Button asChild variant="outline" className="lp-header-cta"><Link to="/">アプリを開く <ArrowUpRight/></Link></Button></nav></div></header>
+    <main>
+      <section className="lp-hero"><img className="lp-hero-image" src={cover} width={1920} height={1088} alt="黄金の螺旋を中心にした羅針盤と星空" fetchPriority="high"/><div className="lp-container"><p className="lp-eyebrow">17の叡智。ひとつの羅針盤。</p><h1>アゴルメンの羅針盤</h1><h2 className="lp-catch">あなたの生まれた秘密を、<br/><em>17の占術</em>で解き明かす。</h2><p className="lp-hero-copy">ひとつの占いでは見えなかった、本当のあなたと<br className="hidden md:block"/>日々の指針を照らす統合羅針盤。</p><StoreButtons/><a className="lp-scroll" href="#concept">あなたを知る旅へ <ArrowDown size={14}/></a></div></section>
+      <section id="concept" className="lp-section lp-concept"><div className="lp-container lp-reveal"><p className="lp-eyebrow">CONCEPT</p><h2 className="lp-section-title">なぜ今、統合占いなのか？</h2><p className="lp-body">1つの占いだけでは、人の多面的な運命は捉えきれません。<br/>東洋の四柱推命・紫微斗数から、西洋占星術・数秘術・姓名判断まで。<br/>17の占術が示す視点をAIが多層的につなぎ、<br/>あなたの強み、注意点、今日からの行動を、ひとつの指針へ。</p><div className="lp-methods"><span>四柱推命</span><span>紫微斗数</span><span>西洋占星術</span><span>数秘術</span><span>姓名判断</span><span>＋12の視点</span></div><p className="lp-caption">占術は自己探求のための象徴的な参考情報です。未来や効果を保証するものではありません。</p></div></section>
+      <section id="features" className="lp-section"><div className="lp-container lp-reveal"><div className="lp-feature-head"><div className="lp-feature-number">01<small>INTEGRATED WISDOM</small></div><div><h2 className="lp-section-title">17の多層統合占術 × AI解析</h2><p className="lp-body">生まれた瞬間の情報を、多角的に読み解く。<br/>あなたの強みと選択の軸が見つかる「人生の取扱説明書」。</p></div></div><div className="lp-feature-cards">{[{ Icon: Fingerprint, name: '本当の自分を知る', body: '性質、価値観、得意なこと。多層的な視点から、あなた自身の輪郭を丁寧に描きます。' }, { Icon: Layers3, name: '17の視点を、ひとつに', body: '異なる占術の共通点と違いを統合。ひとつの結果では気づけなかった強みや注意点を整理します。' }, { Icon: Compass, name: '理解を、行動に変える', body: '仕事、人間関係、日々の選択。目標に沿った具体的な行動を、わかりやすい言葉で届けます。' }].map(({ Icon, name, body }) => <article key={name} className="lp-card"><Icon className="lp-card-icon"/><h3>{name}</h3><p>{body}</p></article>)}</div></div></section>
+      <section className="lp-section"><div className="lp-container lp-split lp-reveal"><div><p className="lp-eyebrow">02 — PERSONAL MANDALA</p><h2 className="lp-section-title">生まれ持った色を、<br/>世界にひとつのアートへ。</h2><p className="lp-body">7つのバースカラーが織りなす、パーソナル曼陀羅アート。あなたの出生情報をもとに、色彩・モチーフ・構成を組み合わせ、あなただけの表現を描きます。<br/>繊細な黄金の装飾と鮮やかな色彩。その美しさを、いつも手元に。</p><div className="lp-swatches" aria-label="7つのバースカラー">{Array.from({ length: 7 }, (_, i) => <span key={i} className="lp-swatch"/>)}</div><p className="lp-caption">アート生成：スタンダード以上 / 高画質保存：VIP以上</p></div><figure><img className="lp-art" src={mandala} loading="lazy" width={768} height={768} alt="七色の花びらと黄金の装飾を重ねた曼陀羅アート"/><figcaption className="lp-caption text-center">曼陀羅アートのベース作品。個別の色彩・構成は出生情報で変化します。</figcaption></figure></div></section>
+      <section className="lp-section"><div className="lp-container lp-reveal"><div className="lp-feature-head"><div className="lp-feature-number">03<small>DAILY GUIDANCE</small></div><div><h2 className="lp-section-title">365日、今日の選択に指針を。</h2><p className="lp-body">天体の動き、吉方位、季節の食。<br/>日々を少し丁寧に選ぶための、あなた専用のデイリーガイド。</p></div></div><div className="lp-daily"><figure><img className="lp-daily-art" src={food} loading="lazy" width={768} height={768} alt="季節のたけのこご飯"/><figcaption className="lp-caption">開運フードの一例：たけのこご飯</figcaption></figure><div className="lp-daily-list"><div><h3><Orbit/>365日天体バイオリズム</h3><p>毎日のリズムを見つめ、取り組む日と整える日を考えるヒントに。健康や能力を予測する測定ではありません。</p></div><div><h3><Compass/>8方位の吉方位</h3><p>お出かけ、気分転換、大切な予定。8方位の参考ガイドから、今日の一歩を選ぶ。</p></div><div><h3><Utensils/>開運フード5選</h3><p>季節に寄り添う料理とレシピを提案。日替わりの5選はVIP以上で楽しめます。</p></div></div></div></div></section>
+      <section className="lp-section"><div className="lp-container lp-reveal"><div className="lp-feature-head"><div className="lp-feature-number">04<small>CONNECTED LIFE</small></div><div><h2 className="lp-section-title">ひとりの悩みも、みんなの関係も。</h2><p className="lp-body">自分を知ることから、大切な人と理解し合うことへ。<br/>AI相談室とファミリー・チームの相性分析が、次の一歩を支えます。</p></div></div><div className="lp-relationship"><div><MessageCircle size={30} strokeWidth={1}/><h3>24時間、AI相談室</h3><p className="lp-body">仕事、恋愛、人間関係。出生情報や目的に沿って、考えを整理するための具体的な助言を届けます。</p><p className="lp-caption">1日の相談回数はプラン別。VIPは10回 / ファミリープレミアムは無制限。</p></div><div><Users size={30} strokeWidth={1}/><h3>関係性を、見えるかたちに。</h3><p className="lp-body">互いの価値観、役割、すれ違いを整理する相性マップ。共通の目標に向けて、関係者それぞれの強みを生かします。</p><p className="lp-caption">深層相性レポート：VIP以上 / グループマップ：ファミリープラン以上</p></div></div></div></section>
+      <section id="pricing" className="lp-section"><div className="lp-container lp-reveal"><div className="lp-pricing-head"><p className="lp-eyebrow">MEMBERSHIP</p><h2 className="lp-section-title">あなたに合う、羅針盤を。</h2><p className="lp-body mx-auto">無料で始めて、必要な深さを選べます。</p></div><div className="lp-feature-cards">{plans.map(plan => <article key={plan.id} className={`lp-card lp-price-card ${plan.id === 'vip' ? 'lp-vip' : ''}`}><div className="lp-plan-label">{plan.english}</div><h3>{plan.name}</h3><p>{plan.summary}</p><div className="lp-price">¥{plan.price.toLocaleString('ja-JP')} <small>{plan.id === 'free' ? 'ずっと無料' : '/ 月（税込）'}</small></div><ul>{plan.items.map(item => <li key={item}><Check/>{item}</li>)}</ul><Button asChild variant={plan.id === 'vip' ? 'default' : 'outline'} className="lp-plan-cta">{plan.id === 'free' ? <Link to="/">無料で始める <ArrowUpRight/></Link> : <Link to="/purchase">プランを詳しく見る <ArrowUpRight/></Link>}</Button></article>)}</div><p className="lp-pricing-note">年額プラン・ファミリープランもご用意しています。<Link to="/purchase" className="text-primary underline underline-offset-4">すべてのプランを見る</Link></p></div></section>
+    </main>
+    <footer className="lp-footer"><div className="lp-container"><div className="lp-footer-top"><div><div className="lp-brand"><img src={logo} loading="lazy" width={42} height={42} alt=""/>アゴルメンの羅針盤</div><p className="lp-footer-contact">アゴルメンの羅針盤 サポートデスク<br/><a href="mailto:support@agolmen-compass.com">support@agolmen-compass.com</a></p></div><nav className="lp-footer-links" aria-label="法的情報"><Link to="/support">お問い合わせ</Link><Link to="/legal/$document" params={{ document: 'terms' }}>利用規約</Link><Link to="/legal/$document" params={{ document: 'privacy' }}>プライバシーポリシー</Link></nav></div><div className="lp-footer-bottom"><span>© 2026 アゴルメンの羅針盤</span><span>自己探求のための参考情報であり、専門的助言に代わるものではありません。</span></div></div></footer>
+  </div>;
+}
