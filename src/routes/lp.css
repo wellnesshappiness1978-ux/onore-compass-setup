@@ -30,6 +30,9 @@
 .lp-catch { font: 600 44px/1.6 var(--font-serif); max-width: 690px; text-wrap: balance; }
 .lp-catch em { color: var(--primary); font-style: normal; }
 .lp-hero-copy { margin-top: 26px; max-width: 530px; font-size: 14px; line-height: 2.2; color: var(--muted-foreground); }
+.official-lp .lp-experience { margin-top: 28px; min-height: 52px; padding: 12px 28px; background: var(--primary); color: var(--primary-foreground); font-size: 15px; font-weight: 700; }
+.official-lp .lp-experience:hover { background: color-mix(in oklab, var(--primary) 88%, var(--foreground)); }
+.lp-experience + .lp-stores { margin-top: 20px; }
 .lp-stores { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
 .official-lp .lp-store { height: 58px; padding: 10px 20px; background: var(--background); border: 1px solid color-mix(in oklab, var(--foreground) 55%, transparent); color: var(--foreground); gap: 12px; }
 .lp-store svg { width: 24px; height: 24px; }
