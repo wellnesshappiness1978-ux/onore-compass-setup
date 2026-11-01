@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
@@ -164,6 +165,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isLanding = useRouterState({ select: state => state.location.pathname === '/lp' });
   useFontSize();
 
   return (
@@ -171,7 +173,7 @@ function RootComponent() {
       <PlanProvider>
         <div className="app-content"><Outlet /></div>
         <Toaster position="top-center" />
-        <LegalFooter />
+        {!isLanding && <LegalFooter />}
       </PlanProvider>
     </QueryClientProvider>
   );

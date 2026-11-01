@@ -17,7 +17,7 @@
 - The pinned administrator test-plan bar mounted in Dashboard is the only plan-switch UI; no read-only duplicate may be mounted elsewhere, and it publishes its measured height into `--preview-bar-height`. Why: one place to change plans and no layout gap where a bar was removed.
 - Preserve legacy storage, event, and ICS identifiers and use the cropped brand logo. Why: avoid lost data and watermarks.
 - Keep support owner-only; legal-content and LegalText serve all four footer/leaf documents with commerce tables. Why: private data and consistent legal text.
-- Read scoped AGENTS.md before editing those areas; they own local contracts.
+- Read scoped AGENTS.md before edits; they own local contracts.
 - Support preserves authenticated ticket saving and offers an explicit administrator mailto handoff, never claims automatic delivery; Settings links to the same legal leaf pages as the footer. Why: an unconfigured sender must not silently imply delivered email or duplicate legal copy.
 - SettingsPanel owns profile/focus overview, account, plan, appearance and reminders after account settings; other switches stay beside Today readings, header owns language/music. Why: one composition without duplicate controls.
 - Mandala preserves the bundled painted master texture with birth-fixed mandala-design pigments and filled surrounding motifs; shares painting, member-count nodes and the personal raster gem between live/export, using DPR-aware Canvas without finished-jewel CSS filters or vector facet outlines. Why: recognizable craft and distinct subject designs stay identical in private captures.
@@ -28,7 +28,7 @@
 - Shared writing-voice owns tone; companion/theory copy localizes advice. Preserve schemas. Why: consistent scientific/symbolic boundaries.
 - Keep legacy `b2b` plan IDs, `team_members`, and `onore-team` storage stable while rendering Family plan and Family roster terminology through localized copy. Why: rename the experience without breaking saved profiles, URLs, or entitlements.
 - Artwork records share a certificate renderer for private local captures. Disclosure resets off, shared art omits scientific birth captions, and random commemorative IDs contain no personal data. Why: prevent birth details leaking through labels.
-- Read src/components and src/lib AGENTS.md before edits; they own shared Canvas and monthly lucky contracts. Why: consistent live/export art and name-first readings.
+- Read src/components and src/lib AGENTS.md for Canvas and monthly lucky contracts.
 - App appearance uses five cumulative manually applied families, bundled imagery and same-origin storage-event synchronization; keep legacy palette/corporate IDs separate from membership. Why: synchronize browser tabs without changing entitlements or artwork.
 - Personal readings share usePersonalReading with owner/day/full-input device cache and one in-flight request per key; /api/readings emits progressive structured fields from server-only generators, while fast essence stays a separate call. Home/Traits reuse MethodExplanationList and integratedArts; sign-out clears reading caches. Why: eliminate duplicate generation, preserve personal context and show real arriving text without weakening availability.
 - AI tabs keep sessions; compatibility compares people separately. Consultation shares request validation and builds group context only from structured members. Why: no invented births or goal overflow.
@@ -55,3 +55,4 @@
 
 - Family v2 keys are matrix/layers/friction/roadmap/directions/rhythm; versioned identity excludes old outputs. Shared family-planning drives timelines/consensus directions; 17-lens inputs retain missing values. Why: replace duplicates without asserting universal luck.
 - Effective plan resolves in SQL effective_membership_plan (active debug override > vip_whitelists email > Stripe-expiry plan); all limits and getMyMembership read it. Why: one source so whitelist/test switches apply everywhere.
+- Keep /lp separate from the / app, with scoped tokens, its own footer and shared prices/caps. Why: marketing must not change app access or appearance.
