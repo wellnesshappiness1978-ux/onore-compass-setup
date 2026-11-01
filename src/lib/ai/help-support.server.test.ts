@@ -22,6 +22,11 @@ function query(admin: boolean, table: string) {
   single: async () => ({ data: { messages: state.messages }, error: null }),
   maybeSingle: async () => {
    if (table === 'ai_support_provider_blocks') return { data: null, error: null };
+   if (patch?.['messages']) {
+    if (token !== state.pending) return { data: null, error: null };
+    state.messages = patch['messages'] as unknown[];
+    return { data: { id: 'thread' }, error: null };
+   }
    const cutoff = filter?.split('pending_at.lte.')[1];
    if (state.pending !== null && (!cutoff || Date.parse(state.pending) > Date.parse(cutoff))) return { data: null, error: null };
    state.pending = String(patch?.['pending_at']);
@@ -61,7 +66,7 @@ import { handleHelpSupport } from './help-support.server';
 
 function request(signal?: AbortSignal) {
  return new Request('http://localhost/api/support-chat', {
-  method: 'POST', signal, headers: { authorization: 'Bearer test-session', 'content-type': 'application/json' },
+  method: 'POST', signal: signal ?? null, headers: { authorization: 'Bearer test-session', 'content-type': 'application/json' },
   body: JSON.stringify({ threadId: '11111111-1111-4111-8111-111111111111', language: 'ja', messages: [{ id: 'user-message', role: 'user', parts: [{ type: 'text', text: 'プランについて' }] }] }),
  });
 }
@@ -115,6 +120,12 @@ describe('support pending lock lifecycle', () => {
   state.throwStream = true;
   await expect(handleHelpSupport(request())).rejects.toThrow('stream setup failed');
   expect(state.pending).toBeNull();
+ });
+ it('does not start generation after losing ownership before initial save', async () => {
+  state.acquireHook = () => { state.pending = new Date(Date.now() + 60_000).toISOString(); };
+  expect((await handleHelpSupport(request())).status).toBe(409);
+  expect(state.streamOptions).toBeUndefined(); expect(state.messages).toEqual([]);
+  expect(state.releases).toBe(0);
  });
  it('persists completed answers and releases once', async () => {
   await handleHelpSupport(request()); const complete = [{ id: 'completed-answer' }];

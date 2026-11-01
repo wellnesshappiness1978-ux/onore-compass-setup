@@ -58,8 +58,9 @@ export async function handleHelpSupport(request: Request) {
  try {
  // Re-read locked history so a concurrent completed answer cannot be overwritten.
  try {const latest=helpUserMessage(parsed.data.messages.at(-1));const previous=Array.isArray(locked.messages)?locked.messages:[];if(previous.some(m=>typeof m==='object'&&m!==null&&'id' in m&&m['id']===latest.id)){await release();return Response.json({message:t.error},{status:409});}messages=await validateUIMessages({messages:[...previous,latest],tools});}catch{await release();return Response.json({message:t.error},{status:400});}
- const {error:saveError}=await supabaseAdmin.from('ai_support_threads').update({messages:messages as unknown as Json,title:messages.filter(m=>m.role==='user')[0]?.parts.filter(p=>p.type==='text').map(p=>p.text).join('').slice(0,120)||'AI support',updated_at:now}).eq('id',threadId).eq('user_id',userId).eq('pending_at',now);
+ const {data:saved,error:saveError}=await supabaseAdmin.from('ai_support_threads').update({messages:messages as unknown as Json,title:messages.filter(m=>m.role==='user')[0]?.parts.filter(p=>p.type==='text').map(p=>p.text).join('').slice(0,120)||'AI support',updated_at:now}).eq('id',threadId).eq('user_id',userId).eq('pending_at',now).select('id').maybeSingle();
  if(saveError){await release();return Response.json({message:t.error},{status:500});}
+ if(!saved||request.signal.aborted){await release();return new Response(null,{status:request.signal.aborted?499:409});}
  let upstreamFailure:{status:number;message:string}|undefined;
  const runId=createLovableAiGatewayRunIdFetch();
  const provider=createOpenAI({baseURL:'https://ai.gateway.lovable.dev/v1',apiKey,headers:{'Lovable-API-Key':apiKey,'X-Lovable-AIG-SDK':'vercel-ai-sdk'},fetch:async(input,init)=>{
