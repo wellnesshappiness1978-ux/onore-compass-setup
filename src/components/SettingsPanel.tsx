@@ -367,7 +367,7 @@ export default function SettingsPanel({
       <section className={card}>
         <h3 className="mb-3 font-serif text-lg text-primary">{createTranslator(language)('legal.nav')}</h3>
         <nav aria-label={createTranslator(language)('legal.nav')} className="grid gap-2 sm:grid-cols-2">
-          {(Object.keys(legalContentByLanguage[language]) as LegalKey[]).map(kind => <Button key={kind} asChild variant="outline" className="h-auto min-h-11 justify-start whitespace-normal text-left"><Link to="/legal/$document" params={{ document: kind }}>{legalContentByLanguage[language][kind].title}</Link></Button>)}
+          {(Object.keys(legalContentByLanguage[language]) as LegalKey[]).map(kind => <Button key={kind} asChild variant="outline" className="h-auto min-h-11 justify-start whitespace-normal text-left">{kind === 'terms' ? <Link to="/terms">{legalContentByLanguage[language][kind].title}</Link> : kind === 'privacy' ? <Link to="/privacy">{legalContentByLanguage[language][kind].title}</Link> : <Link to="/legal/$document" params={{ document: kind }}>{legalContentByLanguage[language][kind].title}</Link>}</Button>)}
           <Button asChild variant="outline" className="h-auto min-h-11 justify-start whitespace-normal text-left"><Link to="/support">{supportCopy[language].title}</Link></Button>
           <Button asChild variant="outline" className="h-auto min-h-11 justify-start whitespace-normal text-left"><Link to="/help">{helpCopy[language].faq}</Link></Button>
         </nav>

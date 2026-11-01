@@ -13,8 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as LpRouteImport } from './routes/lp'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PurchaseRouteImport } from './routes/purchase'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiConsultationRouteImport } from './routes/api/consultation'
 import { Route as ApiReadingsRouteImport } from './routes/api/readings'
 import { Route as ApiSupportChatRouteImport } from './routes/api/support-chat'
@@ -42,6 +44,11 @@ const LpRoute = LpRouteImport.update({
   path: '/lp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PurchaseRoute = PurchaseRouteImport.update({
   id: '/purchase',
   path: '/purchase',
@@ -50,6 +57,11 @@ const PurchaseRoute = PurchaseRouteImport.update({
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiConsultationRoute = ApiConsultationRouteImport.update({
@@ -88,8 +100,10 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRoute
   '/help': typeof HelpRoute
   '/lp': typeof LpRoute
+  '/privacy': typeof PrivacyRoute
   '/purchase': typeof PurchaseRoute
   '/support': typeof SupportRouteWithChildren
+  '/terms': typeof TermsRoute
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
   '/api/support-chat': typeof ApiSupportChatRoute
@@ -102,8 +116,10 @@ export interface FileRoutesByTo {
   '/app': typeof AppRoute
   '/help': typeof HelpRoute
   '/lp': typeof LpRoute
+  '/privacy': typeof PrivacyRoute
   '/purchase': typeof PurchaseRoute
   '/support': typeof SupportRouteWithChildren
+  '/terms': typeof TermsRoute
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
   '/api/support-chat': typeof ApiSupportChatRoute
@@ -117,8 +133,10 @@ export interface FileRoutesById {
   '/app': typeof AppRoute
   '/help': typeof HelpRoute
   '/lp': typeof LpRoute
+  '/privacy': typeof PrivacyRoute
   '/purchase': typeof PurchaseRoute
   '/support': typeof SupportRouteWithChildren
+  '/terms': typeof TermsRoute
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
   '/api/support-chat': typeof ApiSupportChatRoute
@@ -133,8 +151,10 @@ export interface FileRouteTypes {
     | '/app'
     | '/help'
     | '/lp'
+    | '/privacy'
     | '/purchase'
     | '/support'
+    | '/terms'
     | '/api/consultation'
     | '/api/readings'
     | '/api/support-chat'
@@ -147,8 +167,10 @@ export interface FileRouteTypes {
     | '/app'
     | '/help'
     | '/lp'
+    | '/privacy'
     | '/purchase'
     | '/support'
+    | '/terms'
     | '/api/consultation'
     | '/api/readings'
     | '/api/support-chat'
@@ -161,8 +183,10 @@ export interface FileRouteTypes {
     | '/app'
     | '/help'
     | '/lp'
+    | '/privacy'
     | '/purchase'
     | '/support'
+    | '/terms'
     | '/api/consultation'
     | '/api/readings'
     | '/api/support-chat'
@@ -176,8 +200,10 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRoute
   HelpRoute: typeof HelpRoute
   LpRoute: typeof LpRoute
+  PrivacyRoute: typeof PrivacyRoute
   PurchaseRoute: typeof PurchaseRoute
   SupportRoute: typeof SupportRouteWithChildren
+  TermsRoute: typeof TermsRoute
   ApiConsultationRoute: typeof ApiConsultationRoute
   ApiReadingsRoute: typeof ApiReadingsRoute
   ApiSupportChatRoute: typeof ApiSupportChatRoute
@@ -215,6 +241,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/purchase': {
       id: '/purchase'
       path: '/purchase'
@@ -227,6 +260,13 @@ declare module '@tanstack/react-router' {
       path: '/support'
       fullPath: '/support'
       preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/consultation': {
@@ -290,8 +330,10 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRoute,
   HelpRoute: HelpRoute,
   LpRoute: LpRoute,
+  PrivacyRoute: PrivacyRoute,
   PurchaseRoute: PurchaseRoute,
   SupportRoute: SupportRouteWithChildren,
+  TermsRoute: TermsRoute,
   ApiConsultationRoute: ApiConsultationRoute,
   ApiReadingsRoute: ApiReadingsRoute,
   ApiSupportChatRoute: ApiSupportChatRoute,
