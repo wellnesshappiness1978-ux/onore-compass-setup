@@ -1,5 +1,10 @@
 # Roadmap
 
+## Official landing page (2026-11-01)
+- [ ] Create independent /lp with eight sections, original cosmic cover and existing painted mandala, leaving the app at / intact.
+- [ ] Show requested three monthly plans with actual VIP 10/day; temporary store # links marked under review, support mail and existing legal links.
+- [ ] Verify mobile/desktop rendering, navigation, reduced motion and regression tests.
+
 ## AI customer support and self-help (2026-10-31)
 - [x] Add private conversation-per-request AI support with server-only history updates, shared factual help and explicit non-sending administrator escalation, separate from reading quotas.
 - [x] Add seven-language accordion FAQ for accounts, plans, billing/cancellation and readings from Settings/support; 390px expanded full text has no overflow.
