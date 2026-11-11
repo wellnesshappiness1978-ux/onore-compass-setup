@@ -56,4 +56,4 @@
 - Family v2 keys are matrix/layers/friction/roadmap/directions/rhythm; versioned identity excludes old outputs. Shared family-planning drives timelines/consensus directions; 17-lens inputs retain missing values. Why: replace duplicates without asserting universal luck.
 - Effective plan resolves in SQL effective_membership_plan (active debug override > vip_whitelists email > Stripe-expiry plan); all limits and getMyMembership read it. Why: one source so whitelist/test switches apply everywhere.
 - Serve LP at /, app at /app, and redirect /lp to /. Keep LP tokens/footer and shared prices/caps. Why: introduce visitors without changing app access or data.
-- /try shows static plan samples only; failed/slow readings show reading-fallback samples, never cached; links use current origin. Why: no free unlocks or stalls; domain-agnostic.
+- /try is static samples; failed readings use reading-fallback; links use current origin. Why: no unlocks/stalls.
