@@ -17,6 +17,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PurchaseRouteImport } from './routes/purchase'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TryRouteImport } from './routes/try'
 import { Route as ApiConsultationRouteImport } from './routes/api/consultation'
 import { Route as ApiReadingsRouteImport } from './routes/api/readings'
 import { Route as ApiSupportChatRouteImport } from './routes/api/support-chat'
@@ -64,6 +65,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TryRoute = TryRouteImport.update({
+  id: '/try',
+  path: '/try',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiConsultationRoute = ApiConsultationRouteImport.update({
   id: '/api/consultation',
   path: '/api/consultation',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/purchase': typeof PurchaseRoute
   '/support': typeof SupportRouteWithChildren
   '/terms': typeof TermsRoute
+  '/try': typeof TryRoute
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
   '/api/support-chat': typeof ApiSupportChatRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/purchase': typeof PurchaseRoute
   '/support': typeof SupportRouteWithChildren
   '/terms': typeof TermsRoute
+  '/try': typeof TryRoute
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
   '/api/support-chat': typeof ApiSupportChatRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/purchase': typeof PurchaseRoute
   '/support': typeof SupportRouteWithChildren
   '/terms': typeof TermsRoute
+  '/try': typeof TryRoute
   '/api/consultation': typeof ApiConsultationRoute
   '/api/readings': typeof ApiReadingsRoute
   '/api/support-chat': typeof ApiSupportChatRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/purchase'
     | '/support'
     | '/terms'
+    | '/try'
     | '/api/consultation'
     | '/api/readings'
     | '/api/support-chat'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/purchase'
     | '/support'
     | '/terms'
+    | '/try'
     | '/api/consultation'
     | '/api/readings'
     | '/api/support-chat'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/purchase'
     | '/support'
     | '/terms'
+    | '/try'
     | '/api/consultation'
     | '/api/readings'
     | '/api/support-chat'
@@ -204,6 +216,7 @@ export interface RootRouteChildren {
   PurchaseRoute: typeof PurchaseRoute
   SupportRoute: typeof SupportRouteWithChildren
   TermsRoute: typeof TermsRoute
+  TryRoute: typeof TryRoute
   ApiConsultationRoute: typeof ApiConsultationRoute
   ApiReadingsRoute: typeof ApiReadingsRoute
   ApiSupportChatRoute: typeof ApiSupportChatRoute
@@ -267,6 +280,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/try': {
+      id: '/try'
+      path: '/try'
+      fullPath: '/try'
+      preLoaderRoute: typeof TryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/consultation': {
@@ -334,6 +354,7 @@ const rootRouteChildren: RootRouteChildren = {
   PurchaseRoute: PurchaseRoute,
   SupportRoute: SupportRouteWithChildren,
   TermsRoute: TermsRoute,
+  TryRoute: TryRoute,
   ApiConsultationRoute: ApiConsultationRoute,
   ApiReadingsRoute: ApiReadingsRoute,
   ApiSupportChatRoute: ApiSupportChatRoute,

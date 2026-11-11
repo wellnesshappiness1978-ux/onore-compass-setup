@@ -32,6 +32,7 @@ import { groupColorMeaning, groupDayLine, groupDepthCopy, groupInsightCopy, SELF
 import { reminderUiCopy } from '@/lib/reminder-ui-copy';
 import DeeperEssenceSections from './DeeperEssenceSections';
 import { SacredDisclosure } from './ui/sacred-disclosure';
+import { readingFallback, useReadingFallback } from '@/lib/reading-fallback';
 
 const mainColor = (m: TeamMember) => birthColorSpectrum(memberToProfile(m))?.main ?? null;
 
@@ -163,9 +164,11 @@ function GroupIntegratedReading({ language }: { language: Language }) {
   const name = ctx?.label(language) ?? '';
   const request = { profile: members[0] ?? ctx?.owner, language, goal: ctx ? goalText(ctx.focus, language) : '', subject: { label: name, isSelf: false }, group: { name, members } };
   const reading = usePersonalReading({ ...request, profile: request.profile ?? { nameKanji: '', nameKana: '', nameRomaji: '', birthDate: '', birthTime: '', birthTimeUnknown: true, birthPlace: '', birthCity: '', bloodType: '', siblingOrder: '', gender: 'undisclosed' } }, 'full', members.length >= 2);
+  const fallback = useReadingFallback(members.length >= 2 && reading.isPending, reading.isError);
   if (members.length < 2) return null;
-  const text = reading.data?.axisSummary ?? reading.partial.axisSummary;
-  return <section className="mt-6 border-y border-primary/30 py-5" aria-label={traitReadingCopy[language].final}><h3 className="font-serif text-xl text-primary">{traitReadingCopy[language].final}</h3>{text ? <div aria-busy={reading.isPending}><ChunkedText className="mt-4 text-base leading-8" text={text} /></div> : <p role="status" className="mt-3 text-sm text-muted-foreground">{reading.isError ? homeReadingCopy[language].error : homeReadingCopy[language].loading}</p>}<ShareCardButton language={language} autoOpen={false} loading={reading.isPending} data={reading.data?.axisSummary ? { kind: "identity", kicker: traitReadingCopy[language].final, title: traitReadingCopy[language].final, names: [name, ...members.flatMap(m => [m.nameKanji, m.nameRomaji])].filter(Boolean), score: 0, lines: [reading.data.axisSummary], fullContent: true } : null} /></section>;
+  const live = reading.data?.axisSummary ?? reading.partial.axisSummary;
+  const text = live ?? (fallback ? readingFallback[language].axisSummary : undefined);
+  return <section className="mt-6 border-y border-primary/30 py-5" aria-label={traitReadingCopy[language].final}><h3 className="font-serif text-xl text-primary">{traitReadingCopy[language].final}</h3>{text ? <div aria-busy={reading.isPending}>{!live && <p role="status" className="mt-3 text-xs text-primary">{readingFallback[language].note}</p>}<ChunkedText className="mt-4 text-base leading-8" text={text} /></div> : <p role="status" className="mt-3 text-sm text-muted-foreground">{homeReadingCopy[language].loading}</p>}<ShareCardButton language={language} autoOpen={false} loading={reading.isPending} data={reading.data?.axisSummary ? { kind: "identity", kicker: traitReadingCopy[language].final, title: traitReadingCopy[language].final, names: [name, ...members.flatMap(m => [m.nameKanji, m.nameRomaji])].filter(Boolean), score: 0, lines: [reading.data.axisSummary], fullContent: true } : null} /></section>;
 }
 
 export function ArtOwnerOnlyNotice({ language, plan, onUpgrade }: { language: Language; plan: Plan; onUpgrade: () => void }) {

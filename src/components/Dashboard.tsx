@@ -78,6 +78,7 @@ import { teamCopy } from "@/lib/team-copy";
 import { usePlan } from "./PlanProvider";
 import { canUseAppearance, decorationTier, appearanceStorageKey, defaultAppearance, readAppearance, readDesign, type AppearanceSelection } from "@/lib/appearance-customization";
 import { inputClass, PREFECTURES, type UserProfile } from "./Onboarding";
+import { readingFallback, useReadingFallback } from "@/lib/reading-fallback";
 import {
   dashboardTranslations,
   prefecturesRomanized,
@@ -163,6 +164,7 @@ function TorisetsuPanel({
   const [mode, setMode] = useState<"manual" | "compatibility">(only ?? initialMode);
   const readingFocus = useFocus();
   const manualReading = usePersonalReading({ profile, language, goal: readingFocus ? goalText(readingFocus.focus, language) : '', subject: { label: readingFocus?.label(language) ?? 'you', isSelf: !readingFocus?.member && !readingFocus?.group } }, 'full', mode === 'manual');
+  const manualFallback = useReadingFallback(mode === 'manual' && manualReading.isPending, manualReading.isError);
   const [partnerName, setPartnerName] = useState("");
   const [partnerKana, setPartnerKana] = useState("");
   const [partnerGender, setPartnerGender] = useState<UserProfile["gender"]>("undisclosed");
@@ -294,12 +296,13 @@ function TorisetsuPanel({
             >
               ✧
             </div>
-            {manualReading.isPending && <AgolmenLoading compact label={homeReadingCopy[language].loading} />}
+            {manualFallback && !manualReading.data && <p role="status" className="mb-4 rounded-md border border-primary/30 bg-primary/10 p-3 text-xs text-primary">{readingFallback[language].note}</p>}
+            {manualReading.isPending && !manualFallback && <AgolmenLoading compact label={homeReadingCopy[language].loading} />}
             <div className="relative space-y-0">
               {[
-                { title: t.coreTitle, body: manualReading.data?.manualCore ?? manualReading.partial.manualCore, symbol: "✦" },
-                { title: t.decisionTitle, body: manualReading.data?.manualDecision ?? manualReading.partial.manualDecision, symbol: "◇" },
-                { title: t.timingTitle, body: manualReading.data?.manualTiming ?? manualReading.partial.manualTiming, symbol: "☼" },
+                { title: t.coreTitle, body: manualReading.data?.manualCore ?? manualReading.partial.manualCore ?? (manualFallback ? readingFallback[language].manualCore : undefined), symbol: "✦" },
+                { title: t.decisionTitle, body: manualReading.data?.manualDecision ?? manualReading.partial.manualDecision ?? (manualFallback ? readingFallback[language].manualDecision : undefined), symbol: "◇" },
+                { title: t.timingTitle, body: manualReading.data?.manualTiming ?? manualReading.partial.manualTiming ?? (manualFallback ? readingFallback[language].manualTiming : undefined), symbol: "☼" },
               ].map((part, index) => (
                 <div
                   key={part.title}

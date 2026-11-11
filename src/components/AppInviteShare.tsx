@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Copy, Share2 } from 'lucide-react';
 import { Button } from './ui/button';
-import { APP_SHARE_URL } from '@/lib/share-content';
+import { currentSiteUrl } from '@/lib/site-url';
 import { APP_INVITE_TEXT, appInviteLinks } from '@/lib/app-invite';
 
 const labels = { x: 'X', line: 'LINE', facebook: 'Facebook' } as const;
@@ -13,13 +13,13 @@ export default function AppInviteShare({ label }: { label: string }) {
   const links = appInviteLinks();
   const share = async () => {
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
-      try { await navigator.share({ title: 'アゴルメンの羅針盤', text: APP_INVITE_TEXT, url: APP_SHARE_URL }); return; }
+      try { await navigator.share({ title: 'アゴルメンの羅針盤', text: APP_INVITE_TEXT, url: currentSiteUrl() }); return; }
       catch (e) { if ((e as Error)?.name === 'AbortError') return; }
     }
     setOpen(v => !v);
   };
   const copy = async () => {
-    try { await navigator.clipboard.writeText(`${APP_INVITE_TEXT}\n${APP_SHARE_URL}`); setCopied(true); window.setTimeout(() => setCopied(false), 2000); } catch { /* ignore */ }
+    try { await navigator.clipboard.writeText(`${APP_INVITE_TEXT}\n${currentSiteUrl()}`); setCopied(true); window.setTimeout(() => setCopied(false), 2000); } catch { /* ignore */ }
   };
   return <div className="mt-4 space-y-3">
     <div className="flex flex-wrap gap-2">

@@ -1,4 +1,5 @@
 import ChunkedText from "@/components/ChunkedText";
+import { readingFallback } from "@/lib/reading-fallback";
 import { usePersonalReading } from "@/hooks/use-personal-reading";
 import MethodExplanationList from "./MethodExplanationList";
 import { goalText } from "@/lib/focus";
@@ -27,7 +28,7 @@ const titles: Record<Language, [string, string, string]> = {
 export default function GrandSummaryCard({ profile, language, plan, embedded = false, part = "all", detailExtra }: { profile: UserProfile; language: Language; plan: Plan; embedded?: boolean; part?: "all" | "approaches" | "summary" | "share"; detailExtra?: (key: ApproachKey) => React.ReactNode }) {
   const focus = useFocus();
   const subject = { label: focus?.label(language) ?? 'you', isSelf: !focus?.member && !focus?.group };
-  const { data, isPending, partial } = usePersonalReading({ profile, language, goal: focus ? goalText(focus.focus, language) : '', subject });
+  const { data, isPending, isError, partial } = usePersonalReading({ profile, language, goal: focus ? goalText(focus.focus, language) : '', subject });
   const copy = homeReadingCopy[language];
   const [title, share] = titles[language];
   const readMore = detailLinkLabel(language, focus?.member || focus?.group ? focus.label(language) : null, Boolean(focus?.group));
@@ -62,14 +63,14 @@ export default function GrandSummaryCard({ profile, language, plan, embedded = f
         if (data?.approachAvailability[key] === "unavailable") return detailExtra?.(key) ?? null;
         return <details className="group mt-3 rounded-md border border-primary/25 bg-primary/5">
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm text-primary [&::-webkit-details-marker]:hidden">{readMore}<ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
-          {body ? <div aria-busy={isPending}><ChunkedText className="px-3 pb-3 text-[15px] leading-7 text-foreground" text={body} /></div> : <AgolmenLoading compact label={copy.loading} />}
+          {body ? <div aria-busy={isPending}><ChunkedText className="px-3 pb-3 text-[15px] leading-7 text-foreground" text={body} /></div> : isError ? <p role="status" className="px-3 pb-3 text-[15px] leading-7 text-foreground">{readingFallback[language].note}</p> : <AgolmenLoading compact label={copy.loading} />}
           {detailExtra?.(key)}
         </details>;
       }} />}
 
       {showSummary && (text ? <section className="mt-6 border-y border-primary/40 py-6 [overflow-wrap:anywhere]"><p aria-busy={isPending} className="whitespace-pre-line text-base leading-8 text-foreground sm:text-lg">{text}</p></section> : loading ? <AgolmenLoading compact label={holding ? readingCompleteMessage[language] : copy.loading} /> : data ? <section className="mt-6 border-y border-primary/40 py-6 [overflow-wrap:anywhere]">
         <ChunkedText className="text-base leading-8 text-foreground sm:text-lg sm:leading-9" text={text} />
-      </section> : <p role="status" className="mt-6 text-foreground">{copy.error}</p>)}
+      </section> : <div role="status" className="mt-6 border-y border-primary/40 py-6"><p className="text-xs text-primary">{readingFallback[language].note}</p><ChunkedText className="mt-3 text-base leading-8 text-foreground" text={[readingFallback[language].manualCore, readingFallback[language].manualDecision, readingFallback[language].manualTiming].join("\n\n")} /></div>)}
       {showSummary && <p className="mt-5 text-center text-[11px] text-muted-foreground">{copy.preview}</p>}
       {showShare && <ShareCardButton
         className="mt-6 h-auto min-h-12 w-full whitespace-normal px-4 py-3 text-base"
