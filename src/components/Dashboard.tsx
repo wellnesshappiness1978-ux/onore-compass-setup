@@ -744,7 +744,21 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
       membership().then((plan) => { if (active) { setActualPlan(plan); setPlanResolved(true); } }).catch(() => { if (active) { setActualPlan("free"); setPlanResolved(true); } });
       checkDebugAccess().then((allowed) => { if (active) setDebugAllowed(allowed); }).catch(() => { if (active) setDebugAllowed(false); });
     }
-    return () => { active = false; };
+    // Android WebView often resumes after sign-in/OAuth or a dropped connection; re-check the server-verified
+    // tester role on resume so the pinned plan bar appears without restarting the app.
+    const recheck = () => {
+      if (!signedIn || document.visibilityState === "hidden") return;
+      checkDebugAccess().then((allowed) => { if (active && allowed) setDebugAllowed(true); }).catch(() => {});
+    };
+    document.addEventListener("visibilitychange", recheck);
+    window.addEventListener("focus", recheck);
+    window.addEventListener("online", recheck);
+    return () => {
+      active = false;
+      document.removeEventListener("visibilitychange", recheck);
+      window.removeEventListener("focus", recheck);
+      window.removeEventListener("online", recheck);
+    };
   }, [signedIn, membership, checkDebugAccess]);
   const [designMode, setDesignMode] = useState<DesignMode>("classic");
   const [appearance, setAppearance] = useState<AppearanceSelection>(defaultAppearance);
