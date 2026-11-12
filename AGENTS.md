@@ -51,7 +51,7 @@
 
 - Family registration uses familyRegistrationAccess independently of analytics gates; signed-in capacity always uses server membership. TeamStudio owns editor state and opens idempotently from onore-family-edit, closing on tab departure or successful save. Why: registration remains available to Standard+ without accidental form opening or preview write access.
 - Account sync owns one owner-filtered Realtime channel; refresh reads, not AI. Private reading copies use hashed cloud keys; font size/preview stay local. Why: cross-device freshness without repeat charges.
-- Family narratives use a server-resolved fingerprint and unique pending lock before explicit AI generation; failed/pending never regenerate. Owner/input-scoped bounded device copies clear on sign-out; pending polls only reads. Why: fast private reopening without duplicate charges.
+- Family narratives use effective membership, owner fingerprints and unique pending locks; errors stop polling/replay, only explicit retry atomically reacquires failed rows. Bounded owner copies clear on sign-out. Why: no divergent gates or duplicate AI.
 
 - Family v2 keys are matrix/layers/friction/roadmap/directions/rhythm; versioned identity excludes old outputs. Shared family-planning drives timelines/consensus directions; 17-lens inputs retain missing values. Why: replace duplicates without asserting universal luck.
 - Effective plan resolves in SQL effective_membership_plan (active debug override > vip_whitelists email > Stripe-expiry plan); all limits and getMyMembership read it. Why: one source so whitelist/test switches apply everywhere.

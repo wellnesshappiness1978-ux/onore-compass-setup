@@ -13,6 +13,7 @@ import { familyReadingCopy } from '@/lib/family-reading-copy';
 import { nextPlan } from '@/lib/plans';
 import { teamCopy } from '@/lib/team-copy';
 import ChunkedText from './ChunkedText';
+import { usageStatusCopy } from '@/lib/usage-status-copy';
 
 const items = [
   { icon: Network, tier: "Family", key: "matrix" }, { icon: BarChart3, tier: "Family", key: "layers" },
@@ -43,7 +44,7 @@ export default function BusinessFeaturePreview({ language, plan, actualPlan, sig
     <h3 className="font-serif text-xl text-primary">{c.title}</h3>
     {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" className="mt-4 h-auto whitespace-normal" disabled={reading.status==='pending'} onClick={reading.generate}>{rc.generate}</Button>}
     {reading.status === 'pending' && <p role="status" className="mt-3 text-sm text-muted-foreground">{rc.pending}</p>}
-    {reading.errorMessage && <p role="alert" className="mt-3 text-sm text-destructive">{rc.failed} {reading.errorMessage}</p>}
+    {reading.errorMessage && !selected && <div className="mt-3 space-y-2"><p role="alert" className="text-sm text-destructive">{rc.failed}</p><Button variant="outline" disabled={reading.isFetching || reading.status==='pending'} onClick={()=>void reading.retry()}>{usageStatusCopy[language].retry}</Button></div>}
     <div className="mt-5 grid gap-3 sm:grid-cols-2">{items.map((item,i) => <Button key={item.key} variant="outline" onClick={() => setSelected(item.key)} className="h-auto min-h-20 justify-start whitespace-normal p-4 text-left">
       <item.icon className="size-5 shrink-0 text-primary"/><span className="min-w-0"><strong className="flex items-center gap-1.5 text-foreground">{!canUseFamilyFeature(plan,item.key) && <Lock className="size-3.5 shrink-0 text-primary"/>}{c.titles[i]}</strong></span>
     </Button>)}</div>
@@ -54,7 +55,7 @@ export default function BusinessFeaturePreview({ language, plan, actualPlan, sig
         {selected && (canUseFamilyFeature(plan,selected) ? <>
           {!eligible && <p className="mb-3 text-xs text-muted-foreground">{rc.preview}</p>}
           {reading.status==='pending' && <p role="status" className="text-sm text-muted-foreground">{rc.pending}</p>}
-          {reading.errorMessage && <p role="alert" className="text-sm text-destructive">{rc.failed} {reading.errorMessage}</p>}
+          {reading.errorMessage && <div className="space-y-2"><p role="alert" className="text-sm text-destructive">{rc.failed}</p><Button variant="outline" disabled={reading.isFetching || reading.status==='pending'} onClick={()=>void reading.retry()}>{usageStatusCopy[language].retry}</Button></div>}
           {eligible && !reading.data && !reading.isPending && !reading.errorMessage && <Button variant="outline" disabled={reading.status==='pending'} onClick={reading.generate}>{rc.generate}</Button>}
           <FamilyFeatureDetail feature={selected} language={language} plan={plan} actualPlan={actualPlan} signedIn={signedIn} previewMode={previewMode} onUpgrade={onUpgrade}/>
           {reading.reading && <ChunkedText text={reading.reading[selected]} className="mt-5 border-t border-primary/25 pt-4 text-sm leading-7"/>}

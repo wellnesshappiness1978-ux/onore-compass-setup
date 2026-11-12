@@ -9,11 +9,10 @@ export const getMyMembership = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     // Reconcile renewals on re-entry; offline failures never extend a paid expiry.
     try { const { refreshBilling } = await import('./billing.server'); await refreshBilling(context.userId); } catch { /* Use last verified, unexpired membership. */ }
-    // Whitelisted relatives are promoted on every sign-in; the database resolves debug, whitelist and Stripe expiry in one place.
-    try { await context.supabase.rpc("claim_vip_whitelist"); } catch { /* Resolution below still honours the whitelist. */ }
-    const { data, error } = await context.supabase.rpc("my_membership_plan");
-    if (error) throw error;
-    return normalizePlan(data);
+    // Read-only resolution already honours the whitelist. Claiming on every read rewrites an
+    // expired debug/Stripe row and triggers Realtime -> refreshBilling -> claim indefinitely.
+    const {readEffectiveMembership}=await import('./membership-plan.server');
+    return readEffectiveMembership(context.supabase);
   });
 
 export const canManageDebugPlan = createServerFn({ method: "GET" })

@@ -11,12 +11,13 @@ import { supportiveWritingVoice } from './ai/writing-voice';
 import { SELF_MEMBER_ID } from './group-insight';
 import { familyPlanning } from './family-planning';
 import { artPrinciplesPrompt } from './art-overview-copy';
+import { normalizePlan } from './plan-identity';
 
-export async function familyReadingOperation(context: { supabase: SupabaseClient<Database>; userId: string }, input: z.infer<typeof familyReadingInput>, generate: boolean) {
+export async function familyReadingOperation(context: { supabase: SupabaseClient<Database>; userId: string }, input: z.infer<typeof familyReadingInput>, generate: boolean, retryFailed = false) {
   const { supabase, userId } = context;
-  const { data: membership, error: membershipError } = await supabase.from('plan_memberships').select('plan,debug_expires_at,debug_previous_plan').eq('user_id',userId).maybeSingle();
+  const { data: membership, error: membershipError } = await supabase.rpc('my_membership_plan');
   if (membershipError) throw membershipError;
-  const plan = membership?.debug_expires_at && Date.parse(membership.debug_expires_at) <= Date.now() ? membership.debug_previous_plan : membership?.plan;
+  const plan = normalizePlan(membership);
   if (plan !== 'b2b' && plan !== 'b2b-premium') throw new Error('Family plan required');
   const [{ data: owner, error: ownerError }, { data: rows, error: memberError }] = await Promise.all([
     supabase.from('profiles').select('*').eq('user_id',userId).single(), supabase.from('team_members').select('*').eq('user_id',userId).order('id'),
@@ -35,13 +36,20 @@ export async function familyReadingOperation(context: { supabase: SupabaseClient
   const fingerprint = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',encoded)),v=>v.toString(16).padStart(2,'0')).join('');
   const { data: saved, error: readError } = await supabase.from('family_readings').select('status,result,error').eq('user_id',userId).eq('fingerprint',fingerprint).maybeSingle();
   if (readError) throw readError;
-  if (saved || !generate) return saved;
+  if (!generate || (saved && !(retryFailed && saved.status === 'failed'))) return saved;
   // Private writes only after membership and ownership are verified. UNIQUE key is the cross-device single-flight lock.
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
+  if (saved?.status === 'failed') {
+    // Compare-and-set permits one explicit retry, never an automatic replay.
+    const { data: acquired, error } = await supabaseAdmin.from('family_readings').update({status:'pending',error:null,updated_at:new Date().toISOString()}).eq('user_id',userId).eq('fingerprint',fingerprint).eq('status','failed').select('status').maybeSingle();
+    if (error) throw error;
+    if (!acquired) return (await supabase.from('family_readings').select('status,result,error').eq('user_id',userId).eq('fingerprint',fingerprint).single()).data;
+  } else {
   const { error: lockError } = await supabaseAdmin.from('family_readings').insert({ user_id:userId,fingerprint,status:'pending' });
   if (lockError) {
     if (lockError.code !== '23505') throw lockError;
     return (await supabase.from('family_readings').select('status,result,error').eq('user_id',userId).eq('fingerprint',fingerprint).single()).data;
+  }
   }
   try {
     const key = process.env['LOVABLE_API_KEY'];

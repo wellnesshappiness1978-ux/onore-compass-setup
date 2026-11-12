@@ -10,7 +10,7 @@ const six=Object.fromEntries(['matrix','layers','friction','roadmap','directions
 function context(saved:unknown,plan='b2b') {
  const datasets:Record<string,unknown>={plan_memberships:{plan},profiles:{birth_date:'1980-02-12',name_kanji:'A',name_kana:'',name_romaji:'A',birth_time:null,birth_time_unknown:true,birth_place:'東京都',birth_city:'',gender:'male',blood_type:'',sibling_order:'',parents:null,goal:'尊重'},team_members:[{id:'b',name:'B',birth_date:'1988-08-10',birth_time_unknown:true,birth_place:'東京都',skills:[],parents:null}],family_readings:saved};
  const from=vi.fn((table:string)=>{const result={data:datasets[table],error:null};const q={select:()=>q,eq:()=>q,order:()=>Promise.resolve(result),single:()=>Promise.resolve(result),maybeSingle:()=>Promise.resolve(result)};return q;});
- return {supabase:{from} as unknown as SupabaseClient<Database>,userId:'owner'};
+ return {supabase:{from,rpc:vi.fn().mockResolvedValue({data:plan,error:null})} as unknown as SupabaseClient<Database>,userId:'owner'};
 }
 beforeEach(()=>{vi.clearAllMocks();});
 it('reads the same saved six fields without generating again',async()=>{
@@ -25,6 +25,25 @@ it.each(['pending','failed'])('never automatically regenerates a %s record',asyn
 it('rejects actual Free membership before any paid call',async()=>{
  await expect(familyReadingOperation(context(null,'free'),input,true)).rejects.toThrow('Family plan required');
  expect(mocks.call).not.toHaveBeenCalled();
+});
+it('honours server-resolved Family Premium even when the raw Stripe row is free',async()=>{
+ const ctx=context(null,'b2b-premium');
+ expect(await familyReadingOperation(ctx,input,false)).toBeNull();
+ expect(ctx.supabase.rpc).toHaveBeenCalledWith('my_membership_plan');
+ expect(ctx.supabase.from).not.toHaveBeenCalledWith('plan_memberships');
+});
+it('stops on membership lookup errors without generating',async()=>{
+ const ctx=context(null);vi.mocked(ctx.supabase.rpc).mockResolvedValueOnce({data:null,error:new Error('offline')} as never);
+ await expect(familyReadingOperation(ctx,input,true)).rejects.toThrow('offline');
+ expect(mocks.call).not.toHaveBeenCalled();
+});
+it('only an explicit retry reacquires one failed generation',async()=>{
+ const changes:unknown[]=[];
+ mocks.adminFrom.mockReturnValue({update:(value:unknown)=>{changes.push(value);const q={eq:vi.fn(()=>q),select:()=>q,maybeSingle:()=>Promise.resolve({data:{status:'pending'},error:null}),then:(resolve:(v:unknown)=>unknown)=>Promise.resolve({error:null}).then(resolve)};return q;}});
+ mocks.call.mockReturnValue({result:{output:Promise.resolve(six)}});
+ const result=await familyReadingOperation(context({status:'failed',result:null,error:'offline'}),input,true,true);
+ expect(result?.status).toBe('complete');expect(mocks.call).toHaveBeenCalledTimes(1);
+ expect(changes).toEqual([expect.objectContaining({status:'pending',error:null}),expect.objectContaining({status:'complete'})]);
 });
 it('a competing unique lock never starts another AI request',async()=>{
  mocks.adminFrom.mockReturnValue({insert:vi.fn().mockResolvedValue({error:{code:'23505'}})});

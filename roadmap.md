@@ -1,5 +1,11 @@
 # Roadmap
 
+## Stability, gem quality and daily food diversity (2026-11-12)
+- [x] Unify Family authorization with effective membership; remove refresh-time whitelist writes that loop with Stripe reconciliation; stop error polling/replay and expose one explicit retry with atomic failed-row acquisition.
+- [x] Restore resolution-aware 512/1024 personal-color brilliant gem with crisp facets/reflections; live and export share composition. Desktop/mobile rendering checked.
+- [x] Strengthen honmei/Sun/life-path/natal + dated seasonal/day reference seed and Japanese/Western/Asian main rotation; preserve five existing course slots/photos and separate nutrition from symbolic reasons. Adjacent-day changes tested over leap/season/year boundaries.
+- [x] 544 tests passed; automatic build OK. Owner Premium Family generation saved all six narratives and restored through UI without generation; Today five new foods displayed. Error recovery covered by tests, not a forced live outage. Native iOS/Android and wallpaper download not separately tested; not published. Owner's 24-hour Premium debug choice remains active after verification.
+
 ## Landing page as the main entrance (2026-11-01)
 - [x] Serve the existing black/gold official LP at / with prominent アプリを体験する links to /app; preserve /lp as a permanent redirect.
 - [x] Preserve existing storage and account restoration; app/support/help/purchase return links, app sign-in return, installed-app entry and notification fallback use /app. Existing purchase/legal/API URLs remain unchanged.

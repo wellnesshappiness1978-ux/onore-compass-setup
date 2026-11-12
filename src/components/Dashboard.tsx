@@ -706,7 +706,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     selectPlan(next);
     setPreviewPlan(next);
   };
-  const actualPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : serverPlan;
+  const actualPlan: Plan = serverPlan;
   // Test preview only: plan cards switch the plan and jump to the newly unlocked feature.
   const selectTestPlan = (next: Plan) => {
     applyDevOverride(next);
@@ -726,7 +726,8 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
     if (debugAllowed && planResolved) syncDisplayToServerPlan(serverPlan);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debugAllowed, planResolved, serverPlan, devOverrideEnabled]);
-  const previewPlan: Plan = devOverrideEnabled && devPlanOverride ? devPlanOverride : planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
+  const previewPlan: Plan = signedIn && debugAllowed ? serverPlan : devOverrideEnabled && devPlanOverride ? devPlanOverride : planOrder.indexOf(selectedPlan) <= planOrder.indexOf(actualPlan) ? selectedPlan : actualPlan;
+  const presentationOnly = devOverrideEnabled && (!signedIn || previewPlan !== serverPlan);
   const membership = useServerFn(getMyMembership);
   const checkDebugAccess = useServerFn(canManageDebugPlan);
   useEffect(() => {
@@ -935,7 +936,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                       day: "numeric",
                     }).format(new Date())}
                   </p>
-                  <FocusedToday language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} render={(p) => <TodayGuide profile={p} language={language} plan={previewPlan} signedIn={signedIn && !devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />} />
+                  <FocusedToday language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} render={(p) => <TodayGuide profile={p} language={language} plan={previewPlan} signedIn={signedIn && !presentationOnly} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />} />
                 </section>
               </>
             ) : id === "consult" ? (
@@ -945,7 +946,7 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 </div>
                 <div id="ai-compatibility" role="tabpanel" hidden={consultMode !== "compatibility"} className="mb-8"><TorisetsuPanel only="compatibility" plan={signedIn ? serverPlan : previewPlan} serverCounted={signedIn} signedIn={signedIn} profile={profile} language={language} onVip={() => setModal("vip")} /></div>
                 <div id="ai-consultation" role="tabpanel" hidden={consultMode !== "consultation"}><SubjectVoice language={language}><ConsultationPanel
-                  previewMode={devOverrideEnabled}
+                  previewMode={presentationOnly}
                   profile={profile}
                   focusTargetId={focusMemberId}
                   goal={focusGoal}
@@ -958,9 +959,9 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
                 /></SubjectVoice></div>
               </>
             ) : id === "business" ? (
-              <><FamilyGroupButtons language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><BusinessFeaturePreview language={language} plan={previewPlan} actualPlan={serverPlan} signedIn={signedIn} previewMode={devOverrideEnabled} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio active={tab === "business"} plan={previewPlan} actualPlan={serverPlan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} /></>
+              <><FamilyGroupButtons language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><BusinessFeaturePreview language={language} plan={previewPlan} actualPlan={serverPlan} signedIn={signedIn} previewMode={presentationOnly} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0, behavior: "smooth" }); }} /><TeamStudio active={tab === "business"} plan={previewPlan} actualPlan={serverPlan} language={language} signedIn={signedIn} ownerBirthDate={profile.birthDate} /></>
             ) : id === "art" ? (
-              <><ArtOwnerOnlyNotice language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /><FocusedArt language={language} owner={profile} plan={previewPlan} render={(p, subject) => <NineStarsPanel key={subject?.key ?? "self"} subject={subject} language={language} profile={p} plan={previewPlan} previewMode={devOverrideEnabled} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} />} /></>
+              <><ArtOwnerOnlyNotice language={language} plan={previewPlan} onUpgrade={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} /><FocusedArt language={language} owner={profile} plan={previewPlan} render={(p, subject) => <NineStarsPanel key={subject?.key ?? "self"} subject={subject} language={language} profile={p} plan={previewPlan} previewMode={presentationOnly} onVip={() => { setTab("settings"); window.scrollTo({ top: 0 }); }} />} /></>
             ) : id === "settings" ? (
               <><SettingsPanel
                 profile={profile}

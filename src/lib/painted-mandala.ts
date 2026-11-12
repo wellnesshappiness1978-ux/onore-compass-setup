@@ -79,24 +79,26 @@ function clearJewelColor(color: string): [number, number, number] {
 /** Round brilliant jewel in a polished gold bezel: diamond-shaped table with a
  * radiating sunburst, alternating bright/deep crown facets, a luminous lower
  * glow and fine internal sparkle, all in the subject's clear overall color. */
-function paintGemSurface(color: string) {
-  const cached = gemPaintings.get(color);
+function paintGemSurface(color: string, resolution: number) {
+  const cacheKey = `${color}:${resolution}:brilliant-v2`;
+  const cached = gemPaintings.get(cacheKey);
   if (cached) return cached;
   const surface = document.createElement("canvas");
-  surface.width = 640;
-  surface.height = 640;
+  surface.width = resolution;
+  surface.height = resolution;
   const context = surface.getContext("2d");
   if (!context) return surface;
   const channels = clearJewelColor(color);
-  const pixels = context.createImageData(640, 640);
-  const radius = 250;
+  const pixels = context.createImageData(resolution, resolution);
+  const radius = resolution * 250 / 640;
+  const center = (resolution - 1) / 2;
   const quarter = Math.PI / 2;
-  for (let py = 0; py < 640; py += 1) {
-    for (let px = 0; px < 640; px += 1) {
-      const x = (px - 319.5) / radius, y = (py - 319.5) / radius;
+  for (let py = 0; py < resolution; py += 1) {
+    for (let px = 0; px < resolution; px += 1) {
+      const x = (px - center) / radius, y = (py - center) / radius;
       const distance = Math.hypot(x, y);
       const angle = Math.atan2(y, x);
-      const offset = (py * 640 + px) * 4;
+      const offset = (py * resolution + px) * 4;
       if (distance <= 1.0) {
         const edgeAlpha = 1 - smoothEdge(0.993, 1.0, distance);
         // Diamond (rotated square) table like a top-view brilliant.
@@ -105,20 +107,22 @@ function paintGemSurface(color: string) {
         const sparkle = pigmentNoise(x * 22, y * 22, 7);
         const bubbles = smoothEdge(0.62, 0.8, pigmentNoise(x * 9, y * 9, 13)) * smoothEdge(0.55, 0.95, distance);
         // Sunburst rays radiating from the table center.
-        const ray = 0.5 + 0.5 * Math.cos(angle * 36);
+        const ray = 0.5 + 0.5 * Math.cos(angle * 32);
         const tableLight = 0.08 + ray * 0.16 - (y + 0.04) * 0.32 + Math.exp(-((y - 0.32) ** 2) / 0.03 - x * x / 0.05) * 0.55;
         // Crown: 8 kite/star facets alternating light and deep.
         const local = (((angle + Math.PI / 4) % quarter) + quarter) % quarter / quarter;
         const index = Math.floor((angle + Math.PI * 2 + Math.PI / 4) / (quarter / 2));
         const facet = (Math.sin(index * 2.71 + 1.3) * 0.5 + 0.5);
         const corner = Math.abs(local - 0.5) * 2;
-        const crownLight = -0.55 + facet * 0.95 + corner * 0.2 - y * 0.15 + bubbles * 0.35;
-        let glaze = tableLight * inTable + crownLight * (1 - inTable) + (sparkle - 0.5) * 0.12;
+        const refraction = Math.pow(Math.max(0, Math.cos(angle * 16 + distance * 7)), 18) * 0.34;
+        const crownLight = -0.62 + facet * 1.16 + corner * 0.2 - y * 0.15 + bubbles * 0.15 + refraction;
+        let glaze = tableLight * inTable + crownLight * (1 - inTable) + (sparkle - 0.5) * 0.035;
         // Bright upper facet and luminous bottom glow (the stone's "fire").
         const topFlash = Math.exp(-(x * x) / 0.02 - ((y + 0.5) ** 2) / 0.04) * 0.7;
         const bottomGlow = Math.exp(-(x * x) / 0.06 - ((y - 0.62) ** 2) / 0.035);
         glaze += topFlash;
-        const white = Math.min(1, bottomGlow * 0.85 + Math.max(0, glaze - 0.75) * 0.6);
+        const reflection = Math.exp(-((x + 0.28) ** 2) / 0.0006 - ((y + 0.38) ** 2) / 0.013) + Math.exp(-((x - 0.33) ** 2) / 0.012 - ((y - 0.12) ** 2) / 0.0005);
+        const white = Math.min(1, reflection * 0.9 + bottomGlow * 0.7 + Math.max(0, glaze - 0.75) * 0.6);
         for (let channel = 0; channel < 3; channel += 1) {
           const base = channels[channel] ?? 160;
           const g = Math.max(-0.75, Math.min(0.75, glaze));
@@ -151,7 +155,7 @@ function paintGemSurface(color: string) {
     const oldest = gemPaintings.keys().next().value;
     if (oldest) gemPaintings.delete(oldest);
   }
-  gemPaintings.set(color, surface);
+  gemPaintings.set(cacheKey, surface);
   return surface;
 }
 
@@ -159,11 +163,14 @@ function paintGemSurface(color: string) {
  * and textured gold leaf, with no facet strokes or uniform metallic border. */
 function drawCenterGem(context: CanvasRenderingContext2D, cx: number, cy: number, radius: number, color: string) {
    drawHalo(context, cx, cy, radius * 1.65, color);
-  const surface = paintGemSurface(color);
+  const resolution = radius >= 64 ? 1024 : 512;
+  const surface = paintGemSurface(color, resolution);
   const extent = radius * (640 / 250);
   context.save();
   context.globalAlpha = 1;
   context.globalCompositeOperation = "source-over";
+  context.filter = "none";
+  context.shadowBlur = 0;
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
   context.drawImage(surface, cx - extent / 2, cy - extent / 2, extent, extent);

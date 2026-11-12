@@ -23,6 +23,7 @@ const pendingFortunes = new Map<string, Promise<TodayFortune>>();
 export type FortuneState = { data: TodayFortune | null; partial?: Partial<TodayFortune>; loading: boolean; error: string | null; retry: () => void };
 const resolvedFortunes = new Map<string, { epoch: number; data: TodayFortune }>();
 const fortuneListeners = new Map<string, Set<(value: Partial<TodayFortune>) => void>>();
+const failedFortunes = new Map<string,{epoch:number;error:string}>();
 
 /** One AI reading per subject/day/language/goal, cached on the device; recent picks are sent as avoid lists. */
 export function useTodayFortune(req: Base | null): FortuneState {
@@ -44,6 +45,9 @@ export function useTodayFortune(req: Base | null): FortuneState {
   useEffect(() => {
     if (!req) { setState({ data: null, loading: false, error: null }); return; }
     const key = cacheKey(req);
+    const failed = failedFortunes.get(key);
+    if(nonce===0 && failed?.epoch===readingCacheEpoch()) {setState({data:null,loading:false,error:failed.error,sig});return;}
+    if(nonce>0) failedFortunes.delete(key);
     try {
       const cached = todayFortuneSchema.safeParse(JSON.parse(localStorage.getItem(key) ?? "null"));
       if (cached.success && nonce === 0) { const data = normalizeFortune(cached.data, req.language); resolvedFortunes.set(key, { epoch: readingCacheEpoch(), data }); setState({ data, loading: false, error: null, sig }); void saveCloudReading(key,data).catch(()=>undefined); return; }
@@ -75,7 +79,7 @@ export function useTodayFortune(req: Base | null): FortuneState {
         if (!active) return;
         setState({ data, loading: false, error: null, sig });
       })
-      .catch((e: unknown) => { if (active) setState({ data: null, loading: false, error: e instanceof Error ? e.message : String(e), sig }); });
+      .catch((e: unknown) => { const error=e instanceof Error ? e.message : String(e);if(failedFortunes.size>=64) {const oldest=failedFortunes.keys().next().value;if(oldest) failedFortunes.delete(oldest);}failedFortunes.set(key,{epoch:readingCacheEpoch(),error}); if (active) setState({ data: null, loading: false, error, sig }); });
     return () => { active = false; listeners.delete(listener); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig, nonce]);
