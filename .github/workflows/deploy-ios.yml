@@ -7,6 +7,7 @@ jobs:
   build:
     name: Build & Upload to App Store
     runs-on: macos-13
+    timeout-minutes: 30
 
     steps:
       - name: Checkout Repository
@@ -19,26 +20,28 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build Web Assets
         run: npm run build
 
-      - name: Sync Capacitor iOS
-        run: npx cap sync ios
+      - name: Setup Capacitor iOS
+        run: |
+          npx cap add ios || true
+          npx cap sync ios
 
       - name: Setup App Store Connect API Key
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: Install Fastlane
-        run: brew install fastlane
-
       - name: Build and Upload with Fastlane
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          CI: "true"
+          FASTLANE_SKIP_UPDATE_CHECK: "true"
+          FASTLANE_DISABLE_COLORS: "true"
         run: |
           cd ios/App
           cat << 'EOF' > Fastfile
@@ -66,4 +69,4 @@ jobs:
             end
           end
           EOF
-          bundle exec fastlane release || fastlane release
+          fastlane release
