@@ -21,7 +21,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
+          ruby-version: '3.3'
 
       - name: Install Dependencies
         run: |
@@ -68,12 +68,24 @@ jobs:
                 duration: 1200,
                 in_house: false
               )
-              build_app(
-                workspace: "App.xcworkspace",
-                scheme: "App",
-                export_method: "app-store",
-                clean: true
-              )
+
+              # xcworkspace があればそれを使い、なければ xcodeproj を使用
+              if File.exist?("App.xcworkspace")
+                build_app(
+                  workspace: "App.xcworkspace",
+                  scheme: "App",
+                  export_method: "app-store",
+                  clean: true
+                )
+              else
+                build_app(
+                  project: "App.xcodeproj",
+                  scheme: "App",
+                  export_method: "app-store",
+                  clean: true
+                )
+              end
+
               upload_to_testflight(
                 api_key: api_key,
                 skip_waiting_for_build_processing: true
