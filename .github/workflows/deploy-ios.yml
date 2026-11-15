@@ -70,38 +70,19 @@ jobs:
                 in_house: false
               )
 
-              # プロジェクトファイルが存在する場合、Team ID を設定
-              project_path = "App.xcodeproj"
-              if File.exist?(project_path) && ENV["APPLE_TEAM_ID"]
-                update_project_team(
-                  path: project_path,
-                  teamid: ENV["APPLE_TEAM_ID"]
-                )
-              end
-
-              if File.exist?("App.xcworkspace")
-                build_app(
-                  workspace: "App.xcworkspace",
-                  scheme: "App",
-                  export_method: "app-store",
-                  clean: true,
-                  export_options: {
-                    signingStyle: "automatic",
-                    teamID: ENV["APPLE_TEAM_ID"]
-                  }
-                )
-              else
-                build_app(
-                  project: "App.xcodeproj",
-                  scheme: "App",
-                  export_method: "app-store",
-                  clean: true,
-                  export_options: {
-                    signingStyle: "automatic",
-                    teamID: ENV["APPLE_TEAM_ID"]
-                  }
-                )
-              end
+              # Xcodeに直接コマンド引数としてTeam IDと自動署名を強制注入
+              build_app(
+                project: "App.xcodeproj",
+                scheme: "App",
+                export_method: "app-store",
+                clean: true,
+                xcargs: "DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']} CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates",
+                export_xcargs: "-allowProvisioningUpdates",
+                export_options: {
+                  signingStyle: "automatic",
+                  teamID: ENV["APPLE_TEAM_ID"]
+                }
+              )
 
               upload_to_testflight(
                 api_key: api_key,
