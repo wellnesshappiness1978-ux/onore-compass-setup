@@ -47,6 +47,11 @@ jobs:
           FASTLANE_DISABLE_COLORS: "true"
         run: |
           cd ios/App
+          cat << 'EOF' > Gemfile
+          source "[suspicious link removed]"
+          gem "fastlane"
+          EOF
+          bundle install
           cat << 'EOF' > Fastfile
           default_platform(:ios)
           platform :ios do
@@ -72,4 +77,4 @@ jobs:
             end
           end
           EOF
-          fastlane release
+          bundle exec fastlane release
