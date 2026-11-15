@@ -18,6 +18,11 @@ jobs:
         with:
           node-version: 22
 
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
       - name: Install Dependencies
         run: |
           npm install --legacy-peer-deps --no-audit --no-fund
@@ -38,6 +43,9 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
+      - name: Install Fastlane
+        run: gem install fastlane --no-document
+
       - name: Build and Upload with Fastlane
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -47,10 +55,6 @@ jobs:
           FASTLANE_DISABLE_COLORS: "true"
         run: |
           cd ios/App
-          rm -f Gemfile Gemfile.lock
-          bundle init
-          echo 'gem "fastlane"' >> Gemfile
-          bundle install
           cat << 'EOF' > Fastfile
           default_platform(:ios)
           platform :ios do
@@ -76,4 +80,4 @@ jobs:
             end
           end
           EOF
-          bundle exec fastlane release
+          fastlane release
