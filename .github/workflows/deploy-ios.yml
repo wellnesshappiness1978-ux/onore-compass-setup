@@ -43,6 +43,15 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
+      - name: Inject Team ID into Xcode Project
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          PBXPROJ="ios/App/App.xcodeproj/project.pbxproj"
+          sed -i '' "s/DevelopmentTeam = \"\";/DevelopmentTeam = ${APPLE_TEAM_ID};/g" "$PBXPROJ" || true
+          sed -i '' "s/DEVELOPMENT_TEAM = \"\";/DEVELOPMENT_TEAM = ${APPLE_TEAM_ID};/g" "$PBXPROJ" || true
+          sed -i '' "s/TargetAttributes = {/TargetAttributes = {\n\t\t\t\t\tDevelopmentTeam = ${APPLE_TEAM_ID};/g" "$PBXPROJ" || true
+
       - name: Install Fastlane
         run: gem install fastlane --no-document
 
@@ -70,14 +79,11 @@ jobs:
                 in_house: false
               )
 
-              # Xcodeに直接コマンド引数としてTeam IDと自動署名を強制注入
               build_app(
                 project: "App.xcodeproj",
                 scheme: "App",
                 export_method: "app-store",
                 clean: true,
-                xcargs: "DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']} CODE_SIGN_STYLE=Automatic -allowProvisioningUpdates",
-                export_xcargs: "-allowProvisioningUpdates",
                 export_options: {
                   signingStyle: "automatic",
                   teamID: ENV["APPLE_TEAM_ID"]
