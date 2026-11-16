@@ -85,26 +85,34 @@ jobs:
                 in_house: false
               )
 
-              # 新規証明書の強制作成は行わず、既存プロファイルを取得
+              # キーチェーン作成
+              create_keychain(
+                name: "fastlane_keychain",
+                password: "temporary_password",
+                default_keychain: true,
+                unlock: true,
+                timeout: 3600
+              )
+
+              # プロビジョニングプロファイルの取得／新規自動生成
+              # (force: true で必要に応じて新規生成)
               get_provisioning_profile(
                 api_key: api_key,
                 app_identifier: "com.agolmen.compass",
-                readonly: true
+                force: true
               )
 
-              profile_uuid = Actions.lane_context[SharedValues::SIGH_UUID] || ENV["SIGH_UUID"]
-
+              # ビルド実行（自動プロビジョニング更新オプションを併用）
               build_app(
                 project: "App.xcodeproj",
                 scheme: "App",
                 export_method: "app-store",
                 clean: true,
+                xcargs: "-allowProvisioningUpdates",
+                export_xcargs: "-allowProvisioningUpdates",
                 export_options: {
-                  signingStyle: "manual",
-                  teamID: ENV["APPLE_TEAM_ID"],
-                  provisioningProfiles: {
-                    "com.agolmen.compass" => profile_uuid
-                  }
+                  signingStyle: "automatic",
+                  teamID: ENV["APPLE_TEAM_ID"]
                 }
               )
 
