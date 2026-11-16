@@ -85,25 +85,13 @@ jobs:
                 in_house: false
               )
 
-              create_keychain(
-                name: "fastlane_keychain",
-                password: "temporary_password",
-                default_keychain: true,
-                unlock: true,
-                timeout: 3600
-              )
-
-              get_certificates(
-                api_key: api_key,
-                keychain_path: "~/Library/Keychains/fastlane_keychain-db"
-              )
-
+              # 新規証明書の強制作成は行わず、既存プロファイルを取得
               get_provisioning_profile(
                 api_key: api_key,
-                app_identifier: "com.agolmen.compass"
+                app_identifier: "com.agolmen.compass",
+                readonly: true
               )
 
-              # 取得したプロファイルの UUID を直接 Xcode に渡す
               profile_uuid = Actions.lane_context[SharedValues::SIGH_UUID] || ENV["SIGH_UUID"]
 
               build_app(
