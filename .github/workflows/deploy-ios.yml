@@ -85,17 +85,28 @@ jobs:
                 in_house: false
               )
 
-              # Appleサーバーから App Store 配布用証明書とプロファイルを自動取得
-              get_certificates(
-                api_key: api_key,
-                type: "appstore"
-              )
-              get_provisioning_profile(
-                api_key: api_key,
-                app_identifier: "com.agolmen.compass",
-                type: "appstore"
+              # CI環境用の一時キーチェーンを作成
+              create_keychain(
+                name: "fastlane_keychain",
+                password: "temporary_password",
+                default_keychain: true,
+                unlock: true,
+                timeout: 3600
               )
 
+              # 配布用証明書（Distribution Certificate）の取得/作成
+              get_certificates(
+                api_key: api_key,
+                keychain_path: "~/Library/Keychains/fastlane_keychain-db"
+              )
+
+              # App Store 配布用プロビジョニングプロファイルの取得/作成
+              get_provisioning_profile(
+                api_key: api_key,
+                app_identifier: "com.agolmen.compass"
+              )
+
+              # ビルド実行
               build_app(
                 project: "App.xcodeproj",
                 scheme: "App",
