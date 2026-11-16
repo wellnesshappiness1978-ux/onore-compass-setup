@@ -43,15 +43,20 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: Create Team xcconfig
+      - name: Configure Xcode Signing Settings
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          cat << EOF > ios/App/team.xcconfig
-          DEVELOPMENT_TEAM = ${APPLE_TEAM_ID}
-          CODE_SIGN_STYLE = Automatic
-          PROVISIONING_PROFILE_SPECIFIER = 
-          EOF
+          python3 -c "
+          import re
+          path = 'ios/App/App.xcodeproj/project.pbxproj'
+          with open(path, 'r') as f:
+              content = f.read()
+          content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', f'DEVELOPMENT_TEAM = ${APPLE_TEAM_ID};', content)
+          content = re.sub(r'DevelopmentTeam = [^;]*;', f'DevelopmentTeam = ${APPLE_TEAM_ID};', content)
+          with open(path, 'w') as f:
+              f.write(content)
+          "
 
       - name: Install Fastlane
         run: gem install fastlane --no-document
@@ -80,16 +85,28 @@ jobs:
                 in_house: false
               )
 
+              # Appleサーバーから App Store 配布用証明書とプロファイルを自動取得
+              get_certificates(
+                api_key: api_key,
+                type: "appstore"
+              )
+              get_provisioning_profile(
+                api_key: api_key,
+                app_identifier: "com.agolmen.compass",
+                type: "appstore"
+              )
+
               build_app(
                 project: "App.xcodeproj",
                 scheme: "App",
                 export_method: "app-store",
                 clean: true,
-                xcargs: "-xcconfig team.xcconfig -allowProvisioningUpdates",
-                export_xcargs: "-allowProvisioningUpdates",
                 export_options: {
-                  signingStyle: "automatic",
-                  teamID: ENV["APPLE_TEAM_ID"]
+                  signingStyle: "manual",
+                  teamID: ENV["APPLE_TEAM_ID"],
+                  provisioningProfiles: {
+                    "com.agolmen.compass" => Actions.lane_context[SharedValues::SIGH_PROFILE_NAME]
+                  }
                 }
               )
 
