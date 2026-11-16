@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     name: Build & Upload to App Store
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 30
 
     steps:
@@ -17,11 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
 
       - name: Install Dependencies
         run: |
@@ -43,7 +38,7 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: Configure Xcode Signing Settings
+      - name: Configure Xcode Project Team ID
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
@@ -58,69 +53,51 @@ jobs:
               f.write(content)
           "
 
-      - name: Install Fastlane
-        run: gem install fastlane --no-document
-
-      - name: Build and Upload with Fastlane
+      - name: Build and Upload via Xcode CLI
         env:
-          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CI: "true"
-          FASTLANE_SKIP_UPDATE_CHECK: "true"
-          FASTLANE_DISABLE_COLORS: "true"
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           cd ios/App
-          mkdir -p fastlane
-          cat << 'EOF' > fastlane/Fastfile
-          default_platform(:ios)
-          platform :ios do
-            desc "Build and upload to App Store Connect"
-            lane :release do
-              api_key = app_store_connect_api_key(
-                key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
-                issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
-                key_filepath: "~/.appstoreconnect/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8",
-                duration: 1200,
-                in_house: false
-              )
+          KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8"
 
-              # キーチェーン作成
-              create_keychain(
-                name: "fastlane_keychain",
-                password: "temporary_password",
-                default_keychain: true,
-                unlock: true,
-                timeout: 3600
-              )
-
-              # プロビジョニングプロファイルの取得／新規自動生成
-              # (force: true で必要に応じて新規生成)
-              get_provisioning_profile(
-                api_key: api_key,
-                app_identifier: "com.agolmen.compass",
-                force: true
-              )
-
-              # ビルド実行（自動プロビジョニング更新オプションを併用）
-              build_app(
-                project: "App.xcodeproj",
-                scheme: "App",
-                export_method: "app-store",
-                clean: true,
-                xcargs: "-allowProvisioningUpdates",
-                export_xcargs: "-allowProvisioningUpdates",
-                export_options: {
-                  signingStyle: "automatic",
-                  teamID: ENV["APPLE_TEAM_ID"]
-                }
-              )
-
-              upload_to_testflight(
-                api_key: api_key,
-                skip_waiting_for_build_processing: true
-              )
-            end
-          end
+          # 1. ExportOptions.plist の作成
+          cat << EOF > ExportOptions.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "[suspicious link removed]">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+              <key>teamID</key>
+              <string>${TEAM_ID}</string>
+              <key>destination</key>
+              <string>upload</string>
+              <key>manageAppVersionAndBuildNumber</key>
+              <true/>
+          </dict>
+          </plist>
           EOF
-          fastlane release
+
+          # 2. アーカイブ作成（Appleサーバーの認証キーを使って自動署名）
+          xcodebuild archive \
+            -project App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER_ID"
+
+          # 3. App Store Connect / TestFlight へ直接アップロード
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER_ID"
