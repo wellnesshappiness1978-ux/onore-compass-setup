@@ -38,31 +38,16 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: Configure Xcode Project Team ID
-        env:
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: |
-          python3 -c "
-          import re
-          path = 'ios/App/App.xcodeproj/project.pbxproj'
-          with open(path, 'r') as f:
-              content = f.read()
-          content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', f'DEVELOPMENT_TEAM = ${APPLE_TEAM_ID};', content)
-          content = re.sub(r'DevelopmentTeam = [^;]*;', f'DevelopmentTeam = ${APPLE_TEAM_ID};', content)
-          with open(path, 'w') as f:
-              f.write(content)
-          "
-
       - name: Build and Upload via Xcode CLI
         env:
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          TEAM_ID: "25478AQH7N"
         run: |
           cd ios/App
           KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8"
 
-          # 1. ExportOptions.plist の作成
+          # ExportOptions.plist の作成
           cat << EOF > ExportOptions.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "[suspicious link removed]">
@@ -82,7 +67,7 @@ jobs:
           </plist>
           EOF
 
-          # 2. アーカイブ作成（Appleサーバーの認証キーを使って自動署名）
+          # アーカイブ作成（Team IDと自動署名を引数で強制注入）
           xcodebuild archive \
             -project App.xcodeproj \
             -scheme App \
@@ -91,9 +76,11 @@ jobs:
             -allowProvisioningUpdates \
             -authenticationKeyPath "$KEY_PATH" \
             -authenticationKeyID "$KEY_ID" \
-            -authenticationKeyIssuerID "$ISSUER_ID"
+            -authenticationKeyIssuerID "$ISSUER_ID" \
+            DEVELOPMENT_TEAM="${TEAM_ID}" \
+            CODE_SIGN_STYLE="Automatic"
 
-          # 3. App Store Connect / TestFlight へ直接アップロード
+          # App Store Connect へアップロード
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
