@@ -38,6 +38,27 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
+      - name: Align Xcode Signing Settings to Distribution
+        env:
+          APPLE_TEAM_ID: "25478AQH7N"
+        run: |
+          python3 -c "
+          import re
+          path = 'ios/App/App.xcodeproj/project.pbxproj'
+          with open(path, 'r') as f:
+              content = f.read()
+          # チームIDを注入
+          content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', f'DEVELOPMENT_TEAM = 25478AQH7N;', content)
+          content = re.sub(r'DevelopmentTeam = [^;]*;', f'DevelopmentTeam = 25478AQH7N;', content)
+          # 署名スタイルをManualに統一して自動署名との衝突を完全防止
+          content = re.sub(r'CODE_SIGN_STYLE = Automatic;', 'CODE_SIGN_STYLE = Manual;', content)
+          content = re.sub(r'ProvisioningStyle = Automatic;', 'ProvisioningStyle = Manual;', content)
+          # 署名アイデンティティを Apple Distribution に設定
+          content = re.sub(r'\"CODE_SIGN_IDENTITY\\[sdk=iphoneos\*\\]\" = [^;]*;', '\"CODE_SIGN_IDENTITY[sdk=iphoneos*]\" = \"Apple Distribution\";', content)
+          with open(path, 'w') as f:
+              f.write(content)
+          "
+
       - name: Build and Upload via Xcode CLI
         env:
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -67,18 +88,17 @@ jobs:
           </plist>
           EOF
 
-          # 2. アーカイブ作成（Apple Distribution 署名を明示して端末登録要求を回避）
+          # 2. アーカイブ作成（Generic iOS Device 向けにReleaseビルド）
           xcodebuild archive \
             -project App.xcodeproj \
             -scheme App \
             -configuration Release \
+            -destination "generic/platform=iOS" \
             -archivePath build/App.xcarchive \
             -allowProvisioningUpdates \
             -authenticationKeyPath "$KEY_PATH" \
             -authenticationKeyID "$KEY_ID" \
-            -authenticationKeyIssuerID "$ISSUER_ID" \
-            DEVELOPMENT_TEAM="${TEAM_ID}" \
-            CODE_SIGN_IDENTITY="Apple Distribution"
+            -authenticationKeyIssuerID "$ISSUER_ID"
 
           # 3. App Store Connect / TestFlight へアップロード
           xcodebuild -exportArchive \
