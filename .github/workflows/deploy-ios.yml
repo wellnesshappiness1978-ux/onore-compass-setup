@@ -33,7 +33,7 @@ jobs:
           npx cap add ios || true
           npx cap sync ios
 
-      - name: Force App Store Distribution Signing
+      - name: Configure Xcode Project Team
         run: |
           python3 -c "
           import re
@@ -41,13 +41,9 @@ jobs:
           with open(path, 'r') as f:
               content = f.read()
           
-          # Team ID を注入
+          # Team ID を確実に注入
           content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', 'DEVELOPMENT_TEAM = 25478AQH7N;', content)
           content = re.sub(r'DevelopmentTeam = [^;]*;', 'DevelopmentTeam = 25478AQH7N;', content)
-          
-          # 開発用署名アイデンティティをすべて Apple Distribution に統一（実機端末要求を物理的に排除）
-          content = re.sub(r'\"CODE_SIGN_IDENTITY\\[sdk=iphoneos\*\\]\" = [^;]*;', '\"CODE_SIGN_IDENTITY[sdk=iphoneos*]\" = \"Apple Distribution\";', content)
-          content = re.sub(r'CODE_SIGN_IDENTITY = [^;]*;', 'CODE_SIGN_IDENTITY = \"Apple Distribution\";', content)
           
           with open(path, 'w') as f:
               f.write(content)
@@ -82,21 +78,21 @@ jobs:
           </plist>
           EOF
 
-          # 2. アーカイブ作成（Release構成でビルド）
+          # 2. アーカイブ作成
+          # CODE_SIGNING_REQUIRED=NO と CODE_SIGN_IDENTITY="" でアーカイブ時の証明書衝突・端末要求を完全にスキップ！
+          # （本番配布用の正式署名は次の exportArchive で一括実行されます）
           xcodebuild archive \
             -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -destination "generic/platform=iOS" \
             -archivePath build/App.xcarchive \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$KEY_PATH" \
-            -authenticationKeyID "$KEY_ID" \
-            -authenticationKeyIssuerID "$ISSUER_ID" \
             DEVELOPMENT_TEAM="${TEAM_ID}" \
-            CODE_SIGN_IDENTITY="Apple Distribution"
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
 
-          # 3. App Store Connect / TestFlight へ直接アップロード
+          # 3. App Store Connect / TestFlight へアップロード
+          # ここで Apple 公式 API キーを使って Apple Distribution 署名が自動適用されます
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
