@@ -33,6 +33,22 @@ jobs:
           npx cap add ios || true
           npx cap sync ios
 
+      - name: Configure Xcode Project for Distribution
+        run: |
+          python3 -c "
+          import re
+          path = 'ios/App/App.xcodeproj/project.pbxproj'
+          with open(path, 'r') as f:
+              content = f.read()
+          # チームIDを全ターゲットに確実に注入
+          content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', 'DEVELOPMENT_TEAM = 25478AQH7N;', content)
+          content = re.sub(r'DevelopmentTeam = [^;]*;', 'DevelopmentTeam = 25478AQH7N;', content)
+          # Developmentプロファイルの強制要求を回避
+          content = re.sub(r'PROVISIONING_PROFILE_SPECIFIER = [^;]*;', '', content)
+          with open(path, 'w') as f:
+              f.write(content)
+          "
+
       - name: Build and Upload via Xcode Native CLI
         env:
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -42,7 +58,7 @@ jobs:
           cd ios/App
           KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8"
 
-          # 1. ExportOptions.plist の作成
+          # 1. ExportOptions.plist の作成（App Store直接配布用）
           cat << EOF > ExportOptions.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "[suspicious link removed]">
@@ -62,7 +78,7 @@ jobs:
           </plist>
           EOF
 
-          # 2. アーカイブ作成（DEVELOPMENT_TEAM を引数で直接Xcodeに強制適用）
+          # 2. アーカイブ作成（Release構成でビルド、実機チェックを回避）
           xcodebuild archive \
             -project App.xcodeproj \
             -scheme App \
