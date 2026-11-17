@@ -7,7 +7,7 @@ jobs:
   build:
     name: Build & Upload to App Store
     runs-on: macos-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout Repository
@@ -18,16 +18,21 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: Verify and Setup iOS Project
+      - name: Initialize Web Assets and Capacitor iOS
         run: |
-          # iosフォルダが存在しない場合のみ最小限で自動生成
-          if [ ! -d "ios/App/App.xcodeproj" ]; then
-            mkdir -p dist
-            if [ ! -f dist/index.html ]; then
+          mkdir -p dist
+          if [ ! -f dist/index.html ]; then
+            if [ -f index.html ]; then
+              cp index.html dist/
+            else
               echo "<!DOCTYPE html><html><head><title>App</title></head><body></body></html>" > dist/index.html
             fi
-            npx --yes @capacitor/cli add ios || true
           fi
+          
+          # Mac標準のnpmでCapacitorツールを即座に導入してiOSプロジェクトを確実に展開
+          npm install @capacitor/cli @capacitor/core @capacitor/ios --no-audit --no-fund
+          npx cap add ios || true
+          npx cap sync ios
 
       - name: Configure Xcode Project Team
         run: |
