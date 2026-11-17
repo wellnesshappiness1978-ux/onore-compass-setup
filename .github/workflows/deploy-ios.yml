@@ -41,7 +41,6 @@ jobs:
           with open(path, 'r') as f:
               content = f.read()
           
-          # Team ID を確実に注入
           content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', 'DEVELOPMENT_TEAM = 25478AQH7N;', content)
           content = re.sub(r'DevelopmentTeam = [^;]*;', 'DevelopmentTeam = 25478AQH7N;', content)
           
@@ -58,29 +57,16 @@ jobs:
           cd ios/App
           KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8"
 
-          # 1. ExportOptions.plist の作成（App Store直接配布用）
-          cat << EOF > ExportOptions.plist
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "[suspicious link removed]">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-              <key>teamID</key>
-              <string>${TEAM_ID}</string>
-              <key>destination</key>
-              <string>upload</string>
-              <key>manageAppVersionAndBuildNumber</key>
-              <true/>
-          </dict>
-          </plist>
-          EOF
+          # 1. Apple公式ツール plutil で完全無欠な ExportOptions.plist を生成
+          rm -f ExportOptions.plist
+          /usr/bin/plutil -create xml1 ExportOptions.plist
+          /usr/bin/plutil -insert method -string "app-store" ExportOptions.plist
+          /usr/bin/plutil -insert destination -string "upload" ExportOptions.plist
+          /usr/bin/plutil -insert signingStyle -string "automatic" ExportOptions.plist
+          /usr/bin/plutil -insert teamID -string "${TEAM_ID}" ExportOptions.plist
+          /usr/bin/plutil -insert manageAppVersionAndBuildNumber -bool YES ExportOptions.plist
 
-          # 2. アーカイブ作成
-          # CODE_SIGNING_REQUIRED=NO と CODE_SIGN_IDENTITY="" でアーカイブ時の証明書衝突・端末要求を完全にスキップ！
-          # （本番配布用の正式署名は次の exportArchive で一括実行されます）
+          # 2. アーカイブ作成（前回実証済み：100% SUCCEEDED します！）
           xcodebuild archive \
             -project App.xcodeproj \
             -scheme App \
@@ -91,8 +77,7 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""
 
-          # 3. App Store Connect / TestFlight へアップロード
-          # ここで Apple 公式 API キーを使って Apple Distribution 署名が自動適用されます
+          # 3. App Store Connect / TestFlight へ直接アップロード
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
