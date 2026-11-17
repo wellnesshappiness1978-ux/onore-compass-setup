@@ -18,6 +18,11 @@ jobs:
         with:
           node-version: 22
 
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
       - name: Install Dependencies
         run: |
           npm install --legacy-peer-deps --no-audit --no-fund
@@ -38,28 +43,10 @@ jobs:
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: Align Xcode Signing Settings to Distribution
-        env:
-          APPLE_TEAM_ID: "25478AQH7N"
-        run: |
-          python3 -c "
-          import re
-          path = 'ios/App/App.xcodeproj/project.pbxproj'
-          with open(path, 'r') as f:
-              content = f.read()
-          # チームIDを注入
-          content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', f'DEVELOPMENT_TEAM = 25478AQH7N;', content)
-          content = re.sub(r'DevelopmentTeam = [^;]*;', f'DevelopmentTeam = 25478AQH7N;', content)
-          # 署名スタイルをManualに統一して自動署名との衝突を完全防止
-          content = re.sub(r'CODE_SIGN_STYLE = Automatic;', 'CODE_SIGN_STYLE = Manual;', content)
-          content = re.sub(r'ProvisioningStyle = Automatic;', 'ProvisioningStyle = Manual;', content)
-          # 署名アイデンティティを Apple Distribution に設定
-          content = re.sub(r'\"CODE_SIGN_IDENTITY\\[sdk=iphoneos\*\\]\" = [^;]*;', '\"CODE_SIGN_IDENTITY[sdk=iphoneos*]\" = \"Apple Distribution\";', content)
-          with open(path, 'w') as f:
-              f.write(content)
-          "
+      - name: Install Fastlane
+        run: gem install fastlane --no-document
 
-      - name: Build and Upload via Xcode CLI
+      - name: Fetch Profile and Build via Xcode CLI
         env:
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -68,7 +55,51 @@ jobs:
           cd ios/App
           KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${KEY_ID}.p8"
 
-          # 1. ExportOptions.plist の作成（App Store直接配布用）
+          # 1. Fastlane で Apple から最新の App Store 配布用プロファイルを取得
+          mkdir -p fastlane
+          cat << 'EOF' > fastlane/Fastfile
+          default_platform(:ios)
+          platform :ios do
+            lane :fetch_profile do
+              api_key = app_store_connect_api_key(
+                key_id: ENV["KEY_ID"],
+                issuer_id: ENV["ISSUER_ID"],
+                key_filepath: "~/.appstoreconnect/private_keys/AuthKey_#{ENV['KEY_ID']}.p8",
+                duration: 1200,
+                in_house: false
+              )
+              get_provisioning_profile(
+                api_key: api_key,
+                app_identifier: "com.agolmen.compass",
+                type: "appstore",
+                force: false
+              )
+            end
+          end
+          EOF
+          fastlane fetch_profile
+
+          # 2. 取得したプロファイルを Xcode のシステム格納場所にコピー
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp AppStore_com.agolmen.compass.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
+          # 3. project.pbxproj の署名設定を完全に紐付け
+          python3 -c "
+          import re
+          path = 'App.xcodeproj/project.pbxproj'
+          with open(path, 'r') as f:
+              content = f.read()
+          content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', 'DEVELOPMENT_TEAM = 25478AQH7N;', content)
+          content = re.sub(r'DevelopmentTeam = [^;]*;', 'DevelopmentTeam = 25478AQH7N;', content)
+          content = re.sub(r'CODE_SIGN_STYLE = [^;]*;', 'CODE_SIGN_STYLE = Manual;', content)
+          content = re.sub(r'ProvisioningStyle = [^;]*;', 'ProvisioningStyle = Manual;', content)
+          content = re.sub(r'\"CODE_SIGN_IDENTITY\\[sdk=iphoneos\*\\]\" = [^;]*;', '\"CODE_SIGN_IDENTITY[sdk=iphoneos*]\" = \"Apple Distribution\";', content)
+          content = re.sub(r'PROVISIONING_PROFILE_SPECIFIER = [^;]*;', 'PROVISIONING_PROFILE_SPECIFIER = \"com.agolmen.compass\";', content)
+          with open(path, 'w') as f:
+              f.write(content)
+          "
+
+          # 4. ExportOptions.plist の作成
           cat << EOF > ExportOptions.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "[suspicious link removed]">
@@ -77,18 +108,23 @@ jobs:
               <key>method</key>
               <string>app-store</string>
               <key>signingStyle</key>
-              <string>automatic</string>
+              <string>manual</string>
               <key>teamID</key>
               <string>${TEAM_ID}</string>
               <key>destination</key>
               <string>upload</string>
               <key>manageAppVersionAndBuildNumber</key>
               <true/>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>com.agolmen.compass</key>
+                  <string>com.agolmen.compass AppStore 1794830486</string>
+              </dict>
           </dict>
           </plist>
           EOF
 
-          # 2. アーカイブ作成（Generic iOS Device 向けにReleaseビルド）
+          # 5. アーカイブ作成（プロファイルがローカルにあるため確実に署名完了）
           xcodebuild archive \
             -project App.xcodeproj \
             -scheme App \
@@ -100,7 +136,7 @@ jobs:
             -authenticationKeyID "$KEY_ID" \
             -authenticationKeyIssuerID "$ISSUER_ID"
 
-          # 3. App Store Connect / TestFlight へアップロード
+          # 6. App Store Connect / TestFlight へアップロード
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
