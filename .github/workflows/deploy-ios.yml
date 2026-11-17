@@ -33,18 +33,22 @@ jobs:
           npx cap add ios || true
           npx cap sync ios
 
-      - name: Configure Xcode Project for Distribution
+      - name: Force App Store Distribution Signing
         run: |
           python3 -c "
           import re
           path = 'ios/App/App.xcodeproj/project.pbxproj'
           with open(path, 'r') as f:
               content = f.read()
-          # チームIDを全ターゲットに確実に注入
+          
+          # Team ID を注入
           content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', 'DEVELOPMENT_TEAM = 25478AQH7N;', content)
           content = re.sub(r'DevelopmentTeam = [^;]*;', 'DevelopmentTeam = 25478AQH7N;', content)
-          # Developmentプロファイルの強制要求を回避
-          content = re.sub(r'PROVISIONING_PROFILE_SPECIFIER = [^;]*;', '', content)
+          
+          # 開発用署名アイデンティティをすべて Apple Distribution に統一（実機端末要求を物理的に排除）
+          content = re.sub(r'\"CODE_SIGN_IDENTITY\\[sdk=iphoneos\*\\]\" = [^;]*;', '\"CODE_SIGN_IDENTITY[sdk=iphoneos*]\" = \"Apple Distribution\";', content)
+          content = re.sub(r'CODE_SIGN_IDENTITY = [^;]*;', 'CODE_SIGN_IDENTITY = \"Apple Distribution\";', content)
+          
           with open(path, 'w') as f:
               f.write(content)
           "
@@ -78,7 +82,7 @@ jobs:
           </plist>
           EOF
 
-          # 2. アーカイブ作成（Release構成でビルド、実機チェックを回避）
+          # 2. アーカイブ作成（Release構成でビルド）
           xcodebuild archive \
             -project App.xcodeproj \
             -scheme App \
@@ -89,7 +93,8 @@ jobs:
             -authenticationKeyPath "$KEY_PATH" \
             -authenticationKeyID "$KEY_ID" \
             -authenticationKeyIssuerID "$ISSUER_ID" \
-            DEVELOPMENT_TEAM="${TEAM_ID}"
+            DEVELOPMENT_TEAM="${TEAM_ID}" \
+            CODE_SIGN_IDENTITY="Apple Distribution"
 
           # 3. App Store Connect / TestFlight へ直接アップロード
           xcodebuild -exportArchive \
