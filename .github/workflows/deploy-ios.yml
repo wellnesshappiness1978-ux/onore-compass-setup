@@ -7,48 +7,40 @@ jobs:
   build:
     name: Build & Upload to App Store
     runs-on: macos-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Generate iOS Project via Capacitor
-        run: |
-          mkdir -p dist
-          # index.html の存在保証
-          if [ ! -f dist/index.html ]; then
-            if [ -f index.html ]; then
-              cp index.html dist/
-            else
-              echo "<!DOCTYPE html><html><head><title>App</title></head><body></body></html>" > dist/index.html
-            fi
-          fi
-          # npm install なしで即時iOSフォルダを生成・同期
-          npx --yes @capacitor/cli add ios || true
-          npx --yes @capacitor/cli sync ios
 
       - name: Setup App Store Connect API Key
         run: |
           mkdir -p ~/.appstoreconnect/private_keys
           echo "${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
+      - name: Verify and Setup iOS Project
+        run: |
+          # iosフォルダが存在しない場合のみ最小限で自動生成
+          if [ ! -d "ios/App/App.xcodeproj" ]; then
+            mkdir -p dist
+            if [ ! -f dist/index.html ]; then
+              echo "<!DOCTYPE html><html><head><title>App</title></head><body></body></html>" > dist/index.html
+            fi
+            npx --yes @capacitor/cli add ios || true
+          fi
+
       - name: Configure Xcode Project Team
         run: |
           python3 -c "
-          import re
+          import os, re
           path = 'ios/App/App.xcodeproj/project.pbxproj'
-          with open(path, 'r') as f:
-              content = f.read()
-          content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', 'DEVELOPMENT_TEAM = 25478AQH7N;', content)
-          content = re.sub(r'DevelopmentTeam = [^;]*;', 'DevelopmentTeam = 25478AQH7N;', content)
-          with open(path, 'w') as f:
-              f.write(content)
+          if os.path.exists(path):
+              with open(path, 'r') as f:
+                  content = f.read()
+              content = re.sub(r'DEVELOPMENT_TEAM = [^;]*;', 'DEVELOPMENT_TEAM = 25478AQH7N;', content)
+              content = re.sub(r'DevelopmentTeam = [^;]*;', 'DevelopmentTeam = 25478AQH7N;', content)
+              with open(path, 'w') as f:
+                  f.write(content)
           "
 
       - name: Build and Upload via Xcode Native CLI
@@ -80,7 +72,7 @@ jobs:
           </plist>
           EOF
 
-          # 2. アーカイブ作成（Xcode Native CLIでApple公式API自動署名）
+          # 2. アーカイブ作成（Apple公式APIキーで自動署名）
           xcodebuild archive \
             -project App.xcodeproj \
             -scheme App \
