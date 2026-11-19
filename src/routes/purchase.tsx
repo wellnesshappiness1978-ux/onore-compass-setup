@@ -3,7 +3,8 @@ import { useServerFn } from '@tanstack/react-start';
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, CreditCard, Crown, LoaderCircle, RefreshCw, Settings, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { PurchaseConsent } from '@/components/PurchaseConsent';
+import { withPurchaseConsent } from '@/lib/purchase-consent';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 import { billingPlans, type BillingPlan } from '@/lib/billing-plans';
@@ -31,7 +32,8 @@ function Purchase() {
  const [signedIn,setSignedIn] = useState(false);
  const [ready,setReady] = useState(false);
  const [yearly,setYearly] = useState(false);
- const [consent,setConsent] = useState(false);
+ const [consents,setConsents] = useState<Partial<Record<BillingPlan, boolean>>>({});
+ const [consentError,setConsentError] = useState<string | null>(null);
  const [busy,setBusy] = useState<string | null>(null);
  const [message,setMessage] = useState<'error'|'success'|'pending'|null>(null);
  const [plan,setPlan] = useState<Plan>('free');
@@ -43,6 +45,14 @@ function Purchase() {
  const portal = useServerFn(createBillingPortal);
  const t = billingCopy[language];
  const names = appearanceUiCopy[language].plans;
+ const updateConsent = (entry: BillingPlan, value: boolean) => {
+   setConsents(previous => ({ ...previous, [entry]: value }));
+   if (value) setConsentError(null);
+ };
+ const requireConsent = (entry: BillingPlan, id: string, proceed: () => void) => withPurchaseConsent(consents[entry] === true, () => {
+   setConsentError(id);
+   document.getElementById(id)?.focus({ preventScroll: true });
+ }, proceed);
  const refresh = useCallback(async () => {
    setBusy('refresh');
    try {
@@ -87,7 +97,7 @@ function Purchase() {
    {search.canceled && <p role="status" className="mb-5 text-sm text-muted-foreground">{t.canceled}</p>}
    <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
      <p className="text-sm">{t.current}: <strong className="text-primary">{names[plan]}</strong></p>
-     <div role="radiogroup" aria-label={t.title} className="flex gap-2">{[false,true].map(value=><Button key={String(value)} variant={yearly===value?'default':'outline'} role="radio" aria-checked={yearly===value} onClick={()=>setYearly(value)}>{value?t.yearly:t.monthly}</Button>)}</div>
+     <div role="radiogroup" aria-label={t.title} className="flex gap-2">{[false,true].map(value=><Button key={String(value)} variant={yearly===value?'default':'outline'} role="radio" aria-checked={yearly===value} onClick={()=>{setYearly(value);setConsents({});setConsentError(null);}}>{value?t.yearly:t.monthly}</Button>)}</div>
    </div>
    {!signedIn && <Button disabled={!ready || busy!==null} className="mb-6 min-h-11 h-auto whitespace-normal" onClick={async()=>{setBusy('signin');try {const result=await lovable.auth.signInWithOAuth('google',{ redirect_uri:`${window.location.origin}/purchase` });if(result.error)setMessage('error');}catch{setMessage('error');}finally{setBusy(null);}}}><ShieldCheck className="size-4" />{ready?t.signin:t.loading}</Button>}
    <div className="grid min-w-0 gap-4 md:grid-cols-2">
@@ -100,16 +110,21 @@ function Purchase() {
          <p className="my-4 flex flex-wrap items-baseline gap-2"><strong className="text-3xl text-primary">¥{(price??entry.monthly).amount.toLocaleString('ja-JP')}</strong><span className="text-sm text-muted-foreground">/ {price && yearly?t.yearly:t.monthly}</span></p>
          <p className="mb-3 text-sm font-semibold text-primary">{planBenefits(entry.plan,language).at(-1)}</p>
          <ul className="mb-5 flex-1 space-y-2 text-sm leading-relaxed">{details?.features.map(f=><li key={f} className="break-words">・{f}</li>)}</ul>
-         <Button className="h-auto min-h-12 w-full whitespace-normal" disabled={!signedIn || !consent || busy!==null || !price} onClick={()=>{setMessage(null);setSelected(entry.plan);}}><CreditCard className="size-4 shrink-0" />{t.pay}</Button>
+         <div className="space-y-3">
+           <PurchaseConsent id={`consent-${entry.plan}`} language={language} checked={consents[entry.plan] === true} error={consentError === `consent-${entry.plan}`} onChange={value => updateConsent(entry.plan, value)} />
+           <Button className="h-auto min-h-12 w-full whitespace-normal" disabled={!signedIn || busy!==null || !price} onClick={()=>requireConsent(entry.plan, `consent-${entry.plan}`, ()=>{setMessage(null);setConsentError(null);setSelected(entry.plan);})}><CreditCard className="size-4 shrink-0" />{t.pay}</Button>
+         </div>
        </article>;
      })}
    </div>
    <section className="mt-6 space-y-4 border-t border-primary/25 py-6">
-     <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed"><Checkbox checked={consent} onCheckedChange={v=>setConsent(v===true)} className="mt-1 shrink-0" /><span>{t.terms}</span></label>
      <div className="flex flex-wrap gap-4 text-sm text-primary">{(['terms','commerce','privacy'] as const).map(document=><Link key={document} to="/legal/$document" params={{document}}>{legalContentByLanguage[language][document].title}</Link>)}</div>
      <p className="text-sm leading-relaxed text-muted-foreground">{t.notice}</p>
      {signedIn && <div className="flex flex-wrap gap-3"><Button variant="outline" disabled={busy!==null} onClick={()=>void refresh()}><RefreshCw className="size-4" />{t.refresh}</Button>{linked && <Button variant="outline" className="h-auto min-h-11 whitespace-normal" disabled={busy!==null} onClick={()=>void open()}><Settings className="size-4" />{t.manage}</Button>}</div>}
    </section>
-   <Dialog open={selected!==null} onOpenChange={v=>{if(!v&&busy===null)setSelected(null);}}><DialogContent className="max-h-[85dvh] overflow-y-auto"><DialogTitle>{planBenefitsCopy[language].confirm}</DialogTitle><DialogDescription>{selected ? names[selected] : ''} · ¥{selected ? (yearly ? billingPlans.find(p=>p.plan===selected)?.yearly?.amount : billingPlans.find(p=>p.plan===selected)?.monthly.amount)?.toLocaleString('ja-JP') : ''} / {yearly?t.yearly:t.monthly}</DialogDescription>{selected && <ul className="space-y-3 text-sm leading-relaxed">{planBenefits(selected,language).map(f=><li key={f}>・{f}</li>)}</ul>}<p className="text-sm text-muted-foreground">{t.notice}</p>{message==='error'&&<p role="alert" className="text-sm text-primary">{billingErrorText(language,errorCode)}</p>}<Button disabled={busy!==null||!consent} className="h-auto min-h-12 whitespace-normal" onClick={()=>{if(selected)void open(selected);}}>{busy?<LoaderCircle className="size-4 animate-spin"/>:<CreditCard className="size-4"/>}{t.pay}</Button></DialogContent></Dialog>
+   <Dialog open={selected!==null} onOpenChange={v=>{if(!v&&busy===null){setSelected(null);setConsentError(null);}}}><DialogContent className="max-h-[90dvh] overflow-y-auto"><DialogTitle>{planBenefitsCopy[language].confirm}</DialogTitle><DialogDescription>{selected ? names[selected] : ''} · ¥{selected ? (yearly ? billingPlans.find(p=>p.plan===selected)?.yearly?.amount : billingPlans.find(p=>p.plan===selected)?.monthly.amount)?.toLocaleString('ja-JP') : ''} / {yearly?t.yearly:t.monthly}</DialogDescription>{selected && <ul className="space-y-3 text-sm leading-relaxed">{planBenefits(selected,language).map(f=><li key={f}>・{f}</li>)}</ul>}<p className="text-sm text-muted-foreground">{t.notice}</p>{message==='error'&&<p role="alert" className="text-sm text-primary">{billingErrorText(language,errorCode)}</p>}{selected && <div className="sticky -bottom-6 space-y-3 border-t border-border bg-background py-4">
+     <PurchaseConsent id="consent-checkout" language={language} checked={consents[selected] === true} error={consentError === 'consent-checkout'} onChange={value => updateConsent(selected, value)} />
+     <Button disabled={busy!==null} className="h-auto min-h-12 w-full whitespace-normal" onClick={()=>requireConsent(selected, 'consent-checkout', ()=>void open(selected))}>{busy?<LoaderCircle className="size-4 animate-spin"/>:<CreditCard className="size-4"/>}{t.pay}</Button>
+   </div>}</DialogContent></Dialog>
  </main>;
 }

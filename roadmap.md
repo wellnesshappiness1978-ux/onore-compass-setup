@@ -1,5 +1,10 @@
 # Roadmap
 
+## Purchase consent placement (2026-11-19)
+- [x] Move agreement into each paid card and immediately above final checkout, with shared localized legal links and visible required styling; remove the bottom agreement.
+- [x] Keep unchecked purchase actions interactive for inline warning/focus; guard selection and checkout, scope agreement per plan and reset on period change.
+- [x] Signed-in all four paid cards and final confirmation show warnings/focus while unchecked; terms open separately and annual toggle clears agreement. Desktop and 320/390/615px checked without overflow/page errors; 15 targeted tests pass, automatic build OK. No payment submitted; native iOS/Android not separately tested. Not published.
+
 ## Stability, gem quality and daily food diversity (2026-11-12)
 - [x] Unify Family authorization with effective membership; remove refresh-time whitelist writes that loop with Stripe reconciliation; stop error polling/replay and expose one explicit retry with atomic failed-row acquisition.
 - [x] Restore resolution-aware 512/1024 personal-color brilliant gem with crisp facets/reflections; live and export share composition. Desktop/mobile rendering checked.
