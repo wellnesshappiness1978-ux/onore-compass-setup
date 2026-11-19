@@ -232,6 +232,13 @@
       "when": 1793426575158,
       "tag": "0032_harden_support_history_writes",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1795074483266,
+      "tag": "0033_invitation_codes",
+      "breakpoints": true
     }
   ]
 }

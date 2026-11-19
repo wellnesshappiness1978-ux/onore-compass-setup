@@ -3,6 +3,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, CreditCard, Crown, LoaderCircle, RefreshCw, Settings, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { InvitationCodeForm } from '@/components/InvitationCodeForm';
 import { PurchaseConsent } from '@/components/PurchaseConsent';
 import { withPurchaseConsent } from '@/lib/purchase-consent';
 import { supabase } from '@/integrations/supabase/client';
@@ -120,6 +121,7 @@ function Purchase() {
    <section className="mt-6 space-y-4 border-t border-primary/25 py-6">
      <div className="flex flex-wrap gap-4 text-sm text-primary">{(['terms','commerce','privacy'] as const).map(document=><Link key={document} to="/legal/$document" params={{document}}>{legalContentByLanguage[language][document].title}</Link>)}</div>
      <p className="text-sm leading-relaxed text-muted-foreground">{t.notice}</p>
+     {signedIn && <InvitationCodeForm onApplied={()=>void refresh()} />}
      {signedIn && <div className="flex flex-wrap gap-3"><Button variant="outline" disabled={busy!==null} onClick={()=>void refresh()}><RefreshCw className="size-4" />{t.refresh}</Button>{linked && <Button variant="outline" className="h-auto min-h-11 whitespace-normal" disabled={busy!==null} onClick={()=>void open()}><Settings className="size-4" />{t.manage}</Button>}</div>}
    </section>
    <Dialog open={selected!==null} onOpenChange={v=>{if(!v&&busy===null){setSelected(null);setConsentError(null);}}}><DialogContent className="max-h-[90dvh] overflow-y-auto"><DialogTitle>{planBenefitsCopy[language].confirm}</DialogTitle><DialogDescription>{selected ? names[selected] : ''} · ¥{selected ? (yearly ? billingPlans.find(p=>p.plan===selected)?.yearly?.amount : billingPlans.find(p=>p.plan===selected)?.monthly.amount)?.toLocaleString('ja-JP') : ''} / {yearly?t.yearly:t.monthly}</DialogDescription>{selected && <ul className="space-y-3 text-sm leading-relaxed">{planBenefits(selected,language).map(f=><li key={f}>・{f}</li>)}</ul>}<p className="text-sm text-muted-foreground">{t.notice}</p>{message==='error'&&<p role="alert" className="text-sm text-primary">{billingErrorText(language,errorCode)}</p>}{selected && <div className="sticky -bottom-6 space-y-3 border-t border-border bg-background py-4">
