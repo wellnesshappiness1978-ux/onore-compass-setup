@@ -833,6 +833,10 @@ body p, body li, body h1, body h2, body h3, body h4, body span, body label, body
 body:has(.debug-plan-bar) { --header-safe-top: 0px; }
 .safe-page { padding-top: max(2rem, var(--safe-top)); }
 .celestial-scene { padding-top: max(2.5rem, var(--safe-top)); }
+.safe-fullscreen { padding-top: calc(var(--safe-top) + 3rem); padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px); overflow-y: auto; }
+.safe-fullscreen-close { top: var(--safe-top); }
+.safe-fullscreen-frame { width: min(100%, calc(100dvh - var(--safe-top) - env(safe-area-inset-bottom, 0px) - 4rem)); flex-shrink: 0; }
+.safe-fullscreen-frame[data-art="mandala"] { width: min(100%, calc(100dvh - var(--safe-top) - env(safe-area-inset-bottom, 0px) - 12rem)); }
 .sacred-modal.sacred-modal {
   top: calc(50% + (var(--safe-top) - env(safe-area-inset-bottom, 0px)) / 2);
   max-height: min(90dvh, calc(100dvh - var(--safe-top) - env(safe-area-inset-bottom, 0px) - 32px));

@@ -15,4 +15,4 @@ export const Route = createFileRoute("/legal/$document")({
   },
   component: LegalPage,
 });
-function LegalPage() { const kind = Route.useLoaderData(); const [language, setLanguage] = useState<Language>("ja"); useEffect(() => setLanguage(storedLanguage()), []); const content = legalContentByLanguage[language]; return <main className="mx-auto min-h-[65dvh] max-w-3xl px-5 py-16"><Link to="/" className="text-sm text-primary underline">{supportCopy[language].back}</Link><h1 className="mb-8 mt-6 font-serif text-2xl text-primary">{content[kind].title}</h1><LegalText kind={kind} language={language} /></main>; }
+function LegalPage() { const kind = Route.useLoaderData(); const [language, setLanguage] = useState<Language>("ja"); useEffect(() => setLanguage(storedLanguage()), []); const content = legalContentByLanguage[language]; return <main className="mx-auto min-h-[65dvh] max-w-3xl px-5 pb-16 pt-[max(4rem,var(--safe-top))]"><Link to="/" className="text-sm text-primary underline">{supportCopy[language].back}</Link><h1 className="mb-8 mt-6 font-serif text-2xl text-primary">{content[kind].title}</h1><LegalText kind={kind} language={language} /></main>; }

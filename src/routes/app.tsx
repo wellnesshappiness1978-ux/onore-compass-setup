@@ -150,7 +150,7 @@ function Index() {
 
   return (
     <>
-      {(!profile || editing) && <div className="relative z-50 mx-4 my-4">
+      {(!profile || editing) && <div className="relative z-50 mx-4 mb-4 pt-[var(--safe-top)]">
         <Button variant="outline" className="h-10 max-w-full border-primary/40 bg-background/85 px-3 text-xs text-primary backdrop-blur-md" onClick={userId ? signOut : signIn}>
           {userId ? copy.signOut : copy.signIn}
         </Button>

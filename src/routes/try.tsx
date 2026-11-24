@@ -27,7 +27,7 @@ function TryItOut() {
   const plan = TRIAL_PLANS.find(p => p.id === active)!;
   const price = billingPlans.find(p => p.plan === active);
   const consult = getPlanConsultationLimit(active);
-  return <main className="min-h-screen bg-background px-4 py-10 text-foreground">
+  return <main className="min-h-screen bg-background px-4 pb-10 pt-[max(2.5rem,var(--safe-top))] text-foreground">
     <div className="mx-auto max-w-3xl">
       <Link to="/" className="text-sm text-primary">← 公式サイトへ戻る</Link>
       <p className="mt-6 text-xs tracking-[0.3em] text-primary">TRY IT OUT</p>

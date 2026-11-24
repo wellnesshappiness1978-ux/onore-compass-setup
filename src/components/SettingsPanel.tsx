@@ -384,11 +384,11 @@ export default function SettingsPanel({
         <DialogContent className="max-w-sm border-primary/30 bg-card text-foreground">
           <DialogTitle className="font-serif text-xl text-primary">{upgradePlan}</DialogTitle>
           <DialogDescription className="text-sm leading-6 text-muted-foreground">
-            {t.upgradeNote}
+            {billingCopy[language].notice}
           </DialogDescription>
-          <p className="text-xs text-muted-foreground">{t.planTestNote}</p>
-          <div className="flex justify-end pt-2">
+          <div className="flex flex-wrap justify-end gap-2 pt-2">
             <Button variant="outline" onClick={() => setUpgradePlan(null)}>{dc.later}</Button>
+            <Button asChild className="h-auto min-h-11 whitespace-normal"><Link to="/purchase">{billingCopy[language].title}</Link></Button>
           </div>
         </DialogContent>
       </Dialog>

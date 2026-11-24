@@ -63,6 +63,7 @@ import { createDialogSwipeHandlers } from './dialog-swipe';
 import SessionPrefetch from './SessionPrefetch';
 import DeepCompatibilityReport from './DeepCompatibilityReport';
 import { hasDeepCompatibility, planBenefitsCopy } from '@/lib/plan-benefits';
+import { billingCopy } from '@/lib/billing-copy';
 import type { DeepReport } from '@/lib/deep-compatibility.functions';
 import { usageStatusCopy } from '@/lib/usage-status-copy';
 import TodayReminders, { DailyReminderCatalogue } from "./TodayReminders";
@@ -1060,7 +1061,10 @@ export default function Dashboard({ profile, onEdit, onProfileChange, language, 
           ) : modal === "notifications" ? (
             <p className="py-7 text-center text-sm text-muted-foreground">{t.noNotifications}</p>
           ) : modal === "vip" ? (
-            <p className="py-7 text-center text-sm text-muted-foreground">{t.comingFeature}</p>
+            <div className="space-y-4">
+              <p className="text-sm leading-7 text-muted-foreground">{billingCopy[language].notice}</p>
+              <Button asChild className="h-auto min-h-11 w-full whitespace-normal"><Link to="/purchase"><Crown className="size-4 shrink-0" />{planBenefitsCopy[language].purchase}</Link></Button>
+            </div>
           ) : (
             <div className="space-y-4">
               <p className="text-sm leading-7 text-foreground">{t.timingResult}</p>

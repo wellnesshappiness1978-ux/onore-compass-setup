@@ -1,5 +1,10 @@
 # Roadmap
 
+## Cross-screen iOS/input/purchase consistency sweep (2026-11-24)
+- [x] Read LP/try/purchase/help/support/thread/legal pages, onboarding/profile, birthplace/parents/siblings, compatibility/group/relationship inputs, consultation/support composers, fullscreen artwork and upgrade/portal entry points. Inputs use one native change path; both composers share IME protection. Unused carousel/alert/sidebar variants were inspected but not altered.
+- [x] Fix initial account button, standalone page insets and independent art fullscreen; replace remaining Settings and compatibility upgrade preparation dialogs with public purchase links. Billing handlers/owner checks, effective_membership_plan/invitation SQL and push job were read and left unchanged; no settled payments, permissions, settings or stored samples changed.
+- [x] 556 tests and automatic build pass. Nine public pages plus guest initial account controls checked at 390px with a simulated 59px inset; signed-in Settings preview-to-upgrade-to-purchase verified. Isolated fictional mandala fullscreen checked at 390x844 and 844x390 without changing membership. Cosmic fullscreen was source-reviewed only; physical iOS/Android, full OAuth, actual payment and publication remain unverified/not performed.
+
 ## iOS input, safe area and public purchase flow (2026-11-24)
 - [x] Protect top controls, dialogs and tester bar from iOS safe areas without double spacing; measure the entire border box after inset changes.
 - [x] Preserve Japanese composition unchanged and suppress keyboard commands during conversion.
