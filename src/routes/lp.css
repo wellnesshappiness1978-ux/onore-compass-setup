@@ -120,3 +120,9 @@
   .lp-nav { flex-shrink: 0; }
   .lp-nav .lp-store { display: none; }
 }
+@media(min-width:769px) and (max-width:1100px) {
+  .lp-brand { white-space: nowrap; flex-shrink: 0; }
+  .lp-nav { gap: 14px; }
+  .lp-nav a { white-space: nowrap; }
+  .lp-nav .lp-nav-detail { display: none; }
+}

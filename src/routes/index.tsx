@@ -8,7 +8,8 @@ const STORE_NOTICE = 'ネイティブアプリ版は近日公開予定です。�
 import { billingPlans } from '@/lib/billing-plans';
 import { getPlanConsultationLimit } from '@/lib/plan-usage';
 import cover from '@/assets/lp-compass-universe.jpg';
-import logo from '@/assets/agolmen-logo-shell.png';
+import logoAsset from '@/assets/agolmen-v10-compass-final.png.asset.json';
+const logo = logoAsset.url;
 import mandala from '@/assets/mandala-base-vivid.jpg';
 import food from '@/assets/dish-bamboo-rice.jpg';
 import './lp.css';
@@ -16,7 +17,7 @@ import './lp.css';
 const title = 'アゴルメンの羅針盤 | 17の占術とAIで、自分を知る';
 const description = '17の多層統合占術とAI解析、7つのバースカラーと曼陀羅アート、毎日の指針と相性分析。アゴルメンの羅針盤の公式サイト。';
 export const Route = createFileRoute('/')({
-  head: () => ({ meta: [{ title }, { name: 'description', content: description }, { property: 'og:title', content: title }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { property: 'og:url', content: 'https://cosmic-beginnings-onboard.lovable.app/' }, { name: 'twitter:card', content: 'summary_large_image' }, { name: 'theme-color', content: '#0B0B0E' }], links: [{ rel: 'canonical', href: 'https://cosmic-beginnings-onboard.lovable.app/' }] }),
+  head: () => ({ meta: [{ title }, { name: 'description', content: description }, { property: 'og:title', content: title }, { property: 'og:description', content: description }, { property: 'og:type', content: 'website' }, { property: 'og:url', content: 'https://agolmen-compass.com/' }, { name: 'twitter:card', content: 'summary_large_image' }, { name: 'theme-color', content: '#0B0B0E' }], links: [{ rel: 'canonical', href: 'https://agolmen-compass.com/' }] }),
   component: OfficialLandingPage,
 });
 
