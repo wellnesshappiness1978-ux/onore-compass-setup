@@ -2,6 +2,9 @@ import { useEffect, useRef } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { ArrowDown, ArrowUpRight, Check, Compass, Fingerprint, Layers3, MessageCircle, Orbit, Play, Users, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+
+const STORE_NOTICE = 'ネイティブアプリ版は近日公開予定です。現在は上の『今すぐWebでアプリを始める』から全機能をご利用いただけます';
 import { billingPlans } from '@/lib/billing-plans';
 import { getPlanConsultationLimit } from '@/lib/plan-usage';
 import cover from '@/assets/lp-compass-universe.jpg';
@@ -18,7 +21,7 @@ export const Route = createFileRoute('/')({
 });
 
 function StoreButtons() {
-  return <><div className="lp-stores"><Button asChild variant="outline" className="lp-store"><a href="#" aria-label="App Store ダウンロード（近日公開予定）"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 3.3c.8-1 1.2-2.1 1.1-3.3-1.2.1-2.5.8-3.3 1.7-.7.8-1.3 2-1.2 3.2 1.3.1 2.6-.6 3.4-1.6ZM20.6 17.7c-.5 1.2-.8 1.7-1.5 2.7-1 1.5-2.4 3.3-4.1 3.3-1.5 0-1.9-1-3.9-1-2 0-2.4 1-3.9 1-1.7 0-3-1.6-4-3.1C.5 16.5-.2 11.1 1.5 8.3c1.2-2 3.1-3.1 5-3.1 1.6 0 2.7 1 4 1 1.3 0 2.3-1 4.1-1 1.5 0 3.1.8 4.3 2.2-3.8 2.1-3.2 7.7 1.7 10.3Z"/></svg><span><small>近日公開予定（準備中）</small><b>App Store</b></span></a></Button><Button asChild variant="outline" className="lp-store"><a href="#" aria-label="Google Play ダウンロード（近日公開予定）"><Play aria-hidden="true"/><span><small>近日公開予定（準備中）</small><b>Google Play</b></span></a></Button></div><p className="lp-release">iOS / Android アプリは現在審査中です。</p></>;
+  return <><div className="lp-stores"><Button type="button" variant="outline" className="lp-store" aria-label="App Store（近日公開予定）" onClick={() => toast.info(STORE_NOTICE)}><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 3.3c.8-1 1.2-2.1 1.1-3.3-1.2.1-2.5.8-3.3 1.7-.7.8-1.3 2-1.2 3.2 1.3.1 2.6-.6 3.4-1.6ZM20.6 17.7c-.5 1.2-.8 1.7-1.5 2.7-1 1.5-2.4 3.3-4.1 3.3-1.5 0-1.9-1-3.9-1-2 0-2.4 1-3.9 1-1.7 0-3-1.6-4-3.1C.5 16.5-.2 11.1 1.5 8.3c1.2-2 3.1-3.1 5-3.1 1.6 0 2.7 1 4 1 1.3 0 2.3-1 4.1-1 1.5 0 3.1.8 4.3 2.2-3.8 2.1-3.2 7.7 1.7 10.3Z"/></svg><span><small>近日公開予定（準備中）</small><b>App Store</b></span></Button><Button type="button" variant="outline" className="lp-store" aria-label="Google Play（近日公開予定）" onClick={() => toast.info(STORE_NOTICE)}><Play aria-hidden="true"/><span><small>近日公開予定（準備中）</small><b>Google Play</b></span></Button></div><p className="lp-release">iOS / Android アプリは現在審査中です。</p></>;
 }
 
 function OfficialLandingPage() {
