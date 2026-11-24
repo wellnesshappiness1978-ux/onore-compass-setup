@@ -152,15 +152,6 @@ export default function SettingsPanel({
     setActiveIndex(index);
   };
   const previewPlan = usePlan();
-  const demoCopy: Record<Language, { badge: string; toast: string }> = {
-    ja: { badge: "各プランの登録受付は準備中です（表示確認用）", toast: "現在は表示確認用のデモモードです。決済・契約は行われません。" },
-    en: { badge: "Plan sign-up is coming soon (preview only)", toast: "This is a preview demo. No payment or contract is made." },
-    "zh-CN": { badge: "各方案的注册即将开放（仅供预览）", toast: "当前为预览演示模式，不会进行付款或签约。" },
-    "zh-TW": { badge: "各方案的註冊即將開放（僅供預覽）", toast: "目前為預覽示範模式，不會進行付款或簽約。" },
-    ko: { badge: "각 플랜 가입은 준비 중입니다 (표시 확인용)", toast: "현재 표시 확인용 데모 모드입니다. 결제나 계약은 진행되지 않습니다." },
-    es: { badge: "La suscripción a los planes llegará pronto (solo vista previa)", toast: "Modo demo de vista previa. No se realiza ningún pago ni contrato." },
-    fr: { badge: "L’inscription aux forfaits arrive bientôt (aperçu uniquement)", toast: "Mode démo d’aperçu. Aucun paiement ni contrat n’est effectué." },
-  };
   const planLabel = appearanceCopy.plans[plan];
   const birth = [
     profile.birthDate || "—",

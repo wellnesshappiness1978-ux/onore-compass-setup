@@ -1,9 +1,11 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { isImeInput } from "@/lib/ime-input";
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+  ({ className, type, onKeyDown, onCompositionStart, onCompositionEnd, ...props }, ref) => {
+    const composing = React.useRef(false);
     return (
       <input
         type={type}
@@ -13,6 +15,9 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
         )}
         ref={ref}
         {...props}
+        onCompositionStart={event => { composing.current = true; onCompositionStart?.(event); }}
+        onCompositionEnd={event => { composing.current = false; onCompositionEnd?.(event); }}
+        onKeyDown={event => { if (!isImeInput(event.nativeEvent, composing.current)) onKeyDown?.(event); }}
       />
     );
   },

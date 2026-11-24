@@ -1,5 +1,11 @@
 # Roadmap
 
+## iOS input, safe area and public purchase flow (2026-11-24)
+- [x] Protect top controls, dialogs and tester bar from iOS safe areas without double spacing; measure the entire border box after inset changes.
+- [x] Preserve Japanese composition unchanged and suppress keyboard commands during conversion.
+- [x] Remove obsolete demo copy; allow guest selection with account verification only before recurring Checkout, offering Google and Lovable.
+- [x] 556 tests passed and automatic build OK; guest widths 390/586/1280, name composition, consultation conversion, simulated 59px inset and signed-in Stripe Checkout destination verified. No payment submitted; physical iOS/Android and full external OAuth not tested; not published.
+
 ## Purchase consent placement (2026-11-19)
 - [x] Move agreement into each paid card and immediately above final checkout, with shared localized legal links and visible required styling; remove the bottom agreement.
 - [x] Keep unchecked purchase actions interactive for inline warning/focus; guard selection and checkout, scope agreement per plan and reset on period change.

@@ -34,10 +34,11 @@ export default function DebugPlanSwitcher({ plan, language, onChanged }: { plan:
     const el = barRef.current;
     if (!el) return;
     const root = document.documentElement;
-    const apply = () => root.style.setProperty("--preview-bar-height", `${Math.round(el.getBoundingClientRect().height)}px`);
+    const apply = () => root.style.setProperty("--preview-bar-height", `${Math.ceil(el.getBoundingClientRect().height)}px`);
     apply();
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(apply);
-    observer?.observe(el);
+    // Safe-area padding can change without changing the content box (rotation/WebView insets).
+    observer?.observe(el, { box: "border-box" });
     window.addEventListener("resize", apply);
     return () => {
       observer?.disconnect();

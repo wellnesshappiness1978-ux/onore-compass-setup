@@ -40,6 +40,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { isImeInput } from "@/lib/ime-input";
 import type { ChatStatus, FileUIPart, SourceDocumentUIPart } from "ai";
 import {
   CornerDownLeftIcon,
@@ -956,6 +957,8 @@ export type PromptInputTextareaProps = ComponentProps<
 export const PromptInputTextarea = ({
   onChange,
   onKeyDown,
+  onCompositionStart,
+  onCompositionEnd,
   className,
   placeholder = "What would you like to know?",
   ...props
@@ -966,6 +969,8 @@ export const PromptInputTextarea = ({
 
   const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = useCallback(
     (e) => {
+      // Conversion keys must never submit, remove attachments or invoke commands.
+      if (isImeInput(e.nativeEvent, isComposing)) return;
       // Call the external onKeyDown handler first
       onKeyDown?.(e);
 
@@ -1038,8 +1043,8 @@ export const PromptInputTextarea = ({
     [attachments]
   );
 
-  const handleCompositionEnd = useCallback(() => setIsComposing(false), []);
-  const handleCompositionStart = useCallback(() => setIsComposing(true), []);
+  const handleCompositionEnd: React.CompositionEventHandler<HTMLTextAreaElement> = useCallback((event) => { setIsComposing(false); onCompositionEnd?.(event); }, [onCompositionEnd]);
+  const handleCompositionStart: React.CompositionEventHandler<HTMLTextAreaElement> = useCallback((event) => { setIsComposing(true); onCompositionStart?.(event); }, [onCompositionStart]);
 
   const controlledProps = controller
     ? {

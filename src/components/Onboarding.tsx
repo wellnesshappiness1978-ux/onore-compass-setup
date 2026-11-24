@@ -10,7 +10,7 @@ import { translations, type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { AgolmenLoading, AgolmenLogo } from "./AgolmenSpiral";
-import { finalizePersonalName, formatPersonalName } from "@/lib/name-format";
+import { finalizePersonalName } from "@/lib/name-format";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
 
 export type UserProfile = {
@@ -166,16 +166,16 @@ export default function Onboarding({ onComplete, language, signedIn, initialProf
               <div className="space-y-4">
                 <div>
                   <label htmlFor="name-kanji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKanji} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
-                  <input id="name-kanji" maxLength={40} placeholder={ui.placeholders.nameKanji} value={profile.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} className={inputClass} />
+                  <input id="name-kanji" maxLength={40} placeholder={ui.placeholders.nameKanji} value={profile.nameKanji} onChange={(e) => set("nameKanji", e.target.value)} onBlur={(e) => set("nameKanji", finalizePersonalName(e.target.value))} className={inputClass} />
                 </div>
                 <div>
                   <label htmlFor="name-kana" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameKana} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
-                  <input id="name-kana" maxLength={60} placeholder={ui.placeholders.nameKana} value={profile.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} className={inputClass} />
+                  <input id="name-kana" maxLength={60} placeholder={ui.placeholders.nameKana} value={profile.nameKana} onChange={(e) => set("nameKana", e.target.value)} onBlur={(e) => set("nameKana", finalizePersonalName(e.target.value))} className={inputClass} />
                   {profile.nameKana && !/^[\u3041-\u309F\u30FC\s]+$/.test(profile.nameKana.trim()) && <p role="alert" className="mt-1 text-xs text-destructive">{ui.kanaError}</p>}
                 </div>
                 <div>
                   <label htmlFor="name-romaji" className="mb-2 block font-serif text-sm font-semibold text-primary">{pt.nameRomaji} <span className="text-xs font-normal text-primary/70">{t.required}</span></label>
-                  <input id="name-romaji" maxLength={60} placeholder={ui.placeholders.nameRomaji} value={profile.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} className={inputClass} />
+                  <input id="name-romaji" maxLength={60} placeholder={ui.placeholders.nameRomaji} value={profile.nameRomaji} onChange={(e) => set("nameRomaji", e.target.value)} onBlur={(e) => set("nameRomaji", finalizePersonalName(e.target.value, true))} className={inputClass} />
                   {profile.nameRomaji && !/^[A-Za-z][A-Za-z\s'-]*$/.test(profile.nameRomaji.trim()) && <p role="alert" className="mt-1 text-xs text-destructive">{pt.romajiError}</p>}
                   <p className="mt-1 text-xs text-muted-foreground">{pt.romajiHint}</p>
                 </div>

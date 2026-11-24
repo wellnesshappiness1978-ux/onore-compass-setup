@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { InvitationCodeForm } from '@/components/InvitationCodeForm';
 import { PurchaseConsent } from '@/components/PurchaseConsent';
 import { withPurchaseConsent } from '@/lib/purchase-consent';
+import { purchaseAccessCopy, purchaseAction, purchaseSelection } from '@/lib/purchase-access';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 import { billingPlans, type BillingPlan } from '@/lib/billing-plans';
@@ -23,7 +24,10 @@ import type { BillingErrorCode } from '@/lib/billing-errors';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 export const Route = createFileRoute('/purchase')({
- validateSearch: (s: Record<string, unknown>): { session_id?: string; canceled?: boolean } => ({ ...(typeof s['session_id'] === 'string' && /^cs_(test_|live_)?[a-zA-Z0-9]+$/.test(s['session_id']) ? {session_id:s['session_id']} : {}), ...(s['canceled'] === 'true' || s['canceled'] === true ? {canceled:true} : {}) }),
+ validateSearch: (s: Record<string, unknown>): { session_id?: string; canceled?: boolean; plan?: BillingPlan; yearly?: boolean } => {
+   const plan = purchaseSelection(s['plan']);
+   return { ...(typeof s['session_id'] === 'string' && /^cs_(test_|live_)?[a-zA-Z0-9]+$/.test(s['session_id']) ? {session_id:s['session_id']} : {}), ...(s['canceled'] === 'true' || s['canceled'] === true ? {canceled:true} : {}), ...(plan ? { plan, yearly: s['yearly'] === 'true' || s['yearly'] === true } : {}) };
+ },
  head: () => ({ meta: [{ title:'会員登録・プラン購入 | アゴルメンの羅針盤' },{ name:'description',content:'スタンダード・VIP・ファミリーの料金を比較し、Stripeで安全に会員登録。' },{ property:'og:title',content:'会員登録・プラン購入 | アゴルメンの羅針盤' },{ property:'og:description',content:'有料プランの料金比較・購入・契約管理。' },{ property:'og:type',content:'website' },{ name:'twitter:card',content:'summary_large_image' }] }),
  component: Purchase,
 });
@@ -45,6 +49,7 @@ function Purchase() {
  const checkout = useServerFn(createBillingCheckout);
  const portal = useServerFn(createBillingPortal);
  const t = billingCopy[language];
+ const access = purchaseAccessCopy[language];
  const names = appearanceUiCopy[language].plans;
  const updateConsent = (entry: BillingPlan, value: boolean) => {
    setConsents(previous => ({ ...previous, [entry]: value }));
@@ -65,6 +70,7 @@ function Purchase() {
  }, [check,search.session_id]);
  useEffect(() => {
    setLanguage(storedLanguage());
+   if (search.plan) { setSelected(search.plan); setYearly(search.yearly === true); }
    let active = true;
    const load = async () => {
      const { data } = await supabase.auth.getUser();
@@ -77,8 +83,18 @@ function Purchase() {
      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') window.setTimeout(() => { if (active) void load(); },0);
    });
    return () => { active=false; subscription.unsubscribe(); };
- },[refresh]);
+ },[refresh,search.plan,search.yearly]);
+ const signIn = async (provider: 'google' | 'lovable') => {
+   setBusy('signin'); setMessage(null);
+   try {
+     const redirect = new URL('/purchase', window.location.origin);
+     if (selected) { redirect.searchParams.set('plan', selected); redirect.searchParams.set('yearly', String(yearly)); }
+     const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: redirect.href });
+     if (result.error) { setErrorCode('network'); setMessage('error'); }
+   } catch { setErrorCode('network'); setMessage('error'); } finally { setBusy(null); }
+ };
  const open = async (selected?: BillingPlan) => {
+   if (purchaseAction(signedIn) === 'signin') return;
    setBusy(selected ?? 'portal'); setMessage(null);
    try {
      const result = selected ? await checkout({ data:{ plan:selected,yearly } }) : await portal();
@@ -88,7 +104,7 @@ function Purchase() {
      window.location.href=result.url; return;
    } catch { setErrorCode('network'); setMessage('error'); } finally { setBusy(null); }
  };
- return <main className="design-canvas mx-auto min-h-screen max-w-5xl px-4 py-8 text-foreground sm:px-8">
+ return <main className="design-canvas safe-page mx-auto min-h-screen max-w-5xl px-4 py-8 text-foreground sm:px-8">
    <Button asChild variant="ghost" className="mb-6"><Link to="/app"><ArrowLeft className="size-4" />{t.return}</Link></Button>
    <header className="mb-8 flex min-w-0 items-center gap-4 border-b border-primary/25 pb-6">
      <img src={logo} alt="" className="size-16 shrink-0 object-contain" />
@@ -100,7 +116,7 @@ function Purchase() {
      <p className="text-sm">{t.current}: <strong className="text-primary">{names[plan]}</strong></p>
      <div role="radiogroup" aria-label={t.title} className="flex gap-2">{[false,true].map(value=><Button key={String(value)} variant={yearly===value?'default':'outline'} role="radio" aria-checked={yearly===value} onClick={()=>{setYearly(value);setConsents({});setConsentError(null);}}>{value?t.yearly:t.monthly}</Button>)}</div>
    </div>
-   {!signedIn && <Button disabled={!ready || busy!==null} className="mb-6 min-h-11 h-auto whitespace-normal" onClick={async()=>{setBusy('signin');try {const result=await lovable.auth.signInWithOAuth('google',{ redirect_uri:`${window.location.origin}/purchase` });if(result.error)setMessage('error');}catch{setMessage('error');}finally{setBusy(null);}}}><ShieldCheck className="size-4" />{ready?t.signin:t.loading}</Button>}
+   {!signedIn && <p className="mb-6 text-sm leading-relaxed text-muted-foreground">{access.guest}</p>}
    <div className="grid min-w-0 gap-4 md:grid-cols-2">
      <article className="rounded-lg border border-primary/25 bg-card p-5"><h2 className="font-serif text-xl">{names.free}</h2><p className="my-4 text-3xl text-primary">¥0</p><ul className="space-y-2 text-sm">{planBenefits('free',language).map(f=><li key={f}>・{f}</li>)}</ul></article>
      {billingPlans.map(entry=>{
@@ -113,7 +129,7 @@ function Purchase() {
          <ul className="mb-5 flex-1 space-y-2 text-sm leading-relaxed">{details?.features.map(f=><li key={f} className="break-words">・{f}</li>)}</ul>
          <div className="space-y-3">
            <PurchaseConsent id={`consent-${entry.plan}`} language={language} checked={consents[entry.plan] === true} error={consentError === `consent-${entry.plan}`} onChange={value => updateConsent(entry.plan, value)} />
-           <Button className="h-auto min-h-12 w-full whitespace-normal" disabled={!signedIn || busy!==null || !price} onClick={()=>requireConsent(entry.plan, `consent-${entry.plan}`, ()=>{setMessage(null);setConsentError(null);setSelected(entry.plan);})}><CreditCard className="size-4 shrink-0" />{t.pay}</Button>
+           <Button className="h-auto min-h-12 w-full whitespace-normal" disabled={busy!==null || !price} onClick={()=>requireConsent(entry.plan, `consent-${entry.plan}`, ()=>{setMessage(null);setConsentError(null);setSelected(entry.plan);})}><CreditCard className="size-4 shrink-0" />{t.pay}</Button>
          </div>
        </article>;
      })}
@@ -126,7 +142,10 @@ function Purchase() {
    </section>
    <Dialog open={selected!==null} onOpenChange={v=>{if(!v&&busy===null){setSelected(null);setConsentError(null);}}}><DialogContent className="max-h-[90dvh] overflow-y-auto"><DialogTitle>{planBenefitsCopy[language].confirm}</DialogTitle><DialogDescription>{selected ? names[selected] : ''} · ¥{selected ? (yearly ? billingPlans.find(p=>p.plan===selected)?.yearly?.amount : billingPlans.find(p=>p.plan===selected)?.monthly.amount)?.toLocaleString('ja-JP') : ''} / {yearly?t.yearly:t.monthly}</DialogDescription>{selected && <ul className="space-y-3 text-sm leading-relaxed">{planBenefits(selected,language).map(f=><li key={f}>・{f}</li>)}</ul>}<p className="text-sm text-muted-foreground">{t.notice}</p>{message==='error'&&<p role="alert" className="text-sm text-primary">{billingErrorText(language,errorCode)}</p>}{selected && <div className="sticky -bottom-6 space-y-3 border-t border-border bg-background py-4">
      <PurchaseConsent id="consent-checkout" language={language} checked={consents[selected] === true} error={consentError === 'consent-checkout'} onChange={value => updateConsent(selected, value)} />
-     <Button disabled={busy!==null} className="h-auto min-h-12 w-full whitespace-normal" onClick={()=>requireConsent(selected, 'consent-checkout', ()=>void open(selected))}>{busy?<LoaderCircle className="size-4 animate-spin"/>:<CreditCard className="size-4"/>}{t.pay}</Button>
+     {signedIn ? <Button disabled={busy!==null} className="h-auto min-h-12 w-full whitespace-normal" onClick={()=>requireConsent(selected, 'consent-checkout', ()=>void open(selected))}>{busy?<LoaderCircle className="size-4 animate-spin"/>:<CreditCard className="size-4"/>}{t.pay}</Button> : <div className="space-y-3">
+       <p className="text-sm leading-relaxed text-muted-foreground">{access.account}</p>
+       <div className="grid gap-2 sm:grid-cols-2">{(['google','lovable'] as const).map(provider => <Button key={provider} variant={provider === 'google' ? 'outline' : 'default'} disabled={!ready || busy!==null} className="h-auto min-h-12 whitespace-normal" onClick={()=>requireConsent(selected, 'consent-checkout', ()=>void signIn(provider))}>{busy ? <LoaderCircle className="size-4 shrink-0 animate-spin"/> : <ShieldCheck className="size-4 shrink-0"/>}{access[provider]}</Button>)}</div>
+     </div>}
    </div>}</DialogContent></Dialog>
  </main>;
 }

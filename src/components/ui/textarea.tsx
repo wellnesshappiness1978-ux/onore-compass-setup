@@ -1,9 +1,11 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { isImeInput } from "@/lib/ime-input";
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<"textarea">>(
-  ({ className, ...props }, ref) => {
+  ({ className, onKeyDown, onCompositionStart, onCompositionEnd, ...props }, ref) => {
+    const composing = React.useRef(false);
     return (
       <textarea
         className={cn(
@@ -12,6 +14,9 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<"tex
         )}
         ref={ref}
         {...props}
+        onCompositionStart={event => { composing.current = true; onCompositionStart?.(event); }}
+        onCompositionEnd={event => { composing.current = false; onCompositionEnd?.(event); }}
+        onKeyDown={event => { if (!isImeInput(event.nativeEvent, composing.current)) onKeyDown?.(event); }}
       />
     );
   },

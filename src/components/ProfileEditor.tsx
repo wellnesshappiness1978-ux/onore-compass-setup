@@ -11,7 +11,7 @@ import { type Language } from "@/lib/translations";
 import { profileTranslations } from "@/lib/profile-translations";
 import { profileStorageCopy } from "@/lib/profile-storage-copy";
 import { getFiveElements } from "@/lib/ai/five-elements";
-import { finalizePersonalName, formatPersonalName } from "@/lib/name-format";
+import { finalizePersonalName } from "@/lib/name-format";
 import { profileUiCopy } from "@/lib/profile-ui-copy";
 
 const ROMAJI = /^[A-Za-z][A-Za-z\s'-]*$/;
@@ -59,11 +59,11 @@ export default function ProfileEditor({
       <p className="mt-3 text-xs text-muted-foreground">{t.cardHint}</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div><label className={label} htmlFor="pe-kanji">{t.nameKanji}</label>
-          <input id="pe-kanji" className={inputClass} maxLength={40} placeholder={ui.placeholders.nameKanji} value={draft.nameKanji} onChange={(e) => set("nameKanji", formatPersonalName(e.target.value))} /></div>
+          <input id="pe-kanji" className={inputClass} maxLength={40} placeholder={ui.placeholders.nameKanji} value={draft.nameKanji} onChange={(e) => set("nameKanji", e.target.value)} onBlur={(e) => set("nameKanji", finalizePersonalName(e.target.value))} /></div>
         <div><label className={label} htmlFor="pe-kana">{t.nameKana}</label>
-          <input id="pe-kana" className={inputClass} maxLength={60} placeholder={ui.placeholders.nameKana} value={draft.nameKana} onChange={(e) => set("nameKana", formatPersonalName(e.target.value))} /></div>
+          <input id="pe-kana" className={inputClass} maxLength={60} placeholder={ui.placeholders.nameKana} value={draft.nameKana} onChange={(e) => set("nameKana", e.target.value)} onBlur={(e) => set("nameKana", finalizePersonalName(e.target.value))} /></div>
         <div className="sm:col-span-2"><label className={label} htmlFor="pe-romaji">{t.nameRomaji}</label>
-          <input id="pe-romaji" className={`${inputClass} uppercase`} maxLength={60} placeholder={ui.placeholders.nameRomaji} value={draft.nameRomaji} onChange={(e) => set("nameRomaji", formatPersonalName(e.target.value, true))} />
+          <input id="pe-romaji" className={`${inputClass} uppercase`} maxLength={60} placeholder={ui.placeholders.nameRomaji} value={draft.nameRomaji} onChange={(e) => set("nameRomaji", e.target.value)} onBlur={(e) => set("nameRomaji", finalizePersonalName(e.target.value, true))} />
           <p className="mt-1 text-[11px] text-muted-foreground">{t.romajiHint}</p></div>
         <div><label className={label} htmlFor="pe-gender">{storage.gender}</label>
           <select id="pe-gender" className={inputClass} value={draft.gender} onChange={(e) => set("gender", e.target.value as UserProfile["gender"])}><option value="undisclosed">{storage.undisclosed}</option><option value="female">{storage.female}</option><option value="male">{storage.male}</option><option value="other">{storage.other}</option></select></div>

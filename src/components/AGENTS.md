@@ -1,4 +1,6 @@
 # UI and feature rules
+- Text fields keep native composing values through one onChange; name normalization waits for blur/save and IME keys never trigger commands. Why: prevent Safari composition duplication and accidental sends.
+- Purchase is public through plan selection; recurring Checkout still verifies a signed-in owner, with provider choice and selected plan/period restored after OAuth. Why: remove browsing friction without orphaned subscriptions.
 - PurchaseConsent stays immediately above each paid action and the sticky confirmation action; unchecked actions remain clickable for localized warning/focus, with per-plan consent reset on billing-period changes. Why: visible agreement without silent checkout blocking.
 - Keep seven stable purpose IDs; all sizes expose five bottom tabs (Traits, Today, Consult, Art, Family) with Home and Settings in a fixed upper bar. Upper-right controls are BGM, language, Settings. Home resets scroll to zero; Family retains the business ID. Why: spacious targets without losing features or legacy state.
 - Compatibility is reflective, not verified; Free/Standard show only overview, signed-in VIP+ unlocks deeper reference prose and explicit four-field AI generation. Export only visible unlocked content. Why: enforce access without overstating calculations.
