@@ -39,7 +39,7 @@ export const Route = createFileRoute("/api/public/jobs/send-push")({
             body: JSON.stringify({ message: {
               token: d.token,
               notification: { title: HEAD[d.language] ?? HEAD["en"], body: due.map((r) => `・${r.title}：${r.body}`).join("\n").slice(0, 1000) },
-              webpush: { notification: { icon: "/pwa-icon-192.png", tag: `onore-summary-${lp.hm}` }, fcm_options: { link: "/" } },
+              webpush: { notification: { icon: "/icon-192.png?v=99", tag: `onore-summary-${lp.hm}` }, fcm_options: { link: "/" } },
             } }),
           });
           if (res.ok) {
