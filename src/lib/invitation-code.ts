@@ -7,7 +7,7 @@ export function detectPlatform(): 'ios' | 'android' | 'web' {
 }
 export const normalizeInvitationCode = (raw: string) => raw.trim().toUpperCase();
 export const invitationMessages: Record<InvitationResult, string> = {
-  ok: 'ファミリープレミアムが適用されました！全機能を無料でお楽しみいただけます',
+  ok: 'テスター特典（VIPアクセス）が解放されました！すべての機能をご自由にお試しいただけます',
   full: '申し訳ありません。このプラットフォームでの先着上限（30名）に達したため終了しました。',
   invalid: '無効なコードか、有効期限が切れています。',
   already: 'このアカウントではすでに招待コードを使用済みです。',

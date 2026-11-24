@@ -45,6 +45,7 @@ import { legalContentByLanguage, type LegalKey } from '@/lib/legal-content';
 import { supportCopy } from '@/lib/support-copy';
 import { createTranslator } from '@/lib/ui-i18n';
 import StripeManagementButton from './StripeManagementButton';
+import { InvitationCodeForm } from './InvitationCodeForm';
 import { helpCopy } from '@/lib/help-copy';
 
 type Props = {
@@ -215,6 +216,7 @@ export default function SettingsPanel({
 
       <section id="membership-plans" className={card}>
         <div className="mb-5"><StripeManagementButton language={language} signedIn={signedIn} /></div>
+        {signedIn && <div className="mb-5"><InvitationCodeForm /></div>}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             <h3 className="font-serif text-xl text-gradient-gold">{pc.sectionTitle}</h3>

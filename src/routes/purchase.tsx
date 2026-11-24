@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, CreditCard, Crown, LoaderCircle, RefreshCw, Settings, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InvitationCodeForm } from '@/components/InvitationCodeForm';
+import { EmailAuthForm } from '@/components/EmailAuthForm';
 import { PurchaseConsent } from '@/components/PurchaseConsent';
 import { withPurchaseConsent } from '@/lib/purchase-consent';
 import { purchaseAccessCopy, purchaseAction, purchaseSelection } from '@/lib/purchase-access';
@@ -84,7 +85,7 @@ function Purchase() {
    });
    return () => { active=false; subscription.unsubscribe(); };
  },[refresh,search.plan,search.yearly]);
- const signIn = async (provider: 'google' | 'lovable') => {
+ const signIn = async (provider: 'google') => {
    setBusy('signin'); setMessage(null);
    try {
      const redirect = new URL('/purchase', window.location.origin);
@@ -144,7 +145,8 @@ function Purchase() {
      <PurchaseConsent id="consent-checkout" language={language} checked={consents[selected] === true} error={consentError === 'consent-checkout'} onChange={value => updateConsent(selected, value)} />
      {signedIn ? <Button disabled={busy!==null} className="h-auto min-h-12 w-full whitespace-normal" onClick={()=>requireConsent(selected, 'consent-checkout', ()=>void open(selected))}>{busy?<LoaderCircle className="size-4 animate-spin"/>:<CreditCard className="size-4"/>}{t.pay}</Button> : <div className="space-y-3">
        <p className="text-sm leading-relaxed text-muted-foreground">{access.account}</p>
-       <div className="grid gap-2 sm:grid-cols-2">{(['google','lovable'] as const).map(provider => <Button key={provider} variant={provider === 'google' ? 'outline' : 'default'} disabled={!ready || busy!==null} className="h-auto min-h-12 whitespace-normal" onClick={()=>requireConsent(selected, 'consent-checkout', ()=>void signIn(provider))}>{busy ? <LoaderCircle className="size-4 shrink-0 animate-spin"/> : <ShieldCheck className="size-4 shrink-0"/>}{access[provider]}</Button>)}</div>
+       <Button variant="outline" disabled={!ready || busy!==null} className="h-auto min-h-12 w-full whitespace-normal" onClick={()=>requireConsent(selected, 'consent-checkout', ()=>void signIn('google'))}>{busy ? <LoaderCircle className="size-4 shrink-0 animate-spin"/> : <ShieldCheck className="size-4 shrink-0"/>}{access.google}</Button>
+       <EmailAuthForm disabled={!ready || busy!==null} redirectPath={selected ? `/purchase?plan=${selected}&yearly=${yearly}` : '/purchase'} />
      </div>}
    </div>}</DialogContent></Dialog>
  </main>;
