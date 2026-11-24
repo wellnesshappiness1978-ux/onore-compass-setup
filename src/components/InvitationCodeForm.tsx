@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { CLOUD_SYNC_EVENT } from '@/lib/account-sync';
-import { detectPlatform, invitationMessages, normalizeInvitationCode, toInvitationResult, type InvitationResult } from '@/lib/invitation-code';
+import { detectInvitationSlot, invitationMessages, normalizeInvitationCode, toInvitationResult, type InvitationResult } from '@/lib/invitation-code';
 
 export function InvitationCodeForm({ onApplied }: { onApplied?: () => void }) {
   const [code, setCode] = useState('');
@@ -16,7 +16,7 @@ export function InvitationCodeForm({ onApplied }: { onApplied?: () => void }) {
     if (!value) { setResult('invalid'); return; }
     setBusy(true);
     try {
-      const { data, error } = await supabase.rpc('redeem_invitation_code', { p_code: value, p_platform: detectPlatform() });
+      const { data, error } = await supabase.rpc('redeem_invitation_code', { p_code: value, p_platform: detectInvitationSlot() });
       const r = error ? 'error' : toInvitationResult(data);
       setResult(r);
       if (r === 'ok') {
