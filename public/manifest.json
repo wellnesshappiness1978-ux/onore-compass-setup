@@ -1,6 +1,6 @@
 {
   "name": "アゴルメンの羅針盤",
-  "short_name": "アゴルメン",
+  "short_name": "アゴルメンの羅針盤",
   "description": "生年月日・血液型・兄弟構成から、15の占術であなたの本質を解析します。",
   "lang": "ja",
   "display": "standalone",
@@ -21,6 +21,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
